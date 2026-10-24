@@ -8,7 +8,7 @@ import { CAPITAL_BUFFER_PP, DAY_MS, DAYS_PER_WEEK } from '../config/balance';
 import { INCIDENT_SPECS } from '../data/incidents';
 import { isQuarterStart } from '../sim/calendar';
 import { advanceDay } from '../sim/engine';
-import type { GameState } from '../sim/state';
+import type { GameEvent, GameState } from '../sim/state';
 import { homeCountry } from '../sim/treasury';
 import { CAPITAL_BUFFER_POLICY } from '../data/newsWorld';
 import { saveToSlot } from './saves';
@@ -18,8 +18,8 @@ const FRAME_MS = 50;
 let timer: ReturnType<typeof setInterval> | undefined;
 let last = 0;
 let acc = 0;
-/** Event-log length already announced, so each new event toasts once. */
-let seenEvents = 0;
+/** The last event announced, so each new event toasts once. */
+let lastSeen: GameEvent | undefined;
 /** Incidents already shown to the player, so only new cases auto-pause. */
 let promptedCases = new Set<string>();
 /** New cases are waiting for the current modal (weekly results) to close. */
@@ -29,7 +29,7 @@ export function startLoop(): void {
   stopLoop();
   last = performance.now();
   acc = 0;
-  seenEvents = peekGame()?.events.log.length ?? 0;
+  lastSeen = peekGame()?.events.log.at(-1);
   promptedCases = new Set(peekGame()?.incidents.active.map((i) => i.id) ?? []);
   casesWaiting = false;
   timer = setInterval(frame, FRAME_MS);
@@ -166,12 +166,16 @@ const BAD_EVENTS = new Set(['WINDOW_USE', 'BANK_RUN']);
 
 function announceEvents(s: GameState): void {
   const log = s.events.log;
-  if (seenEvents > log.length) seenEvents = 0;
+  // The log drops old weeks every tick, so track the last event announced by
+  // identity rather than by index (trimming keeps the same objects).
+  // If it has aged out of the log (a fast-forward), skip the backlog rather than flood toasts.
+  const at = lastSeen ? log.indexOf(lastSeen) : -1;
+  const from = !lastSeen ? 0 : at >= 0 ? at + 1 : log.length;
   const home = homeCountry(s).id;
-  for (const e of log.slice(seenEvents)) {
+  for (const e of log.slice(from)) {
     if (HOME_ONLY.has(e.type) && e.payload.country !== home) continue;
     const text = EVENT_TEXT[e.type]?.(e.payload);
     if (text) toast(text, BAD_EVENTS.has(e.type) ? 'bad' : 'info');
   }
-  seenEvents = log.length;
+  lastSeen = log.at(-1) ?? lastSeen;
 }

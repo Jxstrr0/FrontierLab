@@ -17,7 +17,7 @@ export interface Partnership {
   productId: string;
   startWeek: Week;
   termWeeks: number;
-  /** Signing fee paid (an intangible asset amortized over the term). */
+  /** Total fees paid: the signing fee plus any renewals (an intangible asset amortized over the term). */
   fee: Money;
   /** Fee not yet amortized: the intangible asset on the balance sheet. */
   unamortized: Money;
