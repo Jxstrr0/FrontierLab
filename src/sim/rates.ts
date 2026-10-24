@@ -4,6 +4,7 @@
 import { CITIES } from '../data/cities';
 import { PRODUCTS, type ProductSpec } from '../data/products';
 import { clamp } from './math';
+import { baseId, productSpec } from './products';
 import type { CountryState, GameState } from './state';
 
 export function ftpShort(c: CountryState): number {
@@ -69,11 +70,15 @@ export function updateMarketRefs(state: GameState): void {
   }
 }
 
-/** Market reference for a product in a city, falling back to the default rule. */
+/**
+ * Market reference for a product in a city, falling back to the default rule.
+ * A developed product compares against its base product's market (× refMult).
+ */
 export function marketRef(state: GameState, cityId: string, productId: string): number {
-  const ref = state.world.cities[cityId]?.marketRef[productId];
-  if (ref !== undefined) return ref;
-  const spec = PRODUCTS[productId];
+  const spec = productSpec(state, productId);
   if (!spec) throw new Error(`Unknown product ${productId}`);
-  return defaultPrice(spec, countryOfCity(state, cityId));
+  const refId = baseId(spec);
+  const ref = state.world.cities[cityId]?.marketRef[refId];
+  const m = ref ?? defaultPrice(PRODUCTS[refId] ?? spec, countryOfCity(state, cityId));
+  return spec.refMult === undefined ? m : m * spec.refMult;
 }

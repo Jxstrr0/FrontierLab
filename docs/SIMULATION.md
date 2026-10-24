@@ -36,7 +36,7 @@ How the economy works, step by step. Every CAPS name is a key in `src/config/bal
    8. branch P&L (§12)
 5. `partnerships.weekly` (§13.7)
 6. `treasury.weekly` (§13)
-7. `hq.weekly`: floors, coverage, benefits, developments (§16)
+7. `hq.weekly`: floors, coverage, benefits, then developments (§16.6) and underwriting models (custom model refresh, switch countdown, §16.7)
 8. Corporate items: offices, executives, brand marketing, real estate, REO, corporate debt, depreciation (§14, §21)
 9. `statements.close`: P&L, cash flow, balance sheet, tax (§14)
 10. `capital.evaluate` and regulator tier (§15)
@@ -633,6 +633,11 @@ If Finance coverage' < 0.9, the newest `ceil((0.9 − k') × 10)` weeks show as 
 - **Cost:** weekly budget × weeks, paid each week.
 - **Duration:** `weeks / max(0.3, productsCoverage')`.
 - **Result:** a new catalog product (template + tier + stars). Enable it at branches, or company-wide with "Apply to all".
+- **Spending and pace:** each week pays `weeklyBudget × progress made`, so the total stays budget × weeks even when a short-staffed team stretches the calendar. Developments pause while there is no Products floor.
+- **Target tier** (`DEV_TIER`): the default price number moves with the tier — rate products −0.10pp / 0 / +0.15pp, fee products ×0.85 / ×1 / ×1.25 — and Premium adds +0.05 to the Products rating where it's offered.
+- **Developed products** are full products with their own id, offers and books. Spec = base product + template modifiers (CONTENT §6) + tier; affinity = base + bumps. The market reference is the base product's (× the fee ratio for templates that set their own fee, e.g. Robo-Advisor, Premium Package). Products rating breadth counts each base product once, covered if it or a variant is offered.
+- **Digital templates** (IT floor required) run once each and create no product: Mobile App 2.0 adds 0.3 to the app rating now and to its target for good (`digitalProjectBonus`, §16.9); Instant Decisions adds 2 to the house model's Speed (capped at 10).
+- **Deleting** a developed product moves its accounts and balances onto the base product's book at each branch.
 
 ### 16.7 Underwriting models
 - **Radar** (1–10 each): Accuracy, Speed, Inclusion, FraudShield, Fairness. Plus `costPerApp`.
@@ -642,7 +647,8 @@ If Finance coverage' < 0.9, the newest `ceil((0.9 − k') × 10)` weeks show as 
   - `cost = Σ w × cost`
   - The Internal History input needs ≥ 5,000 loans booked. Its accuracy = `4 + min(5, loansBooked/20,000 × 5)`.
 - **Bureau-hosted custom model:** like the original's custom blend at a roaster. No Products floor needed; same mix rules, with `qualityMult = 0.95` and cost × 1.15.
-- **Switching models** takes 2 weeks; old and new blend linearly over that time.
+- **Switching models** takes 2 weeks; old and new blend linearly over that time: the old model's weight is `weeksLeft / (MODEL_SWITCH_WEEKS + 1)`, so 2/3 then 1/3, then fully new. Radar and cost per application both blend.
+- Custom models' radars are recomputed every week, so they follow the Products team's coverage and skill and Internal History's growing accuracy. Radar values cap at 10.
 
 ### 16.8 Risk appetite
 Levels 1–5 (Very conservative to Very aggressive):

@@ -127,3 +127,34 @@ export function dcos(x: number): number {
 
 /** Euclidean distance; sqrt is exactly rounded everywhere. */
 export const dhypot = (x: number, y: number) => Math.sqrt(x * x + y * y);
+
+const SQRT_PI = Math.sqrt(Math.PI);
+
+/** Error function: Taylor series below 3, continued fraction for erfc above. */
+export function derf(x: number): number {
+  if (Number.isNaN(x)) return NaN;
+  if (x < 0) return -derf(-x);
+  if (x > 6) return 1;
+  if (x <= 3) {
+    // erf(x) = 2/√π Σ (−1)^n x^(2n+1) / (n! (2n+1)).
+    const x2 = x * x;
+    let term = x;
+    let sum = x;
+    for (let n = 1; n < 200; n++) {
+      term *= -x2 / n;
+      const add = term / (2 * n + 1);
+      sum += add;
+      if (Math.abs(add) < 1e-17 * Math.abs(sum)) break;
+    }
+    return (2 / SQRT_PI) * sum;
+  }
+  // erfc(x) = e^(−x²)/√π · 1/(x + ½/(x + 1/(x + (3/2)/(x + …)))), evaluated backward.
+  let t = x;
+  for (let k = 60; k >= 1; k--) t = x + k / 2 / t;
+  return 1 - dexp(-x * x) / (SQRT_PI * t);
+}
+
+/** Standard normal cumulative distribution Φ(x). */
+export function normalCdf(x: number): number {
+  return 0.5 * (1 + derf(x / Math.SQRT2));
+}

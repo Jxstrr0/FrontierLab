@@ -234,6 +234,8 @@ export interface Company {
   riskAppetite: 1 | 2 | 3 | 4 | 5;
   applyRatesToAll: boolean;
   companyPrices: Record<string, number>;
+  /** HQ product lineup (on/off per product), set by setCompanyOffered. Absent until first used. */
+  companyOffered?: Record<string, boolean>;
 }
 
 export interface FixedAsset {
@@ -516,12 +518,16 @@ export interface Development {
 export interface ProductsState {
   catalog: Record<Id, ProductEntry>;
   developments: Development[];
+  /** Digital templates already completed (each runs once; CONTENT §6). Absent until the first. */
+  digitalDone?: string[];
 }
 
 export interface UnderwritingModel {
   id: Id;
   name: string;
   source: 'bureau' | 'custom';
+  /** Bureau hosting a custom model (no Products floor needed, §16.7). */
+  hostedBy?: string;
   mix: Record<string, number>;
   /** Accuracy, Speed, Inclusion, FraudShield, Fairness (1–10). */
   radar: Pentagon;

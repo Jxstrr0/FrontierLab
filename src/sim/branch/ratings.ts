@@ -20,9 +20,7 @@ import {
   WINDOW_STIGMA,
 } from '../../config/balance';
 import { BUILD_SLOTS, EQUIPMENT } from '../../data/equipment';
-import { PRODUCTS } from '../../data/products';
 import { CAMPAIGN_REVIEW_LINES, REVIEW_LINES } from '../../data/reviews';
-import { AFFINITY } from '../../data/segments';
 import { SEGMENTS, type RatingCategory } from '../../data/types';
 import { clamp, ema } from '../math';
 import { marketRef } from '../rates';
@@ -33,11 +31,21 @@ import type { CampaignEffects } from './marketing';
 import { branchPrice, competitiveness, isOffered } from './pricing';
 import { managerOf } from './staff';
 import { cityBrandBonus } from '../hqMarketing';
+import {
+  affinityOf,
+  allProducts,
+  BASE_PRODUCTS,
+  baseId,
+  developedEntries,
+  productSpec,
+  starsOf,
+} from '../products';
 
 /** Σ over segments of mix_s × affinity[s][p] at this branch's lot. */
 export function lotAffinity(state: GameState, branch: Branch, productId: string): number {
   const lot = state.world.lots[branch.lotId];
-  const aff = AFFINITY[productId];
+  const spec = productSpec(state, productId);
+  const aff = spec && affinityOf(spec);
   if (!lot || !aff) return 0;
   return SEGMENTS.reduce((sum, s) => sum + lot.mix[s] * aff[s], 0);
 }
@@ -49,7 +57,7 @@ export function ratesTarget(state: GameState, branch: Branch, fx: CampaignEffect
   }
   let wSum = 0;
   let cSum = 0;
-  for (const spec of Object.values(PRODUCTS)) {
+  for (const spec of allProducts(state)) {
     if (!isOffered(branch, spec.id) || spec.kind === 'sbl') continue;
     const bal = Math.abs(branch.books[spec.id]?.balance ?? 0);
     const w = (totalBalance > 0 ? bal / totalBalance : 0) + BALANCE_WEIGHT_FLOOR;
@@ -67,15 +75,25 @@ export function ratesTarget(state: GameState, branch: Branch, fx: CampaignEffect
 export function productsTarget(state: GameState, branch: Branch, fx: CampaignEffects): number {
   let affSum = 0;
   let starSum = 0;
+  let bump = 0;
+  // Breadth counts each base product once, covered if it or a variant is offered.
+  const covered = new Set<string>();
+  for (const spec of allProducts(state)) {
+    if (!isOffered(branch, spec.id)) continue;
+    const aff = lotAffinity(state, branch, spec.id);
+    covered.add(baseId(spec));
+    affSum += aff;
+    starSum += aff * starsOf(state, spec);
+    bump += spec.productsBump ?? 0;
+  }
   let totalAff = 0;
-  for (const spec of Object.values(PRODUCTS)) {
+  let coveredAff = 0;
+  for (const spec of BASE_PRODUCTS) {
     const aff = lotAffinity(state, branch, spec.id);
     totalAff += aff;
-    if (!isOffered(branch, spec.id)) continue;
-    affSum += aff;
-    starSum += aff * (state.products.catalog[spec.id]?.stars ?? spec.startStars);
+    if (covered.has(spec.id)) coveredAff += aff;
   }
-  const share = totalAff > 0 ? affSum / totalAff : 0;
+  const share = totalAff > 0 ? coveredAff / totalAff : 0;
   const breadth =
     share >= PRODUCTS_RATING.breadthGoodShare
       ? PRODUCTS_RATING.breadthGood
@@ -88,7 +106,8 @@ export function productsTarget(state: GameState, branch: Branch, fx: CampaignEff
       breadth +
       PRODUCTS_RATING.app * (state.company.appRating - PRODUCTS_RATING.appBase) +
       PRODUCTS_RATING.model * (modelQuality(activeModel(state)) - PRODUCTS_RATING.modelBase) +
-      fx.bumps.products,
+      fx.bumps.products +
+      bump,
     1,
     5,
   );
@@ -127,7 +146,25 @@ export function branchTarget(state: GameState, branch: Branch, fx: CampaignEffec
     if (over > 0) upkeep += UPKEEP_PENALTY.perStep * Math.floor(over / UPKEEP_PENALTY.stepWeeks);
   }
   const prestige = cityBrandBonus(state, branch.cityId);
-  return clamp(q + fx.bumps.branch + staffMods(state).reputation + prestige - upkeep, 1, 5);
+  return clamp(
+    q +
+      fx.bumps.branch +
+      staffMods(state).reputation +
+      prestige -
+      upkeep +
+      productBranchBump(state, branch),
+    1,
+    5,
+  );
+}
+
+/** Reputation from developed products offered here (e.g. Green GIC, CONTENT §6). */
+function productBranchBump(state: GameState, branch: Branch): number {
+  let bump = 0;
+  for (const e of developedEntries(state)) {
+    if (isOffered(branch, e.id)) bump += productSpec(state, e.id)?.branchBump ?? 0;
+  }
+  return bump;
 }
 
 /** Recomputes targets, eases displayed ratings toward them and adds reviews. */

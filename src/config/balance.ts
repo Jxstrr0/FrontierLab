@@ -527,6 +527,53 @@ export const BENEFIT_FLATTEN = 0.5;
 /** Remote Fridays: HQ effective staff −3%. */
 export const REMOTE_FRIDAY_STAFF = 0.03;
 
+// ─── PRODUCT DEVELOPMENT (§16.6) ──────────────────────────────────────────────
+/** Development terms in weeks and their term score T. */
+export const DEV_TERMS = [4, 8, 12, 24, 48] as const;
+export const DEV_TERM_SCORE: Record<(typeof DEV_TERMS)[number], number> = {
+  4: 0,
+  8: 0.2,
+  12: 0.4,
+  24: 0.7,
+  48: 1,
+};
+/** D = 0.40 T + 0.40 B + 0.20 team. */
+export const DEV_WEIGHTS = { term: 0.4, budget: 0.4, team: 0.2 } as const;
+/** Weekly budget: minimum, and the budget at which B reaches 1 ($5k → 0, $500k → 1). */
+export const DEV_MIN_WEEKLY = 5_000;
+export const DEV_MAX_BUDGET_SCORE_AT = 500_000;
+export const DEV_BUDGET_STEP = 1_000;
+/** team score while there's no Products floor. */
+export const DEV_NO_FLOOR_TEAM = 0.5;
+/** Star odds: normal with μ = base + slope × D and σ = DEV_SIGMA. */
+export const DEV_MU = { base: 1.79, slope: 2.6 } as const;
+export const DEV_SIGMA = 0.9;
+export const DEV_MAX_STARS = 5;
+/**
+ * Target tier (decision log, DESIGN §7): the default price number moves with the
+ * tier — rates −0.10pp / 0 / +0.15pp (CONTENT §6 senior_saver), fees ×0.85 / 1 /
+ * ×1.25 — and Premium adds a small Products rating bump where it's offered.
+ */
+export const DEV_TIER = {
+  rateAdd: { low: -0.001, medium: 0, premium: 0.0015 },
+  feeMult: { low: 0.85, medium: 1, premium: 1.25 },
+  productsBump: { low: 0, medium: 0, premium: 0.05 },
+} as const;
+export const PRODUCT_NAME_MAX = 32;
+
+// ─── UNDERWRITING MODELS (§16.7) ──────────────────────────────────────────────
+/** Custom model quality: 0.9 + 0.2 × productsCoverage′ × avgSkill/100. */
+export const MODEL_QUALITY = { base: 0.9, slope: 0.2 } as const;
+/** Bureau-hosted custom model: fixed quality and a 15% hosting markup. */
+export const BUREAU_HOSTED = { qualityMult: 0.95, costMult: 1.15 } as const;
+/** Internal History accuracy = 4 + min(5, loansBooked / 20,000 × 5). */
+export const INTERNAL_HISTORY = { accuracyBase: 4, accuracyGain: 5, fullLoans: 20_000 } as const;
+export const MODEL_SWITCH_WEEKS = 2;
+/** Mix weights must sum to 1 within this tolerance (sliders in whole percent). */
+export const MODEL_MIX_TOLERANCE = 0.005;
+export const MODEL_RADAR_MAX = 10;
+export const MODEL_NAME_MAX = 32;
+
 // ─── IT (§16.9) ───────────────────────────────────────────────────────────────
 export const APP_RATING = {
   base: 2.0,

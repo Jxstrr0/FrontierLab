@@ -1,5 +1,5 @@
 // The v1 product catalog (docs/CONTENT.md §5).
-import type { CategoryId } from './types';
+import type { CategoryId, SegmentId } from './types';
 
 /** How a product's balances behave in the books (SIMULATION §10). */
 export type ProductKind =
@@ -51,6 +51,22 @@ export interface ProductSpec {
   spendPerMonth?: number;
   annualFee?: number;
   startStars: number;
+  // Developed products only (SIMULATION §16.6, built in src/sim/products.ts):
+  /** The base product this one was developed from. */
+  base?: string;
+  /** Affinity per segment; base products read AFFINITY in segments.ts. */
+  affinity?: Record<SegmentId, number>;
+  /** × take-up probability q (§9.6). */
+  takeUpMult?: number;
+  /** Interchange rate on card spend, replacing INTERCHANGE. */
+  interchange?: number;
+  /** Wealth product that needs no advisor offices. */
+  noAdvisorOffice?: boolean;
+  /** Branch and Products rating bumps where it's offered. */
+  branchBump?: number;
+  productsBump?: number;
+  /** Market reference = the base product's × this (fee templates that set their own fee). */
+  refMult?: number;
 }
 
 export const PRODUCTS: Record<string, ProductSpec> = {

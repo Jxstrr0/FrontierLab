@@ -13,7 +13,7 @@ import {
 } from '../../config/balance';
 import { CAMPAIGNS } from '../../data/campaigns';
 import { EQUIPMENT } from '../../data/equipment';
-import { PRODUCTS, type ProductSpec } from '../../data/products';
+import type { ProductSpec } from '../../data/products';
 import { loanDemand } from '../macro';
 import { clamp, roundToStep } from '../math';
 import { countryOfCity, defaultPrice, ftpFor, marketRef } from '../rates';
@@ -24,6 +24,7 @@ import { lotAffinity } from './ratings';
 import { managerOf, marketWage, staffNeeded } from './staff';
 import { difficultyOf } from '../difficulty';
 import { dpow } from '../detmath';
+import { allProducts, baseId } from '../products';
 
 /** Campaigns a delegated manager weighs by awareness return. */
 const AWARENESS_CAMPAIGNS = [
@@ -79,7 +80,7 @@ export function delegatedPrice(
     } else {
       price = m - offset;
       const spread = def - ftp;
-      if (spread > 0 && spec.id !== 'credit_card')
+      if (spread > 0 && baseId(spec) !== 'credit_card')
         price = Math.max(price, ftp + DELEGATE.minMarginShare * spread);
     }
     price += error;
@@ -90,7 +91,7 @@ export function delegatedPrice(
 function delegatePricing(state: GameState, branch: Branch, productSkill: number): void {
   const offices = EQUIPMENT[branch.build.lobby]?.advisorOffices ?? 0;
   const boxes = EQUIPMENT[branch.build.vault]?.boxes ?? 0;
-  for (const spec of Object.values(PRODUCTS)) {
+  for (const spec of allProducts(state)) {
     const slot = (branch.offered[spec.id] ??= { on: false, price: 0 });
     let on = spec.kind === 'sbl' || lotAffinity(state, branch, spec.id) >= DELEGATE.minAffinity;
     if (spec.kind === 'wealth' && offices === 0) on = false;
