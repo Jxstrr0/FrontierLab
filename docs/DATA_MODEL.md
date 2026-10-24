@@ -323,3 +323,23 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 | Incidents | `resolveIncident(id, optionId)` |
 | Personal | `buyHome`, `rebuildHome`, `buyCar`, `placeBid`, `appraise`, `consign`, `buyJet`, `buyFranchise`, `setKit`, `signPlayer`, `releasePlayer` |
 | Settings and saves | `updateSettings`, `saveToSlot`, `loadSlot`, `exportCode`, `importCode` |
+
+## 12. Implemented so far (schema v1, Stage 1)
+
+`src/sim/state.ts` is the source of truth; this section records how it differs from the guide above. Later stages add the rest with a schema bump and a migration.
+
+- **Present:** `meta`, `clock`, `rng`, `settings`, `world` (one country and one city in Stage 1), `company`, `branches`, `people` (managers only), `products.catalog`, `underwriting`, `treasury`, `loanDesk`, `rivals`, `reo`, `events` (`log`, `scheduled`), `history`, `milestones`, `flags`.
+- **Not yet present:** `offices`, `departments`, execs and benefits in `people`, product `developments`, funding lots and offers, `partnerships`, `market`, `ventures`, `realEstate`, `governance`, `personal`, `news`, incidents and cooldowns.
+- **Added fields:**
+  - `ledger`: P&L lines and cash movements since the last weekly close, so commands between ticks land in the right week.
+  - `nextId`: counter for generated ids.
+  - `company.retainedEarnings`, `company.leaseDeposits` (an asset). `company.liquidityRatio` is `null` while there are no deposits.
+  - `CountryState`: `hpiHistory`, `prevFtpShort`/`prevFtpLong` (to detect moves), `cardAnchor`, `startPolicy`, `feeIndex`, `marketReturn`, `forceRecessionAtWeek`.
+  - `Lot.address`; `Branch.builtDay`, `Branch.last` (prospects, captured, served, share); `ReviewCard` unchanged.
+  - `LoanApplication.estPd` (the noisy estimate behind the risk band); `BusinessLoan.payment`.
+  - `QuarterReport.endWeek`; `WeeklySnapshot.netRevenue`, `capitalRatio`, `tier`, `totals.liquid`, `totals.taxPayable`.
+  - `people.managerCandidates` and `candidatesRefreshWeek` are keyed by city.
+- **Changed:** rival rate sheets live on `RivalBank.prices` (one sheet per bank), not per branch. `RivalBranch` carries `cityId` and `overall`.
+- **Commands:** `leaseStorefront` is folded into `buildBranch`, which leases and builds in one step (DESIGN §7). Stage 1 also has `renameBranch`, `fireManager`, `setManagerSalary`, `setRiskAppetite`, `decideApplication` and `declineApplication`.
+- **Saves:** `src/sim/save/serialize.ts` has `serialize`, `deserialize` (with migrations and a required-keys check), `checksum` (cyrb53) and `exportCode`/`importCode`. localStorage slots arrive with the Stage 2 UI.
+

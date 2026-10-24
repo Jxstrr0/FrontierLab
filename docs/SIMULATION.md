@@ -208,7 +208,7 @@ Targets are computed each week. Displayed ratings follow them with `ema(rating, 
   |---|---|
   | Deposit rate products | `(price − m)/0.005` |
   | Loan and card rate products | `(m − price)/0.005` |
-  | Fee products | `(m − price)/max(0.25 × m, 1)` |
+  | Fee products | `(m − price)/max(0.25 × m, 1)` ($ fees) or `max(0.25 × m, 0.25pp)` (% fees) |
 
   Weight each product by `w_p = balanceShare_p + 0.1`.
 
@@ -230,11 +230,11 @@ Targets are computed each week. Displayed ratings follow them with `ema(rating, 
 ## 9. Demand and competition
 
 ### 9.1 Catchment
-- `population = footTraffic × CATCHMENT_MULT (2.5)`
+- `population = footTraffic × CATCHMENT_MULT (1.0)` (tuned from 2.5 in Stage 1 so branches mature within about two years)
 - `penetration = customers / population`
 
 ### 9.2 Prospects
-`P = footTraffic × PROSPECT_RATE (0.030) × (0.25 + 0.75 × e) × loanDemand^0.5 × (1 − penetration)^SATURATION_EXP (2.5) × noise(±5%)`.
+`P = footTraffic × PROSPECT_RATE (0.040) × (0.25 + 0.75 × e) × loanDemand^0.5 × (1 − penetration)^SATURATION_EXP (2.8) × noise(±5%)`. (Stage 1 tuning: 0.030 → 0.040 and 2.5 → 2.8.)
 
 **Pacing intent:** like the original's stores, a branch should reach most of its mature size within about a year, with most of the growth in the first six months, rather than compounding for a decade. High intake plus strong saturation does that, so a mid build pays back in under ~40 weeks.
 
@@ -273,11 +273,11 @@ Targets are computed each week. Displayed ratings follow them with `ema(rating, 
 ### 9.7 Price factors `pf`
 | Product type | Formula |
 |---|---|
-| Deposit-rate products | `clamp(1 + sensDep_s × (price − m)/0.005, 0.25, 2.0)` |
-| Loan and card rate products | `clamp(1 − sensLoan_s × (price − m)/0.005, 0.20, 1.8)` |
+| Deposit-rate products | `clamp(1 + sensDep_s × (price − m)/PF_RATE_STEP, 0.25, 2.0)` |
+| Loan and card rate products | `clamp(1 − sensLoan_s × (price − m)/PF_RATE_STEP, 0.20, 1.8)` |
 | Fee products (incl. wealth fee and FX markup) | `clamp(1 − sensFee_s × (price − m)/max(0.5 × m, FEE_STEP_MIN), 0.20, 1.8)` |
 
-Segment sensitivities are in CONTENT (Segments). FEE_STEP_MIN = $2 for $-denominated fees and 0.25pp for %-denominated fees.
+Segment sensitivities are in CONTENT (Segments). FEE_STEP_MIN = $2 for $-denominated fees and 0.25pp for %-denominated fees. PF_RATE_STEP = 0.01 (tuned in Stage 1 from 0.005, which made deposits too price-elastic: half a point above market doubled retiree take-up and GIC renewals). The Rates rating (§8) still uses 0.005 steps.
 
 ### 9.8 Customers
 `customers = round(Σ_p accounts_p / PRODUCTS_PER_CUSTOMER (1.6))`.
@@ -293,6 +293,7 @@ One `Book` per (branch, product): `accounts`, `balance`, `bookRate`, `pd` (annua
 2. **Organic growth:** `balance ×= 1 + organic_p × depositGrowth / 52`.
 3. **Churn:**
    - `k = churn_p/52 × (1 + rateChurnSens_p × max(0, (m − price)/0.005)) × (1 + 0.6 × max(0, 3.2 − Overall)) × signupChurn × runMult`
+   - For fee-priced accounts (chequing), the gap is the fee comparison from §8 instead: `max(0, −c_p)`.
    - Then `balance −= balance × k` and `accounts −= accounts × k`.
    - `signupChurn` is the Sign-Up Bonus multiplier, applied for 26 weeks to that week's cohort. Approximate it as a branch-level multiplier with linear decay.
 4. **GIC maturity:**
@@ -346,7 +347,7 @@ One `Book` per (branch, product): `accounts`, `balance`, `bookRate`, `pd` (annua
 ### 10.5 Services
 - **Safe deposit boxes:** accounts are capped at `vault.boxes`. Income = `accounts × fee/52`.
 - **FX & Wires:**
-  - `volume = customers × FX_PER_CUSTOMER (1,800/yr) × incomeIndex × pf`
+  - `volume = customers × FX_PER_CUSTOMER (900/yr; tuned from 1,800) × incomeIndex × pf`
   - income = `volume × markup / 52`
 
 ### 10.6 Applications and servicing
@@ -359,7 +360,7 @@ One `Book` per (branch, product): `accounts`, `balance`, `bookRate`, `pd` (annua
 - **Each application:**
   - **Sector:** weighted pick by district (CONTENT Loan Desk sectors).
   - **Business name:** from the name generator.
-  - **Amount:** `lognormal(120,000 × incomeIndex × sector.amountMult, 0.7)`, clamped to $20k–$3M.
+  - **Amount:** `lognormal(70,000 × incomeIndex × sector.amountMult, 0.7)` (tuned from 120,000), clamped to $20k–$3M.
   - **Term:** within the sector's range.
   - **Pentagon** (Management, Track record, Market, Competitiveness, Financial health): each score = round(normal(sector profile, 1.6)), clamped to 1–10. In a Recession, Financial health −1.
   - **Collateral:** None 30%, Partial 45%, Full 25%.
@@ -405,6 +406,8 @@ One `Book` per (branch, product): `accounts`, `balance`, `bookRate`, `pd` (annua
 
 ### 12.1 Worked example (mature branch, policy 3.25%, term premium +0.40%)
 The balance script should land near this; §25 targets match it. Treat it as calibration, not as test truth.
+
+**Superseded in Stage 1 (2026-10-24):** the deposit and loan sizes still hold, but with CONTENT's fee table the "fees and other" line comes to about $1.4M a year rather than $0.75M, and policy rates sit nearer 3.75–4%. A mature branch therefore earns about $50–65k a week; §25 was updated to match.
 
 | Item | Approximate value |
 |---|---|
@@ -888,15 +891,17 @@ Levels 1–5 (Very conservative to Very aggressive):
 
 ## 25. Balance targets
 
-Run `npm run balance` with seed 42 and the start city Calgary, unless noted.
+Run `npm run balance` with seed 42 and the start city Calgary, unless noted. Branch checkpoints read the first branch of the steady strategy, built on an "average lot" (the median-rent free lot in Midtown). Weekly revenue and income checkpoints use a 4-week average, so a single large default doesn't swing them.
+
+**Updated 2026-10-24 (Stage 1, owner's decision):** with CONTENT's fees and card rates at the 3.5–4% policy rates the macro rule produces, a mature branch earns about $50–65k a week on $120–145k of revenue. That is close to the original's store economics (about £51k income on £84k revenue), so the targets below were raised to match instead of cutting fee income. The old values are kept in brackets.
 
 | Checkpoint | Target |
 |---|---|
 | First branch build + lease deposit (mid build, average lot) | $300k–$450k, leaving room for at most one more basic branch from the $750k start |
 | First branch weekly income turns positive | week 6–16 |
 | Branch at week 26 | deposits $15–30M; income positive |
-| Branch at week 52 | deposits $30–50M; loans 75–90% of deposits; customers 3,000–5,000; income +$15k–$30k/week |
-| Mature branch (week 104+) | deposits $40–60M; loans 75–90% of deposits; revenue $80k–$100k/week; income +$25k–$35k/week (matches §12.1) |
+| Branch at week 52 | deposits $30–50M; loans 75–90% of deposits; customers 3,000–5,000; income +$20k–$40k/week [was $15k–$30k] |
+| Mature branch (week 104+) | deposits $40–65M (organic chequing growth keeps it creeping up) [was $40–60M]; loans 75–90% of deposits; revenue $110k–$150k/week [was $80k–$100k]; income +$45k–$70k/week [was $25k–$35k] |
 | Payback of a mid build on an average lot | ≤ 40 weeks from opening |
 | Year 2 (steady) | 4–8 branches; HQ required; cash never < 0 |
 | Capital first binds (no raises) | years 1–3; private placements and the IPO are the intended growth fuel |
@@ -904,7 +909,7 @@ Run `npm run balance` with seed 42 and the start city Calgary, unless noted.
 | Year 10 (steady) | 60–200 branches; total assets $8–40B |
 | Year 15 (steady) | weekly revenue $20–80M; founder net worth $2–40B |
 | Annual loan loss rate | 0.4–1.0% of loans in Expansion; 1.2–2.5% in Recession |
-| Net interest margin | 2.0–3.5% |
+| Net interest margin | 3.0–5.0% [was 2.0–3.5%; even §12.1's own figures give about 4.7%] |
 | Company loan-to-deposit ratio | 0.75–0.90 in Expansion (tune mortgage approval first) |
 | ROE | 8–18% in Expansion |
 | Turtle (deposits only) | profitable, but < 40% of steady's year-5 equity |
