@@ -161,7 +161,13 @@ function Financing(p: { site: Site }) {
         <Row label={`Your branches in ${city}`} value={String(branches)} />
         <Row
           label="Expected volume"
-          value={branches > 0 ? `+${money(volume, sym)} new loans / week` : '—'}
+          value={
+            volume > 0
+              ? `+${money(volume, sym)} new loans / week`
+              : branches > 0
+                ? 'Offer auto loans first'
+                : '—'
+          }
         />
       </Card>
       {deal ? (
