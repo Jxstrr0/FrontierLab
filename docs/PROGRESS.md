@@ -2,9 +2,9 @@
 
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
-**Current stage:** 3 — The city map (built; awaiting the owner's iPhone check). Stage 2's check is still open too.
+**Current stage:** 4 — HQ and operations (built and live; awaiting the owner's iPhone check). The Stage 2 and 3 checks are still open too.
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `0acda65581fd17` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `0831e6b2f8796e` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
@@ -22,6 +22,31 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 - **Determinism snapshot:** unchanged (`08b4ee1bc7e8a3`). The scripted game doesn't use the Products floor, and the new state fields are only written once you use them. The 5-year balance report is identical.
 - **Dependencies:** none added.
 - **Next:** the Products floor and Credit bureau screens (SCREENS §10, §13).
+
+### 2026-10-24 — Stage 4 built: HQ and operations
+- **Stage / step:** 4 — HQ and operations depth
+- **Done:**
+  - **Offices:** every city has 3–9 office buildings for lease (mostly in the financial district), plus credit bureaus and marketing agencies, all on the map with their own pins and layers. Leasing takes the whole building; each floor holds one department and is fitted out when a team moves in. Floors and whole offices can be released.
+  - **Departments:** Finance, HR, Products, Treasury, Marketing, IT and Risk. Each hires toward a target you set, pays a salary you set, and has skill, morale and coverage (staff versus what your bank's size needs).
+  - **Founder mode:** with 1–2 branches nothing is required; requirements phase in from 3 to 6 branches. Short departments hurt: HR slows hiring and lowers morale, Risk raises defaults and regulator fines and blurs loan estimates, Treasury makes funding dearer and the market thinner, Marketing weakens every campaign, IT drags the app rating, Products slows developments and raises model costs, and Finance delays your statements.
+  - **HR benefits:** nine benefits with costs and effects on morale, hiring, quits, skill growth and reputation.
+  - **Products floor:** your house underwriting model with Manage models (sliders that always total 100%), risk appetite, the company product lineup with "Apply rates to all branches", and new product development with the live star-odds table. Developed products are real products at your branches.
+  - **Credit bureaus:** buy a bureau's packaged model or commission your own mix there.
+  - **Treasury floor:** liquidity gauge and policy, government bonds (they lose value when rates rise), a funding market that refreshes every two weeks, your funding lots (they mature on schedule), and the central bank window.
+  - **Marketing floor and agencies:** brand campaigns by city or country, and agency packages.
+  - **IT floor:** the app rating and digital projects (Mobile App 2.0, Instant Decisions).
+  - **Risk floor:** loss rates by product, model performance, and the quarterly regulator review.
+  - Saves move to version 5; your Stage 3 save is kept as a test fixture and loads and plays on.
+- **How it was built:** I wrote the foundation (data shape, save migration, offices, departments, coverage and benefits). Two helper agents then built the Products and the Treasury/Marketing/Risk simulation in parallel, and three more built the screens. I reviewed and merged everything and tuned the balance.
+- **Balance:** a bank without an HQ was coming out ahead, so per-branch HQ requirements were cut about 40% and the Risk shortfall penalty raised. Now `steady` (which leases its first office at 4 branches) ends year 6 with about $72M equity against `nohq`'s $63M, and `nohq` runs loan losses near 2%. Both steady and stress stay inside their targets apart from the pre-existing 74.9% loans-to-deposits at week 104.
+- **Determinism snapshot:** `0acda65581fd17` → `08b4ee1bc7e8a3` (HQ state added; the script leases an office at week 80) → `1ecdcf158cfecb` (risk records and regulator reviews) → `0831e6b2f8796e` (requirement tuning). All intended.
+- **Next:** the owner checks Stage 4 on iPhone: lease an office from the Offices layer, add floors, try the Products, Treasury and Marketing floors, and visit the Northscore bureau and the agency in Calgary.
+- **Known issues:**
+  - HQ coverage refreshes on the weekly tick, so a staffing change shows next week.
+  - The app rating keeps no history yet, so IT shows the current rating and its target rather than a trend.
+  - Predicted and actual default rates match closely for pooled books (defaults are booked at the expected rate); they drift apart through the credit cycle, Risk shortfalls and Loan Desk loans.
+  - The deposits-only `turtle` strategy reaches about 45% of steady's year-5 equity (target under 40%); left for Stage 5 tuning.
+  - Executive and Investment floors show "arrives later" cards (Stages 6 and 7).
 
 ### 2026-10-24 — Next week button
 - **Done:** a ▶| button in the date pill (top right) jumps to the end of the current week, shows the weekly results and pauses, so you can play week by week instead of watching days tick by. It runs through the same simulation steps as normal play, so nothing about the numbers changes. When paused, the pill now shows just the date (the ▶ button already says it's paused).
