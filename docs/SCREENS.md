@@ -260,11 +260,12 @@ Tabs: Overview · Loans · Credit.
     - probability table (5★ … 1★ with %)
     - Start development
 - **Treasury:**
-  - liquidity gauge (LR vs minimum and target), with a funding freeze banner when active
+  - liquidity gauge (LR vs minimum and target), with a funding freeze banner when active, and a one-way "Transfer cash to Treasury"
   - Treasury policy: target LR slider, bonds share slider, auto-funding toggle
   - Bonds: market value, book, unrealized gain/loss, yield, duration
   - **Funding inventory:** lot cards with counterparty, type, rate, amount, maturity date and rosette, plus Details and "Repay early" where flexibility allows
   - **Funding market:** offer cards with an amount slider and Borrow
+  - **Central bank:** the standing facility from §8 (window rate, window and overnight usage, Borrow / Repay with the stigma warning)
   - **Partnerships:** cards with employer, employees, "Year 3 of 7", deposits and a health bar. Tap to open the partnership view (§14).
 - **Marketing:** brand awareness by city (bars), brand campaign cards (scope: city or country; level; cost), active agency packages.
 - **IT & Security:** app rating coins with a 26-week trend, a security posture summary, digital projects (developments of type Digital).

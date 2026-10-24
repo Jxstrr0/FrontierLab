@@ -1,10 +1,9 @@
 // Credit bureau (SCREENS §13) and marketing agency (SCREENS §15) panels:
-// header with the address, the advisor's line and the vignette. Their bodies
-// are placeholders for now.
+// header with the address, the advisor's line and the vignette. The agency's
+// body is its package cards (AgencyBody).
 //
-// PLACEHOLDER: the bureau's packaged models carousel and "My model", and the
-// agency's package cards with Buy, arrive with the Products and Marketing
-// floor updates; replace the <FloorPlaceholder> bodies below.
+// PLACEHOLDER: the bureau's packaged models carousel and "My model" arrive
+// with the Products floor update; replace the bureau's <FloorPlaceholder>.
 import { DISTRICT_SPECS } from '../../data/districts';
 import type { SiteKind } from '../../sim/state';
 import { Panel } from '../components';
@@ -12,6 +11,7 @@ import { FloorPlaceholder } from '../hq/FloorPlaceholder';
 import { LayerMedallion } from '../map/LayerIcon';
 import { siteName } from '../map/pins';
 import { closePanel, useGame } from '../store';
+import { AgencyBody } from './AgencyBody';
 import { SiteArt } from './SiteArt';
 import './sites.css';
 
@@ -58,7 +58,11 @@ export function SitePanel(p: { siteId: string; kind: SiteKind }) {
       hero={<SiteArt kind={site.kind} />}
     >
       <div class="stack">
-        <FloorPlaceholder title={copy.title} arrives={copy.arrives} body={copy.body} />
+        {site.kind === 'agency' ? (
+          <AgencyBody site={site} />
+        ) : (
+          <FloorPlaceholder title={copy.title} arrives={copy.arrives} body={copy.body} />
+        )}
       </div>
     </Panel>
   );
