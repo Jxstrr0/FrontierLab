@@ -908,6 +908,89 @@ export const CORPORATE_LENDING = {
 // ─── BANK RUNS AND RECAPITALISATION (§13.8, §15) ──────────────────────────────
 
 // ─── NEWS: THE DAILY LEDGER (§24) ─────────────────────────────────────────────
+/** Articles per weekly issue, the Top tab's size and how many issues the archive keeps. */
+export const NEWS_ARTICLES_MIN = 6;
+export const NEWS_ARTICLES_MAX = 12;
+export const NEWS_TOP_N = 6;
+export const NEWS_ARCHIVE_ISSUES = 52;
+/** Central bank stories from countries where you don't operate, per issue (moves first). */
+export const NEWS_CB_ABROAD_MAX = 2;
+/** Most stories of one kind per issue, so a busy quarter doesn't flood the paper. */
+export const NEWS_GROUP_CAPS: Record<string, number> = {
+  earnings: 3,
+  dividend: 2,
+  rivalBranch: 3,
+  exec: 2,
+  sports: 2,
+  economy: 1,
+  incident: 2,
+};
+/**
+ * Story priority (higher leads; Top = the six highest). SIMULATION §24 order:
+ * your company, central banks (yours first), rivals in your cities, earnings,
+ * conventions/auctions, sports, then filler.
+ */
+export const NEWS_PRIORITY = {
+  companyAlarm: 120,
+  company: 100,
+  companyRoutine: 82,
+  /** Your week's figures: below rivals in your cities, above central banks abroad. */
+  companyWeek: 66,
+  cbHome: 95,
+  cbOperated: 90,
+  cbAbroadMove: 64,
+  cbAbroadHold: 52,
+  rivalLocal: 75,
+  rivalAbroad: 40,
+  earnings: 58,
+  sports: 30,
+  politicsLocal: 45,
+  politicsAbroad: 24,
+  ranking: 70,
+  housing: 34,
+  market: 26,
+  economy: 22,
+  rateWatch: 20,
+  poll: 18,
+  filler: 12,
+};
+/** Housing story every n weeks per country you operate in, once a year of prices exists. */
+export const NEWS_HOUSING_EVERY_WEEKS = 4;
+/** A poll story every n weeks in your home country. Weekly poll drift (points, σ). */
+export const NEWS_POLL_EVERY_WEEKS = 6;
+export const NEWS_POLL_DRIFT = 1.2;
+export const NEWS_POLL_FLOOR = 8;
+/** Politics (§24): weekly chance a country's government tables a proposal, and the vote. */
+export const NEWS_POLICY_PROPOSE_P = 0.012;
+export const NEWS_POLICY_VOTE_WEEKS: [number, number] = [3, 8];
+export const NEWS_POLICY_PASS_P = 0.5;
+/** Share of proposals that are a capital buffer (the one with a game effect). */
+export const NEWS_CAPITAL_BUFFER_SHARE = 0.3;
+/** A passed capital buffer: tier thresholds rise by this many pp for this many weeks. */
+export const CAPITAL_BUFFER_PP = 1;
+export const CAPITAL_BUFFER_WEEKS = 52;
+/** Sports: chance of a draw where leagues allow them, and how much strength tilts a match. */
+export const SPORTS_DRAW_P = 0.24;
+export const SPORTS_STRENGTH_WEIGHT = 0.9;
+/** Win-probability bounds, and the chance a level game goes to extra time (no-draw leagues). */
+export const SPORTS_WIN_P_RANGE: [number, number] = [0.15, 0.85];
+export const SPORTS_EXTRA_TIME_P = 0.12;
+/** League table points for a win and a draw. */
+export const SPORTS_POINTS = { win: 3, draw: 1 };
+/** Rankings: banks named in Fastest Growing, and the asset floor to qualify. */
+export const RANKING_SIZE = 3;
+export const RANKING_MIN_ASSETS = 1_000_000;
+/**
+ * Yield curve on the central bank panel (SCREENS §8): each tenor is the policy
+ * rate plus this share of the term premium, so a negative premium (slowdown,
+ * SIMULATION §4.2) inverts the curve.
+ */
+export const YIELD_CURVE: { label: string; premiumShare: number }[] = [
+  { label: 'Overnight', premiumShare: 0 },
+  { label: '2y', premiumShare: 0.45 },
+  { label: '5y', premiumShare: 0.8 },
+  { label: '10y', premiumShare: 1 },
+];
 
 // ─── PARTNERSHIPS AND UNIVERSITIES (§13.7) ────────────────────────────────────
 /** Contract length L in weeks ("Year X of 7", CONTENT §14). */
