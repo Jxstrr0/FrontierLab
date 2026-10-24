@@ -294,6 +294,13 @@ function run(): void {
         : `listed week ${listed} (year ${Math.floor(listed / 52) + 1}) as ${state.stock.ticker}`) +
       `, founder stake ${P(founderStake(state))}, share price ${state.stock.price.toFixed(2)}`,
   );
+  const byCity = new Map<string, number>();
+  for (const b of Object.values(state.branches))
+    byCity.set(b.cityId, (byCity.get(b.cityId) ?? 0) + 1);
+  console.log(
+    `Branches by city: ${[...byCity].map(([id, n]) => `${id} ${n}`).join(', ')}; ` +
+      `${state.world.travel.flights} flight(s); total assets ${M(balanceSheet(state).assets)}`,
+  );
   checks.push({
     label: 'Balance identity gap',
     value: maxIdentityGap.toFixed(4),

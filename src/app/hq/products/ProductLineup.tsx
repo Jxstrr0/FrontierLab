@@ -7,6 +7,7 @@ import { useState } from 'preact/hooks';
 import { COUNTRIES } from '../../../data/countries';
 import type { CategoryId, CountryId } from '../../../data/types';
 import * as cmd from '../../../sim/commands';
+import { theCountryName } from '../../../sim/newsStory';
 import { Card, Chips, Row, Segmented, Toggle } from '../../components';
 import { pct } from '../../format/format';
 import { act, useGame } from '../../store';
@@ -52,8 +53,8 @@ export function ProductLineup() {
           <Row label={`${COUNTRIES[country].centralBank} policy rate`} value={pct(policy)} />
           <p class="muted small pf-note">
             {on
-              ? `Every branch in ${COUNTRIES[country].name} uses this list.`
-              : `Showing your first ${COUNTRIES[country].name} branch's prices.`}
+              ? `Every branch in ${theCountryName(country)} uses this list.`
+              : `Showing your first branch's prices in ${theCountryName(country)}.`}
           </p>
         </Card>
       )}

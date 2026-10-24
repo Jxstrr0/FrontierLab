@@ -103,12 +103,12 @@ export function countryOrder(s: GameState, rows: BranchRow[]): CountryId[] {
   return all.filter((c, i) => all.indexOf(c) === i);
 }
 
-/** Sorted rows split by country, in `countryOrder`, keeping the sort within each. */
+/** Sorted rows split by country, in `order` (countryOrder of every row), keeping the sort within each. */
 export function groupByCountry(
-  s: GameState,
+  order: CountryId[],
   rows: BranchRow[],
 ): { country: CountryId; rows: BranchRow[] }[] {
-  return countryOrder(s, rows).map((country) => ({
+  return order.map((country) => ({
     country,
     rows: rows.filter((r) => countryOf(r) === country),
   }));

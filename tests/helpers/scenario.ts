@@ -8,9 +8,13 @@ import type { GameState } from '../../src/sim/state';
 
 export const LENDING = ['personal_loan', 'auto_loan', 'mortgage', 'loc', 'credit_card'];
 
+/** The first free lot (by id) in the city you're in, optionally in one district. */
 export function freeLot(state: GameState, district?: string) {
   const lots = Object.values(state.world.lots).filter(
-    (l) => !l.occupant && (!district || l.district === district),
+    (l) =>
+      !l.occupant &&
+      l.cityId === state.world.currentCityId &&
+      (!district || l.district === district),
   );
   return lots.sort((a, b) => a.id.localeCompare(b.id))[0]!;
 }
