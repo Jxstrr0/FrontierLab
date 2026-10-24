@@ -57,3 +57,21 @@ export const PIN_HIT_PX = 44;
 export const PIN_LIFT_PX = 20;
 /** Pins this far outside the viewport (CSS px) are still placed, so edges don't pop. */
 export const PIN_CULL_MARGIN_PX = 48;
+
+// ─── Flight overlay (Stage 8, ART_DIRECTION §1.4 "planes follow a dotted arc") ──
+/** The plane crosses the world map in this many ms, then the overlay fades. */
+export const FLIGHT_MS = 2500;
+export const FLIGHT_FADE_MS = 320;
+/** With reduced motion: a still frame of the whole route for this long, then a crossfade. */
+export const FLIGHT_STILL_MS = 900;
+/** Points sampled along the great circle. */
+export const FLIGHT_PATH_POINTS = 64;
+/** Extra lift of the drawn arc at its middle, as a share of its projected length. */
+export const FLIGHT_ARC_LIFT = 0.12;
+/** The map frames the route with at least this many degrees of longitude, plus padding. */
+export const FLIGHT_MIN_SPAN_DEG = 45;
+export const FLIGHT_PAD_DEG = 14;
+/** Shares of the screen height the overlay's header and footer cover; the route is framed between. */
+export const FLIGHT_INSETS = { top: 0.2, bottom: 0.07 } as const;
+/** How long the arrival toast stays up, in ms. */
+export const ARRIVAL_TOAST_MS = 4200;

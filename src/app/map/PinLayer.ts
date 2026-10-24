@@ -1,6 +1,7 @@
 // DOM pins over the map canvas (ART_DIRECTION §2): medallions for branches
 // and your HQ, plain "$" medallions for open branch locations, type
-// medallions for credit bureaus and agencies (employers and universities you
+// medallions for credit bureaus and agencies, the central bank's and airport's
+// own landmark medallions (employers and universities you
 // partner with add a brand-ink seal; acquired branches still converting wear
 // the old bank's ink with a progress ring), brass "For lease" tags for
 // office buildings you can rent, and count medallions for clusters at the far
@@ -15,6 +16,7 @@ import {
   PIN_LIFT_PX,
   PIN_MEDALLION_PX,
 } from '../../config/mapView';
+import { AirportMedallion } from '../airport/AirportMedallion';
 import { CentralBankMedallion } from '../centralbank/CentralBankMedallion';
 import { Medallion } from '../components';
 import { LayerIcon, LayerMedallion } from './LayerIcon';
@@ -213,14 +215,16 @@ function makePinElement(p: PinSpec): HTMLButtonElement {
     render(
       p.kind === 'centralBank'
         ? h(CentralBankMedallion, { size: PIN_MEDALLION_PX })
-        : p.icon
-          ? h(LayerMedallion, { id: p.icon, size: PIN_MEDALLION_PX })
-          : h(Medallion, {
-              ink: p.ink,
-              monogram: p.monogram,
-              size: PIN_MEDALLION_PX,
-              ring: p.kind === 'rival',
-            }),
+        : p.kind === 'airport'
+          ? h(AirportMedallion, { size: PIN_MEDALLION_PX })
+          : p.icon
+            ? h(LayerMedallion, { id: p.icon, size: PIN_MEDALLION_PX })
+            : h(Medallion, {
+                ink: p.ink,
+                monogram: p.monogram,
+                size: PIN_MEDALLION_PX,
+                ring: p.kind === 'rival',
+              }),
       body,
     );
     el.appendChild(body);

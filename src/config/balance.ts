@@ -24,7 +24,7 @@ export const FEATURES = {
   /** Stage 7: ventures, conventions and real estate. */
   investments: true,
   /** Stage 8: every city, airports and travel. */
-  multiCity: false,
+  multiCity: true,
   /** Stage 9: personal wealth, homes, cars, auctions, franchise. */
   personalEmpire: false,
   /** Stage 10: art pass, tutorial, sound, PWA. */
@@ -1142,6 +1142,8 @@ export const TRAVEL_KM_PER_WEEK = 24_140;
 export const FLIGHT_FARE = 80_000;
 /** Mean Earth radius for great-circle distances. */
 export const EARTH_RADIUS_KM = 6_371;
+/** Kilometres in a statute mile, for showing distances in miles (settings.units). */
+export const KM_PER_MILE = 1.609344;
 /** Private jet (§22): upkeep and depreciation per year of its value; resale haircut. */
 export const JET = { upkeepRate: 0.08, depreciation: 0.06, resaleHaircut: 0.1 } as const;
 

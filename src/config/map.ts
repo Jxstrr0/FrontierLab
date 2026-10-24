@@ -61,6 +61,10 @@ export const LANDMARKS = [
   { id: 'airport', district: 'industrial' },
 ] as const satisfies readonly { id: string; district: DistrictId }[];
 export type LandmarkId = (typeof LANDMARKS)[number]['id'];
+/** Regional sites (CONTENT §2) are small towns: only the airport landmark. */
+export const REGIONAL_LANDMARKS: readonly LandmarkId[] = ['airport'];
+/** Regional sites keep filler buildings low (storeys), whatever the district. */
+export const REGIONAL_MAX_FLOORS = 3;
 
 // ─── Engraved renderer (src/art/isoRenderer.ts) ───────────────────────────────
 // Rendering and cache tuning for the chunked map renderer. Purely visual: none
