@@ -15,6 +15,7 @@ import type { GameEvent, GameState } from '../sim/state';
 import { homeCountry } from '../sim/treasury';
 import { CAPITAL_BUFFER_POLICY } from '../data/newsWorld';
 import { saveToSlot } from './saves';
+import { play } from './sound/sound';
 import { bump, modal, peekGame, toast } from './store';
 import { MNA_BAD_EVENTS, MNA_EVENT_TEXT } from './investmentBank/mnaToasts';
 import { VENTURE_BAD_EVENTS, VENTURE_EVENT_TEXT } from './startup/ventureToasts';
@@ -213,6 +214,7 @@ function announceEvents(s: GameState): void {
   const home = homeCountry(s).id;
   for (const e of log.slice(from)) {
     if (HOME_ONLY.has(e.type) && e.payload.country !== home) continue;
+    if (e.type === 'APPRAISAL_DONE' && e.payload.genuine === false) play('stamp');
     const text = EVENT_TEXT[e.type]?.(e.payload);
     if (text) toast(text, BAD_EVENTS.has(e.type) ? 'bad' : 'info');
   }

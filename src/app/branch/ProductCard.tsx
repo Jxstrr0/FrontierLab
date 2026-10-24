@@ -43,7 +43,7 @@ export function ProductCard(p: { branch: Branch; spec: ProductSpec; onLoanDesk: 
           <div class="br-product-name">{spec.name}</div>
           <CoinRating value={stars} size={14} />
         </div>
-        <div class="br-product-toggle">
+        <div class="br-product-toggle" data-tutorial={`offer-${spec.id}`}>
           <Toggle
             label="Offered"
             checked={offered}
@@ -57,7 +57,7 @@ export function ProductCard(p: { branch: Branch; spec: ProductSpec; onLoanDesk: 
       ) : (
         <Figures branch={branch} spec={spec} costLabel={unit.costLabel} costText={unit.costText} />
       )}
-      <div class="br-product-price">
+      <div class="br-product-price" data-tutorial={`price-${spec.id}`}>
         <RingGauge
           value={unit.margin}
           label={`${Math.round(unit.margin * 100)}%`}

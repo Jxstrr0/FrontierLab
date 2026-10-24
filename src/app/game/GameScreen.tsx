@@ -43,6 +43,10 @@ import { EmployerPanel } from '../partners/EmployerPanel';
 import { UniversityPanel } from '../partners/UniversityPanel';
 import { RivalBranchPanel } from '../rivals/RivalBranchPanel';
 import { RivalHqPanel } from '../rivals/RivalHqPanel';
+import { watchSoundCues } from '../sound/cues';
+import { watchTutorial } from '../tutorial/controller';
+import { TutorialOverlay } from '../tutorial/TutorialOverlay';
+import { CreditsScreen } from '../credits/CreditsScreen';
 import { Hud } from './Hud';
 import { MenuSheet } from './MenuSheet';
 import './game.css';
@@ -50,7 +54,13 @@ import './game.css';
 export function GameScreen() {
   useEffect(() => {
     startLoop();
-    return stopLoop;
+    const stopTutorial = watchTutorial();
+    const stopSounds = watchSoundCues();
+    return () => {
+      stopLoop();
+      stopTutorial();
+      stopSounds();
+    };
   }, []);
   return (
     <div class="game">
@@ -69,6 +79,7 @@ export function GameScreen() {
       {sheet.value === 'layers' && <LayersSheet />}
       {FEATURES.multiCity && sheet.value === 'travel' && <TravelSheet />}
       <ModalHost />
+      <TutorialOverlay />
       {FEATURES.multiCity && <FlightOverlay />}
       <ToastHost />
     </div>
@@ -152,6 +163,8 @@ function PanelHost() {
       return <SettingsScreen inGame />;
     case 'saves':
       return <SavesScreen inGame />;
+    case 'credits':
+      return <CreditsScreen inGame />;
   }
 }
 
