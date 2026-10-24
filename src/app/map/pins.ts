@@ -47,6 +47,8 @@ export interface PinSpec {
   icon?: MapLayerId;
   /** The central bank pin's country. */
   countryId?: CountryId;
+  /** A failed rival's head office (distressed): drawn faded with a dashed ring. */
+  muted?: boolean;
 }
 
 /** Clustering seeds and stacking: yours first, then rivals, then other buildings, open locations last. */
@@ -168,7 +170,13 @@ const SITE_LAYER: Record<Site['kind'], MapLayerId> = SITE_ICON;
 function sitePin(s: GameState, map: CityMap, site: Site): PinSpec {
   const at = anchor(map, site.tile);
   const suffix =
-    site.kind === 'agency' ? ', marketing agency' : site.kind === 'employer' ? ', employer' : '';
+    site.kind === 'agency'
+      ? ', marketing agency'
+      : site.kind === 'employer'
+        ? ', employer'
+        : site.kind === 'rivalHq' && s.rivals[site.refId]?.status === 'distressed'
+          ? ', seized by regulators'
+          : '';
   const rival = site.kind === 'rivalHq' ? s.rivals[site.refId] : undefined;
   return {
     id: site.id,
@@ -180,6 +188,7 @@ function sitePin(s: GameState, map: CityMap, site: Site): PinSpec {
     monogram: rival?.monogram ?? '',
     badge: false,
     icon: SITE_ICON[site.kind],
+    ...(rival && rival.status !== 'active' ? { muted: true } : {}),
   };
 }
 
@@ -231,7 +240,9 @@ export function buildPins(
       if (site.cityId !== map.cityId) continue;
       const stage5 = site.kind !== 'bureau' && site.kind !== 'agency';
       if (stage5 && !features.competition) continue;
-      if (site.kind === 'rivalHq' && s.rivals[site.refId]?.status !== 'active') continue;
+      // A seized or acquired rival's head office leaves the map; a distressed one stays, faded.
+      const status = site.kind === 'rivalHq' ? s.rivals[site.refId]?.status : undefined;
+      if (status === 'seized' || status === 'acquired') continue;
       if (layerOn(layers, SITE_LAYER[site.kind])) pins.push(sitePin(s, map, site));
     }
   }
@@ -246,7 +257,9 @@ export function buildPins(
 
 /** A string that changes whenever any pin would look or act differently. */
 export function pinsKey(pins: PinSpec[]): string {
-  return pins.map((p) => `${p.id}|${p.kind}|${p.ink}|${p.monogram}|${p.label}`).join(';');
+  return pins
+    .map((p) => `${p.id}|${p.kind}|${p.ink}|${p.monogram}|${p.label}|${p.muted ? 1 : 0}`)
+    .join(';');
 }
 
 /**

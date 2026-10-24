@@ -1,6 +1,6 @@
-// Rival banks, Stage 1 scope (SIMULATION §5, §18.1–18.3): who operates in a
+// Rival banks (SIMULATION §5, §18.1–18.3): who operates in a
 // city, where their branches stand, their quality profiles, and rate sheets that
-// follow FTP with deposit beta. Expansion, closures and failures arrive in Stage 5.
+// follow FTP with deposit beta. Expansion, closures and failures live in rivalAi.ts.
 import {
   CARD_REPRICE_GAP,
   DEPOSIT_BETA_DOWN,
@@ -44,6 +44,7 @@ export function rivalTargetPrice(
   strategy: Strategy,
   c: CountryState,
   edge = 0,
+  depositBump = 0,
 ): number {
   const p = STRATEGY_PROFILES[strategy];
   const base = defaultPrice(spec, c);
@@ -56,6 +57,8 @@ export function rivalTargetPrice(
   else price = base + p.loans;
   // Difficulty edge: better deposit rates, cheaper loans (in pp).
   if (spec.priceType === 'rate') price += isDeposit(spec) ? edge / 100 : -edge / 100;
+  // Price wars (§18.6) lift deposit rates.
+  if (spec.priceType === 'rate' && isDeposit(spec)) price += depositBump;
   return clamp(price, spec.min, spec.max);
 }
 
@@ -209,6 +212,14 @@ function branchCounts(chosen: RivalSpec[], total: number, rng: Rng): number[] {
   return counts;
 }
 
+/** incomeFit(strategy) (§18.4): premium likes wealth, community likes modest areas, disruptors the young. */
+export function incomeFit(lot: Lot, strategy: Strategy): number {
+  if (strategy === 'premium') return dpow(lot.incomeIndex, 2);
+  if (strategy === 'community') return 1 / lot.incomeIndex;
+  if (strategy === 'disruptor') return RIVAL_PLACEMENT.disruptorBase + lot.mix.YP + lot.mix.STU;
+  return 1;
+}
+
 /** score = footTraffic × incomeFit(strategy), discouraging clusters of the same bank. */
 function bestLot(lots: Lot[], strategy: Strategy, bank: RivalBank, rng: Rng): Lot | undefined {
   let best: Lot | undefined;
@@ -216,12 +227,7 @@ function bestLot(lots: Lot[], strategy: Strategy, bank: RivalBank, rng: Rng): Lo
   const own = lots.filter((l) => l.occupant?.id === bank.id);
   for (const lot of lots) {
     if (lot.occupant) continue;
-    let fit = 1;
-    if (strategy === 'premium') fit = dpow(lot.incomeIndex, 2);
-    else if (strategy === 'community') fit = 1 / lot.incomeIndex;
-    else if (strategy === 'disruptor')
-      fit = RIVAL_PLACEMENT.disruptorBase + lot.mix.YP + lot.mix.STU;
-    let score = lot.footTraffic * fit * rng.range(...RIVAL_PLACEMENT.jitter);
+    let score = lot.footTraffic * incomeFit(lot, strategy) * rng.range(...RIVAL_PLACEMENT.jitter);
     if (own.some((o) => tileDistance(o, lot) < RIVAL_PLACEMENT.spacing)) {
       score *= RIVAL_PLACEMENT.clusterPenalty;
     }
@@ -271,19 +277,27 @@ export function updateRivalPrices(state: GameState): void {
   for (const rival of Object.values(state.rivals)) {
     if (rival.status !== 'active') continue;
     const c = countryOfCity(state, rival.cities[0]!);
+    const bump = priceWarBump(rival);
     for (const spec of Object.values(PRODUCTS)) {
-      let price = rival.prices[spec.id] ?? rivalTargetPrice(spec, rival.strategy, c, edge);
+      let price = rival.prices[spec.id] ?? rivalTargetPrice(spec, rival.strategy, c, edge, bump);
       const lag = rival.priceLags[spec.id];
       if (lag) {
         price += (lag.target - price) / Math.max(1, lag.weeksLeft);
         lag.weeksLeft -= 1;
         if (lag.weeksLeft <= 0) delete rival.priceLags[spec.id];
       }
-      const target = rivalTargetPrice(spec, rival.strategy, c, edge);
+      const target = rivalTargetPrice(spec, rival.strategy, c, edge, bump);
       price += RIVAL_PRICE_DRIFT * (target - price);
       rival.prices[spec.id] = clamp(price, spec.min, spec.max);
     }
   }
+}
+
+/** The largest active price-war bump on a rival's rate sheet (§18.6). */
+export function priceWarBump(rival: RivalBank): number {
+  let max = 0;
+  for (const v of Object.values(rival.priceWar)) max = Math.max(max, v);
+  return max;
 }
 
 function queueMove(rival: RivalBank, spec: ProductSpec, delta: number, rng: Rng): void {
