@@ -176,3 +176,26 @@ export interface LobbyingState {
   /** A won "Stall the capital buffer bill": the pending bill in that country fails its vote. */
   blockBill?: { country: CountryId; untilWeek: Week };
 }
+
+// ─── Currencies (SIMULATION §19.10) ───────────────────────────────────────────
+
+export interface FxPosition {
+  /** Currency units held; value = units × the currency's rate vs home. */
+  units: number;
+  /** Total paid, for gain display. */
+  cost: Money;
+}
+
+export interface FxState {
+  /**
+   * Each country's strength level (starts at FX_START_INDEX). A currency's rate
+   * against your home currency is level[c] / level[home] × FX_START_INDEX.
+   */
+  level: Partial<Record<CountryId, number>>;
+  /** Weekly rates vs your home currency, oldest first. */
+  history: Partial<Record<CountryId, number[]>>;
+  positions: {
+    company: Partial<Record<CountryId, FxPosition>>;
+    personal: Partial<Record<CountryId, FxPosition>>;
+  };
+}

@@ -4,6 +4,7 @@
 import { isDeposit, isLoan, PRODUCTS } from '../data/products';
 import { totalWholesale } from './fundingLots';
 import { summarize } from './ledger';
+import { fxValue } from './fx';
 import { realEstateValue, ventureDebtValue, venturesValue } from './portfolio';
 import { holdingsValue } from './securities';
 import { productSpec } from './products';
@@ -27,6 +28,8 @@ export interface BalanceSheet {
   ventureDebt: number;
   /** Company-owned buildings at estimated value (§21.2). */
   realEstate: number;
+  /** Company currency positions at today's rates (§19.10). */
+  currencies: number;
   /** Goodwill from acquisitions (§19.8, deducted from CET1). */
   goodwill: number;
   assets: number;
@@ -116,6 +119,7 @@ export function balanceSheet(state: GameState): BalanceSheet {
   const ventures = venturesValue(state, 'company');
   const ventureDebt = ventureDebtValue(state, 'company');
   const realEstate = realEstateValue(state, 'company');
+  const currencies = fxValue(state, 'company');
   const assets =
     c.cash +
     t.reserves +
@@ -129,6 +133,7 @@ export function balanceSheet(state: GameState): BalanceSheet {
     ventures +
     ventureDebt +
     realEstate +
+    currencies +
     c.goodwill;
   const deposits = totalDeposits(state);
   const wholesale = totalWholesale(state);
@@ -149,6 +154,7 @@ export function balanceSheet(state: GameState): BalanceSheet {
     ventures,
     ventureDebt,
     realEstate,
+    currencies,
     goodwill: c.goodwill,
     assets,
     deposits,
