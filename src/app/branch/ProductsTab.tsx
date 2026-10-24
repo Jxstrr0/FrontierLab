@@ -2,8 +2,8 @@
 // switch and one card per product. Cards stack vertically rather than in a
 // carousel so every product's toggle and price stay visible on a phone.
 import { useState } from 'preact/hooks';
-import { PRODUCTS } from '../../data/products';
 import type { CategoryId } from '../../data/types';
+import { allProducts } from '../../sim/products';
 import { activeModel } from '../../sim/underwriting';
 import type { Branch } from '../../sim/state';
 import { Card, Segmented } from '../components';
@@ -20,7 +20,7 @@ export function ProductsTab(p: { branch: Branch; onLoanDesk: () => void }) {
   const s = useGame();
   const [cat, setCat] = useState<CategoryId>('deposits');
   const model = activeModel(s);
-  const specs = Object.values(PRODUCTS).filter((x) => x.category === cat);
+  const specs = allProducts(s).filter((x) => x.category === cat);
   return (
     <div class="stack">
       <Card>

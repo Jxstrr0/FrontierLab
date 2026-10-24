@@ -1,6 +1,7 @@
 // Read-only view of each branch for the Branches list (SCREENS §25): the figures
 // to show and sort by, and the issues worth a badge.
-import { isDeposit, isLoan, PRODUCTS } from '../../data/products';
+import { isDeposit, isLoan } from '../../data/products';
+import { productSpec } from '../../sim/products';
 import { staffNeeded } from '../../sim/branch/staff';
 import type { Branch, GameState } from '../../sim/state';
 
@@ -23,11 +24,11 @@ export interface BranchRow {
   issues: Issue[];
 }
 
-function bookTotals(branch: Branch): { deposits: number; loans: number } {
+function bookTotals(s: GameState, branch: Branch): { deposits: number; loans: number } {
   let deposits = 0;
   let loans = 0;
   for (const [pid, book] of Object.entries(branch.books)) {
-    const spec = PRODUCTS[pid];
+    const spec = productSpec(s, pid);
     if (!spec) continue;
     if (isDeposit(spec)) deposits += book.balance;
     else if (isLoan(spec)) loans += book.balance;
@@ -57,7 +58,7 @@ export function branchRows(s: GameState): BranchRow[] {
     name: b.name,
     cityId: b.cityId,
     rating: b.ratings.overall,
-    ...bookTotals(b),
+    ...bookTotals(s, b),
     income: b.pnl.at(-1)?.income ?? 0,
     issues: issuesOf(s, b),
   }));
