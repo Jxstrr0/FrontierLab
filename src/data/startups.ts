@@ -396,6 +396,8 @@ export const ROUND_NAMES: Record<StartupStageId, string> = {
   D: 'Series E',
 };
 export const STAGE_ORDER: StartupStageId[] = ['seed', 'A', 'B', 'C', 'D'];
+/** The first round in every funding history. */
+export const SEED_ROUND_NAME = 'Seed';
 
 /** Post-money range for a newly generated startup by stage. */
 export const GENERATED_POST_MONEY: Record<StartupStageId, [number, number]> = {
