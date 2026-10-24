@@ -2,7 +2,7 @@
 // debt from rival banks, incidents with their timed effects, The Daily Ledger's
 // issues and the price-war tracker. Re-exported from state.ts; kept here so
 // state.ts stays readable. See docs/DATA_MODEL.md §6 and §8.
-import type { Id, Money, Rate, Week } from '../data/types';
+import type { CountryId, Id, Money, Rate, Week } from '../data/types';
 
 // ─── Partnerships (SIMULATION §13.7) ──────────────────────────────────────────
 
@@ -145,6 +145,8 @@ export interface LedgerArticle {
   body: string;
   /** Higher leads the front page; Top shows the six highest. */
   priority: number;
+  /** `${template}:${subject}#${variant}`, so tests can check no repeats (optional, Stage 5). */
+  ref?: string;
 }
 
 export interface LedgerIssue {
@@ -159,6 +161,29 @@ export interface NewsState {
   issues: LedgerIssue[];
   /** Template used for each subject (`${type}:${subject}`) in its latest issue, so it never repeats next week. */
   lastTemplate: Record<string, { week: Week; idx: number }>;
+  /** The news desk's memory: politics, sports seasons, polls, rankings (optional, created on first issue). */
+  desk?: NewsDesk;
+}
+
+/** A bill before a country's lawmakers (§24 Politics). */
+export interface PolicyProposal {
+  country: CountryId;
+  /** Policy id in src/data/newsWorld.ts. */
+  policyId: string;
+  party: string;
+  voteWeek: Week;
+}
+
+export interface NewsDesk {
+  /** Events of `week` already reported: the first `count` in log order. Later ones arrived mid-week. */
+  cursor?: { week: Week; count: number };
+  proposals: PolicyProposal[];
+  /** Season records per league and club: [won, drawn, lost]. */
+  seasons: Record<string, Record<string, [number, number, number]>>;
+  /** Poll shares (percent) per country, by party index. */
+  polls: Partial<Record<CountryId, number[]>>;
+  /** Total assets per bank ('you' for yours) when the ranking year began. */
+  assetMarks: Record<Id, Money>;
 }
 
 // ─── Competition tracker ──────────────────────────────────────────────────────

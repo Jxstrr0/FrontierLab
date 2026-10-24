@@ -101,8 +101,21 @@ export interface EventPayloads {
   GRAD_PROGRAM: { siteId: Id; university: string; cost: Money; started: boolean };
 
   // ─── Politics (news.ts) ───────────────────────────────────────────────────
-  POLICY_PROPOSED: { country: string; policy: string; effect: string };
-  POLICY_PASSED: { country: string; policy: string; effect: string };
+  /** `country` is a CountryId; `policy` and `effect` are copy from src/data/newsWorld.ts. */
+  POLICY_PROPOSED: PolicyPayload;
+  /** A passed capital buffer also sets that country's `capitalBuffer`. */
+  POLICY_PASSED: PolicyPayload;
+  POLICY_REJECTED: PolicyPayload;
 }
 
 export type EventType = keyof EventPayloads;
+
+export interface PolicyPayload {
+  country: string;
+  policy: string;
+  effect: string;
+  /** Policy id in src/data/newsWorld.ts. */
+  policyId: string;
+  /** The fictional party that tabled it. */
+  party: string;
+}
