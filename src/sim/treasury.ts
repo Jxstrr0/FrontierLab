@@ -19,6 +19,7 @@ import {
 import { CITIES } from '../data/cities';
 import { totalDeposits } from './balanceSheet';
 import { pushEvent } from './events';
+import { treasuryPenalty } from './hq';
 import { earn, postPnl, spend } from './ledger';
 import { ftpLong } from './rates';
 import { stream } from './rng';
@@ -39,9 +40,11 @@ export function ratingSpread(capitalRatio: number): number {
 }
 
 export function overnightRate(state: GameState): number {
-  // treasuryPenalty is 0 until the Treasury floor exists (Stage 4).
   return (
-    homeCountry(state).policyRate + OVERNIGHT_SPREAD + ratingSpread(state.company.capitalRatio)
+    homeCountry(state).policyRate +
+    OVERNIGHT_SPREAD +
+    ratingSpread(state.company.capitalRatio) +
+    treasuryPenalty(state)
   );
 }
 

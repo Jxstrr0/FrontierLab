@@ -18,6 +18,18 @@ export type SegmentMix = Record<SegmentId, number>;
 export type CategoryId = 'deposits' | 'lending' | 'cards';
 export type DistrictId =
   'financial' | 'downtown' | 'midtown' | 'university' | 'suburbs' | 'industrial' | 'waterfront';
+export type DeptId =
+  | 'finance'
+  | 'hr'
+  | 'products'
+  | 'treasury'
+  | 'marketing'
+  | 'it'
+  | 'risk'
+  | 'executive'
+  | 'investment';
+/** Departments with staffing requirements and coverage effects. */
+export type HqDeptId = 'finance' | 'hr' | 'products' | 'treasury' | 'marketing' | 'it' | 'risk';
 export type Difficulty = 'easy' | 'normal' | 'hard' | 'expert';
 
 export type Phase = 'expansion' | 'slowdown' | 'recession' | 'recovery';

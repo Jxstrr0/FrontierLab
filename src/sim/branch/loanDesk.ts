@@ -2,6 +2,7 @@
 // pentagon profile and a hidden PD. The player (or a delegated manager) approves
 // at a rate or declines; booked loans amortize and default one by one.
 import {
+  HQ_EFFECTS,
   AWARENESS_FLOOR,
   LOANDESK,
   LOANDESK_BASE,
@@ -15,6 +16,8 @@ import { BUSINESS_PREFIXES, LOAN_SECTORS } from '../../data/loanSectors';
 import { PRODUCTS } from '../../data/products';
 import type { Pentagon } from '../../data/types';
 import { pushEvent } from '../events';
+import { riskPdMult, shortfall } from '../hq';
+import { appCost } from '../underwriting';
 import { newId } from '../ids';
 import { creditCycle, loanDemand } from '../macro';
 import { clamp, roundToStep } from '../math';
@@ -109,8 +112,7 @@ export function runLoanDesk(
       const app = generateApplication(state, branch, rng);
       state.loanDesk.applications[app.id] = app;
     }
-    wk.underwriting +=
-      n * (state.underwriting.models[state.underwriting.activeModelId]?.costPerApp ?? 0);
+    wk.underwriting += n * appCost(state);
   }
 
   if (branch.delegation.loans && branch.managerId) {
@@ -156,7 +158,10 @@ function generateApplication(state: GameState, branch: Branch, rng: Rng): LoanAp
     LOANDESK.amountMin,
     LOANDESK.amountMax,
   );
-  const sigma = LOANDESK.estimateSigma * (1 - estimatorSkill(state, branch) / 100);
+  const sigma =
+    LOANDESK.estimateSigma *
+    (1 - estimatorSkill(state, branch) / 100) *
+    (1 + HQ_EFFECTS.riskEstimate * shortfall(state, 'risk'));
   return {
     id: newId(state, 'app'),
     branchId: branch.id,
@@ -259,7 +264,7 @@ function runBusinessLoans(state: GameState, branch: Branch, wk: BranchWeek, rng:
   let defaulted = 0;
   for (const loan of Object.values(state.loanDesk.loans)) {
     if (loan.branchId !== branch.id || loan.status !== 'current') continue;
-    if (rng.chance((loan.pd * cycle) / WEEKS_PER_YEAR)) {
+    if (rng.chance((loan.pd * cycle * riskPdMult(state)) / WEEKS_PER_YEAR)) {
       const loss = loan.balance * loan.lgd;
       wk.losses += loss;
       state.treasury.reserves += loan.balance - loss;

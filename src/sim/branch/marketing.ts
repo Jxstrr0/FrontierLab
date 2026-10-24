@@ -10,6 +10,7 @@ import {
 import { CAMPAIGNS, type CampaignLevel } from '../../data/campaigns';
 import { CITIES } from '../../data/cities';
 import type { RatingCategory, SegmentId } from '../../data/types';
+import { campaignMult } from '../hq';
 import { clamp } from '../math';
 import type { Branch, GameState } from '../state';
 
@@ -73,8 +74,7 @@ export function campaignEffects(branch: Branch): CampaignEffects {
 export function marketingMult(state: GameState, branch: Branch): number {
   const mgr = branch.managerId ? state.people.managers[branch.managerId] : undefined;
   const skill = mgr?.skills.marketing ?? 0;
-  // marketingFloorMult is 1.0 until the Marketing floor exists (Stage 4).
-  return MANAGER_MARKETING.base + (MANAGER_MARKETING.slope * skill) / 100;
+  return (MANAGER_MARKETING.base + (MANAGER_MARKETING.slope * skill) / 100) * campaignMult(state);
 }
 
 /** Weekly branch awareness: a = a × (1 − decay) + Σ gain × (1 − a) × mktMult. */
