@@ -434,10 +434,21 @@ export interface MarketingState {
 
 export interface LossWeek {
   week: Week;
-  /** Losses and average balance by product id (sbl covers Loan Desk loans). */
-  byProduct: Record<string, { loss: Money; balance: Money }>;
+  /** Exposure, defaults and losses by product id (sbl covers Loan Desk loans). */
+  byProduct: Record<string, LossLine>;
   /** Expected loss from booked PDs this week, for model performance. */
   expected: Money;
+}
+
+/** One product's week on the Risk floor. Balances are before this week's defaults. */
+export interface LossLine {
+  balance: Money;
+  /** Balance that defaulted this week. */
+  defaulted: Money;
+  /** Loss after recoveries. */
+  loss: Money;
+  /** Defaults the booked PDs predicted (balance × PD / 52, before the credit cycle). */
+  expectedDefaults: Money;
 }
 
 export interface RegulatorReview {
