@@ -2,13 +2,40 @@
 
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
-**Current stage:** 7 — Investments and real estate (built and live; awaiting the owner's iPhone check). The Stage 2–6 checks are still open too. Next: Stage 8 — Multi-city and travel.
+**Current stage:** 8 — Multi-city and travel (built and live; awaiting the owner's iPhone check). The Stage 2–7 checks are still open too; the owner will do major testing and tuning later. Next: Stage 9 — Personal empire (owner: go straight on).
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `09f58c873bc838` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `1563c839eb89fa` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-24 — Stage 8 built: multi-city and travel
+- **Stage / step:** 8 — Multi-city and travel
+- **Done:**
+  - **Airports everywhere.** Every city map (and three small regional sites: Fort McMurray, Pilbara, Midland) has an airport pin. The departures board lists every destination nearest first, with distance (km or mi), "New" for places you haven't been, and how many branches you have there. A region filter keeps it one-handed.
+  - **Travel is never blocked.** Flights inside the weekly 24,140 km are free. Past that, a one-way ticket ($80k × the city's cost level) comes from your personal cash; if you can't cover it, the bank pays the rest as a travel expense.
+  - **Flight animation:** a plane follows a dotted arc across a world map (tap to skip), then the new city loads with a welcome toast. Tap the city pill at the bottom of the map for a Travel sheet: Go to the airport, and Fly now if you own a jet.
+  - **New cities are built when you first land**, the same in a given save whenever you arrive: storefronts, rival banks, offices, bureaus, the investment bank, buildings for sale, employers and the university.
+  - **Play everywhere at once.** Everything you own in every city runs every week. Each country runs its own economy and central bank, and your branches there earn on that country's rates. The Branches list groups branches by country and opens any of them from anywhere.
+  - **HQ prices per country:** with "Apply rates to all branches" on, the Products floor shows a country picker (with that country's central bank rate), because Japan's 0.75% and the US's 4.5% can't share one rate sheet.
+  - **HQ brand campaigns** can target any city you've reached; agency packages need you in that agency's city.
+  - **Private jet:** buy a Corvid 600 (6,000 km range) or an Albatross 8000 (anywhere) with personal cash; jet flights are free. Upkeep comes from personal cash, and you can sell it.
+  - Your start city is your bank's home: its central bank lends to you, taxes you and lists your shares.
+  - Saves move to version 9; a real Stage 7 save (listed, HQ prices on, a building, a yen position) is kept as a test, loads, flies and plays on.
+- **How it was built:** I laid the foundation (save format, city generation, travel and jet rules, per-country prices, distances), then two helper agents built the airport, flights and jet screens, and the multi-city audit (rivals priced per country, regional employer deals, news, campaigns, strategies). I merged them and played it at phone size: Calgary → New York → London, a branch in each.
+- **Fixed along the way:** rivals in two countries now price each country off its own central bank; HQ coverage no longer stalls at 88% with a full building (a second building is leased); a weekly loan scan that slowed big banks is about 7× faster.
+- **Balance:** the scripted steady player now moves on to other Canadian cities once Calgary is full, which removes the old 52-branch cap: year 10 ends at 167–223 branches and $7–10B of assets (target 60–200 and $8–40B; slightly outside on two seeds — noted for the tuning pass). Everything before the first flight is unchanged. 477 tests pass, including both Stage 8 acceptance checks: branches in three countries run a year with balanced books, and raising one country's rate moves only that country's branch margins.
+- **Determinism snapshot:** `09f58c873bc838` → `1563c839eb89fa`. Intended: new save fields (home city, travel, the travel line).
+- **Dependencies:** none added.
+- **Next:** Stage 9 (personal empire). Owner iPhone check for Stage 8 when convenient: tap the city pill → Go to the airport, fly free somewhere, fly far enough to pay a fare, open a branch abroad, try the Products floor country picker with Apply-to-all on, and visit Fort McMurray.
+- **Known issues:**
+  - The CPO's "best bureau model" delegation only looks at bureaus in the city you're standing in.
+  - "Fast-track a merger review" is global rather than per country.
+  - No Ledger story yet for a first branch in a new country.
+  - Toasts can draw over confirm sheets; on desktop the drawer covers the date pill.
+  - The world map's continents are deliberately rough.
+  - Carried over: a private building can push personal cash below zero (jet upkeep can too); rare startup IPOs; flavour-only networking cards; first-branch checkpoints at weeks 156/260; high ROE.
 
 ### 2026-10-24 — Stage 7 built: investments and real estate
 - **Stage / step:** 7 — Investments and real estate

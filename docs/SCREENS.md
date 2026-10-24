@@ -430,8 +430,9 @@ Tabs: Overview · Loans · Credit.
 - **Header:** airport name; advisor.
 - **Hero:** terminal vignette.
 - **Stats:** flown this week and remaining mileage (weekly allowance).
-- **Departures board:** split-flap styled rows with destination and distance (km or mi). Tap a row to fly: the plane animates across the map, then the destination map loads. Rows beyond the remaining mileage stay tappable and show the one-way fare ("$100k ticket"); a confirm says the fare comes from personal cash. Travel is never blocked.
-- **Private jet card:** Buy jet, or Fly now once owned.
+- **Departures board:** split-flap styled rows (airport code tiles, destination, country, distance in km or mi), nearest first, with a region filter (All / Americas / Europe / Asia-Pac). Rows mark "New" for places you haven't visited, "regional site", and your branch count there. Tap a row to fly: the plane follows a dotted great-circle arc across a world map (tap to skip; a still frame with reduced motion), then the destination map loads and a toast welcomes you. Rows beyond the remaining mileage stay tappable and show the one-way fare ("$104K ticket"); a confirm shows what personal cash pays and what the bank pays as a travel expense. Travel is never blocked.
+- **Private jet card:** without a jet, both models (price, range, Buy with confirm). With one: value, weekly upkeep, Fly now (the board in jet mode: rows within range read "Jet") and Sell (shows resale, confirm).
+- **City pill** (bottom centre of the map, SCREENS §0.2): tap for the Travel sheet — where you are, this week's mileage, Go to the airport, and Fly now with a jet.
 
 ## 19. Vacation home · Car dealer · Auction house
 
@@ -495,7 +496,7 @@ Tabs: Overview · Loans · Credit.
 ## 25. Branches list
 
 - Sortable rows: name, city, coins, deposits, loans, weekly income, issues badge.
-- Filter by city.
+- Filter by city (sideways-scrolling chips, hidden with one city). Once the bank spans several countries, chips and rows show the country code and "All cities" groups rows under country headings, home first.
 - Tap a row to open the branch panel (works from any city).
 
 ## 26. Settings and saves
