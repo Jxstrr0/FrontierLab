@@ -26,7 +26,7 @@ import { runReo } from './reo';
 import { runVentures, venturesQuarter } from './ventures';
 import { runPersonal } from './personal';
 import { runTravel } from './travel';
-import { insiderQuarter, runPersonalAssets } from './personalAssets';
+import { insiderQuarter, recordNetWorth, runPersonalAssets } from './personalAssets';
 import { runAuctions } from './auctions';
 import { runFranchises } from './franchise';
 import { richListYear } from './richList';
@@ -133,6 +133,7 @@ export function weeklyTick(state: GameState): void {
   }
   if (isYearStart(state.meta.startDate, state.clock.day)) yearEnd(state); // 14
   runIncidents(state); // 15
+  recordNetWorth(state); // 15 (the Personal Wealth screen's weekly change, §22)
   composeNews(state); // 16
 
   for (const cityId of Object.keys(state.world.cities)) {

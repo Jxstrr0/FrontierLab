@@ -1,7 +1,7 @@
 // Incidents (SIMULATION §23, CONTENT §22): the catalog, rolls under their
 // conditions and cooldowns, manager delegation, deadlines and timed effects.
 import { describe, expect, it } from 'vitest';
-import { FEATURES, INCIDENTS } from '../../src/config/balance';
+import { INCIDENTS } from '../../src/config/balance';
 import { INCIDENT_SPECS } from '../../src/data/incidents';
 import { balanceSheet } from '../../src/sim/balanceSheet';
 import { branchPrice } from '../../src/sim/branch/pricing';
@@ -47,10 +47,11 @@ describe('incident catalog', () => {
     }
   });
 
-  it('raises Stage 9 incidents only once the personal empire is on', () => {
+  it('raises the Stage 9 insider probe as a personal case with no corporate cost', () => {
     const { s } = openBank();
-    const raised = raiseIncident(s, 'INSIDER_PROBE', 'personal', 'personal');
-    expect(raised !== undefined).toBe(FEATURES.personalEmpire);
+    const inc = raiseIncident(s, 'INSIDER_PROBE', 'personal', 'personal', { fine: 300_000 });
+    expect(inc?.scopeKind).toBe('personal');
+    expect(inc?.options.every((o) => o.cost === 0)).toBe(true);
   });
 });
 
