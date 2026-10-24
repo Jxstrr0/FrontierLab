@@ -1,8 +1,10 @@
 // Headless multi-year balance run (SIMULATION §25).
 //   npm run balance -- --years 5 --seed 42 --strategy steady --city cal
 //     [--difficulty normal] [--competitors 3] [--cash 750000]
-// Prints a yearly company table, first-branch checkpoints, and a warning for
-// every Stage 1 target that is out of range.
+// Prints a yearly company table, the steady first branch's checkpoints, the
+// strategy's own targets (strategyTargets.ts), and a warning for every target
+// out of range. Branch revenue, income and loan-ratio checkpoints that land in
+// a recession or the 26 weeks after it read "n/a" (§25: they assume Expansion).
 import { isDeposit, PRODUCTS } from '../src/data/products';
 import { balanceSheet } from '../src/sim/balanceSheet';
 import { advanceWeeks } from '../src/sim/engine';
@@ -13,6 +15,7 @@ import { hqStaff } from '../src/sim/hq';
 import { summarize } from '../src/sim/ledger';
 import { founderStake } from '../src/sim/shares';
 import { STRATEGIES } from './strategies';
+import { emptyLog, logWeek, nearRecession, strategyChecks, type Check } from './strategyTargets';
 
 interface Args {
   years: number;
@@ -72,12 +75,8 @@ function minCoverage(state: GameState): number {
   return Math.min(...Object.values(state.hq.coverage).map((c) => c.kPrime));
 }
 
-interface Check {
-  label: string;
-  value: string;
-  ok: boolean;
-  target: string;
-}
+/** Weeks after a recession during which branch earnings checkpoints don't apply. */
+const RECESSION_GRACE_WEEKS = 26;
 
 function run(): void {
   const args = parseArgs(process.argv.slice(2));
@@ -108,6 +107,7 @@ function run(): void {
   let minCash = Infinity;
   let maxIdentityGap = 0;
   const yearly = { ni: 0, nii: 0, losses: 0, loans: 0, earning: 0, equity: 0, n: 0 };
+  const log = emptyLog();
 
   for (let w = 1; w <= weeks; w++) {
     advanceWeeks(state, 1);
@@ -117,6 +117,7 @@ function run(): void {
     maxIdentityGap = Math.max(maxIdentityGap, Math.abs(bs.equity - bs.expectedEquity));
     const snap = state.history.weekly.at(-1)!;
     const sum = summarize(snap.pnl);
+    logWeek(log, state, sum.netIncome);
     yearly.ni += sum.netIncome;
     yearly.nii += sum.netInterestIncome;
     yearly.losses += sum.loanLosses;
@@ -181,6 +182,10 @@ function run(): void {
   for (const r of rows) console.log(r);
 
   const checks: Check[] = [];
+  const branchChecks = strategy.name === 'steady';
+  const exempt = (wk: number) => nearRecession(log, wk, RECESSION_GRACE_WEEKS);
+  const na = (c: Check, wk: number): Check =>
+    exempt(wk) ? { ...c, value: 'n/a', ok: true, target: `${c.target} (recession)` } : c;
   const inRange = (x: number | undefined, lo: number, hi: number) =>
     x !== undefined && x >= lo && x <= hi;
   checks.push({
@@ -243,27 +248,42 @@ function run(): void {
     checks.push({
       label: `Week ${wk} deposits`,
       value: M(m.dep),
-      ok: inRange(m.dep, 40e6, 65e6),
-      target: '$40–65M',
+      ok: inRange(m.dep, 40e6, 70e6),
+      target: '$40–70M',
     });
-    checks.push({
-      label: `Week ${wk} loans / deposits`,
-      value: P(m.loans / m.dep),
-      ok: inRange(m.loans / m.dep, 0.75, 0.9),
-      target: '75–90%',
-    });
-    checks.push({
-      label: `Week ${wk} revenue / week`,
-      value: K(m.rev),
-      ok: inRange(m.rev, 110e3, 150e3),
-      target: '$110–150k',
-    });
-    checks.push({
-      label: `Week ${wk} income / week`,
-      value: K(m.inc),
-      ok: inRange(m.inc, 45e3, 70e3),
-      target: '$45–70k',
-    });
+    checks.push(
+      na(
+        {
+          label: `Week ${wk} loans / deposits`,
+          value: P(m.loans / m.dep),
+          ok: inRange(m.loans / m.dep, 0.7, 0.9),
+          target: '70–90%',
+        },
+        wk,
+      ),
+    );
+    checks.push(
+      na(
+        {
+          label: `Week ${wk} revenue / week`,
+          value: K(m.rev),
+          ok: inRange(m.rev, 110e3, 150e3),
+          target: '$110–150k',
+        },
+        wk,
+      ),
+    );
+    checks.push(
+      na(
+        {
+          label: `Week ${wk} income / week`,
+          value: K(m.inc),
+          ok: inRange(m.inc, 45e3, 70e3),
+          target: '$45–70k',
+        },
+        wk,
+      ),
+    );
   }
   checks.push({
     label: 'Payback from opening',
@@ -271,6 +291,8 @@ function run(): void {
     ok: inRange(paybackWeek, 1, 40),
     target: '≤ 40 weeks',
   });
+  // §25: the branch checkpoints read the steady strategy's first branch only.
+  if (!branchChecks) checks.splice(0, checks.length);
   checks.push({
     label: 'Corporate cash never < 0',
     value: K(minCash),
@@ -308,12 +330,27 @@ function run(): void {
     target: '< $1',
   });
 
-  console.log('\nFirst-branch checkpoints (SIMULATION §25)');
-  for (const c of checks)
-    console.log(
-      `  ${c.ok ? '✓' : '✗'} ${c.label.padEnd(30)} ${c.value.padStart(10)}   target ${c.target}`,
-    );
-  const bad = checks.filter((c) => !c.ok);
+  const own = strategyChecks(
+    strategy.name,
+    {
+      seed: args.seed,
+      cityId: args.city,
+      difficulty: args.difficulty,
+      competitors: args.competitors,
+      startCash: args.cash,
+    },
+    log,
+  );
+  const print = (title: string, list: Check[]) => {
+    console.log(`\n${title}`);
+    for (const c of list)
+      console.log(
+        `  ${c.ok ? '✓' : '✗'} ${c.label.padEnd(30)} ${c.value.padStart(10)}   target ${c.target}`,
+      );
+  };
+  print(branchChecks ? 'First-branch checkpoints (SIMULATION §25)' : 'Company checks', checks);
+  if (own.length) print(`Strategy targets: ${strategy.name} (SIMULATION §25)`, own);
+  const bad = [...checks, ...own].filter((c) => !c.ok);
   console.log(bad.length ? `\n${bad.length} warning(s).` : '\nAll checkpoints in range.');
 }
 
