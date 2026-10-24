@@ -9,6 +9,7 @@ import { advanceWeeks } from '../src/sim/engine';
 import { newGame } from '../src/sim/newGame';
 import type { Difficulty } from '../src/data/types';
 import type { Branch, GameState } from '../src/sim/state';
+import { hqStaff } from '../src/sim/hq';
 import { summarize } from '../src/sim/ledger';
 import { STRATEGIES } from './strategies';
 
@@ -63,6 +64,11 @@ function branchLoans(state: GameState, b: Branch): number {
     if (kind === 'amortizing' || kind === 'revolving' || kind === 'sbl') total += bk.balance;
   }
   return total;
+}
+
+/** Lowest HQ coverage k′ across departments (1 in founder mode). */
+function minCoverage(state: GameState): number {
+  return Math.min(...Object.values(state.hq.coverage).map((c) => c.kPrime));
 }
 
 interface Check {
@@ -156,6 +162,8 @@ function run(): void {
           M(state.company.cash).padStart(8),
           state.company.tier.padStart(10),
           `${(country.policyRate * 100).toFixed(2)}% ${country.phase}`.padStart(18),
+          String(hqStaff(state)).padStart(6),
+          P(minCoverage(state)).padStart(7),
         ].join(' '),
       );
       Object.assign(yearly, { ni: 0, nii: 0, losses: 0, loans: 0, earning: 0, equity: 0, n: 0 });
@@ -167,7 +175,7 @@ function run(): void {
       `${args.difficulty}, ${state.meta.competitors} competitors, ${args.years} years\n`,
   );
   console.log(
-    'Year Branches  Deposits     Loans   Equity      CR    NIM   Loss     ROE     Cash       Tier       Policy',
+    'Year Branches  Deposits     Loans   Equity      CR    NIM   Loss     ROE     Cash       Tier       Policy HQ ppl  Min k′',
   );
   for (const r of rows) console.log(r);
 

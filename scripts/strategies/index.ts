@@ -1,6 +1,7 @@
 // The scripted strategies from SIMULATION §25.
 import { forceRecession } from './stress';
 import { averageLot, bestLot, buildCost, followDefaults, openBranch } from './common';
+import { manageHq } from './hq';
 import type { Strategy } from './types';
 import * as cmd from '../../src/sim/commands';
 import type { GameState } from '../../src/sim/state';
@@ -32,6 +33,7 @@ export const steady: Strategy = {
   setup: (s) => firstBranch(s, true),
   weekly: (s) => {
     followDefaults(s);
+    manageHq(s);
     expand(s, 2, 0.12, true);
   },
 };
@@ -41,6 +43,7 @@ export const turtle: Strategy = {
   setup: (s) => firstBranch(s, false, { ...DELEGATE_OPS, loans: false }),
   weekly: (s) => {
     followDefaults(s);
+    manageHq(s);
     for (const app of Object.values(s.loanDesk.applications)) cmd.declineApplication(s, app.id);
     const lot = bestLot(s);
     if (lot && s.company.cash > 2 * buildCost(s, lot)) {
@@ -67,6 +70,7 @@ export const aggressive: Strategy = {
   weekly: (s) => {
     // Cheapest prices: savers get 0.5pp more, borrowers pay 0.5pp less.
     followDefaults(s, 0.005, -0.005);
+    manageHq(s);
     expand(s, 1.2, 0.085, true);
   },
 };
