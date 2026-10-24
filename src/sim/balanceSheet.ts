@@ -3,6 +3,7 @@
 // retained earnings and AOCI forward, and the two must agree (balance identity).
 import { isDeposit, isLoan, PRODUCTS } from '../data/products';
 import { summarize } from './ledger';
+import { productSpec } from './products';
 import type { GameState } from './state';
 
 export interface BalanceSheet {
@@ -32,7 +33,7 @@ export function totalDeposits(state: GameState): number {
   let total = 0;
   for (const b of Object.values(state.branches)) {
     for (const [pid, book] of Object.entries(b.books)) {
-      const spec = PRODUCTS[pid];
+      const spec = productSpec(state, pid);
       if (spec && isDeposit(spec)) total += book.balance;
     }
   }
@@ -45,7 +46,7 @@ export function loanTotals(state: GameState): { total: number; rwa: number } {
   let rwa = 0;
   for (const b of Object.values(state.branches)) {
     for (const [pid, book] of Object.entries(b.books)) {
-      const spec = PRODUCTS[pid];
+      const spec = productSpec(state, pid);
       // SBL book totals mirror the individual loans below; skip them here.
       if (!spec || !isLoan(spec) || spec.kind === 'sbl') continue;
       total += book.balance;

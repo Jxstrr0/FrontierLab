@@ -10,7 +10,7 @@ import {
   PRICE_FACTOR_CLAMP,
   RATE_COMP_STEP,
 } from '../../config/balance';
-import { PRODUCTS, type ProductSpec } from '../../data/products';
+import type { ProductSpec } from '../../data/products';
 import { SEGMENT_SPECS } from '../../data/segments';
 import type { SegmentId } from '../../data/types';
 import { clamp } from '../math';
@@ -69,10 +69,4 @@ export function branchPrice(state: GameState, branch: Branch, productId: string)
 
 export function isOffered(branch: Branch, productId: string): boolean {
   return branch.offered[productId]?.on === true;
-}
-
-export function productSpec(id: string): ProductSpec {
-  const spec = PRODUCTS[id];
-  if (!spec) throw new Error(`Unknown product ${id}`);
-  return spec;
 }
