@@ -44,6 +44,8 @@ export function closeAcquisition(
 ): string[] {
   payForShares(state, bank, plan);
   settleDebt(state, bank.id);
+  // A won Lobbying fast-track covers one deal (§19.8).
+  if (state.lobbying?.fastTrack) delete state.lobbying.fastTrack;
   // The target's cash (and the loans' fair-value markdown, if any) arrives as reserves.
   state.treasury.reserves += plan.reserves;
   state.company.leaseDeposits += plan.leaseDeposits;

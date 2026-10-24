@@ -2,7 +2,8 @@
 // table policies now and then and lawmakers vote a few weeks later. A passed
 // capital buffer raises that country's capital tier thresholds by
 // CAPITAL_BUFFER_PP for CAPITAL_BUFFER_WEEKS (capital.ts applies it at home);
-// every other policy is flavour and its copy promises nothing in the game.
+// every other policy is flavour and its copy promises nothing in the game. A
+// won lobbying stall (lobbying.ts) makes the pending buffer bill fail its vote.
 // Also the home country's opinion poll. Runs inside tick step 16.
 import {
   CAPITAL_BUFFER_PP,
@@ -44,7 +45,10 @@ export function runPolitics(state: GameState, desk: NewsDesk, rng: Rng): void {
       policyId: spec.id,
       party: bill.party,
     };
-    if (rng.chance(NEWS_POLICY_PASS_P)) {
+    // The vote is always drawn so a won lobbying stall doesn't shift later draws.
+    const roll = rng.chance(NEWS_POLICY_PASS_P);
+    const passed = !stalled(state, bill.country, spec.id) && roll;
+    if (passed) {
       if (spec.id === CAPITAL_BUFFER_POLICY) {
         const c = state.world.countries[bill.country];
         if (c) c.capitalBuffer = { pp: CAPITAL_BUFFER_PP, untilWeek: week + CAPITAL_BUFFER_WEEKS };
@@ -74,6 +78,15 @@ export function runPolitics(state: GameState, desk: NewsDesk, rng: Rng): void {
       5,
     );
   }
+}
+
+/** A won lobbying campaign ("Stall the capital buffer bill") makes that country's buffer bill fail; used once. */
+function stalled(state: GameState, country: CountryId, policyId: string): boolean {
+  const block = state.lobbying?.blockBill;
+  if (policyId !== CAPITAL_BUFFER_POLICY || !block || block.country !== country) return false;
+  if (block.untilWeek < state.clock.week) return false;
+  delete state.lobbying.blockBill;
+  return true;
 }
 
 const POLICY_KEYS = {

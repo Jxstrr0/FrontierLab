@@ -1,5 +1,57 @@
-// The Daily Ledger's templates for realEstate stories (Stage 7, CONTENT §23).
-// Merged into LEDGER_TEMPLATES via ledgerTemplatesInvestments.ts.
+// The Daily Ledger's templates for real estate stories (Stage 7, CONTENT §23):
+// big building deals by the bank or its founder, and foreclosed homes sold off
+// city by city. Merged into LEDGER_TEMPLATES via ledgerTemplatesInvestments.ts.
 import type { LedgerTemplate } from './ledgerTemplates';
 
-export const REAL_ESTATE_TEMPLATES = {} satisfies Record<string, LedgerTemplate[]>;
+export const REAL_ESTATE_TEMPLATES = {
+  PROPERTY_BOUGHT: [
+    {
+      h: '{bank} buys {address} for {price}',
+      b: 'The bank adds the {city} building to its books and says the tenants stay put.',
+    },
+    {
+      h: 'Landlord {bank}: lender snaps up {address}',
+      b: 'A {price} purchase in {city}. Rent from the building will now flow to the bank.',
+    },
+  ],
+  PROPERTY_BOUGHT_PERSONAL: [
+    {
+      h: '{founder} buys {address} privately',
+      b: 'The {bank} founder paid {price} for the {city} building out of their own pocket.',
+    },
+    {
+      h: 'Founder turns landlord: {founder} pays {price} for {city} block',
+      b: '{address} changes hands. The bank says the deal has nothing to do with it.',
+    },
+  ],
+  PROPERTY_SOLD: [
+    {
+      h: '{bank} sells {address} for {price}',
+      b: 'The bank cashes in on the {city} building. Brokers say the buyer was quick to sign.',
+    },
+    {
+      h: '{bank} lets go of {city} building',
+      b: '{address} fetched {price}. The proceeds go straight to corporate cash.',
+    },
+  ],
+  PROPERTY_SOLD_PERSONAL: [
+    {
+      h: '{founder} sells {address}',
+      b: 'The {bank} founder banked {price} on the {city} building.',
+    },
+    {
+      h: '{founder} cashes out of {city} property',
+      b: '{address} sold for {price} in a private deal.',
+    },
+  ],
+  REO_SOLD: [
+    {
+      h: '{bank} clears its foreclosed homes in {city}',
+      b: '{units} repossessed homes went in one lot for {price}, about a tenth under their value.',
+    },
+    {
+      h: 'Bulk sale: {bank} sells {units} foreclosed homes',
+      b: 'Investors paid {price} for the {city} portfolio. The bank takes a small haircut to free up capital.',
+    },
+  ],
+} satisfies Record<string, LedgerTemplate[]>;

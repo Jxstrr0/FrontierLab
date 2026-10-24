@@ -1483,6 +1483,14 @@ export const REAL_ESTATE = {
   sqmRange: [1500, 12000] as [number, number],
   sqmPerFloor: 800,
   startOcc: [0.75, 0.95] as [number, number],
+  /** Annual rent you can set, as a share of market rent, and the stepper step per m². */
+  rentRange: [0.5, 1.6] as [number, number],
+  rentStep: 5,
+  /** Offer stepper on a listing: from this share of asking up to asking, in steps of this share. */
+  offerMin: 0.8,
+  offerStep: 0.01,
+  /** A purchase or sale at least this large makes The Daily Ledger. */
+  newsMin: 10_000_000,
 } as const;
 /** §21.3 foreclosed homes: carrying cost per year, Sell all at 90% in 1–4 weeks, Rent yield at 90% occupancy. */
 export const REO = {
