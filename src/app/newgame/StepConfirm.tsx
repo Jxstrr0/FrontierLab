@@ -5,7 +5,7 @@ import { CITIES } from '../../data/cities';
 import { Card, Medallion, Row } from '../components';
 import { gameDate } from '../format/format';
 import { FounderPortrait } from './AvatarPicker';
-import { DIFFICULTY_LABEL, cashLabel } from './choices';
+import { CURRENCY_NAME, DIFFICULTY_LABEL, cashLabel } from './choices';
 import { randomSeed, type Draft } from './draft';
 
 export function StepConfirm(p: { draft: Draft; patch: (d: Partial<Draft>) => void }) {
@@ -25,7 +25,8 @@ export function StepConfirm(p: { draft: Draft; patch: (d: Partial<Draft>) => voi
         <Row label="Start city" value={city.name} />
         <Row label="Rival banks" value={draft.competitors} />
         <Row label="Difficulty" value={DIFFICULTY_LABEL[draft.difficulty]} />
-        <Row label="Starting cash" value={cashLabel(draft.startCash)} />
+        <Row label="Starting cash" value={cashLabel(draft.startCash, draft.currency)} />
+        <Row label="Currency" value={`${draft.currency} ${CURRENCY_NAME[draft.currency]}`} />
       </Card>
 
       <details class="advanced">
