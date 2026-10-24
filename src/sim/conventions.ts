@@ -24,7 +24,8 @@ const MS_PER_DAY = 86_400_000;
 export function absoluteWeek(startDate: string, year: number, woy: number): number {
   const start = Date.parse(`${startDate}T00:00:00Z`);
   const blockStart = Date.UTC(year, 0, 1) + (woy - 1) * DAYS_PER_WEEK * MS_PER_DAY;
-  return Math.ceil((blockStart - start) / MS_PER_DAY / DAYS_PER_WEEK);
+  // `+ 0` turns a −0 (a block starting just before the first day) into 0.
+  return Math.ceil((blockStart - start) / MS_PER_DAY / DAYS_PER_WEEK) + 0;
 }
 
 /** One year's runs from the calendar, in opening order. */
@@ -75,6 +76,7 @@ function announce(state: GameState, run: ConventionRun): void {
       cityId: run.cityId,
       city: cityName(run.cityId),
       startWeek: run.startWeek,
+      local: run.cityId === state.world.currentCityId,
     },
     run.cityId === state.world.currentCityId ? 3 : 1,
     run.cityId,
@@ -96,6 +98,7 @@ export function runConventions(state: GameState): void {
           name: specOf(run.conventionId)?.name ?? 'A convention',
           cityId: run.cityId,
           city: cityName(run.cityId),
+          local: run.cityId === state.world.currentCityId,
         },
         run.cityId === state.world.currentCityId ? 2 : 0,
         run.cityId,

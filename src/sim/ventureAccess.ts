@@ -36,10 +36,7 @@ export function liveRun(state: GameState, conventionId: string): ConventionRun |
   const week = state.clock.week;
   return state.conventions.runs.find(
     (r) =>
-      r.conventionId === conventionId &&
-      r.announced &&
-      week >= announceWeek(r) &&
-      week < r.endWeek,
+      r.conventionId === conventionId && r.announced && week >= announceWeek(r) && week < r.endWeek,
   );
 }
 

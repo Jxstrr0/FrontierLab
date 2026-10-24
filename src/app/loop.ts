@@ -17,6 +17,7 @@ import { CAPITAL_BUFFER_POLICY } from '../data/newsWorld';
 import { saveToSlot } from './saves';
 import { bump, modal, peekGame, toast } from './store';
 import { MNA_BAD_EVENTS, MNA_EVENT_TEXT } from './investmentBank/mnaToasts';
+import { VENTURE_BAD_EVENTS, VENTURE_EVENT_TEXT } from './startup/ventureToasts';
 
 const FRAME_MS = 50;
 let timer: ReturnType<typeof setInterval> | undefined;
@@ -163,6 +164,7 @@ function expiringApplications(s: GameState): number {
 
 const EVENT_TEXT: Record<string, (p: Record<string, unknown>) => string> = {
   ...MNA_EVENT_TEXT,
+  ...VENTURE_EVENT_TEXT,
   BRANCH_OPENED: (p) => `${String(p.name)} is open for business.`,
   CB_DECISION: (p) => {
     const change = Number(p.change);
@@ -191,7 +193,7 @@ const EVENT_TEXT: Record<string, (p: Record<string, unknown>) => string> = {
 
 /** Events about a country toast only when it is your home country (nine central banks meet). */
 const HOME_ONLY = new Set(['CB_DECISION', 'POLICY_PASSED']);
-const BAD_EVENTS = new Set(['WINDOW_USE', 'BANK_RUN', ...MNA_BAD_EVENTS]);
+const BAD_EVENTS = new Set(['WINDOW_USE', 'BANK_RUN', ...MNA_BAD_EVENTS, ...VENTURE_BAD_EVENTS]);
 
 function announceEvents(s: GameState): void {
   const log = s.events.log;

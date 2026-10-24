@@ -110,7 +110,8 @@ describe('office commands', () => {
   it('rejects too many floors, later-stage floors and short cash', () => {
     const s = newGame({ seed: 7, cityId: 'cal', startCash: 500_000 });
     const l = Object.values(s.world.officeListings)[0]!;
-    expect(cmd.leaseOffice(s, l.id, ['investment']).ok).toBe(false);
+    // Every floor is available once Stage 7 enables the Investment floor; unknown ones still fail.
+    expect(cmd.leaseOffice(s, l.id, ['vault' as never]).ok).toBe(false);
     const all = ['finance', 'hr', 'products', 'treasury', 'marketing', 'it', 'risk'] as const;
     expect(cmd.leaseOffice(s, l.id, [...all, 'finance']).ok).toBe(false);
     s.company.cash = 1000;

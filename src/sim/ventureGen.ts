@@ -96,6 +96,8 @@ export function buildStartup(
     burn > 0
       ? burn * rng.range(VENTURE_GEN.startRunway[0], VENTURE_GEN.startRunway[1])
       : spec.postMoney * VENTURE_GEN.profitableCash;
+  quarters[quarters.length - 1]!.cash = cash;
+  quarters[quarters.length - 1]!.debt = 0;
 
   // Funding history spread evenly from founding to now.
   const rounds = roundsTo(spec.stage);

@@ -1,0 +1,93 @@
+/* Startups (SCREENS §11): vignettes, venture cards, the panel's profile and lots. */
+.st-art {
+  flex: none;
+}
+.st-art-ring {
+  fill: none;
+  stroke: var(--brass);
+  stroke-width: 1;
+}
+.st-art-ring-fine {
+  stroke-dasharray: 1.5 2;
+  opacity: 0.7;
+}
+.st-art-line {
+  fill: none;
+  stroke: var(--brass-light);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.st-carousel .carousel > .st-card {
+  flex-basis: 84%;
+}
+.st-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.st-card-head {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+}
+.st-card-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-16);
+}
+.st-card-head p {
+  margin: var(--space-1) 0 0;
+}
+.st-card-desc {
+  margin: 0;
+  flex: 1;
+}
+.st-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.st-desc {
+  margin: 0 0 var(--space-3);
+}
+.st-ceo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+.st-ceo-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+.st-block {
+  margin: var(--space-2) 0 0;
+}
+.st-lot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.st-lot-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.st-lot-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+.st-lot-price {
+  font-variant-numeric: tabular-nums;
+  color: var(--brass-light);
+}
+.st-lot .btn {
+  flex: none;
+  min-height: var(--tap-min);
+}

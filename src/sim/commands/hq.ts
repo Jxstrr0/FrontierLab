@@ -39,6 +39,7 @@ export function floorFitout(cityId: string): number {
  */
 export function deptAvailable(id: DeptId): boolean {
   if (id === 'executive') return FEATURES.capitalMarkets;
+  if (id === 'investment') return FEATURES.investments;
   return (HQ_DEPTS as readonly string[]).includes(id);
 }
 

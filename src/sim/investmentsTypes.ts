@@ -70,8 +70,8 @@ export interface Startup {
   /** Price per share of the latest round (marks, §20.6). */
   lastPrice: Money;
   cash: Money;
-  /** Quarterly results, oldest first (last 12). */
-  quarters: { revenue: Money; netIncome: Money }[];
+  /** Quarterly results, oldest first (last 12); cash and debt at quarter end when known. */
+  quarters: { revenue: Money; netIncome: Money; cash?: Money; debt?: Money }[];
   round?: StartupRound;
   history: { round: string; amount: Money; week: Week }[];
   holders: StartupHolder[];
@@ -91,6 +91,8 @@ export interface VenturesState {
   /** Startups the Investment floor currently shows (§20.3). */
   pipeline: Id[];
   pipelineRefreshWeek: Week;
+  /** Portfolio totals at last week's step 8, for the Investment floor's weekly change. */
+  valueLog?: { week: Week; company: Money; personal: Money };
 }
 
 // ─── Conventions (CONTENT §19) ────────────────────────────────────────────────
