@@ -20,12 +20,21 @@ const PRIORITY: readonly HqDeptId[] = [
   'marketing',
 ];
 /** Keep this many weeks of costs in hand before fitting out another floor. */
-const CASH_BUFFER = 3;
+const CASH_BUFFER = 1.5;
+/** Leasing the first office (deposit, rent and three fit-outs) needs more headroom. */
+const LEASE_BUFFER = 3;
 /** Staff a little over the requirement so quits don't dip coverage. */
 const HEADROOM = 1.15;
+/** Lease the first office once requirements are half phased in (4 branches). */
+const LEASE_AT_RAMP = 0.5;
+/** Staff each department for this coverage k′. */
+const TARGET_K = 0.95;
 
 export function manageHq(state: GameState): void {
-  if (founderRamp(state) <= 0 && Object.keys(state.offices).length === 0) return;
+  const ramp = founderRamp(state);
+  if (ramp < LEASE_AT_RAMP && Object.keys(state.offices).length === 0) return;
+  // Only the uncovered share counts at a partial ramp: k needed for k′ = TARGET_K.
+  const kNeeded = ramp > 0 ? Math.max(0, 1 - (1 - TARGET_K) / ramp) : 0;
   ensureFloors(state);
   for (const id of HQ_DEPTS) {
     const d = state.departments[id];
@@ -33,7 +42,7 @@ export function manageHq(state: GameState): void {
     const perHead =
       (HQ_COVERAGE.skillBase + (HQ_COVERAGE.skillSlope * d.skill) / 100) *
       (HQ_COVERAGE.moraleBase + (HQ_COVERAGE.moraleSlope * d.morale) / 100);
-    const want = Math.ceil((requiredStaff(state, id) * HEADROOM) / perHead);
+    const want = Math.ceil((requiredStaff(state, id) * kNeeded * HEADROOM) / perHead);
     if (want > deptDesks(state, id)) addFloorFor(state, id);
     cmd.setDeptTarget(state, id, want);
   }
@@ -47,7 +56,7 @@ function ensureFloors(state: GameState): void {
     if (!listing) return;
     const first = PRIORITY.slice(0, 3);
     const quote = cmd.officeQuote(state, listing.id, first.length);
-    if (state.company.cash > quote.total * CASH_BUFFER)
+    if (state.company.cash > quote.total * LEASE_BUFFER)
       cmd.leaseOffice(state, listing.id, [...first]);
     return;
   }
@@ -60,4 +69,23 @@ function addFloorFor(state: GameState, id: HqDeptId): void {
   if (!office) return;
   if (state.company.cash < cmd.floorFitout(office.cityId) * CASH_BUFFER) return;
   cmd.addFloor(state, office.id, id);
+}
+
+/** Expansion waits while requirements apply and any department is short of READY_K. */
+const READY_K = 0.9;
+/** Weeks of HQ costs kept in hand before opening another branch. */
+const HQ_RESERVE_WEEKS = 13;
+
+/** Last week's HQ payroll, benefits and office rent. */
+function hqWeeklyCost(state: GameState): number {
+  const pnl = state.history.weekly.at(-1)?.pnl;
+  const rent = Object.values(state.offices).reduce((sum, o) => sum + o.weeklyRent, 0);
+  return (pnl?.hqStaff ?? 0) + (pnl?.benefits ?? 0) + rent;
+}
+
+export function hqReady(state: GameState): boolean {
+  // Keep a reserve for HQ payroll and rent before spending on branches.
+  if (state.company.cash < HQ_RESERVE_WEEKS * hqWeeklyCost(state)) return false;
+  if (founderRamp(state) < LEASE_AT_RAMP) return true;
+  return Object.values(state.hq.coverage).every((c) => c.kPrime >= READY_K);
 }

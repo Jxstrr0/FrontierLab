@@ -227,15 +227,17 @@ Weekly campaign costs scale by city.costIndex. Per-account costs don't.
 
 | Dept | Desks | Market salary | Required staff | Effects when short (k′ < 1) |
 |---|---|---|---|---|
-| finance | 24 | 82,000 | 2 + 0.6 × branches + 1 per $2B assets (+4 if public) | statement delay `ceil((0.9 − k′) × 10)` weeks; IR discount; public & k′ < 0.6 → late filing fine of 0.02% of revenue per quarter; IPO needs k′ ≥ 0.8 |
-| hr | 24 | 68,000 | 1 + employees / 60 | hiring ×k′; morale −(1 − k′) × 15 company-wide |
-| products | 24 | 90,000 | 2 + 0.3 × branches + 2 per active development | dev duration ÷ max(0.3, k′); model cost +(1 − k′) × 30% |
+| finance | 24 | 82,000 | 2 + 0.35 × branches + 1 per $2B assets (+4 if public) | statement delay `ceil((0.9 − k′) × 10)` weeks; IR discount; public & k′ < 0.6 → late filing fine of 0.02% of revenue per quarter; IPO needs k′ ≥ 0.8 |
+| hr | 24 | 68,000 | 1 + employees / 80 | hiring ×k′; morale −(1 − k′) × 15 company-wide |
+| products | 24 | 90,000 | 2 + 0.2 × branches + 2 per active development | dev duration ÷ max(0.3, k′); model cost +(1 − k′) × 30% |
 | treasury | 24 | 95,000 | 1 + 1 per $1B (deposits + wholesale) | funding spread +(1 − k′) × 0.50%; fewer market offers |
-| marketing | 24 | 72,000 | 1 + 0.25 × branches + 2 per active brand campaign | all campaign effects ×(0.5 + 0.5k′) |
-| it | 24 | 98,000 | 2 + 0.4 × branches + 1 per $5B assets | app rating target ×k′; breach and outage odds ×(1 + 2(1 − k′)) |
-| risk | 24 | 88,000 | 2 + 0.2 × branches + 1 per $750M loans | PD ×(1 + 0.4(1 − k′)); fine odds ×(1 + 3(1 − k′)); weaker loan estimates |
+| marketing | 24 | 72,000 | 1 + 0.15 × branches + 2 per active brand campaign | all campaign effects ×(0.5 + 0.5k′) |
+| it | 24 | 98,000 | 2 + 0.25 × branches + 1 per $5B assets | app rating target ×k′; breach and outage odds ×(1 + 2(1 − k′)) |
+| risk | 24 | 88,000 | 2 + 0.15 × branches + 1 per $750M loans | PD ×(1 + 1.5(1 − k′)); fine odds ×(1 + 3(1 − k′)); weaker loan estimates |
 | executive | 7 (suite) | (per exec) | — | enables executives: COO, CFO, CPO, CMO, CTO, CRO |
 | investment | 32 | 120,000 | optional | ventures shown = 1 + floor(staff / 4), max 8 |
+
+Stage 4 tuning (2026-10-24): per-branch requirements were cut by about 40% and the Risk PD penalty raised from 0.4 to 1.5 so that a bank without an HQ ends a 6-year steady run clearly behind one with a staffed HQ (balance strategy `nohq`), instead of ahead of it. Shortfall effects read effect(k′) = k′^0.7.
 
 Salaries scale by city.wageIndex. Desks per floor come from the building (24 or 32); Investment floors are always 32 and the Executive suite 7.
 

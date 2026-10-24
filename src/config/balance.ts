@@ -480,13 +480,13 @@ export const FOUNDER_RAMP = { fromBranches: 2, overBranches: 4 } as const;
  * base + perBranch × branches + per$ × the department's dollar driver.
  */
 export const DEPT_REQUIREMENTS = {
-  finance: { base: 2, perBranch: 0.6, perAssets: 1 / 2e9 },
-  hr: { base: 1, perEmployee: 1 / 60 },
-  products: { base: 2, perBranch: 0.3, perDevelopment: 2 },
+  finance: { base: 2, perBranch: 0.35, perAssets: 1 / 2e9 },
+  hr: { base: 1, perEmployee: 1 / 80 },
+  products: { base: 2, perBranch: 0.2, perDevelopment: 2 },
   treasury: { base: 1, perFunding: 1 / 1e9 },
-  marketing: { base: 1, perBranch: 0.25, perCampaign: 2 },
-  it: { base: 2, perBranch: 0.4, perAssets: 1 / 5e9 },
-  risk: { base: 2, perBranch: 0.2, perLoans: 1 / 750e6 },
+  marketing: { base: 1, perBranch: 0.15, perCampaign: 2 },
+  it: { base: 2, perBranch: 0.25, perAssets: 1 / 5e9 },
+  risk: { base: 2, perBranch: 0.15, perLoans: 1 / 750e6 },
 } as const;
 /** Coverage (§16.4): staffEff, k, k′ and the shortfall curve. */
 export const HQ_COVERAGE = {
@@ -509,13 +509,12 @@ export const HQ_EFFECTS = {
   /** Statement delay ceil((delayFrom − k′) × 10) weeks below k′ 0.9. */
   financeDelayFrom: 0.9,
   financeDelayScale: 10,
-  /** Hiring × k′ (never below this, so floors can always be staffed). */
-  hrHireFloor: 0.25,
   hrMoralePenalty: 15,
   devSpeedFloor: 0.3,
   modelCostPenalty: 0.3,
   campaignBase: 0.5,
-  riskPd: 0.4,
+  /** PD × (1 + riskPd × (1 − k′)); raised from 0.4 in Stage 4 tuning (CONTENT §9). */
+  riskPd: 1.5,
   riskFine: 3,
   /** Loan Desk estimate noise × (1 + this × (1 − k′)). */
   riskEstimate: 1,

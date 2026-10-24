@@ -310,7 +310,7 @@ One `Book` per (branch, product): `accounts`, `balance`, `bookRate`, `pd` (annua
 1. **Origination:**
    - `pdNew = basePD_p × appetite.pdMult × (1.30 − 0.06 × model.accuracy) × (1 + 0.02 × (model.inclusion − 5)) × adverse × riskMult`
    - `adverse = max(0.85, 1 + 0.25 × max(0, (price − m)/0.01) − 0.05 × max(0, (m − price)/0.01))`
-   - `riskMult = 1 + 0.4 × (1 − riskCoverage')` (§16.4)
+   - `riskMult = 1 + 1.5 × (1 − riskCoverage')` (§16.4, CONTENT §9)
    - Update the balance-weighted `pd` and `bookRate`. `lgd` is a product constant.
    - Cash: liquid pool −= `newVolume`, plus the origination fee (CONTENT; mortgage 0.5%) as cash in.
 2. **Scheduled runoff:** `principal = balance / term_p`. Mortgages use the 1,300-week amortization.
