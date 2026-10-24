@@ -27,6 +27,14 @@ export default tseslint.config(
           property: 'random',
           message: 'Use the seeded RNG streams in src/sim/rng.ts.',
         },
+        ...['exp', 'log', 'pow', 'sin', 'cos', 'tan', 'tanh', 'atan', 'atan2', 'hypot', 'cbrt']
+          .concat(['log1p', 'log2', 'log10', 'expm1', 'sinh', 'cosh', 'asin', 'acos'])
+          .map((property) => ({
+            object: 'Math',
+            property,
+            message:
+              'Engines differ here; use src/sim/detmath.ts so every browser gets the same game.',
+          })),
         {
           object: 'Date',
           property: 'now',
@@ -38,6 +46,13 @@ export default tseslint.config(
         { name: 'window', message: 'src/sim must not touch the DOM.' },
         { name: 'document', message: 'src/sim must not touch the DOM.' },
         { name: 'localStorage', message: 'localStorage lives in src/sim/save/ only.' },
+      ],
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "BinaryExpression[operator='**'], AssignmentExpression[operator='**=']",
+          message: 'Engines differ on **; use dpow from src/sim/detmath.ts.',
+        },
       ],
     },
   },

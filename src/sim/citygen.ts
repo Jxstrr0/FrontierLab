@@ -18,6 +18,7 @@ import type { DistrictId } from '../data/types';
 import { clamp } from './math';
 import { stream } from './rng';
 import type { GameState, Lot } from './state';
+import { dhypot, dpow } from './detmath';
 
 export function generateLots(state: GameState, cityId: string): Lot[] {
   const city = CITIES[cityId];
@@ -55,7 +56,7 @@ export function generateLots(state: GameState, cityId: string): Lot[] {
       const weeklyRent = Math.round(
         spec.baseRent *
           city.rentIndex *
-          Math.pow(footTraffic / spec.footTraffic, RENT_TRAFFIC_EXP) *
+          dpow(footTraffic / spec.footTraffic, RENT_TRAFFIC_EXP) *
           rng.range(...LOT_RENT_NOISE),
       );
       index += 1;
@@ -81,5 +82,5 @@ export function generateLots(state: GameState, cityId: string): Lot[] {
 
 /** Straight-line tile distance between two lots. */
 export function tileDistance(a: Lot, b: Lot): number {
-  return Math.hypot(a.tile.x - b.tile.x, a.tile.y - b.tile.y);
+  return dhypot(a.tile.x - b.tile.x, a.tile.y - b.tile.y);
 }

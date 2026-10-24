@@ -23,6 +23,7 @@ import { marketingMult } from './marketing';
 import { lotAffinity } from './ratings';
 import { managerOf, marketWage, staffNeeded } from './staff';
 import { difficultyOf } from '../difficulty';
+import { dpow } from '../detmath';
 
 /** Campaigns a delegated manager weighs by awareness return. */
 const AWARENESS_CAMPAIGNS = [
@@ -122,7 +123,7 @@ function delegateMarketing(state: GameState, branch: Branch): void {
     (1 - AWARENESS_FLOOR) *
     (1 - b) *
     Math.sqrt(loanDemand(country)) *
-    (1 - pen) ** SATURATION_EXP;
+    dpow(1 - pen, SATURATION_EXP);
   const share = branch.last.share;
   const H = DELEGATE.marketingHorizon;
   const steady = (g: number) => (g * mult) / (AWARENESS_DECAY + g * mult);

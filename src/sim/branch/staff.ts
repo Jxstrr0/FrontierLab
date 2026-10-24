@@ -15,6 +15,7 @@ import { CITIES } from '../../data/cities';
 import { EQUIPMENT } from '../../data/equipment';
 import { clamp, ema } from '../math';
 import type { Branch, GameState } from '../state';
+import { dpow, dtanh } from '../detmath';
 
 export function marketWage(cityId: string): number {
   return BASE_TELLER_WAGE * (CITIES[cityId]?.wageIndex ?? 1);
@@ -51,7 +52,7 @@ export function updateStaff(state: GameState, branch: Branch): void {
 
   const moraleTarget = clamp(
     MORALE.base +
-      MORALE.wageSwing * Math.tanh(MORALE.wageSteep * (ratio - 1)) +
+      MORALE.wageSwing * dtanh(MORALE.wageSteep * (ratio - 1)) +
       MORALE.managerPeople * (people - 50) -
       MORALE.waitPenalty * Math.max(0, branch.waitIndex - 1) -
       (mgr ? 0 : MORALE.noManager),
@@ -67,7 +68,7 @@ export function updateStaff(state: GameState, branch: Branch): void {
       : Math.max(sTarget, s.skill - SKILL.fallWeekly);
 
   // Quits accumulate fractionally; a person leaves when the accumulator reaches 1.
-  s.quitAccumulator += s.count * QUIT_BASE * (2 - s.morale / 100) ** 2;
+  s.quitAccumulator += s.count * QUIT_BASE * dpow(2 - s.morale / 100, 2);
   const quits = Math.min(s.count, Math.floor(s.quitAccumulator));
   s.quitAccumulator -= quits;
   s.count -= quits;

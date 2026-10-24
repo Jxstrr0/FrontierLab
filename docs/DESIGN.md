@@ -431,5 +431,6 @@ Add one dated line per decision. Never delete entries; supersede them.
 - 2026-10-24: Insolvency and game-over checks are deferred to Stage 2, when there is a UI to show them.
 - 2026-10-24: `closeBranch` moves loans to the nearest branch in the city and 85% of accounts and deposits with them (an assumption for "extra churn"); the rest leave, paid from reserves. Closing your only branch in a city is refused while it holds loans. Equipment recovery uses book value; the remaining book value is written off as depreciation.
 - 2026-10-24: Game over arrives in Stage 2: insolvency after 4 weeks of negative corporate cash, and regulator takeover after 13 weeks with a capital ratio below 4.5% (the 8-week wait plus the 5-week recapitalisation window). The recapitalisation offer itself waits for incidents.
+- 2026-10-24: The simulation uses its own exp/log/pow/cos/tanh (`detmath.ts`) because JavaScript engines round the built-ins differently, which made the determinism snapshot differ between Node 22 and CI's Node 24 (and would between browsers).
 - 2026-10-24 (owner's call): Difficulty is its own New Game setting (Easy, Normal, Hard, Expert) instead of coming from the start city. The wizard also picks 1–5 competitors and a starting cash amount from a small range ($500k–$1.25M). Normal, the city's usual rival count and $750k reproduce the balance reference exactly.
 
