@@ -2,13 +2,37 @@
 
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
-**Current stage:** 6 — Governance and capital markets (built and live; awaiting the owner's iPhone check). The Stage 2–5 checks are still open too.
+**Current stage:** 7 — Investments and real estate (built and live; awaiting the owner's iPhone check). The Stage 2–6 checks are still open too. Next: Stage 8 — Multi-city and travel.
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `08b65f0864d155` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `09f58c873bc838` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-24 — Stage 7 built: investments and real estate
+- **Stage / step:** 7 — Investments and real estate
+- **Done:**
+  - **Investment floor** (add it to your HQ): your portfolio for the company or for you personally, with a chart of stocks, startups, buildings, venture debt and currencies, a full list of holdings, and a carousel of startups that are raising money. More analysts find more startups (1 plus 1 per 4 staff, up to 8).
+  - **Startups:** 20 to start, more appear over time. Each grows or shrinks every quarter, raises new rounds (up or down), and can fail, be bought out, or list on the stock market. A startup's screen shows its profile, its strengths (pentagon), quarterly results, the two offer lots of the current round (invest as the company or privately), its funding history and shareholders. You can also lend to it (venture debt): up to 10% of its value, repaid weekly over 3 years, and mostly lost if it fails.
+  - **Conventions:** a yearly calendar. Each is announced in the Daily Ledger two weeks ahead, appears on the map, and is open for one week with 3–6 startups you can only back there. Calgary's is the Foothills Founders Fair in mid-July.
+  - **Real estate:** each city has buildings; some go up for sale every 4 weeks ("For sale" pins). Make an offer as the company or privately. Once you own one, set the rent: higher rent loses tenants, lower rent fills it. The screen shows weekly rent, upkeep, empty-space cost and return (about 9% at 85% full, like the original). Put it up for sale any time.
+  - **Foreclosed homes:** homes from defaulted mortgages now follow house prices. On the Company screen, hold them, rent them out, or sell them all at 90% of value.
+  - **Lobbying firms:** pay for a campaign to ease your capital requirement for a year, fast-track your next takeover, or kill a pending capital-requirement bill. Each can fail, and each can be exposed in the paper (a fine and a hit to your brand).
+  - **Currencies (owner request):** a simple "country up or down" bet on any foreign currency, at any investment bank (Market tab → Currencies), as the company or privately. Currencies move with each country's growth, interest rate and business cycle.
+  - **Starting currency (owner request, already live):** choose $, C$, £, € or ¥ when you start a game.
+  - Everything the bank owns appears on its balance sheet and counts toward its capital requirement; the bank can't buy startups or buildings while its capital is Restricted or worse. Saves move to version 8; a real Stage 6 save (listed, with foreclosed homes) is kept as a test and loads and plays on.
+- **Owner decisions recorded:** you'll be able to travel to any city at any time and run everything everywhere at once (Stage 8): flights inside the weekly allowance are free, longer ones cost a fare, never blocked. Currencies are an investment only; the bank's books stay in one currency.
+- **How it was built:** I laid the foundation (save format, map buildings, balance-sheet lines, data tables, empty hooks) and built currencies myself; two helper agents built startups and conventions, and real estate, foreclosed homes and lobbying, in parallel. I merged them, added the capital-tier rule for buildings and the Investment floor's advisor line, and played it all at phone size.
+- **Balance:** the scripted strategies don't invest yet, so the balance report is unchanged from Stage 6 (same 4 warnings as before, all pre-existing). 429 tests pass, including both Stage 7 acceptance checks: portfolio values tie out to the balance sheet and capital requirement every week (through rounds, failures, buyouts, listings, purchases, rent changes, sales and all foreclosed-home modes), and the Foothills Founders Fair appears on schedule with startups that can only be bought there, that week.
+- **Determinism snapshot:** `08b65f0864d155` → `09f58c873bc838`. Intended: new state (startups, conventions, buildings, currencies) and foreclosed homes now carry costs and follow house prices.
+- **Dependencies:** none added.
+- **Next:** the owner checks Stage 7 on iPhone: add an Investment floor at HQ and hire a few analysts, open a startup and invest (company or private), try venture debt, buy a "For sale" building and change its rent, open a lobbying firm, try a currency at the investment bank, and watch for the Foothills Founders Fair in July (week 28).
+- **Known issues:**
+  - A privately owned building whose costs exceed its rent can push personal cash below zero.
+  - IPOs of startups are rare (about one per 10 years without your money), because they need $50M of quarterly revenue, as specified.
+  - The convention's networking cards are flavour only.
+  - Carried over: first-branch checkpoints at weeks 156 and 260, high ROE in the steady run, Calgary's ~52-branch lot cap.
 
 ### 2026-10-24 — Stage 6 built: governance and capital markets
 - **Stage / step:** 6 — Governance and capital markets

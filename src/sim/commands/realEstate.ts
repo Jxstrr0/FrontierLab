@@ -11,6 +11,7 @@ import { marketRentFor, offerAcceptance, rentBounds } from '../propertyMath';
 import { stream } from '../rng';
 import type { GameState, ReoPool } from '../state';
 import { fail, money, ok, type CommandResult } from './result';
+import { ventureTierBlock } from './ventures';
 
 export type PropertyAccount = 'company' | 'personal';
 
@@ -32,6 +33,10 @@ export function offerProperty(
     return fail(
       `The seller turned down ${money(listing.rejectedOffer)}. Try again when the listings refresh.`,
     );
+  if (account === 'company') {
+    const block = ventureTierBlock(state);
+    if (block) return fail(block);
+  }
   const cash = account === 'company' ? state.company.cash : state.personal.cash;
   if (offer > cash)
     return fail(
