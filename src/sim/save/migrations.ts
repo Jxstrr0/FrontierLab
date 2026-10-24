@@ -3,6 +3,7 @@
 // which upgrades a save from oldVersion to oldVersion + 1.
 import { START_CASH } from '../../config/balance';
 import { CITIES } from '../../data/cities';
+import { isFrontage, nearestFrontage } from '../cityLayout';
 import { SCHEMA_VERSION } from '../state';
 
 type RawSave = Record<string, unknown> & { schemaVersion: number };
@@ -28,7 +29,33 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     }
     return s;
   },
+  // 3 → 4: lots move onto tiles facing the Stage 3 street grid. Lots already on
+  // frontage stay put; the rest snap to the nearest free frontage tile.
+  3: (s) => {
+    const lots = Object.values(
+      (s.world as { lots: Record<string, { id: string; cityId: string; tile: Tile }> }).lots,
+    ).sort((a, b) => (a.id < b.id ? -1 : 1));
+    const used = new Map<string, Set<string>>();
+    const usedIn = (cityId: string) => used.get(cityId) ?? used.set(cityId, new Set()).get(cityId)!;
+    const misplaced: typeof lots = [];
+    for (const lot of lots) {
+      const city = CITIES[lot.cityId];
+      if (city && isFrontage(city, lot.tile.x, lot.tile.y)) {
+        usedIn(lot.cityId).add(`${lot.tile.x},${lot.tile.y}`);
+      } else misplaced.push(lot);
+    }
+    for (const lot of misplaced) {
+      const city = CITIES[lot.cityId];
+      const spot = city && nearestFrontage(city, lot.tile.x, lot.tile.y, usedIn(lot.cityId));
+      if (!spot) continue;
+      lot.tile = spot;
+      usedIn(lot.cityId).add(`${spot.x},${spot.y}`);
+    }
+    return s;
+  },
 };
+
+type Tile = { x: number; y: number };
 
 /** Upgrades a raw save to the current schema, or throws if it can't. */
 export function migrate(raw: RawSave): RawSave {

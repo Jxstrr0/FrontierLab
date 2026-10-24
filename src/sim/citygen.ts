@@ -1,6 +1,6 @@
-// City lot generation (Stage 1: data only, no art). Lays out district centres on
-// the city's tile grid and scatters storefront lots around them, seeded per city
-// from the `citygen:{cityId}` stream so a city is identical every time.
+// City lot generation. Scatters storefront lots around district centres on the
+// city's tile grid, snapped to tiles facing a street (cityLayout.ts), seeded per
+// city from the `citygen:{cityId}` stream so a city is identical every time.
 // Lot values follow CONTENT §3 ("How a lot's values are derived").
 import {
   CITYGEN,
@@ -15,6 +15,7 @@ import { CITIES } from '../data/cities';
 import { DISTRICT_SPECS } from '../data/districts';
 import { STREET_KINDS, STREET_NAMES } from '../data/names';
 import type { DistrictId } from '../data/types';
+import { nearestFrontage } from './cityLayout';
 import { clamp } from './math';
 import { stream } from './rng';
 import type { GameState, Lot } from './state';
@@ -36,20 +37,19 @@ export function generateLots(state: GameState, cityId: string): Lot[] {
     const place = CITYGEN.layout[district];
     const count = Math.max(1, Math.round(total * share));
     for (let i = 0; i < count; i++) {
-      // Find a free tile near the district centre.
-      let x = 0;
-      let y = 0;
-      for (let tries = 0; tries < CITYGEN.placementTries; tries++) {
-        x = Math.round(
-          clamp(rng.normal(place.cx, place.spread), CITYGEN.edge, 1 - CITYGEN.edge) *
-            (city.tiles - 1),
-        );
-        y = Math.round(
-          clamp(rng.normal(place.cy, place.spread), CITYGEN.edge, 1 - CITYGEN.edge) *
-            (city.tiles - 1),
-        );
-        if (!used.has(`${x},${y}`)) break;
-      }
+      // Draw a point near the district centre, then snap it to the nearest free
+      // tile facing a street (cityLayout).
+      const px = Math.round(
+        clamp(rng.normal(place.cx, place.spread), CITYGEN.edge, 1 - CITYGEN.edge) *
+          (city.tiles - 1),
+      );
+      const py = Math.round(
+        clamp(rng.normal(place.cy, place.spread), CITYGEN.edge, 1 - CITYGEN.edge) *
+          (city.tiles - 1),
+      );
+      const spot = nearestFrontage(city, px, py, used);
+      if (!spot) throw new Error(`No room for another lot in ${city.name}`);
+      const { x, y } = spot;
       used.add(`${x},${y}`);
 
       const footTraffic = Math.round(spec.footTraffic * rng.range(...LOT_TRAFFIC_NOISE));
