@@ -1,6 +1,6 @@
 // Tick orchestration (SIMULATION §2). `advanceDay` moves the clock and resolves
 // scheduled events; every 7th day runs `weeklyTick`, which calls each system in
-// the documented order. Stage 1 runs steps 1–4, 6, 8–10, 13 and 14.
+// the documented order. Steps 5, 11, 12, 15 and 16 arrive with later stages.
 import { DAYS_PER_WEEK } from '../config/balance';
 import { runBooks } from './branch/books';
 import { addBranchCosts, closeBranchWeek } from './branch/branchPnl';
@@ -16,10 +16,13 @@ import { evaluateCapital } from './capital';
 import { checkFailure } from './failure';
 import { updateAppRating } from './company';
 import { pushEvent, trimEvents } from './events';
+import { refreshFundingOffers } from './fundingMarket';
 import { runHq } from './hq';
+import { runBrandMarketing } from './hqMarketing';
 import { updateMacro } from './macro';
 import { refreshManagerPool } from './people';
 import { ftpLong, ftpShort, updateMarketRefs } from './rates';
+import { regulatorReview } from './riskFloor';
 import { repriceRivalFees, updateRivalPrices } from './rivals';
 import type { Branch, GameState } from './state';
 import { closeWeek, depreciate, quarterEnd } from './statements';
@@ -65,14 +68,19 @@ export function weeklyTick(state: GameState): void {
   }
   updateBrandAwareness(state);
   runTreasury(state); // 6
+  refreshFundingOffers(state); // 6 (§13.6 market, after this week's flows)
   runHq(state); // 7
   updateAppRating(state);
+  runBrandMarketing(state); // 8 (brand marketing)
   depreciate(state); // 8
   closeWeek(state); // 9
   evaluateCapital(state); // 10
   checkFailure(state);
 
-  if (isQuarterStart(state.meta.startDate, state.clock.day)) quarterEnd(state); // 13
+  if (isQuarterStart(state.meta.startDate, state.clock.day)) {
+    quarterEnd(state); // 13
+    regulatorReview(state); // 13 (§15)
+  }
   if (isYearStart(state.meta.startDate, state.clock.day)) yearEnd(state); // 14
 
   for (const cityId of Object.keys(state.world.cities)) refreshManagerPool(state, cityId);

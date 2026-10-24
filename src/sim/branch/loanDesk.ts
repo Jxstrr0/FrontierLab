@@ -17,6 +17,7 @@ import { PRODUCTS } from '../../data/products';
 import type { Pentagon } from '../../data/types';
 import { pushEvent } from '../events';
 import { riskPdMult, shortfall } from '../hq';
+import { recordLoss } from '../riskFloor';
 import { appCost } from '../underwriting';
 import { newId } from '../ids';
 import { creditCycle, loanDemand } from '../macro';
@@ -264,7 +265,15 @@ function runBusinessLoans(state: GameState, branch: Branch, wk: BranchWeek, rng:
   let defaulted = 0;
   for (const loan of Object.values(state.loanDesk.loans)) {
     if (loan.branchId !== branch.id || loan.status !== 'current') continue;
-    if (rng.chance((loan.pd * cycle * riskPdMult(state)) / WEEKS_PER_YEAR)) {
+    const hit = rng.chance((loan.pd * cycle * riskPdMult(state)) / WEEKS_PER_YEAR);
+    recordLoss(state, 'sbl', {
+      balance: loan.balance,
+      defaulted: hit ? loan.balance : 0,
+      loss: hit ? loan.balance * loan.lgd : 0,
+      pd: loan.pd,
+      lgd: loan.lgd,
+    });
+    if (hit) {
       const loss = loan.balance * loan.lgd;
       wk.losses += loss;
       state.treasury.reserves += loan.balance - loss;

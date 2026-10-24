@@ -27,6 +27,7 @@ import { BENEFIT_RULES, BENEFITS } from '../data/benefits';
 import { CITIES } from '../data/cities';
 import { DEPARTMENTS, HQ_DEPTS } from '../data/departments';
 import { dpow, dtanh } from './detmath';
+import { totalWholesale } from './fundingLots';
 import { spend } from './ledger';
 import { clamp, ema } from './math';
 import type { Coverage, Department, DeptId, GameState, HqDeptId } from './state';
@@ -75,8 +76,7 @@ export function requiredStaff(state: GameState, id: HqDeptId): number {
   const last = state.history.weekly.at(-1)?.totals;
   const assets = last?.assets ?? 0;
   const branches = branchCount(state);
-  const t = state.treasury;
-  const wholesale = t.overnight + t.window + t.lots.reduce((s, l) => s + l.amount, 0);
+  const wholesale = totalWholesale(state);
   const r = DEPT_REQUIREMENTS;
   switch (id) {
     // +4 once public arrives with Stage 6.
