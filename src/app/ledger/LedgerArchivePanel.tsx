@@ -51,7 +51,9 @@ export function LedgerArchivePanel(p: { week?: number }) {
       ) : (
         <ol class="ledger ledger-archive" aria-label="Back issues">
           {newest.map((issue) => {
-            const lead = articlesFor(issue, 'top')[0];
+            const top = articlesFor(issue, 'top');
+            // Headline the week by its biggest real story; your routine weekly figures only when nothing else ran.
+            const lead = top.find((a) => !isRoutine(a)) ?? top[0];
             return (
               <li key={issue.week}>
                 <button
@@ -74,4 +76,9 @@ export function LedgerArchivePanel(p: { week?: number }) {
       )}
     </Panel>
   );
+}
+
+/** Your bank's routine weekly figures story (newsWeek.ts BANK_WEEK_*). */
+function isRoutine(a: { ref?: string }): boolean {
+  return a.ref?.startsWith('BANK_WEEK_') ?? false;
 }
