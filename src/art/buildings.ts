@@ -120,7 +120,7 @@ function awning(e: Engraver, face: Face, shell: Shell, ink: string): void {
 }
 
 /** The player's flag: a pole on the roof with a pennant in the brand ink. */
-function roofFlag(e: Engraver, roof: Vec3, ink: string): void {
+export function roofFlag(e: Engraver, roof: Vec3, ink: string): void {
   const [a, b, z] = roof;
   const top = z + FLAG_PX;
   e.segments(

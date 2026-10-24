@@ -751,3 +751,42 @@
 .carousel > .card + .card {
   margin-top: 0;
 }
+
+/* Carousel page dots: small brass dots inside 44px-tall tap targets. */
+.carousel-dots {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.carousel-dot {
+  width: 28px;
+  height: var(--tap-min);
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.carousel-dot span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1px solid var(--brass);
+}
+.carousel-dot.is-active span {
+  background: var(--brass);
+}
+
+/* ─── Vignette line art (with .art-line / .art-text in storefront.css) ── */
+.art-fine {
+  stroke-width: 0.8;
+}
+.art-faint {
+  opacity: 0.4;
+}
+.art-small {
+  font-size: 7px;
+  fill: var(--ivory-dim);
+}

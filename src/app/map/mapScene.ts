@@ -2,11 +2,11 @@
 // save seed, since generating an XL city takes a moment), a renderer factory,
 // where the camera starts, and the remembered camera for each city. App-side
 // memory only; none of this is game state or saved.
-import { generateCityMap, type CityMap } from '../../art/citygen';
+import { generateCityMap, type CityMap, type MapPlaces } from '../../art/citygen';
 import { tileCenter } from '../../art/iso';
 import { createMapRenderer } from '../../art/isoRenderer';
 import type { MapRenderer } from '../../art/mapRenderer';
-import { CITYGEN } from '../../config/balance';
+import { CITYGEN, FEATURES } from '../../config/balance';
 import { BRANCH_ZOOM, OVERVIEW_ZOOM } from '../../config/mapView';
 import type { CitySpec } from '../../data/cities';
 import type { GameState, Lot } from '../../sim/state';
@@ -31,11 +31,23 @@ function paperColour(): string {
   return v || PAPER_FALLBACK;
 }
 
-/** The scene for a city and seed; lots only matter on first build (they never move). */
-export function sceneFor(city: CitySpec, seed: number, lots: Lot[]): Scene {
+/** Office buildings and sites to draw in a city (Stage 4, behind FEATURES.hq). */
+export function mapPlaces(s: GameState, cityId: string): MapPlaces {
+  if (!FEATURES.hq) return {};
+  return {
+    offices: Object.values(s.world.officeListings).filter((o) => o.cityId === cityId),
+    sites: Object.values(s.world.sites).filter((x) => x.cityId === cityId),
+  };
+}
+
+/**
+ * The scene for a city and seed; lots, offices and sites only matter on first
+ * build (they never move; who leases them is drawn from the occupants).
+ */
+export function sceneFor(city: CitySpec, seed: number, lots: Lot[], places: MapPlaces = {}): Scene {
   const key = `${city.id}:${seed}`;
   if (cached?.key === key) return cached;
-  const map = generateCityMap(city, seed, lots);
+  const map = generateCityMap(city, seed, lots, places);
   cached = {
     key,
     city,

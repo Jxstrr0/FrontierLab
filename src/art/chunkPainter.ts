@@ -3,6 +3,7 @@
 // Performance). Steps are the ground layers followed by every raised item that
 // reaches into the chunk, back to front.
 import { drawBuilding } from './buildings';
+import { drawOffice, drawSite } from './buildingsOffice';
 import type { ChunkGrid, Rect } from './chunkGrid';
 import { chunkRect } from './chunkGrid';
 import { context2d, createCanvas, type AnyCanvas, type Ctx2D } from './canvasKit';
@@ -103,5 +104,7 @@ function drawItem(e: Engraver, pc: PaintContext, item: DrawItem): void {
   }
   const t = tileAt(pc.map, item.x, item.y)!;
   if (t.kind === 'park') parkTrees(e, t.x, t.y, t.seed);
+  else if (t.kind === 'office') drawOffice(e, t, t.officeId ? pc.occupants[t.officeId] : undefined);
+  else if (t.kind === 'site') drawSite(e, t);
   else drawBuilding(e, t, t.lotId ? pc.occupants[t.lotId] : undefined);
 }

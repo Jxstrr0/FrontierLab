@@ -4,7 +4,7 @@
 // components read it (via useGame) to re-render.
 import { signal } from '@preact/signals';
 import type { CommandResult } from '../sim/commands';
-import type { GameState } from '../sim/state';
+import type { DeptId, GameState } from '../sim/state';
 
 export type Screen = 'title' | 'newgame' | 'game' | 'saves' | 'settings';
 
@@ -13,6 +13,10 @@ export type PanelRoute =
   | { type: 'storefront'; lotId: string }
   | { type: 'build'; lotId: string }
   | { type: 'branch'; branchId: string; tab?: BranchTab }
+  | { type: 'office'; listingId: string }
+  | { type: 'hq'; officeId?: string; dept?: DeptId }
+  | { type: 'bureau'; siteId: string }
+  | { type: 'agency'; siteId: string }
   | { type: 'company' }
   | { type: 'branches' }
   | { type: 'cityList' }

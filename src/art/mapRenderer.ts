@@ -3,7 +3,7 @@
 // renderer draws the engraved city for a camera. Plain data in, pixels out.
 import type { CityMap } from './citygen';
 
-/** Who occupies a storefront lot, for roof flags and awnings. */
+/** Who occupies a storefront lot (or leases an office building), for roof flags and awnings. */
 export interface LotOccupant {
   type: 'player' | 'rival';
   /** Brand ink of the occupying bank. */

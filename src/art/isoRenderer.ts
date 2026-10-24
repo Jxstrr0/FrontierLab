@@ -65,8 +65,10 @@ export const createMapRenderer: CreateMapRenderer = (map, style) => {
     rasterRatio: 1,
     flushTarget: context2d(createCanvas(1, 1)),
   };
+  // Occupants are keyed by storefront lot id or office listing id.
   const tileOfLot = new Map<string, number>();
   for (const [index, lotId] of map.lotAt) tileOfLot.set(lotId, index);
+  for (const [index, officeId] of map.officeAt) tileOfLot.set(officeId, index);
   const lru = new PixelLru<Entry>(CHUNK_CACHE_BUDGET_PX);
   let dpr = 0;
   let grids = new Map<number, ChunkGrid>();

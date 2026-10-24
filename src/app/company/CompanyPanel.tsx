@@ -1,12 +1,13 @@
 // Company summary (SCREENS §24): capital ratio and tier, liquidity, the main
-// totals, a private valuation stand-in and simplified statements. The HQ
-// Finance floor will take over the statements later.
+// totals, a private valuation stand-in and simplified statements, with a link
+// to the full statements on the HQ Finance floor once you have one.
 import { useState } from 'preact/hooks';
+import { FEATURES } from '../../config/balance';
 import { balanceSheet } from '../../sim/balanceSheet';
 import { capitalSnapshot } from '../../sim/capital';
 import { Badge, Card, Medallion, Panel, Row, SectionTitle, Sheet } from '../components';
 import { capitalRatioText, money, pct } from '../format/format';
-import { closePanel, useGame } from '../store';
+import { closePanel, openPanel, useGame } from '../store';
 import { CapitalMeter, TIER_LABEL, TIER_TONE } from './CapitalMeter';
 import { Statements } from './Statements';
 import './company.css';
@@ -96,6 +97,17 @@ export function CompanyPanel() {
 
         <div>
           <SectionTitle>Statements</SectionTitle>
+          {FEATURES.hq && (
+            <button
+              type="button"
+              class="btn btn-secondary btn-block co-hq-link"
+              onClick={() =>
+                openPanel(s.departments.finance ? { type: 'hq', dept: 'finance' } : { type: 'hq' })
+              }
+            >
+              {s.departments.finance ? 'Full statements on the Finance floor' : 'Open HQ'}
+            </button>
+          )}
           <Statements state={s} />
         </div>
       </div>

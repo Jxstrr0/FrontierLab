@@ -21,7 +21,10 @@ const seed = Number(params.get('seed') ?? 42);
 const city = CITIES[cityId] ?? CITIES.sas!;
 const state = newGame({ seed, cityId: city.id });
 const lots = Object.values(state.world.lots).filter((l) => l.cityId === city.id);
-const map = generateCityMap(city, seed, lots);
+// Stage 4 offices and sites; the first office shows as leased (roof flag).
+const offices = Object.values(state.world.officeListings).filter((o) => o.cityId === city.id);
+const sites = Object.values(state.world.sites).filter((x) => x.cityId === city.id);
+const map = generateCityMap(city, seed, lots, { offices, sites });
 
 // Rivals keep their lots; the player takes the free lots nearest the centre.
 const occupants: Record<string, LotOccupant> = {};
@@ -39,6 +42,8 @@ lots
   )
   .slice(0, PLAYER_LOTS)
   .forEach((l) => (occupants[l.id] = { type: 'player', ink: PLAYER_INK }));
+
+if (offices[0]) occupants[offices[0].id] = { type: 'player', ink: PLAYER_INK };
 
 const renderer = createMapRenderer(map, { ink: city.ink, paper: PAPER, cityName: city.name });
 renderer.setOccupants(occupants);
