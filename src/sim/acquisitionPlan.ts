@@ -54,6 +54,9 @@ export interface DealPlan {
   loansByProduct: Record<string, number>;
   proFormaCr: number;
   cityShares: CityShare[];
+  /** City deposit share limit: MERGERS.maxCityShare, or fastTrackShare after a won Lobbying fast-track. */
+  shareLimit: number;
+  fastTrack: boolean;
 }
 
 /** Corporate debt you owe a rival: business loan balances plus a drawn line. */
@@ -165,7 +168,14 @@ export function planDeal(state: GameState, bank: RivalBank, pricePerShare: numbe
     loansByProduct,
     proFormaCr,
     cityShares: cityShares(state, bank),
+    ...shareLimitFor(state),
   };
+}
+
+/** §19.8: the city share limit, relaxed for one deal by a won Lobbying "Fast-track a merger review". */
+export function shareLimitFor(state: GameState): { shareLimit: number; fastTrack: boolean } {
+  const fastTrack = state.lobbying?.fastTrack === true;
+  return { shareLimit: fastTrack ? MERGERS.fastTrackShare : MERGERS.maxCityShare, fastTrack };
 }
 
 export interface RegulatorCheck {
@@ -190,8 +200,8 @@ export function regulatorChecks(
   for (const c of plan.cityShares) {
     checks.push({
       label: `Deposit share in ${cityName(c.cityId)}`,
-      ok: c.share <= MERGERS.maxCityShare,
-      detail: `${pct(c.share)} of the city's deposits (limit ${pct(MERGERS.maxCityShare)})`,
+      ok: c.share <= plan.shareLimit,
+      detail: `${pct(c.share)} of the city's deposits (limit ${pct(plan.shareLimit)}${plan.fastTrack ? ', fast-tracked' : ''})`,
     });
   }
   return checks;

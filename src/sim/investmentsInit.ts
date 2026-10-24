@@ -9,6 +9,7 @@ import type {
   RealEstateState,
   VenturesState,
 } from './state';
+import { seedListings } from './propertyListings';
 
 export const emptyVentures = (): VenturesState => ({
   startups: {},
@@ -33,4 +34,5 @@ export function initInvestments(state: GameState): void {
   state.realEstate = emptyRealEstate();
   state.lobbying = emptyLobbying();
   state.fx = emptyFx();
+  seedListings(state);
 }
