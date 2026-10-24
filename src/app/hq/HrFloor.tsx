@@ -46,7 +46,7 @@ function BenefitCard({ spec }: { spec: BenefitSpec }) {
   const s = useGame();
   const sym = s.settings.currency;
   const value = s.people.benefits[spec.id] ?? 0;
-  const locked = !!spec.publicOnly;
+  const locked = !!spec.publicOnly && s.stock.status !== 'public';
   const set = (v: number) => act(cmd.setBenefit, spec.id, v);
   const cost = benefitWeeklyCost(s, spec.id, value);
   const effects = benefitEffects(spec, value);

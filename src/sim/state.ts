@@ -717,6 +717,8 @@ export interface RivalBank {
   low52: Money;
   /** Mean-reverting sentiment around 1 (listed rivals, §19.5 model). */
   sentiment: number;
+  /** Last quarter's dividend per share (0 when it skipped one). */
+  dps?: Money;
 }
 
 export interface RivalBranch {

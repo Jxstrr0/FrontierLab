@@ -1,0 +1,222 @@
+/* Investment bank panel: Market and Equity tabs, Trade sheet (SCREENS §12). */
+
+/* ─── Index and sectors ────────────────────────────────────────────────── */
+.ib-index {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: var(--space-4);
+}
+.ib-index-level {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-24);
+  font-variant-numeric: tabular-nums;
+}
+.ib-sectors {
+  overflow-x: auto;
+  scrollbar-width: none;
+  margin: 0 calc(-1 * var(--space-1));
+  padding: 0 var(--space-1);
+}
+.ib-sectors::-webkit-scrollbar {
+  display: none;
+}
+.ib-sectors .segmented {
+  width: max-content;
+  min-width: 100%;
+}
+.ib-sectors .segmented-opt {
+  flex: 1 0 auto;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-3);
+  white-space: nowrap;
+}
+
+/* ─── Company cards ────────────────────────────────────────────────────── */
+.ib-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.ib-list > .card + .card {
+  margin-top: 0;
+}
+.ib-card-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+.ib-card-title {
+  min-width: 0;
+}
+.ib-card-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-20);
+  line-height: 1.2;
+}
+.ib-card-price {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+.ib-card-quote {
+  text-align: right;
+}
+.ib-price {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-24);
+  font-variant-numeric: tabular-nums;
+}
+.ib-spark {
+  display: block;
+  width: 100%;
+  height: 40px;
+}
+.ib-spark polyline {
+  fill: none;
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+  stroke-linejoin: round;
+}
+.ib-spark-up {
+  stroke: var(--jade);
+}
+.ib-spark-down {
+  stroke: var(--oxblood);
+}
+.ib-holders {
+  margin: var(--space-3) 0;
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--hairline);
+}
+.ib-holder {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 2px 0;
+  font-size: var(--text-14);
+  font-variant-numeric: tabular-nums;
+}
+.ib-holder.is-you {
+  color: var(--brass-light);
+  font-weight: 600;
+}
+
+/* ─── Trade sheet ──────────────────────────────────────────────────────── */
+.ib-shares-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+}
+.ib-shares-input {
+  width: 9em;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-card);
+  background: var(--vault-deep);
+  color: var(--ivory);
+  font: inherit;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.ib-range {
+  display: block;
+  width: 100%;
+  height: var(--tap-min);
+  margin: 0;
+  background: transparent;
+  accent-color: var(--brass);
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+.ib-range::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--vault-deep);
+  border: 1px solid var(--hairline);
+}
+.ib-range::-moz-range-track {
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--vault-deep);
+  border: 1px solid var(--hairline);
+}
+.ib-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 28px;
+  height: 28px;
+  margin-top: -12px;
+  border-radius: 50%;
+  border: 2px solid var(--brass-light);
+  background: var(--brass);
+}
+.ib-range::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--brass-light);
+  background: var(--brass);
+}
+.ib-range:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 2px;
+}
+.ib-range:disabled {
+  opacity: 0.45;
+}
+.ib-range-scale {
+  display: flex;
+  justify-content: space-between;
+  margin-top: -8px;
+}
+
+/* ─── Equity cards ─────────────────────────────────────────────────────── */
+.ib-checklist {
+  list-style: none;
+  margin: var(--space-3) 0;
+  padding: 0;
+}
+.ib-checklist li {
+  display: grid;
+  grid-template-columns: 24px 1fr auto;
+  align-items: baseline;
+  gap: var(--space-2);
+  padding: var(--space-1) 0;
+  font-size: var(--text-14);
+}
+.ib-check {
+  font-weight: 700;
+}
+.ib-checklist .is-ok .ib-check {
+  color: var(--jade);
+}
+.ib-checklist .is-no .ib-check {
+  color: var(--oxblood);
+}
+.ib-check-detail {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.ib-status {
+  margin: var(--space-2) 0 var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-left: 3px solid var(--jade);
+  background: var(--vault-deep);
+  border-radius: var(--radius-card);
+}
+.ib-status-bad {
+  border-left-color: var(--oxblood);
+}
+.ib-card .btn-block {
+  margin-top: var(--space-3);
+}
