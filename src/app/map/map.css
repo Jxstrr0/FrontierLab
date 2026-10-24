@@ -90,6 +90,36 @@
   outline-offset: 1.5px;
 }
 
+/* Rival head office: the banks medallion ringed in the rival's ink with a small
+   swallowtail pennant, unlike rival branches (ringed monograms) and "$" lots. */
+.pin-rivalHq .pin-body {
+  position: relative;
+  outline: 2.5px solid var(--pin-ink, var(--brass));
+  outline-offset: 0;
+}
+.pin-rivalHq .pin-body::after {
+  content: '';
+  position: absolute;
+  right: -6px;
+  top: -4px;
+  width: 11px;
+  height: 8px;
+  background: var(--pin-ink, var(--brass));
+  clip-path: polygon(0 0, 100% 0, 72% 50%, 100% 100%, 0 100%);
+}
+/* A failed (distressed) rival's head office: faded, dashed ring. */
+.pin-rivalHq.is-muted .pin-body {
+  opacity: 0.55;
+  outline-style: dashed;
+}
+/* The central bank: its own navy, columned-dome medallion, a touch larger (a landmark). */
+.pin-centralBank .pin-body {
+  transform: scale(1.12);
+}
+.map-pin.pin-centralBank:active .pin-body {
+  transform: scale(1.02);
+}
+
 /* Open branch location: a smaller blank "$" medallion, quieter than branches. */
 .pin-lot .pin-body {
   transform: scale(0.8);
@@ -199,6 +229,38 @@
   border-radius: 50%;
   background: var(--brass-light);
   border: 2px solid var(--vault-deep);
+  pointer-events: none;
+}
+/* Employer or university you partner with: a brand-ink seal, lower right of the medallion. */
+.pin-partner {
+  position: absolute;
+  top: calc(50% + var(--pin-size) / 2 - 12px);
+  left: calc(50% + var(--pin-size) / 2 - 10px);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--pin-ink);
+  border: 1px solid var(--ivory);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.pin-partner svg {
+  display: block;
+}
+
+/* Oxblood dot: an unresolved incident (SCREENS §0.2), opposite the brass dot. */
+.pin-alert {
+  position: absolute;
+  top: calc(50% - var(--pin-size) / 2 - 2px);
+  left: calc(50% - var(--pin-size) / 2 - 3px);
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--oxblood);
+  border: 2px solid var(--ivory);
   pointer-events: none;
 }
 

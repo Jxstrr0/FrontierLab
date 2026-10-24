@@ -1,0 +1,80 @@
+/* Rival branch and rival head office panels (SCREENS §6, §7). */
+.rv-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.rv-notice {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-left: 3px solid var(--oxblood);
+  background: var(--vault-raised);
+  border-radius: var(--radius-card);
+}
+.rv-art-mono {
+  fill: var(--ivory);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+}
+.rv-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+.rv-strategy {
+  font-family: var(--font-display);
+  font-size: var(--text-20);
+}
+.rv-capital {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.rv-sheet + .rv-sheet {
+  margin-top: var(--space-3);
+}
+.rv-sheet-head,
+.rv-sheet-row,
+.rv-q {
+  display: grid;
+  grid-template-columns: 1fr 5.5em 5.5em;
+  gap: var(--space-2);
+  padding: 6px 0;
+  font-size: var(--text-14);
+  border-bottom: 1px solid rgb(184 145 61 / 12%);
+}
+.rv-sheet-head.rv-two,
+.rv-sheet-row.rv-two {
+  grid-template-columns: 1fr 5.5em;
+}
+.rv-sheet-head,
+.rv-q-head {
+  color: var(--brass-light);
+  font-weight: 600;
+}
+.rv-sheet-head span:not(:first-child),
+.rv-sheet-row span:not(:first-child),
+.rv-q span:not(:first-child) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.rv-q {
+  grid-template-columns: 1fr 6em 6em;
+}
+.rv-offer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.rv-offer + .rv-offer {
+  margin-top: var(--space-3);
+}
+.rv-offer .btn {
+  margin-top: var(--space-2);
+}
+.rv-offer-amount {
+  font-family: var(--font-display);
+  font-size: var(--text-24);
+  color: var(--brass-light);
+}

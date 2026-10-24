@@ -2,12 +2,13 @@ import { describe, expect, it } from 'vitest';
 import { advanceWeeks } from '../../src/sim/engine';
 import { deserialize, exportCode, importCode, serialize } from '../../src/sim/save/serialize';
 import { runScript } from '../helpers/scenario';
+import { SCHEMA_VERSION } from '../../src/sim/state';
 
 describe('saves', () => {
   it('round-trips through JSON and an export code', () => {
     const s = runScript(60);
     const code = exportCode(s);
-    expect(code.startsWith('VS5:')).toBe(true);
+    expect(code.startsWith(`VS${SCHEMA_VERSION}:`)).toBe(true);
     const back = importCode(code);
     expect(back).toEqual(s);
     expect(deserialize(serialize(s))).toEqual(s);

@@ -9,10 +9,24 @@ import { roofAnchor } from '../../art/iso';
 import type { LotOccupant } from '../../art/mapRenderer';
 import { FEATURES, type FeatureId } from '../../config/balance';
 import { AGENCIES } from '../../data/brandCampaigns';
+import { CITIES } from '../../data/cities';
+import { COUNTRIES } from '../../data/countries';
+import type { CountryId } from '../../data/types';
 import { LEASE_ONLY_KEY, layerOn, type MapLayerId } from '../../data/mapLayers';
 import type { GameState, Lot, OfficeListing, Site } from '../../sim/state';
 
-export type PinKind = 'mine' | 'hq' | 'rival' | 'office' | 'bureau' | 'agency' | 'lot';
+export type PinKind =
+  | 'mine'
+  | 'hq'
+  | 'rival'
+  | 'office'
+  | 'bureau'
+  | 'agency'
+  | 'centralBank'
+  | 'rivalHq'
+  | 'employer'
+  | 'university'
+  | 'lot';
 
 export interface PinSpec {
   /** Lot, office listing or site id (also the DOM `data-lot-id`). */
@@ -26,11 +40,19 @@ export interface PinSpec {
   monogram: string;
   /** Brass dot: Loan Desk applications waiting (SCREENS §0.2). */
   badge: boolean;
+  /** Oxblood dot: an unresolved incident at this branch (SCREENS §0.2). */
+  alert?: boolean;
   branchId?: string;
   /** Your office in this building (kind 'hq'). */
   officeId?: string;
   /** Type icon for office, bureau and agency pins (offices also wear the For lease tag). */
   icon?: MapLayerId;
+  /** The central bank pin's country. */
+  countryId?: CountryId;
+  /** Employer or university you partner with: a brand-ink seal on the medallion (ink = brand ink). */
+  partner?: boolean;
+  /** A failed rival's head office (distressed): drawn faded with a dashed ring. */
+  muted?: boolean;
 }
 
 /** Clustering seeds and stacking: yours first, then rivals, then other buildings, open locations last. */
@@ -41,7 +63,11 @@ const KIND_ORDER: Record<PinKind, number> = {
   office: 3,
   bureau: 4,
   agency: 5,
-  lot: 6,
+  centralBank: 6,
+  rivalHq: 7,
+  employer: 8,
+  university: 9,
+  lot: 10,
 };
 
 /** Pins drawn in your brand ink, lifted above the rest. */
@@ -67,13 +93,15 @@ function lotPin(s: GameState, map: CityMap, lot: Lot, pending: Record<string, nu
     const branch = s.branches[occ.id];
     const waiting = pending[occ.id] ?? 0;
     const name = branch?.name ?? lot.address;
+    const alert = s.incidents.active.some((i) => i.scopeKind === 'branch' && i.scope === occ.id);
     return {
       ...base,
       kind: 'mine',
-      label: `Your branch, ${name}${waiting ? `, ${waiting} loan applications waiting` : ''}`,
+      label: `Your branch, ${name}${alert ? ', open incident' : ''}${waiting ? `, ${waiting} loan applications waiting` : ''}`,
       ink: s.meta.brandInk,
       monogram: s.meta.monogram,
       badge: waiting > 0,
+      alert,
       branchId: occ.id,
     };
   }
@@ -121,26 +149,83 @@ function officePin(s: GameState, map: CityMap, o: OfficeListing): PinSpec {
   };
 }
 
-/** A site's display name: the bureau's name or the agency's. */
-export function siteName(site: Site): string {
-  return site.kind === 'agency'
-    ? (AGENCIES[site.refId]?.name ?? 'Marketing agency')
-    : `${site.refId} credit bureau`;
+/** A site's display name: the bureau's, agency's, rival head office's, employer's or university's. */
+export function siteName(s: GameState | undefined, site: Site): string {
+  switch (site.kind) {
+    case 'agency':
+      return AGENCIES[site.refId]?.name ?? 'Marketing agency';
+    case 'bureau':
+      return `${site.refId} credit bureau`;
+    case 'rivalHq':
+      return `${s?.rivals[site.refId]?.name ?? 'Rival bank'} head office`;
+    default:
+      return site.employer?.name ?? site.refId;
+  }
 }
 
-function sitePin(map: CityMap, site: Site): PinSpec {
+const SITE_ICON: Record<Site['kind'], MapLayerId> = {
+  bureau: 'creditBureaus',
+  agency: 'marketingAgencies',
+  rivalHq: 'banks',
+  employer: 'employers',
+  university: 'universities',
+};
+
+const SITE_LAYER: Record<Site['kind'], MapLayerId> = SITE_ICON;
+
+/** You hold a partnership (or the graduate program) at this employer or university. */
+export function isPartnerSite(s: GameState, site: Site): boolean {
+  if (site.kind !== 'employer' && site.kind !== 'university') return false;
+  if (s.company.gradProgram?.siteId === site.id) return true;
+  return Object.values(s.partnerships).some((p) => p.siteId === site.id && p.status === 'active');
+}
+
+function sitePin(s: GameState, map: CityMap, site: Site): PinSpec {
   const at = anchor(map, site.tile);
-  const agency = site.kind === 'agency';
-  return {
+  const partner = isPartnerSite(s, site);
+  const suffix =
+    (site.kind === 'agency'
+      ? ', marketing agency'
+      : site.kind === 'employer'
+        ? ', employer'
+        : site.kind === 'rivalHq' && s.rivals[site.refId]?.status === 'distressed'
+          ? ', seized by regulators'
+          : '') + (partner ? ', your partner' : '');
+  const rival = site.kind === 'rivalHq' ? s.rivals[site.refId] : undefined;
+  const pin: PinSpec = {
     id: site.id,
     kind: site.kind,
     x: at.x,
     y: at.y,
-    label: `${siteName(site)}${agency ? ', marketing agency' : ''}, ${site.address}`,
+    label: `${siteName(s, site)}${suffix}, ${site.address}`,
+    ink: rival?.ink ?? (partner ? s.meta.brandInk : ''),
+    monogram: rival?.monogram ?? '',
+    badge: false,
+    icon: SITE_ICON[site.kind],
+    ...(rival && rival.status !== 'active' ? { muted: true } : {}),
+  };
+  if (partner) pin.partner = true;
+  return pin;
+}
+
+/** The central bank landmark (one per city; it speaks for the city's country). */
+function centralBankPin(s: GameState, map: CityMap): PinSpec | undefined {
+  const lm = map.landmarks.find((l) => l.id === 'centralBank');
+  const country = CITIES[map.cityId]?.country;
+  if (!lm || !country) return undefined;
+  const mid = Math.floor(lm.size / 2);
+  const at = anchor(map, { x: lm.x + mid, y: lm.y + mid });
+  return {
+    id: `cb_${map.cityId}`,
+    kind: 'centralBank',
+    x: at.x,
+    y: at.y,
+    label: `${COUNTRIES[country].centralBank}`,
     ink: '',
     monogram: '',
     badge: false,
-    icon: agency ? 'marketingAgencies' : 'creditBureaus',
+    icon: 'banks',
+    countryId: country,
   };
 }
 
@@ -167,12 +252,19 @@ export function buildPins(
       for (const o of Object.values(s.world.officeListings))
         if (o.cityId === map.cityId) pins.push(officePin(s, map, o));
     }
-    const bureaus = layerOn(layers, 'creditBureaus');
-    const agencies = layerOn(layers, 'marketingAgencies');
     for (const site of Object.values(s.world.sites)) {
       if (site.cityId !== map.cityId) continue;
-      if (site.kind === 'bureau' ? bureaus : agencies) pins.push(sitePin(map, site));
+      const stage5 = site.kind !== 'bureau' && site.kind !== 'agency';
+      if (stage5 && !features.competition) continue;
+      // A seized or acquired rival's head office leaves the map; a distressed one stays, faded.
+      const status = site.kind === 'rivalHq' ? s.rivals[site.refId]?.status : undefined;
+      if (status === 'seized' || status === 'acquired') continue;
+      if (layerOn(layers, SITE_LAYER[site.kind])) pins.push(sitePin(s, map, site));
     }
+  }
+  if (features.competition && layerOn(layers, 'banks')) {
+    const cb = centralBankPin(s, map);
+    if (cb) pins.push(cb);
   }
   return pins.sort(
     (a, b) => KIND_ORDER[a.kind] - KIND_ORDER[b.kind] || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0),
@@ -181,7 +273,9 @@ export function buildPins(
 
 /** A string that changes whenever any pin would look or act differently. */
 export function pinsKey(pins: PinSpec[]): string {
-  return pins.map((p) => `${p.id}|${p.kind}|${p.ink}|${p.monogram}|${p.label}`).join(';');
+  return pins
+    .map((p) => `${p.id}|${p.kind}|${p.ink}|${p.monogram}|${p.label}|${p.muted ? 1 : 0}`)
+    .join(';');
 }
 
 /**

@@ -35,6 +35,7 @@ import { capacity, visitRate } from './staff';
 import { difficultyOf } from '../difficulty';
 import { dpow } from '../detmath';
 import { brandSegmentMults } from '../hqMarketing';
+import { isClosed, takeupMult } from '../incident/effects';
 import { affinityOf, allProducts, baseId, starsOf } from '../products';
 
 export interface Origination {
@@ -148,7 +149,9 @@ export function runDemand(state: GameState, branch: Branch, fx: CampaignEffects)
     (AWARENESS_FLOOR + (1 - AWARENESS_FLOOR) * e) *
     Math.sqrt(loanDemand(country)) *
     dpow(1 - penetration, SATURATION_EXP) *
-    noise(rng, DEMAND_NOISE);
+    noise(rng, DEMAND_NOISE) *
+    // A branch closed by an incident (flood repairs, walkout) serves no one (§23).
+    (isClosed(state, branch.id) ? 0 : 1);
 
   // §9.3–9.4 share, capture and service
   const share = shareOf(state, branch);
@@ -175,7 +178,8 @@ export function runDemand(state: GameState, branch: Branch, fx: CampaignEffects)
     const affinity = affinityOf(spec);
     const approval = approvalOf(state, spec);
     const sp = special(state, branch, spec);
-    const boost = spec.category === 'deposits' ? fx.depositTakeUp : 1;
+    const boost =
+      (spec.category === 'deposits' ? fx.depositTakeUp : 1) * takeupMult(state, baseId(spec));
     let accounts = 0;
     let volume = 0;
     for (const s of SEGMENTS) {

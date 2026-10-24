@@ -1,0 +1,57 @@
+/* Central bank panel (SCREENS §8): the big policy rate and the yield-curve
+   mini-chart (ART_DIRECTION §5: 1.5 px brass strokes, no fills). */
+
+.cb-rate-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+.cb-rate-label {
+  font-size: var(--text-14);
+  color: var(--ivory-dim);
+}
+.cb-rate {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: var(--text-44);
+  line-height: 1.05;
+  color: var(--ivory);
+}
+.cb-curve-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+.yield-chart {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.yield-axis {
+  stroke: var(--hairline);
+  stroke-width: 1;
+}
+.yield-line {
+  fill: none;
+  stroke: var(--brass-light);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+.yield-dot {
+  fill: var(--vault-raised);
+  stroke: var(--brass-light);
+  stroke-width: 1.5;
+}
+.yield-rate {
+  fill: var(--ivory);
+  font-size: 12px;
+  font-weight: 600;
+}
+.yield-tenor {
+  fill: var(--ivory-dim);
+  font-size: 12px;
+}

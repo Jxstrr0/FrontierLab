@@ -11,6 +11,7 @@ import {
 import type { Tier } from '../data/types';
 import { balanceSheet, loanTotals } from './balanceSheet';
 import type { GameState } from './state';
+import { homeCountry } from './treasury';
 
 export interface CapitalSnapshot {
   cet1: number;
@@ -20,9 +21,16 @@ export interface CapitalSnapshot {
   equity: number;
 }
 
-export function tierFor(cr: number): Tier {
-  for (const t of TIER_THRESHOLDS) if (cr >= t.minCr) return t.tier;
+/** The tier for a capital ratio; a policy capital buffer raises every threshold (§24 Politics). */
+export function tierFor(cr: number, bufferPp = 0): Tier {
+  for (const t of TIER_THRESHOLDS) if (cr >= t.minCr + bufferPp / 100) return t.tier;
   return 'critical';
+}
+
+/** Capital buffer in force in your home country, in percentage points. */
+export function capitalBufferPp(state: GameState): number {
+  const b = homeCountry(state).capitalBuffer;
+  return b && b.untilWeek > state.clock.week ? b.pp : 0;
 }
 
 /** Trailing 52-week net revenue (net interest income + fee & other income). */
@@ -32,15 +40,16 @@ export function trailingNetRevenue(state: GameState): number {
 
 export function capitalSnapshot(state: GameState): CapitalSnapshot {
   const bs = balanceSheet(state);
-  // No goodwill or intangibles until acquisitions and partnerships exist.
-  const cet1 = bs.equity;
+  // CET1 = equity − goodwill − intangibles (goodwill arrives with acquisitions, Stage 6).
+  const cet1 = bs.equity - bs.intangibles;
   const rwa =
     loanTotals(state).rwa +
     bs.reo * REO_RISK_WEIGHT +
     bs.fixedAssets * FIXED_ASSET_RISK_WEIGHT +
     OP_RISK_MULT * Math.max(0, trailingNetRevenue(state));
   const capitalRatio = cet1 / Math.max(rwa, 1);
-  const tier = bs.equity < CHARTER_MIN_EQUITY ? 'critical' : tierFor(capitalRatio);
+  const tier =
+    bs.equity < CHARTER_MIN_EQUITY ? 'critical' : tierFor(capitalRatio, capitalBufferPp(state));
   return { cet1, rwa, capitalRatio, tier, equity: bs.equity };
 }
 

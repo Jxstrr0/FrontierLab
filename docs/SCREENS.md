@@ -26,6 +26,7 @@ Every building panel uses the same five parts, mirroring the original's structur
 - **Bottom-center:** city pill with an engraved flag. Tap → Travel sheet (the nearest airport's departures, plus "Fly now" if you own a jet).
 - **Bottom-right:** Menu.
 - **Badges:** pins show a small oxblood dot for an unresolved incident, a brass dot for pending Loan Desk applications.
+- **Cases chip:** while incidents wait for a decision, an "N cases" chip sits under the date pill and reopens the incident modal.
 
 ### 0.3 Menu sheet
 Wealth · Company · Branches · Portfolio · The Ledger (archive) · Milestones · Settings · Save game · Exit to title.
@@ -386,7 +387,7 @@ Tabs: Overview · Loans · Credit.
   - examples: "Ease the capital buffer by 1pp for 4 quarters", "Fast-track a merger review", "Delay fee-cap legislation"
 - **University:**
   - Student partnership: same as an employer deal, but with student accounts
-  - Graduate program: yearly cost; adds +10 to candidate skill and speeds up hiring
+  - Graduate program: yearly cost ($120k × wageIndex); adds +10 to candidate skill and +1 hire a week
 
 ## 16. Real estate
 

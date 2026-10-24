@@ -24,6 +24,9 @@ export function MenuSheet() {
     // Opens your HQ, or explains how to lease an office when you have none.
     ...(FEATURES.hq ? [{ label: 'HQ', onClick: () => openPanel({ type: 'hq' }) }] : []),
     { label: 'Branches', onClick: () => openPanel({ type: 'branches' }) },
+    ...(FEATURES.competition
+      ? [{ label: 'The Ledger', onClick: () => openPanel({ type: 'ledger' }) }]
+      : []),
     { label: 'Settings', onClick: () => openPanel({ type: 'settings' }) },
     { label: 'Save game', onClick: () => openPanel({ type: 'saves' }) },
     { label: 'Exit to title', onClick: exit },

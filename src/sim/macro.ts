@@ -64,6 +64,16 @@ export function initCountry(id: CountryId, rng: Rng): CountryState {
   };
 }
 
+/**
+ * Simulates every country in the data (Stage 5): the home country first, then
+ * the rest in CONTENT order, so a migrated save and a new game iterate alike.
+ */
+export function initCountries(state: GameState, home: CountryId): void {
+  const rng = stream(state, 'macro');
+  const ids = [home, ...(Object.keys(COUNTRIES) as CountryId[]).filter((id) => id !== home)];
+  for (const id of ids) state.world.countries[id] ??= initCountry(id, rng);
+}
+
 /** Weekly macro update for every simulated country (tick step 1). */
 export function updateMacro(state: GameState): void {
   const rng = stream(state, 'macro');
