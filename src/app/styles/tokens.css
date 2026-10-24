@@ -1,0 +1,58 @@
+/*
+ * Design tokens for the "Banknote Deco" look (docs/ART_DIRECTION.md §1).
+ * Every colour, font and size used by the UI comes from here.
+ */
+:root {
+  /* UI colour (ART_DIRECTION §1.1) */
+  --vault: #18233a;
+  --vault-deep: #0f1828;
+  --vault-raised: #22304a;
+  --ivory: #eee7d3;
+  --ivory-dim: #b9b3a2;
+  --brass: #b8913d;
+  --brass-light: #d9be7a;
+  --jade: #3e8a73;
+  --oxblood: #9e3d3d;
+  --paper: #e3e9df;
+  --ledger-ink: #22252b;
+
+  /* Hairlines are brass at 40% (§1.3) */
+  --hairline: rgb(184 145 61 / 40%);
+
+  /* Type (§1.2) */
+  --font-display: 'Bodoni Moda', 'Didot', 'Bodoni 72', Georgia, serif;
+  --font-ui: 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --text-12: 12px;
+  --text-14: 14px;
+  --text-16: 16px;
+  --text-20: 20px;
+  --text-24: 24px;
+  --text-32: 32px;
+  --text-44: 44px;
+  --line-body: 1.45;
+
+  /* Shape (§1.3) */
+  --radius-card: 6px;
+  --radius-pill: 999px;
+  --tap-min: 44px;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  /* Motion (§1.4) */
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --dur-panel: 200ms;
+  --dur-press: 220ms;
+
+  /* Safe areas (CLAUDE.md non-negotiable 3) */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+}
