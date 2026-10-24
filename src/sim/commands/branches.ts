@@ -10,6 +10,7 @@ import {
   START_AWARENESS,
   START_STAFF_MORALE,
   START_STAFF_SKILL,
+  WAGE_STEP,
   GRAND_OPENING_WEEKS,
 } from '../../config/balance';
 import { DISTRICT_SPECS } from '../../data/districts';
@@ -95,7 +96,7 @@ export function buildBranch(
     staff: {
       count: 0,
       target: 0,
-      wage: marketWage(lot.cityId),
+      wage: roundToStep(marketWage(lot.cityId), WAGE_STEP),
       skill: START_STAFF_SKILL,
       morale: START_STAFF_MORALE,
       quitAccumulator: 0,
