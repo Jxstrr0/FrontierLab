@@ -227,7 +227,7 @@ export function staffMods(state: GameState): StaffMods {
     morale: 0,
     hqMorale: 0,
     quitMult: 1,
-    hireMult: Math.max(HQ_EFFECTS.hrHireFloor, Math.min(1, cov(state, 'hr'))),
+    hireMult: Math.min(1, cov(state, 'hr')),
     skillRiseMult: 1,
     attraction: 0,
     reputation: 0,
@@ -326,10 +326,10 @@ function updateDepartment(state: GameState, d: Department, mods: StaffMods): voi
   }
 }
 
-/** Hires per week from the pay ratio, benefits and HR coverage (at least one). */
+/** Hires per week (§6.3): 1 + floor(2 × hrCoverage′ × attraction), attraction with benefits. */
 export function hiresPerWeek(payRatio: number, mods: StaffMods): number {
   const attraction = clamp(payRatio + mods.attraction, ...ATTRACTION_RANGE);
-  return Math.max(1, Math.floor((HIRE_BASE + Math.floor(2 * attraction)) * mods.hireMult));
+  return HIRE_BASE + Math.floor(2 * mods.hireMult * attraction);
 }
 
 /** Tick step 7: department staffing and payroll, benefits, then coverage. */

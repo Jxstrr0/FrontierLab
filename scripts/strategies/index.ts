@@ -1,7 +1,7 @@
 // The scripted strategies from SIMULATION §25.
 import { forceRecession } from './stress';
 import { averageLot, bestLot, buildCost, followDefaults, openBranch } from './common';
-import { manageHq } from './hq';
+import { hqReady, manageHq } from './hq';
 import type { Strategy } from './types';
 import * as cmd from '../../src/sim/commands';
 import type { GameState } from '../../src/sim/state';
@@ -14,9 +14,9 @@ function firstBranch(state: GameState, lending: boolean, delegate = DELEGATE_OPS
 }
 
 /** Opens a branch when cash > mult × build cost and the capital ratio clears minCr. */
-function expand(state: GameState, mult: number, minCr: number, lending: boolean): void {
+function expand(state: GameState, mult: number, minCr: number, lending: boolean, hq = true): void {
   const lot = bestLot(state);
-  if (!lot) return;
+  if (!lot || (hq && !hqReady(state))) return;
   if (state.company.cash > mult * buildCost(state, lot) && state.company.capitalRatio > minCr) {
     openBranch(state, lot, { lending, delegate: DELEGATE_OPS });
   }
@@ -46,7 +46,7 @@ export const turtle: Strategy = {
     manageHq(s);
     for (const app of Object.values(s.loanDesk.applications)) cmd.declineApplication(s, app.id);
     const lot = bestLot(s);
-    if (lot && s.company.cash > 2 * buildCost(s, lot)) {
+    if (lot && hqReady(s) && s.company.cash > 2 * buildCost(s, lot)) {
       const id = openBranchTurtle(s, lot.id);
       if (id) cmd.setDelegation(s, id, 'loans', false);
     }
@@ -84,4 +84,21 @@ export const stress: Strategy = {
   weekly: steady.weekly,
 };
 
-export const STRATEGIES: Record<string, Strategy> = { idle, steady, turtle, aggressive, stress };
+/** Steady without ever leasing an HQ: shows what understaffing costs (Stage 4 acceptance). */
+export const nohq: Strategy = {
+  name: 'nohq',
+  setup: steady.setup,
+  weekly: (s) => {
+    followDefaults(s);
+    expand(s, 2, 0.12, true, false);
+  },
+};
+
+export const STRATEGIES: Record<string, Strategy> = {
+  idle,
+  steady,
+  turtle,
+  aggressive,
+  stress,
+  nohq,
+};
