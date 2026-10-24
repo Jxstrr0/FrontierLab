@@ -19,6 +19,7 @@ import { pushEvent } from '../events';
 import { riskPdMult, shortfall } from '../hq';
 import { recordLoss } from '../riskFloor';
 import { appCost } from '../underwriting';
+import { delegationOn } from '../execSeats';
 import { newId } from '../ids';
 import { creditCycle, loanDemand } from '../macro';
 import { clamp, roundToStep } from '../math';
@@ -117,7 +118,8 @@ export function runLoanDesk(
     wk.underwriting += n * appCost(state);
   }
 
-  if (branch.delegation.loans && branch.managerId) {
+  // A delegated manager decides, or else the CRO's Loan Desk policy (§17.2).
+  if ((branch.delegation.loans && branch.managerId) || delegationOn(state, 'cro', 'loanPolicy')) {
     for (const app of Object.values(state.loanDesk.applications)) {
       if (app.branchId === branch.id) decideDelegated(state, branch, app);
     }
