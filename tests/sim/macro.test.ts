@@ -7,7 +7,7 @@ describe('macro (§4)', () => {
   it('derives factors with percent and decimal units kept apart', () => {
     const c = initCountry('CA', rngFromState(hashSeed(1, 'm')));
     c.unemployment = 7.6;
-    expect(creditCycle(c)).toBeCloseTo(1.416);
+    expect(creditCycle(c)).toBeCloseTo(1.91); // 1 + 0.35 × 2.6
     c.gdp = 2;
     c.policyRate = 0.0275; // at neutral
     expect(loanDemand(c)).toBeCloseTo(1);

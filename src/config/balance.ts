@@ -143,7 +143,7 @@ export const POLICY_FLOOR = 0.0025;
 export const POLICY_CAP = 0.09;
 export const GDP_FORECAST_SIGMA = 0.2;
 /** Derived factors (§4.5). */
-export const CREDIT_CYCLE = { floor: 0.8, slope: 0.16, base: 5.0 } as const;
+export const CREDIT_CYCLE = { floor: 0.8, slope: 0.35, base: 5.0 } as const;
 export const LOAN_DEMAND = { gdpSlope: 0.05, rateSlope: 0.12, min: 0.6, max: 1.3 } as const;
 export const DEPOSIT_GROWTH_SLOPE = 0.01;
 export const MORTGAGE_LGD_SLOPE = 3;
