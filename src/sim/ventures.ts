@@ -4,6 +4,7 @@
 // acquisition or a new round when runway is short). Draws come from the
 // `ventures` stream; generated startups from `ventureGen`.
 import { VENTURE_GEN, VENTURES } from '../config/balance';
+import { portfolioBreakdown } from './portfolio';
 import { investmentStaff } from './ventureAccess';
 import { stream, type Rng } from './rng';
 import type { GameState, Startup } from './state';
@@ -40,7 +41,13 @@ const activeCount = (state: GameState) =>
   Object.values(state.ventures.startups).filter(isPrivate).length;
 
 /** Opens a round now on a startup that isn't raising: price step from a fresh growth draw. */
-function raiseNow(state: GameState, s: Startup, rng: Rng, growth: number, closesWeek: number): void {
+function raiseNow(
+  state: GameState,
+  s: Startup,
+  rng: Rng,
+  growth: number,
+  closesWeek: number,
+): void {
   const step = drawPriceStep(rng, growth);
   const fraction = rng.range(VENTURES.newMoney[0], VENTURES.newMoney[1]);
   openRound(state, s, step, fraction, closesWeek);
@@ -85,8 +92,13 @@ export function refreshPipeline(state: GameState): void {
   v.pipeline = raising;
 }
 
-/** Tick step 8: venture debt, rounds closing, the pipeline and pruning. */
+/** Tick step 8: the portfolio log, venture debt, rounds closing, the pipeline and pruning. */
 export function runVentures(state: GameState): void {
+  state.ventures.valueLog = {
+    week: state.clock.week,
+    company: portfolioBreakdown(state, 'company').total,
+    personal: portfolioBreakdown(state, 'personal').total,
+  };
   serviceVentureDebt(state);
   closeDueRounds(state, stream(state, 'ventures'));
   refreshPipeline(state);
@@ -105,6 +117,9 @@ function quarter(state: GameState, s: Startup, rng: Rng, recession: boolean): vo
   s.quarters.push({ revenue, netIncome });
   if (s.quarters.length > VENTURES.quartersKept) s.quarters.shift();
   s.cash += netIncome;
+  const q = s.quarters.at(-1)!;
+  q.cash = s.cash;
+  q.debt = s.ventureDebt?.balance ?? 0;
   s.pentagon = driftPentagon(rng, s.pentagon);
 
   const failRoll = rng.next();

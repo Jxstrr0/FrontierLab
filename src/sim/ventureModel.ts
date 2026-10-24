@@ -119,7 +119,8 @@ export function debtAccepted(rate: number, policyRate: number): boolean {
 }
 
 /** §20.5: the most venture debt a startup takes: 10% of post-money. */
-export const maxVentureDebt = (s: Pick<Startup, 'postMoney'>) => VENTURE_DEBT.maxShare * s.postMoney;
+export const maxVentureDebt = (s: Pick<Startup, 'postMoney'>) =>
+  VENTURE_DEBT.maxShare * s.postMoney;
 
 /** Sector spec, falling back to fintech for unknown ids (old saves, typos). */
 export const sectorOf = (id: string) => STARTUP_SECTORS[id] ?? STARTUP_SECTORS.fintech!;

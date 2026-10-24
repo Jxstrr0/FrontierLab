@@ -213,8 +213,10 @@ export interface EventPayloads {
     cityId: Id;
     city: string;
     startWeek: number;
+    /** In the city you were in when it was announced. */
+    local: boolean;
   };
-  CONVENTION_OPEN: { conventionId: Id; name: string; cityId: Id; city: string };
+  CONVENTION_OPEN: { conventionId: Id; name: string; cityId: Id; city: string; local: boolean };
 
   // ─── Real estate (realEstate.ts, reo.ts) ──────────────────────────────────
   PROPERTY_BOUGHT: { siteId: Id; address: string; price: Money; account: string };

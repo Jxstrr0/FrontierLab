@@ -123,7 +123,8 @@ export function closeDueRounds(state: GameState, rng: Rng): void {
   for (const s of Object.values(state.ventures.startups)) {
     const r = s.round;
     if (!r || state.clock.week < r.closesWeek) continue;
-    for (const lot of r.lots) if (!lot.taken) takeLot(state, s, lot, { fund: rng.pick(FUND_NAMES) });
+    for (const lot of r.lots)
+      if (!lot.taken) takeLot(state, s, lot, { fund: rng.pick(FUND_NAMES) });
     s.postMoney = s.shares * s.lastPrice;
     delete s.round;
   }
