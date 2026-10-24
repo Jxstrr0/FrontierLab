@@ -18,6 +18,7 @@ import { deptAdvisor } from './deptSelectors';
 import { DeptStaffing } from './DeptStaffing';
 import { FinanceFloor } from './FinanceFloor';
 import { ExecutiveFloor } from '../executive/ExecutiveFloor';
+import { InvestmentFloor } from '../investment/InvestmentFloor';
 import { PLACEHOLDER_FLOORS, PlaceholderFloor } from './FloorPlaceholder';
 import { HrFloor } from './HrFloor';
 import { ItFloor } from './ItFloor';
@@ -113,6 +114,7 @@ export function HqPanel(p: { officeId?: string; dept?: DeptId }) {
             {dept === 'marketing' && <MarketingFloor />}
             {dept === 'risk' && <RiskFloor />}
             {dept === 'executive' && <ExecutiveFloor />}
+            {dept === 'investment' && <InvestmentFloor />}
             {PLACEHOLDER_FLOORS[dept] && <PlaceholderFloor dept={dept} />}
           </>
         ) : (

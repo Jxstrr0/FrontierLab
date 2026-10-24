@@ -62,7 +62,7 @@ export interface CityMap {
 /** Non-storefront buildings to place on the map (Stage 4); omitted while FEATURES.hq is off. */
 export interface MapPlaces {
   offices?: Pick<OfficeListing, 'id' | 'tile' | 'district' | 'floors' | 'buildingSeed'>[];
-  sites?: Pick<Site, 'id' | 'kind' | 'tile' | 'district' | 'buildingSeed'>[];
+  sites?: Pick<Site, 'id' | 'kind' | 'tile' | 'district' | 'buildingSeed' | 'property'>[];
 }
 
 export interface TileInfo {
@@ -186,7 +186,7 @@ export function generateCityMap(
     map.kind[i] = KIND.site;
     map.district[i] = DISTRICT_INDEX[site.district];
     map.seed[i] = site.buildingSeed >>> 0;
-    map.floors[i] = SITE_STOREYS[site.kind];
+    map.floors[i] = site.property?.floors ?? SITE_STOREYS[site.kind];
     map.siteAt.set(i, { id: site.id, kind: site.kind });
   }
 

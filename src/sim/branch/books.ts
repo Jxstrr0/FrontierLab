@@ -266,7 +266,9 @@ function defaults(ctx: Ctx, spec: ProductSpec, book: Book): void {
 function addReo(ctx: Ctx, value: number): void {
   if (value <= 0) return;
   const cityId = ctx.branch.cityId;
-  const pool = (ctx.state.reo[cityId] ??= { units: 0, value: 0 });
+  const country = CITIES[cityId]?.country;
+  const hpi = (country && ctx.state.world.countries[country]?.hpi) || 100;
+  const pool = (ctx.state.reo[cityId] ??= { units: 0, value: 0, mode: 'hold', hpiRef: hpi });
   const homeValue =
     ((PRODUCTS.mortgage?.ticket ?? 1) * (CITIES[cityId]?.incomeIndex ?? 1)) / REO_LTV;
   pool.value += value;

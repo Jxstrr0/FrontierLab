@@ -181,6 +181,48 @@ export interface EventPayloads {
   /** A failed rival's network goes on sale in M&A (rivalQuarter.ts failureCheck, §18.5). */
   DISTRESSED_SALE: { rivalId: Id; bank: string; ask: Money; pb: number; weeks: number; n: number };
 
+  // ─── Ventures and conventions (ventures.ts, conventions.ts) ────────────────
+  /** You (company or personal) bought an offer lot. */
+  VENTURE_INVESTED: { startupId: Id; name: string; account: string; amount: Money; pct: number };
+  VENTURE_ROUND: {
+    startupId: Id;
+    name: string;
+    round: string;
+    amount: Money;
+    postMoney: Money;
+    down: boolean;
+  };
+  VENTURE_FAILED: { startupId: Id; name: string; held: boolean };
+  VENTURE_IPO: { startupId: Id; name: string; ticker: string; price: Money; held: boolean };
+  VENTURE_ACQUIRED: { startupId: Id; name: string; price: Money; held: boolean };
+  VENTURE_DEBT_OFFERED: {
+    startupId: Id;
+    name: string;
+    amount: Money;
+    rate: number;
+    accepted: boolean;
+  };
+  CONVENTION_ANNOUNCED: {
+    conventionId: Id;
+    name: string;
+    cityId: Id;
+    city: string;
+    startWeek: number;
+  };
+  CONVENTION_OPEN: { conventionId: Id; name: string; cityId: Id; city: string };
+
+  // ─── Real estate (realEstate.ts, reo.ts) ──────────────────────────────────
+  PROPERTY_BOUGHT: { siteId: Id; address: string; price: Money; account: string };
+  PROPERTY_OFFER_REJECTED: { siteId: Id; address: string; offer: Money };
+  PROPERTY_SOLD: { siteId: Id; address: string; price: Money; account: string };
+  REO_SOLD: { cityId: Id; city: string; units: number; price: Money };
+
+  // ─── Lobbying (lobbying.ts) ───────────────────────────────────────────────
+  LOBBY_STARTED: { campaignId: string; title: string; firm: string; cost: Money };
+  LOBBY_WON: { campaignId: string; title: string; firm: string; country: string };
+  LOBBY_LOST: { campaignId: string; title: string; firm: string; country: string };
+  LOBBY_EXPOSED: { campaignId: string; title: string; firm: string; bank: string; fine: Money };
+
   // ─── Politics (news.ts) ───────────────────────────────────────────────────
   /** `country` is a CountryId; `policy` and `effect` are copy from src/data/newsWorld.ts. */
   POLICY_PROPOSED: PolicyPayload;

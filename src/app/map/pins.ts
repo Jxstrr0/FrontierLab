@@ -12,7 +12,12 @@ import { FEATURES, MERGERS, type FeatureId } from '../../config/balance';
 import { AGENCIES } from '../../data/brandCampaigns';
 import { CITIES } from '../../data/cities';
 import { COUNTRIES } from '../../data/countries';
+import { CONVENTIONS_CALENDAR, DEFAULT_VENUE } from '../../data/conventions';
 import { INVESTMENT_BANKS } from '../../data/investmentBanks';
+import { LOBBY_FIRMS } from '../../data/lobbying';
+import { conventionPinInfo } from '../convention/conventionPin';
+import { propertyPinInfo } from '../realEstate/propertyPin';
+import type { SitePinInfo } from './sitePinInfo';
 import type { CountryId } from '../../data/types';
 import { LEASE_ONLY_KEY, layerOn, type MapLayerId } from '../../data/mapLayers';
 import type { GameState, Lot, OfficeListing, Site } from '../../sim/state';
@@ -29,6 +34,9 @@ export type PinKind =
   | 'employer'
   | 'university'
   | 'investmentBank'
+  | 'property'
+  | 'conventionCenter'
+  | 'lobbyingFirm'
   | 'lot';
 
 export interface PinSpec {
@@ -58,6 +66,8 @@ export interface PinSpec {
   muted?: boolean;
   /** Your acquired branch still converting (§19.8): old ink and monogram, with a progress ring. */
   converting?: { from: string; weeksLeft: number; progress: number };
+  /** A short note under the medallion on Stage 7 sites ("For sale", "Open now"). */
+  tag?: string;
 }
 
 /** Clustering seeds and stacking: yours first, then rivals, then other buildings, open locations last. */
@@ -73,7 +83,10 @@ const KIND_ORDER: Record<PinKind, number> = {
   employer: 8,
   university: 9,
   investmentBank: 10,
-  lot: 11,
+  property: 11,
+  conventionCenter: 12,
+  lobbyingFirm: 13,
+  lot: 14,
 };
 
 /** Pins drawn in your brand ink, lifted above the rest. */
@@ -178,6 +191,15 @@ export function siteName(s: GameState | undefined, site: Site): string {
       return `${s?.rivals[site.refId]?.name ?? 'Rival bank'} head office`;
     case 'investmentBank':
       return INVESTMENT_BANKS[site.refId]?.name ?? 'Investment bank';
+    case 'property':
+      return `Building at ${site.address}`;
+    case 'conventionCenter':
+      return (
+        CONVENTIONS_CALENDAR.find((c) => c.id === site.refId)?.venue ??
+        DEFAULT_VENUE(CITIES[site.cityId]?.name ?? 'City')
+      );
+    case 'lobbyingFirm':
+      return LOBBY_FIRMS[site.refId]?.name ?? 'Lobbying firm';
     default:
       return site.employer?.name ?? site.refId;
   }
@@ -190,6 +212,9 @@ const SITE_ICON: Record<Site['kind'], MapLayerId> = {
   employer: 'employers',
   university: 'universities',
   investmentBank: 'investmentBanks',
+  property: 'realEstate',
+  conventionCenter: 'conventions',
+  lobbyingFirm: 'lobbyingFirms',
 };
 
 const SITE_LAYER: Record<Site['kind'], MapLayerId> = SITE_ICON;
@@ -201,19 +226,29 @@ export function isPartnerSite(s: GameState, site: Site): boolean {
   return Object.values(s.partnerships).some((p) => p.siteId === site.id && p.status === 'active');
 }
 
-function sitePin(s: GameState, map: CityMap, site: Site): PinSpec {
+/** Visibility, label, tag and owned seal for Stage 7 sites; undefined for other kinds. */
+function stage7Info(s: GameState, site: Site): SitePinInfo | undefined {
+  if (site.kind === 'property') return propertyPinInfo(s, site);
+  if (site.kind === 'conventionCenter') return conventionPinInfo(s, site);
+  if (site.kind === 'lobbyingFirm') return { visible: true, suffix: ', lobbying firm' };
+  return undefined;
+}
+
+function sitePin(s: GameState, map: CityMap, site: Site, info?: SitePinInfo): PinSpec {
   const at = anchor(map, site.tile);
-  const partner = isPartnerSite(s, site);
+  const partner = isPartnerSite(s, site) || !!info?.owned;
   const suffix =
-    (site.kind === 'agency'
-      ? ', marketing agency'
-      : site.kind === 'employer'
-        ? ', employer'
-        : site.kind === 'investmentBank'
-          ? ', investment bank'
-          : site.kind === 'rivalHq' && s.rivals[site.refId]?.status === 'distressed'
-            ? ', seized by regulators'
-            : '') + (partner ? ', your partner' : '');
+    (info
+      ? info.suffix
+      : site.kind === 'agency'
+        ? ', marketing agency'
+        : site.kind === 'employer'
+          ? ', employer'
+          : site.kind === 'investmentBank'
+            ? ', investment bank'
+            : site.kind === 'rivalHq' && s.rivals[site.refId]?.status === 'distressed'
+              ? ', seized by regulators'
+              : '') + (partner ? ', your partner' : '');
   const rival = site.kind === 'rivalHq' ? s.rivals[site.refId] : undefined;
   const pin: PinSpec = {
     id: site.id,
@@ -228,6 +263,7 @@ function sitePin(s: GameState, map: CityMap, site: Site): PinSpec {
     ...(rival && rival.status !== 'active' ? { muted: true } : {}),
   };
   if (partner) pin.partner = true;
+  if (info?.tag) pin.tag = info.tag;
   return pin;
 }
 
@@ -259,6 +295,8 @@ export function siteEnabled(
 ): boolean {
   if (kind === 'bureau' || kind === 'agency') return features.hq;
   if (kind === 'investmentBank') return features.capitalMarkets;
+  if (kind === 'property' || kind === 'conventionCenter' || kind === 'lobbyingFirm')
+    return features.investments;
   return features.competition;
 }
 
@@ -291,7 +329,10 @@ export function buildPins(
       // A seized or acquired rival's head office leaves the map; a distressed one stays, faded.
       const status = site.kind === 'rivalHq' ? s.rivals[site.refId]?.status : undefined;
       if (status === 'seized' || status === 'acquired') continue;
-      if (layerOn(layers, SITE_LAYER[site.kind])) pins.push(sitePin(s, map, site));
+      if (!layerOn(layers, SITE_LAYER[site.kind])) continue;
+      const info = stage7Info(s, site);
+      if (info && !info.visible) continue;
+      pins.push(sitePin(s, map, site, info));
     }
   }
   if (features.competition && layerOn(layers, 'banks')) {
@@ -308,7 +349,7 @@ export function pinsKey(pins: PinSpec[]): string {
   return pins
     .map(
       (p) =>
-        `${p.id}|${p.kind}|${p.ink}|${p.monogram}|${p.label}|${p.muted ? 1 : 0}|${p.converting?.weeksLeft ?? ''}`,
+        `${p.id}|${p.kind}|${p.ink}|${p.monogram}|${p.label}|${p.muted ? 1 : 0}|${p.converting?.weeksLeft ?? ''}|${p.tag ?? ''}|${p.partner ? 1 : 0}`,
     )
     .join(';');
 }

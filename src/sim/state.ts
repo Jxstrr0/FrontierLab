@@ -39,10 +39,17 @@ import type {
   OwnStock,
   PersonalState,
 } from './marketsTypes';
+import type {
+  ConventionsState,
+  LobbyingState,
+  RealEstateState,
+  VenturesState,
+} from './investmentsTypes';
 export type * from './competitionTypes';
 export type * from './marketsTypes';
+export type * from './investmentsTypes';
 
-export const SCHEMA_VERSION = 7;
+export const SCHEMA_VERSION = 8;
 
 export interface GameState {
   schemaVersion: number;
@@ -92,8 +99,16 @@ export interface GameState {
   personal: PersonalState;
   /** Rival M&A offers, integrations and completed deals (§19.8). */
   mergers: MergersState;
-  /** Foreclosed homes per city at recovery value (SIMULATION §21.3; modes arrive in Stage 7). */
+  /** Foreclosed homes per city (SIMULATION §21.3): value tracks house prices; hold, rent or sell. */
   reo: Record<Id, ReoPool>;
+  /** Startups, the Investment floor pipeline and venture debt (Stage 7, SIMULATION §20). */
+  ventures: VenturesState;
+  /** This year's and next year's convention runs (CONTENT §19). */
+  conventions: ConventionsState;
+  /** Owned buildings and buildings for sale (§21.1–21.2, §21.4). */
+  realEstate: RealEstateState;
+  /** Lobbying campaigns and their effects (DESIGN §5.8.10). */
+  lobbying: LobbyingState;
   /** Accumulates P&L lines and cash movements since the last weekly close. */
   ledger: Ledger;
   events: { log: GameEvent[]; scheduled: ScheduledEvent[] };
@@ -182,16 +197,29 @@ export interface OfficeListing {
 }
 
 export type SiteKind =
-  'bureau' | 'agency' | 'rivalHq' | 'employer' | 'university' | 'investmentBank';
+  | 'bureau'
+  | 'agency'
+  | 'rivalHq'
+  | 'employer'
+  | 'university'
+  | 'investmentBank'
+  | 'property'
+  | 'conventionCenter'
+  | 'lobbyingFirm';
 
 export interface Site {
   id: Id;
   cityId: Id;
   kind: SiteKind;
-  /** Bureau name, agency id, rival bank id, employer/university name or investment bank id. */
+  /**
+   * Bureau name, agency id, rival bank id, employer/university name, investment
+   * bank id, lobbying firm id, convention centre name, or the property's own id.
+   */
   refId: string;
   /** Employer details on employer and university sites (Stage 5). */
   employer?: EmployerInfo;
+  /** Building details on property sites (Stage 7, SIMULATION §21.1). */
+  property?: { sqm: number; floors: number };
   tile: { x: number; y: number };
   district: DistrictId;
   address: string;
@@ -742,6 +770,11 @@ export interface RivalBranch {
 export interface ReoPool {
   units: number;
   value: Money;
+  /** Hold (carry the cost), Rent (yield income) or Selling (settles at sellWeek), §21.3. */
+  mode: 'hold' | 'rent' | 'selling';
+  sellWeek?: Week;
+  /** House price index the value was last marked at (value tracks hpi). */
+  hpiRef: number;
 }
 
 // ─── Ledger, events, history ──────────────────────────────────────────────────
@@ -781,6 +814,11 @@ export type PnlLine =
   | 'dividendIncome'
   | 'investmentGains'
   | 'acquisitionGain'
+  | 'ventureDebtInterest'
+  | 'rentalIncome'
+  | 'propertyGains'
+  | 'propertyCosts'
+  | 'lobbying'
   | 'loanLosses'
   | 'depreciation'
   | 'tax';

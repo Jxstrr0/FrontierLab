@@ -4,6 +4,7 @@
 import { isDeposit, isLoan, PRODUCTS } from '../data/products';
 import { totalWholesale } from './fundingLots';
 import { summarize } from './ledger';
+import { realEstateValue, ventureDebtValue, venturesValue } from './portfolio';
 import { holdingsValue } from './securities';
 import { productSpec } from './products';
 import type { GameState } from './state';
@@ -20,6 +21,12 @@ export interface BalanceSheet {
   intangibles: number;
   /** Stocks the company holds, at market (§19.7). */
   investments: number;
+  /** Venture stakes at the latest round price (§20.6). */
+  ventures: number;
+  /** Venture debt the company has lent (§20.5). */
+  ventureDebt: number;
+  /** Company-owned buildings at estimated value (§21.2). */
+  realEstate: number;
   /** Goodwill from acquisitions (§19.8, deducted from CET1). */
   goodwill: number;
   assets: number;
@@ -106,6 +113,9 @@ export function balanceSheet(state: GameState): BalanceSheet {
   const fixedAssets = c.fixedAssets.reduce((sum, a) => sum + assetBookValue(a), 0);
   const intangibles = intangibleAssets(state);
   const investments = holdingsValue(state, 'company');
+  const ventures = venturesValue(state, 'company');
+  const ventureDebt = ventureDebtValue(state, 'company');
+  const realEstate = realEstateValue(state, 'company');
   const assets =
     c.cash +
     t.reserves +
@@ -116,6 +126,9 @@ export function balanceSheet(state: GameState): BalanceSheet {
     c.leaseDeposits +
     intangibles +
     investments +
+    ventures +
+    ventureDebt +
+    realEstate +
     c.goodwill;
   const deposits = totalDeposits(state);
   const wholesale = totalWholesale(state);
@@ -133,6 +146,9 @@ export function balanceSheet(state: GameState): BalanceSheet {
     leaseDeposits: c.leaseDeposits,
     intangibles,
     investments,
+    ventures,
+    ventureDebt,
+    realEstate,
     goodwill: c.goodwill,
     assets,
     deposits,

@@ -1,5 +1,5 @@
 // Placeholder cards for floors whose systems arrive in later stages
-// (Investment in Stage 7). Each says what is coming, so a floor is
+// (none left after Stage 7). Each says what is coming, so a floor is
 // honest about what works today. Replace an entry when its floor is built.
 import type { DeptId } from '../../sim/state';
 import { Card } from '../components';
@@ -23,15 +23,7 @@ interface PlaceholderSpec {
 }
 
 /** What each not-yet-built floor will hold (SCREENS §10). */
-export const PLACEHOLDER_FLOORS: Partial<Record<DeptId, PlaceholderSpec[]>> = {
-  investment: [
-    {
-      title: 'Portfolio and ventures',
-      arrives: 'Arrives with investments',
-      body: 'Stocks, ventures, real estate and venture debt.',
-    },
-  ],
-};
+export const PLACEHOLDER_FLOORS: Partial<Record<DeptId, PlaceholderSpec[]>> = {};
 
 export function PlaceholderFloor(p: { dept: DeptId }) {
   return (

@@ -36,6 +36,10 @@ export const SITE_STOREYS = {
   employer: 4,
   university: 3,
   investmentBank: 9,
+  /** Property buildings use their own floor count (Site.property.floors); this is the fallback. */
+  property: 5,
+  conventionCenter: 3,
+  lobbyingFirm: 6,
 } as const;
 
 /** Share of lot-free blocks that become parks, by district. */

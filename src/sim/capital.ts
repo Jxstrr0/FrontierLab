@@ -4,9 +4,12 @@ import {
   CHARTER_MIN_EQUITY,
   FIXED_ASSET_RISK_WEIGHT,
   OP_RISK_MULT,
+  PROPERTY_RISK_WEIGHT,
   REO_RISK_WEIGHT,
   STOCK_RISK_WEIGHT,
   TIER_THRESHOLDS,
+  VENTURE_DEBT_RISK_WEIGHT,
+  VENTURE_RISK_WEIGHT,
   WEEKS_PER_YEAR,
 } from '../config/balance';
 import type { Tier } from '../data/types';
@@ -28,10 +31,18 @@ export function tierFor(cr: number, bufferPp = 0): Tier {
   return 'critical';
 }
 
-/** Capital buffer in force in your home country, in percentage points. */
+/**
+ * Capital buffer in force in your home country, in percentage points: a passed
+ * buffer policy adds, a won lobbying campaign ("Ease the capital buffer") subtracts.
+ */
 export function capitalBufferPp(state: GameState): number {
-  const b = homeCountry(state).capitalBuffer;
-  return b && b.untilWeek > state.clock.week ? b.pp : 0;
+  const home = homeCountry(state);
+  const week = state.clock.week;
+  const b = home.capitalBuffer;
+  const relief = state.lobbying?.bufferRelief; // absent mid-migration from older saves
+  const plus = b && b.untilWeek > week ? b.pp : 0;
+  const minus = relief && relief.country === home.id && relief.untilWeek > week ? relief.pp : 0;
+  return plus - minus;
 }
 
 /** Trailing 52-week net revenue (net interest income + fee & other income). */
@@ -48,6 +59,9 @@ export function capitalSnapshot(state: GameState): CapitalSnapshot {
     bs.reo * REO_RISK_WEIGHT +
     bs.fixedAssets * FIXED_ASSET_RISK_WEIGHT +
     bs.investments * STOCK_RISK_WEIGHT +
+    bs.ventures * VENTURE_RISK_WEIGHT +
+    bs.ventureDebt * VENTURE_DEBT_RISK_WEIGHT +
+    bs.realEstate * PROPERTY_RISK_WEIGHT +
     OP_RISK_MULT * Math.max(0, trailingNetRevenue(state));
   const capitalRatio = cet1 / Math.max(rwa, 1);
   const tier =

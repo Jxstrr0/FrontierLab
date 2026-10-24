@@ -66,17 +66,28 @@ export function balanceSheetLines(s: GameState): StatementLine[] {
   const b = balanceSheet(s);
   // Retained earnings = equity − paid-in capital − AOCI (§14.4).
   const retained = b.equity - s.company.paidInCapital - b.aoci;
+  // Lines that only appear once something is in them (later-stage assets and liabilities).
+  const optional = (label: string, value: number): StatementLine[] =>
+    Math.abs(value) >= 0.5 ? [{ label, value, kind: 'sub' }] : [];
   return [
     { label: 'Cash', value: b.cash, kind: 'sub' },
     { label: 'Reserves', value: b.reserves, kind: 'sub' },
     { label: 'Government bonds', value: b.bonds, kind: 'sub' },
     { label: 'Loans', value: b.loans, kind: 'sub' },
     { label: 'Foreclosed property', value: b.reo, kind: 'sub' },
+    ...optional('Stocks', b.investments),
+    ...optional('Ventures', b.ventures),
+    ...optional('Venture debt', b.ventureDebt),
+    ...optional('Real estate', b.realEstate),
     { label: 'Branches and equipment', value: b.fixedAssets, kind: 'sub' },
     { label: 'Lease deposits', value: b.leaseDeposits, kind: 'sub' },
+    ...optional('Partnership fees', b.intangibles),
+    ...optional('Goodwill', b.goodwill),
     { label: 'Total assets', value: b.assets, kind: 'total' },
     { label: 'Deposits', value: b.deposits, kind: 'sub' },
     { label: 'Wholesale funding', value: b.wholesale, kind: 'sub' },
+    ...optional('Corporate debt', b.corporateDebt),
+    ...optional('Dividends payable', b.dividendsPayable),
     { label: 'Taxes payable', value: b.taxPayable, kind: 'sub' },
     { label: 'Total liabilities', value: b.liabilities, kind: 'total' },
     { label: 'Paid-in capital', value: s.company.paidInCapital, kind: 'sub' },
