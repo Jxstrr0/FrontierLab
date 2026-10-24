@@ -1,7 +1,8 @@
 // One brand campaign card on the Marketing floor (SCREENS §10, CONTENT §11):
 // name, a scope Segmented where the campaign runs per city or per country,
-// where it would run, weekly cost and awareness gain, segment boosts, and
-// Start / Stop. Campaigns that can't run yet (arena naming rights) show why.
+// where it would run (the city picked on the floor, or its country) and where
+// else it runs, weekly cost and awareness gain, segment boosts, and Start /
+// Stop. Campaigns that can't run yet (arena naming rights) show why.
 import { useState } from 'preact/hooks';
 import { SEGMENT_SPECS } from '../../../data/segments';
 import type { BrandCampaignSpec } from '../../../data/brandCampaigns';
@@ -17,21 +18,23 @@ import {
   campaignBlocker,
   pointsText,
   runningAt,
+  runningElsewhere,
   SCOPE_LABEL,
   scopeTarget,
   targetName,
   type Scope,
 } from './marketingView';
 
-export function BrandCampaignCard({ spec }: { spec: BrandCampaignSpec }) {
+export function BrandCampaignCard({ spec, cityId }: { spec: BrandCampaignSpec; cityId: string }) {
   const s = useGame();
   const sym = s.settings.currency;
   // Open on the scope that's already running, if any.
   const initial =
-    spec.scopes.find((sc) => runningAt(s, spec.id, sc, scopeTarget(s, sc))) ?? spec.scopes[0]!;
+    spec.scopes.find((sc) => runningAt(s, spec.id, sc, scopeTarget(cityId, sc))) ?? spec.scopes[0]!;
   const [scope, setScope] = useState<Scope>(initial);
-  const target = scopeTarget(s, scope);
+  const target = scopeTarget(cityId, scope);
   const running = runningAt(s, spec.id, scope, target);
+  const elsewhere = runningElsewhere(s, spec.id, { scope, targetId: target });
   const blocker = campaignBlocker(spec);
   const cost = brandCampaignCost(spec, scope);
   const gain = (spec.gainPerWeek[scope] ?? 0) * campaignMult(s);
@@ -68,6 +71,7 @@ export function BrandCampaignCard({ spec }: { spec: BrandCampaignSpec }) {
         <span class="muted small">{scope === 'city' ? 'Runs per city' : 'Runs countrywide'}</span>
       )}
       <Row label={scope === 'city' ? 'City' : 'Country'} value={targetName(scope, target)} />
+      {elsewhere && <Row label="Also running in" value={elsewhere} tone="dim" />}
       <Row label="Cost" value={`${money(cost, sym)} /week`} strong />
       <Row
         label="Brand awareness"

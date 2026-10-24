@@ -48,7 +48,7 @@ export interface NewsContext {
   home: CountryId;
   /** Countries with one of your branches, plus your home country. */
   operated: Set<CountryId>;
-  /** Cities with one of your branches, plus the city on screen. */
+  /** Cities with one of your branches, plus your home city. */
   yourCities: Set<string>;
   /** This issue's events: this week's tick plus anything that arrived mid-week since the last issue. */
   events: GameEvent[];
@@ -57,7 +57,8 @@ export interface NewsContext {
 export function newsContext(state: GameState, events: GameEvent[]): NewsContext {
   const home = homeCountry(state).id;
   const operated = new Set<CountryId>([home]);
-  const yourCities = new Set<string>([state.world.currentCityId]);
+  // Home rather than wherever you happen to stand, so a visit doesn't reshuffle the paper.
+  const yourCities = new Set<string>([state.meta.homeCityId]);
   for (const b of Object.values(state.branches)) {
     yourCities.add(b.cityId);
     const country = CITIES[b.cityId]?.country;
@@ -86,17 +87,26 @@ export const theCountryName = (id: CountryId): string =>
 export const districtName = (id: string): string =>
   DISTRICT_SPECS[id as DistrictId]?.name ?? 'the district';
 
-/** The city the paper uses for a country: where most of your branches are, else its first city. */
-export function cityFor(state: GameState, country: CountryId): string {
+/**
+ * The city with most of your open branches (first opened wins a tie), limited
+ * to one country when given; undefined if you have none there.
+ */
+export function busiestCity(state: GameState, country?: CountryId): string | undefined {
   const counts = new Map<string, number>();
   for (const b of Object.values(state.branches)) {
-    if (CITIES[b.cityId]?.country === country)
-      counts.set(b.cityId, (counts.get(b.cityId) ?? 0) + 1);
+    if (b.status === 'closed') continue;
+    if (country && CITIES[b.cityId]?.country !== country) continue;
+    counts.set(b.cityId, (counts.get(b.cityId) ?? 0) + 1);
   }
   let best: string | undefined;
   for (const [id, n] of counts) if (best === undefined || n > counts.get(best)!) best = id;
+  return best;
+}
+
+/** The city the paper uses for a country: where most of your branches are, your home city, else its first city. */
+export function cityFor(state: GameState, country: CountryId): string {
+  const best = busiestCity(state, country);
   if (best) return cityName(best);
-  if (CITIES[state.world.currentCityId]?.country === country)
-    return cityName(state.world.currentCityId);
+  if (CITIES[state.meta.homeCityId]?.country === country) return cityName(state.meta.homeCityId);
   return cityName(Object.values(CITIES).find((c) => c.country === country)?.id ?? '');
 }

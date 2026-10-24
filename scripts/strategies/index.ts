@@ -1,8 +1,11 @@
-// The scripted strategies from SIMULATION §25.
+// The scripted strategies from SIMULATION §25. Steady and aggressive expand
+// city by city once home runs out of good lots (expansion.ts); turtle and nohq
+// stay in the home city.
 import { forceRecession } from './stress';
 import { averageLot, bestLot, buildCost, followDefaults, openBranch } from './common';
 import { manageEquity } from './equity';
 import { hqReady, manageHq } from './hq';
+import { cityFull, nextExpansionLot } from './expansion';
 import type { Strategy } from './types';
 import * as cmd from '../../src/sim/commands';
 import type { GameState } from '../../src/sim/state';
@@ -14,10 +17,23 @@ function firstBranch(state: GameState, lending: boolean, delegate = DELEGATE_OPS
   if (lot) openBranch(state, lot, { lending, delegate });
 }
 
-/** Opens a branch when cash > mult × build cost and the capital ratio clears minCr. */
-function expand(state: GameState, mult: number, minCr: number, lending: boolean, hq = true): void {
-  const lot = bestLot(state);
-  if (!lot || (hq && !hqReady(state))) return;
+/**
+ * Opens a branch when cash > mult × build cost and the capital ratio clears
+ * minCr. With `travel`, it builds only on good lots and flies on to the next
+ * city once the current one has none (expansion.ts); without, it stays home.
+ */
+function expand(
+  state: GameState,
+  mult: number,
+  minCr: number,
+  lending: boolean,
+  opts: { hq?: boolean; travel?: boolean } = {},
+): void {
+  const { hq = true, travel = true } = opts;
+  if (hq && !hqReady(state)) return;
+  if (travel && cityFull(state) && state.company.capitalRatio <= minCr) return;
+  const lot = travel ? nextExpansionLot(state) : bestLot(state);
+  if (!lot) return;
   if (state.company.cash > mult * buildCost(state, lot) && state.company.capitalRatio > minCr) {
     openBranch(state, lot, { lending, delegate: DELEGATE_OPS });
   }
@@ -92,7 +108,7 @@ export const nohq: Strategy = {
   setup: steady.setup,
   weekly: (s) => {
     followDefaults(s);
-    expand(s, 2, 0.12, true, false);
+    expand(s, 2, 0.12, true, { hq: false, travel: false });
   },
 };
 

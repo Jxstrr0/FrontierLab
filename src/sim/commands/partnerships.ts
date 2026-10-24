@@ -2,6 +2,8 @@
 // student partnership at an employer or university, renew it in its last year,
 // release it, and start or end a university graduate program.
 import { PARTNER_CONTRACT_WEEKS, PARTNER_HEALTH, WEEKS_PER_YEAR } from '../../config/balance';
+import { CITIES } from '../../data/cities';
+import { COUNTRIES } from '../../data/countries';
 import { isDeposit } from '../../data/products';
 import { isOffered } from '../branch/pricing';
 import { pushEvent } from '../events';
@@ -10,6 +12,7 @@ import { postCash, spend } from '../ledger';
 import {
   canRenew,
   gradProgramCost,
+  hostCandidates,
   renewalFee,
   signingFee,
   startRunoff,
@@ -47,8 +50,11 @@ export function signBlocker(
     return 'Only universities offer student partnerships.';
   if (activePartnership(state, siteId, kind)) return 'You already have this partnership.';
   const host = state.branches[hostBranchId];
-  if (!host || host.status !== 'open' || host.cityId !== site.cityId)
-    return 'Pick an open branch of yours in this city to host the accounts.';
+  // A regional site has no storefronts: any open branch in its country can host (hostCandidates).
+  if (!host || !hostCandidates(state, site.cityId).some((b) => b.id === host.id))
+    return CITIES[site.cityId]?.regional
+      ? `Pick an open branch of yours in ${COUNTRIES[CITIES[site.cityId]!.country].name} to host the accounts.`
+      : 'Pick an open branch of yours in this city to host the accounts.';
   const spec = productSpec(state, productId);
   if (!spec || !isDeposit(spec) || !isOffered(host, productId))
     return 'Pick a deposit account the host branch offers as the package.';

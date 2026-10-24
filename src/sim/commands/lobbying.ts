@@ -4,6 +4,7 @@
 // only while such a bill is waiting for its vote in that country.
 import { LOBBYING } from '../../config/balance';
 import { CITIES } from '../../data/cities';
+import { COUNTRIES } from '../../data/countries';
 import { LOBBY_FIRMS } from '../../data/lobbying';
 import { pushEvent } from '../events';
 import { spend } from '../ledger';
@@ -27,6 +28,10 @@ export function lobbyBlock(
     return 'You need to be in this city to hire the firm.';
   if (state.lobbying.campaigns.some((c) => c.campaignId === campaignId && c.status === 'pending'))
     return 'This campaign is already under way.';
+  // The capital buffer binds only at home (§15 follows the home regulator, DESIGN §5.2).
+  const home = CITIES[state.meta.homeCityId]?.country;
+  if ((campaignId === 'easeBuffer' || campaignId === 'stallBuffer') && country !== home)
+    return `Your capital buffer is set at home in ${COUNTRIES[home ?? country].name}, so this campaign only helps there.`;
   if (campaignId === 'stallBuffer' && !pendingBufferBill(state, country))
     return 'There is no capital buffer bill before lawmakers here right now.';
   if (campaignId === 'fastTrack' && state.lobbying.fastTrack)

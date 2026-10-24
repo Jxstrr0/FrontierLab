@@ -13,6 +13,7 @@ import {
   WAGE_STEP,
   GRAND_OPENING_WEEKS,
 } from '../../config/balance';
+import { CITIES } from '../../data/cities';
 import { DISTRICT_SPECS } from '../../data/districts';
 import { BUILD_SLOTS, EQUIPMENT, isFitout, type BuildSpec } from '../../data/equipment';
 import { isDeposit, isLoan } from '../../data/products';
@@ -65,9 +66,12 @@ export function buildBlocker(
   return undefined;
 }
 
-/** The district's name, numbered when one of your branches already has it. */
-export function defaultName(state: GameState, district: string): string {
-  const base = DISTRICT_SPECS[district as keyof typeof DISTRICT_SPECS]?.name ?? 'Branch';
+/** The district's name (led by the city's away from home), numbered when one of your branches already has it. */
+export function defaultName(state: GameState, district: string, cityId?: string): string {
+  const area = DISTRICT_SPECS[district as keyof typeof DISTRICT_SPECS]?.name ?? 'Branch';
+  // Away from home the city leads the name ("New York Midtown"), so lists and news stay clear.
+  const away = cityId && cityId !== state.meta.homeCityId ? CITIES[cityId]?.name : undefined;
+  const base = away ? `${away} ${area}` : area;
   const taken = new Set(Object.values(state.branches).map((b) => b.name));
   if (!taken.has(base)) return base;
   for (let n = 2; ; n++) if (!taken.has(`${base} ${n}`)) return `${base} ${n}`;
@@ -91,7 +95,10 @@ export function buildBranch(
     id,
     cityId: lot.cityId,
     lotId: lot.id,
-    name: (args.name?.trim() || defaultName(state, lot.district)).slice(0, BRANCH_NAME_MAX),
+    name: (args.name?.trim() || defaultName(state, lot.district, lot.cityId)).slice(
+      0,
+      BRANCH_NAME_MAX,
+    ),
     builtDay: state.clock.day,
     status: 'fitout',
     build: { ...args.build },

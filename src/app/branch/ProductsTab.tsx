@@ -2,12 +2,15 @@
 // switch and one card per product. Cards stack vertically rather than in a
 // carousel so every product's toggle and price stay visible on a phone.
 import { useState } from 'preact/hooks';
+import { CITIES } from '../../data/cities';
 import type { CategoryId } from '../../data/types';
+import { theCountryName } from '../../sim/newsStory';
 import { allProducts } from '../../sim/products';
 import { activeModel } from '../../sim/underwriting';
-import type { Branch } from '../../sim/state';
+import type { Branch, GameState } from '../../sim/state';
 import { Card, Segmented } from '../components';
 import { useGame } from '../store';
+import { priceCountries } from '../hq/products/productSelectors';
 import { ProductCard } from './ProductCard';
 
 const CATEGORIES: { value: CategoryId; label: string }[] = [
@@ -41,9 +44,7 @@ export function ProductsTab(p: { branch: Branch; onLoanDesk: () => void }) {
         </p>
       </Card>
       <Segmented label="Product category" options={CATEGORIES} value={cat} onChange={setCat} />
-      {s.company.applyRatesToAll && (
-        <p class="muted small">Prices are set at HQ for every branch.</p>
-      )}
+      {s.company.applyRatesToAll && <p class="muted small">{hqPriceNotice(s, p.branch)}</p>}
       {p.branch.delegation.products && (
         <p class="muted small">Your manager sets products and prices here.</p>
       )}
@@ -52,6 +53,15 @@ export function ProductsTab(p: { branch: Branch; onLoanDesk: () => void }) {
       ))}
     </div>
   );
+}
+
+/** Where this branch's prices come from while HQ sets them: the list for its own country. */
+function hqPriceNotice(s: GameState, branch: Branch): string {
+  if (priceCountries(s).length < 2) return 'Prices are set at HQ for every branch.';
+  const country = CITIES[branch.cityId]?.country;
+  return country
+    ? `Prices follow HQ's list for ${theCountryName(country)}.`
+    : 'Prices are set at HQ.';
 }
 
 /** Small engraved rosette standing in for the model's radar until the HQ floor exists. */

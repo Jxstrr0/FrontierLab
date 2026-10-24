@@ -83,12 +83,31 @@ export function deskWeek(state: GameState, branch: Branch): DeskWeek {
     : { week: state.clock.week, approved: 0, refused: 0, declined: 0, expired: 0 };
 }
 
-/** New applications, expiry, delegated decisions and booked loans for one branch. */
+/**
+ * Every booked business loan grouped by branch, in booking order. The weekly
+ * tick builds it once so each branch walks only its own loans (a bank with
+ * hundreds of branches across cities holds thousands of loans).
+ */
+export function loansByBranch(state: GameState): Map<string, BusinessLoan[]> {
+  const out = new Map<string, BusinessLoan[]>();
+  for (const loan of Object.values(state.loanDesk.loans)) {
+    const list = out.get(loan.branchId);
+    if (list) list.push(loan);
+    else out.set(loan.branchId, [loan]);
+  }
+  return out;
+}
+
+/**
+ * New applications, expiry, delegated decisions and booked loans for one
+ * branch. `loans` is this branch's entry in loansByBranch, when the caller has one.
+ */
 export function runLoanDesk(
   state: GameState,
   branch: Branch,
   fx: CampaignEffects,
   wk: BranchWeek,
+  loans?: BusinessLoan[],
 ): void {
   const rng = stream(state, 'loanDesk');
   const week = state.clock.week;
@@ -119,12 +138,19 @@ export function runLoanDesk(
   }
 
   // A delegated manager decides, or else the CRO's Loan Desk policy (§17.2).
+  const booked: BusinessLoan[] = [];
   if ((branch.delegation.loans && branch.managerId) || delegationOn(state, 'cro', 'loanPolicy')) {
     for (const app of Object.values(state.loanDesk.applications)) {
-      if (app.branchId === branch.id) decideDelegated(state, branch, app);
+      if (app.branchId !== branch.id) continue;
+      const loan = decideDelegated(state, branch, app);
+      if (loan) booked.push(loan);
     }
   }
-  runBusinessLoans(state, branch, wk, rng);
+  // Same loans in the same order as a scan of every loan: earlier bookings, then this week's.
+  const mine = loans
+    ? [...loans, ...booked]
+    : Object.values(state.loanDesk.loans).filter((l) => l.branchId === branch.id);
+  runBusinessLoans(state, branch, wk, rng, mine);
 }
 
 function generateApplication(state: GameState, branch: Branch, rng: Rng): LoanApplication {
@@ -200,11 +226,16 @@ export function acceptanceProb(app: LoanApplication, rate: number): number {
 
 /** Offers a loan at `rate`; returns whether the business accepted. Removes the application. */
 export function offerLoan(state: GameState, app: LoanApplication, rate: number): boolean {
+  return bookOffer(state, app, rate) !== undefined;
+}
+
+/** offerLoan's work: the booked loan, or undefined when the business refused. */
+function bookOffer(state: GameState, app: LoanApplication, rate: number): BusinessLoan | undefined {
   delete state.loanDesk.applications[app.id];
   const rng = stream(state, 'loanDesk');
   if (!rng.chance(acceptanceProb(app, rate))) {
     recordDesk(state, app.branchId, 'refused');
-    return false;
+    return undefined;
   }
   recordDesk(state, app.branchId, 'approved');
   const r = rate / WEEKS_PER_YEAR;
@@ -235,16 +266,23 @@ export function offerLoan(state: GameState, app: LoanApplication, rate: number):
     3,
     app.branchId,
   );
-  return true;
+  return loan;
 }
 
-/** A delegated manager approves when the estimated PD clears the appetite threshold (§11). */
-function decideDelegated(state: GameState, branch: Branch, app: LoanApplication): void {
+/**
+ * A delegated manager approves when the estimated PD clears the appetite
+ * threshold (§11). Returns the loan when one is booked.
+ */
+function decideDelegated(
+  state: GameState,
+  branch: Branch,
+  app: LoanApplication,
+): BusinessLoan | undefined {
   const threshold = LOANDESK.delegatedThresholds[state.company.riskAppetite - 1] ?? 0;
   if (app.estPd > threshold) {
     delete state.loanDesk.applications[app.id];
     recordDesk(state, branch.id, 'declined');
-    return;
+    return undefined;
   }
   const country = countryOfCity(state, branch.cityId);
   const spec = PRODUCTS.sbl!;
@@ -255,19 +293,25 @@ function decideDelegated(state: GameState, branch: Branch, app: LoanApplication)
     ),
     spec.step,
   );
-  offerLoan(state, app, rate);
+  return bookOffer(state, app, rate);
 }
 
-/** Amortizes and defaults each booked business loan; keeps the SBL book's totals. */
-function runBusinessLoans(state: GameState, branch: Branch, wk: BranchWeek, rng: Rng): void {
+/** Amortizes and defaults each of the branch's booked business loans; keeps the SBL book's totals. */
+function runBusinessLoans(
+  state: GameState,
+  branch: Branch,
+  wk: BranchWeek,
+  rng: Rng,
+  loans: BusinessLoan[],
+): void {
   const country = countryOfCity(state, branch.cityId);
   const cycle = creditCycle(country);
   const spec = PRODUCTS.sbl!;
   let count = 0;
   let balance = 0;
   let defaulted = 0;
-  for (const loan of Object.values(state.loanDesk.loans)) {
-    if (loan.branchId !== branch.id || loan.status !== 'current') continue;
+  for (const loan of loans) {
+    if (loan.status !== 'current') continue;
     const hit = rng.chance((loan.pd * cycle * riskPdMult(state)) / WEEKS_PER_YEAR);
     recordLoss(state, 'sbl', {
       balance: loan.balance,
