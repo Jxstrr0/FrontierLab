@@ -5,6 +5,7 @@ import {
   FIXED_ASSET_RISK_WEIGHT,
   OP_RISK_MULT,
   REO_RISK_WEIGHT,
+  STOCK_RISK_WEIGHT,
   TIER_THRESHOLDS,
   WEEKS_PER_YEAR,
 } from '../config/balance';
@@ -40,12 +41,13 @@ export function trailingNetRevenue(state: GameState): number {
 
 export function capitalSnapshot(state: GameState): CapitalSnapshot {
   const bs = balanceSheet(state);
-  // CET1 = equity − goodwill − intangibles (goodwill arrives with acquisitions, Stage 6).
-  const cet1 = bs.equity - bs.intangibles;
+  // CET1 = equity − goodwill − intangibles (§15).
+  const cet1 = bs.equity - bs.intangibles - bs.goodwill;
   const rwa =
     loanTotals(state).rwa +
     bs.reo * REO_RISK_WEIGHT +
     bs.fixedAssets * FIXED_ASSET_RISK_WEIGHT +
+    bs.investments * STOCK_RISK_WEIGHT +
     OP_RISK_MULT * Math.max(0, trailingNetRevenue(state));
   const capitalRatio = cet1 / Math.max(rwa, 1);
   const tier =

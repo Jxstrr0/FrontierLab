@@ -11,6 +11,7 @@ import { FEATURES, type FeatureId } from '../../config/balance';
 import { AGENCIES } from '../../data/brandCampaigns';
 import { CITIES } from '../../data/cities';
 import { COUNTRIES } from '../../data/countries';
+import { INVESTMENT_BANKS } from '../../data/investmentBanks';
 import type { CountryId } from '../../data/types';
 import { LEASE_ONLY_KEY, layerOn, type MapLayerId } from '../../data/mapLayers';
 import type { GameState, Lot, OfficeListing, Site } from '../../sim/state';
@@ -26,6 +27,7 @@ export type PinKind =
   | 'rivalHq'
   | 'employer'
   | 'university'
+  | 'investmentBank'
   | 'lot';
 
 export interface PinSpec {
@@ -67,7 +69,8 @@ const KIND_ORDER: Record<PinKind, number> = {
   rivalHq: 7,
   employer: 8,
   university: 9,
-  lot: 10,
+  investmentBank: 10,
+  lot: 11,
 };
 
 /** Pins drawn in your brand ink, lifted above the rest. */
@@ -158,6 +161,8 @@ export function siteName(s: GameState | undefined, site: Site): string {
       return `${site.refId} credit bureau`;
     case 'rivalHq':
       return `${s?.rivals[site.refId]?.name ?? 'Rival bank'} head office`;
+    case 'investmentBank':
+      return INVESTMENT_BANKS[site.refId]?.name ?? 'Investment bank';
     default:
       return site.employer?.name ?? site.refId;
   }
@@ -169,6 +174,7 @@ const SITE_ICON: Record<Site['kind'], MapLayerId> = {
   rivalHq: 'banks',
   employer: 'employers',
   university: 'universities',
+  investmentBank: 'investmentBanks',
 };
 
 const SITE_LAYER: Record<Site['kind'], MapLayerId> = SITE_ICON;
@@ -188,9 +194,11 @@ function sitePin(s: GameState, map: CityMap, site: Site): PinSpec {
       ? ', marketing agency'
       : site.kind === 'employer'
         ? ', employer'
-        : site.kind === 'rivalHq' && s.rivals[site.refId]?.status === 'distressed'
-          ? ', seized by regulators'
-          : '') + (partner ? ', your partner' : '');
+        : site.kind === 'investmentBank'
+          ? ', investment bank'
+          : site.kind === 'rivalHq' && s.rivals[site.refId]?.status === 'distressed'
+            ? ', seized by regulators'
+            : '') + (partner ? ', your partner' : '');
   const rival = site.kind === 'rivalHq' ? s.rivals[site.refId] : undefined;
   const pin: PinSpec = {
     id: site.id,
@@ -229,6 +237,16 @@ function centralBankPin(s: GameState, map: CityMap): PinSpec | undefined {
   };
 }
 
+/** Whether a site kind's stage is switched on (bureaus and agencies come with the HQ stage). */
+export function siteEnabled(
+  kind: Site['kind'],
+  features: Record<FeatureId, boolean> = FEATURES,
+): boolean {
+  if (kind === 'bureau' || kind === 'agency') return features.hq;
+  if (kind === 'investmentBank') return features.capitalMarkets;
+  return features.competition;
+}
+
 /** Pins for the city on screen, after the Layers settings, in stacking order. */
 export function buildPins(
   s: GameState,
@@ -254,8 +272,7 @@ export function buildPins(
     }
     for (const site of Object.values(s.world.sites)) {
       if (site.cityId !== map.cityId) continue;
-      const stage5 = site.kind !== 'bureau' && site.kind !== 'agency';
-      if (stage5 && !features.competition) continue;
+      if (!siteEnabled(site.kind, features)) continue;
       // A seized or acquired rival's head office leaves the map; a distressed one stays, faded.
       const status = site.kind === 'rivalHq' ? s.rivals[site.refId]?.status : undefined;
       if (status === 'seized' || status === 'acquired') continue;

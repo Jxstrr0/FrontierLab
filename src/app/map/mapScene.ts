@@ -11,6 +11,7 @@ import { BRANCH_ZOOM, OVERVIEW_ZOOM } from '../../config/mapView';
 import type { CitySpec } from '../../data/cities';
 import type { GameState, Lot } from '../../sim/state';
 import type { ViewCamera } from './camera';
+import { siteEnabled } from './pins';
 
 /** Fallback for the map paper if the --paper token can't be read (ART_DIRECTION §1.1). */
 const PAPER_FALLBACK = '#E3E9DF';
@@ -36,10 +37,7 @@ export function mapPlaces(s: GameState, cityId: string): MapPlaces {
   if (!FEATURES.hq) return {};
   return {
     offices: Object.values(s.world.officeListings).filter((o) => o.cityId === cityId),
-    sites: Object.values(s.world.sites).filter(
-      (x) =>
-        x.cityId === cityId && (FEATURES.competition || x.kind === 'bureau' || x.kind === 'agency'),
-    ),
+    sites: Object.values(s.world.sites).filter((x) => x.cityId === cityId && siteEnabled(x.kind)),
   };
 }
 

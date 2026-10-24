@@ -30,9 +30,19 @@ import type {
   NewsState,
   Partnership,
 } from './competitionTypes';
+import type {
+  BranchConversion,
+  ExecutivesState,
+  Governance,
+  MarketState,
+  MergersState,
+  OwnStock,
+  PersonalState,
+} from './marketsTypes';
 export type * from './competitionTypes';
+export type * from './marketsTypes';
 
-export const SCHEMA_VERSION = 6;
+export const SCHEMA_VERSION = 7;
 
 export interface GameState {
   schemaVersion: number;
@@ -70,6 +80,18 @@ export interface GameState {
   news: NewsState;
   /** Price-war tracking (§18.6). */
   competition: CompetitionState;
+  /** Senior executives and candidate pools (Stage 6, SIMULATION §17.2). */
+  executives: ExecutivesState;
+  /** Board meetings, CEO pay and dividends (DESIGN §5.13). */
+  governance: Governance;
+  /** Your bank's shares: cap table, valuation or price, placements, IPO (§19.2–19.6). */
+  stock: OwnStock;
+  /** Listed companies, the index and holdings (§19.1, §19.7). */
+  market: MarketState;
+  /** The founder's own money (§22). */
+  personal: PersonalState;
+  /** Rival M&A offers, integrations and completed deals (§19.8). */
+  mergers: MergersState;
   /** Foreclosed homes per city at recovery value (SIMULATION §21.3; modes arrive in Stage 7). */
   reo: Record<Id, ReoPool>;
   /** Accumulates P&L lines and cash movements since the last weekly close. */
@@ -159,13 +181,14 @@ export interface OfficeListing {
   officeId?: Id;
 }
 
-export type SiteKind = 'bureau' | 'agency' | 'rivalHq' | 'employer' | 'university';
+export type SiteKind =
+  'bureau' | 'agency' | 'rivalHq' | 'employer' | 'university' | 'investmentBank';
 
 export interface Site {
   id: Id;
   cityId: Id;
   kind: SiteKind;
-  /** Bureau name, agency id, rival bank id, or employer/university name. */
+  /** Bureau name, agency id, rival bank id, employer/university name or investment bank id. */
   refId: string;
   /** Employer details on employer and university sites (Stage 5). */
   employer?: EmployerInfo;
@@ -237,8 +260,10 @@ export interface Lot {
 export interface Company {
   cash: Money;
   paidInCapital: Money;
-  /** Cumulative net income (dividends arrive in Stage 6). */
+  /** Cumulative net income less dividends declared. */
   retainedEarnings: Money;
+  /** Goodwill from acquisitions (§19.8), deducted from CET1. */
+  goodwill: Money;
   sharesOutstanding: number;
   taxPayable: Money;
   taxLossCarry: Money;
@@ -303,6 +328,8 @@ export interface Branch {
   pnl: BranchPnl[];
   /** Loan Desk outcomes for the current week (schema v3). */
   desk: DeskWeek;
+  /** An acquired branch still converting to your brand (Stage 6). */
+  converting?: BranchConversion;
 }
 
 export interface BranchStaff {
@@ -679,6 +706,15 @@ export interface RivalBank {
   priceWar: Record<Id, Rate>;
   /** While distressed: the week its network is split among other rivals (§18.5). */
   distressedUntil?: Week;
+  /** Stage 6 (§19): shares outstanding (fixed), price (market if listed, book if private). */
+  shares: number;
+  price: Money;
+  /** Weekly closes, oldest first (listed rivals only). */
+  history: number[];
+  high52: Money;
+  low52: Money;
+  /** Mean-reverting sentiment around 1 (listed rivals, §19.5 model). */
+  sentiment: number;
 }
 
 export interface RivalBranch {
@@ -734,6 +770,13 @@ export type PnlLine =
   | 'incidents'
   | 'corporateInterest'
   | 'amortization'
+  | 'execPay'
+  | 'grantExpense'
+  | 'integration'
+  | 'commissions'
+  | 'dividendIncome'
+  | 'investmentGains'
+  | 'acquisitionGain'
   | 'loanLosses'
   | 'depreciation'
   | 'tax';

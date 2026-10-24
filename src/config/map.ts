@@ -35,6 +35,7 @@ export const SITE_STOREYS = {
   rivalHq: 8,
   employer: 4,
   university: 3,
+  investmentBank: 9,
 } as const;
 
 /** Share of lot-free blocks that become parks, by district. */

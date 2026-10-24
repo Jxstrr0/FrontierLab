@@ -7,7 +7,9 @@ import { isFrontage, nearestFrontage } from '../cityLayout';
 import { fullCoverage } from '../hq';
 import { generateSites } from '../hqSites';
 import { RIVALS } from '../../data/rivals';
+import { generateCapitalMarketSites } from '../capitalSites';
 import { generateCompetitionSites } from '../competitionSites';
+import { initCapitalMarkets, initRivalShares } from '../marketInit';
 import { emptyCorporateDebt } from '../corporateDebt';
 import { initCountries } from '../macro';
 import { initRivalFinancials, seedMatureBooks } from '../rivals';
@@ -132,8 +134,38 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     }
     return s;
   },
+  // 6 → 7: Stage 6 governance and capital markets. Rivals get share counts and
+  // prices, cities get investment bank offices, branches can convert after an
+  // acquisition, and the executive, board, cap table, stock market, personal
+  // and M&A records start fresh (the founder holds every share).
+  6: (s) => {
+    const state = s as unknown as GameState;
+    const addLines = (pnl: Record<string, number>) => {
+      for (const line of STAGE6_PNL_LINES) pnl[line] ??= 0;
+    };
+    addLines(state.ledger.pnl);
+    for (const w of state.history.weekly) addLines(w.pnl);
+    for (const bank of Object.values(state.rivals)) {
+      Object.assign(bank, { shares: 0, price: 0, history: [], high52: 0, low52: 0, sentiment: 1 });
+      initRivalShares(bank);
+    }
+    for (const cityId of Object.keys(state.world.cities).sort()) {
+      generateCapitalMarketSites(state, cityId);
+    }
+    initCapitalMarkets(state);
+    return s;
+  },
 };
 
+const STAGE6_PNL_LINES = [
+  'execPay',
+  'grantExpense',
+  'integration',
+  'commissions',
+  'dividendIncome',
+  'investmentGains',
+  'acquisitionGain',
+] as const;
 const NEW_PNL_LINES = ['hqStaff', 'benefits', 'development'] as const;
 const STAGE5_PNL_LINES = ['incidents', 'corporateInterest', 'amortization'] as const;
 

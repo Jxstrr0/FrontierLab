@@ -22,7 +22,15 @@ import { fullCoverage } from './hq';
 import { generateSites } from './hqSites';
 import { emptyLedger } from './ledger';
 import { initCountries } from './macro';
+import { generateCapitalMarketSites } from './capitalSites';
 import { generateCompetitionSites } from './competitionSites';
+import {
+  emptyExecutives,
+  emptyGovernance,
+  emptyMergers,
+  initCapitalMarkets,
+  initMarket,
+} from './marketInit';
 import { emptyCorporateDebt } from './corporateDebt';
 import { refreshManagerPool } from './people';
 import { updateMarketRefs } from './rates';
@@ -115,6 +123,7 @@ export function newGame(opts: NewGameOptions): GameState {
       cash: startCash,
       paidInCapital: startCash + CHARTER_CAPITAL,
       retainedEarnings: 0,
+      goodwill: 0,
       sharesOutstanding: START_SHARES,
       taxPayable: 0,
       taxLossCarry: 0,
@@ -163,6 +172,21 @@ export function newGame(opts: NewGameOptions): GameState {
     incidents: { active: [], cooldowns: {}, effects: [] },
     news: { issues: [], lastTemplate: {} },
     competition: { ratesStreak: {} },
+    executives: emptyExecutives(),
+    governance: emptyGovernance(),
+    stock: {
+      status: 'private',
+      price: 0,
+      history: [],
+      high52: 0,
+      low52: 0,
+      sentiment: 1,
+      holders: [],
+      placements: [],
+    },
+    market: initMarket(),
+    personal: { cash: 0 },
+    mergers: emptyMergers(),
     reo: {},
     ledger: emptyLedger(),
     events: { log: [], scheduled: [] },
@@ -183,11 +207,13 @@ export function newGame(opts: NewGameOptions): GameState {
   for (const lot of lots) state.world.lots[lot.id] = lot;
   generateSites(state, city.id);
   generateCompetitionSites(state, city.id);
+  generateCapitalMarketSites(state, city.id);
   updateMarketRefs(state);
   refreshManagerPool(state, city.id, true);
 
   const cap = capitalSnapshot(state);
   state.company.capitalRatio = cap.capitalRatio;
   state.company.tier = cap.tier;
+  initCapitalMarkets(state);
   return state;
 }

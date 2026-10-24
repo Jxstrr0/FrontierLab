@@ -1,6 +1,8 @@
 // The in-game screen: the city view (the Stage 3 map, or the Stage 2 list when
 // FEATURES.cityMap is off), the HUD, and the overlay layers for panels,
 // modals, the menu and layers sheets, and toasts.
+import { BoardMeetingModal } from '../executive/BoardMeetingModal';
+import { InvestmentBankPanel } from '../investmentBank/InvestmentBankPanel';
 import { useEffect } from 'preact/hooks';
 import { FEATURES } from '../../config/balance';
 import { BranchPanel } from '../branch/BranchPanel';
@@ -92,6 +94,11 @@ function PanelHost() {
       return FEATURES.competition ? <UniversityPanel key={p.siteId} siteId={p.siteId} /> : null;
     case 'ledger':
       return FEATURES.competition ? <LedgerArchivePanel week={p.week} /> : null;
+    // Stage 6 (FEATURES.capitalMarkets): investment banks.
+    case 'investmentBank':
+      return FEATURES.capitalMarkets ? (
+        <InvestmentBankPanel key={p.siteId} siteId={p.siteId} tab={p.tab ?? 'market'} />
+      ) : null;
     case 'company':
       return <CompanyPanel />;
     case 'branches':
@@ -110,5 +117,6 @@ function ModalHost() {
   if (!m) return null;
   if (m.type === 'weekly') return <WeeklyResults week={m.week} />;
   if (m.type === 'incident') return FEATURES.competition ? <IncidentModal /> : null;
+  if (m.type === 'boardMeeting') return FEATURES.capitalMarkets ? <BoardMeetingModal /> : null;
   return <GameOverModal />;
 }
