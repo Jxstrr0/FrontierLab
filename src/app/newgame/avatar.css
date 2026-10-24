@@ -1,0 +1,119 @@
+/* Founder avatar picker: the placeholder portrait, part rows and tone swatches. */
+:root {
+  /* Six skin tones, tinted from the UI inks so no new colours enter the palette. */
+  --tone-0: color-mix(in srgb, var(--ivory) 88%, var(--brass-light));
+  --tone-1: color-mix(in srgb, var(--brass-light) 80%, var(--ivory));
+  --tone-2: var(--brass-light);
+  --tone-3: color-mix(in srgb, var(--brass) 75%, var(--oxblood));
+  --tone-4: color-mix(in srgb, var(--oxblood) 60%, var(--brass));
+  --tone-5: color-mix(in srgb, var(--vault-raised) 55%, var(--oxblood));
+}
+
+.avatar-picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.avatar-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+.avatar-summary {
+  margin: 0;
+  max-width: 28em;
+  text-align: center;
+}
+
+.founder-portrait {
+  flex: none;
+  display: block;
+}
+.portrait-frame {
+  fill: none;
+  stroke: var(--brass);
+  stroke-width: 1.5;
+}
+.portrait-frame-inner {
+  fill: none;
+  stroke: var(--hairline);
+  stroke-width: 1;
+  stroke-dasharray: 1.5 2.5;
+}
+.portrait-ground {
+  fill: var(--vault-raised);
+}
+.portrait-shoulders {
+  fill: var(--vault-deep);
+  stroke: var(--brass-light);
+  stroke-width: 1;
+}
+.portrait-head {
+  stroke: var(--brass-light);
+  stroke-width: 1;
+}
+
+.part-list {
+  display: flex;
+  flex-direction: column;
+}
+.part-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 56px;
+  border-bottom: 1px solid rgb(184 145 61 / 12%);
+}
+.part-row:last-child {
+  border-bottom: 0;
+}
+.part-label {
+  flex: 0 0 6.5em;
+  font-size: var(--text-14);
+  color: var(--ivory-dim);
+}
+.part-name {
+  flex: 1;
+  text-align: center;
+  font-weight: 600;
+  font-size: var(--text-14);
+}
+.part-row-tone {
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0;
+  padding: var(--space-2) 0;
+}
+.part-row-tone .part-label {
+  flex: none;
+}
+.tone-swatches {
+  display: flex;
+  justify-content: space-between;
+}
+.tone-swatch {
+  position: relative;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.tone-swatch::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
+  background: var(--swatch);
+  border: 1px solid var(--hairline);
+}
+.tone-swatch.is-active::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  border: 2px solid var(--brass);
+}

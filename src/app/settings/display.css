@@ -1,0 +1,20 @@
+/* Display settings (SCREENS §26).
+
+   Reduced motion: the player's setting, on top of the system preference. */
+html.reduced-motion *,
+html.reduced-motion *::before,
+html.reduced-motion *::after {
+  animation-duration: 1ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 1ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* Text size zooms #app, which also scales viewport units (vw, vh). Divide them back
+   so toasts and sheets still fit the screen at 115% and 130%. */
+#app .toasts {
+  width: min(calc(92vw / var(--ui-zoom, 1)), 420px);
+}
+#app .sheet {
+  max-height: calc(88vh / var(--ui-zoom, 1));
+}

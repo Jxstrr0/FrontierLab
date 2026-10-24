@@ -1,0 +1,64 @@
+/* Text fields and quiet link buttons used by the wizard (and reusable elsewhere). */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.field-label {
+  padding: 0;
+  font-size: var(--text-14);
+  font-weight: 600;
+  color: var(--ivory);
+}
+.field-input {
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-4);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-card);
+  background: var(--vault-deep);
+  color: var(--ivory);
+  font: inherit;
+  /* 16px or more keeps iOS Safari from zooming into the field. */
+  font-size: var(--text-16);
+}
+.field-input::placeholder {
+  color: var(--ivory-dim);
+  opacity: 0.7;
+}
+.field-input:focus {
+  outline: 2px solid var(--brass);
+  outline-offset: 1px;
+}
+.field-input-short {
+  max-width: 6em;
+  text-align: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+.field-hint {
+  font-size: var(--text-12);
+  color: var(--ivory-dim);
+}
+
+.link-btn {
+  align-self: center;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-3);
+  border: 0;
+  background: transparent;
+  color: var(--ivory-dim);
+  font-size: var(--text-14);
+  text-decoration: underline;
+  text-decoration-color: var(--hairline);
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+.link-btn:active {
+  color: var(--brass-light);
+}

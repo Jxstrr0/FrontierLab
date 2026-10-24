@@ -1,0 +1,248 @@
+/* New Game wizard layout. Phone portrait first (390×844), centred on wide screens. */
+.wizard {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--vault);
+}
+.wizard-column {
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 0 calc(var(--space-4) + var(--safe-right)) 0 calc(var(--space-4) + var(--safe-left));
+}
+
+.wizard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: calc(var(--safe-top) + var(--space-3)) calc(var(--space-4) + var(--safe-right))
+    var(--space-3) calc(var(--space-4) + var(--safe-left));
+  background: var(--vault-deep);
+  border-bottom: 1px solid var(--hairline);
+}
+.wizard-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-20);
+}
+
+/* Step indicator: five segments, then the step's name in Bodoni. */
+.steps {
+  padding-top: var(--space-4);
+  padding-bottom: var(--space-2);
+}
+.steps-bar {
+  display: flex;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-3);
+  padding: 0;
+  list-style: none;
+}
+.steps-dot {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--vault-raised);
+}
+.steps-dot.is-done {
+  background: var(--brass);
+  opacity: 0.55;
+}
+.steps-dot.is-current {
+  background: var(--brass-light);
+}
+.steps-label {
+  font-size: var(--text-14);
+}
+.steps-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-24);
+  line-height: 1.2;
+}
+
+.wizard-body {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-top: var(--space-3);
+  padding-bottom: var(--space-5);
+}
+.wizard-body .wizard-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.wizard-footer {
+  padding: var(--space-3) 0 calc(var(--space-3) + var(--safe-bottom));
+  background: var(--vault-deep);
+  border-top: 1px solid var(--hairline);
+}
+.wizard-blocker {
+  margin: 0 0 var(--space-2);
+  text-align: center;
+}
+
+.step-intro {
+  margin: 0;
+}
+
+/* Step 1 */
+.preview {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-card);
+  background: var(--vault-raised);
+}
+.preview-text {
+  min-width: 0;
+}
+.preview-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-20);
+  overflow-wrap: anywhere;
+}
+.ink-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+.ink {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: 72px;
+  padding: var(--space-2) 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius-card);
+  background: transparent;
+  cursor: pointer;
+}
+.ink-swatch {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid var(--brass);
+}
+.ink-name {
+  font-size: var(--text-12);
+  color: var(--ivory-dim);
+  text-align: center;
+}
+.ink.is-active {
+  border-color: var(--brass);
+  background: rgb(184 145 61 / 12%);
+}
+.ink.is-active .ink-name {
+  color: var(--ivory);
+  font-weight: 600;
+}
+
+/* Step 3 */
+.city-card {
+  display: block;
+  cursor: pointer;
+}
+.city-card + .city-card {
+  margin-top: 0;
+}
+.city-card.is-selected {
+  border-color: var(--brass);
+  background: color-mix(in srgb, var(--brass) 10%, var(--vault-raised));
+}
+.city-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.city-ink {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid var(--brass);
+}
+.city-name {
+  flex: 1;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-20);
+}
+.city-check {
+  font-size: var(--text-12);
+  font-weight: 600;
+  color: var(--brass-light);
+}
+.city-flavour {
+  display: block;
+  margin: var(--space-2) 0 var(--space-3);
+  font-size: var(--text-14);
+  color: var(--ivory-dim);
+}
+.city-facts {
+  display: block;
+}
+
+/* Step 4 */
+.option-stack {
+  gap: var(--space-5);
+}
+.option-note {
+  margin: 0;
+  font-size: var(--text-14);
+  color: var(--ivory-dim);
+}
+
+/* Step 5 */
+.summary-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+.summary-titles {
+  flex: 1;
+  min-width: 0;
+}
+.summary-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-20);
+  overflow-wrap: anywhere;
+}
+.advanced {
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-card);
+  padding: 0 var(--space-4);
+}
+.advanced summary {
+  min-height: var(--tap-min);
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: var(--text-14);
+  color: var(--ivory-dim);
+}
+.advanced-body {
+  padding-bottom: var(--space-4);
+}
+.seed-row {
+  display: flex;
+  gap: var(--space-2);
+}
+.seed-row .btn {
+  flex: none;
+  padding: 0 var(--space-4);
+}
