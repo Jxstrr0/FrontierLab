@@ -106,6 +106,11 @@ export class MapController {
     this.invalidate();
   }
 
+  /** The city map on screen (for framing landmarks). */
+  get cityMap(): CityMap | null {
+    return this.map;
+  }
+
   get camera(): ViewCamera {
     return { ...this.cam };
   }

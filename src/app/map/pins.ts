@@ -1,7 +1,7 @@
 // Pin data for the map (SCREENS §2, ART_DIRECTION §2): one entry per storefront
 // lot (your branches, rivals and open branch locations) in the current city and, with the HQ stage (FEATURES.hq), per office
 // building, credit bureau and marketing agency, filtered by the Layers
-// settings, with its roof anchor in world px and its accessible label. An
+// settings, plus the central bank and (Stage 8) airport landmarks, with its roof anchor in world px and its accessible label. An
 // acquired branch still converting wears the old bank's ink with a progress
 // ring. Also the renderer's occupants (lots and leased offices). Read-only views of
 // GameState; positions come from the CityMap.
@@ -11,12 +11,12 @@ import type { LotOccupant } from '../../art/mapRenderer';
 import { FEATURES, MERGERS, type FeatureId } from '../../config/balance';
 import { AGENCIES } from '../../data/brandCampaigns';
 import { CITIES } from '../../data/cities';
-import { COUNTRIES } from '../../data/countries';
 import { CONVENTIONS_CALENDAR, DEFAULT_VENUE } from '../../data/conventions';
 import { INVESTMENT_BANKS } from '../../data/investmentBanks';
 import { LOBBY_FIRMS } from '../../data/lobbying';
 import { conventionPinInfo } from '../convention/conventionPin';
 import { propertyPinInfo } from '../realEstate/propertyPin';
+import { airportPin, centralBankPin } from './landmarkPins';
 import type { SitePinInfo } from './sitePinInfo';
 import type { CountryId } from '../../data/types';
 import { LEASE_ONLY_KEY, layerOn, type MapLayerId } from '../../data/mapLayers';
@@ -37,6 +37,7 @@ export type PinKind =
   | 'property'
   | 'conventionCenter'
   | 'lobbyingFirm'
+  | 'airport'
   | 'lot';
 
 export interface PinSpec {
@@ -86,7 +87,8 @@ const KIND_ORDER: Record<PinKind, number> = {
   property: 11,
   conventionCenter: 12,
   lobbyingFirm: 13,
-  lot: 14,
+  airport: 14,
+  lot: 15,
 };
 
 /** Pins drawn in your brand ink, lifted above the rest. */
@@ -267,27 +269,6 @@ function sitePin(s: GameState, map: CityMap, site: Site, info?: SitePinInfo): Pi
   return pin;
 }
 
-/** The central bank landmark (one per city; it speaks for the city's country). */
-function centralBankPin(s: GameState, map: CityMap): PinSpec | undefined {
-  const lm = map.landmarks.find((l) => l.id === 'centralBank');
-  const country = CITIES[map.cityId]?.country;
-  if (!lm || !country) return undefined;
-  const mid = Math.floor(lm.size / 2);
-  const at = anchor(map, { x: lm.x + mid, y: lm.y + mid });
-  return {
-    id: `cb_${map.cityId}`,
-    kind: 'centralBank',
-    x: at.x,
-    y: at.y,
-    label: `${COUNTRIES[country].centralBank}`,
-    ink: '',
-    monogram: '',
-    badge: false,
-    icon: 'banks',
-    countryId: country,
-  };
-}
-
 /** Whether a site kind's stage is switched on (bureaus and agencies come with the HQ stage). */
 export function siteEnabled(
   kind: Site['kind'],
@@ -336,8 +317,13 @@ export function buildPins(
     }
   }
   if (features.competition && layerOn(layers, 'banks')) {
-    const cb = centralBankPin(s, map);
+    const cb = centralBankPin(map);
     if (cb) pins.push(cb);
+  }
+  // Stage 8: the airport is always on the map (SCREENS §18), whatever the Layers say.
+  if (features.multiCity) {
+    const ap = airportPin(map);
+    if (ap) pins.push(ap);
   }
   return pins.sort(
     (a, b) => KIND_ORDER[a.kind] - KIND_ORDER[b.kind] || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0),

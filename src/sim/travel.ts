@@ -63,6 +63,11 @@ export function runTravel(state: GameState): void {
   jet.value -= (jet.value * JET.depreciation) / WEEKS_PER_YEAR;
 }
 
+/** A week's upkeep of a jet worth `value`, from personal cash (as runTravel charges it). */
+export function jetUpkeepWeekly(value: number): number {
+  return (value * JET.upkeepRate) / WEEKS_PER_YEAR;
+}
+
 /** What selling the jet would raise now. */
 export function jetResale(state: GameState): number {
   const jet = state.personal.jet;
