@@ -189,8 +189,10 @@ const LOT_MEDALLION_SVG =
 function makePinElement(p: PinSpec): HTMLButtonElement {
   const el = document.createElement('button');
   el.type = 'button';
-  el.className = `map-pin pin-${p.kind}`;
+  el.className = `map-pin pin-${p.kind}${p.muted ? ' is-muted' : ''}`;
   el.dataset.lotId = p.id;
+  // Rival head offices wear the bank's ink as a ring and pennant (map.css).
+  if (p.kind === 'rivalHq' && p.ink) el.style.setProperty('--pin-ink', p.ink);
   el.setAttribute('aria-label', p.label);
   el.style.display = 'none';
   if (p.kind === 'office') {

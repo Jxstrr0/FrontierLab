@@ -61,7 +61,7 @@ function Reviews({ branch }: { branch: Branch }) {
   );
 }
 
-function ReviewCardView({ card }: { card: ReviewCard }) {
+export function ReviewCardView({ card }: { card: ReviewCard }) {
   const s = useGame();
   return (
     <Card class="br-review">
