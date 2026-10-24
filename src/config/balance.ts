@@ -1246,5 +1246,16 @@ export const MERGERS = {
   moraleHit: 10,
   /** A distressed network's asking price as P/B (§18.5). */
   distressedPb: [0.4, 0.7] as [number, number],
+  /** Floor on a distressed asking price per share (thin or negative equity, like the $1 price floor). */
+  distressedMinAsk: 1,
+  /** Offers kept in state.mergers.offers for the M&A tab. */
+  offersKept: 12,
+  /** A pending offer this large makes the paper (MERGER_OFFER story). */
+  offerNewsMin: 10_000_000,
+  /** Offer sheet stepper: price per share from lo × to hi × the reference price, in steps. */
+  offerRange: [0.5, 3] as [number, number],
+  offerStep: 0.1,
+  /** An acquired branch's awareness = perStar × the rival branch's overall stars, clamped. */
+  acquiredAwareness: { perStar: 0.12, min: 0.2, max: 0.6 },
 } as const;
 export const REBRAND_COST = 60_000;
