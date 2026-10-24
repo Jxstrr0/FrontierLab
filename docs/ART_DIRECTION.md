@@ -95,7 +95,9 @@ Spend the boldness on the map and the illustrations, the way a banknote's engrav
   - Rivals: an ivory fill with their ink ring and monogram.
   - For lease: a rectangular ivory tag with a brass outline, "For lease".
 - **Performance:**
-  - Render each 16×16-tile chunk once to an offscreen canvas at the current devicePixelRatio; redraw only on zoom-stop change or when a building changes.
+  - Split the map into square screen-space chunks, 256 CSS px at each zoom stop, rendered once to an offscreen canvas at stop × devicePixelRatio. Each chunk draws every tile whose art touches it, back to front, so buildings overlap correctly across chunk edges.
+  - In-between zooms scale the nearest stop's chunks; missing chunks show a scaled copy from another stop (or paper) and are painted about 6 ms per frame, nearest the centre first.
+  - Keep at most 40 M px of chunks (least recently used goes first) to stay inside iOS Safari's canvas memory. A building change repaints only the chunks it touches.
   - Cull off-screen chunks.
   - Pins use `transform: translate3d`.
 

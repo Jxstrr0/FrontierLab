@@ -29,14 +29,18 @@ const systemReducedMotion = () =>
  */
 const counterZoom = (scale: number) => (scale === 1 ? undefined : { zoom: String(1 / scale) });
 
+/** The microprint ring is drawn with Public Sans; repaint once web fonts have loaded. */
+const fontsLoaded = () => typeof document === 'undefined' || document.fonts?.status === 'loaded';
+
 export function MapView() {
   const s = useGame();
   const container = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const pinHost = useRef<HTMLDivElement>(null);
   const ctrl = useRef<MapController | null>(null);
-  const keys = useRef({ scene: '', pins: STALE, occupants: STALE });
+  const keys = useRef({ scene: '', build: '', pins: STALE, occupants: STALE });
   const [rivalLotId, setRivalLotId] = useState<string | null>(null);
+  const [fontsReady, setFontsReady] = useState(fontsLoaded);
   // Read through a ref so the controller always sees the latest settings.
   const reduced = useRef(false);
   reduced.current = s.settings.reducedMotion || systemReducedMotion();
@@ -59,7 +63,8 @@ export function MapView() {
     });
     ctrl.current = c;
     active = c;
-    keys.current = { scene: '', pins: STALE, occupants: STALE };
+    keys.current = { scene: '', build: '', pins: STALE, occupants: STALE };
+    if (!fontsLoaded()) void document.fonts.ready.then(() => setFontsReady(true));
     return () => {
       rememberCamera(keys.current.scene, c.camera);
       c.dispose();
@@ -75,9 +80,11 @@ export function MapView() {
     if (!c || !city) return;
     const lots = cityLots(s);
     const scene = sceneFor(city, s.meta.seed, lots);
-    if (scene.key !== keys.current.scene) {
+    // Rebuilding after the fonts load keeps the view: the camera is remembered per scene.
+    const build = `${scene.key}|${fontsReady ? 'fonts' : 'fallback'}`;
+    if (build !== keys.current.build) {
       if (keys.current.scene) rememberCamera(keys.current.scene, c.camera);
-      keys.current = { scene: scene.key, pins: STALE, occupants: STALE };
+      keys.current = { scene: scene.key, build, pins: STALE, occupants: STALE };
       c.setScene(scene.map, scene.createRenderer(), initialCamera(s, scene));
     }
     const occupants = occupantsOf(s, lots);
