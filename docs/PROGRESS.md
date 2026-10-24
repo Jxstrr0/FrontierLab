@@ -3,7 +3,7 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Current stage:** 2 — Playable loop in plain UI (built; awaiting the owner's iPhone check)
-**Live URL:** (after the first deploy) https://jxstrr0.github.io/VaultStreet/
+**Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
 **Determinism snapshot:** `1b00e5e0304fc5` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
