@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Map lab</title>
+    <!-- Dev-only page for iterating on the engraved city renderer (src/art/lab/maplab.ts).
+         Not part of the production build: Vite only builds index.html. -->
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        overflow: hidden;
+        background: #e3e9df;
+        touch-action: none;
+      }
+      canvas {
+        display: block;
+        width: 100vw;
+        height: 100vh;
+      }
+      #hud {
+        position: fixed;
+        left: 8px;
+        top: 8px;
+        padding: 4px 8px;
+        font:
+          12px/1.4 ui-monospace,
+          monospace;
+        color: #e3e9df;
+        background: rgba(15, 24, 40, 0.75);
+        border-radius: 4px;
+        pointer-events: none;
+        white-space: pre;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="map"></canvas>
+    <div id="hud"></div>
+    <script type="module" src="/src/art/lab/maplab.ts"></script>
+  </body>
+</html>
