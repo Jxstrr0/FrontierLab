@@ -222,7 +222,12 @@ export interface Site {
   /** Employer details on employer and university sites (Stage 5). */
   employer?: EmployerInfo;
   /** Building details on property sites (Stage 7, SIMULATION §21.1). */
-  property?: { sqm: number; floors: number };
+  property?: {
+    sqm: number;
+    floors: number;
+    /** Occupancy while nobody in the game owns it; set at its first listing and when you sell it. */
+    occupancy?: Pct;
+  };
   tile: { x: number; y: number };
   district: DistrictId;
   address: string;

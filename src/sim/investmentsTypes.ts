@@ -141,6 +141,8 @@ export interface PropertyListing {
   asking: Money;
   occupancy: Pct;
   listedWeek: Week;
+  /** An offer the seller turned down; no further offers until the listings refresh. */
+  rejectedOffer?: Money;
 }
 
 export interface RealEstateState {

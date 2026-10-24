@@ -248,7 +248,7 @@ function sitePin(s: GameState, map: CityMap, site: Site, info?: SitePinInfo): Pi
             ? ', investment bank'
             : site.kind === 'rivalHq' && s.rivals[site.refId]?.status === 'distressed'
               ? ', seized by regulators'
-              : '') + (partner ? ', your partner' : '');
+              : '') + (partner && !info?.owned ? ', your partner' : '');
   const rival = site.kind === 'rivalHq' ? s.rivals[site.refId] : undefined;
   const pin: PinSpec = {
     id: site.id,

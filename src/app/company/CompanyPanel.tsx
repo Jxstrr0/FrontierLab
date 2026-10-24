@@ -8,6 +8,7 @@ import { balanceSheet } from '../../sim/balanceSheet';
 import { capitalSnapshot } from '../../sim/capital';
 import { Badge, Card, Medallion, Panel, Row, SectionTitle, Sheet } from '../components';
 import { capitalRatioText, money, pct } from '../format/format';
+import { RealEstateCard } from '../realEstate/RealEstateCard';
 import { closePanel, openPanel, useGame } from '../store';
 import { CapitalMeter, TIER_LABEL, TIER_TONE } from './CapitalMeter';
 import { ShareSummary } from './ShareSummary';
@@ -87,6 +88,8 @@ export function CompanyPanel() {
         </div>
 
         {FEATURES.capitalMarkets && <ShareSummary s={s} />}
+
+        {FEATURES.investments && <RealEstateCard />}
 
         <button type="button" class="btn btn-secondary btn-block" onClick={() => setLearn(true)}>
           How this works
