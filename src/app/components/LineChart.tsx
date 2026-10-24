@@ -1,7 +1,7 @@
 // LineChart (SCREENS §0.5, ART_DIRECTION §5): a multi-series weekly trend with
 // 1.5 px strokes, no area fills, a dotted brass marker on the latest week
-// ("now"), first and last date labels and a legend. Each series gets its own
-// tone class so colours stay in the CSS tokens.
+// ("now", or any point via markerIndex), first and last date labels and a
+// legend. Each series gets its own tone class so colours stay in the CSS tokens.
 export interface LineSeries {
   label: string;
   values: number[];
@@ -32,10 +32,15 @@ export function LineChart(p: {
   startLabel?: string;
   endLabel?: string;
   label: string;
+  /** Index of the dotted "now" marker; defaults to the latest point. */
+  markerIndex?: number;
 }) {
   const count = Math.max(0, ...p.series.map((s) => s.values.length));
   const max = Math.max(0, ...p.series.flatMap((s) => s.values));
-  const nowX = W;
+  const nowX =
+    p.markerIndex === undefined
+      ? W
+      : (Math.min(p.markerIndex, count - 1) / Math.max(1, count - 1)) * W;
   return (
     <div class="linechart">
       <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" role="img" aria-label={p.label}>

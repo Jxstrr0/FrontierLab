@@ -567,6 +567,7 @@ Pentagon order: Management, Track record, Market, Competitiveness, Financial hea
 - Types match the sector: Bakery, Café, Logistics, Dental, Construction, Brewing Co., Auto Repair, Design Studio, Clinic, Outfitters, Farms, Robotics, Hotel, Law Group.
 
 ## 22. Incidents
+Implemented in `src/data/incidents.ts` (texts and options) and `src/data/incidentParams.ts` (numbers).
 
 Default cooldown: 8 weeks per scope.
 
@@ -591,7 +592,7 @@ Default cooldown: 8 weeks per scope.
 | RECAP_OFFER | company | §15 | — | Accept recapitalisation · Decline (takeover risk) |
 
 ## 23. Ledger headline templates
-Tokens are in {braces}. Write 2–4 variants per type in code.
+Tokens are in {braces}. Write 2–4 variants per type in code. The full set lives in `src/data/ledgerTemplates.ts`, `ledgerTemplatesRivals.ts` and `ledgerTemplatesWorld.ts` (about 50 story types); the fictional leagues, parties and policies are in `src/data/newsWorld.ts`.
 
 | Type | Headline | Body |
 |---|---|---|

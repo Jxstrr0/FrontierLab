@@ -1,11 +1,11 @@
 // Weekly results modal (SCREENS §21): the week's revenue and net income with
-// their change, the cash flow, and The Daily Ledger. Closing resumes the game.
+// their change, the cash flow, and that week's issue of The Daily Ledger (as
+// composed by the sim, src/sim/news.ts). Closing resumes the game.
 import { DAYS_PER_WEEK } from '../../config/balance';
 import type { GameState, WeeklySnapshot } from '../../sim/state';
 import { Card, Medallion, Modal, Row, SectionTitle } from '../components';
 import { delta, gameDate, money, moneyFull } from '../format/format';
 import { modal, useGame } from '../store';
-import { buildArticles } from './ledgerArticles';
 import { LedgerCard } from './LedgerCard';
 import './weekly.css';
 
@@ -22,8 +22,9 @@ export function WeeklyResults(p: { week: number }) {
   const sym = s.settings.currency;
   const snap = snapshotFor(s, p.week);
   const prev = snap ? s.history.weekly.find((w) => w.week === snap.week - 1) : undefined;
-  const date = gameDate(s.meta.startDate, (snap?.week ?? p.week + 1) * DAYS_PER_WEEK);
-  const articles = buildArticles(s, snap);
+  const week = snap?.week ?? p.week + 1;
+  const date = gameDate(s.meta.startDate, week * DAYS_PER_WEEK);
+  const issue = s.news.issues.find((i) => i.week === week);
 
   return (
     <Modal
@@ -39,7 +40,7 @@ export function WeeklyResults(p: { week: number }) {
     >
       <div class="stack">
         <p class="weekly-date">
-          Week {snap?.week ?? p.week + 1} · ending {date}
+          Week {week} · ending {date}
         </p>
         {snap ? (
           <>
@@ -61,10 +62,11 @@ export function WeeklyResults(p: { week: number }) {
           <p class="muted">No figures yet for this week.</p>
         )}
         <LedgerCard
+          issue={issue}
           date={date}
-          edition={`No. ${snap?.week ?? p.week + 1}`}
-          articles={articles}
+          edition={`No. ${week}`}
           reducedMotion={s.settings.reducedMotion}
+          press
         />
       </div>
     </Modal>

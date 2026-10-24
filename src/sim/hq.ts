@@ -11,6 +11,7 @@ import {
   FEATURES,
   FOUNDER_MODE_ASSETS,
   FOUNDER_RAMP,
+  GRAD_PROGRAM,
   HIRE_BASE,
   HOURS_PER_WEEK,
   HQ_COVERAGE,
@@ -28,6 +29,7 @@ import { CITIES } from '../data/cities';
 import { DEPARTMENTS, HQ_DEPTS } from '../data/departments';
 import { dpow, dtanh } from './detmath';
 import { totalWholesale } from './fundingLots';
+import { riskCoverageBonus } from './incident/effects';
 import { spend } from './ledger';
 import { clamp, ema } from './math';
 import type { Coverage, Department, DeptId, GameState, HqDeptId } from './state';
@@ -144,7 +146,9 @@ export function computeCoverage(state: GameState, id: HqDeptId, ramp: number): C
   const d = state.departments[id];
   const required = requiredStaff(state, id);
   const k = Math.min(HQ_COVERAGE.kMax, (d ? staffEff(state, d) : 0) / Math.max(required, 0.01));
-  const kPrime = 1 - ramp * (1 - Math.min(k, 1));
+  // Consultants hired after a regulator audit lift Risk coverage′ for a while (§23).
+  const extra = id === 'risk' ? riskCoverageBonus(state) : 0;
+  const kPrime = Math.min(1, 1 - ramp * (1 - Math.min(k, 1)) + extra);
   const bonus = k > 1 ? Math.min(HQ_COVERAGE.bonusCap, (k - 1) * HQ_COVERAGE.bonusSlope) : 0;
   const eff = kPrime < 1 ? dpow(kPrime, HQ_COVERAGE.curve) : 1 + bonus;
   return { required, k, kPrime, eff };
@@ -206,6 +210,8 @@ export interface StaffMods {
   quitMult: number;
   /** Multiplier on hires per week (HR coverage). */
   hireMult: number;
+  /** Extra hires per week from a university graduate program (DESIGN §5.8.10). */
+  hireBonus: number;
   /** Multiplier on weekly skill growth. */
   skillRiseMult: number;
   /** Added to the attraction ratio. */
@@ -228,6 +234,7 @@ export function staffMods(state: GameState): StaffMods {
     hqMorale: 0,
     quitMult: 1,
     hireMult: Math.min(1, cov(state, 'hr')),
+    hireBonus: state.company.gradProgram ? GRAD_PROGRAM.hireBonus : 0,
     skillRiseMult: 1,
     attraction: 0,
     reputation: 0,
@@ -329,7 +336,7 @@ function updateDepartment(state: GameState, d: Department, mods: StaffMods): voi
 /** Hires per week (§6.3): 1 + floor(2 × hrCoverage′ × attraction), attraction with benefits. */
 export function hiresPerWeek(payRatio: number, mods: StaffMods): number {
   const attraction = clamp(payRatio + mods.attraction, ...ATTRACTION_RANGE);
-  return HIRE_BASE + Math.floor(2 * mods.hireMult * attraction);
+  return HIRE_BASE + Math.floor(2 * mods.hireMult * attraction) + mods.hireBonus;
 }
 
 /** Tick step 7: department staffing and payroll, benefits, then coverage. */

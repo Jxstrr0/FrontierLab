@@ -5,6 +5,7 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { CITIES } from '../../data/cities';
 import { CLUSTER_EXPAND_ZOOM } from '../../config/mapView';
+import { FEATURES } from '../../config/balance';
 import { RivalSheet } from '../city/RivalSheet';
 import { cityLots } from '../city/lotInfo';
 import { openPanel, useGame } from '../store';
@@ -55,7 +56,14 @@ export function MapView() {
       onPin: (pin) => {
         if (pin.kind === 'mine' && pin.branchId)
           openPanel({ type: 'branch', branchId: pin.branchId });
-        else if (pin.kind === 'rival') setRivalLotId(pin.id);
+        else if (pin.kind === 'rival') {
+          if (FEATURES.competition) openPanel({ type: 'rivalBranch', lotId: pin.id });
+          else setRivalLotId(pin.id);
+        } else if (pin.kind === 'rivalHq') openPanel({ type: 'rivalHq', siteId: pin.id });
+        else if (pin.kind === 'centralBank' && pin.countryId)
+          openPanel({ type: 'centralBank', countryId: pin.countryId });
+        else if (pin.kind === 'employer') openPanel({ type: 'employer', siteId: pin.id });
+        else if (pin.kind === 'university') openPanel({ type: 'university', siteId: pin.id });
         else if (pin.kind === 'hq') openPanel({ type: 'hq', officeId: pin.officeId });
         else if (pin.kind === 'office') openPanel({ type: 'office', listingId: pin.id });
         else if (pin.kind === 'bureau') openPanel({ type: 'bureau', siteId: pin.id });

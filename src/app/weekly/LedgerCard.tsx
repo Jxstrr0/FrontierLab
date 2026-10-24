@@ -1,20 +1,22 @@
-// The Daily Ledger card (ART_DIRECTION §6): ivory paper, the masthead between
-// double rules, text tabs and a two-column article grid. The weekly results and
-// the game-over screen both use `Masthead`; the weekly results use `LedgerCard`.
+// The Daily Ledger card (ART_DIRECTION §6, SCREENS §21): ivory paper, the
+// masthead between double rules, text tabs (Top | Banking | Business | Markets
+// | Politics | Sports) and the article grid of one stored issue. The weekly
+// results and the archive use `LedgerCard`; the game-over screen uses `Masthead`.
 import { useState } from 'preact/hooks';
-import type { Article } from './ledgerArticles';
+import { NEWS_TOP_N } from '../../config/balance';
+import type { LedgerArticle, LedgerIssue, LedgerTab } from '../../sim/state';
 import { LedgerGlyph } from './ledgerIcons';
 
-type Tab = 'top' | 'banking' | 'business';
+type Tab = 'top' | LedgerTab;
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'top', label: 'Top' },
   { id: 'banking', label: 'Banking' },
   { id: 'business', label: 'Business' },
+  { id: 'markets', label: 'Markets' },
+  { id: 'politics', label: 'Politics' },
+  { id: 'sports', label: 'Sports' },
 ];
-
-/** Most stories the Top page carries. */
-const TOP_STORIES = 5;
 
 /** "The Daily Ledger" between a double rule, with edition and date underneath. */
 export function Masthead(p: { date: string; edition?: string }) {
@@ -29,29 +31,38 @@ export function Masthead(p: { date: string; edition?: string }) {
   );
 }
 
-export function ArticleView(p: { article: Article; lead?: boolean }) {
+export function ArticleView(p: { article: LedgerArticle; lead?: boolean }) {
   const a = p.article;
   return (
     <article class={`article${p.lead ? ' article-lead' : ''}`}>
       <LedgerGlyph icon={a.icon} />
-      <h4 class="article-headline">{a.headline}</h4>
-      <p class="article-body">{a.body}</p>
+      <div class="article-text">
+        <h4 class="article-headline">{a.headline}</h4>
+        <p class="article-body">{a.body}</p>
+      </div>
     </article>
   );
 }
 
+/** Articles for a tab, highest priority first; Top is the six highest overall. */
+export function articlesFor(issue: LedgerIssue | undefined, tab: Tab): LedgerArticle[] {
+  const sorted = [...(issue?.articles ?? [])].sort((a, b) => b.priority - a.priority);
+  return tab === 'top' ? sorted.slice(0, NEWS_TOP_N) : sorted.filter((a) => a.tab === tab);
+}
+
 export function LedgerCard(p: {
+  issue: LedgerIssue | undefined;
   date: string;
   edition: string;
-  articles: Article[];
   reducedMotion: boolean;
+  /** The landing "press" animation (weekly results only). */
+  press?: boolean;
 }) {
   const [tab, setTab] = useState<Tab>('top');
-  const shown =
-    tab === 'top' ? p.articles.slice(0, TOP_STORIES) : p.articles.filter((a) => a.section === tab);
-  const [lead, ...rest] = shown;
+  const [lead, ...rest] = articlesFor(p.issue, tab);
+  const press = p.press ? ` ledger-press${p.reducedMotion ? ' is-reduced' : ''}` : '';
   return (
-    <section class={`ledger ledger-press${p.reducedMotion ? ' is-reduced' : ''}`}>
+    <section class={`ledger${press}`}>
       <Masthead date={p.date} edition={p.edition} />
       <nav class="ledger-tabs" aria-label="Sections">
         {TABS.map((t) => (
@@ -78,7 +89,9 @@ export function LedgerCard(p: {
           )}
         </>
       ) : (
-        <p class="article-body ledger-quiet">A quiet day on this page.</p>
+        <p class="article-body ledger-quiet">
+          {p.issue ? 'A quiet week on this page.' : 'The presses were quiet this week.'}
+        </p>
       )}
     </section>
   );

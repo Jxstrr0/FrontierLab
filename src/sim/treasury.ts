@@ -13,6 +13,7 @@ import {
   OVERNIGHT_LIMIT_MULT,
   OVERNIGHT_SPREAD,
   RATING_SPREADS,
+  RESERVE_RATE_SPREAD,
   WEEKS_PER_YEAR,
   WINDOW_SPREAD,
   WINDOW_STIGMA,
@@ -77,8 +78,9 @@ export function runTreasury(state: GameState): void {
   repayWholesale(state, deposits);
   rebalanceBonds(state, deposits, c);
 
-  // Interest: reserves earn the policy rate, bonds pay their book coupon, wholesale costs.
-  earn(state, 'reserveInterest', (Math.max(0, t.reserves) * c.policyRate) / WEEKS_PER_YEAR);
+  // Interest: reserves earn the deposit-facility rate, bonds pay their book coupon, wholesale costs.
+  const reserveRate = Math.max(0, c.policyRate - RESERVE_RATE_SPREAD);
+  earn(state, 'reserveInterest', (Math.max(0, t.reserves) * reserveRate) / WEEKS_PER_YEAR);
   earn(state, 'bondCoupon', (t.bondsBook * t.bondBookYield) / WEEKS_PER_YEAR);
   spend(
     state,

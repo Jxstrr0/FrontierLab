@@ -11,6 +11,7 @@ import { CITIES } from '../data/cities';
 import { FIRST_NAMES, LAST_NAMES } from '../data/names';
 import { newId } from './ids';
 import { clamp } from './math';
+import { gradSkillBonus } from './partnerships';
 import { stream, type Rng } from './rng';
 import type { AvatarSpec, GameState, Manager } from './state';
 
@@ -33,20 +34,26 @@ export function personName(rng: Rng): string {
   return `${rng.pick(FIRST_NAMES)} ${rng.pick(LAST_NAMES)}`;
 }
 
-function skill(rng: Rng): number {
+/** One candidate skill; a university graduate program adds its bonus (§17.2). */
+function skill(rng: Rng, bonus: number): number {
   return Math.round(
-    clamp(rng.normal(MANAGER_SKILL.mean, MANAGER_SKILL.sd), MANAGER_SKILL.min, MANAGER_SKILL.max),
+    clamp(
+      rng.normal(MANAGER_SKILL.mean, MANAGER_SKILL.sd) + bonus,
+      MANAGER_SKILL.min,
+      MANAGER_SKILL.max,
+    ),
   );
 }
 
 export function generateManager(state: GameState, cityId: string): Manager {
   const rng = stream(state, 'people');
   const city = CITIES[cityId];
+  const bonus = gradSkillBonus(state);
   const skills = {
-    people: skill(rng),
-    product: skill(rng),
-    marketing: skill(rng),
-    ethics: skill(rng),
+    people: skill(rng, bonus),
+    product: skill(rng, bonus),
+    marketing: skill(rng, bonus),
+    ethics: skill(rng, bonus),
   };
   const avg = (skills.people + skills.product + skills.marketing + skills.ethics) / 4;
   const salary =

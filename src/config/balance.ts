@@ -18,7 +18,7 @@ export const FEATURES = {
   /** Stage 4: HQ offices, departments and operations depth. */
   hq: true,
   /** Stage 5: rival AI, macro for every country, The Daily Ledger, incidents. */
-  competition: false,
+  competition: true,
   /** Stage 6: governance, executives and capital markets. */
   capitalMarkets: false,
   /** Stage 7: ventures, conventions and real estate. */
@@ -143,7 +143,7 @@ export const POLICY_FLOOR = 0.0025;
 export const POLICY_CAP = 0.09;
 export const GDP_FORECAST_SIGMA = 0.2;
 /** Derived factors (§4.5). */
-export const CREDIT_CYCLE = { floor: 0.8, slope: 0.16, base: 5.0 } as const;
+export const CREDIT_CYCLE = { floor: 0.8, slope: 0.35, base: 5.0 } as const;
 export const LOAN_DEMAND = { gdpSlope: 0.05, rateSlope: 0.12, min: 0.6, max: 1.3 } as const;
 export const DEPOSIT_GROWTH_SLOPE = 0.01;
 export const MORTGAGE_LGD_SLOPE = 3;
@@ -357,6 +357,8 @@ export const EQUIPMENT_LIFE_WEEKS = 260;
 
 // ─── TREASURY (§13) ───────────────────────────────────────────────────────────
 export const LIQ_MIN = 0.1;
+/** Reserves earn the policy rate minus this spread (the central bank's deposit facility, §13.4). */
+export const RESERVE_RATE_SPREAD = 0.005;
 export const LIQ_TARGET_DEFAULT = 0.15;
 export const LIQ_TARGET_RANGE: [number, number] = [0.1, 0.4];
 export const LIQ_REPAY_BUFFER = 0.05;
@@ -437,12 +439,11 @@ export const RISK_LOSS_WEEKS = 13;
 export const DELINQUENCY = { recentWeeks: 4, pipelineWeeks: 13 } as const;
 export const RECAP_DISCOUNT = 0.5;
 /**
- * Game over (DESIGN §5.18). Insolvency: corporate cash below zero for 4 weeks (no
- * corporate credit exists before Stage 5). Takeover: capital ratio below 4.5% for
- * 13 weeks (the 8-week wait plus the 5-week recapitalisation window; the offer
- * itself arrives with incidents).
+ * Game over (DESIGN §5.18). Insolvency: corporate cash below zero for 4 weeks.
+ * Takeover: the capital ratio stays below takeoverCr until the emergency
+ * recapitalisation (RECAP, §15) is declined or fails to lift it in time.
  */
-export const FAILURE = { insolvencyWeeks: 4, takeoverCr: 0.045, takeoverWeeks: 13 } as const;
+export const FAILURE = { insolvencyWeeks: 4, takeoverCr: 0.045 } as const;
 
 // ─── RISK APPETITE (§16.8) ────────────────────────────────────────────────────
 export const RISK_APPETITE = {
@@ -704,3 +705,426 @@ export const WAGE_RANGE: [number, number] = [0.5, 3];
 export const MAX_STAFF_MULT = 3;
 export const MANAGER_SALARY_RANGE: [number, number] = [0.5, 3];
 export const BRANCH_NAME_MAX = 32;
+
+// ═══ STAGE 5: COMPETITION, MACRO AND NEWS ═════════════════════════════════════
+// Each system below owns its own section; keep additions inside the right one.
+
+// ─── STAGE 5 MAP SITES (CONTENT §14, §16) ─────────────────────────────────────
+/** Chance an employer's payroll already sits with one of the city's rivals. */
+export const EMPLOYER_PARTNER_CHANCE = 0.6;
+
+// ─── RIVAL AI (§18) ───────────────────────────────────────────────────────────
+/** Starting capital ratio range by strategy (§18.5, simplified financials). */
+export const RIVAL_START_CR: Record<
+  'incumbent' | 'disruptor' | 'premium' | 'community',
+  [number, number]
+> = {
+  incumbent: [0.125, 0.14],
+  premium: [0.13, 0.15],
+  community: [0.105, 0.125],
+  disruptor: [0.08, 0.1],
+};
+/** A mature rival branch's deposits at quality RIVAL_QUALITY_REF and incomeIndex 1 (§18.1). */
+export const RIVAL_MATURE_DEPOSITS = 45_000_000;
+export const RIVAL_QUALITY_REF = 3.4;
+/** Rival loans per $ of deposits (their LDR). */
+export const RIVAL_LDR = 0.82;
+/** Risk weight on a rival's loans for its capital ratio. */
+export const RIVAL_LOAN_RISK_WEIGHT = 0.75;
+/** Books move this share of the gap to their target each week (§18.1). */
+export const RIVAL_BOOK_EMA = 0.05;
+/** Branches opened after the start ramp to their mature size over this many weeks (§18.1). */
+export const RIVAL_RAMP_WEEKS = 156;
+/**
+ * Local competition on a rival branch's target deposits (assumption, DESIGN §7):
+ * target × (1 / (1 + crowdK × max(0, crowd − crowdFree)) − playerK × Σ w × max(0, share − playerShareRef)),
+ * where crowd and w use the share formula's distance weights within RIVAL_RADIUS (§9.3).
+ */
+export const RIVAL_COMPETITION = {
+  crowdFree: 2,
+  crowdK: 0.1,
+  playerShareRef: 0.15,
+  playerK: 1.2,
+  min: 0.35,
+} as const;
+/** Loans = deposits × RIVAL_LDR × (1 + slope × (loanDemand − 1)). */
+export const RIVAL_LDR_DEMAND_SLOPE = 0.3;
+/**
+ * Simplified weekly financials by strategy (§18.5): net interest margin on loans,
+ * fee yield on deposits, cost and loss multipliers, how hard the credit cycle
+ * bites (losses × (1 + cycleSens × (creditCycle − 1)); thin-file disruptors feel
+ * a recession most), the capital ratio dividends steer toward, and the
+ * expansion rate multiplier (disruptors 0.25×, §18.4).
+ */
+export const RIVAL_FINANCE: Record<
+  'incumbent' | 'disruptor' | 'premium' | 'community',
+  {
+    nim: number;
+    feeMult: number;
+    costMult: number;
+    lossMult: number;
+    cycleSens: number;
+    crTarget: number;
+    expandMult: number;
+  }
+> = {
+  incumbent: {
+    nim: 0.03,
+    feeMult: 1.1,
+    costMult: 1,
+    lossMult: 1,
+    cycleSens: 4,
+    crTarget: 0.13,
+    expandMult: 1,
+  },
+  premium: {
+    nim: 0.031,
+    feeMult: 1.4,
+    costMult: 1.3,
+    lossMult: 0.7,
+    cycleSens: 3,
+    crTarget: 0.14,
+    expandMult: 1,
+  },
+  community: {
+    nim: 0.028,
+    feeMult: 0.8,
+    costMult: 0.95,
+    lossMult: 1.1,
+    cycleSens: 5,
+    crTarget: 0.115,
+    expandMult: 1,
+  },
+  disruptor: {
+    nim: 0.026,
+    feeMult: 0.4,
+    costMult: 0.6,
+    lossMult: 1.6,
+    cycleSens: 7,
+    crTarget: 0.085,
+    expandMult: 0.25,
+  },
+};
+/** NIM moves with the policy rate's gap from neutral (low rates squeeze deposit margins). */
+export const RIVAL_NIM_POLICY_SLOPE = 0.25;
+/** Gross loan yield over policy, for reported revenue. */
+export const RIVAL_LOAN_YIELD_SPREAD = 0.03;
+/** Fee income per $ of deposits a year, before the strategy multiplier. */
+export const RIVAL_FEE_YIELD = 0.02;
+/** Weekly cost of running a branch, × city cost index × strategy cost multiplier. */
+export const RIVAL_BRANCH_COST = 18_000;
+/** Servicing cost per $ of deposits a year. */
+export const RIVAL_SERVICING = 0.004;
+/** Annual loss rate on loans in a neutral cycle, before the strategy multiplier. */
+export const RIVAL_BASE_LOSS_RATE = 0.006;
+/** Monthly expansion check (§18.4). */
+export const RIVAL_EXPANSION = {
+  everyWeeks: 4,
+  minCr: 0.11,
+  /** Chance per monthly check that an eligible rival opens a branch. */
+  chance: 0.06,
+  /** Trailing profit needs this many reported quarters (so no openings in year one). */
+  minQuarters: 4,
+  /** Rivals stop opening once they hold this share of a city's lots… */
+  maxRivalLotShare: 0.3,
+  /** …or once fewer than this share of lots is free. */
+  minFreeLotShare: 0.3,
+  /** Build cost taken from equity, × city cost index. */
+  buildCost: 450_000,
+  reviews: [20, 120] as [number, number],
+} as const;
+/** Close a branch after this many negative weeks, ignoring its first graceWeeks (§18.4). */
+export const RIVAL_CLOSURE = { negativeWeeks: 26, graceWeeks: 52 } as const;
+/** Review cards shown on a rival branch panel (derived, not stored). */
+export const RIVAL_REVIEW_CARDS = 4;
+/** New reviews a rival branch collects each week. */
+export const RIVAL_REVIEWS_PER_WEEK = 2;
+/**
+ * Quarterly dividends: clamp(excessShare × excess capital, ratio × net income,
+ * maxRatio × net income), never more than the excess; paid only when profitable
+ * and above the strategy's capital target.
+ */
+export const RIVAL_PAYOUT = { ratio: 0.45, maxRatio: 0.8, excessShare: 0.5 } as const;
+/**
+ * Notional shares until the stock market arrives (Stage 6): book value per share
+ * is fixed and price = book × clamp(ROE_ttm / coe, pb) (like §19.2).
+ */
+export const RIVAL_NOTIONAL_SHARE = {
+  bookPerShare: 20,
+  coe: 0.1,
+  pb: [0.5, 2.5] as [number, number],
+} as const;
+export const RIVAL_EXEC_RESIGN_CHANCE = 0.03;
+/**
+ * Recession failure check (§18.5): CR below maxCr fails with `chance` per quarter.
+ * A rival whose CR falls below insolventCr is seized at quarter-end in any phase
+ * (assumption, DESIGN §7: no zombie banks with negative equity).
+ */
+export const RIVAL_FAILURE = {
+  maxCr: 0.06,
+  chance: 0.15,
+  insolventCr: 0.02,
+  distressWeeks: 8,
+} as const;
+/** Price wars (§18.6). Bumps in rate units; decay per week once your streak ends. */
+export const PRICE_WAR = {
+  minRating: 4.0,
+  streakWeeks: 8,
+  everyWeeks: 4,
+  chance: 0.3,
+  bump: 0.0015,
+  cap: 0.006,
+  decay: 0.0001,
+} as const;
+
+// ─── RIVAL CORPORATE LENDING (§19.9) ──────────────────────────────────────────
+export const CORPORATE_LENDING = {
+  refreshWeeks: 4,
+  offersPerRival: [2, 3] as [number, number],
+  /** Loan offers up to this share of your equity, less corporate debt already owed. */
+  maxEquityShare: 0.4,
+  /** Smallest offer worth making. */
+  minAmount: 50_000,
+  amountStep: 10_000,
+  /** Offer size as a share of the room left. */
+  sizeRange: [0.3, 1] as [number, number],
+  /** Rate = home policy + spread: best at crBest, worst at crWorst. */
+  spreadBest: 0.025,
+  spreadWorst: 0.05,
+  crBest: 0.16,
+  crWorst: 0.08,
+  spreadNoise: 0.004,
+  terms: [52, 78, 104, 130, 156] as const,
+  /** Line of credit: limit share of equity per lender, rate = policy + lineSpread. */
+  lineEquityShare: 0.2,
+  lineSpread: 0.04,
+  /** Balances below this count as repaid. */
+  dust: 0.5,
+} as const;
+
+// ─── INCIDENTS (§23) ──────────────────────────────────────────────────────────
+/**
+ * Incident engine (§23, §17.1). Per-incident numbers live in src/data/incidents.ts.
+ * An unresolved incident takes its worst option `deadlineWeeks` after it was raised;
+ * each type waits `cooldownWeeks` per scope before it can fire again.
+ * A delegated manager scores each option by expected cost, with noise
+ * normal(0, managerError × (1 − (People + Ethics)/200)) as a share of that cost;
+ * non-cash effects are valued in weeks of the branch's revenue (at least minWeeklyValue).
+ * Until executives arrive (Stage 6) the CTO's expertise reads as defaultCtoExpertise,
+ * and a branch with no manager reads ethics as defaultEthics.
+ */
+export const INCIDENTS = {
+  deadlineWeeks: 4,
+  cooldownWeeks: 8,
+  managerError: 0.5,
+  minWeeklyValue: 10_000,
+  defaultEthics: 50,
+  defaultCtoExpertise: 50,
+  /** Rating modifiers are clamped to the 1–5 scale like every rating. */
+  ratingMin: 1,
+  ratingMax: 5,
+  /** Morale stays on its 0–100 scale. */
+  moraleMax: 100,
+} as const;
+/**
+ * fraudShield, 0–10 (decision log): itWeight × IT coverage′ + modelWeight × the
+ * active underwriting model's FraudShield (1–10) + the branch ATM's bonus. A
+ * company-level check (card fraud) has no ATM bonus.
+ */
+export const FRAUD_SHIELD = {
+  itWeight: 4,
+  modelWeight: 0.4,
+  max: 10,
+  atmBonus: { atm_none: 0, atm_wall: 0, atm_dual: 0.5, atm_smart: 1, atm_lobby: 1.5 } as Record<
+    string,
+    number
+  >,
+} as const;
+
+// ─── BANK RUNS AND RECAPITALISATION (§13.8, §15) ──────────────────────────────
+/**
+ * Bank runs (§13.8): while the average overall rating is under maxOverall and the
+ * tier is Restricted/Critical or the liquidity ratio is under maxLiquidity, a run
+ * starts with weeklyChance and lasts `weeks`; deposit churn × runMult meanwhile.
+ * BANK_RUN options: the central bank window borrows windowShare × deposits;
+ * the rate raise adds savingsBoost to savings rates everywhere for boostWeeks;
+ * a public statement succeeds with statementBase + statementPerPoint per CR point
+ * above statementFromCr (capped at statementMax) and ends the run.
+ */
+export const BANK_RUN = {
+  maxOverall: 2.6,
+  maxLiquidity: 0.08,
+  weeklyChance: 0.04,
+  weeks: [3, 6] as [number, number],
+  runMult: 6,
+  windowShare: 0.1,
+  savingsBoost: 0.01,
+  boostWeeks: 8,
+  statementBase: 0.3,
+  statementPerPoint: 0.05,
+  statementFromCr: 0.08,
+  statementMax: 0.95,
+} as const;
+/**
+ * Emergency recapitalisation (§15): after offerWeeks in a row below
+ * FAILURE.takeoverCr, the regulator offers forced new shares at RECAP_DISCOUNT of
+ * book value per share, enough to reach targetCr (rounded up to roundTo). Still
+ * below FAILURE.takeoverCr graceWeeks after accepting means a takeover.
+ * minPrice floors the share price when book value is at or below zero.
+ */
+export const RECAP = {
+  offerWeeks: 8,
+  graceWeeks: 5,
+  targetCr: 0.105,
+  roundTo: 1_000,
+  minPrice: 0.01,
+} as const;
+
+// ─── NEWS: THE DAILY LEDGER (§24) ─────────────────────────────────────────────
+/** Articles per weekly issue, the Top tab's size and how many issues the archive keeps. */
+export const NEWS_ARTICLES_MIN = 6;
+export const NEWS_ARTICLES_MAX = 12;
+export const NEWS_TOP_N = 6;
+export const NEWS_ARCHIVE_ISSUES = 52;
+/** Central bank stories from countries where you don't operate, per issue (moves first). */
+export const NEWS_CB_ABROAD_MAX = 2;
+/** Most stories of one kind per issue, so a busy quarter doesn't flood the paper. */
+export const NEWS_GROUP_CAPS: Record<string, number> = {
+  earnings: 3,
+  dividend: 2,
+  rivalBranch: 3,
+  exec: 2,
+  sports: 2,
+  economy: 1,
+  incident: 2,
+};
+/**
+ * Story priority (higher leads; Top = the six highest). SIMULATION §24 order:
+ * your company, central banks (yours first), rivals in your cities, earnings,
+ * conventions/auctions, sports, then filler.
+ */
+export const NEWS_PRIORITY = {
+  companyAlarm: 120,
+  company: 100,
+  companyRoutine: 82,
+  /** Your week's figures: below rivals in your cities, above central banks abroad. */
+  companyWeek: 66,
+  cbHome: 95,
+  cbOperated: 90,
+  cbAbroadMove: 64,
+  cbAbroadHold: 52,
+  rivalLocal: 75,
+  rivalAbroad: 40,
+  earnings: 58,
+  sports: 30,
+  politicsLocal: 45,
+  politicsAbroad: 24,
+  ranking: 70,
+  housing: 34,
+  market: 26,
+  economy: 22,
+  rateWatch: 20,
+  poll: 18,
+  filler: 12,
+};
+/** Housing story every n weeks per country you operate in, once a year of prices exists. */
+export const NEWS_HOUSING_EVERY_WEEKS = 4;
+/** A poll story every n weeks in your home country. Weekly poll drift (points, σ). */
+export const NEWS_POLL_EVERY_WEEKS = 6;
+export const NEWS_POLL_DRIFT = 1.2;
+export const NEWS_POLL_FLOOR = 8;
+/** Politics (§24): weekly chance a country's government tables a proposal, and the vote. */
+export const NEWS_POLICY_PROPOSE_P = 0.012;
+export const NEWS_POLICY_VOTE_WEEKS: [number, number] = [3, 8];
+export const NEWS_POLICY_PASS_P = 0.5;
+/** Share of proposals that are a capital buffer (the one with a game effect). */
+export const NEWS_CAPITAL_BUFFER_SHARE = 0.3;
+/** A passed capital buffer: tier thresholds rise by this many pp for this many weeks. */
+export const CAPITAL_BUFFER_PP = 1;
+export const CAPITAL_BUFFER_WEEKS = 52;
+/** Sports: chance of a draw where leagues allow them, and how much strength tilts a match. */
+export const SPORTS_DRAW_P = 0.24;
+export const SPORTS_STRENGTH_WEIGHT = 0.9;
+/** Win-probability bounds, and the chance a level game goes to extra time (no-draw leagues). */
+export const SPORTS_WIN_P_RANGE: [number, number] = [0.15, 0.85];
+export const SPORTS_EXTRA_TIME_P = 0.12;
+/** League table points for a win and a draw. */
+export const SPORTS_POINTS = { win: 3, draw: 1 };
+/** Rankings: banks named in Fastest Growing, and the asset floor to qualify. */
+export const RANKING_SIZE = 3;
+export const RANKING_MIN_ASSETS = 1_000_000;
+/**
+ * Yield curve on the central bank panel (SCREENS §8): each tenor is the policy
+ * rate plus this share of the term premium, so a negative premium (slowdown,
+ * SIMULATION §4.2) inverts the curve.
+ */
+export const YIELD_CURVE: { label: string; premiumShare: number }[] = [
+  { label: 'Overnight', premiumShare: 0 },
+  { label: '2y', premiumShare: 0.45 },
+  { label: '5y', premiumShare: 0.8 },
+  { label: '10y', premiumShare: 1 },
+];
+
+// ─── PARTNERSHIPS AND UNIVERSITIES (§13.7) ────────────────────────────────────
+/** Contract length L in weeks ("Year X of 7", CONTENT §14). */
+export const PARTNER_CONTRACT_WEEKS = 364;
+/** Signing fee = employees × PARTNER_FEE_PER_EMPLOYEE × income mult × city incomeIndex (CONTENT §14). */
+export const PARTNER_FEE_PER_EMPLOYEE = 160;
+// DEPOSIT_PER_EMPLOYEE ($4,500 per participating employee) sits with the treasury constants above.
+/**
+ * Participation curve over a contract of L weeks (§13.7): an S-curve from 0 to
+ * `rampTo` by `rampWeeks` (logistic with this `steepness`, rescaled to hit both
+ * ends exactly), linear to `peak` by `matureWeeks`, flat until L − `declineWeeks`,
+ * then linear down to `end` at L.
+ */
+export const PARTICIPATION = {
+  rampWeeks: 52,
+  rampTo: 0.65,
+  steepness: 8,
+  matureWeeks: 104,
+  peak: 0.8,
+  declineWeeks: 104,
+  end: 0.45,
+} as const;
+/** Share of the gap to the balance target closed each week (§13.7). */
+export const PARTNER_BALANCE_STEP = 0.15;
+/**
+ * Relationship health (§13.7): target = base + perOverall × (hostOverall − pivot)
+ * + perComp × c_package + perksBonus, eased by `ema`. Below `terminateBelow` for
+ * `terminateWeeks` straight weeks the partner walks. The balance target scales
+ * by balanceBase + balanceSlope × health/100. New partnerships start at `start`.
+ */
+export const PARTNER_HEALTH = {
+  start: 60,
+  base: 40,
+  perOverall: 12,
+  overallPivot: 3,
+  perComp: 10,
+  ema: 0.05,
+  terminateBelow: 30,
+  terminateWeeks: 8,
+  balanceBase: 0.5,
+  balanceSlope: 0.6,
+} as const;
+/** perksBonus = perMoralePoint × the benefits' morale bonus (HR, §16.5), capped at max. */
+export const PARTNER_PERKS = { perMoralePoint: 1, max: 10 } as const;
+/** A terminated, lapsed or released partnership's balance leaves over this many weeks. */
+export const PARTNER_RUNOFF_WEEKS = 12;
+/** Renewal fee = current signing fee × (base − health/100), in the last `windowWeeks` of the term. */
+export const PARTNER_RENEWAL = { base: 1.5, windowWeeks: 52 } as const;
+/**
+ * University student partnership: students enrolled by city size, fee per
+ * student × city incomeIndex, and a lower balance per participating student.
+ */
+export const STUDENT_PARTNERSHIP = {
+  students: { S: 6000, M: 10000, L: 16000, XL: 24000 },
+  feePerStudent: 30,
+  depositPerStudent: 600,
+} as const;
+/**
+ * University graduate program (DESIGN §5.8.10): yearly cost × the city's
+ * wageIndex, paid up front and each year (P&L `benefits`); +skillBonus to
+ * manager candidate skills (§17.2) and +hireBonus hires per week at branches
+ * and HQ floors (§6.3).
+ */
+export const GRAD_PROGRAM = { yearlyCost: 120_000, skillBonus: 10, hireBonus: 1 } as const;

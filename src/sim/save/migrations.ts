@@ -6,6 +6,11 @@ import { CITIES } from '../../data/cities';
 import { isFrontage, nearestFrontage } from '../cityLayout';
 import { fullCoverage } from '../hq';
 import { generateSites } from '../hqSites';
+import { RIVALS } from '../../data/rivals';
+import { generateCompetitionSites } from '../competitionSites';
+import { emptyCorporateDebt } from '../corporateDebt';
+import { initCountries } from '../macro';
+import { initRivalFinancials, seedMatureBooks } from '../rivals';
 import { SCHEMA_VERSION, type GameState } from '../state';
 
 type RawSave = Record<string, unknown> & { schemaVersion: number };
@@ -85,9 +90,52 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     for (const cityId of Object.keys(state.world.cities).sort()) generateSites(state, cityId);
     return s;
   },
+  // 5 → 6: Stage 5 competition. Every country gets a macro economy, rivals get
+  // financials and branch books, cities get rival head offices, employers and a
+  // university, and the new partnership, corporate debt, incident, news and
+  // price-war state starts empty.
+  5: (s) => {
+    const state = s as unknown as GameState;
+    state.partnerships = {};
+    state.corporateDebt = emptyCorporateDebt();
+    state.incidents = { active: [], cooldowns: {}, effects: [] };
+    state.news = { issues: [], lastTemplate: {} };
+    state.competition = { ratesStreak: {} };
+    const addLines = (pnl: Record<string, number>) => {
+      for (const line of STAGE5_PNL_LINES) pnl[line] ??= 0;
+    };
+    addLines(state.ledger.pnl);
+    for (const w of state.history.weekly) addLines(w.pnl);
+    for (const bank of Object.values(state.rivals)) {
+      const spec = RIVALS[bank.id];
+      Object.assign(bank, {
+        equity: 0,
+        capitalRatio: 0,
+        listed: spec?.ticker !== undefined,
+        ceo: '',
+        qtd: { revenue: 0, netIncome: 0 },
+        quarters: [],
+        priceWar: {},
+      });
+      if (spec?.ticker) bank.ticker = spec.ticker;
+      for (const b of bank.branches) {
+        Object.assign(b, { deposits: 0, loans: 0, contribution: 0, negativeWeeks: 0 });
+        seedMatureBooks(b);
+      }
+    }
+    for (const id of Object.keys(state.rivals).sort())
+      initRivalFinancials(state, state.rivals[id]!);
+    const home = CITIES[Object.values(state.branches)[0]?.cityId ?? state.world.currentCityId];
+    if (home) initCountries(state, home.country);
+    for (const cityId of Object.keys(state.world.cities).sort()) {
+      generateCompetitionSites(state, cityId);
+    }
+    return s;
+  },
 };
 
 const NEW_PNL_LINES = ['hqStaff', 'benefits', 'development'] as const;
+const STAGE5_PNL_LINES = ['incidents', 'corporateInterest', 'amortization'] as const;
 
 type Tile = { x: number; y: number };
 
