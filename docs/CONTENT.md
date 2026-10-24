@@ -247,7 +247,7 @@ Salaries scale by city.wageIndex. Desks per floor come from the building (24 or 
 |---|---|---|---|---|
 | tuition | Tuition Support | $/employee/yr (0–15,000, step 1,000) | as set | skill growth +3% per $1k (max +40%); attraction +2 at ≥ $8k |
 | pension | Pension Match | % of salary (0–8%) | salary × % | retention +5% per pt (max +30%); morale +1 per 2 pts |
-| espp | Employee Stock Plan | discount (0–15%), public only | 0.5% × discount × payroll (dilution) | loyalty +5; morale +2 at ≥ 10% |
+| espp | Employee Stock Plan | discount (0–15%), public only | 0.5% of payroll per discount point, in cash (dilution not modelled) | executive loyalty +5; morale +2 at ≥ 10% |
 | childcare | Childcare Support | $/employee/yr (0–10,000) | as set | morale +3 at $6k; retention +10% |
 | lunch | Free Lunch & Snacks | $/employee/wk (0–100) | as set | morale +4 at $60 |
 | volunteer | Volunteer Days | $/employee/wk (0–150) | as set | morale +3 at $100; reputation +0.05 on all branches |
@@ -393,6 +393,8 @@ Branch counts at start, by city size: S 3–5, M 6–10, L 10–16, XL 16–24 i
   | Hollis Crane & Co. | Zürich, San Francisco | 6.00% | 10–25% | |
   | Sakura Bridge Securities | Tokyo, Singapore, Hong Kong | 4.40% | 0–10% | |
   | Southern Gate Advisory | Sydney, Vancouver | 4.70% | 0–12% | |
+
+  Cities not listed borrow the nearest house: Saskatoon and Montréal → Ashgrove Capital, Seattle → Whitlock & Rowe, Frankfurt and Amsterdam → Meridian Partners. Implemented in `src/data/investmentBanks.ts`.
 - **Marketing agencies:** Brightwell Creative, Northwind & Pike, Studio Halcyon. Present in L and XL cities; M cities get one.
 - **Lobbying firms:** Capitol Bridge Advisors (US), Parliament Row Partners (CA, UK), Rue Royale Affairs (EA), Harbourline Policy Group (AU, SG, HK).
 - **Universities:**
@@ -426,7 +428,9 @@ Branch counts at start, by city size: S 3–5, M 6–10, L 10–16, XL 16–24 i
 | GSQR | Granite Square REIT | Real estate | 24 | 900M | 1.40 | 3% | 20% | 5.8% |
 | HBFP | Harbourfront Properties | Real estate | 47 | 350M | 2.90 | 4% | 22% | 4.1% |
 
-The Banking sector lists the rivals marked "Listed" in §15.
+The Banking sector lists the rivals marked "Listed" in §15, and your bank once it lists.
+
+Implemented in `src/data/stocks.ts`, with a home exchange per company and beta by sector (Technology 1.3, Auto 1.2, Banking 1.1, Energy 0.9, Retail 0.8, Real estate 0.7). **Exchanges** (fictional, one per country): CA Maple Exchange · US Union Exchange · UK Thames Exchange · EA Rhine Bourse · CH Alpine Exchange · JP Sakura Exchange · AU Coral Exchange · SG Lion City Exchange · HK Pearl Exchange. **Index:** the Ledger Composite.
 
 **Sector μ by phase** (annual, Expansion / Slowdown / Recession / Recovery):
 

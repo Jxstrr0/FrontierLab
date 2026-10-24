@@ -2,13 +2,39 @@
 
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
-**Current stage:** 5 — Competition, macro and news (built and live; awaiting the owner's iPhone check). The Stage 2–4 checks are still open too.
+**Current stage:** 6 — Governance and capital markets (built and live; awaiting the owner's iPhone check). The Stage 2–5 checks are still open too.
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `1c47c86155686e` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `08b65f0864d155` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-24 — Stage 6 built: governance and capital markets
+- **Stage / step:** 6 — Governance and capital markets
+- **Done:**
+  - **Investment banks** on the map (chart medallion, Investment Banks layer; Calgary's is Ashgrove Capital). Three tabs:
+    - **Market:** 16 listed companies in five sectors plus the listed rival banks, with prices that move each week with the economy, quarterly earnings and dividends, 52-week ranges, P/E and top shareholders, and the "Ledger Composite" index. Trade from the company (corporate cash) or privately (your personal cash).
+    - **Equity:** while private, sell up to 25% of the bank to an investment fund (3 rounds, 26 weeks apart) and launch the IPO once you qualify (the checklist shows each rule); it lists at the next quarter-end with a first-day pop. Once public, issue more shares (secondary offering).
+    - **M&A:** buy a rival bank. You offer a price per share; next week the regulator checks your capital after the deal and that you'd hold no more than 35% of a city's deposits, then the rival's board accepts or refuses depending on the premium. Failed rivals are sold off cheap for 8 weeks. Bought branches become yours at once (with a manager kept on) and switch to your brand over 8 weeks; on the map they keep the old colours with a progress ring until then.
+  - **Your share price:** a private valuation from book value and profitability; once public, a market price that follows earnings, dividends and incidents (a data breach hurts far more than a robbery). The Company screen shows it with your stake, the top shareholders and your personal money.
+  - **Executive floor:** hire a COO, CFO, CPO, CMO, CTO and CRO. Each makes their departments stronger (or weaker, if they're not very good) and can run things for you: hiring branch managers, staff benefits, liquidity, dividends proposals, pricing, new products, the underwriting model, brand campaigns, digital projects, risk appetite and Loan Desk decisions. Set their pay, give stock options or shares that vest over 4 years, or fire them. Underpaid executives without unvested shares get poached (you can counter-offer).
+  - **Board meeting** once a quarter (the game reminds you): propose a dividend and your own salary; shareholders vote, and outsiders judge whether it's reasonable. While you own most of the bank it always passes. The regulator limits dividends when capital is weak. Your CEO salary ($120k a year to start) and your share of dividends go into your personal cash.
+  - New Ledger stories for all of it; saves move to version 7 (a real Stage 5 save is kept as a test and loads and plays on).
+- **How it was built:** I laid the foundation (save format, data tables, map buildings, the share register, balance sheet lines, empty hooks), then three helper agents built executives and the board, the stock market and fundraising, and takeovers in parallel. I merged them, wired the Employee Stock Plan's loyalty bonus between two of them, and played the whole thing at phone size.
+- **Balance:**
+  - Steady now raises money once privately when capital gets tight and lists in years 5–6 (weeks 222, 248 and 261 on seeds 42, 7 and 99), keeping 60% of the bank. The IPO money takes it from 7 to about 44 branches in year 5.
+  - Turtle (deposits only) ends year 5 at 27% of steady's equity (target under 40%). Aggressive hits the Restricted tier; stress survives its forced recession without going Critical.
+  - 370 tests pass, including the three Stage 6 acceptance checks: an IPO in years 3–6 of a steady run; a public bank's price falls after a data breach and moves with earnings; and after buying a rival the books balance every week while its branches convert in 8 weeks.
+- **Determinism snapshot:** `1c47c86155686e` → `08b65f0864d155`. Intended: the new state, the weekly CEO salary, the CTO seat's effect on breach odds and the moving private valuation.
+- **Dependencies:** none added.
+- **Next:** the owner checks Stage 6 on iPhone: open the investment bank and look through the three tabs, buy a few shares privately, lease an office with an Executive floor and hire someone, hold a board meeting, and (with enough cash) make an offer for a small rival and watch its branches convert.
+- **Known issues:**
+  - The first-branch checkpoints still read seed 42's recession at week 156 and miss at week 260 (deposits a little high, income $42k vs $45–70k); a cross-seed calibration is open.
+  - ROE runs well above the 8–18% target in the steady run (20–60%); it did before Stage 6 too, because a young bank's equity is small next to its branch profits. To look at in a calibration pass.
+  - Wealth advice still follows each country's own market return rather than the new index.
+  - When the CRO decides Loan Desk applications, branch screens don't say so.
+  - Calgary still runs out of locations at about 52 branches (more cities arrive in Stage 8).
 
 ### 2026-10-24 — Stage 5 built: competition, macro and news
 - **Stage / step:** 5 — Competition, macro and news

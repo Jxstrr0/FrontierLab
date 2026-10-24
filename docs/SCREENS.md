@@ -302,6 +302,7 @@ Tabs: Overview · Loans · Credit.
 - **Dividends:** current dividend per share and yield, new per-share stepper, payout ratio, and the regulator cap note when the tier restricts it.
 - **CEO compensation:** current, plus a new stepper.
 - **Take votes:** an animated tally (For / Against %) per item, then the outcome. If approved, the declared dividend schedules its payment in 3 weeks.
+- **Quarterly reminder (Stage 6):** the same modal opens once per quarter with Later / Hold meeting when the board hasn't met (after weekly results and incidents).
 
 ## 11. Startup detail
 
@@ -325,6 +326,7 @@ Tabs: Overview · Loans · Credit.
 - **Tabs:** Market · Equity · M&A.
 
 **Market:**
+- the Ledger Composite index card (value, weekly change, sparkline)
 - sector Segmented: Banking, Technology, Energy, Auto, Retail, Real estate
 - company card carousel:
   - monogram, name, ticker and exchange
@@ -355,6 +357,8 @@ Tabs: Overview · Loans · Credit.
   - regulator pre-check (✓/✗ with reasons)
   - Offer merger
 - The response arrives the next week.
+- Below the cards: integrations in progress (bank, branches, weeks left) and completed deals.
+- **Converting branches (Stage 6):** while an acquired branch converts, its map pin keeps the old bank's ink and monogram with a brass progress ring and a "Converting" label; the branch panel shows the old medallion and a "Converting from X: N weeks left" banner.
 
 ## 13. Credit bureau
 - Header and advisor.
@@ -478,7 +482,8 @@ Tabs: Overview · Loans · Credit.
 - capital ratio with tier badge and a meter with thresholds
 - liquidity ratio
 - totals: assets, deposits, loans, equity
-- share price or private valuation
+- share price or private valuation, with the 52-week range, market cap, your stake and top shareholders
+- a Personal line: personal cash plus holdings
 - one-line explanations ("Deposits fund loans; capital limits growth") with a "Learn more" sheet
 - links to the full statements (Finance floor, or a simplified view without an HQ)
 

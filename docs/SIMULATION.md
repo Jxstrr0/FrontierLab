@@ -704,6 +704,22 @@ Levels 1–5 (Very conservative to Very aggressive):
 
 **Candidate pools** refresh every 4 weeks. A University Graduate Program adds +10 to candidate skills.
 
+### 17.3 Board meeting (Stage 6)
+- **When:** once per calendar quarter, with an Executive suite. The loop pauses once per quarter to remind you (after weekly results and incidents).
+- **Votes:** the founder and executive holders vote For. Outside holders approve with `a`; `forShare = insiders + (1 − insiders) × a`; an item passes at ≥ 50%. While you hold a majority, every proposal passes.
+- **Dividend approval `a`:** payout = dps × shares × 4 ÷ trailing net income. With no profit: 0.9 for a zero dividend, 0.15 otherwise. With profit: 0.6 for zero; 0.9 up to a 60% payout, falling linearly to 0.1 at 120%.
+- **CEO salary approval `a`:** CEO market rate = 1.5 × the executive market salary. 0.9 at or below it, else `clamp(0.9 − 0.8 × (new/market − 1), 0.05, 0.95)`; −0.2 for a raise above 25%; −0.15 while ROE_ttm < COE. The board won't consider more than 4× the market rate.
+- **Caps (§15):** Watch caps the quarter's dividend total at 50% of trailing-four-quarter net income ÷ 4; Restricted and Critical allow none. A new dividend can't be declared while the last is unpaid.
+- **Declared dividend:** retained earnings fall at once and the total is a liability ("dividends payable") until it is paid 3 weeks later (financing cash); the founder's share goes to personal cash. `DIVIDEND_DUE` reminds you at declaration.
+- Numbers: `BOARD_VOTE`, `GOVERNANCE` in balance.ts.
+
+### 17.4 Executive details (Stage 6)
+- **Market salary** = ($180,000 + $60,000 per $1B of total assets) × city wageIndex, capped at $2.5M. A candidate asks market × (0.8 + 0.4 × average skill/100), in $5k steps; salaries can be set from 0.5× to 3× market. Severance on firing: 26 weeks of salary.
+- **execMult** multiplies the department's staff effectiveness (§16.4) for the seat's departments: COO → HR, CFO → Finance and Treasury, CPO → Products, CMO → Marketing, CTO → IT, CRO → Risk. Expertise under 40 lowers it below 1. Leadership only feeds the asking salary in v1.
+- **Grants:** a grant is at most 2% of outstanding shares; it vests 25% a year. Grant-date value: the share price (RSU) or max(price − strike, 25% of price) (option), expensed straight-line as non-cash `grantExpense` with paid-in capital rising by the same amount. Vested RSUs issue shares; vested options are exercised whenever in the money (the strike comes in as cash). Leaving forfeits the unvested part; booked expense isn't reversed.
+- **Employee Stock Plan** (public only) adds +5 to executive loyalty in the resignation formula.
+- **Delegation details:** `EXEC_DELEGATION` in balance.ts (COO benefits spending ≤ 8% of payroll; CFO dividend proposal 40% of trailing net income; CPO/CTO developments of 12 weeks at Medium within 1% of revenue; CMO awareness 45–55% within 3% of revenue; CRO steps appetite every 4 weeks, at most 4).
+
 ## 18. Rivals
 
 - **18.1 State:**
@@ -734,6 +750,10 @@ Levels 1–5 (Very conservative to Very aggressive):
 - Dividends are paid quarterly at the stated yield to company and personal holders.
 - The equity market index = cap-weighted average of all listed companies (used by Wealth AUM).
 
+- **Details (Stage 6):** beta comes from the sector; returns use the phase of the home country (a listed rival: its first city's country). The earnings tilt is 10% of the sector's annual μ; EPS grows by growth/4 plus the surprise each quarter. Dividends pay a quarter of the yield on the current price at quarter-end. The index ("Ledger Composite", 1000 at the start) is chain-linked over non-bank companies and trading listed rivals; your bank isn't in it. History keeps 104 weeks.
+- **Listed rivals** follow the §19.5 model (with the banking sector's shock folded into their sentiment); before their first report they're priced at book. Private rivals trade at book value; a seized rival's shares go to 0.
+- **Company holdings** are marked to market every week through the non-cash P&L line `investmentGains`; they carry the 2.5× risk weight. You and your company together may own at most 30% of a listed company or rival.
+
 ### 19.2 Your bank while private
 - `valuation/share = BVPS × PB_priv`
 - `PB_priv = clamp(ROE_ttm / COE (0.10), 0.5, 2.5) × 0.8`
@@ -752,7 +772,8 @@ Levels 1–5 (Very conservative to Very aggressive):
   - not in a Recession, unless CR ≥ 14%
 - **Choices:** float 10–40% as new shares, and the investment bank (fee 4.0–6.5%; quality sets the first-day pop of 0–25%).
 - **Offer price:** `BVPS × clamp(ROE_ttm/COE, 0.5, 3.0) × 0.9`.
-- **Listing:** at the next quarter-end tick, with a news event.
+- **Listing:** at the next quarter-end tick, with a news event. Eligibility is checked again then; if it fails the IPO is withdrawn.
+- **Float:** the float % is the public's share after listing: new shares = outstanding × f ÷ (1 − f). The ticker comes from your monogram; the exchange is your home country's.
 
 ### 19.5 Your bank while public
 - `target = BVPS × clamp(ROE_ttm/COE, 0.3, 3.0) × sentiment × irPenalty`
@@ -762,12 +783,14 @@ Levels 1–5 (Very conservative to Very aggressive):
   - shocks: incidents −3% to −15%; earnings growth vs last quarter ±(0–8%); dividend raise +3%, cut −6%
 - **Price:** `price = ema(price, target, 0.15) × (1 + normal(0, 0.025))`.
 - Track the 52-week high/low and P/E.
+- **Details (Stage 6):** sentiment stays within 0.4–1.8. Incident shock = −(3% + 12% × severity), severity per type in `INCIDENT_PRICE_SEVERITY` (minor branch mishaps, reminders, city and personal cases don't move it). Earnings growth of 25% or more (or a swing from loss to profit) gives the full ±8%. A weekly move of 8% or more is news.
+- **Public duties:** Finance needs +4 staff; Finance k′ below 0.6 at quarter-end files late (fine 0.02% of the quarter's revenue).
 
 ### 19.6 Secondary offering
 - New shares n, entered as a % of outstanding.
 - Price per share = current × 0.97.
 - Gross proceeds = n × price. Underwriting fee = bank fee %, default 4.55%. Capital raised = gross − fee.
-- Price impact: −2% to −5%, scaled by size.
+- Price impact: −2% to −5%, scaled by size up to the 25% cap per offering.
 
 ### 19.7 Trading
 - Two accounts: company (Investment floor or portfolio) and personal.
@@ -784,7 +807,9 @@ Levels 1–5 (Very conservative to Very aggressive):
 - **On close:**
   - Goodwill = price − target book equity (floored at 0; a negative difference is booked as a gain).
   - Books and wholesale funding merge.
-  - Branches convert over 8 weeks: REBRAND_COST ($60,000) per branch, staff morale −10, managers kept.
+  - Branches convert over 8 weeks: REBRAND_COST ($60,000) per branch (spread evenly over the 8 weeks), staff morale −10, managers kept.
+- **Closing details (Stage 6):** the target brings cash R = D + E − L − (corporate debt you owe it, which is settled) − (lease deposits on its lots, which move to you); if R would be negative its loans are marked down until R = 0. Goodwill = cash paid + your company's holding of it at market − net assets. Personal holdings are paid out at the offer price. Acquired fit-outs aren't booked as fixed assets. Books split by a mature mix (deposits: chequing 28%, savings 34%, GIC 26%, business 10%, student 2%; loans: mortgage 62%, personal 8%, auto 12%, line of credit 8%, card 10%), which also sets the pro-forma risk weights. Build by seller strategy: premium → premium, incumbent and community → mid, disruptor → basic. City share counts branch deposit books of you and every rival not seized or acquired. A regulator block doesn't start the 4-week retry wait; an accepted deal that can no longer close (cash or tier) lapses.
+- **Distressed ask:** BVPS × P/B rolled once at failure in 0.4–0.7, floored at $1 per share. Offers to a distressed bank compare with the ask.
 
 ### 19.9 Rival corporate lending (Banks layer)
 - **Business loans:** 2–3 offers.
@@ -904,6 +929,8 @@ Levels 1–5 (Very conservative to Very aggressive):
 Run `npm run balance` with seed 42 and the start city Calgary, unless noted. Branch checkpoints read the first branch of the steady strategy, built on an "average lot" (the median-rent free lot in Midtown). Weekly revenue and income checkpoints use a 4-week average, so a single large default doesn't swing them.
 
 **Note (Stage 5):** the branch checkpoints are a seed-42 reference and assume Expansion. With every country simulated, seed 42's path has a recession at weeks 97–134 and policy cuts to 1.5%, so week 156 reads about $90k revenue / $41k income (below band) before recovering inside it by week 208. Other seeds (e.g. 7, 99) already missed the first-branch checkpoints in Stage 4 because their median Midtown lot is weaker; a cross-seed calibration is open.
+
+**Note (Stage 6):** steady takes one private placement when capital binds and lists as soon as it's eligible: seed 42 lists in week 222, seed 7 in week 248, seed 99 in week 261 (years 5–6), with the founder keeping 60%. The IPO money lifts steady from 7 to about 44 branches in year 5. Acceptance test: `tests/sim/ipoAcceptance.test.ts`.
 
 **Updated 2026-10-24 (Stage 1, owner's decision):** with CONTENT's fees and card rates at the 3.5–4% policy rates the macro rule produces, a mature branch earns about $50–65k a week on $120–145k of revenue. That is close to the original's store economics (about £51k income on £84k revenue), so the targets below were raised to match instead of cutting fee income. The old values are kept in brackets.
 
