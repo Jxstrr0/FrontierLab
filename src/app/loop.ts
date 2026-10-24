@@ -3,10 +3,12 @@
 // weekly results when settings ask for it, and pauses for game over or expiring
 // loan applications. Hidden tabs pause time. stepWeek() runs the rest of the
 // current week at once and leaves the game paused, for week-by-week play.
-import { DAY_MS, DAYS_PER_WEEK } from '../config/balance';
+import { CAPITAL_BUFFER_PP, DAY_MS, DAYS_PER_WEEK } from '../config/balance';
 import { isQuarterStart } from '../sim/calendar';
 import { advanceDay } from '../sim/engine';
 import type { GameState } from '../sim/state';
+import { homeCountry } from '../sim/treasury';
+import { CAPITAL_BUFFER_POLICY } from '../data/newsWorld';
 import { saveToSlot } from './saves';
 import { bump, modal, peekGame, toast } from './store';
 
@@ -115,12 +117,21 @@ const EVENT_TEXT: Record<string, (p: Record<string, unknown>) => string> = {
     return `${String(p.cb)} ${verb} its policy rate${change ? ' to' : ' at'} ${(Number(p.rate) * 100).toFixed(2)}%.`;
   },
   WINDOW_USE: () => 'Treasury borrowed from the central bank window.',
+  POLICY_PASSED: (p) =>
+    p.policyId === CAPITAL_BUFFER_POLICY
+      ? `Lawmakers passed a capital buffer: capital requirements rise by ${CAPITAL_BUFFER_PP} pp for a year.`
+      : '',
 };
+
+/** Events about a country toast only when it is your home country (nine central banks meet). */
+const HOME_ONLY = new Set(['CB_DECISION', 'POLICY_PASSED']);
 
 function announceEvents(s: GameState): void {
   const log = s.events.log;
   if (seenEvents > log.length) seenEvents = 0;
+  const home = homeCountry(s).id;
   for (const e of log.slice(seenEvents)) {
+    if (HOME_ONLY.has(e.type) && e.payload.country !== home) continue;
     const text = EVENT_TEXT[e.type]?.(e.payload);
     if (text) toast(text, e.type === 'WINDOW_USE' ? 'bad' : 'info');
   }

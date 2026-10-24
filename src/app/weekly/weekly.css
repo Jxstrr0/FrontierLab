@@ -91,20 +91,30 @@
 
 .ledger-tabs {
   display: flex;
-  gap: var(--space-4);
+  gap: var(--space-3);
   border-bottom: 1px solid var(--ink-line);
   margin-bottom: var(--space-2);
+  /* Six tabs overflow a phone: they scroll sideways under the masthead. */
+  overflow-x: auto;
+  scrollbar-width: none;
+  scroll-snap-type: x proximity;
+}
+.ledger-tabs::-webkit-scrollbar {
+  display: none;
 }
 .ledger-tab {
+  flex: none;
+  min-width: var(--tap-min);
   min-height: var(--tap-min);
   padding: 0 var(--space-1);
   border: 0;
   border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
   background: transparent;
   color: color-mix(in srgb, var(--ledger-ink) 70%, var(--ivory));
   font-size: var(--text-14);
   font-weight: 600;
+  white-space: nowrap;
+  scroll-snap-align: start;
   cursor: pointer;
 }
 .ledger-tab.is-active {
@@ -112,7 +122,12 @@
   border-bottom-color: var(--brass);
 }
 
+/* Phones: one column, the vignette to the left of each story. */
 .article {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: var(--space-3);
+  align-items: start;
   padding: var(--space-3) 0;
 }
 .article + .article,
@@ -121,8 +136,10 @@
 }
 .ledger-glyph {
   display: block;
-  margin-bottom: var(--space-1);
   color: var(--ledger-ink);
+}
+.article-text {
+  min-width: 0;
 }
 .article-headline {
   margin: 0 0 var(--space-1);
@@ -130,6 +147,10 @@
   font-weight: 700;
   font-size: var(--text-16);
   line-height: 1.2;
+}
+.article-lead {
+  grid-template-columns: 1fr;
+  gap: var(--space-1);
 }
 .article-lead .article-headline {
   font-size: var(--text-24);
@@ -142,20 +163,33 @@
 }
 .article-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-}
-.article-grid .article:nth-child(odd) {
-  padding-right: var(--space-3);
-}
-.article-grid .article:nth-child(even) {
-  padding-left: var(--space-3);
-  border-left: 1px solid var(--ink-line);
+  grid-template-columns: 1fr;
 }
 .article-grid .article + .article {
-  border-top: 0;
-}
-.article-grid .article:nth-child(n + 3) {
   border-top: 1px solid var(--ink-line);
+}
+/* Wider screens: the two-column grid of ART_DIRECTION §6, vignette above the headline. */
+@media (min-width: 520px) {
+  .article-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .article-grid .article {
+    grid-template-columns: 1fr;
+    gap: var(--space-1);
+  }
+  .article-grid .article:nth-child(odd) {
+    padding-right: var(--space-3);
+  }
+  .article-grid .article:nth-child(even) {
+    padding-left: var(--space-3);
+    border-left: 1px solid var(--ink-line);
+  }
+  .article-grid .article + .article {
+    border-top: 0;
+  }
+  .article-grid .article:nth-child(n + 3) {
+    border-top: 1px solid var(--ink-line);
+  }
 }
 .ledger-quiet {
   padding: var(--space-4) 0;
