@@ -32,6 +32,7 @@ import { activeModel, modelQuality, RADAR } from '../underwriting';
 import type { CampaignEffects } from './marketing';
 import { branchPrice, competitiveness, isOffered } from './pricing';
 import { managerOf } from './staff';
+import { cityBrandBonus } from '../hqMarketing';
 
 /** Σ over segments of mix_s × affinity[s][p] at this branch's lot. */
 export function lotAffinity(state: GameState, branch: Branch, productId: string): number {
@@ -125,7 +126,8 @@ export function branchTarget(state: GameState, branch: Branch, fx: CampaignEffec
     const over = asset.ageWeeks - asset.lifeWeeks;
     if (over > 0) upkeep += UPKEEP_PENALTY.perStep * Math.floor(over / UPKEEP_PENALTY.stepWeeks);
   }
-  return clamp(q + fx.bumps.branch + staffMods(state).reputation - upkeep, 1, 5);
+  const prestige = cityBrandBonus(state, branch.cityId);
+  return clamp(q + fx.bumps.branch + staffMods(state).reputation + prestige - upkeep, 1, 5);
 }
 
 /** Recomputes targets, eases displayed ratings toward them and adds reviews. */

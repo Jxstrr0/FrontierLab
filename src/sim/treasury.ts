@@ -1,6 +1,7 @@
-// Treasury (SIMULATION §13.1–13.5): liquid assets (reserves plus government
-// bonds), bond mark-to-market, automatic overnight and central bank window
-// funding, funding freezes, and interest on all of it.
+// Treasury (SIMULATION §13.1–13.6): liquid assets (reserves plus government
+// bonds), bond mark-to-market, funding lot interest and maturities, automatic
+// overnight and central bank window funding, funding freezes, and interest on
+// all of it. Market offers are generated in fundingMarket.ts.
 import {
   BOND_DURATION,
   BOND_PULL_TO_PAR_WEEKS,
@@ -19,6 +20,7 @@ import {
 import { CITIES } from '../data/cities';
 import { totalDeposits } from './balanceSheet';
 import { pushEvent } from './events';
+import { matureLots, payLotInterest } from './fundingLots';
 import { treasuryPenalty } from './hq';
 import { earn, postPnl, spend } from './ledger';
 import { ftpLong } from './rates';
@@ -66,6 +68,10 @@ export function runTreasury(state: GameState): void {
   t.bondsMarket *= 1 - BOND_DURATION * dLong;
   t.bondsMarket += (t.bondsBook - t.bondsMarket) / BOND_PULL_TO_PAR_WEEKS;
 
+  // §13.6 lots: interest from corporate cash, then maturities drain L before §13.5 runs.
+  payLotInterest(state);
+  matureLots(state);
+
   const deposits = totalDeposits(state);
   handleShortfall(state, deposits);
   repayWholesale(state, deposits);
@@ -82,6 +88,14 @@ export function runTreasury(state: GameState): void {
 
   if (t.windowStigmaWeeks > 0) t.windowStigmaWeeks -= 1;
   state.company.liquidityRatio = deposits > 0 ? liquidAssets(state) / deposits : null;
+}
+
+/** Window stigma (§13.5): branch ratings dip for 4 weeks, with a chance of a news story. */
+export function applyWindowStigma(state: GameState, amount: number): void {
+  state.treasury.windowStigmaWeeks = WINDOW_STIGMA.weeks;
+  if (stream(state, 'news').chance(WINDOW_STIGMA.newsChance)) {
+    pushEvent(state, 'WINDOW_USE', { amount }, 2);
+  }
 }
 
 /** §13.5: borrow overnight, then from the window; without auto-funding, freeze lending. */
@@ -105,10 +119,7 @@ function handleShortfall(state: GameState, deposits: number): void {
   if (need > 0) {
     t.window += need;
     t.reserves += need;
-    t.windowStigmaWeeks = WINDOW_STIGMA.weeks;
-    if (stream(state, 'news').chance(WINDOW_STIGMA.newsChance)) {
-      pushEvent(state, 'WINDOW_USE', { amount: need }, 2);
-    }
+    applyWindowStigma(state, need);
   }
   t.freeze = false;
 }

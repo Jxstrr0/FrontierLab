@@ -1,7 +1,8 @@
 // Scripted test scenarios: a new game plus a fixed list of player commands.
 import { REFERENCE_BUILDS } from '../../src/data/equipment';
+import type { DeptId } from '../../src/data/types';
 import * as cmd from '../../src/sim/commands';
-import { advanceDay } from '../../src/sim/engine';
+import { advanceDay, advanceWeeks } from '../../src/sim/engine';
 import { newGame } from '../../src/sim/newGame';
 import type { GameState } from '../../src/sim/state';
 
@@ -59,5 +60,28 @@ export function runScript(weeks: number, onWeek?: (s: GameState, week: number) =
     if (week === 100) cmd.setBenefit(s, 'lunch', 40);
     onWeek?.(s, week);
   }
+  return s;
+}
+
+/**
+ * A bank with one branch run for `weeks`, extra paid-in capital (so the balance
+ * identity still holds) and an HQ office with the given floors (Stage 4 tests).
+ */
+export function bankWithFloors(
+  depts: DeptId[],
+  opts: { cityId?: string; weeks?: number; capital?: number } = {},
+): GameState {
+  const s = newGame({ seed: 42, cityId: opts.cityId ?? 'cal', bankName: 'Test Bank' });
+  openScriptedBranch(s, 'midtown');
+  advanceWeeks(s, opts.weeks ?? 26);
+  const capital = opts.capital ?? 5_000_000;
+  s.company.cash += capital;
+  s.company.paidInCapital += capital;
+  if (depts.length === 0) return s;
+  const listing = Object.values(s.world.officeListings)
+    .filter((l) => !l.officeId && l.cityId === s.world.currentCityId && l.floors >= depts.length)
+    .sort((a, b) => a.id.localeCompare(b.id))[0]!;
+  const r = cmd.leaseOffice(s, listing.id, depts);
+  if (!r.ok) throw new Error(r.reason);
   return s;
 }
