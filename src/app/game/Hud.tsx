@@ -6,6 +6,7 @@ import { CITIES } from '../../data/cities';
 import { Medallion } from '../components';
 import { gameDate, money } from '../format/format';
 import { pause, setSpeed, stepWeek } from '../loop';
+import { CasesChip } from '../incidents/CasesChip';
 import { LayerIcon } from '../map/LayerIcon';
 import { openPanel, sheet, useGame } from '../store';
 
@@ -32,33 +33,36 @@ export function Hud() {
             </span>
           </span>
         </button>
-        <div class={`hud-chip hud-time${paused ? ' is-paused' : ''}`}>
-          <button
-            type="button"
-            class="hud-date"
-            aria-label={paused ? 'Resume' : 'Change speed'}
-            onClick={() => setSpeed(paused ? s.settings.defaultSpeed : NEXT_SPEED[s.clock.speed])}
-          >
-            <span>{gameDate(s.meta.startDate, s.clock.day)}</span>
-            {!paused && <span class="hud-speed">{s.clock.speed}×</span>}
-          </button>
-          <button
-            type="button"
-            class="hud-pause"
-            aria-label={paused ? 'Play' : 'Pause'}
-            onClick={() => (paused ? setSpeed(s.settings.defaultSpeed) : pause())}
-          >
-            {paused ? '▶' : '❚❚'}
-          </button>
-          <button
-            type="button"
-            class="hud-step"
-            aria-label="Next week"
-            disabled={!!s.flags.gameOver}
-            onClick={stepWeek}
-          >
-            <NextWeekIcon />
-          </button>
+        <div class="hud-right">
+          <div class={`hud-chip hud-time${paused ? ' is-paused' : ''}`}>
+            <button
+              type="button"
+              class="hud-date"
+              aria-label={paused ? 'Resume' : 'Change speed'}
+              onClick={() => setSpeed(paused ? s.settings.defaultSpeed : NEXT_SPEED[s.clock.speed])}
+            >
+              <span>{gameDate(s.meta.startDate, s.clock.day)}</span>
+              {!paused && <span class="hud-speed">{s.clock.speed}×</span>}
+            </button>
+            <button
+              type="button"
+              class="hud-pause"
+              aria-label={paused ? 'Play' : 'Pause'}
+              onClick={() => (paused ? setSpeed(s.settings.defaultSpeed) : pause())}
+            >
+              {paused ? '▶' : '❚❚'}
+            </button>
+            <button
+              type="button"
+              class="hud-step"
+              aria-label="Next week"
+              disabled={!!s.flags.gameOver}
+              onClick={stepWeek}
+            >
+              <NextWeekIcon />
+            </button>
+          </div>
+          {FEATURES.competition && <CasesChip />}
         </div>
       </div>
       <div class="hud-bottom">

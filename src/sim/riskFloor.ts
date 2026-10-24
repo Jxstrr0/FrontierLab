@@ -10,6 +10,7 @@ import {
 } from '../config/balance';
 import type { Tier } from '../data/types';
 import { pushEvent } from './events';
+import { raiseIncident } from './incidents';
 import { spend } from './ledger';
 import { stream } from './rng';
 import type { GameState, LossLine, LossWeek, RegulatorReview } from './state';
@@ -197,7 +198,10 @@ export function trailingRevenue(state: GameState): number {
   return state.history.weekly.slice(-WEEKS_PER_YEAR).reduce((sum, w) => sum + w.revenue, 0);
 }
 
-/** §15: the regulator's quarterly review. A failure fines 0.05–0.3% of trailing revenue. */
+/**
+ * §15: the regulator's quarterly review. A failure proposes a fine of 0.05–0.3% of
+ * trailing revenue through the REGULATOR_AUDIT incident.
+ */
 export function regulatorReview(state: GameState): RegulatorReview {
   const rng = stream(state, 'regulator');
   const failed = rng.chance(reviewFailChance(state));
@@ -206,9 +210,11 @@ export function regulatorReview(state: GameState): RegulatorReview {
   const review: RegulatorReview = { week: state.clock.week, passed: !failed, fine };
   state.risk.reviews.push(review);
   if (failed) {
-    // The REGULATOR_AUDIT incident and its options arrive with Stage 5; until then the fine is paid.
-    spend(state, 'fines', fine);
     pushEvent(state, 'REGULATOR_AUDIT', { fine }, 1);
+    // The fine waits on the REGULATOR_AUDIT incident's choice (pay, appeal or consultants).
+    if (!raiseIncident(state, 'REGULATOR_AUDIT', 'company', 'company', { fine })) {
+      spend(state, 'fines', fine);
+    }
   }
   return review;
 }

@@ -77,7 +77,7 @@ export function runPriceWars(state: GameState): void {
         4,
         city,
       );
-      raiseIncident(state, 'PRICE_WAR', 'city', city, { rivalId: bank.id, bump });
+      raiseIncident(state, 'PRICE_WAR', 'city', city, { rivalId: bank.id, bank: bank.name, bump });
     }
   }
 }

@@ -2,7 +2,7 @@
 // last week's new accounts, balance, funding or unit cost, the margin ring and
 // the price stepper. The small business loan card points to the Loan Desk.
 import type { ProductSpec } from '../../data/products';
-import { branchPrice, isOffered } from '../../sim/branch/pricing';
+import { basePrice, branchPrice, incidentBoost, isOffered } from '../../sim/branch/pricing';
 import * as cmd from '../../sim/commands';
 import { countryOfCity, ftpFor, marketRef } from '../../sim/rates';
 import type { Branch } from '../../sim/state';
@@ -19,6 +19,8 @@ export function ProductCard(p: { branch: Branch; spec: ProductSpec; onLoanDesk: 
   const stars = s.products.catalog[spec.id]?.stars ?? spec.startStars;
   const offered = isOffered(branch, spec.id);
   const price = branchPrice(s, branch, spec.id);
+  const setPrice = basePrice(s, branch, spec.id);
+  const boost = incidentBoost(s, branch, spec.id);
   const ftp = ftpFor(spec, countryOfCity(s, branch.cityId));
   const m = marketRef(s, branch.cityId, spec.id);
   const book = branch.books[spec.id];
@@ -26,11 +28,13 @@ export function ProductCard(p: { branch: Branch; spec: ProductSpec; onLoanDesk: 
   const delegated = branch.delegation.products;
   const atHq = s.company.applyRatesToAll;
   const fmt = (v: number) => priceText(spec, v, sym);
-  const priceHint = atHq
+  const baseHint = atHq
     ? 'Set at HQ'
     : delegated
       ? 'Your manager sets this'
       : `Market ${fmt(m)} · ${rangeText(spec, sym)}`;
+  // Incident boosts (price-war match, bank-run raise) pay on top of the set rate for a while.
+  const priceHint = boost > 0 ? `${baseHint} · paying ${fmt(price)} for now` : baseHint;
 
   return (
     <Card class={`br-product${offered ? '' : ' is-off'}`}>
@@ -62,7 +66,7 @@ export function ProductCard(p: { branch: Branch; spec: ProductSpec; onLoanDesk: 
         />
         <Stepper
           label={spec.priceType === 'rate' ? 'Rate' : 'Fee'}
-          value={price}
+          value={setPrice}
           min={spec.min}
           max={spec.max}
           step={spec.step}
