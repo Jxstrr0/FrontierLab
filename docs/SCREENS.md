@@ -80,6 +80,7 @@ Wealth · Company · Branches · Portfolio · The Ledger (archive) · Milestones
    - Difficulty: Segmented (Easy / Normal / Hard / Expert) with a one-line description of each
    - Competitors: Stepper 1–5 (defaults to the city's usual count)
    - Starting cash: Segmented ($500K / $750K / $1M / $1.25M)
+   - Currency: Segmented ($ / C$ / £ / € / ¥), defaulting to the saved preference; the display symbol only, changeable later in Settings
 5. **Confirm:**
    - summary
    - advanced: seed (random by default), start date

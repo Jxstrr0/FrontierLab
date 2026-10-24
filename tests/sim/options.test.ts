@@ -17,6 +17,11 @@ function depositsAfter(opts: Partial<NewGameOptions>, weeks: number): number {
 }
 
 describe('new game options', () => {
+  it('shows money in the chosen starting currency, $ by default', () => {
+    expect(newGame(base).settings.currency).toBe('$');
+    expect(newGame({ ...base, currency: '£' }).settings.currency).toBe('£');
+  });
+
   it('sets the rival bank count from 1 to 5, defaulting to the city', () => {
     expect(Object.keys(newGame(base).rivals)).toHaveLength(3);
     expect(Object.keys(newGame({ ...base, competitors: 1 }).rivals)).toHaveLength(1);

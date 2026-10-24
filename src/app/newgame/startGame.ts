@@ -8,7 +8,8 @@ import { screen, setGame, toast } from '../store';
 export function startGame(opts: Omit<NewGameOptions, 'version'>): void {
   const state = newGame({ ...opts, version: __APP_VERSION__ });
   // Preferences were checked when saved, but storage can be edited by hand.
-  setSettings(state, loadPrefs());
+  // The wizard's currency choice wins over the saved preference.
+  setSettings(state, { ...loadPrefs(), ...(opts.currency ? { currency: opts.currency } : {}) });
   setGame(state);
   screen.value = 'game';
   const err = saveToSlot('auto', state);
