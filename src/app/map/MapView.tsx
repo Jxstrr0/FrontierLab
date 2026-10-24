@@ -8,7 +8,7 @@ import { CLUSTER_EXPAND_ZOOM } from '../../config/mapView';
 import { RivalSheet } from '../city/RivalSheet';
 import { cityLots } from '../city/lotInfo';
 import { openPanel, useGame } from '../store';
-import { initialCamera, rememberCamera, sceneFor } from './mapScene';
+import { initialCamera, mapPlaces, rememberCamera, sceneFor } from './mapScene';
 import { MapController } from './mapController';
 import { buildPins, occupantsKey, occupantsOf, pinsKey } from './pins';
 import './map.css';
@@ -56,6 +56,10 @@ export function MapView() {
         if (pin.kind === 'mine' && pin.branchId)
           openPanel({ type: 'branch', branchId: pin.branchId });
         else if (pin.kind === 'rival') setRivalLotId(pin.id);
+        else if (pin.kind === 'hq') openPanel({ type: 'hq', officeId: pin.officeId });
+        else if (pin.kind === 'office') openPanel({ type: 'office', listingId: pin.id });
+        else if (pin.kind === 'bureau') openPanel({ type: 'bureau', siteId: pin.id });
+        else if (pin.kind === 'agency') openPanel({ type: 'agency', siteId: pin.id });
         else openPanel({ type: 'storefront', lotId: pin.id });
       },
       onCluster: (cl) =>
@@ -79,7 +83,7 @@ export function MapView() {
     const city = CITIES[s.world.currentCityId];
     if (!c || !city) return;
     const lots = cityLots(s);
-    const scene = sceneFor(city, s.meta.seed, lots);
+    const scene = sceneFor(city, s.meta.seed, lots, mapPlaces(s, city.id));
     // Rebuilding after the fonts load keeps the view: the camera is remembered per scene.
     const build = `${scene.key}|${fontsReady ? 'fonts' : 'fallback'}`;
     if (build !== keys.current.build) {

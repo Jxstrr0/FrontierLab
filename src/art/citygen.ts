@@ -1,17 +1,35 @@
 // The drawable city (ART_DIRECTION §2, ROADMAP Stage 3): every tile of the grid
-// classified as street, water, park, landmark, storefront lot or filler
-// building, with its district, height and art seed. Pure and seeded from the
-// save seed and city id, so a city looks the same in every session. Streets and
-// shoreline come from the simulation's cityLayout so lots always face a street.
+// classified as street, water, park, landmark, storefront lot, office building
+// for lease, other site (credit bureau, marketing agency) or filler building,
+// with its district, height and art seed. Pure and seeded from the save seed and
+// city id, so a city looks the same in every session. Streets and shoreline come
+// from the simulation's cityLayout so lots always face a street. Offices and
+// sites are claimed before landmarks and parks, so those never cover them.
 import { CITYGEN, CITY_LAYOUT } from '../config/balance';
-import { FLOORS, LANDMARKS, PARK_SHARE, type LandmarkId } from '../config/map';
+import {
+  FLOORS,
+  LANDMARKS,
+  OFFICE_ART_EXTRA_STOREYS,
+  PARK_SHARE,
+  SITE_STOREYS,
+  type LandmarkId,
+} from '../config/map';
 import type { CitySpec } from '../data/cities';
 import { DISTRICTS, type DistrictId } from '../data/types';
 import { isStreet, isWater } from '../sim/cityLayout';
-import type { Lot } from '../sim/state';
+import type { Lot, OfficeListing, Site, SiteKind } from '../sim/state';
 import { artRng, hashString, mixSeed } from './prng';
 
-export const TILE_KINDS = ['street', 'water', 'park', 'landmark', 'lot', 'building'] as const;
+export const TILE_KINDS = [
+  'street',
+  'water',
+  'park',
+  'landmark',
+  'lot',
+  'building',
+  'office',
+  'site',
+] as const;
 export type TileKind = (typeof TILE_KINDS)[number];
 
 export interface LandmarkSite {
@@ -34,7 +52,17 @@ export interface CityMap {
   seed: Uint32Array;
   /** Storefront lot id by tile index. */
   lotAt: Map<number, string>;
+  /** Office listing id by tile index (Stage 4). */
+  officeAt: Map<number, string>;
+  /** Credit bureau or marketing agency by tile index (Stage 4). */
+  siteAt: Map<number, { id: string; kind: SiteKind }>;
   landmarks: LandmarkSite[];
+}
+
+/** Non-storefront buildings to place on the map (Stage 4); omitted while FEATURES.hq is off. */
+export interface MapPlaces {
+  offices?: Pick<OfficeListing, 'id' | 'tile' | 'district' | 'floors' | 'buildingSeed'>[];
+  sites?: Pick<Site, 'id' | 'kind' | 'tile' | 'district' | 'buildingSeed'>[];
 }
 
 export interface TileInfo {
@@ -45,6 +73,9 @@ export interface TileInfo {
   floors: number;
   seed: number;
   lotId?: string;
+  officeId?: string;
+  siteId?: string;
+  siteKind?: SiteKind;
 }
 
 const KIND = Object.fromEntries(TILE_KINDS.map((k, i) => [k, i])) as Record<TileKind, number>;
@@ -64,6 +95,9 @@ export function tileAt(map: CityMap, x: number, y: number): TileInfo | undefined
     floors: map.floors[i]!,
     seed: map.seed[i]!,
     lotId: map.lotAt.get(i),
+    officeId: map.officeAt.get(i),
+    siteId: map.siteAt.get(i)?.id,
+    siteKind: map.siteAt.get(i)?.kind,
   };
 }
 
@@ -85,7 +119,12 @@ export function districtAt(city: CitySpec, x: number, y: number): DistrictId {
   return best;
 }
 
-export function generateCityMap(city: CitySpec, saveSeed: number, lots: Lot[]): CityMap {
+export function generateCityMap(
+  city: CitySpec,
+  saveSeed: number,
+  lots: Lot[],
+  places: MapPlaces = {},
+): CityMap {
   const n = city.tiles;
   const rng = artRng(mixSeed(saveSeed, hashString(`citymap:${city.id}`)));
   const map: CityMap = {
@@ -97,6 +136,8 @@ export function generateCityMap(city: CitySpec, saveSeed: number, lots: Lot[]): 
     floors: new Uint8Array(n * n),
     seed: new Uint32Array(n * n),
     lotAt: new Map(),
+    officeAt: new Map(),
+    siteAt: new Map(),
     landmarks: [],
   };
 
@@ -131,6 +172,24 @@ export function generateCityMap(city: CitySpec, saveSeed: number, lots: Lot[]): 
     map.lotAt.set(i, lot.id);
   }
 
+  // Office buildings stand taller than the floors you can lease (lobby and crown).
+  for (const o of places.offices ?? []) {
+    const i = o.tile.y * n + o.tile.x;
+    map.kind[i] = KIND.office;
+    map.district[i] = DISTRICT_INDEX[o.district];
+    map.seed[i] = o.buildingSeed >>> 0;
+    map.floors[i] = Math.max(FLOORS[o.district][0], o.floors + OFFICE_ART_EXTRA_STOREYS);
+    map.officeAt.set(i, o.id);
+  }
+  for (const site of places.sites ?? []) {
+    const i = site.tile.y * n + site.tile.x;
+    map.kind[i] = KIND.site;
+    map.district[i] = DISTRICT_INDEX[site.district];
+    map.seed[i] = site.buildingSeed >>> 0;
+    map.floors[i] = SITE_STOREYS[site.kind];
+    map.siteAt.set(i, { id: site.id, kind: site.kind });
+  }
+
   // Whole land blocks without lots can hold a landmark or a park.
   const free = freeBlocks(map);
   for (const lm of LANDMARKS) {
@@ -158,7 +217,7 @@ export function generateCityMap(city: CitySpec, saveSeed: number, lots: Lot[]): 
   return map;
 }
 
-/** Top-left tiles of 3×3 blocks that are all filler buildings (no lots, no water). */
+/** Top-left tiles of 3×3 blocks that are all filler buildings (no lots, offices, sites or water). */
 function freeBlocks(map: CityMap): { x: number; y: number }[] {
   const out: { x: number; y: number }[] = [];
   const step = CITY_LAYOUT.block;

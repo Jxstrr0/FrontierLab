@@ -208,3 +208,27 @@
   font-size: var(--text-12);
   white-space: nowrap;
 }
+
+/* "Delayed" placeholder for weeks a short Finance floor hasn't closed (SCREENS §10). */
+.stmt-delayed {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px dashed var(--hairline);
+  border-radius: var(--radius-card);
+  color: var(--ivory-dim);
+}
+.stmt-delayed-tag {
+  flex: none;
+  padding: 2px 10px;
+  border: 1px solid var(--oxblood);
+  border-radius: var(--radius-pill);
+  color: #e07a7a;
+  font-size: var(--text-12);
+  font-weight: 700;
+}
+
+.co-hq-link {
+  margin-bottom: var(--space-3);
+}

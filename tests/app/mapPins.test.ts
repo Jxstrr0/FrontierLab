@@ -49,6 +49,10 @@ describe('pin clustering', () => {
   });
 });
 
+/** Feature sets with the HQ stage off and on, whatever the build's flags say. */
+const NO_HQ = { ...FEATURES, hq: false };
+const WITH_HQ = { ...FEATURES, hq: true };
+
 describe('map pins', () => {
   function setup() {
     const s = newGame({ seed: 42, cityId: 'cal', bankName: 'Pin Bank' });
@@ -60,7 +64,7 @@ describe('map pins', () => {
 
   it('has one pin per storefront, yours first, anchored on the roof', () => {
     const { s, branchId, lots, map } = setup();
-    const pins = buildPins(s, map, lots);
+    const pins = buildPins(s, map, lots, NO_HQ);
     expect(pins).toHaveLength(lots.length);
     const mine = pins[0]!;
     expect(mine.kind).toBe('mine');
@@ -77,20 +81,96 @@ describe('map pins', () => {
   it('follows the layer settings', () => {
     const { s, lots, map } = setup();
     cmd.setSettings(s, { layers: { [LEASE_ONLY_KEY]: true } });
-    const leaseOnly = buildPins(s, map, lots);
+    const leaseOnly = buildPins(s, map, lots, NO_HQ);
     expect(leaseOnly.length).toBeGreaterThan(0);
     expect(leaseOnly.every((p) => p.kind === 'lease')).toBe(true);
     cmd.setSettings(s, { layers: { branches: false } });
-    expect(buildPins(s, map, lots)).toEqual([]);
+    expect(buildPins(s, map, lots, NO_HQ)).toEqual([]);
   });
 
   it('tells the renderer who occupies each lot, in their ink', () => {
     const { s, lots } = setup();
-    const occ = Object.values(occupantsOf(s, lots));
+    const occ = Object.values(occupantsOf(s, lots, NO_HQ));
     expect(occ.filter((o) => o.type === 'player')).toEqual([
       { type: 'player', ink: s.meta.brandInk },
     ]);
     expect(occ.some((o) => o.type === 'rival')).toBe(true);
+  });
+});
+
+describe('HQ pins (Stage 4)', () => {
+  function setup() {
+    const s = newGame({ seed: 42, cityId: 'cal', bankName: 'Pin Bank' });
+    s.company.cash = 50_000_000;
+    const lots = Object.values(s.world.lots).filter((l) => l.cityId === 'cal');
+    const offices = Object.values(s.world.officeListings).filter((o) => o.cityId === 'cal');
+    const sites = Object.values(s.world.sites).filter((x) => x.cityId === 'cal');
+    const map = generateCityMap(CITIES.cal!, s.meta.seed, lots, { offices, sites });
+    return { s, lots, offices, sites, map };
+  }
+
+  it('adds offices for lease, credit bureaus and agencies only with the HQ stage', () => {
+    const { s, lots, offices, sites, map } = setup();
+    expect(
+      buildPins(s, map, lots, NO_HQ).every((p) => p.kind === 'rival' || p.kind === 'lease'),
+    ).toBe(true);
+    const pins = buildPins(s, map, lots, WITH_HQ);
+    const officePins = pins.filter((p) => p.kind === 'office');
+    expect(officePins.map((p) => p.id).sort()).toEqual(offices.map((o) => o.id).sort());
+    const o = offices.find((x) => x.id === officePins[0]!.id)!;
+    expect(officePins[0]!.label).toBe(`Office for lease, ${o.address}, ${o.floors} floors`);
+    expect(officePins[0]!.icon).toBe('offices');
+    const floors = map.floors[o.tile.y * map.tiles + o.tile.x]!;
+    expect({ x: officePins[0]!.x, y: officePins[0]!.y }).toEqual(
+      roofAnchor(map.tiles, o.tile.x, o.tile.y, floors),
+    );
+    expect(pins.filter((p) => p.kind === 'bureau').length).toBe(
+      sites.filter((x) => x.kind === 'bureau').length,
+    );
+    const agencies = pins.filter((p) => p.kind === 'agency');
+    expect(agencies.length).toBe(sites.filter((x) => x.kind === 'agency').length);
+    expect(agencies.length).toBeGreaterThan(0);
+    expect(agencies[0]!.label).toMatch(/, marketing agency, /);
+    expect(agencies[0]!.icon).toBe('marketingAgencies');
+  });
+
+  it('shows a leased office as your HQ in brand ink, stacked with your pins', () => {
+    const { s, lots, offices, map } = setup();
+    const listing = offices[0]!;
+    const r = cmd.leaseOffice(s, listing.id, ['finance']);
+    expect(r.ok).toBe(true);
+    const pins = buildPins(s, map, lots, WITH_HQ);
+    const hq = pins.find((p) => p.id === listing.id)!;
+    expect(hq.kind).toBe('hq');
+    expect(hq.label).toBe(`Your HQ, ${listing.address}`);
+    expect(hq.ink).toBe(s.meta.brandInk);
+    expect(hq.monogram).toBe(s.meta.monogram);
+    expect(hq.officeId).toBe(r.ok ? r.officeId : undefined);
+    expect(pins[0]!.kind).toBe('hq');
+    expect(occupantsOf(s, lots, WITH_HQ)[listing.id]).toEqual({
+      type: 'player',
+      ink: s.meta.brandInk,
+    });
+    expect(occupantsOf(s, lots, NO_HQ)[listing.id]).toBeUndefined();
+  });
+
+  it('follows the Offices, Credit Bureaus and Marketing Agencies layers', () => {
+    const { s, lots, map } = setup();
+    cmd.setSettings(s, { layers: { branches: false, offices: false } });
+    const kinds = new Set(buildPins(s, map, lots, WITH_HQ).map((p) => p.kind));
+    expect([...kinds].sort()).toEqual(['agency', 'bureau']);
+    // setSettings replaces the whole layers map.
+    cmd.setSettings(s, {
+      layers: { branches: false, offices: false, creditBureaus: false, marketingAgencies: false },
+    });
+    expect(buildPins(s, map, lots, WITH_HQ)).toEqual([]);
+  });
+
+  it('clusters HQ pins with the rest', () => {
+    const { s, lots, map } = setup();
+    const pins = buildPins(s, map, lots, WITH_HQ);
+    const ids = clusterPins(pins, clusterRadius(0.4)).flatMap((c) => c.members.map((m) => m.id));
+    expect(ids.sort()).toEqual(pins.map((p) => p.id).sort());
   });
 });
 

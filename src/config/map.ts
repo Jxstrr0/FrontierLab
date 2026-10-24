@@ -26,6 +26,11 @@ export const FLOORS: Record<DistrictId, [number, number]> = {
   waterfront: [2, 6],
 };
 
+/** Office buildings for lease draw this many storeys above their leasable floors (lobby, crown). */
+export const OFFICE_ART_EXTRA_STOREYS = 2;
+/** Storeys of credit bureau and marketing agency buildings (Stage 4). */
+export const SITE_STOREYS = { bureau: 5, agency: 4 } as const;
+
 /** Share of lot-free blocks that become parks, by district. */
 export const PARK_SHARE: Record<DistrictId, number> = {
   financial: 0.05,

@@ -1,17 +1,21 @@
 // Pin data for the map (SCREENS §2, ART_DIRECTION §2): one entry per storefront
-// lot in the current city, filtered by the Layers settings, with its roof
-// anchor in world px and its accessible label. Also the renderer's lot
-// occupants. Read-only views of GameState; positions come from the CityMap.
+// lot in the current city and, with the HQ stage (FEATURES.hq), per office
+// building, credit bureau and marketing agency, filtered by the Layers
+// settings, with its roof anchor in world px and its accessible label. Also
+// the renderer's occupants (lots and leased offices). Read-only views of
+// GameState; positions come from the CityMap.
 import type { CityMap } from '../../art/citygen';
 import { roofAnchor } from '../../art/iso';
 import type { LotOccupant } from '../../art/mapRenderer';
-import { LEASE_ONLY_KEY, layerOn } from '../../data/mapLayers';
-import type { GameState, Lot } from '../../sim/state';
+import { FEATURES, type FeatureId } from '../../config/balance';
+import { AGENCIES } from '../../data/brandCampaigns';
+import { LEASE_ONLY_KEY, layerOn, type MapLayerId } from '../../data/mapLayers';
+import type { GameState, Lot, OfficeListing, Site } from '../../sim/state';
 
-export type PinKind = 'mine' | 'rival' | 'lease';
+export type PinKind = 'mine' | 'hq' | 'rival' | 'office' | 'bureau' | 'agency' | 'lease';
 
 export interface PinSpec {
-  /** The lot id (also the DOM `data-lot-id`). */
+  /** Lot, office listing or site id (also the DOM `data-lot-id`). */
   id: string;
   kind: PinKind;
   /** World position of the roof anchor (zoom-1 px). */
@@ -23,10 +27,25 @@ export interface PinSpec {
   /** Brass dot: Loan Desk applications waiting (SCREENS §0.2). */
   badge: boolean;
   branchId?: string;
+  /** Your office in this building (kind 'hq'). */
+  officeId?: string;
+  /** Type icon for office, bureau and agency pins. */
+  icon?: MapLayerId;
 }
 
-/** Clustering seeds and stacking: your branches first, then rivals, then storefronts. */
-const KIND_ORDER: Record<PinKind, number> = { mine: 0, rival: 1, lease: 2 };
+/** Clustering seeds and stacking: yours first, then rivals, then other buildings, storefronts last. */
+const KIND_ORDER: Record<PinKind, number> = {
+  mine: 0,
+  hq: 1,
+  rival: 2,
+  office: 3,
+  bureau: 4,
+  agency: 5,
+  lease: 6,
+};
+
+/** Pins drawn in your brand ink, lifted above the rest. */
+export const isYours = (p: { kind: PinKind }): boolean => p.kind === 'mine' || p.kind === 'hq';
 
 export function pendingByBranch(s: GameState): Record<string, number> {
   const out: Record<string, number> = {};
@@ -35,9 +54,13 @@ export function pendingByBranch(s: GameState): Record<string, number> {
   return out;
 }
 
-function lotPin(s: GameState, map: CityMap, lot: Lot, pending: Record<string, number>) {
-  const floors = map.floors[lot.tile.y * map.tiles + lot.tile.x] ?? 0;
-  const at = roofAnchor(map.tiles, lot.tile.x, lot.tile.y, floors);
+function anchor(map: CityMap, tile: { x: number; y: number }) {
+  const floors = map.floors[tile.y * map.tiles + tile.x] ?? 0;
+  return roofAnchor(map.tiles, tile.x, tile.y, floors);
+}
+
+function lotPin(s: GameState, map: CityMap, lot: Lot, pending: Record<string, number>): PinSpec {
+  const at = anchor(map, lot.tile);
   const occ = lot.occupant;
   const base = { id: lot.id, x: at.x, y: at.y };
   if (occ?.type === 'player') {
@@ -46,7 +69,7 @@ function lotPin(s: GameState, map: CityMap, lot: Lot, pending: Record<string, nu
     const name = branch?.name ?? lot.address;
     return {
       ...base,
-      kind: 'mine' as const,
+      kind: 'mine',
       label: `Your branch, ${name}${waiting ? `, ${waiting} loan applications waiting` : ''}`,
       ink: s.meta.brandInk,
       monogram: s.meta.monogram,
@@ -58,7 +81,7 @@ function lotPin(s: GameState, map: CityMap, lot: Lot, pending: Record<string, nu
     const bank = s.rivals[occ.id];
     return {
       ...base,
-      kind: 'rival' as const,
+      kind: 'rival',
       label: `${bank?.name ?? 'Rival bank'} branch, ${lot.address}`,
       ink: bank?.ink ?? '#5a5a5a',
       monogram: bank?.monogram ?? '?',
@@ -67,7 +90,7 @@ function lotPin(s: GameState, map: CityMap, lot: Lot, pending: Record<string, nu
   }
   return {
     ...base,
-    kind: 'lease' as const,
+    kind: 'lease',
     label: `For lease, ${lot.address}`,
     ink: '',
     monogram: '',
@@ -75,17 +98,81 @@ function lotPin(s: GameState, map: CityMap, lot: Lot, pending: Record<string, nu
   };
 }
 
+function officePin(s: GameState, map: CityMap, o: OfficeListing): PinSpec {
+  const at = anchor(map, o.tile);
+  const base = { id: o.id, x: at.x, y: at.y, badge: false };
+  if (o.officeId) {
+    return {
+      ...base,
+      kind: 'hq',
+      label: `Your HQ, ${o.address}`,
+      ink: s.meta.brandInk,
+      monogram: s.meta.monogram,
+      officeId: o.officeId,
+    };
+  }
+  return {
+    ...base,
+    kind: 'office',
+    label: `Office for lease, ${o.address}, ${o.floors} floors`,
+    ink: '',
+    monogram: '',
+    icon: 'offices',
+  };
+}
+
+/** A site's display name: the bureau's name or the agency's. */
+export function siteName(site: Site): string {
+  return site.kind === 'agency'
+    ? (AGENCIES[site.refId]?.name ?? 'Marketing agency')
+    : `${site.refId} credit bureau`;
+}
+
+function sitePin(map: CityMap, site: Site): PinSpec {
+  const at = anchor(map, site.tile);
+  const agency = site.kind === 'agency';
+  return {
+    id: site.id,
+    kind: site.kind,
+    x: at.x,
+    y: at.y,
+    label: `${siteName(site)}${agency ? ', marketing agency' : ''}, ${site.address}`,
+    ink: '',
+    monogram: '',
+    badge: false,
+    icon: agency ? 'marketingAgencies' : 'creditBureaus',
+  };
+}
+
 /** Pins for the city on screen, after the Layers settings, in stacking order. */
-export function buildPins(s: GameState, map: CityMap, lots: Lot[]): PinSpec[] {
+export function buildPins(
+  s: GameState,
+  map: CityMap,
+  lots: Lot[],
+  features: Record<FeatureId, boolean> = FEATURES,
+): PinSpec[] {
   const layers = s.settings.layers;
-  if (!layerOn(layers, 'branches')) return [];
-  const leaseOnly = layers[LEASE_ONLY_KEY] === true;
-  const pending = pendingByBranch(s);
   const pins: PinSpec[] = [];
-  for (const lot of lots) {
-    if (lot.cityId !== map.cityId) continue;
-    if (leaseOnly && lot.occupant) continue;
-    pins.push(lotPin(s, map, lot, pending));
+  if (layerOn(layers, 'branches')) {
+    const leaseOnly = layers[LEASE_ONLY_KEY] === true;
+    const pending = pendingByBranch(s);
+    for (const lot of lots) {
+      if (lot.cityId !== map.cityId) continue;
+      if (leaseOnly && lot.occupant) continue;
+      pins.push(lotPin(s, map, lot, pending));
+    }
+  }
+  if (features.hq) {
+    if (layerOn(layers, 'offices')) {
+      for (const o of Object.values(s.world.officeListings))
+        if (o.cityId === map.cityId) pins.push(officePin(s, map, o));
+    }
+    const bureaus = layerOn(layers, 'creditBureaus');
+    const agencies = layerOn(layers, 'marketingAgencies');
+    for (const site of Object.values(s.world.sites)) {
+      if (site.cityId !== map.cityId) continue;
+      if (site.kind === 'bureau' ? bureaus : agencies) pins.push(sitePin(map, site));
+    }
   }
   return pins.sort(
     (a, b) => KIND_ORDER[a.kind] - KIND_ORDER[b.kind] || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0),
@@ -97,8 +184,15 @@ export function pinsKey(pins: PinSpec[]): string {
   return pins.map((p) => `${p.id}|${p.kind}|${p.ink}|${p.monogram}|${p.label}`).join(';');
 }
 
-/** Who is in each lot, for the renderer's roof flags (src/art/mapRenderer.ts). */
-export function occupantsOf(s: GameState, lots: Lot[]): Record<string, LotOccupant> {
+/**
+ * Who is in each lot (and, with FEATURES.hq, which office buildings you lease),
+ * for the renderer's roof flags and awnings (src/art/mapRenderer.ts).
+ */
+export function occupantsOf(
+  s: GameState,
+  lots: Lot[],
+  features: Record<FeatureId, boolean> = FEATURES,
+): Record<string, LotOccupant> {
   const out: Record<string, LotOccupant> = {};
   for (const lot of lots) {
     const occ = lot.occupant;
@@ -107,6 +201,12 @@ export function occupantsOf(s: GameState, lots: Lot[]): Record<string, LotOccupa
       occ.type === 'player'
         ? { type: 'player', ink: s.meta.brandInk }
         : { type: 'rival', ink: s.rivals[occ.id]?.ink ?? '#5a5a5a' };
+  }
+  if (features.hq) {
+    for (const o of Object.values(s.world.officeListings)) {
+      if (o.officeId && o.cityId === s.world.currentCityId)
+        out[o.id] = { type: 'player', ink: s.meta.brandInk };
+    }
   }
   return out;
 }

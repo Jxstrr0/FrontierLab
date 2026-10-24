@@ -8,13 +8,16 @@ import { BuildPanel } from '../build/BuildPanel';
 import { CityList } from '../city/CityList';
 import { BranchesPanel } from '../company/BranchesPanel';
 import { CompanyPanel } from '../company/CompanyPanel';
+import { HqPanel } from '../hq/HqPanel';
 import { ToastHost } from '../components';
 import { startLoop, stopLoop } from '../loop';
 import { CityListPanel } from '../map/CityListPanel';
 import { LayersSheet } from '../map/LayersSheet';
 import { MapView } from '../map/MapView';
+import { OfficePanel } from '../office/OfficePanel';
 import { SavesScreen } from '../saves/SavesScreen';
 import { SettingsScreen } from '../settings/SettingsScreen';
+import { SitePanel } from '../sites/SitePanel';
 import { modal, panel, sheet } from '../store';
 import { StorefrontPanel } from '../storefront/StorefrontPanel';
 import { GameOverModal } from '../weekly/GameOverModal';
@@ -59,6 +62,14 @@ function PanelHost() {
       return <BuildPanel key={p.lotId} lotId={p.lotId} />;
     case 'branch':
       return <BranchPanel key={p.branchId} branchId={p.branchId} tab={p.tab ?? 'service'} />;
+    // Stage 4 (FEATURES.hq): offices, HQ and the bureau and agency sites.
+    case 'office':
+      return FEATURES.hq ? <OfficePanel key={p.listingId} listingId={p.listingId} /> : null;
+    case 'hq':
+      return FEATURES.hq ? <HqPanel officeId={p.officeId} dept={p.dept} /> : null;
+    case 'bureau':
+    case 'agency':
+      return FEATURES.hq ? <SitePanel key={p.siteId} siteId={p.siteId} kind={p.type} /> : null;
     case 'company':
       return <CompanyPanel />;
     case 'branches':

@@ -1,5 +1,6 @@
 // Line icons for the 14 map layers (SCREENS §2), on a 24 px grid in the
-// current text colour, engraved-style: thin even strokes, no fills.
+// current text colour, engraved-style: thin even strokes, no fills. Also the
+// type medallion that map pins and panel headers use for non-bank buildings.
 import type { MapLayerId } from '../../data/mapLayers';
 
 const PATHS: Record<MapLayerId, string> = {
@@ -52,6 +53,39 @@ export function LayerIcon(p: { id: MapLayerId; size?: number }) {
       aria-hidden="true"
     >
       <path d={PATHS[p.id]} />
+    </svg>
+  );
+}
+
+/**
+ * A round type medallion (ART_DIRECTION §2, Pins): brass rim, ivory fill, an
+ * engraved inner ring and the layer's icon in ink. For offices for lease,
+ * credit bureaus, agencies and other special buildings.
+ */
+export function LayerMedallion(p: { id: MapLayerId; size?: number }) {
+  const size = p.size ?? 30;
+  return (
+    <svg class="medallion" width={size} height={size} viewBox="0 0 30 30" aria-hidden="true">
+      <circle cx="15" cy="15" r="14" fill="var(--ivory)" stroke="var(--brass)" stroke-width="1.5" />
+      <circle
+        cx="15"
+        cy="15"
+        r="11.5"
+        fill="none"
+        stroke="var(--brass)"
+        stroke-width="0.6"
+        stroke-dasharray="1 1.2"
+      />
+      <g
+        transform="translate(6 6) scale(0.75)"
+        fill="none"
+        stroke="var(--ledger-ink)"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d={PATHS[p.id]} />
+      </g>
     </svg>
   );
 }
