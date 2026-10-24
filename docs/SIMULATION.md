@@ -125,7 +125,7 @@ These are read by other systems:
 
 | Factor | Formula |
 |---|---|
-| `creditCycle` | `max(0.8, 1 + 0.16 × (unemployment − 5.0))`, multiplies default rates |
+| `creditCycle` | `max(0.8, 1 + 0.35 × (unemployment − 5.0))`, multiplies default rates (slope raised from 0.16 in Stage 5 so recessions reach the §25 loss band) |
 | `loanDemand` | `clamp(1 + 0.05 × (gdp − 2) − 0.12 × (policyRate − neutralRate) × 100, 0.6, 1.3)`, with rates in decimals ×100 to get pp |
 | `depositGrowth` | `1 + 0.01 × (gdp − 2)` |
 | `hpiYoY` | % change of hpi over 52 weeks |
