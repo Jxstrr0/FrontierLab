@@ -50,8 +50,9 @@ describe('pin clustering', () => {
 });
 
 /** Feature sets with the HQ stage off and on, whatever the build's flags say. */
-const NO_HQ = { ...FEATURES, hq: false };
-const WITH_HQ = { ...FEATURES, hq: true };
+const NO_HQ = { ...FEATURES, hq: false, competition: false };
+const WITH_HQ = { ...FEATURES, hq: true, competition: false };
+const STAGE5 = { ...FEATURES, hq: true, competition: true };
 
 describe('map pins', () => {
   function setup() {
@@ -171,6 +172,29 @@ describe('HQ pins (Stage 4)', () => {
     const pins = buildPins(s, map, lots, WITH_HQ);
     const ids = clusterPins(pins, clusterRadius(0.4)).flatMap((c) => c.members.map((m) => m.id));
     expect(ids.sort()).toEqual(pins.map((p) => p.id).sort());
+  });
+});
+
+describe('Stage 5 pins', () => {
+  it('adds rival head offices, employers, the university and the central bank', () => {
+    const s = newGame({ seed: 42, cityId: 'cal', bankName: 'Pin Bank' });
+    const lots = Object.values(s.world.lots).filter((l) => l.cityId === 'cal');
+    const offices = Object.values(s.world.officeListings).filter((o) => o.cityId === 'cal');
+    const sites = Object.values(s.world.sites).filter((x) => x.cityId === 'cal');
+    const map = generateCityMap(CITIES.cal!, s.meta.seed, lots, { offices, sites });
+    const pins = buildPins(s, map, lots, STAGE5);
+    const hqs = pins.filter((p) => p.kind === 'rivalHq');
+    expect(hqs.length).toBe(Object.values(s.rivals).length);
+    expect(hqs[0]!.label).toMatch(/ head office, /);
+    expect(pins.filter((p) => p.kind === 'employer').length).toBeGreaterThanOrEqual(2);
+    expect(pins.filter((p) => p.kind === 'university')).toHaveLength(1);
+    const cb = pins.find((p) => p.kind === 'centralBank')!;
+    expect(cb.countryId).toBe('CA');
+    expect(cb.label).toBe('Bank of Canada');
+    cmd.setSettings(s, { layers: { banks: false, employers: false, universities: false } });
+    const kinds = new Set(buildPins(s, map, lots, STAGE5).map((p) => p.kind));
+    for (const k of ['rivalHq', 'centralBank', 'employer', 'university'] as const)
+      expect(kinds.has(k)).toBe(false);
   });
 });
 

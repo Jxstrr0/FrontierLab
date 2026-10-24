@@ -21,10 +21,11 @@ import { generateLots } from './citygen';
 import { fullCoverage } from './hq';
 import { generateSites } from './hqSites';
 import { emptyLedger } from './ledger';
-import { initCountry } from './macro';
+import { initCountries } from './macro';
+import { generateCompetitionSites } from './competitionSites';
+import { emptyCorporateDebt } from './corporateDebt';
 import { refreshManagerPool } from './people';
 import { updateMarketRefs } from './rates';
-import { stream } from './rng';
 import { seedRivals } from './rivals';
 import { SCHEMA_VERSION, type AvatarSpec, type GameState, type Settings } from './state';
 import { packagedModel } from './underwriting';
@@ -157,6 +158,11 @@ export function newGame(opts: NewGameOptions): GameState {
     rivals: {},
     marketing: { campaigns: [], packages: [], cityBonus: {} },
     risk: { losses: [], reviews: [] },
+    partnerships: {},
+    corporateDebt: emptyCorporateDebt(),
+    incidents: { active: [], cooldowns: {}, effects: [] },
+    news: { issues: [], lastTemplate: {} },
+    competition: { ratesStreak: {} },
     reo: {},
     ledger: emptyLedger(),
     events: { log: [], scheduled: [] },
@@ -170,12 +176,13 @@ export function newGame(opts: NewGameOptions): GameState {
     state.products.catalog[spec.id] = { id: spec.id, stars: spec.startStars, developed: false };
   }
 
-  state.world.countries[city.country] = initCountry(city.country, stream(state, 'macro'));
+  initCountries(state, city.country);
   state.world.cities[city.id] = { id: city.id, generated: true, brandAwareness: 0, marketRef: {} };
   const lots = generateLots(state, city.id);
   seedRivals(state, city.id, lots);
   for (const lot of lots) state.world.lots[lot.id] = lot;
   generateSites(state, city.id);
+  generateCompetitionSites(state, city.id);
   updateMarketRefs(state);
   refreshManagerPool(state, city.id, true);
 

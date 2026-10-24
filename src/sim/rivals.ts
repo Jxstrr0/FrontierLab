@@ -9,10 +9,16 @@ import {
   LOAN_LAG_WEEKS,
   LOAN_PASS_THROUGH,
   OVERALL_WEIGHTS,
+  RIVAL_LDR,
+  RIVAL_LOAN_RISK_WEIGHT,
+  RIVAL_MATURE_DEPOSITS,
   RIVAL_PLACEMENT,
   RIVAL_PRICE_DRIFT,
+  RIVAL_QUALITY_REF,
   RIVAL_QUALITY_SIGMA,
+  RIVAL_START_CR,
 } from '../config/balance';
+import { FIRST_NAMES, LAST_NAMES } from '../data/names';
 import { CITIES } from '../data/cities';
 import { isDeposit, PRODUCTS, type ProductSpec } from '../data/products';
 import { difficultyOf } from './difficulty';
@@ -27,7 +33,7 @@ import { tileDistance } from './citygen';
 import { clamp } from './math';
 import { countryOfCity, defaultPrice, ftpLong, ftpShort } from './rates';
 import { stream, type Rng } from './rng';
-import type { CountryState, GameState, Lot, RivalBank } from './state';
+import type { CountryState, GameState, Lot, RivalBank, RivalBranch } from './state';
 import { dpow } from './detmath';
 
 const STRATEGY_ORDER: Strategy[] = ['incumbent', 'community', 'disruptor', 'premium'];
@@ -106,7 +112,7 @@ export function seedRivals(state: GameState, cityId: string, lots: Lot[]): void 
       const quality = profile.map((q) =>
         clamp(q + qualityShift + rng.normal(0, RIVAL_QUALITY_SIGMA), 1, 5),
       ) as [number, number, number, number];
-      bank.branches.push({
+      const branch: RivalBranch = {
         id: `rb_${bank.id}_${bank.branches.length + 1}`,
         cityId,
         lotId: lot.id,
@@ -114,9 +120,44 @@ export function seedRivals(state: GameState, cityId: string, lots: Lot[]): void 
         quality,
         overall: overallOf(quality),
         reviewCount: rng.int(RIVAL_PLACEMENT.reviewsMin, RIVAL_PLACEMENT.reviewsMax),
-      });
+        deposits: 0,
+        loans: 0,
+        contribution: 0,
+        negativeWeeks: 0,
+      };
+      seedMatureBooks(branch);
+      bank.branches.push(branch);
     }
   });
+  for (const spec of chosen) {
+    const bank = state.rivals[spec.id];
+    if (bank && bank.equity === 0) initRivalFinancials(state, bank);
+  }
+}
+
+/** A rival branch's mature deposit size (§18.1): city size × quality. */
+export function matureDeposits(branch: Pick<RivalBranch, 'cityId' | 'overall'>): number {
+  const income = CITIES[branch.cityId]?.incomeIndex ?? 1;
+  return RIVAL_MATURE_DEPOSITS * income * (branch.overall / RIVAL_QUALITY_REF);
+}
+
+/** Branches present at the start are already mature. */
+export function seedMatureBooks(branch: RivalBranch): void {
+  branch.deposits = matureDeposits(branch);
+  branch.loans = branch.deposits * RIVAL_LDR;
+}
+
+/**
+ * Starting equity (from a strategy capital ratio over its loans), CEO and
+ * listing. Uses its own stream so seeding draws never shift branch placement.
+ */
+export function initRivalFinancials(state: GameState, bank: RivalBank): void {
+  const rng = stream(state, 'rivalInit');
+  const loans = bank.branches.reduce((sum, b) => sum + b.loans, 0);
+  const cr = rng.range(...RIVAL_START_CR[bank.strategy]);
+  bank.capitalRatio = cr;
+  bank.equity = loans * RIVAL_LOAN_RISK_WEIGHT * cr;
+  bank.ceo = `${rng.pick(FIRST_NAMES)} ${rng.pick(LAST_NAMES)}`;
 }
 
 function ensureRival(state: GameState, spec: RivalSpec, c: CountryState): RivalBank {
@@ -139,7 +180,15 @@ function ensureRival(state: GameState, spec: RivalSpec, c: CountryState): RivalB
     priceLags: {},
     appRating: STRATEGY_PROFILES[spec.strategy].app,
     status: 'active',
+    equity: 0,
+    capitalRatio: 0,
+    listed: spec.ticker !== undefined,
+    ceo: '',
+    qtd: { revenue: 0, netIncome: 0 },
+    quarters: [],
+    priceWar: {},
   };
+  if (spec.ticker) bank.ticker = spec.ticker;
   state.rivals[spec.id] = bank;
   return bank;
 }

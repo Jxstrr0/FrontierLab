@@ -21,8 +21,18 @@ import type {
   Tier,
   Week,
 } from '../data/types';
+import type {
+  CompetitionState,
+  CorporateDebt,
+  EmployerInfo,
+  GradProgram,
+  IncidentsState,
+  NewsState,
+  Partnership,
+} from './competitionTypes';
+export type * from './competitionTypes';
 
-export const SCHEMA_VERSION = 5;
+export const SCHEMA_VERSION = 6;
 
 export interface GameState {
   schemaVersion: number;
@@ -50,6 +60,16 @@ export interface GameState {
   marketing: MarketingState;
   /** Risk floor records: weekly losses by product and regulator reviews (§15, §16). */
   risk: RiskState;
+  /** Payroll and student partnerships (Stage 5, SIMULATION §13.7). */
+  partnerships: Record<Id, Partnership>;
+  /** Business loans and lines of credit from rival banks (§19.9). */
+  corporateDebt: CorporateDebt;
+  /** Open incidents, cooldowns and timed effects (§23). */
+  incidents: IncidentsState;
+  /** The Daily Ledger archive (§24). */
+  news: NewsState;
+  /** Price-war tracking (§18.6). */
+  competition: CompetitionState;
   /** Foreclosed homes per city at recovery value (SIMULATION §21.3; modes arrive in Stage 7). */
   reo: Record<Id, ReoPool>;
   /** Accumulates P&L lines and cash movements since the last weekly close. */
@@ -139,14 +159,16 @@ export interface OfficeListing {
   officeId?: Id;
 }
 
-export type SiteKind = 'bureau' | 'agency';
+export type SiteKind = 'bureau' | 'agency' | 'rivalHq' | 'employer' | 'university';
 
 export interface Site {
   id: Id;
   cityId: Id;
   kind: SiteKind;
-  /** Bureau name or agency id in src/data. */
+  /** Bureau name, agency id, rival bank id, or employer/university name. */
   refId: string;
+  /** Employer details on employer and university sites (Stage 5). */
+  employer?: EmployerInfo;
   tile: { x: number; y: number };
   district: DistrictId;
   address: string;
@@ -178,6 +200,8 @@ export interface CountryState {
   feeIndex: number;
   /** Equity market return this week (feeds wealth AUM until markets arrive). */
   marketReturn: number;
+  /** Extra capital buffer from a passed policy (§24 Politics): tier thresholds rise by pp. */
+  capitalBuffer?: { pp: number; untilWeek: Week };
   /** Week a forced recession should start (balance-script option, §4.1). */
   forceRecessionAtWeek?: Week;
 }
@@ -236,6 +260,8 @@ export interface Company {
   companyPrices: Record<string, number>;
   /** HQ product lineup (on/off per product), set by setCompanyOffered. Absent until first used. */
   companyOffered?: Record<string, boolean>;
+  /** University graduate program (Stage 5). */
+  gradProgram?: GradProgram;
 }
 
 export interface FixedAsset {
@@ -639,6 +665,20 @@ export interface RivalBank {
   priceLags: Record<string, { target: number; weeksLeft: number }>;
   appRating: Stars;
   status: 'active' | 'distressed' | 'seized' | 'acquired';
+  /** Stage 5 (§18.5): simplified financials. */
+  equity: Money;
+  capitalRatio: number;
+  listed: boolean;
+  ticker?: string;
+  ceo: string;
+  /** Revenue and net income since the quarter began. */
+  qtd: { revenue: Money; netIncome: Money };
+  /** Reported quarters, oldest first (last 8). */
+  quarters: { revenue: Money; netIncome: Money }[];
+  /** Deposit-rate bump from price wars by city, in rate units (§18.6). */
+  priceWar: Record<Id, Rate>;
+  /** While distressed: the week its network is split among other rivals (§18.5). */
+  distressedUntil?: Week;
 }
 
 export interface RivalBranch {
@@ -650,6 +690,13 @@ export interface RivalBranch {
   quality: [Stars, Stars, Stars, Stars];
   overall: Stars;
   reviewCount: number;
+  /** Stage 5 aggregate books (§18.1). */
+  deposits: Money;
+  loans: Money;
+  /** Last week's contribution (earnings minus costs). */
+  contribution: Money;
+  /** Consecutive weeks of negative contribution (closes at 26, §18.4). */
+  negativeWeeks: number;
 }
 
 export interface ReoPool {
@@ -684,6 +731,9 @@ export type PnlLine =
   | 'benefits'
   | 'development'
   | 'fines'
+  | 'incidents'
+  | 'corporateInterest'
+  | 'amortization'
   | 'loanLosses'
   | 'depreciation'
   | 'tax';
