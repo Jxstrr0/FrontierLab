@@ -124,6 +124,36 @@ export function companyPrice(
   return c ? defaultPrice(spec, c) : defaultPrice(spec, countryOfCity(s, s.meta.homeCityId));
 }
 
+/**
+ * Countries with HQ price lists to edit: your home country, then every country
+ * with an open (or opening) branch, in the order you entered them.
+ */
+export function priceCountries(s: GameState): CountryId[] {
+  const ids: CountryId[] = [CITIES[s.meta.homeCityId]!.country];
+  for (const b of openBranches(s)) {
+    const c = CITIES[b.cityId]?.country;
+    if (c && !ids.includes(c)) ids.push(c);
+  }
+  return ids;
+}
+
+/**
+ * The city whose market a country's HQ prices are compared with: where most of
+ * your branches there stand, your home city at home, else its first city.
+ */
+export function countryRefCity(s: GameState, country: CountryId): string {
+  const counts = new Map<string, number>();
+  for (const b of openBranches(s)) {
+    if (CITIES[b.cityId]?.country === country)
+      counts.set(b.cityId, (counts.get(b.cityId) ?? 0) + 1);
+  }
+  let best: string | undefined;
+  for (const [id, n] of counts) if (best === undefined || n > counts.get(best)!) best = id;
+  if (best) return best;
+  if (CITIES[s.meta.homeCityId]?.country === country) return s.meta.homeCityId;
+  return Object.values(CITIES).find((c) => c.country === country && !c.regional)?.id ?? '';
+}
+
 /** How many open branches offer a product. */
 export function offeredCount(s: GameState, productId: string): { on: number; total: number } {
   const open = openBranches(s);

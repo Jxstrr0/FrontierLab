@@ -2,7 +2,7 @@
 // the agency's package cards (name, length, cost, total awareness boost and
 // the Prestige package's branch-rating bonus) for the agency's own city, Buy
 // with your corporate cash shown, and the runs from this agency going now.
-// No Marketing floor is needed.
+// No Marketing floor is needed, but buying means being in the agency's city.
 import { AGENCIES, type AgencyPackageSpec } from '../../data/brandCampaigns';
 import { CITIES } from '../../data/cities';
 import * as cmd from '../../sim/commands';
@@ -69,7 +69,10 @@ function PackageCard(p: {
   const s = useGame();
   const sym = s.settings.currency;
   const { pkg } = p;
-  const operating = !!s.world.cities[p.cityId];
+  const here = s.world.currentCityId === p.cityId;
+  const branches = Object.values(s.branches).some(
+    (b) => b.cityId === p.cityId && b.status !== 'closed',
+  );
   const short = pkg.cost > s.company.cash;
   const buy = () => {
     const r = act(cmd.buyAgencyPackage, {
@@ -99,15 +102,17 @@ function PackageCard(p: {
       <button
         type="button"
         class="btn btn-primary btn-block"
-        disabled={!operating || short}
+        disabled={!here || short}
         onClick={buy}
       >
         Buy · {money(pkg.cost, sym)}
       </button>
       <p class={`small mk-note mk-center ${short ? 'tone-bad' : 'muted'}`}>
-        {operating
-          ? `Corporate cash ${money(s.company.cash, sym)}`
-          : "Your bank doesn't operate in this city yet."}
+        {!here
+          ? `You can buy from this agency once you're in ${p.city}.`
+          : branches
+            ? `Corporate cash ${money(s.company.cash, sym)}`
+            : `Corporate cash ${money(s.company.cash, sym)}. No branch in ${p.city} yet; the awareness will help your first one.`}
       </p>
     </Card>
   );

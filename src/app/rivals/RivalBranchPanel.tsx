@@ -4,6 +4,7 @@
 // (derived from its quality, CONTENT §24); its rate sheet against our nearest
 // branch in the city; and a link to the bank's head office.
 import { DISTRICT_SPECS } from '../../data/districts';
+import { rivalPriceInCity } from '../../sim/rivalPrices';
 import { rivalReviewCards } from '../../sim/rivalReviews';
 import type { GameState, RivalBank, RivalBranch } from '../../sim/state';
 import { ReviewCardView } from '../branch/ServiceTab';
@@ -47,7 +48,7 @@ export function RivalBranchPanel(p: { lotId: string }) {
   const { bank, branch } = found;
   const district = DISTRICT_SPECS[lot.district]?.name;
   const mine = nearestOwnBranch(s, branch);
-  const theirs = bank.prices.savings;
+  const theirs = rivalPriceInCity(s, bank, 'savings', branch.cityId);
   const ours = ourPrice(s, mine, 'savings');
   const advice =
     theirs !== undefined && ours !== undefined
@@ -142,7 +143,7 @@ function RateSheet(p: { s: GameState; bank: RivalBank; branch: RivalBranch }) {
             </div>
             {group.ids.map((id) => {
               const spec = productOf(id);
-              const theirs = p.bank.prices[id];
+              const theirs = rivalPriceInCity(p.s, p.bank, id, p.branch.cityId);
               if (!spec || theirs === undefined) return null;
               const ours = ourPrice(p.s, mine, id);
               const tone = ours !== undefined ? comparison(spec, ours, theirs) : 'flat';

@@ -1,10 +1,10 @@
 // HQ marketing commands (SIMULATION §16.10, CONTENT §11, SCREENS §10 and §15):
-// start and stop brand campaigns (Marketing floor required) and buy agency
-// packages at a marketing agency's office in a city (no floor needed).
+// start and stop brand campaigns (Marketing floor required) in any city or
+// country you've reached, from anywhere, and buy agency packages at a
+// marketing agency's office in the city you're in (no floor needed).
 import { AGENCIES, BRAND_CAMPAIGNS } from '../../data/brandCampaigns';
 import { CITIES } from '../../data/cities';
-import type { CountryId } from '../../data/types';
-import { agenciesInCity, hasMarketingFloor } from '../hqMarketing';
+import { agenciesInCity, campaignTargetBlock, hasMarketingFloor } from '../hqMarketing';
 import { newId } from '../ids';
 import { spend } from '../ledger';
 import type { GameState } from '../state';
@@ -29,10 +29,8 @@ export function startBrandCampaign(
     return fail(`${spec.name} needs a sports franchise in the city, and you don't own one yet.`);
   if (!spec.scopes.includes(order.scope))
     return fail(`${spec.name} runs per ${spec.scopes.join(' or ')}, not per ${order.scope}.`);
-  if (order.scope === 'city' && !state.world.cities[order.targetId])
-    return fail('Pick a city where your bank operates.');
-  if (order.scope === 'country' && !state.world.countries[order.targetId as CountryId])
-    return fail('Pick a country where your bank operates.');
+  const where = campaignTargetBlock(state, order.scope, order.targetId);
+  if (where) return fail(where);
   const running = state.marketing.campaigns.some(
     (c) =>
       c.campaignId === order.campaignId && c.scope === order.scope && c.targetId === order.targetId,
@@ -70,9 +68,13 @@ export function buyAgencyPackage(
   const agency = AGENCIES[order.agencyId];
   const pkg = agency?.packages.find((p) => p.id === order.packageId);
   if (!agency || !pkg) return fail('That package is not available.');
-  if (!state.world.cities[order.cityId]) return fail('Pick a city where your bank operates.');
   if (!agenciesInCity(state, order.cityId).includes(agency.id))
     return fail(`${agency.name} has no office in ${CITIES[order.cityId]?.name ?? 'that city'}.`);
+  // DESIGN §5.17: visiting a building means being in its city.
+  if (order.cityId !== state.world.currentCityId)
+    return fail(
+      `You need to be in ${CITIES[order.cityId]?.name ?? 'that city'} to visit the agency.`,
+    );
   if (pkg.cost > state.company.cash)
     return fail(`${pkg.name} costs ${money(pkg.cost)}; you have ${money(state.company.cash)}.`);
   spend(state, 'marketing', pkg.cost);

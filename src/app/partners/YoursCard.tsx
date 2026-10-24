@@ -3,6 +3,7 @@
 // marker, Renew (shows the fee; opens in the last year) and Release.
 import { useState } from 'preact/hooks';
 import { PARTNER_RENEWAL } from '../../config/balance';
+import { CITIES } from '../../data/cities';
 import * as cmd from '../../sim/commands';
 import {
   canRenew,
@@ -58,7 +59,16 @@ export function YoursCard(p: { site: Site; partnership: Partnership }) {
       <StatBar label="Health" value={ps.health} />
       <Row label="Deposits" value={money(ps.balance, sym)} strong />
       <Row label="Accounts" value={count(ps.accounts)} />
-      <Row label="Host branch" value={host?.name ?? 'None'} />
+      <Row
+        label="Host branch"
+        value={
+          !host
+            ? 'None'
+            : host.cityId === p.site.cityId
+              ? host.name
+              : `${host.name} · ${CITIES[host.cityId]?.name ?? host.cityId}`
+        }
+      />
       <Row
         label="Package"
         value={`${productName(s, ps.productId)} · pays ${pct(packageRate(s, host, ps.productId))}`}

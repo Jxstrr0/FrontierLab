@@ -120,7 +120,11 @@ export function setCompanyPrice(
   if (!state.world.countries[country]) return fail('Unknown country.');
   if (!Number.isFinite(price)) return fail('Enter a number.');
   const p = clamp(roundToStep(price, spec.step), spec.min, spec.max);
-  if (!state.company.companyPrices[country]) seedCountryPrices(state, country);
+  if (!state.company.companyPrices[country]) {
+    // A country without a list yet starts from its first branch's sheet, as Apply-to-all does.
+    const ref = openBranches(state).find((b) => CITIES[b.cityId]?.country === country);
+    seedCountryPrices(state, country, ref);
+  }
   state.company.companyPrices[country]![productId] = p;
   return ok({ price: p });
 }

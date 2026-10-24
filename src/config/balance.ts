@@ -24,7 +24,7 @@ export const FEATURES = {
   /** Stage 7: ventures, conventions and real estate. */
   investments: true,
   /** Stage 8: every city, airports and travel. */
-  multiCity: false,
+  multiCity: true,
   /** Stage 9: personal wealth, homes, cars, auctions, franchise. */
   personalEmpire: false,
   /** Stage 10: art pass, tutorial, sound, PWA. */

@@ -1,10 +1,12 @@
 // One company-level product card (SCREENS §10 Product lineup, mirroring §5.2):
 // name, template and tier for developed products, stars, the Offered toggle
 // with how many branches offer it, company totals, and the HQ price stepper
-// (live only while "Apply rates to all branches" is on). Developed products
+// for the picked country's list (live only while "Apply rates to all
+// branches" is on), compared with that country's market. Developed products
 // carry a delete button that asks first.
 import { useState } from 'preact/hooks';
 import type { ProductSpec } from '../../../data/products';
+import type { CountryId } from '../../../data/types';
 import * as cmd from '../../../sim/commands';
 import { starsOf } from '../../../sim/products';
 import { marketRef } from '../../../sim/rates';
@@ -17,11 +19,12 @@ import {
   companyOffered,
   companyPrice,
   companyTotals,
+  countryRefCity,
   offeredCount,
   productSubtitle,
 } from './productSelectors';
 
-export function CompanyProductCard(p: { spec: ProductSpec }) {
+export function CompanyProductCard(p: { spec: ProductSpec; country: CountryId }) {
   const s = useGame();
   const { spec } = p;
   const sym = s.settings.currency;
@@ -31,7 +34,7 @@ export function CompanyProductCard(p: { spec: ProductSpec }) {
   const n = offeredCount(s, spec.id);
   const totals = companyTotals(s, spec.id);
   const subtitle = productSubtitle(s, spec);
-  const cityId = Object.values(s.branches)[0]?.cityId ?? s.world.currentCityId;
+  const cityId = countryRefCity(s, p.country);
   const fmt = (v: number) => priceText(spec, v, sym);
   const developed = !!s.products.catalog[spec.id]?.developed;
   return (
@@ -68,14 +71,14 @@ export function CompanyProductCard(p: { spec: ProductSpec }) {
       </div>
       <Stepper
         label={spec.priceType === 'rate' ? 'HQ rate' : 'HQ fee'}
-        value={companyPrice(s, spec)}
+        value={companyPrice(s, spec, p.country)}
         min={spec.min}
         max={spec.max}
         step={spec.step}
         format={fmt}
         parse={(t) => parsePrice(spec, t)}
         editText={(v) => editPrice(spec, v)}
-        onChange={(v) => act(cmd.setCompanyPrice, spec.id, v)}
+        onChange={(v) => act(cmd.setCompanyPrice, spec.id, v, p.country)}
         hint={
           atHq
             ? `Market ${fmt(marketRef(s, cityId, spec.id))} · ${rangeText(spec, sym)}`
