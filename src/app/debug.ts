@@ -1,11 +1,15 @@
 // Debug hook for development and screenshots: with `?debug` in the URL,
 // `window.__vs` exposes the live game, commands and a fast-forward. Not used by
 // the game itself.
+import { tileCenter } from '../art/iso';
+import { CITIES } from '../data/cities';
 import { REFERENCE_BUILDS } from '../data/equipment';
 import * as cmd from '../sim/commands';
 import { advanceWeeks } from '../sim/engine';
 import { act, bump, modal, openPanel, peekGame, screen, setGame } from './store';
 import { newGame } from '../sim/newGame';
+import { activeMap } from './map/MapView';
+import { loadFromSlot, saveToSlot, type SlotId } from './saves';
 
 export function installDebug(): void {
   if (!new URLSearchParams(location.search).has('debug')) return;
@@ -15,9 +19,9 @@ export function installDebug(): void {
     cmd,
     openPanel,
     builds: REFERENCE_BUILDS,
-    /** Starts a game in Calgary with seed 42 and opens the game screen. */
-    start(seed = 42) {
-      setGame(newGame({ seed, cityId: 'cal', version: 'debug' }));
+    /** Starts a game (Calgary, seed 42 by default) and opens the game screen. */
+    start(seed = 42, cityId = 'cal') {
+      setGame(newGame({ seed, cityId, version: 'debug' }));
       screen.value = 'game';
     },
     /** Builds a mid branch on the first free Midtown lot and returns its id. */
@@ -35,6 +39,30 @@ export function installDebug(): void {
       if (s) s.clock.speed = 0;
       modal.value = null;
       bump();
+    },
+    /** The map camera ({cx, cy, zoom}: world point at screen centre), viewport and pin cost. */
+    camera() {
+      const m = activeMap();
+      return m ? { ...m.camera, viewport: m.viewport, pinUpdateMs: m.pinUpdateMs } : null;
+    },
+    /** Centres the map on a lot (zoom defaults to 1). */
+    flyTo(lotId: string, zoom = 1) {
+      const s = peekGame();
+      const lot = s?.world.lots[lotId];
+      const city = s && CITIES[s.world.currentCityId];
+      if (!lot || !city) return false;
+      activeMap()?.flyTo(tileCenter(city.tiles, lot.tile.x, lot.tile.y), zoom);
+      return true;
+    },
+    /** Saves the game to a slot; returns an error message or null. */
+    save(slot: SlotId = '1') {
+      const s = peekGame();
+      return s ? saveToSlot(slot, s) : 'No game';
+    },
+    /** Loads a slot into the game screen. */
+    load(slot: SlotId = '1') {
+      setGame(loadFromSlot(slot));
+      screen.value = 'game';
     },
     /** Runs whole weeks instantly. */
     advance(weeks: number) {
