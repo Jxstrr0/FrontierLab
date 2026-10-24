@@ -16,7 +16,7 @@ export const FEATURES = {
   /** Stage 3: engraved isometric city map. */
   cityMap: true,
   /** Stage 4: HQ offices, departments and operations depth. */
-  hq: false,
+  hq: true,
   /** Stage 5: rival AI, macro for every country, The Daily Ledger, incidents. */
   competition: false,
   /** Stage 6: governance, executives and capital markets. */

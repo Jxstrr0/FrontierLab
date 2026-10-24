@@ -96,6 +96,9 @@ export function deptAdvisor(s: GameState, dept: DeptId): string[] {
   const d = s.departments[dept];
   const name = DEPARTMENTS[dept].name;
   const lines: string[] = [];
+  if (dept === 'treasury' && s.treasury.freeze) {
+    lines.push('Funding freeze: new lending is stopped until liquidity recovers.');
+  }
   if (!d || d.staff === 0) {
     lines.push(
       d && d.target > 0
@@ -103,7 +106,7 @@ export function deptAdvisor(s: GameState, dept: DeptId): string[] {
         : `This floor is empty. Raise Employees to start hiring.`,
     );
   }
-  if (isHqDept(dept)) {
+  if (isHqDept(dept) && !(dept === 'treasury' && s.treasury.freeze)) {
     const cov = coverageView(s, dept);
     const [ok, short] = LINES[dept];
     if (cov.status === 'short') lines.push(short);
