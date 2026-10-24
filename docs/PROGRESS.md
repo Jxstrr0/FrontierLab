@@ -2,13 +2,37 @@
 
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
-**Current stage:** 2 — Playable loop in plain UI (next)
+**Current stage:** 2 — Playable loop in plain UI (built; awaiting the owner's iPhone check)
 **Live URL:** (after the first deploy) https://jxstrr0.github.io/VaultStreet/
 **Determinism snapshot:** `1a6f96ddc5855e` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-24 — Stage 2 built
+- **Stage / step:** 2 — Playable loop in plain UI
+- **Done:**
+  - Game loop at 1×/2×/4× with pause, weekly auto-pause for results (every week, quarter or off), auto-pause for expiring loan applications, autosave every week, and toasts for branch openings and central bank decisions.
+  - Game over: insolvency (4 weeks of negative cash) and regulator takeover (13 weeks below a 4.5% capital ratio), shown as a Daily Ledger front page.
+  - HUD (cash, date and speed, city, menu) and the menu sheet.
+  - New Game wizard in 5 steps: bank (name, monogram, ink), founder (name, avatar parts), start city, game options (difficulty, 1–5 competitors, starting cash), confirm (seed, start date). Plus a quick start.
+  - City list in place of the map: districts → lots with rent, traffic and occupant; rival info sheet.
+  - Storefront panel and the build flow (five part pickers, cost summary, Build).
+  - Branch panel with all five tabs: Service (reviews, staff, manager, hiring, delegation), Products (lineup with prices, margins and toggles), Loan Desk (applications with rosettes, approve/decline, active loans), Marketing (campaign levels), Finance (statement, chart, rename, close).
+  - Weekly results with The Daily Ledger, Company summary (capital meter, statements), Branches list.
+  - Saves: autosave plus 3 slots, export/import save codes (copy, share, paste); settings (currency, units, weekly results, speed, auto-pause, reduced motion, text size, founder avatar).
+  - Sim additions: `closeBranch`/`closeQuote`, `setSettings`, `setFounderAvatar`, game-over checks, deterministic math.
+  - 51 tests. Playwright walkthroughs at 390×844 and 1280×800 with no console errors: wizard → build → 7 weeks at 4× → every tab; save → exit → load round-trips exactly.
+- **How it was built:** I wrote the foundation (store, loop, saves, components, HUD), then four helper agents built the screens in parallel, each in its own folder, and I reviewed and merged them.
+- **Decisions** (also in DESIGN §7): products show as a vertical list rather than a carousel so every toggle and price is visible on a phone; the product margin ring is revenue kept after funding cost, servicing and expected loss; save storage lives in `src/sim/save/storage.ts` (the only module allowed to touch browser storage).
+- **Next:** the owner plays a two-game-year run on iPhone and moves a save code between iPhone Safari and desktop Chrome (Stage 2 acceptance). Then Stage 3, the engraved city map.
+- **Known issues:**
+  - Loan Desk "declined" and "approval rate" are counted by the screen only, so they reset on reload and miss manager-declined applications. Moving these counters into the sim needs a schema bump.
+  - Branch history keeps 26 weeks, so the branch "Year" statement shows what's on record.
+  - The capital ratio reads in the hundreds of percent before any loans exist (true, but odd-looking).
+  - No hero vignettes, portraits or area mini-map yet (art stages); the advisor bar doesn't cycle hints on tap.
+  - Typing into a rate stepper accepts "3.25" or "0.0325"; it edits the raw value rather than the display value.
 
 ### 2026-10-24 — Cross-engine determinism fix
 - CI failed the determinism snapshot since Stage 1: `Math.pow` with a fractional exponent returns different bits on Node 24 (CI) than Node 22 (local), and browsers can differ the same way.

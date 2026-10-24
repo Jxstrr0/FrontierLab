@@ -4,7 +4,7 @@
 import { REFERENCE_BUILDS } from '../data/equipment';
 import * as cmd from '../sim/commands';
 import { advanceWeeks } from '../sim/engine';
-import { act, bump, openPanel, peekGame, screen, setGame } from './store';
+import { act, bump, modal, openPanel, peekGame, screen, setGame } from './store';
 import { newGame } from '../sim/newGame';
 
 export function installDebug(): void {
@@ -28,6 +28,13 @@ export function installDebug(): void {
       if (!lot) return undefined;
       const r = act(cmd.buildBranch, { lotId: lot.id, build: REFERENCE_BUILDS.mid });
       return r.ok ? r.branchId : undefined;
+    },
+    /** Pauses the clock and closes any open modal (weekly results, game over). */
+    pause() {
+      const s = peekGame();
+      if (s) s.clock.speed = 0;
+      modal.value = null;
+      bump();
     },
     /** Runs whole weeks instantly. */
     advance(weeks: number) {

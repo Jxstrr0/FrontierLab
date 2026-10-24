@@ -56,5 +56,10 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    // The one place allowed to use browser storage and wall time (save timestamps).
+    files: ['src/sim/save/storage.ts'],
+    rules: { 'no-restricted-globals': 'off', 'no-restricted-properties': 'off' },
+  },
   prettier,
 );

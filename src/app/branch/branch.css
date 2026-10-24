@@ -293,6 +293,3 @@
   -webkit-line-clamp: 2;
   line-clamp: 2;
 }
-.panel:has(.br-root) .panel-tab {
-  padding: 0 var(--space-1);
-}

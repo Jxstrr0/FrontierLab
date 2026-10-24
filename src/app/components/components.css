@@ -498,7 +498,7 @@
 .panel-tab {
   flex: 1 0 auto;
   min-height: 52px;
-  padding: 0 var(--space-3);
+  padding: 0 var(--space-1);
   border: 0;
   background: transparent;
   color: var(--ivory-dim);
