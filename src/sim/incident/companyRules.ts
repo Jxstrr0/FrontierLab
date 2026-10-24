@@ -1,7 +1,7 @@
 // Company and city incidents (CONTENT §22): data breach, card fraud, the
 // regulator's audit and letter, price wars, bank runs and the emergency
 // recapitalisation, the governance cases (executives poached, dividends due;
-// rules in execRules.ts), plus the insider probe, not raised before Stage 9.
+// rules in execRules.ts), plus the insider probe (Stage 9, insiderRule.ts).
 import { BANK_RUN as BANK_RUN_P, FAILURE, RECAP, WEEKS_PER_YEAR } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { INCIDENT_PARAMS, INCIDENT_SPECS } from '../../data/incidents';
@@ -16,6 +16,7 @@ import { acceptRecap, endBankRun, recapQuote, statementOdds, takeover } from './
 import { addEffect, incidentPMult } from './effects';
 import { DIVIDEND_DUE, EXEC_POACHED } from './execRules';
 import { fraudShield, num, ratingHit, type IncidentRule } from './helpers';
+import { INSIDER_PROBE } from './insiderRule';
 import { compactMoney } from './text';
 
 const P = INCIDENT_PARAMS;
@@ -217,8 +218,7 @@ export const COMPANY_RULES: Record<string, IncidentRule> = {
   RECAP_OFFER,
   EXEC_POACHED,
   DIVIDEND_DUE,
-  // Later stages: the insider probe (Stage 9).
-  INSIDER_PROBE: NOTHING,
+  INSIDER_PROBE, // Stage 9 (insiderRule.ts)
 };
 
 /** Liquidity the central bank window lends in a run: a share of deposits. */

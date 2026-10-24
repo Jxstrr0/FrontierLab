@@ -142,4 +142,8 @@ export interface PersonalEmpire {
   collectibles: OwnedCollectible[];
   richList: { fortunes: RichFortune[]; rank?: number; lastRankWeek?: Week };
   insider: { pending: InsiderCase[] };
+  /** Home id → week until which its seller won't hear another offer (a refusal). */
+  offerLocks?: Record<string, Week>;
+  /** Net worth at each weekly close, oldest first (WEALTH_HISTORY_WEEKS), for the weekly change. */
+  netWorthLog?: Money[];
 }

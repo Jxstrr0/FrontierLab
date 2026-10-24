@@ -1,7 +1,8 @@
 // Portfolio donut (SCREENS §10, ART_DIRECTION charts): one ring segment per
 // category on a hairline track, the total in the middle, and a legend with
 // values below (the legend carries the numbers, so nothing is hover-only).
-import type { Slice } from './investmentView';
+/** Any slice set: `id` picks the colour class `inv-slice-{id}` (the Personal Wealth donut reuses it). */
+type Slice = { id: string; label: string; value: number };
 
 const R = 52;
 const STROKE = 16;
