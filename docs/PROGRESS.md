@@ -2,13 +2,36 @@
 
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
-**Current stage:** 8 — Multi-city and travel (built and live; awaiting the owner's iPhone check). The Stage 2–7 checks are still open too; the owner will do major testing and tuning later. Next: Stage 9 — Personal empire (owner: go straight on).
+**Current stage:** 9 — Personal empire (built and live; awaiting the owner's iPhone check). The Stage 2–8 checks are still open too; the owner will do major testing and tuning later. Next: Stage 10 — Art pass, onboarding, polish, launch (waiting for the owner's go).
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `1563c839eb89fa` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `18c44acb4c1d33` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-24 — Stage 9 built: personal empire
+- **Stage / step:** 9 — Personal empire
+- **Done:**
+  - **Personal Wealth** (Menu → Personal wealth): your profile and salary, total net worth with its weekly change, a chart (cash, stocks, real estate, other), and every holding with cost and gain. A rich list chip opens the full list of 50 fortunes; you're ranked each year end.
+  - **Vacation homes** on the map (12, from a $1.6M lake cabin near Saskatoon to a $35M Côte d'Azur villa): make an offer (85–100% of asking), rebuild to raise the value (25% of value, 8 weeks, +20%), sell any time. Values follow that country's house prices.
+  - **Car dealers** in every medium and large city: buy any of 7 fictional cars (the 1962 classic gains value, the rest lose it). The **Dealer financing** tab signs a 3-year deal ($120k a year, paid by the bank) that brings 25% more car-loan customers to your branches in that city.
+  - **Auction houses** (London and New York, Toronto and Chicago, Tokyo and Hong Kong): a sale every 4 weeks with 3–5 lots. Set a maximum bid; the winner pays the clearing price plus 12%. Some lots are fakes: appraise (1% fee, a week) to find out — a fake gets a red FAKE stamp and is worth $0. Appraised genuine pieces can be consigned to the next sale.
+  - **Sports clubs** (10, playing at each city's stadium): buy one personally or as the bank. Club, Kit, Squad, Transfers and Finance tabs; a 40-game season; sign and release stars when the transfer window is open. Put your bank on the shirt to raise brand awareness across that country (you give up the outside sponsor's money).
+  - **Insider trading:** trading your own bank's shares in the 2 weeks before a quarter-end has a 15% chance of a probe (settle, or fight it 50/50).
+  - Saves move to version 10; a real Stage 8 save (with a jet and a New York branch) is kept as a test and loads and plays on.
+- **How it was built:** I laid the foundation (save format, data, map buildings, net worth, a club on the bank's books, empty hooks), then three helper agents built homes/cars/wealth/rich list/insider trading, auctions, and sports clubs in parallel. I merged them and played it at phone size: bought a classic car and the Calgary Bighorns, turned on the shirt deal, flew to New York and won an auction lot.
+- **Fixed along the way:** an occasional "Hook can only be invoked from render methods" error when map pins updated during a render.
+- **Balance:** the scripted players don't buy personal assets, so the balance report is unchanged in kind (books balance; 3 warnings, all known). 540 tests pass, including the three Stage 9 acceptance checks: net worth ties out week after week; a counterfeit can be bought and discovered; kit sponsorship raises brand awareness in that country and nowhere else.
+- **Determinism snapshot:** `1563c839eb89fa` → `18c44acb4c1d33`. Intended: new state, the rich list, clubs and auctions now run every week.
+- **Dependencies:** none added.
+- **Next:** Stage 10 when the owner says go. Owner iPhone check for Stage 9 when convenient: open Personal wealth, buy the Bow Valley Ranch (Calgary) and rebuild it, buy a car, sign dealer financing with an open branch, fly to New York and bid at Marlowe & Finch, buy a club from its stadium pin and put your bank on the shirt.
+- **Known issues:**
+  - Personal cash can go below zero from upkeep, a personally owned club's losses or an insider fine (flagged on the Wealth screen).
+  - The incident modal labels the insider probe with the bank's name and shows "No cost" on both options (the option text gives the fine).
+  - At far zoom Toronto's two stadium pins merge into one cluster (tap to split).
+  - A consignment added while a sale's lots are on view can repeat an item in that sale.
+  - Carried over from Stage 8 and earlier (see below).
 
 ### 2026-10-24 — Stage 8 built: multi-city and travel
 - **Stage / step:** 8 — Multi-city and travel
