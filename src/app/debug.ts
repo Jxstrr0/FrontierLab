@@ -10,6 +10,7 @@ import { forceIncident } from '../sim/incidents';
 import { INCIDENT_SPECS } from '../data/incidents';
 import { investmentBanksIn } from '../data/investmentBanks';
 import { listPendingIpo } from '../sim/equityIpo';
+import { listLots } from '../sim/auctions';
 import { act, bump, modal, openPanel, peekGame, screen, setGame } from './store';
 import { newGame } from '../sim/newGame';
 import { startFlight } from './airport/flight';
@@ -52,10 +53,10 @@ export function installDebug(): void {
       const m = activeMap();
       return m ? { ...m.camera, viewport: m.viewport, pinUpdateMs: m.pinUpdateMs } : null;
     },
-    /** Centres the map on a lot (zoom defaults to 1). */
+    /** Centres the map on a lot or a site (zoom defaults to 1). */
     flyTo(lotId: string, zoom = 1) {
       const s = peekGame();
-      const lot = s?.world.lots[lotId];
+      const lot = s?.world.lots[lotId] ?? s?.world.sites[lotId];
       const city = s && CITIES[s.world.currentCityId];
       if (!lot || !city) return false;
       activeMap()?.flyTo(tileCenter(city.tiles, lot.tile.x, lot.tile.y), zoom);
@@ -105,6 +106,20 @@ export function installDebug(): void {
       if (s) s.personal.cash = amount;
       bump();
       return s?.personal.cash;
+    },
+    /**
+     * Auctions (Stage 9): moves a house's next sale to next week with its lots
+     * on view; `fake` makes every lot a counterfeit. Returns the lot ids.
+     */
+    auctionSoon(houseId = 'marlowe', fake = false) {
+      const s = peekGame();
+      const h = s?.auctions[houseId];
+      if (!s || !h) return undefined;
+      h.nextWeek = s.clock.week + 1;
+      if (h.listedWeek === undefined) listLots(s, h);
+      if (fake) for (const l of h.lots) l.genuine = false;
+      bump();
+      return h.lots.map((l) => l.id);
     },
     /** Runs whole weeks instantly. */
     advance(weeks: number) {
