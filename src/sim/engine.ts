@@ -2,6 +2,7 @@
 // scheduled events; every 7th day runs `weeklyTick`, which calls each system in
 // the documented order.
 import { DAYS_PER_WEEK } from '../config/balance';
+import { CITIES } from '../data/cities';
 import { runBooks } from './branch/books';
 import { addBranchCosts, closeBranchWeek } from './branch/branchPnl';
 import { runDelegation } from './branch/delegation';
@@ -24,6 +25,7 @@ import { runRealEstate } from './realEstate';
 import { runReo } from './reo';
 import { runVentures, venturesQuarter } from './ventures';
 import { runPersonal } from './personal';
+import { runTravel } from './travel';
 import { checkFailure } from './failure';
 import { updateAppRating } from './company';
 import { pushEvent, trimEvents } from './events';
@@ -108,6 +110,7 @@ export function weeklyTick(state: GameState): void {
   evaluateCapital(state); // 10
   checkFailure(state);
   runPersonal(state); // 11
+  runTravel(state); // 11 (allowance reset, jet upkeep, DESIGN §5.17)
   runMarkets(state); // 12
   runFx(state); // 12 (currencies, §19.10)
 
@@ -123,7 +126,9 @@ export function weeklyTick(state: GameState): void {
   runIncidents(state); // 15
   composeNews(state); // 16
 
-  for (const cityId of Object.keys(state.world.cities)) refreshManagerPool(state, cityId);
+  for (const cityId of Object.keys(state.world.cities)) {
+    if (!CITIES[cityId]?.regional) refreshManagerPool(state, cityId);
+  }
   for (const c of Object.values(state.world.countries)) {
     if (!c) continue;
     c.prevFtpShort = ftpShort(c);

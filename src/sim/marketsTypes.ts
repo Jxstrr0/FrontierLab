@@ -182,6 +182,8 @@ export interface MarketState {
 /** The founder's own money (§22). Homes, cars and the rest arrive in Stage 9. */
 export interface PersonalState {
   cash: Money;
+  /** A private jet (Stage 8, CONTENT "Jets"): flies free within its range. */
+  jet?: { model: string; value: Money; boughtWeek: Week; price: Money };
 }
 
 // ─── Rival M&A (SIMULATION §19.8) ─────────────────────────────────────────────

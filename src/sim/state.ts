@@ -50,7 +50,7 @@ export type * from './competitionTypes';
 export type * from './marketsTypes';
 export type * from './investmentsTypes';
 
-export const SCHEMA_VERSION = 8;
+export const SCHEMA_VERSION = 9;
 
 export interface GameState {
   schemaVersion: number;
@@ -137,6 +137,8 @@ export interface Meta {
   /** Rival banks per city, 1–5. */
   competitors: number;
   startCash: number;
+  /** The start city (schema v9): the bank's domicile — home central bank, tax, exchange. */
+  homeCityId: Id;
 }
 
 export interface Clock {
@@ -180,6 +182,17 @@ export interface World {
   officeListings: Record<Id, OfficeListing>;
   /** Credit bureaus, marketing agencies and other non-bank buildings on the map. */
   sites: Record<Id, Site>;
+  /** Flying (Stage 8, DESIGN §5.17): the weekly allowance and lifetime totals. */
+  travel: TravelState;
+}
+
+export interface TravelState {
+  /** Free km flown since the last weekly tick (TRAVEL_KM_PER_WEEK allowance). */
+  kmThisWeek: number;
+  totalKm: number;
+  flights: number;
+  /** Fares paid, lifetime (personal and bank share together). */
+  faresPaid: Money;
 }
 
 export interface OfficeListing {
@@ -318,7 +331,11 @@ export interface Company {
   appRating: Stars;
   riskAppetite: 1 | 2 | 3 | 4 | 5;
   applyRatesToAll: boolean;
-  companyPrices: Record<string, number>;
+  /**
+   * HQ prices per country while Apply-to-all is on (schema v9): each country's
+   * branches charge their own country's list, since policy rates differ.
+   */
+  companyPrices: Partial<Record<CountryId, Record<string, number>>>;
   /** HQ product lineup (on/off per product), set by setCompanyOffered. Absent until first used. */
   companyOffered?: Record<string, boolean>;
   /** University graduate program (Stage 5). */
@@ -827,6 +844,7 @@ export type PnlLine =
   | 'propertyGains'
   | 'propertyCosts'
   | 'lobbying'
+  | 'travel'
   | 'loanLosses'
   | 'depreciation'
   | 'tax';

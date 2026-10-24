@@ -1,5 +1,6 @@
 // Price competitiveness and price factors (SIMULATION §8 Rates, §9.7). Shared by
 // ratings, demand, churn and the delegated manager.
+import { CITIES } from '../../data/cities';
 import {
   COMP_CLAMP,
   FEE_COMP_MIN,
@@ -67,10 +68,20 @@ export function branchPrice(state: GameState, branch: Branch, productId: string)
 /** The price the player (or the manager) set, before incident boosts. */
 export function basePrice(state: GameState, branch: Branch, productId: string): number {
   if (state.company.applyRatesToAll) {
-    const p = state.company.companyPrices[productId];
+    const p = companyPrice(state, branch.cityId, productId);
     if (p !== undefined) return p;
   }
   return branch.offered[productId]?.price ?? 0;
+}
+
+/** The HQ price for a product in a city's country (Apply-to-all), if its list has one. */
+export function companyPrice(
+  state: GameState,
+  cityId: string,
+  productId: string,
+): number | undefined {
+  const country = CITIES[cityId]?.country;
+  return country ? state.company.companyPrices[country]?.[productId] : undefined;
 }
 
 /** Savings boosts from incident choices: price-war match, bank-run raise (§23). */

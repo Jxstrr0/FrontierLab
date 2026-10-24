@@ -184,6 +184,22 @@ export interface EventPayloads {
   /** A currency moved ≥ FX.newsMove against your home currency this week (fx.ts, §19.10). */
   FX_MOVE: { country: string; currency: string; home: string; pct: number };
 
+  // ─── Travel (Stage 8, travel.ts) ──────────────────────────────────────────
+  /** You flew. `mode`: inside the weekly allowance, a paid fare, or your jet. */
+  FLIGHT_TAKEN: {
+    from: Id;
+    to: Id;
+    km: number;
+    mode: 'free' | 'fare' | 'jet';
+    fare: Money;
+    /** Part of the fare the bank paid because personal cash was short. */
+    bankPaid: Money;
+    /** First visit: the city was generated on arrival. */
+    firstVisit: boolean;
+  };
+  JET_BOUGHT: { model: string; price: Money };
+  JET_SOLD: { model: string; price: Money };
+
   // ─── Ventures and conventions (ventures.ts, conventions.ts) ────────────────
   /** You (company or personal) bought an offer lot. */
   VENTURE_INVESTED: { startupId: Id; name: string; account: string; amount: Money; pct: number };

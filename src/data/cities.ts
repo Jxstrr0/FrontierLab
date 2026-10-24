@@ -24,6 +24,13 @@ export interface CitySpec {
   start?: Difficulty;
   /** Whether the city has a waterfront district. */
   water: boolean;
+  /** The city's airport (CONTENT §2 airports); every map has one. */
+  airport: { code: string; name: string };
+  /**
+   * Regional sites (CONTENT §2): a small map with an airport and 1–2 named
+   * employers, and no storefronts, offices, rivals or other buildings.
+   */
+  regional?: { employers: { name: string; type: string }[] };
 }
 
 const c = (s: CitySpec) => s;
@@ -47,6 +54,7 @@ export const CITIES: Record<string, CitySpec> = {
     inkName: 'Prairie Ochre',
     start: 'easy',
     water: true,
+    airport: { code: 'SAS', name: 'Saskatoon Regional' },
   }),
   cal: c({
     id: 'cal',
@@ -66,6 +74,7 @@ export const CITIES: Record<string, CitySpec> = {
     inkName: 'Foothill Olive',
     start: 'normal',
     water: true,
+    airport: { code: 'CAL', name: 'Calgary International' },
   }),
   van: c({
     id: 'van',
@@ -84,6 +93,7 @@ export const CITIES: Record<string, CitySpec> = {
     ink: '#2F5D8A',
     inkName: 'Harbour Blue',
     water: true,
+    airport: { code: 'VAN', name: 'Vancouver International' },
   }),
   tor: c({
     id: 'tor',
@@ -103,6 +113,7 @@ export const CITIES: Record<string, CitySpec> = {
     inkName: 'Polymer Teal',
     start: 'hard',
     water: true,
+    airport: { code: 'TOR', name: 'Lakeshore International' },
   }),
   mtl: c({
     id: 'mtl',
@@ -121,6 +132,7 @@ export const CITIES: Record<string, CitySpec> = {
     ink: '#8A4E5C',
     inkName: 'Rose Granite',
     water: true,
+    airport: { code: 'MTL', name: 'Montréal-Mercier' },
   }),
   nyc: c({
     id: 'nyc',
@@ -140,6 +152,7 @@ export const CITIES: Record<string, CitySpec> = {
     inkName: 'Federal Green',
     start: 'expert',
     water: true,
+    airport: { code: 'NYC', name: 'Liberty International' },
   }),
   chi: c({
     id: 'chi',
@@ -158,6 +171,7 @@ export const CITIES: Record<string, CitySpec> = {
     ink: '#3F5F78',
     inkName: 'Lake Steel',
     water: true,
+    airport: { code: 'CHI', name: 'Lakefront International' },
   }),
   sfo: c({
     id: 'sfo',
@@ -176,6 +190,7 @@ export const CITIES: Record<string, CitySpec> = {
     ink: '#5E5878',
     inkName: 'Fog Violet',
     water: true,
+    airport: { code: 'SFO', name: 'Bayview International' },
   }),
   sea: c({
     id: 'sea',
@@ -194,6 +209,7 @@ export const CITIES: Record<string, CitySpec> = {
     ink: '#355E45',
     inkName: 'Evergreen',
     water: true,
+    airport: { code: 'SEA', name: 'Sound International' },
   }),
   lon: c({
     id: 'lon',
@@ -212,6 +228,7 @@ export const CITIES: Record<string, CitySpec> = {
     ink: '#5B3B66',
     inkName: 'Sterling Plum',
     water: true,
+    airport: { code: 'LON', name: 'Thameshaven' },
   }),
   par: c({
     id: 'par',
@@ -230,6 +247,7 @@ export const CITIES: Record<string, CitySpec> = {
     ink: '#9A4F62',
     inkName: 'Lumière Rose',
     water: true,
+    airport: { code: 'PAR', name: 'Charles-Lumière' },
   }),
   fra: c({
     id: 'fra',
@@ -248,6 +266,7 @@ export const CITIES: Record<string, CitySpec> = {
     ink: '#4F6E64',
     inkName: 'Mint Grey',
     water: true,
+    airport: { code: 'FRA', name: 'Rhein-Main' },
   }),
   ams: c({
     id: 'ams',
@@ -266,6 +285,7 @@ export const CITIES: Record<string, CitySpec> = {
     ink: '#3D6584',
     inkName: 'Canal Blue',
     water: true,
+    airport: { code: 'AMS', name: 'Polder International' },
   }),
   zur: c({
     id: 'zur',
@@ -284,6 +304,7 @@ export const CITIES: Record<string, CitySpec> = {
     ink: '#4A5A6E',
     inkName: 'Alpine Slate',
     water: true,
+    airport: { code: 'ZUR', name: 'Kloten-Alpen' },
   }),
   tyo: c({
     id: 'tyo',
@@ -302,6 +323,7 @@ export const CITIES: Record<string, CitySpec> = {
     ink: '#2E3F78',
     inkName: 'Indigo',
     water: true,
+    airport: { code: 'TYO', name: 'Haneda-Bay' },
   }),
   syd: c({
     id: 'syd',
@@ -320,6 +342,7 @@ export const CITIES: Record<string, CitySpec> = {
     ink: '#A65A45',
     inkName: 'Coral',
     water: true,
+    airport: { code: 'SYD', name: 'Harbour Kingsford' },
   }),
   sin: c({
     id: 'sin',
@@ -338,6 +361,7 @@ export const CITIES: Record<string, CitySpec> = {
     ink: '#7A4A85',
     inkName: 'Orchid',
     water: true,
+    airport: { code: 'SIN', name: 'Changi-Garden' },
   }),
   hkg: c({
     id: 'hkg',
@@ -356,7 +380,75 @@ export const CITIES: Record<string, CitySpec> = {
     ink: '#2F7A6A',
     inkName: 'Jade Harbour',
     water: true,
+    airport: { code: 'HKG', name: 'Lantau Harbour' },
+  }),
+  // Regional sites (CONTENT §2): small maps with an airport and named employers.
+  fmm: c({
+    id: 'fmm',
+    name: 'Fort McMurray',
+    country: 'CA',
+    size: 'S',
+    tiles: 28,
+    lat: 56.73,
+    lon: -111.38,
+    rentIndex: 0.6,
+    wageIndex: 1.2,
+    incomeIndex: 1.3,
+    costIndex: 1.0,
+    incumbent: 0,
+    rivals: 0,
+    ink: '#6E5A3A',
+    inkName: 'Boreal Umber',
+    water: false,
+    airport: { code: 'FMM', name: 'Athabasca Field' },
+    regional: { employers: [{ name: 'Athabasca Sands Camp', type: 'resourceCamp' }] },
+  }),
+  plb: c({
+    id: 'plb',
+    name: 'Pilbara',
+    country: 'AU',
+    size: 'S',
+    tiles: 28,
+    lat: -20.31,
+    lon: 118.58,
+    rentIndex: 0.6,
+    wageIndex: 1.25,
+    incomeIndex: 1.35,
+    costIndex: 1.05,
+    incumbent: 0,
+    rivals: 0,
+    ink: '#9A4A2A',
+    inkName: 'Iron Red',
+    water: true,
+    airport: { code: 'PHE', name: 'Port Hedland Strip' },
+    regional: { employers: [{ name: 'Red Range Iron', type: 'resourceCamp' }] },
+  }),
+  mid: c({
+    id: 'mid',
+    name: 'Midland',
+    country: 'US',
+    size: 'S',
+    tiles: 28,
+    lat: 31.99,
+    lon: -102.08,
+    rentIndex: 0.55,
+    wageIndex: 1.15,
+    incomeIndex: 1.25,
+    costIndex: 0.95,
+    incumbent: 0,
+    rivals: 0,
+    ink: '#8A6A3A',
+    inkName: 'Permian Tan',
+    water: false,
+    airport: { code: 'MAF', name: 'Permian Regional' },
+    regional: { employers: [{ name: 'Permian Basin Field Services', type: 'resourceCamp' }] },
   }),
 };
 
 export const START_CITIES = ['sas', 'cal', 'tor', 'nyc'] as const;
+
+/** Every place with an airport: the v1 cities, then the regional sites. */
+export const DESTINATIONS = Object.keys(CITIES);
+
+/** Cities with storefronts (not regional sites). */
+export const isRegional = (cityId: string): boolean => !!CITIES[cityId]?.regional;

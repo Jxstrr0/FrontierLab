@@ -21,3 +21,4 @@ export * from './ventures';
 export * from './realEstate';
 export * from './lobbying';
 export * from './fx';
+export * from './travel';

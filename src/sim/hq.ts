@@ -127,9 +127,9 @@ export function deptDesks(state: GameState, id: DeptId): number {
   return desks;
 }
 
-/** The city that sets HQ salaries: the first office's, else the current city. */
+/** The city that sets HQ salaries: the first office's, else the home city. */
 export function hqCityId(state: GameState): string {
-  return Object.values(state.offices)[0]?.cityId ?? state.world.currentCityId;
+  return Object.values(state.offices)[0]?.cityId ?? state.meta.homeCityId;
 }
 
 export function deptMarketSalary(state: GameState, id: DeptId): number {

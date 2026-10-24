@@ -1131,6 +1131,20 @@ export const GRAD_PROGRAM = { yearlyCost: 120_000, skillBonus: 10, hireBonus: 1 
 // ─── PERSONAL (SIMULATION §22) ────────────────────────────────────────────────
 export const PERSONAL_TAX = 0;
 
+// ─── TRAVEL (SIMULATION §22, DESIGN §5.17) ────────────────────────────────────
+/** Free flying per week (the original's allowance); resets every weekly tick. */
+export const TRAVEL_KM_PER_WEEK = 24_140;
+/**
+ * One-way fare past the allowance, × the destination's costIndex (the original
+ * shows a flat £80,000). Paid from personal cash; any shortfall the bank pays
+ * as a travel expense, so travel is never blocked.
+ */
+export const FLIGHT_FARE = 80_000;
+/** Mean Earth radius for great-circle distances. */
+export const EARTH_RADIUS_KM = 6_371;
+/** Private jet (§22): upkeep and depreciation per year of its value; resale haircut. */
+export const JET = { upkeepRate: 0.08, depreciation: 0.06, resaleHaircut: 0.1 } as const;
+
 // ─── EXECUTIVES (SIMULATION §17.2) ────────────────────────────────────────────
 /**
  * execMult = multBase + multSlope × expertise/100 on the departments in an

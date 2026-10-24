@@ -22,7 +22,8 @@ import {
 } from '../config/balance';
 import { BUREAU_PACKAGES, bureausIn } from '../data/bureaus';
 import { DEV_TEMPLATES, isDigital, type DevTemplate } from '../data/devTemplates';
-import type { Pentagon } from '../data/types';
+import { CITIES } from '../data/cities';
+import type { CountryId, Pentagon } from '../data/types';
 import { delegatedPrice } from './branch/delegation';
 import { startDevelopment } from './commands/development';
 import { setCompanyPrice } from './commands/products';
@@ -33,7 +34,7 @@ import { hasTreasuryFloor, maxBorrow } from './fundingMarket';
 import { roundToStep } from './math';
 import { allProducts } from './products';
 import { stream } from './rng';
-import type { GameState } from './state';
+import type { Branch, GameState } from './state';
 import { activeModel, mixRadar, RADAR } from './underwriting';
 
 /** Average weekly revenue over the last few closes (interest + fee income). */
@@ -71,15 +72,29 @@ export function cfoTreasury(state: GameState): void {
 
 // ─── CPO ──────────────────────────────────────────────────────────────────────
 
-/** Pricing: company prices set like a delegated manager's, from the first open branch's market. */
+/**
+ * Pricing: each country's company prices set like a delegated manager's, from
+ * that country's first open branch's market.
+ */
 export function cpoPricing(state: GameState): void {
   const cpo = state.executives.seats.cpo;
   if (!cpo || !state.company.applyRatesToAll) return;
-  const ref = Object.values(state.branches).find((b) => b.status === 'open');
-  if (!ref) return;
+  const refs = new Map<CountryId, Branch>();
+  for (const b of Object.values(state.branches)) {
+    const country = CITIES[b.cityId]?.country;
+    if (b.status === 'open' && country && !refs.has(country)) refs.set(country, b);
+  }
+  if (refs.size === 0) return;
   const rng = stream(state, 'execs');
-  for (const spec of allProducts(state)) {
-    setCompanyPrice(state, spec.id, delegatedPrice(state, ref, spec, cpo.expertise, rng));
+  for (const [country, ref] of refs) {
+    for (const spec of allProducts(state)) {
+      setCompanyPrice(
+        state,
+        spec.id,
+        delegatedPrice(state, ref, spec, cpo.expertise, rng),
+        country,
+      );
+    }
   }
 }
 

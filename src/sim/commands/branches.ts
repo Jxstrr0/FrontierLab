@@ -29,6 +29,7 @@ import { newId } from '../ids';
 import { postCash, postPnl, spend } from '../ledger';
 import { roundToStep } from '../math';
 import { countryOfCity, defaultPrice } from '../rates';
+import { seedCountryPrices } from './products';
 import type { Book, Branch, GameState } from '../state';
 import { fail, money, ok, type CommandResult } from './result';
 
@@ -140,6 +141,10 @@ export function buildBranch(
   }
   state.branches[id] = branch;
   lot.occupant = { type: 'player', id };
+  // First branch in a new country under Apply-to-all: that country gets its own HQ list.
+  if (state.company.applyRatesToAll && !state.company.companyPrices[country.id]) {
+    seedCountryPrices(state, country.id);
+  }
 
   // Start ratings at their targets so the first week reflects what was built.
   const fx = campaignEffects(branch);

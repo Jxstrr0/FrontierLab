@@ -7,7 +7,8 @@ import { DEV_TIER, DEV_TERMS, RISK_APPETITE } from '../../../config/balance';
 import { DATA_INPUTS } from '../../../data/bureaus';
 import { DEV_TEMPLATES, type DevTemplate } from '../../../data/devTemplates';
 import { PRODUCTS, type ProductSpec } from '../../../data/products';
-import type { CategoryId } from '../../../data/types';
+import { CITIES } from '../../../data/cities';
+import type { CategoryId, CountryId } from '../../../data/types';
 import { isOffered } from '../../../sim/branch/pricing';
 import { allProducts } from '../../../sim/products';
 import { countryOfCity, defaultPrice } from '../../../sim/rates';
@@ -103,16 +104,24 @@ export function lineupSpecs(s: GameState, cat: CategoryId): ProductSpec[] {
   return allProducts(s).filter((x) => x.category === cat);
 }
 
-/** The company price: the HQ price while Apply-to-all is on, else the first branch's (or default). */
-export function companyPrice(s: GameState, spec: ProductSpec): number {
-  const first = openBranches(s)[0];
+/**
+ * The company price in a country (home by default): the HQ price while
+ * Apply-to-all is on, else that country's first branch's (or the default).
+ */
+export function companyPrice(
+  s: GameState,
+  spec: ProductSpec,
+  country: CountryId = CITIES[s.meta.homeCityId]!.country,
+): number {
   if (s.company.applyRatesToAll) {
-    const p = s.company.companyPrices[spec.id];
+    const p = s.company.companyPrices[country]?.[spec.id];
     if (p !== undefined) return p;
   }
+  const first = openBranches(s).find((b) => CITIES[b.cityId]?.country === country);
   const slot = first?.offered[spec.id];
   if (slot) return slot.price;
-  return defaultPrice(spec, countryOfCity(s, first?.cityId ?? s.world.currentCityId));
+  const c = s.world.countries[country];
+  return c ? defaultPrice(spec, c) : defaultPrice(spec, countryOfCity(s, s.meta.homeCityId));
 }
 
 /** How many open branches offer a product. */

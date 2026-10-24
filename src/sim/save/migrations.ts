@@ -179,6 +179,25 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     initInvestments(state);
     return s;
   },
+
+  // 8 → 9: Stage 8 travel. The start city is recorded as home, travel starts
+  // fresh, a travel expense line appears, and HQ prices become per country
+  // (the existing list belongs to the home country).
+  8: (s) => {
+    const state = s as unknown as GameState;
+    const raw = state as unknown as { company: { companyPrices: Record<string, unknown> } };
+    const home = Object.values(state.branches)[0]?.cityId ?? state.world.currentCityId;
+    state.meta.homeCityId = home;
+    state.world.travel = { kmThisWeek: 0, totalKm: 0, flights: 0, faresPaid: 0 };
+    state.ledger.pnl.travel ??= 0;
+    for (const w of state.history.weekly) w.pnl.travel ??= 0;
+    const old = raw.company.companyPrices;
+    const country = CITIES[home]!.country;
+    state.company.companyPrices = Object.keys(old).length
+      ? { [country]: old as Record<string, number> }
+      : {};
+    return s;
+  },
 };
 
 const STAGE7_PNL_LINES = [

@@ -1,6 +1,7 @@
-// Creates a fresh GameState (SIMULATION §26 START constants): one city with its
-// lots and rivals, the home country's macro, the chosen corporate cash ($750k by
-// default) and $2M of charter capital held in treasury reserves.
+// Creates a fresh GameState (SIMULATION §26 START constants): the start city
+// (worldGen.ts; other cities are made on first visit), every country's macro,
+// the chosen corporate cash ($750k by default) and $2M of charter capital held
+// in treasury reserves.
 import {
   BOND_SHARE_DEFAULT,
   CHARTER_CAPITAL,
@@ -17,14 +18,9 @@ import { DEFAULT_MODEL_ID } from '../data/bureaus';
 import { CITIES } from '../data/cities';
 import { PRODUCTS } from '../data/products';
 import { capitalSnapshot } from './capital';
-import { generateLots } from './citygen';
 import { fullCoverage } from './hq';
-import { generateSites } from './hqSites';
 import { emptyLedger } from './ledger';
 import { initCountries } from './macro';
-import { generateCapitalMarketSites } from './capitalSites';
-import { generateCompetitionSites } from './competitionSites';
-import { generateInvestmentSites } from './investmentSites';
 import { emptyFx } from './fx';
 import {
   emptyConventions,
@@ -41,11 +37,9 @@ import {
   initMarket,
 } from './marketInit';
 import { emptyCorporateDebt } from './corporateDebt';
-import { refreshManagerPool } from './people';
-import { updateMarketRefs } from './rates';
-import { seedRivals } from './rivals';
 import { SCHEMA_VERSION, type AvatarSpec, type GameState, type Settings } from './state';
 import { packagedModel } from './underwriting';
+import { generateCity } from './worldGen';
 import type { Difficulty } from '../data/types';
 
 export interface NewGameOptions {
@@ -118,6 +112,7 @@ export function newGame(opts: NewGameOptions): GameState {
       difficulty: opts.difficulty ?? 'normal',
       competitors,
       startCash,
+      homeCityId: city.id,
     },
     clock: { day: 0, week: 0, speed: 0 },
     rng: {},
@@ -132,6 +127,7 @@ export function newGame(opts: NewGameOptions): GameState {
       lots: {},
       officeListings: {},
       sites: {},
+      travel: { kmThisWeek: 0, totalKm: 0, flights: 0, faresPaid: 0 },
     },
     company: {
       cash: startCash,
@@ -220,16 +216,7 @@ export function newGame(opts: NewGameOptions): GameState {
   }
 
   initCountries(state, city.country);
-  state.world.cities[city.id] = { id: city.id, generated: true, brandAwareness: 0, marketRef: {} };
-  const lots = generateLots(state, city.id);
-  seedRivals(state, city.id, lots);
-  for (const lot of lots) state.world.lots[lot.id] = lot;
-  generateSites(state, city.id);
-  generateCompetitionSites(state, city.id);
-  generateCapitalMarketSites(state, city.id);
-  generateInvestmentSites(state, city.id);
-  updateMarketRefs(state);
-  refreshManagerPool(state, city.id, true);
+  generateCity(state, city.id);
 
   const cap = capitalSnapshot(state);
   state.company.capitalRatio = cap.capitalRatio;
