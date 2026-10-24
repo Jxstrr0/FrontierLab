@@ -155,4 +155,6 @@ export const BENEFIT_RULES = {
   mortgageShare: 0.3,
   mortgageTicket: 340_000,
   esppPayrollCost: 0.5,
+  /** Executive loyalty bonus while the Employee Stock Plan runs (public only, CONTENT §10). */
+  esppLoyalty: 5,
 } as const;

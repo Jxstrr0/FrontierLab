@@ -114,7 +114,7 @@ export function rivalHqSite(s: GameState, rivalId: string, cityId: string): stri
 export function failedText(s: GameState, bank: RivalBank): string | undefined {
   if (bank.status === 'distressed') {
     const weeks = Math.max(0, (bank.distressedUntil ?? s.clock.week) - s.clock.week);
-    return `Regulators seized ${bank.name}. Its branches will be handed to other banks in ${weeks} week${weeks === 1 ? '' : 's'}.`;
+    return `Regulators seized ${bank.name}. Its network is for sale at any investment bank's M&A desk for ${weeks} more week${weeks === 1 ? '' : 's'}; then other banks take its branches.`;
   }
   if (bank.status === 'seized')
     return `${bank.name} failed. Its branches now belong to other banks.`;
