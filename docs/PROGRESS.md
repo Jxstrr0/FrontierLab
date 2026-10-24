@@ -2,13 +2,44 @@
 
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
-**Current stage:** 4 — HQ and operations (built and live; awaiting the owner's iPhone check). The Stage 2 and 3 checks are still open too.
+**Current stage:** 5 — Competition, macro and news (built and live; awaiting the owner's iPhone check). The Stage 2–4 checks are still open too.
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `0831e6b2f8796e` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `1c47c86155686e` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-24 — Stage 5 built: competition, macro and news
+- **Stage / step:** 5 — Competition, macro and news
+- **Done:**
+  - **Rivals come alive.** They grow new branches toward a mature size, open new ones on good free locations once they've had a profitable year, and close branches that lose money for half a year. Their books feel the economy: thin-capital banks (disruptors especially) can fail in a deep recession; regulators hold the network for 8 weeks, then other rivals take the branches. Buying a failed network yourself comes with Stage 6.
+  - **Price wars.** Lead a city's savings rates (Rates rating 4.0 or better) for 8 weeks and rivals start raising theirs. You get a case asking whether to match.
+  - **Rival screens.** Tap a rival branch for its ratings, customer reviews and its rate sheet next to yours (green where you're the better deal, red where not). Rival head offices (Banks layer) show the bank's overview, offer business loans and a line of credit you can actually take; it's company debt, paid from corporate cash.
+  - **Every country's economy and central bank** runs now (nine of them), even before you can open there.
+  - **The Daily Ledger** is a real weekly paper built from what happened: rate decisions, rival openings and results, your loans and profits, house prices, markets, politics (fictional parties; a passed "capital buffer" really does raise your capital requirements for a year) and fictional sports leagues. Tabs Top / Banking / Business / Markets / Politics / Sports, and an archive of 52 issues under Menu → The Ledger.
+  - **Central bank screen:** tap the domed building for the policy rate, last and next meeting, the economy, a yield curve (it inverts before downturns) and, at home, emergency borrowing.
+  - **Incidents:** robbery, ATM skimming, data breach, mis-selling, viral complaint, branch flood, card fraud, staff walkout, bank runs, regulator audits and letters, price wars, big defaults, and the emergency rescue offer before a regulator takeover. Each is a case with 2–3 choices and their costs. Branch managers can handle branch cases for you ("Branch troubles"); undecided cases take the worst option after 4 weeks. Waiting cases show as an "N cases" chip under the date and a red dot on the branch pin.
+  - **Employers and universities** (Employers / Universities layers): sign a 7-year payroll deal and the staff bring deposits that grow over two years; keep the deal healthy (good host branch, competitive account) or the employer walks. Universities also offer student accounts and a graduate program that sharpens manager candidates and speeds hiring.
+  - More review lines (4 per rating and mood); rival branches show reviews too.
+  - Saves move to version 6; a real Stage 4 save is kept as a test and loads and plays on.
+- **How it was built:** I laid the foundation (save format, map buildings, every country's economy, an event catalog, stubs). Four helper agents then built rivals, the Ledger with the central bank, incidents, and partnerships in parallel; I merged them, joined them up (price wars raise their case; incident press stories reach the paper) and fixed what showed up in play.
+- **Balance:**
+  - Recessions now hurt loan books: the credit cycle is steeper, so seed 42's year-2/3 recession books 1.6% losses (target 1.2–2.5%) against 0.8–0.9% in good years. New acceptance test.
+  - Reserves earn 0.5% below the policy rate (a deposit-facility rate), so a deposits-only bank falls well behind a lender.
+  - 259 tests pass, including both Stage 5 acceptance checks: 3 years of Ledger issues with 6–12 stories, correct numbers and no repeated wording for the same subject in back-to-back weeks; and a 10-year run with a recession and clearly higher defaults.
+- **Fixed along the way:** event toasts could repeat or go missing because they tracked a position in an event log that drops old weeks; they now remember the last event shown.
+- **Determinism snapshot:** `0831e6b2f8796e` → `1c47c86155686e`. Intended: every country simulated, rival AI, news, incidents and the two balance changes above.
+- **Dependencies:** none added.
+- **Next:** the owner checks Stage 5 on iPhone: watch a few weekly papers (tabs and the archive), tap the central bank dome, a rival branch and a rival head office (try a small loan), sign an employer once you can afford it, and answer an incident.
+- **Known issues:**
+  - The first-branch checkpoints are tuned on seed 42 only. On seed 42, week 156 now falls just after a recession (revenue about $90k a week against $110–150k), recovering by week 208. Other seeds (7, 99) already missed them in Stage 4 because of weaker starting lots; a cross-seed calibration is open.
+  - The deposits-only `turtle` strategy ends year 5 at about 45% of steady's equity (target under 40%); its equity swings with bond values because it holds so many bonds.
+  - Steady tops out at about 52 branches in Calgary by year 8 (year-10 target 60–200) because the city runs out of locations; other cities arrive in Stage 8.
+  - A payroll deal costs $330k–$920k in Calgary, so it's a mid-game move.
+  - Partnership deposits count in company totals but don't credit the host branch's own P&L; the quarterly partnership review isn't built; winning an employer doesn't shrink the rival's books.
+  - Rival networks can't be bought yet (Stage 6); executive, dividend and insider incidents wait for Stages 6 and 9.
+  - Toasts sit over the bottom of modals.
 
 ### 2026-10-24 — Stage 4: Products floor simulation
 - **Stage / step:** 4 — HQ and operations depth (Products floor, simulation only; the screens are a separate step)
@@ -24,7 +55,7 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 - **Next:** the Products floor and Credit bureau screens (SCREENS §10, §13).
 
 ### 2026-10-24 — Map pins: "$" for open locations, "For lease" for offices
-- **Done:** at the owner's request, open branch locations now show a plain "$" coin (a little smaller than branch pins, and smaller still when zoomed out) instead of the "For lease" tag. The "For lease" tag now marks buildings you rent: office buildings, with a small office icon. The list view, the Layers filter ("Available only") and the storefront panel ("Available location") use the same wording. Credit bureaus and agencies keep their icon medallions, and so will investment banks when Stage 7 adds them.
+- **Done:** at the owner's request, open branch locations now show a plain "$" coin (a little smaller than branch pins, and smaller still when zoomed out) instead of the "For lease" tag. The "For lease" tag now marks buildings you rent: office buildings, with a small office icon. The list view, the Layers filter ("Available only") and the storefront panel ("Available location") use the same wording. Credit bureaus and agencies keep their icon medallions, and so will investment banks when Stage 6 adds them.
 - **Next:** unchanged: the owner's iPhone check of Stage 4.
 
 ### 2026-10-24 — Stage 4 built: HQ and operations
