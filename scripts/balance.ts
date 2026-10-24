@@ -1,11 +1,13 @@
 // Headless multi-year balance run (SIMULATION §25).
 //   npm run balance -- --years 5 --seed 42 --strategy steady --city cal
+//     [--difficulty normal] [--competitors 3] [--cash 750000]
 // Prints a yearly company table, first-branch checkpoints, and a warning for
 // every Stage 1 target that is out of range.
 import { isDeposit, PRODUCTS } from '../src/data/products';
 import { balanceSheet } from '../src/sim/balanceSheet';
 import { advanceWeeks } from '../src/sim/engine';
 import { newGame } from '../src/sim/newGame';
+import type { Difficulty } from '../src/data/types';
 import type { Branch, GameState } from '../src/sim/state';
 import { summarize } from '../src/sim/ledger';
 import { STRATEGIES } from './strategies';
@@ -15,10 +17,19 @@ interface Args {
   seed: number;
   strategy: string;
   city: string;
+  difficulty: Difficulty;
+  competitors?: number;
+  cash?: number;
 }
 
 function parseArgs(argv: string[]): Args {
-  const args: Args = { years: 5, seed: 42, strategy: 'steady', city: 'cal' };
+  const args: Args = {
+    years: 5,
+    seed: 42,
+    strategy: 'steady',
+    city: 'cal',
+    difficulty: 'normal',
+  };
   for (let i = 0; i < argv.length; i++) {
     const key = argv[i]?.replace(/^--/, '');
     const val = argv[i + 1];
@@ -27,6 +38,9 @@ function parseArgs(argv: string[]): Args {
     if (key === 'seed') args.seed = Number(val);
     if (key === 'strategy') args.strategy = val;
     if (key === 'city') args.city = val;
+    if (key === 'difficulty') args.difficulty = val as Difficulty;
+    if (key === 'competitors') args.competitors = Number(val);
+    if (key === 'cash') args.cash = Number(val);
   }
   return args;
 }
@@ -65,7 +79,13 @@ function run(): void {
     throw new Error(
       `Unknown strategy ${args.strategy}. Try: ${Object.keys(STRATEGIES).join(', ')}`,
     );
-  const state = newGame({ seed: args.seed, cityId: args.city });
+  const state = newGame({
+    seed: args.seed,
+    cityId: args.city,
+    difficulty: args.difficulty,
+    competitors: args.competitors,
+    startCash: args.cash,
+  });
   const cash0 = state.company.cash;
   strategy.setup(state);
   const first = Object.values(state.branches)[0];
@@ -143,7 +163,8 @@ function run(): void {
   }
 
   console.log(
-    `Vault Street balance — strategy ${strategy.name}, seed ${args.seed}, city ${args.city}, ${args.years} years\n`,
+    `Vault Street balance — strategy ${strategy.name}, seed ${args.seed}, city ${args.city}, ` +
+      `${args.difficulty}, ${state.meta.competitors} competitors, ${args.years} years\n`,
   );
   console.log(
     'Year Branches  Deposits     Loans   Equity      CR    NIM   Loss     ROE     Cash       Tier       Policy',

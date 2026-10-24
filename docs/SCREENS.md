@@ -64,17 +64,21 @@ Wealth · Company · Branches · Portfolio · The Ledger (archive) · Milestones
 - Continue (latest autosave), New Game, Load, Settings
 - version string, "A Longlight Interactive game"
 
-**New Game wizard** (4 steps, with Back and Next):
+**New Game wizard** (5 steps, with Back and Next):
 1. **Your bank:**
    - name (max 24 characters)
    - monogram (2 letters, auto-filled from the name)
    - brand ink (8 swatches)
    - live medallion preview
 2. **Founder:** name and the avatar builder (portrait parts, §ART).
-3. **Start city:** four cards (Saskatoon Easy, Calgary Normal, Toronto Hard, New York Expert), each with:
-   - average rent, rival count, market size, policy rate
+3. **Start city:** four cards (Saskatoon, Calgary, Toronto, New York), each with:
+   - average rent, usual rival count, market size, policy rate
    - a one-line flavour
-4. **Confirm:**
+4. **Game options:**
+   - Difficulty: Segmented (Easy / Normal / Hard / Expert) with a one-line description of each
+   - Competitors: Stepper 1–5 (defaults to the city's usual count)
+   - Starting cash: Segmented ($500K / $750K / $1M / $1.25M)
+5. **Confirm:**
    - summary
    - advanced: seed (random by default), start date
    - "Open the doors" button

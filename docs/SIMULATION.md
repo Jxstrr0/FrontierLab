@@ -934,6 +934,16 @@ Group the constants like this, with the defaults shown above:
   - `START_DATE = '2027-01-04'`, `QUARTER_ENDS`
 - **START:**
   - `START_CASH = 750_000`, `CHARTER_CAPITAL = 2_000_000` (in reserves), `START_SHARES = 10_000_000`
+  - `START_CASH_OPTIONS = [500_000, 750_000, 1_000_000, 1_250_000]`; `COMPETITORS = { min: 1, max: 5 }`
+  - `DIFFICULTY` per level (`demandMult` on prospects §9.2, `rivalQuality` coins added at rival seeding, `rivalRateEdge` pp toward customers on rival rates §18.2, `lossMult` on new-loan and business-loan PDs §10.3, §11):
+
+    | Level | demandMult | rivalQuality | rivalRateEdge | lossMult |
+    |---|---|---|---|---|
+    | Easy | 1.15 | −0.3 | −0.10pp | 0.85 |
+    | Normal | 1 | 0 | 0 | 1 |
+    | Hard | 0.92 | +0.2 | +0.10pp | 1.10 |
+    | Expert | 0.85 | +0.4 | +0.20pp | 1.25 |
+  - **Competitors:** a city takes the first n rivals in strategy order. Its starting rival branch total (CONTENT §15) scales by n ÷ the city's usual count, with at least one branch each.
   - `START_PERSONAL_CASH = 150_000`, `START_CEO_SALARY = 120_000`
   - `CHARTER_MIN_EQUITY = 2_000_000`
 - **MACRO:**

@@ -36,6 +36,7 @@ import type { DemandResult, Origination } from './demand';
 import { signupChurnMult, type CampaignEffects } from './marketing';
 import { branchPrice, churnGap, isOffered, priceFactor } from './pricing';
 import type { BranchWeek } from './week';
+import { difficultyOf } from '../difficulty';
 
 const NONE: Origination = { newAccounts: 0, newVolume: 0, approval: 1 };
 
@@ -215,6 +216,7 @@ export function newLoanPd(state: GameState, spec: ProductSpec, price: number, m:
   return (
     (spec.basePd ?? 0) *
     (RISK_APPETITE.pdMult[appetite] ?? 1) *
+    difficultyOf(state).lossMult *
     (MODEL_PD.base - MODEL_PD.accuracy * model.radar[RADAR.accuracy]) *
     (1 + MODEL_PD.inclusion * (model.radar[RADAR.inclusion] - 5)) *
     adverse

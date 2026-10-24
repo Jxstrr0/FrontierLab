@@ -2,7 +2,7 @@
 // Names match the CAPS names used in docs/SIMULATION.md (§26 parameter index).
 // Constants that the docs give inline in a formula get a name here too, with the
 // section reference, so logic files never carry magic numbers.
-import type { Phase, Tier } from '../data/types';
+import type { Difficulty, Phase, Tier } from '../data/types';
 
 /**
  * Feature flags, one per ROADMAP stage. A stage's systems stay switched off on
@@ -41,7 +41,28 @@ export const WEEKS_PER_YEAR = 52;
 export const START_DATE = '2027-01-04';
 
 // ─── START ────────────────────────────────────────────────────────────────────
+/** Default spendable cash; the New Game wizard offers START_CASH_OPTIONS. */
 export const START_CASH = 750_000;
+export const START_CASH_OPTIONS = [500_000, 750_000, 1_000_000, 1_250_000] as const;
+/** Rival banks in each city (the wizard's competitor count); clamped to the rivals available. */
+export const COMPETITORS = { min: 1, max: 5 } as const;
+
+/**
+ * Difficulty levels (DESIGN §5.2). Normal is the identity and the balance reference.
+ * - demandMult scales branch prospects
+ * - rivalQuality shifts every rival branch's quality coins at seeding
+ * - rivalRateEdge moves rival rates in customers' favour (deposit rates up, loan rates down), pp
+ * - lossMult scales default probabilities on new loans and business loans
+ */
+export const DIFFICULTY: Record<
+  Difficulty,
+  { demandMult: number; rivalQuality: number; rivalRateEdge: number; lossMult: number }
+> = {
+  easy: { demandMult: 1.15, rivalQuality: -0.3, rivalRateEdge: -0.1, lossMult: 0.85 },
+  normal: { demandMult: 1, rivalQuality: 0, rivalRateEdge: 0, lossMult: 1 },
+  hard: { demandMult: 0.92, rivalQuality: 0.2, rivalRateEdge: 0.1, lossMult: 1.1 },
+  expert: { demandMult: 0.85, rivalQuality: 0.4, rivalRateEdge: 0.2, lossMult: 1.25 },
+};
 export const CHARTER_CAPITAL = 2_000_000;
 export const START_SHARES = 10_000_000;
 export const START_PERSONAL_CASH = 150_000;

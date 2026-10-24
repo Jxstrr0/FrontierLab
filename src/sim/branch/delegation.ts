@@ -22,6 +22,7 @@ import type { Branch, GameState } from '../state';
 import { marketingMult } from './marketing';
 import { lotAffinity } from './ratings';
 import { managerOf, marketWage, staffNeeded } from './staff';
+import { difficultyOf } from '../difficulty';
 
 /** Campaigns a delegated manager weighs by awareness return. */
 const AWARENESS_CAMPAIGNS = [
@@ -117,6 +118,7 @@ function delegateMarketing(state: GameState, branch: Branch): void {
   const prospectsPerAwareness =
     lot.footTraffic *
     PROSPECT_RATE *
+    difficultyOf(state).demandMult *
     (1 - AWARENESS_FLOOR) *
     (1 - b) *
     Math.sqrt(loanDemand(country)) *

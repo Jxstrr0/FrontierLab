@@ -14,7 +14,8 @@ import {
   RIVAL_QUALITY_SIGMA,
 } from '../config/balance';
 import { CITIES } from '../data/cities';
-import { PRODUCTS, type ProductSpec } from '../data/products';
+import { isDeposit, PRODUCTS, type ProductSpec } from '../data/products';
+import { difficultyOf } from './difficulty';
 import {
   RIVAL_BRANCHES_BY_SIZE,
   RIVALS,
@@ -31,7 +32,12 @@ import type { CountryState, GameState, Lot, RivalBank } from './state';
 const STRATEGY_ORDER: Strategy[] = ['incumbent', 'community', 'disruptor', 'premium'];
 
 /** Price offset or fee multiplier a strategy applies to a product's default (CONTENT §15). */
-export function rivalTargetPrice(spec: ProductSpec, strategy: Strategy, c: CountryState): number {
+export function rivalTargetPrice(
+  spec: ProductSpec,
+  strategy: Strategy,
+  c: CountryState,
+  edge = 0,
+): number {
   const p = STRATEGY_PROFILES[strategy];
   const base = defaultPrice(spec, c);
   let price: number;
@@ -41,6 +47,8 @@ export function rivalTargetPrice(spec: ProductSpec, strategy: Strategy, c: Count
   else if (spec.id === 'mortgage') price = base + p.mortgage;
   else if (spec.id === 'credit_card') price = base + p.cardApr;
   else price = base + p.loans;
+  // Difficulty edge: better deposit rates, cheaper loans (in pp).
+  if (spec.priceType === 'rate') price += isDeposit(spec) ? edge / 100 : -edge / 100;
   return clamp(price, spec.min, spec.max);
 }
 
@@ -74,10 +82,16 @@ export function seedRivals(state: GameState, cityId: string, lots: Lot[]): void 
     Object.values(RIVALS).filter((r) => r.home.includes(city.country)),
     rng,
   ).sort((a, b) => STRATEGY_ORDER.indexOf(a.strategy) - STRATEGY_ORDER.indexOf(b.strategy));
-  const chosen = candidates.slice(0, city.rivals);
+  const chosen = candidates.slice(0, state.meta.competitors);
+  const qualityShift = difficultyOf(state).rivalQuality;
 
+  // Branch totals are per city size for the city's usual rival count; scale to the chosen count.
   const [minB, maxB] = RIVAL_BRANCHES_BY_SIZE[city.size];
-  const total = rng.int(minB, maxB);
+  const drawn = rng.int(minB, maxB);
+  const total =
+    chosen.length === city.rivals
+      ? drawn
+      : Math.max(chosen.length, Math.round((drawn * chosen.length) / city.rivals));
   const counts = branchCounts(chosen, total, rng);
 
   chosen.forEach((spec, i) => {
@@ -88,12 +102,9 @@ export function seedRivals(state: GameState, cityId: string, lots: Lot[]): void 
       if (!lot) return;
       lot.occupant = { type: 'rival', id: bank.id };
       const profile = STRATEGY_PROFILES[spec.strategy].quality;
-      const quality = profile.map((q) => clamp(q + rng.normal(0, RIVAL_QUALITY_SIGMA), 1, 5)) as [
-        number,
-        number,
-        number,
-        number,
-      ];
+      const quality = profile.map((q) =>
+        clamp(q + qualityShift + rng.normal(0, RIVAL_QUALITY_SIGMA), 1, 5),
+      ) as [number, number, number, number];
       bank.branches.push({
         id: `rb_${bank.id}_${bank.branches.length + 1}`,
         cityId,
@@ -111,7 +122,10 @@ function ensureRival(state: GameState, spec: RivalSpec, c: CountryState): RivalB
   const existing = state.rivals[spec.id];
   if (existing) return existing;
   const prices: Record<string, number> = {};
-  for (const p of Object.values(PRODUCTS)) prices[p.id] = rivalTargetPrice(p, spec.strategy, c);
+  const edge = difficultyOf(state).rivalRateEdge;
+  for (const p of Object.values(PRODUCTS)) {
+    prices[p.id] = rivalTargetPrice(p, spec.strategy, c, edge);
+  }
   const bank: RivalBank = {
     id: spec.id,
     name: spec.name,
@@ -185,6 +199,7 @@ function shuffle<T>(items: T[], rng: Rng): T[] {
  */
 export function updateRivalPrices(state: GameState): void {
   const rng = stream(state, 'rivals');
+  const edge = difficultyOf(state).rivalRateEdge;
   for (const c of Object.values(state.world.countries)) {
     if (!c) continue;
     const dShort = ftpShort(c) - c.prevFtpShort;
@@ -207,14 +222,14 @@ export function updateRivalPrices(state: GameState): void {
     if (rival.status !== 'active') continue;
     const c = countryOfCity(state, rival.cities[0]!);
     for (const spec of Object.values(PRODUCTS)) {
-      let price = rival.prices[spec.id] ?? rivalTargetPrice(spec, rival.strategy, c);
+      let price = rival.prices[spec.id] ?? rivalTargetPrice(spec, rival.strategy, c, edge);
       const lag = rival.priceLags[spec.id];
       if (lag) {
         price += (lag.target - price) / Math.max(1, lag.weeksLeft);
         lag.weeksLeft -= 1;
         if (lag.weeksLeft <= 0) delete rival.priceLags[spec.id];
       }
-      const target = rivalTargetPrice(spec, rival.strategy, c);
+      const target = rivalTargetPrice(spec, rival.strategy, c, edge);
       price += RIVAL_PRICE_DRIFT * (target - price);
       rival.prices[spec.id] = clamp(price, spec.min, spec.max);
     }

@@ -4,6 +4,7 @@
 import type { BuildSpec } from '../data/equipment';
 import type {
   CountryId,
+  Difficulty,
   DistrictId,
   Id,
   Money,
@@ -19,7 +20,7 @@ import type {
   Week,
 } from '../data/types';
 
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 export interface GameState {
   schemaVersion: number;
@@ -59,6 +60,11 @@ export interface Meta {
   seed: number;
   startDate: string;
   createdWith: string;
+  /** New Game options (schema v2). */
+  difficulty: Difficulty;
+  /** Rival banks per city, 1–5. */
+  competitors: number;
+  startCash: number;
 }
 
 export interface Clock {
