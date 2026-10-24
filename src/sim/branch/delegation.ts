@@ -17,7 +17,7 @@ import type { ProductSpec } from '../../data/products';
 import { loanDemand } from '../macro';
 import { clamp, roundToStep } from '../math';
 import { countryOfCity, defaultPrice, ftpFor, marketRef } from '../rates';
-import { stream } from '../rng';
+import { stream, type Rng } from '../rng';
 import type { Branch, GameState } from '../state';
 import { marketingMult } from './marketing';
 import { lotAffinity } from './ratings';
@@ -53,12 +53,17 @@ export function runDelegation(state: GameState, branch: Branch): void {
   if (branch.delegation.marketing) delegateMarketing(state, branch);
 }
 
-/** The price a delegated manager targets: a little better than market, keeping ≥ 40% of the default margin. */
+/**
+ * The price a delegated manager targets: a little better than market, keeping
+ * ≥ 40% of the default margin. `rng` draws the skill error (a CPO pricing the
+ * company lineup passes its own stream).
+ */
 export function delegatedPrice(
   state: GameState,
   branch: Branch,
   spec: ProductSpec,
   productSkill: number,
+  rng: Rng = stream(state, 'demand'),
 ): number {
   const c = countryOfCity(state, branch.cityId);
   const m = marketRef(state, branch.cityId, spec.id);
@@ -69,10 +74,7 @@ export function delegatedPrice(
   } else {
     const ftp = ftpFor(spec, c);
     const def = defaultPrice(spec, c);
-    const error = stream(state, 'demand').normal(
-      0,
-      DELEGATE.priceErrorSd * (1 - productSkill / 100),
-    );
+    const error = rng.normal(0, DELEGATE.priceErrorSd * (1 - productSkill / 100));
     if (spec.category === 'deposits') {
       price = m + offset;
       const spread = ftp - def;

@@ -107,10 +107,10 @@ describe('office commands', () => {
     expect(identityGap(s)).toBeLessThan(1);
   });
 
-  it('rejects too many floors, executive floors and short cash', () => {
+  it('rejects too many floors, later-stage floors and short cash', () => {
     const s = newGame({ seed: 7, cityId: 'cal', startCash: 500_000 });
     const l = Object.values(s.world.officeListings)[0]!;
-    expect(cmd.leaseOffice(s, l.id, ['executive']).ok).toBe(false);
+    expect(cmd.leaseOffice(s, l.id, ['investment']).ok).toBe(false);
     const all = ['finance', 'hr', 'products', 'treasury', 'marketing', 'it', 'risk'] as const;
     expect(cmd.leaseOffice(s, l.id, [...all, 'finance']).ok).toBe(false);
     s.company.cash = 1000;

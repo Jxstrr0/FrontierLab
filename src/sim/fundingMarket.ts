@@ -31,8 +31,9 @@ function treasuryCoverage(state: GameState): number {
 
 /** §13.6: 2 + floor(3 × treasuryCoverage′) + (CFO expertise ≥ 70 ? 1 : 0). */
 export function offerCount(state: GameState): number {
-  // Executives (and the CFO bonus) arrive with Stage 6.
-  const cfoBonus = 0;
+  const cfo = state.executives.seats.cfo;
+  const cfoBonus =
+    cfo && cfo.expertise >= FUNDING_OFFERS.cfoExpertise ? FUNDING_OFFERS.cfoBonus : 0;
   return (
     FUNDING_OFFERS.base +
     Math.floor(FUNDING_OFFERS.perCoverage * Math.min(1, treasuryCoverage(state))) +

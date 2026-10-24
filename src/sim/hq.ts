@@ -8,6 +8,7 @@ import {
   DEPT_DEFAULT_EFF,
   DEPT_REQUIREMENTS,
   DEPT_SKILL,
+  EXEC_DELEGATION,
   FEATURES,
   FOUNDER_MODE_ASSETS,
   FOUNDER_RAMP,
@@ -28,6 +29,7 @@ import { BENEFIT_RULES, BENEFITS } from '../data/benefits';
 import { CITIES } from '../data/cities';
 import { DEPARTMENTS, HQ_DEPTS } from '../data/departments';
 import { dpow, dtanh } from './detmath';
+import { execMult, seated } from './execSeats';
 import { totalWholesale } from './fundingLots';
 import { riskCoverageBonus } from './incident/effects';
 import { spend } from './ledger';
@@ -131,14 +133,15 @@ export function deptMarketSalary(state: GameState, id: DeptId): number {
 
 // ─── Coverage (§16.4) ─────────────────────────────────────────────────────────
 
-/** Effective staff: headcount scaled by skill, morale and Remote Fridays. */
+/** Effective staff: headcount scaled by skill, morale, Remote Fridays and the seat's execMult (§16.4). */
 export function staffEff(state: GameState, d: Department): number {
   const remote = state.people.benefits.remote_fri ? 1 - REMOTE_FRIDAY_STAFF : 1;
   return (
     d.staff *
     (HQ_COVERAGE.skillBase + (HQ_COVERAGE.skillSlope * d.skill) / 100) *
     (HQ_COVERAGE.moraleBase + (HQ_COVERAGE.moraleSlope * d.morale) / 100) *
-    remote
+    remote *
+    execMult(state, d.id)
   );
 }
 
@@ -191,12 +194,14 @@ export function treasuryPenalty(state: GameState): number {
   return shortfall(state, 'treasury') * TREASURY_PENALTY;
 }
 
-/** Weeks of statements shown as Delayed (CONTENT §9, Finance). */
+/** Weeks of statements shown as Delayed (CONTENT §9, Finance); a seated CFO halves it (§17.2). */
 export function statementDelayWeeks(state: GameState): number {
   const k = cov(state, 'finance');
-  return k < HQ_EFFECTS.financeDelayFrom
-    ? Math.ceil((HQ_EFFECTS.financeDelayFrom - k) * HQ_EFFECTS.financeDelayScale)
-    : 0;
+  const delay =
+    k < HQ_EFFECTS.financeDelayFrom
+      ? Math.ceil((HQ_EFFECTS.financeDelayFrom - k) * HQ_EFFECTS.financeDelayScale)
+      : 0;
+  return seated(state, 'cfo') ? Math.ceil(delay * EXEC_DELEGATION.cfoDelayFactor) : delay;
 }
 
 // ─── Benefits (§16.5, CONTENT §10) ────────────────────────────────────────────
@@ -344,7 +349,8 @@ export function runHq(state: GameState): void {
   const mods = staffMods(state);
   let payroll = 0;
   for (const d of Object.values(state.departments)) {
-    if (!d) continue;
+    // The Executive suite has no hired team: executives are paid in executives.ts.
+    if (!d || d.id === 'executive') continue;
     updateDepartment(state, d, mods);
     payroll += (d.staff * d.salary) / WEEKS_PER_YEAR;
   }
@@ -363,7 +369,9 @@ export function newDepartment(state: GameState, id: DeptId): Department {
   return {
     id,
     staff: 0,
-    target: Math.min(desks, Math.max(1, Math.ceil(required / DEPT_DEFAULT_EFF))),
+    // The Executive suite's desks are you and the six executives, not hired staff.
+    target:
+      id === 'executive' ? 0 : Math.min(desks, Math.max(1, Math.ceil(required / DEPT_DEFAULT_EFF))),
     salary: Math.round(deptMarketSalary(state, id) / 1000) * 1000,
     skill: DEPT_SKILL.base,
     morale: START_STAFF_MORALE,

@@ -21,8 +21,12 @@ export interface EquityGrant {
   grantWeek: Week;
   /** Shares vested so far. */
   vested: number;
+  /** Vested option shares exercised so far (RSUs: equal to vested). */
+  exercised: number;
   /** Grant-date value per share, expensed straight-line over the vesting period. */
   fairValue: Money;
+  /** Grant expense recognised so far. */
+  expensed: Money;
 }
 
 export interface Executive {
@@ -46,6 +50,8 @@ export interface ExecutivesState {
   /** Candidates per seat; the pool refreshes every few weeks (§17.2). */
   candidates: Partial<Record<ExecSeat, Executive[]>>;
   candidatesRefreshWeek: Week;
+  /** True once a CTO has been hired: an empty CTO seat then drags the app rating (§16.9). */
+  hadCto: boolean;
 }
 
 // ─── Board and dividends (DESIGN §5.13, SCREENS §10.2) ────────────────────────
