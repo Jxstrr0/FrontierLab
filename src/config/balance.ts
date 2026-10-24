@@ -12,7 +12,7 @@ export const FEATURES = {
   /** Stage 1: headless simulation core. */
   simulation: true,
   /** Stage 2: playable founder loop in plain UI (enables New Game / Continue). */
-  playableLoop: false,
+  playableLoop: true,
   /** Stage 3: engraved isometric city map. */
   cityMap: false,
   /** Stage 4: HQ offices, departments and operations depth. */
@@ -404,6 +404,13 @@ export const CAPITAL_GATE: Record<Tier, number> = {
 };
 export const CRITICAL_FINE_RWA = 0.001;
 export const RECAP_DISCOUNT = 0.5;
+/**
+ * Game over (DESIGN §5.18). Insolvency: corporate cash below zero for 4 weeks (no
+ * corporate credit exists before Stage 5). Takeover: capital ratio below 4.5% for
+ * 13 weeks (the 8-week wait plus the 5-week recapitalisation window; the offer
+ * itself arrives with incidents).
+ */
+export const FAILURE = { insolvencyWeeks: 4, takeoverCr: 0.045, takeoverWeeks: 13 } as const;
 
 // ─── RISK APPETITE (§16.8) ────────────────────────────────────────────────────
 export const RISK_APPETITE = {

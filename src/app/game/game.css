@@ -1,0 +1,124 @@
+/* In-game layout: the city view under a floating HUD (SCREENS §0.2). */
+.game {
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+.game-view {
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: calc(var(--safe-top) + 72px) calc(var(--safe-right) + var(--space-4))
+    calc(var(--safe-bottom) + 88px) calc(var(--safe-left) + var(--space-4));
+}
+.hud-top,
+.hud-bottom {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+  padding-left: calc(var(--safe-left) + var(--space-3));
+  padding-right: calc(var(--safe-right) + var(--space-3));
+  pointer-events: none;
+}
+.hud-top {
+  top: 0;
+  padding-top: calc(var(--safe-top) + var(--space-3));
+}
+.hud-bottom {
+  bottom: 0;
+  padding-bottom: calc(var(--safe-bottom) + var(--space-3));
+}
+.hud-chip {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--tap-min);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--vault-deep);
+  border: 1px solid var(--hairline);
+  color: var(--ivory);
+  font-size: var(--text-14);
+}
+button.hud-chip {
+  cursor: pointer;
+}
+.hud-bank {
+  padding-left: 6px;
+}
+.hud-cash {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+  text-align: left;
+}
+.hud-cash-label {
+  font-size: 11px;
+  color: var(--ivory-dim);
+}
+.hud-cash-value {
+  font-weight: 700;
+  font-size: var(--text-16);
+}
+.hud-time {
+  padding: 0;
+  overflow: hidden;
+}
+.hud-time button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  min-height: var(--tap-min);
+}
+.hud-date {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-2) 0 var(--space-3);
+  font-weight: 600;
+}
+.hud-speed {
+  color: var(--brass-light);
+  min-width: 2.2em;
+}
+.hud-pause {
+  width: var(--tap-min);
+  border-left: 1px solid var(--hairline) !important;
+  color: var(--brass-light) !important;
+}
+.hud-time.is-paused .hud-date {
+  opacity: 0.7;
+}
+.hud-city {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-16);
+}
+.hud-menu {
+  font-weight: 600;
+  padding: 0 var(--space-5);
+}
+.menu-list {
+  display: flex;
+  flex-direction: column;
+}
+.menu-item {
+  min-height: 52px;
+  border: 0;
+  border-bottom: 1px solid rgb(184 145 61 / 15%);
+  background: transparent;
+  text-align: left;
+  font-size: var(--text-16);
+  cursor: pointer;
+  padding: 0 var(--space-2);
+}
+.menu-item:last-child {
+  border-bottom: 0;
+}

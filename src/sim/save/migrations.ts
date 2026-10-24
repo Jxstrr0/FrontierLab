@@ -15,6 +15,9 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     meta.difficulty = 'normal';
     meta.competitors = CITIES[world.currentCityId]?.rivals ?? 3;
     meta.startCash = START_CASH;
+    const company = s.company as Record<string, unknown>;
+    company.negativeCashWeeks = 0;
+    company.lowCapitalWeeks = 0;
     return s;
   },
 };
