@@ -96,3 +96,6 @@ export const NAMED_UNIVERSITIES: Record<string, string> = {
 };
 
 export const UNIVERSITY_PATTERNS = ['University of {city}', '{city} Institute of Technology'];
+
+/** Average yearly pay at income mult 1 and city incomeIndex 1 (shown on the employer panel). */
+export const BASE_ANNUAL_INCOME = 58_000;

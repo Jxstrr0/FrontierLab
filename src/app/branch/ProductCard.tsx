@@ -9,6 +9,7 @@ import type { Branch } from '../../sim/state';
 import { Card, CoinRating, RingGauge, Row, Stepper, Toggle } from '../components';
 import { count, money } from '../format/format';
 import { act, useGame } from '../store';
+import { partnerTotals } from '../partners/partnerView';
 import { businessLoans, editPrice, parsePrice, priceText, rangeText, unitView } from './selectors';
 
 export function ProductCard(p: { branch: Branch; spec: ProductSpec; onLoanDesk: () => void }) {
@@ -84,6 +85,7 @@ function Figures(p: { branch: Branch; spec: ProductSpec; costLabel: string; cost
   const book = p.branch.books[spec.id];
   const net = book?.last.deltaAccounts ?? 0;
   const netText = net === 0 ? '' : `${net > 0 ? '+' : '−'}${count(Math.abs(net))} net`;
+  const partners = partnerTotals(s, p.branch.id, spec.id);
   return (
     <div class="br-product-figures">
       {spec.kind === 'fx' ? (
@@ -106,7 +108,14 @@ function Figures(p: { branch: Branch; spec: ProductSpec; costLabel: string; cost
           ) : (
             <Row
               label={spec.kind === 'wealth' ? 'Assets under management' : 'Balance'}
-              value={money(book?.balance ?? 0, sym)}
+              value={money((book?.balance ?? 0) + partners.balance, sym)}
+            />
+          )}
+          {partners.count > 0 && (
+            <Row
+              label="incl. partners"
+              value={`${money(partners.balance, sym)} · ${count(partners.accounts)} accounts`}
+              tone="dim"
             />
           )}
         </>
