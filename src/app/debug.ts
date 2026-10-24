@@ -33,7 +33,9 @@ export function installDebug(): void {
     quickBranch(): string | undefined {
       const s = peekGame();
       if (!s) return undefined;
-      const lot = Object.values(s.world.lots).find((l) => !l.occupant && l.district === 'midtown');
+      const lot = Object.values(s.world.lots).find(
+        (l) => !l.occupant && l.district === 'midtown' && l.cityId === s.world.currentCityId,
+      );
       if (!lot) return undefined;
       const r = act(cmd.buildBranch, { lotId: lot.id, build: REFERENCE_BUILDS.mid });
       return r.ok ? r.branchId : undefined;

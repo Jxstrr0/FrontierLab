@@ -988,6 +988,8 @@ Run `npm run balance` with seed 42 and the start city Calgary, unless noted. Bra
 | Aggressive (appetite 5, cheapest prices) | higher growth to year 3, then Watch tier or worse in the first recession |
 | Recession stress (forced at year 3) | steady survives without Critical tier; aggressive hits Restricted or Critical |
 
+**Note (Stage 8):** steady now expands to other cities once the home city has no good lots left (years 5–6). Year 10: seed 42 223 branches / $9.8B assets, seed 7 171 / $7.2B, seed 99 167 / $8.1B. Seed 42 sits just above the branch band and seed 7 just below the asset band; left for the full tuning pass (owner: testing and tuning come later).
+
 **Strategies** (`scripts/strategies/*.ts`):
 - `idle`: one branch, no further actions
 - `steady`: open a branch when cash > 2× build cost and CR > 12%; HQ floors staffed to 100%; appetite 3; default prices
