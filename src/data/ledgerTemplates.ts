@@ -4,6 +4,7 @@
 // two weeks running. Fictional names only. Rival templates live in
 // ledgerTemplatesRivals.ts and macro, markets, sports and politics in
 // ledgerTemplatesWorld.ts; all are merged into LEDGER_TEMPLATES.
+import { CAPITAL_TEMPLATES } from './ledgerTemplatesCapital';
 import { RIVAL_TEMPLATES } from './ledgerTemplatesRivals';
 import { WORLD_TEMPLATES } from './ledgerTemplatesWorld';
 
@@ -339,6 +340,11 @@ const BANK_TEMPLATES = {
   ],
 } satisfies Record<string, LedgerTemplate[]>;
 
-export const LEDGER_TEMPLATES = { ...BANK_TEMPLATES, ...RIVAL_TEMPLATES, ...WORLD_TEMPLATES };
+export const LEDGER_TEMPLATES = {
+  ...BANK_TEMPLATES,
+  ...RIVAL_TEMPLATES,
+  ...WORLD_TEMPLATES,
+  ...CAPITAL_TEMPLATES,
+};
 
 export type TemplateKey = keyof typeof LEDGER_TEMPLATES;
