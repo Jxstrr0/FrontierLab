@@ -42,3 +42,11 @@ export function worldToTile(tiles: number, p: Point): Point {
   const dy = (p.y - MAP_MARGIN.top) / (TILE_H / 2);
   return { x: (dy + dx) / 2, y: (dy - dx) / 2 };
 }
+
+/** Any point in tile space (fractional tile x, y) at height z world px above the ground. */
+export function isoPoint(tiles: number, tx: number, ty: number, z: number): Point {
+  return {
+    x: MAP_MARGIN.x + (tiles * TILE_W) / 2 + ((tx - ty) * TILE_W) / 2,
+    y: MAP_MARGIN.top + ((tx + ty) * TILE_H) / 2 - z,
+  };
+}
