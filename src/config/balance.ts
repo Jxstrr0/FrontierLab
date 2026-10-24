@@ -1447,6 +1447,62 @@ export const VENTURES = {
 } as const;
 /** §20.5: offer up to maxShare of post-money; accepted if rate ≤ policy + spread; 156-week amortization. */
 export const VENTURE_DEBT = { maxShare: 0.1, spread: 0.08, termWeeks: 156, lgd: 0.8 } as const;
+/**
+ * §20.2 net margin target: the sector margin once Product maturity reaches
+ * matureAt, falling by `gap` × the missing share below it (young startups burn cash).
+ */
+export const VENTURE_MARGIN = { gap: 4, matureAt: 8 } as const;
+/** Startup creation (§20.1): price per share, cap table, cash runway, history and the generator. */
+export const VENTURE_GEN = {
+  sharePrice: {
+    seed: [0.4, 1.2],
+    A: [1, 3],
+    B: [2.5, 7],
+    C: [6, 18],
+    D: [12, 36],
+  } as Record<'seed' | 'A' | 'B' | 'C' | 'D', [number, number]>,
+  /** Founder's share of the company by stage; one or two funds hold the rest. */
+  founderShare: { seed: 0.7, A: 0.55, B: 0.42, C: 0.32, D: 0.25 } as Record<
+    'seed' | 'A' | 'B' | 'C' | 'D',
+    number
+  >,
+  fundHolders: [1, 2] as [number, number],
+  /** Cash at creation = runway quarters × quarterly burn (or a share of post-money if profitable). */
+  startRunway: [2, 10] as [number, number],
+  profitableCash: 0.08,
+  /** Funding history: the last round raised roundShare of post-money, each earlier one stepDown of the next. */
+  historyRoundShare: 0.2,
+  historyStepDown: 0.4,
+  /** Years since founding by stage, for generated startups. */
+  ageYears: {
+    seed: [0, 1],
+    A: [1, 2],
+    B: [2, 4],
+    C: [3, 6],
+    D: [4, 8],
+  } as Record<'seed' | 'A' | 'B' | 'C' | 'D', [number, number]>,
+  stageWeights: { seed: 30, A: 30, B: 20, C: 15, D: 5 } as Record<
+    'seed' | 'A' | 'B' | 'C' | 'D',
+    number
+  >,
+  pentagonRange: [3, 8] as [number, number],
+  /** Quarterly results generated for a new startup. */
+  historyQuarters: 4,
+  /** The generator stops while this many private startups are active. */
+  maxActive: 60,
+  /** Finished startups you never held: keep only the most recent few. */
+  endedKept: 12,
+  nameTries: 20,
+} as const;
+/** §20.2 IPO: listing price = last round price × pop; the listed stock's volatility and growth cap. */
+export const VENTURE_IPO = {
+  pop: [1.0, 1.5] as [number, number],
+  vol: 0.45,
+  maxGrowth: 0.2,
+  tickerLength: 4,
+} as const;
+/** Ledger thresholds for ventures stories (SIMULATION §24). */
+export const VENTURE_NEWS = { bigRound: 50_000_000, bigExit: 100_000_000 } as const;
 /** Risk weights (§15): venture equity like listed stocks; venture debt and buildings. */
 export const VENTURE_RISK_WEIGHT = 2.5;
 export const VENTURE_DEBT_RISK_WEIGHT = 1.5;
