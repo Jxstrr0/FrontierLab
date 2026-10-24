@@ -1,6 +1,7 @@
 // Branch panel (SCREENS §5): header "{Bank} — {branch}", the manager's advisor
-// line and the five tabs. The active tab lives in the panel route so it
+// line and the five tabs; an acquired branch shows a converting banner. The active tab lives in the panel route so it
 // survives re-renders and reopening.
+import { MERGERS } from '../../config/balance';
 import { DISTRICT_SPECS } from '../../data/districts';
 import { managerOf } from '../../sim/branch/staff';
 import { Medallion, Panel, type Tab } from '../components';
@@ -23,6 +24,8 @@ export function BranchPanel(p: { branchId: string; tab: BranchTab }) {
   const mgr = managerOf(s, branch);
   const opening = gameDate(s.meta.startDate, openingDay(s, branch));
   const pending = businessLoans(s, branch.id).pending > 0;
+  // An acquired branch converting to your brand (§19.8) still wears the old bank's colours.
+  const conv = branch.converting;
   const tabs: Tab<BranchTab>[] = [
     { id: 'service', label: 'Service' },
     { id: 'products', label: 'Products' },
@@ -38,7 +41,13 @@ export function BranchPanel(p: { branchId: string; tab: BranchTab }) {
       subtitle={[lot?.address, district !== branch.name ? district : undefined]
         .filter(Boolean)
         .join(' · ')}
-      icon={<Medallion ink={s.meta.brandInk} monogram={s.meta.monogram} size={32} />}
+      icon={
+        <Medallion
+          ink={conv?.ink ?? s.meta.brandInk}
+          monogram={conv?.monogram ?? s.meta.monogram}
+          size={32}
+        />
+      }
       onClose={closePanel}
       advisor={{ name: mgr?.name ?? 'Branch advisor', text: advisorLines(s, branch, opening) }}
       tabs={tabs}
@@ -52,6 +61,18 @@ export function BranchPanel(p: { branchId: string; tab: BranchTab }) {
             <span class="muted small">
               The fit-out is under way. Set staff, prices and campaigns now; customers arrive when
               the doors open.
+            </span>
+          </div>
+        )}
+        {conv && (
+          <div class="br-opening br-converting" role="status">
+            <span class="br-opening-title">
+              Converting from {conv.name}: {conv.weeksLeft} week{conv.weeksLeft === 1 ? '' : 's'}{' '}
+              left
+            </span>
+            <span class="muted small">
+              Signs, systems and uniforms switch to {s.meta.bankName} over {MERGERS.conversionWeeks}{' '}
+              weeks. The branch already works as yours.
             </span>
           </div>
         )}

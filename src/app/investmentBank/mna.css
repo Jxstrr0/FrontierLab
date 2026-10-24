@@ -1,0 +1,65 @@
+/* Investment bank M&A tab and Offer sheet (SCREENS §12). */
+.ma-card.is-distressed {
+  box-shadow: inset 3px 0 0 var(--oxblood);
+}
+.ma-head,
+.ma-sheet-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+.ma-title {
+  flex: 1;
+  min-width: 0;
+}
+.ma-name {
+  font-family: var(--font-display);
+  font-size: var(--text-20);
+  line-height: 1.2;
+}
+.ma-capital {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.ma-sale {
+  margin: var(--space-1) 0 var(--space-2);
+  color: var(--ivory-dim);
+}
+.ma-status {
+  margin: var(--space-2) 0;
+}
+.ma-card .btn {
+  margin-top: var(--space-2);
+  min-height: var(--tap-min);
+}
+.ma-check-title {
+  color: var(--brass-light);
+  font-weight: 600;
+  margin-bottom: var(--space-1);
+}
+.ma-checks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+.ma-checks li {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+}
+.ma-checks li > span:last-child {
+  display: flex;
+  flex-direction: column;
+}
+.ma-check-mark {
+  width: 1.4em;
+  text-align: center;
+  font-weight: 700;
+}
+.ma-blocker {
+  margin: 0;
+}

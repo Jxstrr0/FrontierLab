@@ -1,7 +1,8 @@
 // DOM pins over the map canvas (ART_DIRECTION §2): medallions for branches
 // and your HQ, plain "$" medallions for open branch locations, type
 // medallions for credit bureaus and agencies (employers and universities you
-// partner with add a brand-ink seal), brass "For lease" tags for
+// partner with add a brand-ink seal; acquired branches still converting wear
+// the old bank's ink with a progress ring), brass "For lease" tags for
 // office buildings you can rent, and count medallions for clusters at the far
 // zoom. Plain DOM managed imperatively: elements are created when the
 // pin set changes and only their transforms are touched per frame, so a pan
@@ -37,7 +38,7 @@ interface Placed {
 }
 
 const pinKey = (p: PinSpec) =>
-  `${p.kind}|${p.ink}|${p.monogram}|${p.label}|${p.badge}|${p.alert ?? false}|${p.x}|${p.y}`;
+  `${p.kind}|${p.ink}|${p.monogram}|${p.label}|${p.badge}|${p.alert ?? false}|${p.x}|${p.y}|${p.converting?.progress ?? ''}`;
 
 export class PinLayer {
   private pins: PinSpec[] = [];
@@ -224,6 +225,15 @@ function makePinElement(p: PinSpec): HTMLButtonElement {
     );
     el.appendChild(body);
   }
+  if (p.converting) {
+    // Acquired branch converting to your brand: a brass progress ring and a small label.
+    el.classList.add('is-converting');
+    el.insertAdjacentHTML('beforeend', convertingRing(p.converting.progress));
+    el.insertAdjacentHTML(
+      'beforeend',
+      '<span class="pin-converting" aria-hidden="true">Converting</span>',
+    );
+  }
   if (p.partner) {
     // Your employer or university partner: a small brand-ink seal with an ivory tick.
     const seal = document.createElement('span');
@@ -238,6 +248,21 @@ function makePinElement(p: PinSpec): HTMLButtonElement {
   if (p.alert)
     el.insertAdjacentHTML('beforeend', '<span class="pin-alert" aria-hidden="true"></span>');
   return el;
+}
+
+/** A ring around the medallion filled clockwise from the top by conversion progress (0–1). */
+function convertingRing(progress: number): string {
+  const size = PIN_MEDALLION_PX + 8;
+  const r = size / 2 - 1.5;
+  const c = 2 * Math.PI * r;
+  const half = size / 2;
+  return (
+    `<svg class="pin-ring" aria-hidden="true" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">` +
+    `<circle cx="${half}" cy="${half}" r="${r}" fill="none" stroke="var(--vault-deep)" stroke-width="3"/>` +
+    `<circle cx="${half}" cy="${half}" r="${r}" fill="none" stroke="var(--brass-light)" stroke-width="3" ` +
+    `stroke-dasharray="${(c * progress).toFixed(2)} ${c.toFixed(2)}" transform="rotate(-90 ${half} ${half})"/>` +
+    '</svg>'
+  );
 }
 
 const PARTNER_SEAL_SVG =

@@ -64,7 +64,8 @@ export function buildBlocker(
   return undefined;
 }
 
-function defaultName(state: GameState, district: string): string {
+/** The district's name, numbered when one of your branches already has it. */
+export function defaultName(state: GameState, district: string): string {
   const base = DISTRICT_SPECS[district as keyof typeof DISTRICT_SPECS]?.name ?? 'Branch';
   const taken = new Set(Object.values(state.branches).map((b) => b.name));
   if (!taken.has(base)) return base;

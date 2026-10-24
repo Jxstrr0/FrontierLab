@@ -706,6 +706,8 @@ export interface RivalBank {
   priceWar: Record<Id, Rate>;
   /** While distressed: the week its network is split among other rivals (§18.5). */
   distressedUntil?: Week;
+  /** While distressed: the asking price per share of its network in M&A (§18.5, set by failureCheck). */
+  distressedAsk?: Money;
   /** Stage 6 (§19): shares outstanding (fixed), price (market if listed, book if private). */
   shares: number;
   price: Money;

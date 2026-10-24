@@ -45,8 +45,12 @@ function skill(rng: Rng, bonus: number): number {
   );
 }
 
-export function generateManager(state: GameState, cityId: string): Manager {
-  const rng = stream(state, 'people');
+/** A generated manager; draws from the `people` stream unless another is given (M&A uses its own). */
+export function generateManager(
+  state: GameState,
+  cityId: string,
+  rng: Rng = stream(state, 'people'),
+): Manager {
   const city = CITIES[cityId];
   const bonus = gradSkillBonus(state);
   const skills = {

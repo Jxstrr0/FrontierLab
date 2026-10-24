@@ -1,8 +1,8 @@
 // Rival quarter-end and failures (SIMULATION §18.5): quarterly earnings,
 // dividends for listed rivals, the occasional CEO change, and the recession
-// failure check. A failed rival is distressed for 8 weeks (its network would be
-// offered for sale), then its branches are split among the other rivals in each
-// city, or closed where there are none.
+// failure check. A failed rival is distressed for 8 weeks, its network offered
+// as a distressed sale in M&A; unless you buy it, its branches are then split
+// among the other rivals in each city, or closed where there are none.
 import {
   RIVAL_EXEC_RESIGN_CHANCE,
   RIVAL_FAILURE,
@@ -16,6 +16,8 @@ import { FIRST_NAMES, LAST_NAMES } from '../data/names';
 import { previousQuarter } from './calendar';
 import { pushEvent } from './events';
 import { clamp } from './math';
+import { pendingOffer } from './mergerRules';
+import { rivalBvps, rollDistressedAsk } from './mergerPricing';
 import { stream, type Rng } from './rng';
 import { rivalCapitalRatio, rivalLoans } from './rivalBooks';
 import type { GameState, RivalBank } from './state';
@@ -136,12 +138,36 @@ function failureCheck(state: GameState, bank: RivalBank, rng: Rng): void {
   if (!insolvent && !(atRisk && rng.chance(RIVAL_FAILURE.chance))) return;
   bank.status = 'distressed';
   bank.distressedUntil = state.clock.week + RIVAL_FAILURE.distressWeeks;
-  // Stage 6: the network is offered as a distressed sale in M&A (P/B 0.4–0.7, §19.8).
   pushEvent(
     state,
     'BANK_FAILURE',
     { rivalId: bank.id, bank: bank.name, n: bank.branches.length },
     9,
+  );
+  offerDistressedSale(state, bank);
+}
+
+/**
+ * §18.5: the seized network goes up for sale in M&A for its distressed weeks,
+ * asking BVPS × P/B (0.4–0.7, floored per share). The roll uses the `mergers`
+ * stream so the rival stream's draws don't shift.
+ */
+function offerDistressedSale(state: GameState, bank: RivalBank): void {
+  const ask = rollDistressedAsk(bank, stream(state, 'mergers'));
+  bank.distressedAsk = ask;
+  const bvps = rivalBvps(bank);
+  pushEvent(
+    state,
+    'DISTRESSED_SALE',
+    {
+      rivalId: bank.id,
+      bank: bank.name,
+      ask,
+      pb: bvps > 0 ? ask / bvps : 0,
+      weeks: RIVAL_FAILURE.distressWeeks,
+      n: bank.branches.length,
+    },
+    7,
   );
 }
 
@@ -153,6 +179,8 @@ function failureCheck(state: GameState, bank: RivalBank, rng: Rng): void {
 export function splitDistressed(state: GameState): void {
   for (const bank of Object.values(state.rivals)) {
     if (bank.status !== 'distressed' || (bank.distressedUntil ?? 0) > state.clock.week) continue;
+    // Your offer gets its answer first (M&A, tick step 8); a network you buy is never split.
+    if (pendingOffer(state, bank.id)) continue;
     const takers = new Set<string>();
     const n = bank.branches.length;
     for (const branch of bank.branches) {
@@ -175,6 +203,7 @@ export function splitDistressed(state: GameState): void {
     bank.branches = [];
     bank.status = 'seized';
     delete bank.distressedUntil;
+    delete bank.distressedAsk;
     bank.priceWar = {};
     pushEvent(
       state,

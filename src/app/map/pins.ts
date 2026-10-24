@@ -1,13 +1,14 @@
 // Pin data for the map (SCREENS §2, ART_DIRECTION §2): one entry per storefront
 // lot (your branches, rivals and open branch locations) in the current city and, with the HQ stage (FEATURES.hq), per office
 // building, credit bureau and marketing agency, filtered by the Layers
-// settings, with its roof anchor in world px and its accessible label. Also
-// the renderer's occupants (lots and leased offices). Read-only views of
+// settings, with its roof anchor in world px and its accessible label. An
+// acquired branch still converting wears the old bank's ink with a progress
+// ring. Also the renderer's occupants (lots and leased offices). Read-only views of
 // GameState; positions come from the CityMap.
 import type { CityMap } from '../../art/citygen';
 import { roofAnchor } from '../../art/iso';
 import type { LotOccupant } from '../../art/mapRenderer';
-import { FEATURES, type FeatureId } from '../../config/balance';
+import { FEATURES, MERGERS, type FeatureId } from '../../config/balance';
 import { AGENCIES } from '../../data/brandCampaigns';
 import { CITIES } from '../../data/cities';
 import { COUNTRIES } from '../../data/countries';
@@ -55,6 +56,8 @@ export interface PinSpec {
   partner?: boolean;
   /** A failed rival's head office (distressed): drawn faded with a dashed ring. */
   muted?: boolean;
+  /** Your acquired branch still converting (§19.8): old ink and monogram, with a progress ring. */
+  converting?: { from: string; weeksLeft: number; progress: number };
 }
 
 /** Clustering seeds and stacking: yours first, then rivals, then other buildings, open locations last. */
@@ -97,16 +100,28 @@ function lotPin(s: GameState, map: CityMap, lot: Lot, pending: Record<string, nu
     const waiting = pending[occ.id] ?? 0;
     const name = branch?.name ?? lot.address;
     const alert = s.incidents.active.some((i) => i.scopeKind === 'branch' && i.scope === occ.id);
-    return {
+    const conv = branch?.converting;
+    const weeks = conv ? `${conv.weeksLeft} week${conv.weeksLeft === 1 ? '' : 's'} left` : '';
+    const pin: PinSpec = {
       ...base,
       kind: 'mine',
-      label: `Your branch, ${name}${alert ? ', open incident' : ''}${waiting ? `, ${waiting} loan applications waiting` : ''}`,
-      ink: s.meta.brandInk,
-      monogram: s.meta.monogram,
+      label: `Your branch, ${name}${conv ? `, converting from ${conv.name}, ${weeks}` : ''}${alert ? ', open incident' : ''}${waiting ? `, ${waiting} loan applications waiting` : ''}`,
+      // An acquired branch keeps the old bank's colours until its conversion finishes.
+      ink: conv?.ink ?? s.meta.brandInk,
+      monogram: conv?.monogram ?? s.meta.monogram,
       badge: waiting > 0,
       alert,
       branchId: occ.id,
     };
+    if (conv) {
+      const total = MERGERS.conversionWeeks;
+      pin.converting = {
+        from: conv.name,
+        weeksLeft: conv.weeksLeft,
+        progress: Math.min(1, Math.max(0, (total - conv.weeksLeft) / total)),
+      };
+    }
+    return pin;
   }
   if (occ?.type === 'rival') {
     const bank = s.rivals[occ.id];
@@ -291,7 +306,10 @@ export function buildPins(
 /** A string that changes whenever any pin would look or act differently. */
 export function pinsKey(pins: PinSpec[]): string {
   return pins
-    .map((p) => `${p.id}|${p.kind}|${p.ink}|${p.monogram}|${p.label}|${p.muted ? 1 : 0}`)
+    .map(
+      (p) =>
+        `${p.id}|${p.kind}|${p.ink}|${p.monogram}|${p.label}|${p.muted ? 1 : 0}|${p.converting?.weeksLeft ?? ''}`,
+    )
     .join(';');
 }
 
@@ -308,9 +326,10 @@ export function occupantsOf(
   for (const lot of lots) {
     const occ = lot.occupant;
     if (!occ) continue;
+    // A converting branch still flies the old bank's colours (§19.8).
     out[lot.id] =
       occ.type === 'player'
-        ? { type: 'player', ink: s.meta.brandInk }
+        ? { type: 'player', ink: s.branches[occ.id]?.converting?.ink ?? s.meta.brandInk }
         : { type: 'rival', ink: s.rivals[occ.id]?.ink ?? '#5a5a5a' };
   }
   if (features.hq) {

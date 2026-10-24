@@ -1,3 +1,87 @@
-// mergers commands (Stage 6). Placeholder from the Stage 6 foundation; one
-// module per area (CLAUDE.md non-negotiable 6).
-export {};
+// M&A commands (SIMULATION §19.8, SCREENS §12): offer to buy a rival bank.
+// The offer is validated now and answered at the next weekly tick
+// (mergers.ts): first the regulator, then the target's board.
+import { MERGERS } from '../../config/balance';
+import { planDeal, regulatorChecks, type DealPlan, type RegulatorCheck } from '../acquisitionPlan';
+import { pushEvent } from '../events';
+import { newId } from '../ids';
+import { offerPremium, referencePrice } from '../mergerPricing';
+import { cityLabel, targetBlocker } from '../mergerRules';
+import type { GameState, MergerOffer } from '../state';
+import { fail, money, ok, type CommandResult } from './result';
+
+export { pendingOffer, retryWeek } from '../mergerRules';
+
+export interface MergerQuote {
+  reference: number;
+  premium: number;
+  plan: DealPlan;
+  /** The regulator's pre-check: the same tests as the answer, without the roll. */
+  checks: RegulatorCheck[];
+  /** Why the offer can't be made now (shown on the disabled button). */
+  blocker?: string;
+}
+
+/** Everything the offer sheet shows for a price per share. */
+export function mergerQuote(
+  state: GameState,
+  rivalId: string,
+  pricePerShare: number,
+): MergerQuote | undefined {
+  const bank = state.rivals[rivalId];
+  if (!bank) return undefined;
+  const plan = planDeal(state, bank, pricePerShare);
+  const quote: MergerQuote = {
+    reference: referencePrice(bank),
+    premium: offerPremium(bank, pricePerShare),
+    plan,
+    checks: regulatorChecks(plan, cityLabel),
+  };
+  const blocker =
+    targetBlocker(state, rivalId) ??
+    (!(pricePerShare > 0) || !Number.isFinite(pricePerShare)
+      ? 'Enter a price per share.'
+      : state.company.cash < plan.cash
+        ? `Not enough cash: you need ${money(plan.cash)}.`
+        : undefined);
+  if (blocker) quote.blocker = blocker;
+  return quote;
+}
+
+/** Offers to buy every outstanding share of a rival at a price per share (cash only, §19.8). */
+export function offerMerger(
+  state: GameState,
+  rivalId: string,
+  pricePerShare: number,
+): CommandResult<{ offerId: string }> {
+  const quote = mergerQuote(state, rivalId, pricePerShare);
+  if (!quote) return fail('That bank no longer exists.');
+  if (quote.blocker) return fail(quote.blocker);
+  const bank = state.rivals[rivalId]!;
+  const offer: MergerOffer = {
+    id: newId(state, 'ma'),
+    rivalId,
+    pricePerShare,
+    total: quote.plan.cash,
+    premium: quote.premium,
+    madeWeek: state.clock.week,
+    respondWeek: state.clock.week + 1,
+    status: 'pending',
+    distressed: bank.status === 'distressed',
+  };
+  state.mergers.offers.push(offer);
+  const kept = MERGERS.offersKept;
+  if (state.mergers.offers.length > kept) {
+    // Drop the oldest answered offers first; pending ones always stay.
+    const answered = state.mergers.offers.filter((o) => o.status !== 'pending');
+    const drop = new Set(answered.slice(0, state.mergers.offers.length - kept));
+    state.mergers.offers = state.mergers.offers.filter((o) => !drop.has(o));
+  }
+  pushEvent(
+    state,
+    'MERGER_OFFER',
+    { rivalId, bank: bank.name, total: offer.total, premiumPct: offer.premium * 100 },
+    3,
+  );
+  return ok({ offerId: offer.id });
+}
