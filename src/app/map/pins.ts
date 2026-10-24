@@ -19,6 +19,9 @@ import { LOBBY_FIRMS } from '../../data/lobbying';
 import { conventionPinInfo } from '../convention/conventionPin';
 import { propertyPinInfo } from '../realEstate/propertyPin';
 import { airportPin, centralBankPin } from './landmarkPins';
+import { auctionPinInfo } from '../auction/auctionPin';
+import { stadiumPins } from '../franchise/stadiumPin';
+import { personalPinInfo } from '../personal/personalPins';
 import type { SitePinInfo } from './sitePinInfo';
 import type { CountryId } from '../../data/types';
 import { LEASE_ONLY_KEY, layerOn, type MapLayerId } from '../../data/mapLayers';
@@ -73,6 +76,8 @@ export interface PinSpec {
   muted?: boolean;
   /** Your acquired branch still converting (§19.8): old ink and monogram, with a progress ring. */
   converting?: { from: string; weeksLeft: number; progress: number };
+  /** The club a stadium pin opens (Stage 9). */
+  clubId?: string;
   /** A short note under the medallion on Stage 7 sites ("For sale", "Open now"). */
   tag?: string;
 }
@@ -250,7 +255,9 @@ function stage7Info(s: GameState, site: Site): SitePinInfo | undefined {
   if (site.kind === 'property') return propertyPinInfo(s, site);
   if (site.kind === 'conventionCenter') return conventionPinInfo(s, site);
   if (site.kind === 'lobbyingFirm') return { visible: true, suffix: ', lobbying firm' };
-  return undefined;
+  // Stage 9: per-kind rules live with each system.
+  if (site.kind === 'auctionHouse') return auctionPinInfo(s, site);
+  return personalPinInfo(s, site);
 }
 
 function sitePin(s: GameState, map: CityMap, site: Site, info?: SitePinInfo): PinSpec {
@@ -339,6 +346,8 @@ export function buildPins(
     const cb = centralBankPin(map);
     if (cb) pins.push(cb);
   }
+  // Stage 9: club stadiums (Sports Teams layer).
+  if (features.personalEmpire && layerOn(layers, 'sportsTeams')) pins.push(...stadiumPins(s, map));
   // Stage 8: the airport is always on the map (SCREENS §18), whatever the Layers say.
   if (features.multiCity) {
     const ap = airportPin(map);

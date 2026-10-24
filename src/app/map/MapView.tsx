@@ -87,6 +87,8 @@ export function MapView() {
         else if (pin.kind === 'autoDealer') openPanel({ type: 'carDealer', siteId: pin.id });
         else if (pin.kind === 'auctionHouse') openPanel({ type: 'auctionHouse', siteId: pin.id });
         else if (pin.kind === 'vacationHome') openPanel({ type: 'vacationHome', siteId: pin.id });
+        else if (pin.kind === 'stadium' && pin.clubId)
+          openPanel({ type: 'franchise', clubId: pin.clubId });
         else if (pin.kind === 'airport') openPanel({ type: 'airport' });
         else openPanel({ type: 'storefront', lotId: pin.id });
       },
