@@ -32,6 +32,12 @@ export type PanelRoute =
   | { type: 'property'; siteId: string }
   | { type: 'convention'; siteId: string }
   | { type: 'lobbyingFirm'; siteId: string }
+  // Stage 9 (FEATURES.personalEmpire)
+  | { type: 'wealth' }
+  | { type: 'vacationHome'; siteId: string }
+  | { type: 'carDealer'; siteId: string; tab?: 'showroom' | 'financing' }
+  | { type: 'auctionHouse'; siteId: string; tab?: 'buy' | 'sell' }
+  | { type: 'franchise'; clubId: string }
   // Stage 8 (FEATURES.multiCity): the airport's departures; `jet` = "Fly now" in your own plane.
   | { type: 'airport'; jet?: boolean }
   | { type: 'company' }

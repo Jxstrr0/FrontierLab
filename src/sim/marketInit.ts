@@ -2,6 +2,7 @@
 // §17, rival share counts and prices, your bank's cap table (the founder owns
 // every share), the personal account and empty governance, executive and M&A
 // records. Used by newGame and the 6 → 7 save migration.
+import { emptyEmpire } from './personalInit';
 import {
   RIVAL_NOTIONAL_SHARE,
   START_CEO_SALARY,
@@ -107,7 +108,7 @@ export function initCapitalMarkets(state: GameState): void {
   state.executives = emptyExecutives();
   state.governance = emptyGovernance();
   state.market = initMarket();
-  state.personal = { cash: START_PERSONAL_CASH };
+  state.personal = { cash: START_PERSONAL_CASH, empire: emptyEmpire() };
   state.mergers = emptyMergers();
   state.stock = initStock(state);
   const price = privateValuation(state);

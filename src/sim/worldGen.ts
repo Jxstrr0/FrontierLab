@@ -9,6 +9,7 @@ import { generateLots } from './citygen';
 import { generateCompetitionSites } from './competitionSites';
 import { generateSites } from './hqSites';
 import { generateInvestmentSites } from './investmentSites';
+import { generatePersonalSites } from './personalSites';
 import { refreshManagerPool } from './people';
 import { refreshListings } from './propertyListings';
 import { updateMarketRefs } from './rates';
@@ -45,6 +46,7 @@ export function generateCity(
   generateCompetitionSites(state, cityId);
   generateCapitalMarketSites(state, cityId);
   generateInvestmentSites(state, cityId);
+  generatePersonalSites(state, cityId);
   updateMarketRefs(state);
   refreshManagerPool(state, cityId, true);
   if (opts.firstListings) refreshListings(state, cityId);

@@ -4,6 +4,7 @@
 // holdings, the personal account and rival M&A. Re-exported from state.ts.
 // See docs/DATA_MODEL.md §7, §8 and SIMULATION §17.2, §19.
 import type { Id, Money, Rate, Score, Week } from '../data/types';
+import type { PersonalEmpire } from './personalTypes';
 import type { AvatarSpec } from './state';
 
 // ─── Executives (SIMULATION §17.2) ────────────────────────────────────────────
@@ -184,6 +185,8 @@ export interface PersonalState {
   cash: Money;
   /** A private jet (Stage 8, CONTENT "Jets"): flies free within its range. */
   jet?: { model: string; value: Money; boughtWeek: Week; price: Money };
+  /** Homes, cars, collectibles, rich list, insider cases (Stage 9, schema v10). */
+  empire: PersonalEmpire;
 }
 
 // ─── Rival M&A (SIMULATION §19.8) ─────────────────────────────────────────────

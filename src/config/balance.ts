@@ -1147,6 +1147,89 @@ export const KM_PER_MILE = 1.609344;
 /** Private jet (§22): upkeep and depreciation per year of its value; resale haircut. */
 export const JET = { upkeepRate: 0.08, depreciation: 0.06, resaleHaircut: 0.1 } as const;
 
+// ─── PERSONAL EMPIRE (SIMULATION §22, Stage 9) ────────────────────────────────
+/** Vacation homes: value tracks the country's hpi; upkeep per year; rebuild; sale fee. */
+export const HOMES_CFG = {
+  upkeepRate: 0.01,
+  rebuildCost: 0.25,
+  rebuildWeeks: 8,
+  rebuildGain: 0.2,
+  /** Offers run from 85% of asking (a linear acceptance ramp to 100%, as buildings). */
+  offerMin: 0.85,
+  sellFee: 0.05,
+} as const;
+/** Cars: yearly value change (classics gain), upkeep, resale haircut. */
+export const CARS_CFG = {
+  depreciation: 0.12,
+  classicGain: 0.03,
+  upkeepRate: 0.02,
+  resaleHaircut: 0.1,
+} as const;
+/** Collectibles: genuine items drift +3%/yr with σ 8% applied yearly; insurance 0.2%/yr. */
+export const COLLECTIBLES_CFG = { drift: 0.03, sigma: 0.08, insuranceRate: 0.002 } as const;
+/**
+ * Auctions: each house holds one every 4 weeks with 3–5 lots, previewed 2 weeks
+ * ahead. Clearing = estimate × lognormal(1, 0.25); the winner pays clearing +
+ * 12% premium. Appraisal 1% of price, 1 week. Consignment hammer = value ×
+ * lognormal(1, 0.15), less a 10% seller fee, sold at the house's next auction.
+ */
+export const AUCTIONS = {
+  everyWeeks: 4,
+  previewWeeks: 2,
+  lots: [3, 5],
+  clearingSigma: 0.25,
+  buyerPremium: 0.12,
+  appraiseFee: 0.01,
+  appraiseWeeks: 1,
+  consignSigma: 0.15,
+  sellerFee: 0.1,
+} as const;
+/**
+ * Dealer financing (SCREENS §19): a car dealer refers auto-loan customers to
+ * your branches in its city for a yearly fee. Auto-loan demand there × (1 + boost).
+ */
+export const DEALER_FINANCING = {
+  feePerYear: 120_000,
+  termWeeks: 156,
+  demandBoost: 0.25,
+} as const;
+/**
+ * Sports franchise (DESIGN §5.16, SCREENS §20; numbers are our assumption).
+ * Revenue a year ≈ revenueYield × value, split across tickets/broadcast/merch/
+ * sponsorship; operations cost opsShare of revenue; payroll from the squad.
+ * Value grows with league revenue (leagueGrowth/yr) ± performance. Kit
+ * sponsorship by your bank adds kitAwareness brand awareness a week in every
+ * city of the club's country (and forgoes the outside sponsor's money).
+ */
+export const FRANCHISE = {
+  revenueYield: 0.12,
+  revenueSplit: { tickets: 0.3, broadcasting: 0.4, merchandise: 0.15, sponsorship: 0.15 },
+  opsShare: 0.25,
+  payrollShare: 0.55,
+  leagueGrowth: 0.05,
+  performanceSwing: 0.1,
+  kitAwareness: 0.004,
+  gamesPerSeason: 40,
+  seasonStartWeek: 36,
+  transferWindows: [
+    [1, 4],
+    [27, 34],
+  ],
+  offerMin: 0.9,
+  riskWeight: 2.5,
+} as const;
+/** Rich list (§22): 50 generated fortunes growing 4–8% a year; ranked at year end. */
+export const RICH_LIST = { size: 50, growth: [0.04, 0.08], fortune: [1.5e9, 120e9] } as const;
+/** Insider trading (§22): trades in your own shares within 2 weeks of a quarter-end. */
+export const INSIDER = {
+  windowWeeks: 2,
+  prob: 0.15,
+  fineMult: 3,
+  fineMin: 250_000,
+  ratingHit: 0.1,
+  ratingWeeks: 8,
+} as const;
+
 // ─── EXECUTIVES (SIMULATION §17.2) ────────────────────────────────────────────
 /**
  * execMult = multBase + multSlope × expertise/100 on the departments in an

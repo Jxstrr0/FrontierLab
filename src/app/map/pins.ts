@@ -11,6 +11,8 @@ import type { LotOccupant } from '../../art/mapRenderer';
 import { FEATURES, MERGERS, type FeatureId } from '../../config/balance';
 import { AGENCIES } from '../../data/brandCampaigns';
 import { CITIES } from '../../data/cities';
+import { AUCTION_HOUSES } from '../../data/collectibles';
+import { HOMES } from '../../data/homes';
 import { CONVENTIONS_CALENDAR, DEFAULT_VENUE } from '../../data/conventions';
 import { INVESTMENT_BANKS } from '../../data/investmentBanks';
 import { LOBBY_FIRMS } from '../../data/lobbying';
@@ -38,6 +40,10 @@ export type PinKind =
   | 'conventionCenter'
   | 'lobbyingFirm'
   | 'airport'
+  | 'autoDealer'
+  | 'auctionHouse'
+  | 'vacationHome'
+  | 'stadium'
   | 'lot';
 
 export interface PinSpec {
@@ -88,7 +94,11 @@ const KIND_ORDER: Record<PinKind, number> = {
   conventionCenter: 12,
   lobbyingFirm: 13,
   airport: 14,
-  lot: 15,
+  autoDealer: 15,
+  auctionHouse: 16,
+  vacationHome: 17,
+  stadium: 18,
+  lot: 19,
 };
 
 /** Pins drawn in your brand ink, lifted above the rest. */
@@ -202,6 +212,10 @@ export function siteName(s: GameState | undefined, site: Site): string {
       );
     case 'lobbyingFirm':
       return LOBBY_FIRMS[site.refId]?.name ?? 'Lobbying firm';
+    case 'auctionHouse':
+      return AUCTION_HOUSES[site.refId]?.name ?? 'Auction house';
+    case 'vacationHome':
+      return HOMES[site.refId]?.name ?? 'Vacation home';
     default:
       return site.employer?.name ?? site.refId;
   }
@@ -217,6 +231,9 @@ const SITE_ICON: Record<Site['kind'], MapLayerId> = {
   property: 'realEstate',
   conventionCenter: 'conventions',
   lobbyingFirm: 'lobbyingFirms',
+  autoDealer: 'autoDealers',
+  auctionHouse: 'auctionHouses',
+  vacationHome: 'realEstate',
 };
 
 const SITE_LAYER: Record<Site['kind'], MapLayerId> = SITE_ICON;
@@ -278,6 +295,8 @@ export function siteEnabled(
   if (kind === 'investmentBank') return features.capitalMarkets;
   if (kind === 'property' || kind === 'conventionCenter' || kind === 'lobbyingFirm')
     return features.investments;
+  if (kind === 'autoDealer' || kind === 'auctionHouse' || kind === 'vacationHome')
+    return features.personalEmpire;
   return features.competition;
 }
 

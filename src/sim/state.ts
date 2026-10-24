@@ -49,8 +49,10 @@ import type {
 export type * from './competitionTypes';
 export type * from './marketsTypes';
 export type * from './investmentsTypes';
+export type * from './personalTypes';
+import type { AuctionHouseState, ClubState, DealerDeal } from './personalTypes';
 
-export const SCHEMA_VERSION = 9;
+export const SCHEMA_VERSION = 10;
 
 export interface GameState {
   schemaVersion: number;
@@ -112,6 +114,12 @@ export interface GameState {
   lobbying: LobbyingState;
   /** Currency strength levels and positions (SIMULATION §19.10). */
   fx: FxState;
+  /** Auction houses' sales by house id (Stage 9, SIMULATION §22). */
+  auctions: Record<Id, AuctionHouseState>;
+  /** Every sports club by club id, yours or not (SCREENS §20). */
+  clubs: Record<Id, ClubState>;
+  /** Car-dealer financing deals by dealer site id (SCREENS §19). */
+  dealerDeals: Record<Id, DealerDeal>;
   /** Accumulates P&L lines and cash movements since the last weekly close. */
   ledger: Ledger;
   events: { log: GameEvent[]; scheduled: ScheduledEvent[] };
@@ -221,7 +229,10 @@ export type SiteKind =
   | 'investmentBank'
   | 'property'
   | 'conventionCenter'
-  | 'lobbyingFirm';
+  | 'lobbyingFirm'
+  | 'autoDealer'
+  | 'auctionHouse'
+  | 'vacationHome';
 
 export interface Site {
   id: Id;
@@ -845,6 +856,9 @@ export type PnlLine =
   | 'propertyCosts'
   | 'lobbying'
   | 'travel'
+  | 'franchiseRevenue'
+  | 'franchiseCosts'
+  | 'dealerFees'
   | 'loanLosses'
   | 'depreciation'
   | 'tax';

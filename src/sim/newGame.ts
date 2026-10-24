@@ -40,6 +40,7 @@ import { emptyCorporateDebt } from './corporateDebt';
 import { SCHEMA_VERSION, type AvatarSpec, type GameState, type Settings } from './state';
 import { packagedModel } from './underwriting';
 import { generateCity } from './worldGen';
+import { emptyEmpire, initPersonalEmpire } from './personalInit';
 import type { Difficulty } from '../data/types';
 
 export interface NewGameOptions {
@@ -195,7 +196,7 @@ export function newGame(opts: NewGameOptions): GameState {
       placements: [],
     },
     market: initMarket(),
-    personal: { cash: 0 },
+    personal: { cash: 0, empire: emptyEmpire() },
     mergers: emptyMergers(),
     reo: {},
     ventures: emptyVentures(),
@@ -203,6 +204,9 @@ export function newGame(opts: NewGameOptions): GameState {
     realEstate: emptyRealEstate(),
     lobbying: emptyLobbying(),
     fx: emptyFx(),
+    auctions: {},
+    clubs: {},
+    dealerDeals: {},
     ledger: emptyLedger(),
     events: { log: [], scheduled: [] },
     history: { weekly: [], quarterly: [] },
@@ -223,5 +227,6 @@ export function newGame(opts: NewGameOptions): GameState {
   state.company.tier = cap.tier;
   initCapitalMarkets(state);
   initInvestments(state);
+  initPersonalEmpire(state);
   return state;
 }

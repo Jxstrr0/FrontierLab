@@ -40,6 +40,9 @@ export const SITE_STOREYS = {
   property: 5,
   conventionCenter: 3,
   lobbyingFirm: 6,
+  autoDealer: 2,
+  auctionHouse: 4,
+  vacationHome: 2,
 } as const;
 
 /** Share of lot-free blocks that become parks, by district. */

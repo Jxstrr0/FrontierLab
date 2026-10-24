@@ -47,6 +47,9 @@ export const PNL_LINES: readonly PnlLine[] = [
   'propertyCosts',
   'lobbying',
   'travel',
+  'franchiseRevenue',
+  'franchiseCosts',
+  'dealerFees',
   'loanLosses',
   'depreciation',
   'tax',
@@ -72,6 +75,7 @@ export const FEE_INCOME: readonly PnlLine[] = [
   'acquisitionGain',
   'rentalIncome',
   'propertyGains',
+  'franchiseRevenue',
 ];
 export const OPEX: readonly PnlLine[] = [
   'branchStaff',
@@ -96,6 +100,8 @@ export const OPEX: readonly PnlLine[] = [
   'propertyCosts',
   'lobbying',
   'travel',
+  'franchiseCosts',
+  'dealerFees',
 ];
 /** Lines that don't move corporate cash (§14.3). */
 export const NON_CASH: readonly PnlLine[] = [

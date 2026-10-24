@@ -1,6 +1,8 @@
 // Save migrations (CLAUDE.md non-negotiable 7). Whenever GameState changes
 // shape, bump SCHEMA_VERSION in state.ts and add `migrations[oldVersion]`,
 // which upgrades a save from oldVersion to oldVersion + 1.
+import { initPersonalEmpire } from '../personalInit';
+import { generatePersonalSites } from '../personalSites';
 import { START_CASH } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { isFrontage, nearestFrontage } from '../cityLayout';
@@ -198,7 +200,25 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
       : {};
     return s;
   },
+
+  // 9 → 10: Stage 9 personal empire. Every visited city gains its car dealer,
+  // auction house and vacation homes; new P&L lines; the empire, auctions,
+  // clubs and rich list start fresh.
+  9: (s) => {
+    const state = s as unknown as GameState;
+    for (const line of STAGE9_PNL_LINES) {
+      state.ledger.pnl[line] ??= 0;
+      for (const w of state.history.weekly) w.pnl[line] ??= 0;
+    }
+    for (const cityId of Object.keys(state.world.cities).sort()) {
+      generatePersonalSites(state, cityId);
+    }
+    initPersonalEmpire(state);
+    return s;
+  },
 };
+
+const STAGE9_PNL_LINES = ['franchiseRevenue', 'franchiseCosts', 'dealerFees'] as const;
 
 const STAGE7_PNL_LINES = [
   'ventureDebtInterest',

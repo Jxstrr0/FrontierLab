@@ -22,3 +22,6 @@ export * from './realEstate';
 export * from './lobbying';
 export * from './fx';
 export * from './travel';
+export * from './personal';
+export * from './auctions';
+export * from './franchise';

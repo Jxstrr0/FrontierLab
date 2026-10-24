@@ -6,6 +6,7 @@
 // ledgerTemplatesWorld.ts; all are merged into LEDGER_TEMPLATES.
 import { CAPITAL_TEMPLATES } from './ledgerTemplatesCapital';
 import { INVESTMENTS_TEMPLATES } from './ledgerTemplatesInvestments';
+import { EMPIRE_TEMPLATES } from './ledgerTemplatesEmpire';
 import { RIVAL_TEMPLATES } from './ledgerTemplatesRivals';
 import { WORLD_TEMPLATES } from './ledgerTemplatesWorld';
 
@@ -347,6 +348,7 @@ export const LEDGER_TEMPLATES = {
   ...WORLD_TEMPLATES,
   ...CAPITAL_TEMPLATES,
   ...INVESTMENTS_TEMPLATES,
+  ...EMPIRE_TEMPLATES,
 };
 
 export type TemplateKey = keyof typeof LEDGER_TEMPLATES;
