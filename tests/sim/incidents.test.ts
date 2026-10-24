@@ -47,9 +47,9 @@ describe('incident catalog', () => {
     }
   });
 
-  it('does not raise later-stage incidents yet', () => {
+  it('raises Stage 9 incidents once the personal empire is switched on', () => {
     const { s } = openBank();
-    expect(raiseIncident(s, 'INSIDER_PROBE', 'personal', 'personal')).toBeUndefined();
+    expect(raiseIncident(s, 'INSIDER_PROBE', 'personal', 'personal')).toBeDefined();
   });
 });
 

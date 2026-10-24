@@ -50,7 +50,13 @@ describe('pin clustering', () => {
 });
 
 /** Feature sets with the HQ stage off and on, whatever the build's flags say. */
-const NO_HQ = { ...FEATURES, hq: false, competition: false, multiCity: false };
+const NO_HQ = {
+  ...FEATURES,
+  hq: false,
+  competition: false,
+  multiCity: false,
+  personalEmpire: false,
+};
 const WITH_HQ = {
   ...FEATURES,
   hq: true,
@@ -58,6 +64,7 @@ const WITH_HQ = {
   capitalMarkets: false,
   investments: false,
   multiCity: false,
+  personalEmpire: false,
 };
 const STAGE5 = {
   ...FEATURES,
