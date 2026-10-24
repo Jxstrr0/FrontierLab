@@ -15,6 +15,7 @@ export type PanelRoute =
   | { type: 'branch'; branchId: string; tab?: BranchTab }
   | { type: 'company' }
   | { type: 'branches' }
+  | { type: 'cityList' }
   | { type: 'settings' }
   | { type: 'saves' };
 
@@ -31,7 +32,7 @@ export interface Toast {
 export const screen = signal<Screen>('title');
 export const panel = signal<PanelRoute | null>(null);
 export const modal = signal<ModalRoute | null>(null);
-export const sheet = signal<'menu' | null>(null);
+export const sheet = signal<'menu' | 'layers' | null>(null);
 export const toasts = signal<Toast[]>([]);
 
 /** Bumped after every mutation of the current game. */
