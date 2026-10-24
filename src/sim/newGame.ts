@@ -112,6 +112,8 @@ export function newGame(opts: NewGameOptions): GameState {
       leaseDeposits: 0,
       tier: 'strong',
       tierWeeks: 0,
+      negativeCashWeeks: 0,
+      lowCapitalWeeks: 0,
       capitalRatio: 0,
       liquidityRatio: null,
       appRating: START_APP_RATING,

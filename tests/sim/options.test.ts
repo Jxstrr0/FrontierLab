@@ -51,3 +51,17 @@ describe('new game options', () => {
     expect(up.meta).toMatchObject({ difficulty: 'normal', competitors: 3, startCash: 750_000 });
   });
 });
+
+describe('game over', () => {
+  it('declares insolvency after four weeks of negative cash', () => {
+    const s = newGame(base);
+    s.company.cash = -1_000_000;
+    advanceWeeks(s, 3);
+    expect(s.flags.gameOver).toBeUndefined();
+    advanceWeeks(s, 1);
+    expect(s.flags.gameOver).toBe('insolvency');
+    const day = s.clock.day;
+    advanceWeeks(s, 1);
+    expect(s.clock.day).toBe(day);
+  });
+});

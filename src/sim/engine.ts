@@ -13,6 +13,7 @@ import { updateStaff } from './branch/staff';
 import { emptyWeek } from './branch/week';
 import { isQuarterStart, isYearStart } from './calendar';
 import { evaluateCapital } from './capital';
+import { checkFailure } from './failure';
 import { updateAppRating } from './company';
 import { pushEvent, trimEvents } from './events';
 import { updateMacro } from './macro';
@@ -67,6 +68,7 @@ export function weeklyTick(state: GameState): void {
   depreciate(state); // 8
   closeWeek(state); // 9
   evaluateCapital(state); // 10
+  checkFailure(state);
 
   if (isQuarterStart(state.meta.startDate, state.clock.day)) quarterEnd(state); // 13
   if (isYearStart(state.meta.startDate, state.clock.day)) yearEnd(state); // 14

@@ -11,6 +11,8 @@ import './app/styles/base.css';
 import './app/styles/buttons.css';
 import { render } from 'preact';
 import { App } from './app/App';
+import { installDebug } from './app/debug';
 
 const root = document.getElementById('app');
+installDebug();
 if (root) render(<App />, root);

@@ -1,12 +1,22 @@
 // Title screen (docs/SCREENS.md §1): engraved wordmark, main menu and version.
-// In Stage 0 the menu buttons are shown but disabled until the game loop exists.
-import { FEATURES } from '../../config/balance';
 import { CornerRosette } from './CornerRosette';
+import { latestSlot, loadFromSlot } from '../saves';
+import { screen, setGame, toast } from '../store';
+import { ToastHost } from '../components';
 import { Rosette } from './Rosette';
 import './title.css';
 
 export function TitleScreen() {
-  const playable = FEATURES.playableLoop;
+  const latest = latestSlot();
+  const resume = () => {
+    if (!latest) return;
+    try {
+      setGame(loadFromSlot(latest.slot));
+      screen.value = 'game';
+    } catch (e) {
+      toast((e as Error).message, 'bad');
+    }
+  };
   return (
     <main class="title">
       <div class="title-frame">
@@ -30,13 +40,28 @@ export function TitleScreen() {
         </div>
 
         <nav class="title-menu" aria-label="Main menu">
-          <button class="btn btn-primary" type="button" disabled={!playable}>
+          {latest && (
+            <button class="btn btn-primary" type="button" onClick={resume}>
+              Continue
+            </button>
+          )}
+          <button
+            class={`btn ${latest ? 'btn-secondary' : 'btn-primary'}`}
+            type="button"
+            onClick={() => (screen.value = 'newgame')}
+          >
             New game
           </button>
-          <button class="btn btn-secondary" type="button" disabled={!playable}>
-            Continue
+          <button class="btn btn-secondary" type="button" onClick={() => (screen.value = 'saves')}>
+            Load
           </button>
-          {!playable && <p class="title-soon">The doors open soon.</p>}
+          <button
+            class="btn btn-secondary"
+            type="button"
+            onClick={() => (screen.value = 'settings')}
+          >
+            Settings
+          </button>
         </nav>
 
         <footer class="title-footer">
@@ -44,6 +69,7 @@ export function TitleScreen() {
           <span class="title-version">v{__APP_VERSION__}</span>
         </footer>
       </div>
+      <ToastHost />
     </main>
   );
 }

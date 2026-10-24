@@ -176,6 +176,10 @@ export interface Company {
   leaseDeposits: Money;
   tier: Tier;
   tierWeeks: number;
+  /** Consecutive weeks with corporate cash below zero (insolvency check). */
+  negativeCashWeeks: number;
+  /** Consecutive weeks with the capital ratio below FAILURE.takeoverCr. */
+  lowCapitalWeeks: number;
   capitalRatio: number;
   /** Liquid assets ÷ deposits; null while there are no deposits. */
   liquidityRatio: number | null;
