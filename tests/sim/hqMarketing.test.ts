@@ -29,8 +29,7 @@ describe('brand campaigns', () => {
       cmd.startBrandCampaign(m, { campaignId: 'naming', scope: 'city', targetId: 'cal' }),
     ).toEqual({
       ok: false,
-      reason:
-        "Arena Naming Rights needs a sports franchise in the city, and you don't own one yet.",
+      reason: 'Arena Naming Rights needs a sports franchise you own in the city.',
     });
     expect(
       cmd.startBrandCampaign(m, { campaignId: 'billboards', scope: 'country', targetId: 'CA' }),

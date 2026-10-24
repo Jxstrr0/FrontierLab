@@ -6,6 +6,7 @@ import { AGENCIES, BRAND_CAMPAIGNS, type BrandCampaignSpec } from '../../../data
 import { CITIES } from '../../../data/cities';
 import { COUNTRIES } from '../../../data/countries';
 import type { CountryId } from '../../../data/types';
+import { ownsClubIn } from '../../../sim/franchise';
 import { brandGainByCity, campaignCities } from '../../../sim/hqMarketing';
 import type { AgencyPackageRun, BrandCampaign, GameState } from '../../../sim/state';
 
@@ -91,10 +92,14 @@ export function awarenessRows(state: GameState): AwarenessRow[] {
     .sort((a, b) => b.awareness - a.awareness || a.name.localeCompare(b.name));
 }
 
-/** Why a campaign can't start at all (before scope checks), or undefined. */
-export function campaignBlocker(spec: BrandCampaignSpec): string | undefined {
-  return spec.needsFranchise
-    ? 'Needs a sports franchise in the city. Franchises arrive with the personal empire.'
+/** Why a campaign can't start in this city (before scope checks), or undefined. */
+export function campaignBlocker(
+  spec: BrandCampaignSpec,
+  s: GameState,
+  cityId: string,
+): string | undefined {
+  return spec.needsFranchise && !ownsClubIn(s, cityId)
+    ? 'Needs a sports franchise you own in the city. Buy one at its stadium.'
     : undefined;
 }
 

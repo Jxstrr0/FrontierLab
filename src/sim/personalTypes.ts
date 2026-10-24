@@ -83,6 +83,8 @@ export interface Player {
   salary: Money;
   /** Contract years left. */
   years: number;
+  /** Transfer fee to sign this player (transfer market only). */
+  fee?: Money;
 }
 
 export interface ClubState {
@@ -113,6 +115,8 @@ export interface ClubState {
     sponsorship: Money;
     payroll: Money;
     operations: Money;
+    /** Transfer fees paid and release settlements this season. */
+    transfers?: Money;
   };
 }
 

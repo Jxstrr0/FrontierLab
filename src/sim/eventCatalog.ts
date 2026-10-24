@@ -259,10 +259,18 @@ export interface EventPayloads {
     genuine: boolean;
     value: Money;
   };
-  CLUB_BOUGHT: { clubId: string; club: string; owner: 'company' | 'personal'; price: Money };
-  CLUB_SOLD: { clubId: string; club: string; price: Money };
+  CLUB_BOUGHT: {
+    clubId: string;
+    club: string;
+    owner: 'company' | 'personal';
+    price: Money;
+    league: string;
+  };
+  CLUB_SOLD: { clubId: string; club: string; price: Money; owner: 'company' | 'personal' };
   CLUB_SEASON: { clubId: string; club: string; league: string; pos: number; record: string };
   KIT_SPONSOR: { clubId: string; club: string; on: boolean };
+  /** You signed a star from the transfer market (commands/franchise.ts). */
+  CLUB_SIGNED: { clubId: string; club: string; player: string; position: string; fee: Money };
   /** Year end, when you rank (richList.ts). */
   RICH_LIST: {
     rank: number;

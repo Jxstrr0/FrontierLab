@@ -35,7 +35,7 @@ export function BrandCampaignCard({ spec, cityId }: { spec: BrandCampaignSpec; c
   const target = scopeTarget(cityId, scope);
   const running = runningAt(s, spec.id, scope, target);
   const elsewhere = runningElsewhere(s, spec.id, { scope, targetId: target });
-  const blocker = campaignBlocker(spec);
+  const blocker = campaignBlocker(spec, s, cityId);
   const cost = brandCampaignCost(spec, scope);
   const gain = (spec.gainPerWeek[scope] ?? 0) * campaignMult(s);
   const boosts = Object.entries(spec.segmentBoost ?? {}) as [SegmentId, number][];
