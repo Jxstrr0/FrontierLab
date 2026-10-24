@@ -133,6 +133,10 @@ export interface OwnStock {
   listedWeek?: Week;
   /** Price the IPO was offered at, for the listing story. */
   ipoPrice?: Money;
+  /** Why the last pending IPO was withdrawn at listing (shown on the Equity tab). */
+  ipoWithdrawn?: { week: Week; reason: string };
+  /** Market step's event cursor: events of `week` already read (§19.5 shocks). */
+  scan?: { week: Week; count: number };
 }
 
 // ─── Stock market (SIMULATION §19.1, §19.7) ───────────────────────────────────

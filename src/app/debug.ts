@@ -8,6 +8,8 @@ import * as cmd from '../sim/commands';
 import { advanceWeeks } from '../sim/engine';
 import { forceIncident } from '../sim/incidents';
 import { INCIDENT_SPECS } from '../data/incidents';
+import { investmentBanksIn } from '../data/investmentBanks';
+import { listPendingIpo } from '../sim/equityIpo';
 import { act, bump, modal, openPanel, peekGame, screen, setGame } from './store';
 import { newGame } from '../sim/newGame';
 import { activeMap } from './map/MapView';
@@ -90,6 +92,33 @@ export function installDebug(): void {
       const s = peekGame();
       if (s) advanceWeeks(s, weeks);
       bump();
+    },
+    /**
+     * Lists the bank at once (Stage 6 screenshots): adds paid-in capital, writes
+     * four profitable quarters, launches the IPO with the city's investment bank
+     * and lists it without waiting for quarter-end.
+     */
+    goPublic(capital = 40_000_000) {
+      const s = peekGame();
+      const bankId = s && investmentBanksIn(s.world.currentCityId)[0];
+      if (!s || !bankId || s.stock.status === 'public') return false;
+      s.company.cash += capital;
+      s.company.paidInCapital += capital;
+      const income = capital * 0.03;
+      s.history.quarterly = [1, 2, 3, 4].map((q) => ({
+        endWeek: s.clock.week - 1,
+        year: 2027,
+        q: q as 1 | 2 | 3 | 4,
+        revenue: income * 3,
+        netIncome: income,
+        eps: income / s.company.sharesOutstanding,
+        roe: 0.12,
+      }));
+      s.company.tier = 'strong';
+      const r = cmd.launchIpo(s, bankId, 0.25);
+      const listed = r.ok && listPendingIpo(s);
+      bump();
+      return listed;
     },
   };
   (window as unknown as { __vs: typeof api }).__vs = api;

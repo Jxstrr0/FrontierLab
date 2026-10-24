@@ -155,20 +155,22 @@ describe('equity grants', () => {
     const s = execGame();
     const cfo = loyal(hire(s, 'cfo'));
     const price = s.stock.price;
-    cmd.addGrant(s, 'cfo', 'option', 10_000, price * 2);
+    // A strike far above anything the private valuation reaches in a year.
+    const strike = price * 50;
+    cmd.addGrant(s, 'cfo', 'option', 10_000, strike);
     const g = cfo.grants[0]!;
     expect(g.fairValue).toBeCloseTo(price * EXEC_PAY.optionMinValue);
     for (let w = 0; w < WEEKS_PER_YEAR; w++) tick(s);
     expect(g.vested).toBe(2_500);
     expect(g.exercised).toBe(0);
     // The share price rises above the strike: the vested part is exercised.
-    s.stock.price = price * 3;
+    s.stock.price = strike * 1.5;
     const cash = s.company.cash;
     const paidIn = s.company.paidInCapital;
     runGrants(s);
     expect(g.exercised).toBe(2_500);
-    expect(s.company.cash - cash).toBeCloseTo(2_500 * price * 2);
-    expect(s.company.paidInCapital - paidIn).toBeGreaterThanOrEqual(2_500 * price * 2);
+    expect(s.company.cash - cash).toBeCloseTo(2_500 * strike);
+    expect(s.company.paidInCapital - paidIn).toBeGreaterThanOrEqual(2_500 * strike);
     expect(sharesHeld(s, cfo.id)).toBe(2_500);
     expect(holderTotal(s)).toBe(s.company.sharesOutstanding);
     expect(identityGap(s)).toBeLessThan(1);
