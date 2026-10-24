@@ -45,3 +45,30 @@ export const LANDMARKS = [
   { id: 'airport', district: 'industrial' },
 ] as const satisfies readonly { id: string; district: DistrictId }[];
 export type LandmarkId = (typeof LANDMARKS)[number]['id'];
+
+// ─── Engraved renderer (src/art/isoRenderer.ts) ───────────────────────────────
+// Rendering and cache tuning for the chunked map renderer. Purely visual: none
+// of these touch the simulation.
+
+/** Chunks are square and this many CSS px on screen at their zoom stop. */
+export const CHUNK_CSS_PX = 256;
+/**
+ * Total device pixels the chunk cache may hold (4 bytes each). iOS Safari caps
+ * all canvases at ~384 MB, so 40 M px (≈160 MB) leaves room for the view canvas.
+ */
+export const CHUNK_CACHE_BUDGET_PX = 40_000_000;
+/** Time budget per frame for drawing missing chunks, in ms. */
+export const RENDER_SLICE_MS = 6;
+/** A stop may be scaled up this much before the next sharper stop is used. */
+export const STOP_UPSCALE_TOLERANCE = 1.15;
+/** Prefetch this many chunks around the visible ones once they are ready. */
+export const PREFETCH_RING = 1;
+
+/** Extra storeys above `floors` that crowns, spires and roofs may reach. */
+export const ROOF_EXTRA_STOREYS = 4;
+/** Height of the player's roof flag above the roof, in world px. */
+export const FLAG_PX = 14;
+/** Tallest a landmark may draw above its block, in world px. */
+export const LANDMARK_MAX_PX = 150;
+/** Cast shadows run along +x for this many tiles per world px of height. */
+export const SHADOW_TILES_PER_PX = 0.006;
