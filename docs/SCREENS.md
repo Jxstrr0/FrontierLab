@@ -92,17 +92,18 @@ After the wizard, the map opens with the tutorial (§27).
 - **Pins** are DOM medallions positioned over the canvas:
   - yours: brand ink with monogram
   - rivals: their brand color ring
-  - for lease: brass "For lease" tag
-  - office for lease, building for sale, and special buildings: type icons
+  - open branch locations: a blank "$" medallion
+  - buildings for rent (office buildings): brass "For lease" tag with the type icon
+  - building for sale and special buildings (bureaus, agencies, investment banks): type icons
 - At the far zoom level, nearby pins cluster with a count.
 - Tap a pin to open its panel. Tapping empty map does nothing.
 - **Layers sheet:** an "All" toggle plus one toggle per type (14) with icons. Toggles persist in settings.
 
-## 3. Storefront for lease
+## 3. Available location (storefront)
 
-- **Header:** "Storefront for lease" with the address.
+- **Header:** "Available location" with the address.
 - **Advisor:** a generated traffic and rent comment ("Foot traffic is light here, but so is the rent.").
-- **Hero:** empty storefront with lease signs.
+- **Hero:** empty storefront with an "Available" sign.
 - **Fields:**
   - weekly rent (/week) and security deposit (upfront)
   - foot traffic (/week)

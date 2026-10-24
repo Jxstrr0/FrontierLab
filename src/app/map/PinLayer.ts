@@ -1,7 +1,8 @@
 // DOM pins over the map canvas (ART_DIRECTION §2): medallions for branches
-// and your HQ, type medallions for offices for lease, credit bureaus and
-// agencies, brass tags for storefronts for lease, and count medallions for
-// clusters at the far zoom. Plain DOM managed imperatively: elements are created when the
+// and your HQ, plain "$" medallions for open branch locations, type
+// medallions for credit bureaus and agencies, brass "For lease" tags for
+// office buildings you can rent, and count medallions for clusters at the far
+// zoom. Plain DOM managed imperatively: elements are created when the
 // pin set changes and only their transforms are touched per frame, so a pan
 // never re-renders Preact. Each pin is a real <button> (tap, keyboard, label).
 import { h, render } from 'preact';
@@ -13,7 +14,7 @@ import {
   PIN_MEDALLION_PX,
 } from '../../config/mapView';
 import { Medallion } from '../components';
-import { LayerMedallion } from './LayerIcon';
+import { LayerIcon, LayerMedallion } from './LayerIcon';
 import { worldToScreen, type Size, type ViewCamera } from './camera';
 import { clusterLevel, clusterPins, clusterRadius, type Cluster } from './cluster';
 import { isYours, type PinSpec } from './pins';
@@ -174,6 +175,16 @@ function hide(p: Placed): void {
   p.shown = '';
 }
 
+const LEASE_TAG_ICON_PX = 13;
+
+/** Open branch location: a blank ivory medallion with a plain "$" (ART_DIRECTION §2). */
+const LOT_MEDALLION_SVG =
+  `<svg class="medallion" width="${PIN_MEDALLION_PX}" height="${PIN_MEDALLION_PX}" viewBox="0 0 30 30">` +
+  '<circle cx="15" cy="15" r="14" fill="var(--ivory)" stroke="var(--brass)" stroke-width="1.5"/>' +
+  '<circle cx="15" cy="15" r="11.5" fill="none" stroke="var(--brass)" stroke-width="0.6" stroke-dasharray="1 1.2"/>' +
+  '<text x="15" y="15.5" text-anchor="middle" dominant-baseline="central" class="medallion-text" fill="var(--ledger-ink)">$</text>' +
+  '</svg>';
+
 function makePinElement(p: PinSpec): HTMLButtonElement {
   const el = document.createElement('button');
   el.type = 'button';
@@ -181,8 +192,16 @@ function makePinElement(p: PinSpec): HTMLButtonElement {
   el.dataset.lotId = p.id;
   el.setAttribute('aria-label', p.label);
   el.style.display = 'none';
-  if (p.kind === 'lease') {
-    el.innerHTML = '<span class="pin-tag" aria-hidden="true">For lease</span>';
+  if (p.kind === 'office') {
+    // Rentable building: the For lease tag with the building type's icon.
+    const tag = document.createElement('span');
+    tag.className = 'pin-tag';
+    tag.setAttribute('aria-hidden', 'true');
+    if (p.icon) render(h(LayerIcon, { id: p.icon, size: LEASE_TAG_ICON_PX }), tag);
+    tag.insertAdjacentText('beforeend', 'For lease');
+    el.appendChild(tag);
+  } else if (p.kind === 'lot') {
+    el.innerHTML = `<span class="pin-body" aria-hidden="true">${LOT_MEDALLION_SVG}</span>`;
   } else {
     const body = document.createElement('span');
     body.className = 'pin-body';

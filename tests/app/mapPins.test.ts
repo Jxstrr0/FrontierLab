@@ -74,8 +74,8 @@ describe('map pins', () => {
     const floors = map.floors[lot.tile.y * map.tiles + lot.tile.x]!;
     expect({ x: mine.x, y: mine.y }).toEqual(roofAnchor(map.tiles, lot.tile.x, lot.tile.y, floors));
     expect(pins.some((p) => p.kind === 'rival')).toBe(true);
-    const lease = pins.find((p) => p.kind === 'lease')!;
-    expect(lease.label).toBe(`For lease, ${s.world.lots[lease.id]!.address}`);
+    const open = pins.find((p) => p.kind === 'lot')!;
+    expect(open.label).toBe(`Available branch location, ${s.world.lots[open.id]!.address}`);
   });
 
   it('follows the layer settings', () => {
@@ -83,7 +83,7 @@ describe('map pins', () => {
     cmd.setSettings(s, { layers: { [LEASE_ONLY_KEY]: true } });
     const leaseOnly = buildPins(s, map, lots, NO_HQ);
     expect(leaseOnly.length).toBeGreaterThan(0);
-    expect(leaseOnly.every((p) => p.kind === 'lease')).toBe(true);
+    expect(leaseOnly.every((p) => p.kind === 'lot')).toBe(true);
     cmd.setSettings(s, { layers: { branches: false } });
     expect(buildPins(s, map, lots, NO_HQ)).toEqual([]);
   });
@@ -112,7 +112,7 @@ describe('HQ pins (Stage 4)', () => {
   it('adds offices for lease, credit bureaus and agencies only with the HQ stage', () => {
     const { s, lots, offices, sites, map } = setup();
     expect(
-      buildPins(s, map, lots, NO_HQ).every((p) => p.kind === 'rival' || p.kind === 'lease'),
+      buildPins(s, map, lots, NO_HQ).every((p) => p.kind === 'rival' || p.kind === 'lot'),
     ).toBe(true);
     const pins = buildPins(s, map, lots, WITH_HQ);
     const officePins = pins.filter((p) => p.kind === 'office');

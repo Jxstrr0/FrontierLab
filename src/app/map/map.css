@@ -90,13 +90,31 @@
   outline-offset: 1.5px;
 }
 
-/* For lease: an ivory tag with a brass outline. */
-.pin-lease {
-  width: 76px;
-  margin-left: -38px;
+/* Open branch location: a smaller blank "$" medallion, quieter than branches. */
+.pin-lot .pin-body {
+  transform: scale(0.8);
+}
+.map-pin.pin-lot:active .pin-body {
+  transform: scale(0.72);
+}
+.pin-lot::after {
+  top: calc(50% + var(--pin-size) * 0.4 - 1px);
+  height: calc(var(--pin-lift) - var(--pin-size) * 0.4 + 1px);
+}
+/* Far zoom: open locations shrink to small "$" coins. */
+.pin-layer.is-far .pin-lot .pin-body {
+  transform: scale(0.5);
+}
+
+/* For lease (office buildings you can rent): an ivory tag with a brass outline. */
+.pin-office {
+  width: 92px;
+  margin-left: -46px;
 }
 .pin-tag {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 3px;
   padding: 2px 6px;
   border: 1.5px solid var(--brass);
   border-radius: 3px;
@@ -108,16 +126,20 @@
   white-space: nowrap;
   transition: transform var(--dur-press) var(--ease-out);
 }
-.pin-lease::after {
+.pin-tag .layer-icon {
+  flex: none;
+}
+.pin-office::after {
   top: calc(50% + 9px);
   height: calc(var(--pin-lift) - 9px);
 }
 /* Far zoom: the tag shrinks to a small brass tag dot. */
-.pin-layer.is-far .pin-lease {
+.pin-layer.is-far .pin-office {
   width: var(--pin-hit);
   margin-left: calc(var(--pin-hit) / -2);
 }
 .pin-layer.is-far .pin-tag {
+  display: block;
   width: 10px;
   height: 10px;
   padding: 0;
@@ -126,6 +148,9 @@
   border-color: var(--brass);
   font-size: 0;
   transform: rotate(45deg);
+}
+.pin-layer.is-far .pin-tag .layer-icon {
+  display: none;
 }
 .pin-layer.is-far .map-pin::after {
   display: none;

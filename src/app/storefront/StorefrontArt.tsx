@@ -1,4 +1,4 @@
-// A simple engraved-style empty storefront with a lease sign, until the
+// A simple engraved-style empty storefront with an "Available" sign, until the
 // procedural vignettes arrive (ART_DIRECTION §4). Line work only.
 export function StorefrontArt() {
   return (
@@ -15,10 +15,10 @@ export function StorefrontArt() {
       {/* Window and door */}
       <path d="M88 86h76v46H88zM126 86v46M88 108h76" class="art-line" />
       <path d="M186 86h46v46h-46zM214 110v2" class="art-line" />
-      {/* Lease sign on a post */}
-      <path d="M284 116v16M258 94h52v22h-52z" class="art-line" />
+      {/* "Available" sign on a post */}
+      <path d="M284 116v16M250 94h68v22h-68z" class="art-line" />
       <text x="284" y="108" text-anchor="middle" class="art-text">
-        For lease
+        Available
       </text>
       <text x="160" y="52" text-anchor="middle" class="art-text art-sign">
         Vacant

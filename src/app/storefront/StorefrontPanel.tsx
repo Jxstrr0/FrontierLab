@@ -1,4 +1,4 @@
-// Storefront for lease (SCREENS §3): what a lot offers (rent, traffic, who lives
+// Available branch location (SCREENS §3): what a lot offers (rent, traffic, who lives
 // and works nearby, the competition) and a Build branch button.
 import { SEGMENTS } from '../../data/types';
 import * as cmd from '../../sim/commands';
@@ -22,7 +22,7 @@ export function StorefrontPanel(p: { lotId: string }) {
   const lot = s.world.lots[p.lotId];
   if (!lot) {
     return (
-      <Panel title="Storefront for lease" onClose={closePanel}>
+      <Panel title="Available location" onClose={closePanel}>
         <p class="muted">That storefront no longer exists.</p>
       </Panel>
     );
@@ -34,7 +34,7 @@ export function StorefrontPanel(p: { lotId: string }) {
 
   return (
     <Panel
-      title="Storefront for lease"
+      title="Available location"
       subtitle={`${lot.address} · ${districtName(lot)}`}
       onClose={closePanel}
       advisor={{ text: storefrontAdvice(lot, cityLots(s)) }}

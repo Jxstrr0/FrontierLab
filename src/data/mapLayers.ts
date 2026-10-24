@@ -29,7 +29,7 @@ export interface MapLayerSpec {
 }
 
 export const MAP_LAYERS: readonly MapLayerSpec[] = [
-  // Your branches, rival branches and storefronts for lease.
+  // Your branches, rival branches and open branch locations ($ pins).
   { id: 'branches', label: 'Branches', feature: 'cityMap' },
   { id: 'offices', label: 'Offices', feature: 'hq' },
   { id: 'realEstate', label: 'Real Estate', feature: 'investments' },
@@ -46,7 +46,7 @@ export const MAP_LAYERS: readonly MapLayerSpec[] = [
   { id: 'employers', label: 'Employers', feature: 'competition' },
 ];
 
-/** Settings key for the Branches layer's "For lease only" sub-filter (off by default). */
+/** Settings key for the Branches layer's "Available only" sub-filter (off by default). */
 export const LEASE_ONLY_KEY = 'branches.leaseOnly';
 
 /** Layers whose systems exist in this build. */

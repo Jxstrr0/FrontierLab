@@ -23,6 +23,10 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 - **Dependencies:** none added.
 - **Next:** the Products floor and Credit bureau screens (SCREENS §10, §13).
 
+### 2026-10-24 — Map pins: "$" for open locations, "For lease" for offices
+- **Done:** at the owner's request, open branch locations now show a plain "$" coin (a little smaller than branch pins, and smaller still when zoomed out) instead of the "For lease" tag. The "For lease" tag now marks buildings you rent: office buildings, with a small office icon. The list view, the Layers filter ("Available only") and the storefront panel ("Available location") use the same wording. Credit bureaus and agencies keep their icon medallions, and so will investment banks when Stage 7 adds them.
+- **Next:** unchanged: the owner's iPhone check of Stage 4.
+
 ### 2026-10-24 — Stage 4 built: HQ and operations
 - **Stage / step:** 4 — HQ and operations depth
 - **Done:**
