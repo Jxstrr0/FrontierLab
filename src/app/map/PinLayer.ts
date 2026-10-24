@@ -1,6 +1,7 @@
 // DOM pins over the map canvas (ART_DIRECTION §2): medallions for branches
 // and your HQ, plain "$" medallions for open branch locations, type
-// medallions for credit bureaus and agencies, brass "For lease" tags for
+// medallions for credit bureaus and agencies (employers and universities you
+// partner with add a brand-ink seal), brass "For lease" tags for
 // office buildings you can rent, and count medallions for clusters at the far
 // zoom. Plain DOM managed imperatively: elements are created when the
 // pin set changes and only their transforms are touched per frame, so a pan
@@ -218,10 +219,23 @@ function makePinElement(p: PinSpec): HTMLButtonElement {
     );
     el.appendChild(body);
   }
+  if (p.partner) {
+    // Your employer or university partner: a small brand-ink seal with an ivory tick.
+    const seal = document.createElement('span');
+    seal.className = 'pin-partner';
+    seal.setAttribute('aria-hidden', 'true');
+    seal.style.setProperty('--pin-ink', p.ink);
+    seal.innerHTML = PARTNER_SEAL_SVG;
+    el.appendChild(seal);
+  }
   if (p.badge)
     el.insertAdjacentHTML('beforeend', '<span class="pin-badge" aria-hidden="true"></span>');
   return el;
 }
+
+const PARTNER_SEAL_SVG =
+  '<svg viewBox="0 0 14 14" width="14" height="14"><path d="M3.8 7.2l2.1 2.1 4.3-4.6" ' +
+  'fill="none" stroke="var(--ivory)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
 function makeClusterElement(c: Cluster<PinSpec>): HTMLButtonElement {
   const el = document.createElement('button');

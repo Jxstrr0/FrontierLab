@@ -201,6 +201,25 @@
   border: 2px solid var(--vault-deep);
   pointer-events: none;
 }
+/* Employer or university you partner with: a brand-ink seal, lower right of the medallion. */
+.pin-partner {
+  position: absolute;
+  top: calc(50% + var(--pin-size) / 2 - 12px);
+  left: calc(50% + var(--pin-size) / 2 - 10px);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--pin-ink);
+  border: 1px solid var(--ivory);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.pin-partner svg {
+  display: block;
+}
 
 /* ─── Layers sheet ─────────────────────────────────────────────────────── */
 .layers {

@@ -742,3 +742,65 @@ export const RIVAL_LOAN_RISK_WEIGHT = 0.75;
 // ─── NEWS: THE DAILY LEDGER (§24) ─────────────────────────────────────────────
 
 // ─── PARTNERSHIPS AND UNIVERSITIES (§13.7) ────────────────────────────────────
+/** Contract length L in weeks ("Year X of 7", CONTENT §14). */
+export const PARTNER_CONTRACT_WEEKS = 364;
+/** Signing fee = employees × PARTNER_FEE_PER_EMPLOYEE × income mult × city incomeIndex (CONTENT §14). */
+export const PARTNER_FEE_PER_EMPLOYEE = 160;
+// DEPOSIT_PER_EMPLOYEE ($4,500 per participating employee) sits with the treasury constants above.
+/**
+ * Participation curve over a contract of L weeks (§13.7): an S-curve from 0 to
+ * `rampTo` by `rampWeeks` (logistic with this `steepness`, rescaled to hit both
+ * ends exactly), linear to `peak` by `matureWeeks`, flat until L − `declineWeeks`,
+ * then linear down to `end` at L.
+ */
+export const PARTICIPATION = {
+  rampWeeks: 52,
+  rampTo: 0.65,
+  steepness: 8,
+  matureWeeks: 104,
+  peak: 0.8,
+  declineWeeks: 104,
+  end: 0.45,
+} as const;
+/** Share of the gap to the balance target closed each week (§13.7). */
+export const PARTNER_BALANCE_STEP = 0.15;
+/**
+ * Relationship health (§13.7): target = base + perOverall × (hostOverall − pivot)
+ * + perComp × c_package + perksBonus, eased by `ema`. Below `terminateBelow` for
+ * `terminateWeeks` straight weeks the partner walks. The balance target scales
+ * by balanceBase + balanceSlope × health/100. New partnerships start at `start`.
+ */
+export const PARTNER_HEALTH = {
+  start: 60,
+  base: 40,
+  perOverall: 12,
+  overallPivot: 3,
+  perComp: 10,
+  ema: 0.05,
+  terminateBelow: 30,
+  terminateWeeks: 8,
+  balanceBase: 0.5,
+  balanceSlope: 0.6,
+} as const;
+/** perksBonus = perMoralePoint × the benefits' morale bonus (HR, §16.5), capped at max. */
+export const PARTNER_PERKS = { perMoralePoint: 1, max: 10 } as const;
+/** A terminated, lapsed or released partnership's balance leaves over this many weeks. */
+export const PARTNER_RUNOFF_WEEKS = 12;
+/** Renewal fee = current signing fee × (base − health/100), in the last `windowWeeks` of the term. */
+export const PARTNER_RENEWAL = { base: 1.5, windowWeeks: 52 } as const;
+/**
+ * University student partnership: students enrolled by city size, fee per
+ * student × city incomeIndex, and a lower balance per participating student.
+ */
+export const STUDENT_PARTNERSHIP = {
+  students: { S: 6000, M: 10000, L: 16000, XL: 24000 },
+  feePerStudent: 30,
+  depositPerStudent: 600,
+} as const;
+/**
+ * University graduate program (DESIGN §5.8.10): yearly cost × the city's
+ * wageIndex, paid up front and each year (P&L `benefits`); +skillBonus to
+ * manager candidate skills (§17.2) and +hireBonus hires per week at branches
+ * and HQ floors (§6.3).
+ */
+export const GRAD_PROGRAM = { yearlyCost: 120_000, skillBonus: 10, hireBonus: 1 } as const;

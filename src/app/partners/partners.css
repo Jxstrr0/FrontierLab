@@ -1,0 +1,47 @@
+/* Employer and university panels (SCREENS §14–15). */
+.pt-deal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.pt-deal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+.pt-deal-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-20);
+}
+.pt-center {
+  text-align: center;
+  margin: 0;
+}
+.pt-picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.pt-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.pt-choice {
+  min-height: var(--tap-min);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-pill);
+  background: var(--vault-deep);
+  color: var(--ivory-dim);
+  font-size: var(--text-14);
+  font-weight: 600;
+  cursor: pointer;
+}
+.pt-choice.is-active {
+  background: var(--brass);
+  border-color: var(--brass);
+  color: var(--vault-deep);
+}
