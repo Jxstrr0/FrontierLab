@@ -11,6 +11,7 @@ import { BRANCH_ZOOM, OVERVIEW_ZOOM } from '../../config/mapView';
 import type { CitySpec } from '../../data/cities';
 import type { GameState, Lot } from '../../sim/state';
 import type { ViewCamera } from './camera';
+import { landmarkCentre } from './landmarkPins';
 import { siteEnabled } from './pins';
 
 /** Fallback for the map paper if the --paper token can't be read (ART_DIRECTION §1.1). */
@@ -65,8 +66,9 @@ export function rememberCamera(key: string, cam: ViewCamera): void {
 
 /**
  * Where the camera starts: where you last looked in this city; else on your
- * first branch here at BRANCH_ZOOM; else over the financial district at
- * OVERVIEW_ZOOM, which shows a good chunk of the city on a phone.
+ * first branch here at BRANCH_ZOOM; at a regional site (Stage 8), between its
+ * airport and employers, so both are on screen when you land; else over the
+ * financial district at OVERVIEW_ZOOM, which shows a good chunk of the city.
  */
 export function initialCamera(s: GameState, scene: Scene): ViewCamera {
   const saved = cameras.get(scene.key);
@@ -79,6 +81,18 @@ export function initialCamera(s: GameState, scene: Scene): ViewCamera {
   if (lot) {
     const c = tileCenter(tiles, lot.tile.x, lot.tile.y);
     return { cx: c.x, cy: c.y, zoom: BRANCH_ZOOM };
+  }
+  if (scene.city.regional) {
+    const airport = landmarkCentre(scene.map, 'airport');
+    const sites = Object.values(s.world.sites)
+      .filter((x) => x.cityId === scene.city.id)
+      .map((x) => tileCenter(tiles, x.tile.x, x.tile.y));
+    const pts = airport ? [airport, ...sites] : sites;
+    if (pts.length) {
+      const cx = pts.reduce((a, p) => a + p.x, 0) / pts.length;
+      const cy = pts.reduce((a, p) => a + p.y, 0) / pts.length;
+      return { cx, cy, zoom: OVERVIEW_ZOOM };
+    }
   }
   const f = CITYGEN.layout.financial;
   const c = tileCenter(tiles, f.cx * tiles, f.cy * tiles);

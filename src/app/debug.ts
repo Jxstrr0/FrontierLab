@@ -12,6 +12,7 @@ import { investmentBanksIn } from '../data/investmentBanks';
 import { listPendingIpo } from '../sim/equityIpo';
 import { act, bump, modal, openPanel, peekGame, screen, setGame } from './store';
 import { newGame } from '../sim/newGame';
+import { startFlight } from './airport/flight';
 import { activeMap } from './map/MapView';
 import { loadFromSlot, saveToSlot, type SlotId } from './saves';
 
@@ -86,6 +87,22 @@ export function installDebug(): void {
       if (inc && s.incidents.active.includes(inc)) modal.value = { type: 'incident' };
       bump();
       return inc?.id;
+    },
+    /**
+     * Flies to a city or regional site (Stage 8) with the plane animation, by
+     * the normal rules or, with `jet`, in your own plane where it reaches.
+     * `animate: false` runs the travelTo command at once instead.
+     */
+    travel(cityId: string, jet = false, animate = true) {
+      if (animate) return startFlight(cityId, jet);
+      return act(cmd.travelTo, cityId, { jet }).ok;
+    },
+    /** Sets the founder's personal cash (e.g. to try buying a jet or paying a fare). */
+    personalCash(amount: number) {
+      const s = peekGame();
+      if (s) s.personal.cash = amount;
+      bump();
+      return s?.personal.cash;
     },
     /** Runs whole weeks instantly. */
     advance(weeks: number) {

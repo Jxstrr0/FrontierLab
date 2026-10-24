@@ -4,13 +4,15 @@
 // occupants on whenever they actually change. Taps open panels or sheets.
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { CITIES } from '../../data/cities';
-import { CLUSTER_EXPAND_ZOOM } from '../../config/mapView';
+import type { LandmarkId } from '../../config/map';
+import { BRANCH_ZOOM, CLUSTER_EXPAND_ZOOM } from '../../config/mapView';
 import { FEATURES } from '../../config/balance';
 import { RivalSheet } from '../city/RivalSheet';
 import { cityLots } from '../city/lotInfo';
 import { openPanel, useGame } from '../store';
 import { initialCamera, mapPlaces, rememberCamera, sceneFor } from './mapScene';
 import { MapController } from './mapController';
+import { landmarkCentre } from './landmarkPins';
 import { buildPins, occupantsKey, occupantsOf, pinsKey } from './pins';
 import './map.css';
 
@@ -20,6 +22,15 @@ const STALE = '\u0000';
 
 /** The live map controller, for the debug hook. */
 export const activeMap = (): MapController | null => active;
+
+/** Glides the map to a landmark (the airport, from the Travel sheet), at least at BRANCH_ZOOM. */
+export function focusLandmark(id: LandmarkId): boolean {
+  const map = active?.cityMap;
+  const at = map && landmarkCentre(map, id);
+  if (!active || !at) return false;
+  active.flyTo(at, Math.max(BRANCH_ZOOM, active.camera.zoom));
+  return true;
+}
 
 const systemReducedMotion = () =>
   typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -73,6 +84,7 @@ export function MapView() {
         else if (pin.kind === 'property') openPanel({ type: 'property', siteId: pin.id });
         else if (pin.kind === 'conventionCenter') openPanel({ type: 'convention', siteId: pin.id });
         else if (pin.kind === 'lobbyingFirm') openPanel({ type: 'lobbyingFirm', siteId: pin.id });
+        else if (pin.kind === 'airport') openPanel({ type: 'airport' });
         else openPanel({ type: 'storefront', lotId: pin.id });
       },
       onCluster: (cl) =>

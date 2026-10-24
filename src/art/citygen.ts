@@ -5,12 +5,15 @@
 // city id, so a city looks the same in every session. Streets and shoreline come
 // from the simulation's cityLayout so lots always face a street. Offices and
 // sites are claimed before landmarks and parks, so those never cover them.
+// Regional sites (CONTENT §2) are low small towns with only the airport landmark.
 import { CITYGEN, CITY_LAYOUT } from '../config/balance';
 import {
   FLOORS,
   LANDMARKS,
   OFFICE_ART_EXTRA_STOREYS,
   PARK_SHARE,
+  REGIONAL_LANDMARKS,
+  REGIONAL_MAX_FLOORS,
   SITE_STOREYS,
   type LandmarkId,
 } from '../config/map';
@@ -141,9 +144,12 @@ export function generateCityMap(
     landmarks: [],
   };
 
+  const regional = !!city.regional;
   const floorsFor = (d: DistrictId, seed: number) => {
-    const [lo, hi] = FLOORS[d];
-    return lo + (seed % (hi - lo + 1));
+    const [lo, top] = FLOORS[d];
+    const hi = regional ? Math.max(1, Math.min(top, REGIONAL_MAX_FLOORS)) : top;
+    const base = Math.min(lo, hi);
+    return base + (seed % (hi - base + 1));
   };
 
   // Base pass: water, streets and filler buildings.
@@ -192,7 +198,10 @@ export function generateCityMap(
 
   // Whole land blocks without lots can hold a landmark or a park.
   const free = freeBlocks(map);
-  for (const lm of LANDMARKS) {
+  const landmarks = regional
+    ? LANDMARKS.filter((l) => REGIONAL_LANDMARKS.includes(l.id))
+    : LANDMARKS;
+  for (const lm of landmarks) {
     const centre = CITYGEN.layout[lm.district];
     let best = -1;
     let bestD = Infinity;

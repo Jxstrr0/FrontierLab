@@ -1,6 +1,9 @@
 // The in-game screen: the city view (the Stage 3 map, or the Stage 2 list when
 // FEATURES.cityMap is off), the HUD, and the overlay layers for panels,
 // modals, the menu and layers sheets, and toasts.
+import { AirportPanel } from '../airport/AirportPanel';
+import { FlightOverlay } from '../airport/FlightOverlay';
+import { TravelSheet } from '../airport/TravelSheet';
 import { BoardMeetingModal } from '../executive/BoardMeetingModal';
 import { InvestmentBankPanel } from '../investmentBank/InvestmentBankPanel';
 import { ConventionPanel } from '../convention/ConventionPanel';
@@ -59,7 +62,9 @@ export function GameScreen() {
       <PanelHost />
       {sheet.value === 'menu' && <MenuSheet />}
       {sheet.value === 'layers' && <LayersSheet />}
+      {FEATURES.multiCity && sheet.value === 'travel' && <TravelSheet />}
       <ModalHost />
+      {FEATURES.multiCity && <FlightOverlay />}
       <ToastHost />
     </div>
   );
@@ -114,6 +119,9 @@ function PanelHost() {
       return FEATURES.investments ? <ConventionPanel key={p.siteId} siteId={p.siteId} /> : null;
     case 'lobbyingFirm':
       return FEATURES.investments ? <LobbyingFirmPanel key={p.siteId} siteId={p.siteId} /> : null;
+    // Stage 8 (FEATURES.multiCity): airports and travel.
+    case 'airport':
+      return FEATURES.multiCity ? <AirportPanel key={p.jet ? 'jet' : 'ap'} jet={p.jet} /> : null;
     case 'company':
       return <CompanyPanel />;
     case 'branches':

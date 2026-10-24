@@ -32,6 +32,8 @@ export type PanelRoute =
   | { type: 'property'; siteId: string }
   | { type: 'convention'; siteId: string }
   | { type: 'lobbyingFirm'; siteId: string }
+  // Stage 8 (FEATURES.multiCity): the airport's departures; `jet` = "Fly now" in your own plane.
+  | { type: 'airport'; jet?: boolean }
   | { type: 'company' }
   | { type: 'branches' }
   | { type: 'cityList' }
@@ -58,7 +60,7 @@ export interface Toast {
 export const screen = signal<Screen>('title');
 export const panel = signal<PanelRoute | null>(null);
 export const modal = signal<ModalRoute | null>(null);
-export const sheet = signal<'menu' | 'layers' | null>(null);
+export const sheet = signal<'menu' | 'layers' | 'travel' | null>(null);
 export const toasts = signal<Toast[]>([]);
 
 /** Bumped after every mutation of the current game. */
