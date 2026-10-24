@@ -194,6 +194,8 @@ export interface EventPayloads {
     amount: Money;
     postMoney: Money;
     down: boolean;
+    /** You (company or personally) hold shares or lend to it. */
+    held: boolean;
   };
   VENTURE_FAILED: { startupId: Id; name: string; held: boolean };
   VENTURE_IPO: { startupId: Id; name: string; ticker: string; price: Money; held: boolean };
