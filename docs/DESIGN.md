@@ -420,3 +420,13 @@ Add one dated line per decision. Never delete entries; supersede them.
 - 2026-10-24: Work lands straight on `main` (owner's choice); every push must pass lint, tests and build.
 - 2026-10-24: Toolchain pinned to Preact 10.x and TypeScript 6.0 (typescript-eslint doesn't support TypeScript 7 yet); Vite 8, Vitest 5, ESLint 10.
 - 2026-10-24: The title shows only New Game and Continue until saves exist (Stage 2), when Load and Settings join them.
+- 2026-10-24: `buildBranch` leases the storefront and builds in one step; there is no separate lease command. The first week's rent is paid up front.
+- 2026-10-24: New branches open with deposits, FX & Wires, the Loan Desk, a safe deposit box (if the vault has boxes) and wealth advice (if the lobby has an advisor office). Other lending and cards start off, so the tutorial's "Turn on Personal Loans" step is meaningful.
+- 2026-10-24: Rival rate sheets are one per bank, shared by all its branches.
+- 2026-10-24: Fee competitiveness for % fees (wealth, FX) uses a 0.25pp floor in place of $1. Chequing churn compares fees against the market, since its pay rate is fixed.
+- 2026-10-24: Until HQ floors exist (Stage 4), every department coverage reads as 1. The central bank window is used automatically after overnight funding in Stage 1. Foreclosed homes (REO) build up at recovery value until Stage 7 adds hold, rent and sell.
+- 2026-10-24: The overnight limit shrinks with the capital tier (×1 Strong/Adequate, ×0.75 Watch, ×0.5 Restricted, ×0.25 Critical). This is an assumption; the docs named a `ratingMult` without values.
+- 2026-10-24 (owner's call): Keep CONTENT's fee levels; a mature branch earns about $45–70k a week, close to the original's store economics. SIMULATION §25 targets updated to match.
+- 2026-10-24: Stage 1 calibration: CATCHMENT_MULT 2.5 → 1.0, PROSPECT_RATE 0.030 → 0.040, SATURATION_EXP 2.5 → 2.8, price factors use PF_RATE_STEP 0.01, FX_PER_CUSTOMER 1,800 → 900, Loan Desk median amount $120k → $70k, lower deposit and wealth tickets, mortgage approval 0.48 (CONTENT §5).
+- 2026-10-24: Insolvency and game-over checks are deferred to Stage 2, when there is a UI to show them.
+

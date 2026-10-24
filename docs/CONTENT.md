@@ -106,23 +106,25 @@ The `business_acct` deposit ticket multiplier for BIZ is 1.0, since the base tic
 | id | Name | Category | Price type | Tenor | Default price | Range / step | Base ticket | Term (wk) | Base PD/yr | LGD | Risk weight | Base approval | Churn/yr | Servicing $/acct/wk | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | chequing | Everyday Chequing | deposits | fee $/mo | short | $12 | 0–30 / 1 | 3,000 | — | — | — | 0 | — | 8% | 0.45 | pays 0.05%; organic +3%/yr; rateChurnSens 0.1 |
-| savings | High-Interest Savings | deposits | rate | short | FTP − 1.00% (floor 0.10%) | 0–8% / 0.05 | 14,000 | — | — | — | 0 | — | 14% | 0.30 | rateChurnSens 0.6 |
-| gic1y | 1-Year GIC | deposits | rate | long | FTP_long − 0.15% | 0–9% / 0.05 | 24,000 | 52 | — | — | 0 | — | (maturity) | 0.20 | renewal base 72% |
+| savings | High-Interest Savings | deposits | rate | short | FTP − 1.00% (floor 0.10%) | 0–8% / 0.05 | 9,000 | — | — | — | 0 | — | 14% | 0.30 | rateChurnSens 0.6 |
+| gic1y | 1-Year GIC | deposits | rate | long | FTP_long − 0.15% | 0–9% / 0.05 | 16,000 | 52 | — | — | 0 | — | (maturity) | 0.20 | renewal base 72% |
 | student | Student Account | deposits | fee $/mo | short | $0 | 0–10 / 1 | 900 | — | — | — | 0 | — | 12% | 0.35 | 8%/yr convert to chequing |
-| business_acct | Business Account | deposits | fee $/mo | short | $25 | 0–80 / 1 | 38,000 | — | — | — | 0 | — | 9% | 0.90 | pays 0.25% |
+| business_acct | Business Account | deposits | fee $/mo | short | $25 | 0–80 / 1 | 15,000 | — | — | — | 0 | — | 9% | 0.90 | pays 0.25% |
 | personal_loan | Personal Loan | lending | rate | short | FTP + 6.00% | 3–25% / 0.05 | 11,000 | 156 | 3.0% | 0.70 | 0.75 | 0.62 | — | 0.40 | |
 | auto_loan | Auto Loan | lending | rate | long | FTP_long + 3.40% | 2–18% / 0.05 | 27,000 | 260 | 1.6% | 0.40 | 0.75 | 0.70 | — | 0.30 | prepay applies |
-| mortgage | Mortgage (5-yr fixed) | lending | rate | long | FTP_long + 1.45% | 1.5–12% / 0.05 | 340,000 | 1,300 amort. | 0.35% | 0.20 | 0.35 | 0.42 | — | 0.60 | origination fee 0.5%; reprices 1/260 per wk |
+| mortgage | Mortgage (5-yr fixed) | lending | rate | long | FTP_long + 1.45% | 1.5–12% / 0.05 | 340,000 | 1,300 amort. | 0.35% | 0.20 | 0.35 | 0.48 | — | 0.60 | origination fee 0.5%; reprices 1/260 per wk |
 | loc | Line of Credit | lending | rate | short | FTP + 5.00% | 3–20% / 0.05 | drawn 8,800 | revolving | 2.0% | 0.60 | 0.75 | 0.60 | 6% | 0.25 | limit 16,000 × incomeIndex |
 | sbl | Small Business Loan | lending | rate | short | FTP + 4.50% | 3–20% / 0.05 | Loan Desk | 52–364 | pentagon | collateral | 1.00 | — | — | 1.20 | individual loans |
 | credit_card | Credit Card | cards | rate (APR) | — | 20.99% | 9.99–29.99% / 0.25 | drawn 2,400 | revolving | 4.5% | 0.85 | 0.75 | 0.60 | 7% | 0.35 | spend 1,300/mo; annual fee $0 |
-| wealth | Wealth Advice | cards | fee %AUM | — | 1.00% | 0.25–2.5% / 0.05 | AUM 120,000 | — | — | — | 0 | — | 8% | 1.50 | needs ≥ 1 advisor office |
+| wealth | Wealth Advice | cards | fee %AUM | — | 1.00% | 0.25–2.5% / 0.05 | AUM 50,000 | — | — | — | 0 | — | 8% | 1.50 | needs ≥ 1 advisor office |
 | safe_box | Safe Deposit Box | cards | fee $/yr | — | $120 | 40–400 / 5 | — | — | — | — | 0 | — | 6% | 0.10 | capped by vault boxes |
 | fx | FX & Wires | cards | markup % | — | 2.50% | 0.5–5% / 0.1 | 1,800/customer/yr | — | — | — | 0 | — | — | 0 | volume-based |
 
 Starting quality: every v1 product starts at 2.5 stars, except chequing and savings at 3.0.
 
 Lending approvals are tuned so company loans settle near 80% of deposits. If the balance report drifts, adjust mortgage approval first.
+
+Stage 1 tuning (2026-10-24): base tickets for savings (14,000 → 9,000), GIC (24,000 → 16,000), business account (38,000 → 15,000) and wealth AUM (120,000 → 50,000) were lowered so a mature branch lands near SIMULATION §12.1's deposit mix. Mortgage approval moved 0.42 → 0.48 to hold loans near 80% of deposits.
 
 ## 6. Product development templates
 
