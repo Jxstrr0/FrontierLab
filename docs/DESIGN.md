@@ -417,3 +417,6 @@ Add one dated line per decision. Never delete entries; supersede them.
 - 2026-10-23 (review): The app rating defaults to about 3.75 without an IT team. A CTO vacancy drags it down until the seat is filled.
 - 2026-10-23 (review): Vacation homes can be rebuilt (option seen in the original; effects assumed).
 - 2026-10-23 (review): Assumptions not seen in the recordings: one-week fit-out, 1 day per second at 1×, executive skill names, jet mileage bonus.
+- 2026-10-24: Work lands straight on `main` (owner's choice); every push must pass lint, tests and build.
+- 2026-10-24: Toolchain pinned to Preact 10.x and TypeScript 6.0 (typescript-eslint doesn't support TypeScript 7 yet); Vite 8, Vitest 5, ESLint 10.
+- 2026-10-24: The title shows only New Game and Continue until saves exist (Stage 2), when Load and Settings join them.

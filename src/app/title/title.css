@@ -1,0 +1,147 @@
+/* Title screen layout. Phone portrait first (390×844), then wider screens. */
+.title {
+  min-height: 100%;
+  display: flex;
+  padding: calc(var(--space-4) + var(--safe-top)) calc(var(--space-4) + var(--safe-right))
+    calc(var(--space-4) + var(--safe-bottom)) calc(var(--space-4) + var(--safe-left));
+  background: var(--vault);
+}
+
+/* Certificate frame: outer hairline plus a second hairline 3px inside. */
+.title-frame {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  max-width: 560px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-5) var(--space-5);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-card);
+  outline: 1px solid var(--hairline);
+  outline-offset: -5px;
+}
+
+.corner {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  color: var(--brass);
+  background: var(--vault);
+}
+.corner-tl {
+  top: -10px;
+  left: -10px;
+}
+.corner-tr {
+  top: -10px;
+  right: -10px;
+}
+.corner-bl {
+  bottom: -10px;
+  left: -10px;
+}
+.corner-br {
+  bottom: -10px;
+  right: -10px;
+}
+
+.title-lockup {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(100%, 340px);
+  aspect-ratio: 1;
+  margin-top: var(--space-5);
+}
+
+.title-rosette {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  color: var(--brass);
+  opacity: 0.35;
+}
+
+.title-words {
+  position: relative;
+  text-align: center;
+}
+
+/* The engraved logotype is the one place all caps are allowed (ART_DIRECTION §1.2). */
+.title-wordmark {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: var(--text-44);
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ivory);
+}
+
+.title-rule {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-3) auto var(--space-2);
+  width: 160px;
+  color: var(--brass);
+  font-size: 10px;
+}
+.title-rule::before,
+.title-rule::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--brass);
+}
+
+.title-tagline {
+  margin: 0;
+  font-size: var(--text-14);
+  color: var(--ivory-dim);
+}
+
+.title-menu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: min(100%, 300px);
+}
+
+.title-soon {
+  margin: 0;
+  text-align: center;
+  font-size: var(--text-14);
+  color: var(--ivory-dim);
+}
+
+.title-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-14);
+  color: var(--ivory-dim);
+}
+
+.title-version {
+  font-size: var(--text-12);
+  letter-spacing: 0.02em;
+}
+
+@media (min-width: 900px) {
+  .title-wordmark {
+    font-size: 56px;
+  }
+  .title-lockup {
+    width: 400px;
+  }
+}
