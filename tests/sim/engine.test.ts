@@ -2,7 +2,7 @@
 // every week of a scripted run (SIMULATION §1, §14.3).
 import { describe, expect, it } from 'vitest';
 import { balanceSheet } from '../../src/sim/balanceSheet';
-import { summarize } from '../../src/sim/ledger';
+import { FEE_INCOME, NON_CASH, summarize } from '../../src/sim/ledger';
 import { runScript } from '../helpers/scenario';
 
 describe('engine', () => {
@@ -21,7 +21,11 @@ describe('engine', () => {
       expect(snap.cashFlow.net).toBeCloseTo(cashAtClose - lastCash, 2);
       // Operations = net income + non-cash items + change in taxes payable.
       const sum = summarize(snap.pnl);
-      const nonCash = snap.pnl.loanLosses + snap.pnl.depreciation - snap.pnl.realizedGains;
+      // Non-cash expenses add back, non-cash gains (realized, property marks…) come off.
+      const nonCash = NON_CASH.reduce(
+        (t, l) => t + (FEE_INCOME.includes(l) ? -snap.pnl[l] : snap.pnl[l]),
+        0,
+      );
       const dTax = snap.totals.taxPayable - lastTaxPayable;
       expect(snap.cashFlow.ops).toBeCloseTo(sum.netIncome + nonCash + dTax, 2);
       lastCash = cashAtClose;

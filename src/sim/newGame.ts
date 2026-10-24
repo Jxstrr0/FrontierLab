@@ -63,6 +63,8 @@ export interface NewGameOptions {
   competitors?: number;
   /** One of START_CASH_OPTIONS. */
   startCash?: number;
+  /** Currency symbol money is shown in (Settings). */
+  currency?: Settings['currency'];
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -119,7 +121,10 @@ export function newGame(opts: NewGameOptions): GameState {
     },
     clock: { day: 0, week: 0, speed: 0 },
     rng: {},
-    settings: structuredClone(DEFAULT_SETTINGS),
+    settings: {
+      ...structuredClone(DEFAULT_SETTINGS),
+      currency: opts.currency ?? DEFAULT_SETTINGS.currency,
+    },
     world: {
       currentCityId: city.id,
       countries: {},

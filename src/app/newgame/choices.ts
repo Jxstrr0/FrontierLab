@@ -48,6 +48,15 @@ export const DIFFICULTY_LABEL: Record<Difficulty, string> = {
 };
 
 /** "$500K", "$1M", "$1.25M" for the starting cash choices. */
-export function cashLabel(amount: number): string {
-  return amount >= 1_000_000 ? `$${amount / 1_000_000}M` : `$${amount / 1_000}K`;
+export function cashLabel(amount: number, sym = '$'): string {
+  return amount >= 1_000_000 ? `${sym}${amount / 1_000_000}M` : `${sym}${amount / 1_000}K`;
 }
+
+/** How the currency choice reads under its control. */
+export const CURRENCY_NAME: Record<string, string> = {
+  $: 'Dollars',
+  C$: 'Canadian dollars',
+  '£': 'Pounds',
+  '€': 'Euros',
+  '¥': 'Yen',
+};

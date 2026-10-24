@@ -219,16 +219,29 @@ export interface EventPayloads {
   CONVENTION_OPEN: { conventionId: Id; name: string; cityId: Id; city: string; local: boolean };
 
   // ─── Real estate (realEstate.ts, reo.ts) ──────────────────────────────────
-  PROPERTY_BOUGHT: { siteId: Id; address: string; price: Money; account: string };
+  /** You bought a building (commands/realEstate.ts); `account` is 'company' or 'personal'. */
+  PROPERTY_BOUGHT: { siteId: Id; address: string; price: Money; account: string; cityId: Id };
+  /** The seller turned an offer down; no new offer on it until the listings refresh. */
   PROPERTY_OFFER_REJECTED: { siteId: Id; address: string; offer: Money };
-  PROPERTY_SOLD: { siteId: Id; address: string; price: Money; account: string };
+  /** A For Sale building of yours sold (realEstate.ts). */
+  PROPERTY_SOLD: { siteId: Id; address: string; price: Money; account: string; cityId: Id };
+  /** A city's foreclosed homes were sold in one lot at 90% of value (reo.ts). */
   REO_SOLD: { cityId: Id; city: string; units: number; price: Money };
 
   // ─── Lobbying (lobbying.ts) ───────────────────────────────────────────────
+  /** You hired a firm for a campaign (commands/lobbying.ts); scope is the campaign record id. */
   LOBBY_STARTED: { campaignId: string; title: string; firm: string; cost: Money };
   LOBBY_WON: { campaignId: string; title: string; firm: string; country: string };
   LOBBY_LOST: { campaignId: string; title: string; firm: string; country: string };
-  LOBBY_EXPOSED: { campaignId: string; title: string; firm: string; bank: string; fine: Money };
+  /** The Ledger uncovered a campaign, won or lost: `fine` was paid and awareness fell. */
+  LOBBY_EXPOSED: {
+    campaignId: string;
+    title: string;
+    firm: string;
+    country: string;
+    bank: string;
+    fine: Money;
+  };
 
   // ─── Politics (news.ts) ───────────────────────────────────────────────────
   /** `country` is a CountryId; `policy` and `effect` are copy from src/data/newsWorld.ts. */
