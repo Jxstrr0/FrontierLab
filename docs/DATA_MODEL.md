@@ -324,12 +324,13 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 | Personal | `buyHome`, `rebuildHome`, `buyCar`, `placeBid`, `appraise`, `consign`, `buyJet`, `buyFranchise`, `setKit`, `signPlayer`, `releasePlayer` |
 | Settings and saves | `updateSettings`, `saveToSlot`, `loadSlot`, `exportCode`, `importCode` |
 
-## 12. Implemented so far (schema v4, Stage 3)
+## 12. Implemented so far (schema v5, Stage 4)
 
 `src/sim/state.ts` is the source of truth; this section records how it differs from the guide above. Later stages add the rest with a schema bump and a migration.
 
-- **Present:** `meta`, `clock`, `rng`, `settings`, `world` (one country and one city in Stage 1), `company`, `branches`, `people` (managers only), `products.catalog`, `underwriting`, `treasury`, `loanDesk`, `rivals`, `reo`, `events` (`log`, `scheduled`), `history`, `milestones`, `flags`.
-- **Not yet present:** `offices`, `departments`, execs and benefits in `people`, product `developments`, funding lots and offers, `partnerships`, `market`, `ventures`, `realEstate`, `governance`, `personal`, `news`, incidents and cooldowns.
+- **Present (Stages 1–3):** `meta`, `clock`, `rng`, `settings`, `world` (one country and one city in Stage 1), `company`, `branches`, `people` (managers only), `products.catalog`, `underwriting`, `treasury`, `loanDesk`, `rivals`, `reo`, `events` (`log`, `scheduled`), `history`, `milestones`, `flags`.
+- **Stage 4 (schema v5) adds:** `offices`, `departments`, `hq` (`ramp` and per-department `coverage`: `required`, `k`, `kPrime`, `eff`), `people.benefits`, `products.developments` and developed catalog entries, `underwriting.switching`, `treasury.lots`/`offers`/`offersRefreshWeek`, `marketing` (brand `campaigns`, agency `packages`, prestige `cityBonus`), `risk` (13 weeks of `losses` by product, regulator `reviews`), `world.officeListings` (office buildings for lease) and `world.sites` (credit bureaus and marketing agencies on the map). New P&L lines: `hqStaff`, `benefits`, `development`. Migration 4 → 5 adds them all and generates each city's listings and sites from the `sites:{cityId}` stream, so storefront lots don't move.
+- **Not yet present:** execs in `people`, `partnerships`, `market`, `ventures`, `realEstate`, `governance`, `personal`, `news`, incidents and cooldowns.
 - **Added fields:**
   - `ledger`: P&L lines and cash movements since the last weekly close, so commands between ticks land in the right week.
   - `nextId`: counter for generated ids.
