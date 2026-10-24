@@ -106,6 +106,8 @@ export interface ConventionRun {
   /** Exclusive startups shown only here (§20.3). */
   startupIds: Id[];
   announced: boolean;
+  /** CONVENTION_OPEN has been sent. */
+  opened?: boolean;
 }
 
 export interface ConventionsState {

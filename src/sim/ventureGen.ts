@@ -107,7 +107,7 @@ export function buildStartup(
       spec.postMoney *
       VENTURE_GEN.historyRoundShare *
       dpow(VENTURE_GEN.historyStepDown, rounds.length - 1 - k),
-    week: Math.round(from + ((to - from) * (k + 1)) / (rounds.length + 1)),
+    week: Math.round(from + ((to - from) * (k + 1)) / (rounds.length + 1)) || 0,
   }));
 
   return {

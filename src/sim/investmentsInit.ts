@@ -2,6 +2,7 @@
 // startups, the conventions calendar, real estate listings and empty lobbying
 // records. Used by newGame and the 7 → 8 save migration.
 import { emptyFx } from './fx';
+import { seedVentures } from './venturesInit';
 import type {
   ConventionsState,
   GameState,
@@ -33,4 +34,5 @@ export function initInvestments(state: GameState): void {
   state.realEstate = emptyRealEstate();
   state.lobbying = emptyLobbying();
   state.fx = emptyFx();
+  seedVentures(state);
 }

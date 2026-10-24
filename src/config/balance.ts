@@ -995,6 +995,7 @@ export const NEWS_GROUP_CAPS: Record<string, number> = {
   sports: 2,
   economy: 1,
   incident: 2,
+  ventures: 2,
 };
 /**
  * Story priority (higher leads; Top = the six highest). SIMULATION §24 order:

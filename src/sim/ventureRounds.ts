@@ -59,11 +59,20 @@ export function openRound(
   s.stage = nextStage(stage);
   s.history.push({ round: name, amount: t.amount, week: state.clock.week });
   const big = t.amount >= VENTURE_NEWS.bigRound;
+  const held = heldByYou(s);
   pushEvent(
     state,
     'VENTURE_ROUND',
-    { startupId: s.id, name: s.name, round: name, amount: t.amount, postMoney: t.postMoney, down: step < 1 },
-    heldByYou(s) ? 3 : big ? 2 : 0,
+    {
+      startupId: s.id,
+      name: s.name,
+      round: name,
+      amount: t.amount,
+      postMoney: t.postMoney,
+      down: step < 1,
+      held,
+    },
+    held ? 3 : big ? 2 : 0,
     s.id,
   );
 }
