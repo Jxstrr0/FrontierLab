@@ -60,12 +60,16 @@ export interface AuctionResult {
   price: Money;
   /** 'you' won it, 'sold' (your consignment sold), or 'other'. */
   outcome: 'you' | 'sold' | 'other';
+  /** The lot's pre-sale estimate. */
+  estimate?: Money;
 }
 
 export interface AuctionHouseState {
   houseId: string;
   /** Week the next sale is held; its lots are listed from previewWeeks before. */
   nextWeek: Week;
+  /** Week the next sale's lots were listed (unset until its preview window opens). */
+  listedWeek?: Week;
   lots: AuctionLot[];
   history: AuctionResult[];
 }

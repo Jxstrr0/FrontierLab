@@ -207,6 +207,7 @@ export interface EventPayloads {
   CAR_BOUGHT: { carId: string; name: string; price: Money };
   DEALER_SIGNED: { siteId: Id; city: Id; dealer: string };
   DEALER_ENDED: { siteId: Id; city: Id; dealer: string };
+  /** A house listed its next sale (auctions.ts); item = the headline lot, week = sale week. */
   AUCTION_PREVIEW: {
     houseId: string;
     house: string;
@@ -214,11 +215,48 @@ export interface EventPayloads {
     item: string;
     estimate: Money;
     week: number;
+    lots: number;
   };
-  AUCTION_WON: { houseId: string; itemId: string; item: string; price: Money };
-  AUCTION_LOST: { houseId: string; itemId: string; item: string; price: Money };
-  AUCTION_SOLD: { houseId: string; itemId: string; item: string; price: Money };
-  APPRAISAL_DONE: { itemId: string; item: string; genuine: boolean; value: Money };
+  /** You won a lot: price = what you paid (hammer + buyer's premium). */
+  AUCTION_WON: { houseId: string; house: string; itemId: string; item: string; price: Money };
+  /** A lot you bid on went elsewhere: outbid, or you couldn't pay at the sale (price = hammer). */
+  AUCTION_LOST: {
+    houseId: string;
+    house: string;
+    itemId: string;
+    item: string;
+    price: Money;
+    reason: 'outbid' | 'cash';
+  };
+  /** Your consignment sold: price = hammer, proceeds = after the seller's fee. */
+  AUCTION_SOLD: {
+    houseId: string;
+    house: string;
+    itemId: string;
+    item: string;
+    price: Money;
+    proceeds: Money;
+  };
+  /** A hammer well above estimate (AUCTIONS.recordFactor); yours = you bought it. */
+  AUCTION_RECORD: {
+    houseId: string;
+    house: string;
+    itemId: string;
+    item: string;
+    price: Money;
+    estimate: Money;
+    yours: boolean;
+  };
+  /** An appraisal reported (auctions.ts); houseId = where the piece was bought. */
+  APPRAISAL_DONE: {
+    collectibleId: Id;
+    houseId: string;
+    house: string;
+    itemId: string;
+    item: string;
+    genuine: boolean;
+    value: Money;
+  };
   CLUB_BOUGHT: { clubId: string; club: string; owner: 'company' | 'personal'; price: Money };
   CLUB_SOLD: { clubId: string; club: string; price: Money };
   CLUB_SEASON: { clubId: string; club: string; league: string; pos: number; record: string };

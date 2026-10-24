@@ -58,6 +58,7 @@ const WITH_HQ = {
   capitalMarkets: false,
   investments: false,
   multiCity: false,
+  personalEmpire: false,
 };
 const STAGE5 = {
   ...FEATURES,
