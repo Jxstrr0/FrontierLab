@@ -5,6 +5,7 @@ import { REFERENCE_BUILDS, type BuildSpec } from '../../src/data/equipment';
 import { PRODUCTS } from '../../src/data/products';
 import * as cmd from '../../src/sim/commands';
 import { roundToStep } from '../../src/sim/math';
+import { managerChoice, optionBlocker } from '../../src/sim/incidents';
 import { countryOfCity, defaultPrice } from '../../src/sim/rates';
 import type { GameState, Lot } from '../../src/sim/state';
 
@@ -71,7 +72,27 @@ const avgSkill = (m: { skills: Record<string, number> }) =>
   Object.values(m.skills).reduce((a, b) => a + b, 0) / 4;
 
 /** Re-sets every rate product to the default rule plus an offset, so prices follow FTP. */
+/**
+ * Answers open incidents like a sensible owner: accept an emergency
+ * recapitalisation, otherwise take the option a branch manager would pick
+ * (falling back to the first affordable one).
+ */
+export function handleIncidents(state: GameState): void {
+  for (const inc of [...state.incidents.active]) {
+    const pick =
+      inc.type === 'RECAP_OFFER'
+        ? 'accept'
+        : (() => {
+            const choice = managerChoice(state, inc);
+            if (!optionBlocker(state, inc, choice)) return choice;
+            return inc.options.find((o) => !optionBlocker(state, inc, o.id))?.id;
+          })();
+    if (pick) cmd.resolveIncident(state, inc.id, pick);
+  }
+}
+
 export function followDefaults(state: GameState, depositOffset = 0, loanOffset = 0): void {
+  handleIncidents(state);
   for (const b of Object.values(state.branches)) {
     if (b.delegation.products) continue;
     const c = countryOfCity(state, b.cityId);

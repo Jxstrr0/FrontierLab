@@ -185,6 +185,18 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
         tokens: { bank, scope: str(p.scopeName, 'a branch') },
       });
     }
+    case 'INCIDENT_NEWS': {
+      const key = `INCIDENT_NEWS_${str(p.type)}`;
+      if (!(key in LEDGER_TEMPLATES)) return undefined;
+      return banking({
+        key: key as TemplateKey,
+        subject: str(p.branchName),
+        icon: 'alert',
+        priority: P.company,
+        group: 'incident',
+        tokens: { bank, scope: str(p.branchName, 'a branch') },
+      });
+    }
     default:
       return bankNamed(ctx, e);
   }

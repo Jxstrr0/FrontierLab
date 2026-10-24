@@ -316,14 +316,25 @@ const BANK_TEMPLATES = {
       b: 'Unhappy staff at the {bank} branch say they will not return until things change.',
     },
   ],
-  INCIDENT_ATM_SKIM: [
+  // Press angles from incident choices (INCIDENT_NEWS): a denied skimming claim, an ignored complaint.
+  INCIDENT_NEWS_ATM_SKIM: [
     {
-      h: 'Card skimmer found at {scope}',
-      b: 'Customers of the {bank} branch are checking their statements.',
+      h: '{bank} denies liability for ATM skimming at {scope}',
+      b: 'Customers who lost money at the cash machine say the bank is refusing refunds.',
     },
     {
-      h: 'Fraudsters target {scope} cash machine',
-      b: 'A skimming device was fitted to the {bank} branch ATM.',
+      h: 'Skimming victims left out of pocket by {bank}',
+      b: 'A device fitted to the ATM at {scope} emptied accounts. The bank says it is not to blame.',
+    },
+  ],
+  INCIDENT_NEWS_VIRAL_COMPLAINT: [
+    {
+      h: 'Complaint about {scope} goes viral',
+      b: 'A customer video about long waits at the {bank} branch has been shared thousands of times. The bank has not responded.',
+    },
+    {
+      h: '{bank} stays silent as {scope} complaint spreads',
+      b: 'Online, customers are swapping stories of slow service at the branch.',
     },
   ],
 } satisfies Record<string, LedgerTemplate[]>;

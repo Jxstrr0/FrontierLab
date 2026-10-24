@@ -31,6 +31,7 @@ import type { CampaignEffects } from './marketing';
 import { branchPrice, competitiveness, isOffered } from './pricing';
 import { managerOf } from './staff';
 import { cityBrandBonus } from '../hqMarketing';
+import { ratingMod } from '../incident/effects';
 import {
   affinityOf,
   allProducts,
@@ -170,17 +171,20 @@ function productBranchBump(state: GameState, branch: Branch): number {
 /** Recomputes targets, eases displayed ratings toward them and adds reviews. */
 export function updateRatings(state: GameState, branch: Branch, fx: CampaignEffects): void {
   const r = branch.ratings;
-  r.rates = ema(r.rates, ratesTarget(state, branch, fx), RATING_EMA);
-  r.products = ema(r.products, productsTarget(state, branch, fx), RATING_EMA);
-  r.service = ema(r.service, serviceTarget(state, branch, fx), RATING_EMA);
-  r.branch = ema(r.branch, branchTarget(state, branch, fx), RATING_EMA);
+  // Incident modifiers (§23) ride on each target while their timed effect lasts.
+  const target = (cat: RatingCategory, t: number) => clamp(t + ratingMod(state, branch, cat), 1, 5);
+  r.rates = ema(r.rates, target('rates', ratesTarget(state, branch, fx)), RATING_EMA);
+  r.products = ema(r.products, target('products', productsTarget(state, branch, fx)), RATING_EMA);
+  r.service = ema(r.service, target('service', serviceTarget(state, branch, fx)), RATING_EMA);
+  r.branch = ema(r.branch, target('branch', branchTarget(state, branch, fx)), RATING_EMA);
   const stigma = state.treasury.windowStigmaWeeks > 0 ? WINDOW_STIGMA.rating : 0;
   r.overall = clamp(
     OVERALL_WEIGHTS.rates * r.rates +
       OVERALL_WEIGHTS.products * r.products +
       OVERALL_WEIGHTS.service * r.service +
       OVERALL_WEIGHTS.branch * r.branch -
-      stigma,
+      stigma +
+      ratingMod(state, branch, 'overall'),
     1,
     5,
   );

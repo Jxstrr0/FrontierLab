@@ -29,6 +29,7 @@ import { CITIES } from '../data/cities';
 import { DEPARTMENTS, HQ_DEPTS } from '../data/departments';
 import { dpow, dtanh } from './detmath';
 import { totalWholesale } from './fundingLots';
+import { riskCoverageBonus } from './incident/effects';
 import { spend } from './ledger';
 import { clamp, ema } from './math';
 import type { Coverage, Department, DeptId, GameState, HqDeptId } from './state';
@@ -145,7 +146,9 @@ export function computeCoverage(state: GameState, id: HqDeptId, ramp: number): C
   const d = state.departments[id];
   const required = requiredStaff(state, id);
   const k = Math.min(HQ_COVERAGE.kMax, (d ? staffEff(state, d) : 0) / Math.max(required, 0.01));
-  const kPrime = 1 - ramp * (1 - Math.min(k, 1));
+  // Consultants hired after a regulator audit lift Risk coverage′ for a while (§23).
+  const extra = id === 'risk' ? riskCoverageBonus(state) : 0;
+  const kPrime = Math.min(1, 1 - ramp * (1 - Math.min(k, 1)) + extra);
   const bonus = k > 1 ? Math.min(HQ_COVERAGE.bonusCap, (k - 1) * HQ_COVERAGE.bonusSlope) : 0;
   const eff = kPrime < 1 ? dpow(kPrime, HQ_COVERAGE.curve) : 1 + bonus;
   return { required, k, kPrime, eff };

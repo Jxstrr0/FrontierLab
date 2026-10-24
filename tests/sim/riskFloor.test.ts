@@ -86,7 +86,7 @@ describe('regulator review', () => {
     expect(regulatorStatus(s).lastReview?.week).toBe(26);
   });
 
-  it('fines 0.05–0.3% of trailing revenue on a failed review', () => {
+  it('proposes a fine of 0.05–0.3% of trailing revenue on a failed review', () => {
     const s = bankWithFloors(['risk'], { weeks: 40 });
     advanceWeeks(s, 1);
     // Seeded scenario: step the regulator stream until its next draw fails the review.
@@ -107,11 +107,14 @@ describe('regulator review', () => {
     const [lo, hi] = REGULATOR_REVIEW.fineRange;
     expect(review.fine).toBeGreaterThanOrEqual(lo * revenue);
     expect(review.fine).toBeLessThanOrEqual(hi * revenue);
-    expect(s.ledger.pnl.fines - fines0).toBeCloseTo(review.fine);
-    expect(s.events.log.at(-1)).toMatchObject({
-      type: 'REGULATOR_AUDIT',
+    // Stage 5: the fine waits on the REGULATOR_AUDIT incident's choice.
+    expect(s.ledger.pnl.fines - fines0).toBe(0);
+    expect(s.events.log.find((e) => e.type === 'REGULATOR_AUDIT')).toMatchObject({
       payload: { fine: review.fine },
     });
+    const audit = s.incidents.active.find((i) => i.type === 'REGULATOR_AUDIT');
+    expect(audit?.data.fine).toBeCloseTo(review.fine);
+    expect(audit?.options.find((o) => o.id === 'pay')?.cost).toBe(Math.round(review.fine));
     expect(regulatorStatus(s)).toMatchObject({ lastReview: review, failedReviews: 1 });
   });
 });

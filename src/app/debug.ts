@@ -6,6 +6,8 @@ import { CITIES } from '../data/cities';
 import { REFERENCE_BUILDS } from '../data/equipment';
 import * as cmd from '../sim/commands';
 import { advanceWeeks } from '../sim/engine';
+import { forceIncident } from '../sim/incidents';
+import { INCIDENT_SPECS } from '../data/incidents';
 import { act, bump, modal, openPanel, peekGame, screen, setGame } from './store';
 import { newGame } from '../sim/newGame';
 import { activeMap } from './map/MapView';
@@ -63,6 +65,25 @@ export function installDebug(): void {
     load(slot: SlotId = '1') {
       setGame(loadFromSlot(slot));
       screen.value = 'game';
+    },
+    /**
+     * Raises an incident now (a robbery at your first branch by default) and opens
+     * the incident modal. Scope defaults to the first branch, the city or 'company'.
+     */
+    incident(type = 'ROBBERY', scope?: string) {
+      const s = peekGame();
+      const spec = INCIDENT_SPECS[type];
+      if (!s || !spec) return undefined;
+      const fallback =
+        spec.scope === 'branch'
+          ? Object.keys(s.branches)[0]
+          : spec.scope === 'city'
+            ? s.world.currentCityId
+            : spec.scope;
+      const inc = forceIncident(s, type, scope ?? fallback ?? 'company');
+      if (inc && s.incidents.active.includes(inc)) modal.value = { type: 'incident' };
+      bump();
+      return inc?.id;
     },
     /** Runs whole weeks instantly. */
     advance(weeks: number) {

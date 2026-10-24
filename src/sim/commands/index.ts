@@ -12,3 +12,4 @@ export * from './underwriting';
 export * from './hq';
 export * from './partnerships';
 export * from './corporate';
+export * from './incidents';
