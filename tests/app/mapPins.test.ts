@@ -98,9 +98,9 @@ describe('map layers', () => {
   it('lists the 14 layer types and only offers those whose stage is on', () => {
     expect(MAP_LAYERS).toHaveLength(14);
     expect(new Set(MAP_LAYERS.map((l) => l.id)).size).toBe(14);
-    const on = availableLayers();
-    expect(on.map((l) => l.id)).toContain('branches');
-    for (const l of on) expect(FEATURES[l.feature]).toBe(true);
+    for (const l of availableLayers()) expect(FEATURES[l.feature]).toBe(true);
+    const mapOnly = { ...FEATURES, cityMap: true, hq: false };
+    expect(availableLayers(mapOnly).map((l) => l.id)).toContain('branches');
     const none = Object.fromEntries(Object.keys(FEATURES).map((k) => [k, false])) as Record<
       keyof typeof FEATURES,
       boolean
