@@ -196,7 +196,8 @@ export function setBenefit(state: GameState, id: string, value: number): Command
   const spec = BENEFITS[id];
   if (!spec) return fail('Unknown benefit.');
   if (!state.departments.hr) return fail('Benefits are managed from the HR floor.');
-  if (spec.publicOnly) return fail('Available once your bank is listed.');
+  if (spec.publicOnly && state.stock.status !== 'public')
+    return fail('Available once your bank is listed.');
   if (!Number.isFinite(value)) return fail('Enter a number.');
   const v = Math.max(spec.min, Math.min(spec.max, roundToStep(value, spec.step)));
   if (v === 0) delete state.people.benefits[id];

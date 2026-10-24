@@ -12,10 +12,12 @@ import {
   RANKING_SIZE,
 } from '../config/balance';
 import { COUNTRIES } from '../data/countries';
-import { HOUSING_REASONS, INDEX_NAMES, MARKET_SECTORS } from '../data/newsWorld';
+import { HOUSING_REASONS, MARKET_SECTORS } from '../data/newsWorld';
+import { MARKET_INDEX_NAME } from '../data/stocks';
 import type { CountryId } from '../data/types';
 import { dateOf, isYearStart } from './calendar';
 import { hpiYoY } from './macro';
+import { indexWeeklyMove } from './marketStocks';
 import { basisPoints, grouped, newsAbsPct, newsPct, newsRate } from './newsFormat';
 import {
   cityFor,
@@ -129,11 +131,11 @@ export function housingStories(ctx: NewsContext, rng: Rng): Story[] {
   return out;
 }
 
-/** The home market's week, from the country's equity market return. */
+/** The market's week, from the Ledger Composite's weekly move (Stage 6, src/sim/market.ts). */
 export function marketStory(ctx: NewsContext, rng: Rng): Story | undefined {
   const c = ctx.state.world.countries[ctx.home];
   if (!c) return undefined;
-  const pct = c.marketReturn * 100;
+  const pct = indexWeeklyMove(ctx.state) * 100;
   return {
     key: pct >= 0 ? 'MARKET_UP' : 'MARKET_DOWN',
     subject: ctx.home,
@@ -141,7 +143,7 @@ export function marketStory(ctx: NewsContext, rng: Rng): Story | undefined {
     icon: 'chart',
     priority: P.market,
     tokens: {
-      index: INDEX_NAMES[ctx.home],
+      index: MARKET_INDEX_NAME,
       pct: newsAbsPct(pct),
       sector: rng.pick(MARKET_SECTORS),
     },

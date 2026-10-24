@@ -265,6 +265,9 @@ export const SECTOR_BETA: Record<SectorId, number> = {
   banking: 1.1,
 };
 
+/** The cap-weighted index of every listed company (SIMULATION §19.1). */
+export const MARKET_INDEX_NAME = 'Ledger Composite';
+
 /** Fictional stock exchanges, one per country. */
 export const EXCHANGES: Record<CountryId, string> = {
   CA: 'Maple Exchange',

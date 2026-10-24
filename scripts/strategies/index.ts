@@ -1,6 +1,7 @@
 // The scripted strategies from SIMULATION §25.
 import { forceRecession } from './stress';
 import { averageLot, bestLot, buildCost, followDefaults, openBranch } from './common';
+import { manageEquity } from './equity';
 import { hqReady, manageHq } from './hq';
 import type { Strategy } from './types';
 import * as cmd from '../../src/sim/commands';
@@ -34,6 +35,7 @@ export const steady: Strategy = {
   weekly: (s) => {
     followDefaults(s);
     manageHq(s);
+    manageEquity(s, 0.12, 2);
     expand(s, 2, 0.12, true);
   },
 };
