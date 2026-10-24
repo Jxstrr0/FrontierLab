@@ -1,0 +1,142 @@
+/* Personal empire screens (SCREENS §19, §23): Personal Wealth, vacation homes
+   and car dealers. Donut layout comes from investment/investment.css. */
+.inv-slice-cash {
+  --slice: var(--jade);
+}
+.inv-slice-others {
+  --slice: #7b93b8;
+}
+
+.pw-profile {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.pw-profile-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.pw-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-20);
+  line-height: 1.2;
+}
+.pw-rank {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: var(--tap-min);
+  margin-top: var(--space-3);
+  border: 1px solid var(--brass);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--brass-light);
+  font: inherit;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.pw-rank:active {
+  background: var(--vault-raised);
+}
+
+.pw-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-2);
+  margin-bottom: var(--space-2);
+}
+.pw-card-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-16);
+}
+.pw-center {
+  margin: 0;
+  text-align: center;
+}
+.pw-blurb {
+  margin: 0 0 var(--space-2);
+  font-style: italic;
+}
+.pw-personal {
+  margin: 0;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Showroom carousel */
+.pw-carousel .carousel > .pw-car {
+  flex-basis: 84%;
+}
+.pw-car {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.pw-car-blurb {
+  margin: 0 0 var(--space-2);
+  min-height: 2.9em;
+}
+.pw-car-art {
+  display: block;
+  width: 100%;
+  max-width: 220px;
+  height: 84px;
+  margin: 0 auto var(--space-2);
+  fill: none;
+  stroke: var(--brass-light);
+  stroke-width: 1.4;
+  stroke-linejoin: round;
+}
+.pw-car-road {
+  stroke: var(--hairline);
+}
+
+/* Rich list sheet */
+.pw-rich-note {
+  margin: 0 0 var(--space-3);
+}
+.pw-rich-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.pw-rich-list li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--tap-min);
+  padding: var(--space-1) 0;
+  border-bottom: 1px solid var(--hairline);
+}
+.pw-rich-list li.is-you {
+  color: var(--brass-light);
+  font-weight: 600;
+}
+.pw-rich-rank {
+  flex: none;
+  width: 3ch;
+  font-variant-numeric: tabular-nums;
+  color: var(--ivory-dim);
+}
+.pw-rich-who {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.pw-rich-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pw-rich-worth {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+}

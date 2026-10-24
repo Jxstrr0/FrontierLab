@@ -47,9 +47,11 @@ describe('incident catalog', () => {
     }
   });
 
-  it('does not raise later-stage incidents yet', () => {
+  it('raises the Stage 9 insider probe as a personal case with no corporate cost', () => {
     const { s } = openBank();
-    expect(raiseIncident(s, 'INSIDER_PROBE', 'personal', 'personal')).toBeUndefined();
+    const inc = raiseIncident(s, 'INSIDER_PROBE', 'personal', 'personal', { fine: 300_000 });
+    expect(inc?.scopeKind).toBe('personal');
+    expect(inc?.options.every((o) => o.cost === 0)).toBe(true);
   });
 });
 

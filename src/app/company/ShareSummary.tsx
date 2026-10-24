@@ -1,8 +1,10 @@
 // Company summary share section (SCREENS §24): share price (or private
 // valuation) with its 52-week range, market cap, your stake, the top
-// shareholders, and your personal line: cash plus the stocks you hold.
+// shareholders, and your personal line: cash plus your holdings, totalling
+// netWorth() like the Personal Wealth screen.
 import { COE } from '../../config/balance';
 import { topHolders } from '../../sim/marketHolders';
+import { netWorth } from '../../sim/netWorth';
 import { holdingsValue } from '../../sim/securities';
 import { founderStake, sharesHeld, FOUNDER_ID } from '../../sim/shares';
 import type { GameState } from '../../sim/state';
@@ -55,10 +57,10 @@ export function ShareSummary(p: { s: GameState }) {
         <Row label="Stocks you hold" value={money(stocks, sym)} />
         <Row label="Your shares in the bank" value={money(ownShares, sym)} />
         <Row
-          label="Personal total"
-          value={money(s.personal.cash + stocks + ownShares, sym)}
-          strong
+          label="Homes, property and other assets"
+          value={money(netWorth(s).total - s.personal.cash - stocks - ownShares, sym)}
         />
+        <Row label="Personal total" value={money(netWorth(s).total, sym)} strong />
       </Card>
     </div>
   );

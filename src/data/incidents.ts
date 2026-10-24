@@ -334,13 +334,18 @@ export const INCIDENT_SPECS: Record<string, IncidentSpec> = {
     trigger: 'triggered',
     stage: 9,
     text: 'Securities regulators are asking about your personal trades in {company}. They suggest a settlement of {fine}.',
-    money: ['fine'],
+    money: ['fine', 'doubled'],
     options: [
-      { id: 'settle', label: 'Settle', effect: 'Pay the fine.' },
+      {
+        id: 'settle',
+        label: 'Settle',
+        effect:
+          'Pay {fine} from your personal cash. The story dents the bank’s ratings for a while.',
+      },
       {
         id: 'fight',
         label: 'Fight it',
-        effect: 'Even odds: cleared, or double the fine and the press.',
+        effect: 'Even odds: cleared, or pay {doubled} and take the same hit in the press.',
       },
     ],
     worst: 'settle',
