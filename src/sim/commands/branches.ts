@@ -15,7 +15,8 @@ import {
 } from '../../config/balance';
 import { DISTRICT_SPECS } from '../../data/districts';
 import { BUILD_SLOTS, EQUIPMENT, isFitout, type BuildSpec } from '../../data/equipment';
-import { isDeposit, isLoan, PRODUCTS } from '../../data/products';
+import { isDeposit, isLoan } from '../../data/products';
+import { allProducts, productSpec } from '../products';
 import { assetBookValue } from '../balanceSheet';
 import { tileDistance } from '../citygen';
 import { emptyBook } from '../branch/books';
@@ -124,11 +125,15 @@ export function buildBranch(
     desk: { week: 0, approved: 0, refused: 0, declined: 0, expired: 0 },
   };
   branch.staff.count = branch.staff.target = staffNeeded(branch);
-  for (const spec of Object.values(PRODUCTS)) {
+  const lineup = state.company.companyOffered;
+  for (const spec of allProducts(state)) {
     // Deposits and everyday services start on; lending and cards wait for the player (SCREENS §27).
     let on = spec.category === 'deposits' || spec.kind === 'fx' || spec.kind === 'sbl';
-    if (spec.kind === 'wealth') on = offices > 0;
+    if (spec.kind === 'wealth') on = offices > 0 || spec.noAdvisorOffice === true;
     if (spec.kind === 'safebox') on = boxes > 0;
+    // Developed products start off; the HQ lineup (setCompanyOffered) overrides either way.
+    if (spec.base) on = false;
+    if (lineup?.[spec.id] !== undefined) on = lineup[spec.id]!;
     branch.offered[spec.id] = { on, price: roundToStep(defaultPrice(spec, country), spec.step) };
     branch.books[spec.id] = emptyBook();
   }
@@ -206,7 +211,7 @@ function successor(state: GameState, branch: Branch): Branch | undefined {
 
 function hasLoans(state: GameState, branch: Branch): boolean {
   const books = Object.entries(branch.books).some(([pid, b]) => {
-    const spec = PRODUCTS[pid];
+    const spec = productSpec(state, pid);
     return spec && isLoan(spec) && b.balance > 0;
   });
   return books || Object.values(state.loanDesk.loans).some((l) => l.branchId === branch.id);
@@ -269,7 +274,7 @@ export function closeBranch(
   const target = quote.targetId ? state.branches[quote.targetId] : undefined;
 
   for (const [pid, from] of Object.entries(branch.books)) {
-    const spec = PRODUCTS[pid];
+    const spec = productSpec(state, pid);
     if (!spec) continue;
     const share = isLoan(spec) ? 1 : quote.retention;
     // Deposits that leave the bank are paid out of treasury reserves.

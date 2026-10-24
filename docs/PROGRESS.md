@@ -10,6 +10,19 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-10-24 — Stage 4: Products floor simulation
+- **Stage / step:** 4 — HQ and operations depth (Products floor, simulation only; the screens are a separate step)
+- **Done:**
+  - Product development: pick a type (18 templates from CONTENT §6), a price tier, 4–48 weeks and a weekly budget (from $5,000). The star odds table follows SIMULATION §16.6 and matches the reference numbers (27/42/26/5/0 at the cheapest setting). Each week pays for the progress made; at the end the stars are rolled and a new product appears in the catalog.
+  - Developed products work like any other: their own prices, toggles and books at each branch, built from the base product plus the template (e.g. Senior Saver = savings with more retiree interest). They start switched off. Deleting one moves its customers onto the base product.
+  - Digital projects (IT floor needed): Mobile App 2.0 lifts the app rating; Instant Decisions makes the house model faster. Each runs once.
+  - Underwriting models: buy a credit bureau's package, commission a custom mix hosted by a bureau, or build your own on the Products floor (sliders over five data inputs; Internal History unlocks at 5,000 loans). Switching models blends old into new over two weeks.
+  - Company lineup: "Apply rates to all branches" lets HQ set prices and the lineup for every branch.
+  - 111 tests (new: odds vs the doc, a development turning into a product that gains customers, digital projects, deleting, custom model maths, the Internal History gate, the switching blend, the company lineup, and a save round-trip with all of it).
+- **Determinism snapshot:** unchanged (`08b4ee1bc7e8a3`). The scripted game doesn't use the Products floor, and the new state fields are only written once you use them. The 5-year balance report is identical.
+- **Dependencies:** none added.
+- **Next:** the Products floor and Credit bureau screens (SCREENS §10, §13).
+
 ### 2026-10-24 — Next week button
 - **Done:** a ▶| button in the date pill (top right) jumps to the end of the current week, shows the weekly results and pauses, so you can play week by week instead of watching days tick by. It runs through the same simulation steps as normal play, so nothing about the numbers changes. When paused, the pill now shows just the date (the ▶ button already says it's paused).
 - **Next:** Stage 4.
