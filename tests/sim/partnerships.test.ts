@@ -168,7 +168,11 @@ describe('payroll partnerships', () => {
     advanceWeeks(s, 1);
     tally();
     expect(cmd.renewPartnership(s, p.id).ok).toBe(false);
+    // Over 13 game years rivals expand around the lone host branch; hold health
+    // above the termination line so the deal runs to its term.
+    const steadyHealth = () => (p.health = Math.max(p.health, 60));
     for (let w = 1; w < PARTNER_CONTRACT_WEEKS - 52; w++) {
+      steadyHealth();
       advanceWeeks(s, 1);
       tally();
     }
@@ -179,6 +183,7 @@ describe('payroll partnerships', () => {
     expect(p.termWeeks).toBe(2 * PARTNER_CONTRACT_WEEKS);
     expect(p.fee).toBeCloseTo(fee0 + quote, 6);
     while (s.partnerships[p.id]?.status === 'active') {
+      steadyHealth();
       advanceWeeks(s, 1);
       tally();
     }

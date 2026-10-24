@@ -732,8 +732,176 @@ export const RIVAL_QUALITY_REF = 3.4;
 export const RIVAL_LDR = 0.82;
 /** Risk weight on a rival's loans for its capital ratio. */
 export const RIVAL_LOAN_RISK_WEIGHT = 0.75;
+/** Books move this share of the gap to their target each week (§18.1). */
+export const RIVAL_BOOK_EMA = 0.05;
+/** Branches opened after the start ramp to their mature size over this many weeks (§18.1). */
+export const RIVAL_RAMP_WEEKS = 156;
+/**
+ * Local competition on a rival branch's target deposits (assumption, DESIGN §7):
+ * target × (1 / (1 + crowdK × max(0, crowd − crowdFree)) − playerK × Σ w × max(0, share − playerShareRef)),
+ * where crowd and w use the share formula's distance weights within RIVAL_RADIUS (§9.3).
+ */
+export const RIVAL_COMPETITION = {
+  crowdFree: 2,
+  crowdK: 0.1,
+  playerShareRef: 0.15,
+  playerK: 1.2,
+  min: 0.35,
+} as const;
+/** Loans = deposits × RIVAL_LDR × (1 + slope × (loanDemand − 1)). */
+export const RIVAL_LDR_DEMAND_SLOPE = 0.3;
+/**
+ * Simplified weekly financials by strategy (§18.5): net interest margin on loans,
+ * fee yield on deposits, cost and loss multipliers, how hard the credit cycle
+ * bites (losses × (1 + cycleSens × (creditCycle − 1)); thin-file disruptors feel
+ * a recession most), the capital ratio dividends steer toward, and the
+ * expansion rate multiplier (disruptors 0.25×, §18.4).
+ */
+export const RIVAL_FINANCE: Record<
+  'incumbent' | 'disruptor' | 'premium' | 'community',
+  {
+    nim: number;
+    feeMult: number;
+    costMult: number;
+    lossMult: number;
+    cycleSens: number;
+    crTarget: number;
+    expandMult: number;
+  }
+> = {
+  incumbent: {
+    nim: 0.03,
+    feeMult: 1.1,
+    costMult: 1,
+    lossMult: 1,
+    cycleSens: 4,
+    crTarget: 0.13,
+    expandMult: 1,
+  },
+  premium: {
+    nim: 0.031,
+    feeMult: 1.4,
+    costMult: 1.3,
+    lossMult: 0.7,
+    cycleSens: 3,
+    crTarget: 0.14,
+    expandMult: 1,
+  },
+  community: {
+    nim: 0.028,
+    feeMult: 0.8,
+    costMult: 0.95,
+    lossMult: 1.1,
+    cycleSens: 5,
+    crTarget: 0.115,
+    expandMult: 1,
+  },
+  disruptor: {
+    nim: 0.026,
+    feeMult: 0.4,
+    costMult: 0.6,
+    lossMult: 1.6,
+    cycleSens: 7,
+    crTarget: 0.085,
+    expandMult: 0.25,
+  },
+};
+/** NIM moves with the policy rate's gap from neutral (low rates squeeze deposit margins). */
+export const RIVAL_NIM_POLICY_SLOPE = 0.25;
+/** Gross loan yield over policy, for reported revenue. */
+export const RIVAL_LOAN_YIELD_SPREAD = 0.03;
+/** Fee income per $ of deposits a year, before the strategy multiplier. */
+export const RIVAL_FEE_YIELD = 0.02;
+/** Weekly cost of running a branch, × city cost index × strategy cost multiplier. */
+export const RIVAL_BRANCH_COST = 18_000;
+/** Servicing cost per $ of deposits a year. */
+export const RIVAL_SERVICING = 0.004;
+/** Annual loss rate on loans in a neutral cycle, before the strategy multiplier. */
+export const RIVAL_BASE_LOSS_RATE = 0.006;
+/** Monthly expansion check (§18.4). */
+export const RIVAL_EXPANSION = {
+  everyWeeks: 4,
+  minCr: 0.11,
+  /** Chance per monthly check that an eligible rival opens a branch. */
+  chance: 0.06,
+  /** Trailing profit needs this many reported quarters (so no openings in year one). */
+  minQuarters: 4,
+  /** Rivals stop opening once they hold this share of a city's lots… */
+  maxRivalLotShare: 0.3,
+  /** …or once fewer than this share of lots is free. */
+  minFreeLotShare: 0.3,
+  /** Build cost taken from equity, × city cost index. */
+  buildCost: 450_000,
+  reviews: [20, 120] as [number, number],
+} as const;
+/** Close a branch after this many negative weeks, ignoring its first graceWeeks (§18.4). */
+export const RIVAL_CLOSURE = { negativeWeeks: 26, graceWeeks: 52 } as const;
+/** Review cards shown on a rival branch panel (derived, not stored). */
+export const RIVAL_REVIEW_CARDS = 4;
+/** New reviews a rival branch collects each week. */
+export const RIVAL_REVIEWS_PER_WEEK = 2;
+/**
+ * Quarterly dividends: clamp(excessShare × excess capital, ratio × net income,
+ * maxRatio × net income), never more than the excess; paid only when profitable
+ * and above the strategy's capital target.
+ */
+export const RIVAL_PAYOUT = { ratio: 0.45, maxRatio: 0.8, excessShare: 0.5 } as const;
+/**
+ * Notional shares until the stock market arrives (Stage 6): book value per share
+ * is fixed and price = book × clamp(ROE_ttm / coe, pb) (like §19.2).
+ */
+export const RIVAL_NOTIONAL_SHARE = {
+  bookPerShare: 20,
+  coe: 0.1,
+  pb: [0.5, 2.5] as [number, number],
+} as const;
+export const RIVAL_EXEC_RESIGN_CHANCE = 0.03;
+/**
+ * Recession failure check (§18.5): CR below maxCr fails with `chance` per quarter.
+ * A rival whose CR falls below insolventCr is seized at quarter-end in any phase
+ * (assumption, DESIGN §7: no zombie banks with negative equity).
+ */
+export const RIVAL_FAILURE = {
+  maxCr: 0.06,
+  chance: 0.15,
+  insolventCr: 0.02,
+  distressWeeks: 8,
+} as const;
+/** Price wars (§18.6). Bumps in rate units; decay per week once your streak ends. */
+export const PRICE_WAR = {
+  minRating: 4.0,
+  streakWeeks: 8,
+  everyWeeks: 4,
+  chance: 0.3,
+  bump: 0.0015,
+  cap: 0.006,
+  decay: 0.0001,
+} as const;
 
 // ─── RIVAL CORPORATE LENDING (§19.9) ──────────────────────────────────────────
+export const CORPORATE_LENDING = {
+  refreshWeeks: 4,
+  offersPerRival: [2, 3] as [number, number],
+  /** Loan offers up to this share of your equity, less corporate debt already owed. */
+  maxEquityShare: 0.4,
+  /** Smallest offer worth making. */
+  minAmount: 50_000,
+  amountStep: 10_000,
+  /** Offer size as a share of the room left. */
+  sizeRange: [0.3, 1] as [number, number],
+  /** Rate = home policy + spread: best at crBest, worst at crWorst. */
+  spreadBest: 0.025,
+  spreadWorst: 0.05,
+  crBest: 0.16,
+  crWorst: 0.08,
+  spreadNoise: 0.004,
+  terms: [52, 78, 104, 130, 156] as const,
+  /** Line of credit: limit share of equity per lender, rate = policy + lineSpread. */
+  lineEquityShare: 0.2,
+  lineSpread: 0.04,
+  /** Balances below this count as repaid. */
+  dust: 0.5,
+} as const;
 
 // ─── INCIDENTS (§23) ──────────────────────────────────────────────────────────
 
