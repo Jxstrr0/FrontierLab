@@ -35,7 +35,7 @@ interface Placed {
 }
 
 const pinKey = (p: PinSpec) =>
-  `${p.kind}|${p.ink}|${p.monogram}|${p.label}|${p.badge}|${p.x}|${p.y}`;
+  `${p.kind}|${p.ink}|${p.monogram}|${p.label}|${p.badge}|${p.alert ?? false}|${p.x}|${p.y}`;
 
 export class PinLayer {
   private pins: PinSpec[] = [];
@@ -220,6 +220,8 @@ function makePinElement(p: PinSpec): HTMLButtonElement {
   }
   if (p.badge)
     el.insertAdjacentHTML('beforeend', '<span class="pin-badge" aria-hidden="true"></span>');
+  if (p.alert)
+    el.insertAdjacentHTML('beforeend', '<span class="pin-alert" aria-hidden="true"></span>');
   return el;
 }
 
@@ -239,5 +241,7 @@ function makeClusterElement(c: Cluster<PinSpec>): HTMLButtonElement {
   el.innerHTML = `<span class="pin-count" aria-hidden="true">${n > 99 ? '99+' : n}</span>`;
   if (c.members.some((m) => m.badge))
     el.insertAdjacentHTML('beforeend', '<span class="pin-badge" aria-hidden="true"></span>');
+  if (c.members.some((m) => m.alert))
+    el.insertAdjacentHTML('beforeend', '<span class="pin-alert" aria-hidden="true"></span>');
   return el;
 }

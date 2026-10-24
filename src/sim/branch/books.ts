@@ -39,6 +39,7 @@ import { signupChurnMult, type CampaignEffects } from './marketing';
 import { branchPrice, churnGap, isOffered, priceFactor } from './pricing';
 import type { BranchWeek } from './week';
 import { difficultyOf } from '../difficulty';
+import { bankRunMult } from '../incident/effects';
 import { allProducts, baseId } from '../products';
 
 const NONE: Origination = { newAccounts: 0, newVolume: 0, approval: 1 };
@@ -154,7 +155,8 @@ function runDeposit(ctx: Ctx, spec: ProductSpec, book: Book, orig: Origination):
     perWeek(spec.churn) *
     (1 + (spec.rateChurnSens ?? 0) * churnGap(spec, price, m)) *
     (1 + OVERALL_CHURN.slope * Math.max(0, OVERALL_CHURN.pivot - branch.ratings.overall)) *
-    signupChurnMult(branch);
+    signupChurnMult(branch) *
+    bankRunMult(state); // runMult during a bank run (§13.8)
   const out = book.balance * k;
   book.balance -= out;
   book.last.churned = book.accounts * k;

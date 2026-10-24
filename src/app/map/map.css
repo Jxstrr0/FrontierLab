@@ -202,6 +202,19 @@
   pointer-events: none;
 }
 
+/* Oxblood dot: an unresolved incident (SCREENS §0.2), opposite the brass dot. */
+.pin-alert {
+  position: absolute;
+  top: calc(50% - var(--pin-size) / 2 - 2px);
+  left: calc(50% - var(--pin-size) / 2 - 3px);
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--oxblood);
+  border: 2px solid var(--ivory);
+  pointer-events: none;
+}
+
 /* ─── Layers sheet ─────────────────────────────────────────────────────── */
 .layers {
   display: flex;

@@ -27,6 +27,7 @@ import { stream, type Rng } from '../rng';
 import type { Branch, BusinessLoan, DeskWeek, GameState, LoanApplication } from '../state';
 import { effectiveAwareness, type CampaignEffects } from './marketing';
 import { branchPrice } from './pricing';
+import { raiseIncident } from '../incidents';
 import { managerOf } from './staff';
 import type { BranchWeek } from './week';
 import { difficultyOf } from '../difficulty';
@@ -286,6 +287,11 @@ function runBusinessLoans(state: GameState, branch: Branch, wk: BranchWeek, rng:
           2,
           branch.id,
         );
+        raiseIncident(state, 'BIG_DEFAULT', 'branch', branch.id, {
+          business: loan.business,
+          sector: loan.sector,
+          amount: loan.balance,
+        });
       }
       loan.balance = 0;
       loan.status = 'defaulted';
