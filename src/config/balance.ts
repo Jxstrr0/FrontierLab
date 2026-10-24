@@ -26,7 +26,7 @@ export const FEATURES = {
   /** Stage 8: every city, airports and travel. */
   multiCity: true,
   /** Stage 9: personal wealth, homes, cars, auctions, franchise. */
-  personalEmpire: false,
+  personalEmpire: true,
   /** Stage 10: art pass, tutorial, sound, PWA. */
   polish: false,
 } as const;
@@ -1165,8 +1165,17 @@ export const CARS_CFG = {
   upkeepRate: 0.02,
   resaleHaircut: 0.1,
 } as const;
-/** Collectibles: genuine items drift +3%/yr with σ 8% applied yearly; insurance 0.2%/yr. */
-export const COLLECTIBLES_CFG = { drift: 0.03, sigma: 0.08, insuranceRate: 0.002 } as const;
+/**
+ * Collectibles (SIMULATION §22): every piece not found to be fake drifts
+ * +3%/yr with σ 8% at each year start (never below floorShare × what you paid);
+ * insurance 0.2%/yr of value, weekly from personal cash.
+ */
+export const COLLECTIBLES_CFG = {
+  drift: 0.03,
+  sigma: 0.08,
+  insuranceRate: 0.002,
+  floorShare: 0.25,
+} as const;
 /**
  * Auctions: each house holds one every 4 weeks with 3–5 lots, previewed 2 weeks
  * ahead. Clearing = estimate × lognormal(1, 0.25); the winner pays clearing +
@@ -1183,6 +1192,19 @@ export const AUCTIONS = {
   appraiseWeeks: 1,
   consignSigma: 0.15,
   sellerFee: 0.1,
+  /** Each house's first sale is this many weeks out, the houses a week apart. */
+  firstSaleWeeks: 3,
+  staggerWeeks: 1,
+  /** A lot's estimate = the item's estimate × (1 ± up to this), rounded. */
+  estimateNoise: 0.1,
+  estimateRound: 10_000,
+  /** A hammer at ≥ this × estimate makes the Ledger as a record price. */
+  recordFactor: 1.4,
+  /** Results kept per house. */
+  historyKeep: 24,
+  /** Max-bid stepper: steps of this share of the estimate, up to bidMaxFactor × estimate. */
+  bidStepShare: 0.05,
+  bidMaxFactor: 3,
 } as const;
 /**
  * Dealer financing (SCREENS §19): a car dealer refers auto-loan customers to

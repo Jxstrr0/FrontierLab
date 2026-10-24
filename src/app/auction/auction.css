@@ -1,0 +1,131 @@
+/* Auction house panel (SCREENS §19): saleroom hero, lot cards, item cards
+   with the red FAKE stamp, results list. */
+.au-art {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: var(--vault-deep);
+}
+.au-icon {
+  position: relative;
+  flex: 0 0 auto;
+  display: block;
+  width: 56px;
+  height: 56px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+.au-icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.au-stamp {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) rotate(-18deg);
+  padding: 0 3px;
+  border: 2px solid #e07a7a;
+  border-radius: 3px;
+  color: #e07a7a;
+  background: rgb(15 24 40 / 55%);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-12);
+  letter-spacing: 0.1em;
+  line-height: 1.2;
+  pointer-events: none;
+}
+.au-lot {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--tap-min);
+  text-align: left;
+}
+.au-lot-body {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+.au-lot-name {
+  font-family: var(--font-display);
+  font-size: var(--text-16);
+  color: var(--ivory);
+  line-height: 1.25;
+}
+.au-lot-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+.au-lot-badges:empty {
+  display: none;
+}
+.au-chevron {
+  color: var(--brass-light);
+  font-size: var(--text-24);
+}
+.au-note {
+  margin: var(--space-2) 0 0;
+}
+.au-warn {
+  margin: var(--space-2) 0 0;
+  color: var(--ivory);
+  border-left: 2px solid var(--oxblood);
+  padding-left: var(--space-2);
+}
+.au-actions {
+  margin-top: var(--space-3);
+}
+.au-actions:empty {
+  display: none;
+}
+.au-sheet-head {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  margin-bottom: var(--space-3);
+}
+.au-blurb {
+  margin: var(--space-1) 0 0;
+}
+.au-item-head {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  margin-bottom: var(--space-2);
+}
+.au-item-title {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+  min-width: 0;
+}
+.au-item.is-fake .au-lot-name {
+  text-decoration: line-through;
+  text-decoration-color: rgb(224 122 122 / 70%);
+}
+.au-result {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+  align-items: center;
+}
+.au-result + .au-result {
+  border-top: 1px solid rgb(184 145 61 / 15%);
+}
+.au-result-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  font-variant-numeric: tabular-nums;
+}
