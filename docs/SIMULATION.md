@@ -495,6 +495,9 @@ If `L > liqTarget + 0.05`: repay central bank window borrowing first, then overn
   - Renew at fee × `(1.5 − health/100)` for another full term.
   - Or let it lapse: run off over 12 weeks.
 
+- **Student partnership (universities):** students by city size S 6,000 / M 10,000 / L 16,000 / XL 24,000; fee $30 × students × incomeIndex; $600 per participating student; same curve, health and term rules. A university has one payroll and one student deal at a time.
+- **Graduate program (universities):** $120,000 × city wageIndex a year, charged up front and every 52 weeks; +10 skill for manager candidates and +1 hire a week at branches and HQ floors.
+
 ### 13.8 Bank runs
 - **Trigger:**
   - Condition: average overall rating < 2.6 AND (capital tier Restricted or Critical OR LR < 0.08).
@@ -899,6 +902,8 @@ Levels 1–5 (Very conservative to Very aggressive):
 ## 25. Balance targets
 
 Run `npm run balance` with seed 42 and the start city Calgary, unless noted. Branch checkpoints read the first branch of the steady strategy, built on an "average lot" (the median-rent free lot in Midtown). Weekly revenue and income checkpoints use a 4-week average, so a single large default doesn't swing them.
+
+**Note (Stage 5):** the branch checkpoints are a seed-42 reference and assume Expansion. With every country simulated, seed 42's path has a recession at weeks 97–134 and policy cuts to 1.5%, so week 156 reads about $90k revenue / $41k income (below band) before recovering inside it by week 208. Other seeds (e.g. 7, 99) already missed the first-branch checkpoints in Stage 4 because their median Midtown lot is weaker; a cross-seed calibration is open.
 
 **Updated 2026-10-24 (Stage 1, owner's decision):** with CONTENT's fees and card rates at the 3.5–4% policy rates the macro rule produces, a mature branch earns about $50–65k a week on $120–145k of revenue. That is close to the original's store economics (about £51k income on £84k revenue), so the targets below were raised to match instead of cutting fee income. The old values are kept in brackets.
 
