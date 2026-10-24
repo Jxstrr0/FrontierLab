@@ -52,6 +52,7 @@ export function BuildPanel(p: { lotId: string }) {
               class="btn btn-primary btn-block"
               disabled={!!blocker}
               onClick={doBuild}
+              data-tutorial="build-confirm"
             >
               Build for {moneyFull(quote.total, sym)}
             </button>

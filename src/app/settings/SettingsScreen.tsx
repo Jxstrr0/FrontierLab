@@ -16,7 +16,10 @@ import type { Settings } from '../../sim/state';
 import { Panel, Row, SectionTitle, Segmented, Sheet, Toggle } from '../components';
 import { AvatarPicker } from '../newgame/AvatarPicker';
 import { loadPrefs, savePrefs } from '../saves';
-import { act, bump, closePanel, peekGame, rev, screen } from '../store';
+import { openCredits } from '../credits/CreditsScreen';
+import { play, unlockAudio } from '../sound/sound';
+import { act, bump, closePanel, openPanel, peekGame, rev, screen } from '../store';
+import { TutorialSetting } from './TutorialSetting';
 import './settings.css';
 import './standalone.css';
 
@@ -114,10 +117,20 @@ export function SettingsScreen(p: { inGame?: boolean }) {
           />
           <Toggle
             label="Sound"
-            hint="Has no effect yet; sound arrives in a later stage."
+            hint="Soft clinks, stamps and latches. Off until you switch it on."
             checked={s.sound}
-            onChange={(sound) => change({ sound })}
+            onChange={(sound) => {
+              change({ sound });
+              // Inside the tap, so iOS lets audio start; a clink confirms it works.
+              if (sound) {
+                unlockAudio();
+                play('coin');
+              }
+            }}
           />
+
+          <SectionTitle>Tutorial</SectionTitle>
+          <TutorialSetting inGame={!!game} />
 
           <SectionTitle>Founder</SectionTitle>
           {game ? (
@@ -137,6 +150,15 @@ export function SettingsScreen(p: { inGame?: boolean }) {
               Settings.
             </p>
           )}
+
+          <SectionTitle>About</SectionTitle>
+          <button
+            type="button"
+            class="btn btn-secondary btn-block"
+            onClick={() => (game ? openPanel({ type: 'credits' }) : openCredits('settings'))}
+          >
+            Credits
+          </button>
         </div>
       </Panel>
       {game && editingAvatar && (

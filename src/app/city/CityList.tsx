@@ -127,6 +127,8 @@ function LotRow(p: {
         type="button"
         class="lot-row"
         onClick={() => openPanel({ type: 'branch', branchId: occ.id })}
+        data-tutorial="my-branch"
+        data-lot-id={lot.id}
       >
         <Medallion ink={s.meta.brandInk} monogram={s.meta.monogram} size={32} />
         <span class="lot-main">
@@ -167,6 +169,7 @@ function LotRow(p: {
       type="button"
       class="lot-row"
       onClick={() => openPanel({ type: 'storefront', lotId: lot.id })}
+      data-tutorial="open-lot"
     >
       <span class="lot-empty" aria-hidden="true" />
       <span class="lot-main">
