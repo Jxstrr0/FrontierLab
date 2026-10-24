@@ -33,6 +33,7 @@ import { effectiveAwareness, type CampaignEffects } from './marketing';
 import { branchPrice, isOffered, priceFactor } from './pricing';
 import { capacity, visitRate } from './staff';
 import { difficultyOf } from '../difficulty';
+import { dpow } from '../detmath';
 
 export interface Origination {
   newAccounts: number;
@@ -52,7 +53,7 @@ export interface DemandResult {
 }
 
 /** Attractiveness A = (Overall/5)^2.2 (§9.3). */
-const attract = (overall: number) => (overall / 5) ** SHARE_EXP;
+const attract = (overall: number) => dpow(overall / 5, SHARE_EXP);
 
 /**
  * share = A / (A + Σ w_j A_j + A0), with w_j = 1 / (1 + d_j / 6) for every
@@ -144,7 +145,7 @@ export function runDemand(state: GameState, branch: Branch, fx: CampaignEffects)
     difficultyOf(state).demandMult *
     (AWARENESS_FLOOR + (1 - AWARENESS_FLOOR) * e) *
     Math.sqrt(loanDemand(country)) *
-    (1 - penetration) ** SATURATION_EXP *
+    dpow(1 - penetration, SATURATION_EXP) *
     noise(rng, DEMAND_NOISE);
 
   // §9.3–9.4 share, capture and service

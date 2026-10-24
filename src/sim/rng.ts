@@ -1,6 +1,7 @@
 // Seeded randomness (SIMULATION §3): sfc32 with one stream per system, each
 // seeded from hash(saveSeed, streamName). Stream state lives in GameState.rng,
 // so the same seed plus the same commands always gives the same game.
+import { dcos, dexp, dlog } from './detmath';
 
 export interface Rng {
   /** Uniform in [0, 1). */
@@ -78,14 +79,14 @@ export function rngFromState(s: number[]): Rng {
       // Box–Muller with two fresh draws (no cached spare, so state stays plain data).
       const u = 1 - next();
       const v = next();
-      return mu + sigma * Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+      return mu + sigma * Math.sqrt(-2 * dlog(u)) * dcos(2 * Math.PI * v);
     },
-    lognormal: (median, sigma) => median * Math.exp(rng.normal(0, sigma)),
+    lognormal: (median, sigma) => median * dexp(rng.normal(0, sigma)),
     poisson: (lambda) => {
       if (lambda <= 0) return 0;
       if (lambda >= 30) return Math.max(0, Math.round(rng.normal(lambda, Math.sqrt(lambda))));
       // Knuth's method.
-      const limit = Math.exp(-lambda);
+      const limit = dexp(-lambda);
       let k = 0;
       let p = 1;
       do {

@@ -26,6 +26,7 @@ import { branchPrice } from './pricing';
 import { managerOf } from './staff';
 import type { BranchWeek } from './week';
 import { difficultyOf } from '../difficulty';
+import { dexp, dpow } from '../detmath';
 
 type Collateral = LoanApplication['collateral'];
 
@@ -36,7 +37,7 @@ export function pentagonScore(p: Pentagon): number {
 
 /** PD before the credit cycle: 0.025 × exp(−0.22 × (avg − 5)) × collateral factor. */
 export function pdFromScore(avg: number, collateral: Collateral): number {
-  return SBL_BASE_PD * Math.exp(-LOANDESK.pdSlope * (avg - 5)) * LOANDESK.collateralPd[collateral];
+  return SBL_BASE_PD * dexp(-LOANDESK.pdSlope * (avg - 5)) * LOANDESK.collateralPd[collateral];
 }
 
 /** Estimator skill: the manager's Product skill (a Risk floor adds 40 + 50 × coverage in Stage 4). */
@@ -172,7 +173,7 @@ export function offerLoan(state: GameState, app: LoanApplication, rate: number):
   if (!rng.chance(acceptanceProb(app, rate))) return false;
   const r = rate / WEEKS_PER_YEAR;
   const payment =
-    r > 0 ? (app.amount * r) / (1 - (1 + r) ** -app.termWeeks) : app.amount / app.termWeeks;
+    r > 0 ? (app.amount * r) / (1 - dpow(1 + r, -app.termWeeks)) : app.amount / app.termWeeks;
   const loan: BusinessLoan = {
     id: newId(state, 'bl'),
     branchId: app.branchId,

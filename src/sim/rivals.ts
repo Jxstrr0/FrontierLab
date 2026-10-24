@@ -28,6 +28,7 @@ import { clamp } from './math';
 import { countryOfCity, defaultPrice, ftpLong, ftpShort } from './rates';
 import { stream, type Rng } from './rng';
 import type { CountryState, GameState, Lot, RivalBank } from './state';
+import { dpow } from './detmath';
 
 const STRATEGY_ORDER: Strategy[] = ['incumbent', 'community', 'disruptor', 'premium'];
 
@@ -167,7 +168,7 @@ function bestLot(lots: Lot[], strategy: Strategy, bank: RivalBank, rng: Rng): Lo
   for (const lot of lots) {
     if (lot.occupant) continue;
     let fit = 1;
-    if (strategy === 'premium') fit = lot.incomeIndex ** 2;
+    if (strategy === 'premium') fit = dpow(lot.incomeIndex, 2);
     else if (strategy === 'community') fit = 1 / lot.incomeIndex;
     else if (strategy === 'disruptor')
       fit = RIVAL_PLACEMENT.disruptorBase + lot.mix.YP + lot.mix.STU;

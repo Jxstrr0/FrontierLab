@@ -65,6 +65,7 @@ How the economy works, step by step. Every CAPS name is a key in `src/config/bal
 ## 3. RNG and determinism
 
 - Use the `sfc32` PRNG.
+- Transcendental math (exp, log, non-integer powers, cos, tanh) goes through `src/sim/detmath.ts`, built from + − × ÷ and sqrt only. Engines are free to round `Math.pow` and friends differently (Node 22 and 24 already disagree), and these are bit-identical everywhere. ESLint bans the Math versions and `**` in `src/sim`.
 - **Per-system streams:** each stream's seed = hash(saveSeed, streamName). Stream names include `macro`, `rivals`, `demand`, `loanDesk`, `market`, `ventures`, `incidents`, `news`, `citygen:{cityId}`, `people` and `auctions`. Adding draws to one system then never reshuffles another, which keeps balancing stable.
 - **Storage:** every stream's state lives in `GameState.rng`.
 - **Helpers:**

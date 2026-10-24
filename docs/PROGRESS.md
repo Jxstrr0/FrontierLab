@@ -4,11 +4,15 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 **Current stage:** 2 — Playable loop in plain UI (next)
 **Live URL:** (after the first deploy) https://jxstrr0.github.io/VaultStreet/
-**Determinism snapshot:** `07611f4e5b88e1` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `1a6f96ddc5855e` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-24 — Cross-engine determinism fix
+- CI failed the determinism snapshot since Stage 1: `Math.pow` with a fractional exponent returns different bits on Node 24 (CI) than Node 22 (local), and browsers can differ the same way.
+- Added `src/sim/detmath.ts` (exp, log, pow, cos, tanh from basic arithmetic), switched the sim to it, and banned the Math versions and `**` in `src/sim` via ESLint. The snapshot now matches on both Node versions; the balance report is unchanged.
 
 ### 2026-10-24 — New Game options (Stage 1 addendum)
 - **Stage / step:** 1 addendum, before Stage 2
