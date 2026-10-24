@@ -3,6 +3,10 @@
 // modals, the menu and layers sheets, and toasts.
 import { BoardMeetingModal } from '../executive/BoardMeetingModal';
 import { InvestmentBankPanel } from '../investmentBank/InvestmentBankPanel';
+import { ConventionPanel } from '../convention/ConventionPanel';
+import { LobbyingFirmPanel } from '../lobbying/LobbyingFirmPanel';
+import { PropertyPanel } from '../realEstate/PropertyPanel';
+import { StartupPanel } from '../startup/StartupPanel';
 import { useEffect } from 'preact/hooks';
 import { FEATURES } from '../../config/balance';
 import { BranchPanel } from '../branch/BranchPanel';
@@ -99,6 +103,17 @@ function PanelHost() {
       return FEATURES.capitalMarkets ? (
         <InvestmentBankPanel key={p.siteId} siteId={p.siteId} tab={p.tab ?? 'market'} />
       ) : null;
+    // Stage 7 (FEATURES.investments): startups, buildings, conventions, lobbyists.
+    case 'startup':
+      return FEATURES.investments ? (
+        <StartupPanel key={p.startupId} startupId={p.startupId} />
+      ) : null;
+    case 'property':
+      return FEATURES.investments ? <PropertyPanel key={p.siteId} siteId={p.siteId} /> : null;
+    case 'convention':
+      return FEATURES.investments ? <ConventionPanel key={p.siteId} siteId={p.siteId} /> : null;
+    case 'lobbyingFirm':
+      return FEATURES.investments ? <LobbyingFirmPanel key={p.siteId} siteId={p.siteId} /> : null;
     case 'company':
       return <CompanyPanel />;
     case 'branches':

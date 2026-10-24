@@ -9,6 +9,8 @@ import { generateSites } from '../hqSites';
 import { RIVALS } from '../../data/rivals';
 import { generateCapitalMarketSites } from '../capitalSites';
 import { generateCompetitionSites } from '../competitionSites';
+import { generateInvestmentSites } from '../investmentSites';
+import { initInvestments } from '../investmentsInit';
 import { initCapitalMarkets, initRivalShares } from '../marketInit';
 import { emptyCorporateDebt } from '../corporateDebt';
 import { initCountries } from '../macro';
@@ -155,7 +157,37 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     initCapitalMarkets(state);
     return s;
   },
+  // 7 → 8: Stage 7 investments. New P&L lines, foreclosed-home pools get a mode
+  // and a house price mark, cities get property buildings, a convention centre
+  // and a lobbying firm, and ventures, conventions, real estate and lobbying
+  // start fresh.
+  7: (s) => {
+    const state = s as unknown as GameState;
+    const addLines = (pnl: Record<string, number>) => {
+      for (const line of STAGE7_PNL_LINES) pnl[line] ??= 0;
+    };
+    addLines(state.ledger.pnl);
+    for (const w of state.history.weekly) addLines(w.pnl);
+    for (const [cityId, pool] of Object.entries(state.reo)) {
+      const country = CITIES[cityId]?.country;
+      pool.mode = 'hold';
+      pool.hpiRef = (country && state.world.countries[country]?.hpi) || 100;
+    }
+    for (const cityId of Object.keys(state.world.cities).sort()) {
+      generateInvestmentSites(state, cityId);
+    }
+    initInvestments(state);
+    return s;
+  },
 };
+
+const STAGE7_PNL_LINES = [
+  'ventureDebtInterest',
+  'rentalIncome',
+  'propertyGains',
+  'propertyCosts',
+  'lobbying',
+] as const;
 
 const STAGE6_PNL_LINES = [
   'execPay',

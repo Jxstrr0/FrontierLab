@@ -234,6 +234,14 @@ function makePinElement(p: PinSpec): HTMLButtonElement {
       '<span class="pin-converting" aria-hidden="true">Converting</span>',
     );
   }
+  if (p.tag) {
+    // Stage 7 sites: a short note under the medallion ("For sale", "Open now").
+    const note = document.createElement('span');
+    note.className = 'pin-converting pin-note';
+    note.setAttribute('aria-hidden', 'true');
+    note.textContent = p.tag;
+    el.appendChild(note);
+  }
   if (p.partner) {
     // Your employer or university partner: a small brand-ink seal with an ivory tick.
     const seal = document.createElement('span');

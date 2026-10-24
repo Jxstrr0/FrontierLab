@@ -17,6 +17,11 @@ import { runExecutives } from './executives';
 import { governanceQuarter, runGovernance } from './governance';
 import { marketsQuarter, runMarkets } from './market';
 import { runMergers } from './mergers';
+import { conventionsYear, runConventions } from './conventions';
+import { runLobbying } from './lobbying';
+import { runRealEstate } from './realEstate';
+import { runReo } from './reo';
+import { runVentures, venturesQuarter } from './ventures';
 import { runPersonal } from './personal';
 import { checkFailure } from './failure';
 import { updateAppRating } from './company';
@@ -92,6 +97,11 @@ export function weeklyTick(state: GameState): void {
   runExecutives(state); // 8 (executives, §17.2)
   runGovernance(state); // 8 (dividends due)
   runMergers(state); // 8 (M&A responses and integrations, §19.8)
+  runRealEstate(state); // 8 (owned buildings, listings, sales, §21.1–21.2)
+  runReo(state); // 8 (foreclosed homes, §21.3)
+  runVentures(state); // 8 (venture debt, open rounds, pipeline, §20.3–20.5)
+  runConventions(state); // 8 (announce, open and close conventions, CONTENT §19)
+  runLobbying(state); // 8 (campaign outcomes, DESIGN §5.8.10)
   depreciate(state); // 8
   closeWeek(state); // 9
   evaluateCapital(state); // 10
@@ -105,6 +115,7 @@ export function weeklyTick(state: GameState): void {
     rivalsQuarter(state); // 13 (rival earnings and failures)
     marketsQuarter(state); // 13 (listed earnings, IPO listing)
     governanceQuarter(state); // 13 (board meeting unlocks)
+    venturesQuarter(state); // 13 (ventures report and raise, §20.2)
   }
   if (isYearStart(state.meta.startDate, state.clock.day)) yearEnd(state); // 14
   runIncidents(state); // 15
@@ -149,6 +160,7 @@ function runBranch(state: GameState, branch: Branch): void {
 }
 
 function yearEnd(state: GameState): void {
+  conventionsYear(state); // next year's conventions calendar
   for (const c of Object.values(state.world.countries)) {
     if (c) c.feeIndex *= 1 + c.inflation / 100;
   }

@@ -41,6 +41,11 @@ export const PNL_LINES: readonly PnlLine[] = [
   'dividendIncome',
   'investmentGains',
   'acquisitionGain',
+  'ventureDebtInterest',
+  'rentalIncome',
+  'propertyGains',
+  'propertyCosts',
+  'lobbying',
   'loanLosses',
   'depreciation',
   'tax',
@@ -50,6 +55,7 @@ export const INTEREST_INCOME: readonly PnlLine[] = [
   'loanInterest',
   'reserveInterest',
   'bondCoupon',
+  'ventureDebtInterest',
 ];
 export const INTEREST_EXPENSE: readonly PnlLine[] = ['depositInterest', 'wholesaleInterest'];
 export const FEE_INCOME: readonly PnlLine[] = [
@@ -63,6 +69,8 @@ export const FEE_INCOME: readonly PnlLine[] = [
   'dividendIncome',
   'investmentGains',
   'acquisitionGain',
+  'rentalIncome',
+  'propertyGains',
 ];
 export const OPEX: readonly PnlLine[] = [
   'branchStaff',
@@ -84,6 +92,8 @@ export const OPEX: readonly PnlLine[] = [
   'grantExpense',
   'integration',
   'commissions',
+  'propertyCosts',
+  'lobbying',
 ];
 /** Lines that don't move corporate cash (§14.3). */
 export const NON_CASH: readonly PnlLine[] = [
@@ -94,6 +104,7 @@ export const NON_CASH: readonly PnlLine[] = [
   'grantExpense',
   'investmentGains',
   'acquisitionGain',
+  'propertyGains',
 ];
 
 export function emptyLedger(): Ledger {

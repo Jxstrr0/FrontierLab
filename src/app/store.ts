@@ -27,6 +27,11 @@ export type PanelRoute =
   | { type: 'ledger'; week?: number }
   // Stage 6 (FEATURES.capitalMarkets)
   | { type: 'investmentBank'; siteId: string; tab?: InvestmentBankTab }
+  // Stage 7 (FEATURES.investments)
+  | { type: 'startup'; startupId: string }
+  | { type: 'property'; siteId: string }
+  | { type: 'convention'; siteId: string }
+  | { type: 'lobbyingFirm'; siteId: string }
   | { type: 'company' }
   | { type: 'branches' }
   | { type: 'cityList' }

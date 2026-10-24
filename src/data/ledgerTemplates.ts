@@ -5,6 +5,7 @@
 // ledgerTemplatesRivals.ts and macro, markets, sports and politics in
 // ledgerTemplatesWorld.ts; all are merged into LEDGER_TEMPLATES.
 import { CAPITAL_TEMPLATES } from './ledgerTemplatesCapital';
+import { INVESTMENTS_TEMPLATES } from './ledgerTemplatesInvestments';
 import { RIVAL_TEMPLATES } from './ledgerTemplatesRivals';
 import { WORLD_TEMPLATES } from './ledgerTemplatesWorld';
 
@@ -345,6 +346,7 @@ export const LEDGER_TEMPLATES = {
   ...RIVAL_TEMPLATES,
   ...WORLD_TEMPLATES,
   ...CAPITAL_TEMPLATES,
+  ...INVESTMENTS_TEMPLATES,
 };
 
 export type TemplateKey = keyof typeof LEDGER_TEMPLATES;

@@ -24,6 +24,14 @@ import { emptyLedger } from './ledger';
 import { initCountries } from './macro';
 import { generateCapitalMarketSites } from './capitalSites';
 import { generateCompetitionSites } from './competitionSites';
+import { generateInvestmentSites } from './investmentSites';
+import {
+  emptyConventions,
+  emptyLobbying,
+  emptyRealEstate,
+  emptyVentures,
+  initInvestments,
+} from './investmentsInit';
 import {
   emptyExecutives,
   emptyGovernance,
@@ -188,6 +196,10 @@ export function newGame(opts: NewGameOptions): GameState {
     personal: { cash: 0 },
     mergers: emptyMergers(),
     reo: {},
+    ventures: emptyVentures(),
+    conventions: emptyConventions(),
+    realEstate: emptyRealEstate(),
+    lobbying: emptyLobbying(),
     ledger: emptyLedger(),
     events: { log: [], scheduled: [] },
     history: { weekly: [], quarterly: [] },
@@ -208,6 +220,7 @@ export function newGame(opts: NewGameOptions): GameState {
   generateSites(state, city.id);
   generateCompetitionSites(state, city.id);
   generateCapitalMarketSites(state, city.id);
+  generateInvestmentSites(state, city.id);
   updateMarketRefs(state);
   refreshManagerPool(state, city.id, true);
 
@@ -215,5 +228,6 @@ export function newGame(opts: NewGameOptions): GameState {
   state.company.capitalRatio = cap.capitalRatio;
   state.company.tier = cap.tier;
   initCapitalMarkets(state);
+  initInvestments(state);
   return state;
 }

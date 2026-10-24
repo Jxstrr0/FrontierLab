@@ -19,6 +19,9 @@ import { companyStories } from './newsCompany';
 import { governanceStories } from './newsGovernance';
 import { marketsStories } from './newsMarkets';
 import { mergersStories } from './newsMergers';
+import { lobbyingStories } from './newsLobbying';
+import { realEstateStories } from './newsRealEstate';
+import { venturesStories } from './newsVentures';
 import { fillTemplate } from './newsFormat';
 import {
   centralBankStories,
@@ -80,6 +83,9 @@ export function composeNews(state: GameState): void {
     ...governanceStories(ctx),
     ...marketsStories(ctx),
     ...mergersStories(ctx),
+    ...venturesStories(ctx),
+    ...realEstateStories(ctx),
+    ...lobbyingStories(ctx),
     ...politicsStories(ctx),
     ...sports.stories,
     ...housingStories(ctx, rng),

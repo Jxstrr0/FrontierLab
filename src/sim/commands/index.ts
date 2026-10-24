@@ -17,3 +17,6 @@ export * from './executives';
 export * from './governance';
 export * from './markets';
 export * from './mergers';
+export * from './ventures';
+export * from './realEstate';
+export * from './lobbying';

@@ -22,7 +22,7 @@ export const FEATURES = {
   /** Stage 6: governance, executives and capital markets. */
   capitalMarkets: true,
   /** Stage 7: ventures, conventions and real estate. */
-  investments: false,
+  investments: true,
   /** Stage 8: every city, airports and travel. */
   multiCity: false,
   /** Stage 9: personal wealth, homes, cars, auctions, franchise. */
@@ -1403,3 +1403,104 @@ export const MERGERS = {
   acquiredAwareness: { perStar: 0.12, min: 0.2, max: 0.6 },
 } as const;
 export const REBRAND_COST = 60_000;
+
+// ─── VENTURES (SIMULATION §20) ────────────────────────────────────────────────
+export const VENTURES = {
+  /** §20.3: the Investment floor pipeline refreshes every N weeks with 1 + floor(staff / staffPerExtra), max. */
+  pipelineEveryWeeks: 4,
+  pipelineBase: 1,
+  staffPerExtra: 4,
+  pipelineMax: 8,
+  /** Exclusive startups a convention adds. */
+  conventionExtra: [3, 6] as [number, number],
+  /** §20.2 quarterly growth g ~ normal(μ_sector + slope × (avg − mid), sigma). */
+  growthSlope: 0.03,
+  growthSigma: 0.12,
+  pentagonMid: 5,
+  /** Share of the gap to the maturity-scaled sector margin closed each quarter. */
+  marginPull: 0.25,
+  /** Each pentagon score drifts ±1 with this chance per quarter. */
+  driftChance: 0.3,
+  /** A new round opens when cash runway falls below this many quarters. */
+  runwayQuarters: 4,
+  newMoney: [0.15, 0.3] as [number, number],
+  /** Price step per share: up round when g > goodGrowth, else a down round. */
+  goodGrowth: 0.1,
+  upStep: [1.2, 3.0] as [number, number],
+  downStep: [0.5, 0.9] as [number, number],
+  /** Two offer lots of 15% each, open 4 weeks (REFERENCE_NOTES §12). */
+  lotPct: 0.15,
+  lots: 2,
+  roundWeeks: 4,
+  /** Failure per quarter = base × (1 + slope × (mid − Financial health)) × (recession ? mult : 1). */
+  failBase: 0.03,
+  failSlope: 0.35,
+  failRecessionMult: 1.5,
+  /** IPO chance per quarter once quarterly revenue > min, net income > 0 and stage ≥ C. */
+  ipoChance: 0.25,
+  ipoMinQuarterRevenue: 50_000_000,
+  /** Acquisition chance per quarter at a multiple of annual revenue. */
+  acquireChance: 0.05,
+  acquireMult: [2, 6] as [number, number],
+  /** Quarterly results kept per startup. */
+  quartersKept: 12,
+} as const;
+/** §20.5: offer up to maxShare of post-money; accepted if rate ≤ policy + spread; 156-week amortization. */
+export const VENTURE_DEBT = { maxShare: 0.1, spread: 0.08, termWeeks: 156, lgd: 0.8 } as const;
+/** Risk weights (§15): venture equity like listed stocks; venture debt and buildings. */
+export const VENTURE_RISK_WEIGHT = 2.5;
+export const VENTURE_DEBT_RISK_WEIGHT = 1.5;
+export const PROPERTY_RISK_WEIGHT = 1.0;
+
+// ─── CONVENTIONS (CONTENT §19) ────────────────────────────────────────────────
+export const CONVENTIONS = { announceWeeks: 2, activeWeeks: 1 } as const;
+
+// ─── REAL ESTATE (SIMULATION §21) ─────────────────────────────────────────────
+export const REAL_ESTATE = {
+  /** §21.1 listings refresh per city every N weeks; this share of unowned buildings is listed. */
+  refreshWeeks: 4,
+  listedShare: 0.4,
+  /** Estimated value = size × marketRent × valueMult × cre / 100. */
+  valueMult: 3.2,
+  askRange: [0.95, 1.1] as [number, number],
+  /** Offer acceptance = clamp((offer/asking − floor) / span, 0, 1). */
+  offerFloor: 0.85,
+  offerSpan: 0.15,
+  /** §21.2 occTarget = clamp(base − slope × (rent/marketRent − 1), min, max); occ = ema(occ, target, ema). */
+  occBase: 0.97,
+  occSlope: 1.6,
+  occMin: 0.3,
+  occMax: 0.98,
+  occEma: 0.06,
+  /** Maintenance = size × marketRent × maintenance / 52; vacancy cost = size × (1 − occ) × vacancyPerSqm / 52. */
+  maintenance: 0.55,
+  vacancyPerSqm: 2,
+  /** For Sale: completes in 2–8 weeks at value × normal(1, saleSigma). */
+  saleWeeks: [2, 8] as [number, number],
+  saleSigma: 0.04,
+  /** Property buildings per city by size, their floor area and starting occupancy. */
+  buildingsPerCity: { S: 4, M: 6, L: 8, XL: 10 } as Record<'S' | 'M' | 'L' | 'XL', number>,
+  sqmRange: [1500, 12000] as [number, number],
+  sqmPerFloor: 800,
+  startOcc: [0.75, 0.95] as [number, number],
+} as const;
+/** §21.3 foreclosed homes: carrying cost per year, Sell all at 90% in 1–4 weeks, Rent yield at 90% occupancy. */
+export const REO = {
+  carryingCost: 0.06,
+  sellPrice: 0.9,
+  sellWeeks: [1, 4] as [number, number],
+  rentYield: 0.045,
+  rentOcc: 0.9,
+} as const;
+
+// ─── LOBBYING (DESIGN §5.8.10, SCREENS §15) ───────────────────────────────────
+export const LOBBYING = {
+  /** The outcome arrives in 4–8 weeks. */
+  resolveWeeks: [4, 8] as [number, number],
+  /** An exposé: a fine of this share of the campaign cost and a brand awareness hit in your cities. */
+  exposeFine: 0.5,
+  exposeAwareness: 0.03,
+  /** "Ease the capital buffer": tier thresholds drop by pp for N weeks. */
+  bufferReliefPp: 1,
+  bufferReliefWeeks: 52,
+} as const;

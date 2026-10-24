@@ -70,6 +70,9 @@ export function MapView() {
         else if (pin.kind === 'agency') openPanel({ type: 'agency', siteId: pin.id });
         else if (pin.kind === 'investmentBank')
           openPanel({ type: 'investmentBank', siteId: pin.id });
+        else if (pin.kind === 'property') openPanel({ type: 'property', siteId: pin.id });
+        else if (pin.kind === 'conventionCenter') openPanel({ type: 'convention', siteId: pin.id });
+        else if (pin.kind === 'lobbyingFirm') openPanel({ type: 'lobbyingFirm', siteId: pin.id });
         else openPanel({ type: 'storefront', lotId: pin.id });
       },
       onCluster: (cl) =>
