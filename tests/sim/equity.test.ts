@@ -2,7 +2,8 @@
 // secondary offering accounting (balance identity, cap table, paid-in capital,
 // financing cash) and the IPO eligibility checklist.
 import { describe, expect, it } from 'vitest';
-import { IPO, PLACEMENT, SECONDARY } from '../../src/config/balance';
+import { IPO, LATE_FILING, PLACEMENT, SECONDARY } from '../../src/config/balance';
+import { BENEFIT_RULES } from '../../src/data/benefits';
 import { INVESTMENT_BANKS } from '../../src/data/investmentBanks';
 import { FUND_NAMES } from '../../src/data/names';
 import * as cmd from '../../src/sim/commands';
@@ -17,7 +18,7 @@ import {
 import { marketsQuarter } from '../../src/sim/market';
 import { founderStake } from '../../src/sim/shares';
 import { privateValuation } from '../../src/sim/valuation';
-import { requiredStaff } from '../../src/sim/hq';
+import { annualPayroll, benefitWeeklyCost, requiredStaff } from '../../src/sim/hq';
 import {
   BANK,
   capTableGap,
@@ -26,6 +27,7 @@ import {
   publicBank,
   setQuarters,
 } from '../helpers/markets';
+import { openScriptedBranch } from '../helpers/scenario';
 
 const fee = INVESTMENT_BANKS[BANK]!.fee;
 
@@ -199,5 +201,30 @@ describe('secondary offering (§19.6)', () => {
     expect(secondaryImpact(0)).toBeCloseTo(0.02, 12);
     expect(secondaryImpact(SECONDARY.maxPct)).toBeCloseTo(0.05, 12);
     expect(cmd.secondaryOffering(eligibleBank(), BANK, 0.1).ok).toBe(false);
+  });
+});
+
+describe('public-company hooks', () => {
+  it('fines a listed bank 0.02% of quarterly revenue when Finance coverage is below 60%', () => {
+    const s = publicBank();
+    s.hq.coverage.finance = { ...s.hq.coverage.finance, kPrime: 0.5 };
+    const revenue = 1_000_000;
+    s.history.quarterly.at(-1)!.revenue = revenue;
+    const fines = s.ledger.pnl.fines;
+    marketsQuarter(s);
+    expect(s.ledger.pnl.fines - fines).toBeCloseTo(revenue * LATE_FILING.fineRate, 6);
+    expect(identityGap(s)).toBeLessThan(1);
+  });
+
+  it('costs the Employee Stock Plan only once listed', () => {
+    const s = eligibleBank();
+    openScriptedBranch(s, 'midtown');
+    expect(annualPayroll(s)).toBeGreaterThan(0);
+    expect(benefitWeeklyCost(s, 'espp', 0.1)).toBe(0);
+    s.stock.status = 'public';
+    expect(benefitWeeklyCost(s, 'espp', 0.1)).toBeCloseTo(
+      (BENEFIT_RULES.esppPayrollCost * 0.1 * annualPayroll(s)) / 52,
+      9,
+    );
   });
 });

@@ -1,6 +1,7 @@
 // Company summary (SCREENS §24): capital ratio and tier, liquidity, the main
-// totals, a private valuation stand-in and simplified statements, with a link
-// to the full statements on the HQ Finance floor once you have one.
+// totals, your share price or private valuation with the cap table and your
+// personal line (ShareSummary.tsx), and simplified statements, with a link to
+// the full statements on the HQ Finance floor once you have one.
 import { useState } from 'preact/hooks';
 import { FEATURES } from '../../config/balance';
 import { balanceSheet } from '../../sim/balanceSheet';
@@ -9,6 +10,7 @@ import { Badge, Card, Medallion, Panel, Row, SectionTitle, Sheet } from '../comp
 import { capitalRatioText, money, pct } from '../format/format';
 import { closePanel, openPanel, useGame } from '../store';
 import { CapitalMeter, TIER_LABEL, TIER_TONE } from './CapitalMeter';
+import { ShareSummary } from './ShareSummary';
 import { Statements } from './Statements';
 import './company.css';
 
@@ -84,12 +86,7 @@ export function CompanyPanel() {
           </Card>
         </div>
 
-        <Card>
-          <Row label="Private valuation" value={money(bs.equity, sym)} strong />
-          <p class="muted small cap-note">
-            Book equity stands in for your valuation until investors can price the bank.
-          </p>
-        </Card>
+        {FEATURES.capitalMarkets && <ShareSummary s={s} />}
 
         <button type="button" class="btn btn-secondary btn-block" onClick={() => setLearn(true)}>
           How this works

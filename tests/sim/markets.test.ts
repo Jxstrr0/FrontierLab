@@ -110,7 +110,8 @@ describe('public price model (§19.5)', () => {
     expect(earningsShock(100, 100)).toBe(0);
   });
   it('incidents cost −3% to −15% by severity', () => {
-    expect(incidentShock('VIRAL_COMPLAINT')).toBeCloseTo(-0.03, 12);
+    expect(incidentShock('ROBBERY')).toBeCloseTo(-(0.03 + 0.12 * 0.15), 12);
+    expect(incidentShock('VIRAL_COMPLAINT')).toBeUndefined();
     expect(incidentShock('BANK_RUN')).toBeCloseTo(-0.15, 12);
     expect(incidentShock('DIVIDEND_DUE')).toBeUndefined();
   });

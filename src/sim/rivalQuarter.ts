@@ -85,6 +85,7 @@ function payDividend(state: GameState, bank: RivalBank, quarter: string): void {
   const netIncome = bank.quarters[bank.quarters.length - 1]?.netIncome ?? 0;
   const target = RIVAL_FINANCE[bank.strategy].crTarget * rivalLoans(bank) * RIVAL_LOAN_RISK_WEIGHT;
   const excess = bank.equity - target;
+  bank.dps = 0;
   if (netIncome <= 0 || excess <= 0) return;
   const p = RIVAL_PAYOUT;
   const dividend = Math.min(
@@ -92,6 +93,7 @@ function payDividend(state: GameState, bank: RivalBank, quarter: string): void {
     clamp(p.excessShare * excess, p.ratio * netIncome, p.maxRatio * netIncome),
   );
   const dps = dividend / Math.max(1, bank.shares);
+  bank.dps = dps;
   bank.equity -= dividend;
   bank.capitalRatio = rivalCapitalRatio(bank);
   if (!bank.listed) return;
