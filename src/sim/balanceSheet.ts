@@ -2,6 +2,7 @@
 // Equity is assets minus liabilities; `expectedEquity` rolls paid-in capital,
 // retained earnings and AOCI forward, and the two must agree (balance identity).
 import { isDeposit, isLoan, PRODUCTS } from '../data/products';
+import { totalWholesale } from './fundingLots';
 import { summarize } from './ledger';
 import type { GameState } from './state';
 
@@ -69,7 +70,7 @@ export function balanceSheet(state: GameState): BalanceSheet {
   const fixedAssets = c.fixedAssets.reduce((sum, a) => sum + assetBookValue(a), 0);
   const assets = c.cash + t.reserves + t.bondsMarket + loans + reo + fixedAssets + c.leaseDeposits;
   const deposits = totalDeposits(state);
-  const wholesale = t.overnight + t.window;
+  const wholesale = totalWholesale(state);
   const liabilities = deposits + wholesale + c.taxPayable;
   const aoci = t.bondsMarket - t.bondsBook;
   return {

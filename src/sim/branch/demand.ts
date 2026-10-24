@@ -34,6 +34,7 @@ import { branchPrice, isOffered, priceFactor } from './pricing';
 import { capacity, visitRate } from './staff';
 import { difficultyOf } from '../difficulty';
 import { dpow } from '../detmath';
+import { brandSegmentMults } from '../hqMarketing';
 
 export interface Origination {
   newAccounts: number;
@@ -156,8 +157,9 @@ export function runDemand(state: GameState, branch: Branch, fx: CampaignEffects)
   const served = captured > 0 ? captured * clamp((cap - visits) / captured, 0, 1) : 0;
   const wait = cap > 0 ? (captured + visits) / cap : 10;
 
-  // §9.5 new customers by segment, with campaign segment boosts
-  const boosted = SEGMENTS.map((s) => lot.mix[s] * fx.segments[s]);
+  // §9.5 new customers by segment, with branch and brand campaign segment boosts
+  const brand = brandSegmentMults(state, branch.cityId);
+  const boosted = SEGMENTS.map((s) => lot.mix[s] * fx.segments[s] * brand[s]);
   const boostSum = boosted.reduce((a, b) => a + b, 0) || 1;
   const newBySeg = {} as Record<SegmentId, number>;
   SEGMENTS.forEach((s, i) => (newBySeg[s] = (served * boosted[i]!) / boostSum));

@@ -387,6 +387,14 @@ export const OVERNIGHT_LIMIT_MULT: Record<Tier, number> = {
   critical: 0.25,
 };
 export const DEPOSIT_PER_EMPLOYEE = 4_500;
+/** Funding market (§13.6): offers regenerate every 2 weeks while you have a Treasury floor. */
+export const FUNDING_REFRESH_WEEKS = 2;
+/** Offer count = base + floor(perCoverage × treasuryCoverage′) + (CFO expertise ≥ cfoExpertise ? cfoBonus : 0). */
+export const FUNDING_OFFERS = { base: 2, perCoverage: 3, cfoBonus: 1, cfoExpertise: 70 } as const;
+/** Offer size = typeSize × max(1, deposits / sizeScale) × (1 ± sizeNoise), rounded to amountStep. */
+export const FUNDING_SIZE = { scale: 100_000_000, noise: 0.25, amountStep: 100_000 } as const;
+/** Offer rate noise: normal(0, FUNDING_RATE_NOISE). */
+export const FUNDING_RATE_NOISE = 0.0008;
 
 // ─── CAPITAL (§15) ────────────────────────────────────────────────────────────
 export const OP_RISK_MULT = 1.0;
@@ -407,6 +415,26 @@ export const CAPITAL_GATE: Record<Tier, number> = {
   critical: 0,
 };
 export const CRITICAL_FINE_RWA = 0.001;
+/**
+ * Quarterly regulator review (§15): fail chance
+ * failBase × (1 + HQ_EFFECTS.riskFine × (1 − riskCoverage′)) × (ethicsBase − avgManagerEthics/100).
+ * With no branch managers, ethics reads as defaultEthics (assumption, DESIGN §7).
+ * A failure fines a uniform share of trailing annual revenue in fineRange.
+ */
+export const REGULATOR_REVIEW = {
+  failBase: 0.02,
+  ethicsBase: 1.6,
+  defaultEthics: 50,
+  fineRange: [0.0005, 0.003] as [number, number],
+} as const;
+/** Risk floor loss records kept, in weeks (SCREENS §10: annualized 13-week loss rates). */
+export const RISK_LOSS_WEEKS = 13;
+/**
+ * Delinquency proxy (assumption, DESIGN §7): the average weekly defaults of the
+ * last `recentWeeks`, times the `pipelineWeeks` a loan spends in arrears before
+ * default, as a share of the current balance.
+ */
+export const DELINQUENCY = { recentWeeks: 4, pipelineWeeks: 13 } as const;
 export const RECAP_DISCOUNT = 0.5;
 /**
  * Game over (DESIGN §5.18). Insolvency: corporate cash below zero for 4 weeks (no

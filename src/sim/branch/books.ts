@@ -32,6 +32,7 @@ import { clamp } from '../math';
 import { countryOfCity, ftpFor, marketRef } from '../rates';
 import type { Book, Branch, CountryState, GameState } from '../state';
 import { riskPdMult } from '../hq';
+import { recordLoss } from '../riskFloor';
 import { activeModel, appCost, RADAR } from '../underwriting';
 import type { DemandResult, Origination } from './demand';
 import { signupChurnMult, type CampaignEffects } from './marketing';
@@ -243,6 +244,13 @@ function defaults(ctx: Ctx, spec: ProductSpec, book: Book): void {
   const lgdMult = spec.id === 'mortgage' ? mortgageLgdMult(ctx.country) : 1;
   const loss = Math.min(defaulted, defaulted * book.lgd * lgdMult);
   const recovery = defaulted - loss;
+  recordLoss(ctx.state, spec.id, {
+    balance: book.balance,
+    defaulted,
+    loss,
+    pd: book.pd,
+    lgd: Math.min(1, book.lgd * lgdMult),
+  });
   book.balance -= defaulted;
   book.accounts -= book.accounts * dRate;
   book.last.defaulted = defaulted;
