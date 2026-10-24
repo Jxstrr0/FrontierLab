@@ -34,16 +34,51 @@ button {
   color: inherit;
 }
 
+/* Keyboard focus: a brass ring on everything interactive (ART_DIRECTION §1.1). */
 :focus-visible {
   outline: 2px solid var(--brass);
   outline-offset: 2px;
 }
+/* Panels, sheets and modals take focus when they open so screen readers and
+   the keyboard start inside them; the container itself needs no ring. */
+[role='dialog'][tabindex='-1']:focus-visible {
+  outline: none;
+}
 
+/* Reduced motion (ART_DIRECTION §1.4): with the system setting, movement turns
+   into a crossfade. The in-game setting applies the same rules from
+   settings/display.css. Slides and the Ledger's press become fades; transitions
+   keep colour and opacity changes but drop movement. */
 @media (prefers-reduced-motion: reduce) {
+  .panel,
+  .sheet,
+  .modal,
+  .toast {
+    animation-name: fade-in !important;
+  }
+  .ledger-press {
+    animation-name: ledger-fade !important;
+    animation-delay: 0s !important;
+  }
   *,
   *::before,
   *::after {
-    animation-duration: 1ms !important;
-    transition-duration: 1ms !important;
+    transition-property: opacity, color, background-color, border-color, fill, stroke !important;
+    scroll-behavior: auto !important;
   }
+}
+
+/* Shown when a screen's code can't be downloaded (src/app/lazy.tsx). */
+.lazy-failed {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  background: var(--vault);
+  text-align: center;
 }

@@ -8,7 +8,7 @@ export function CoinRating(p: { value: number; showNumber?: boolean; size?: numb
   const id = useId();
   const v = Math.max(0, Math.min(5, p.value));
   return (
-    <span class="coins" aria-label={`${v.toFixed(1)} out of 5`}>
+    <span class="coins" role="img" aria-label={`${v.toFixed(1)} out of 5`}>
       <svg width={size * 5 + 16} height={size} viewBox={`0 0 ${size * 5 + 16} ${size}`}>
         <defs>
           <clipPath id={`clip${id}`}>
@@ -114,7 +114,12 @@ export function BarChart(p: {
   const w = 100 / Math.max(1, p.data.length);
   return (
     <div class="barchart">
-      <svg viewBox={`0 0 100 ${h + 18}`} preserveAspectRatio="none" role="img">
+      <svg
+        viewBox={`0 0 100 ${h + 18}`}
+        preserveAspectRatio="none"
+        role="img"
+        aria-label="Revenue and income bars"
+      >
         <line x1="0" x2="100" y1={zero} y2={zero} class="barchart-axis" />
         {p.data.map((d, i) => {
           const x = i * w + w * 0.18;

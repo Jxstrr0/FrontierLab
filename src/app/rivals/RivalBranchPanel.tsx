@@ -117,7 +117,7 @@ function Reviews(p: { s: GameState; branch: RivalBranch }) {
           ))}
         </div>
       </Card>
-      <div class="carousel br-review-carousel">
+      <div class="carousel br-review-carousel" role="group" aria-label="Reviews" tabIndex={0}>
         {cards.map((c) => (
           <ReviewCardView card={c} />
         ))}

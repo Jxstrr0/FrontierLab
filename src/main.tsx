@@ -1,18 +1,11 @@
-// Boot: load bundled fonts and global styles, then mount <App/>.
-import '@fontsource/bodoni-moda/500.css';
-import '@fontsource/bodoni-moda/700.css';
-import '@fontsource/bodoni-moda/900.css';
-import '@fontsource/public-sans/400.css';
-import '@fontsource/public-sans/500.css';
-import '@fontsource/public-sans/600.css';
-import '@fontsource/public-sans/700.css';
-import './app/styles/tokens.css';
-import './app/styles/base.css';
-import './app/styles/buttons.css';
+// Boot: load bundled fonts and global styles, then mount <App/> and register the
+// offline service worker (production builds only). The `?debug` hook has its
+// own entry point, src/debugEntry.ts.
+import './app/styles/global';
 import { render } from 'preact';
 import { App } from './app/App';
-import { installDebug } from './app/debug';
+import { registerServiceWorker } from './app/pwa/register';
 
 const root = document.getElementById('app');
-installDebug();
 if (root) render(<App />, root);
+registerServiceWorker();
