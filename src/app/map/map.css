@@ -120,6 +120,14 @@
   transform: scale(1.02);
 }
 
+/* The airport (Stage 8): its own navy plane medallion, landmark-sized like the central bank. */
+.pin-airport .pin-body {
+  transform: scale(1.12);
+}
+.map-pin.pin-airport:active .pin-body {
+  transform: scale(1.02);
+}
+
 /* Open branch location: a smaller blank "$" medallion, quieter than branches. */
 .pin-lot .pin-body {
   transform: scale(0.8);

@@ -1,8 +1,9 @@
 // HUD over the map (SCREENS §0.2): bank medallion and cash (→ Company), the
 // date pill with speed control and a next-week step, the Layers button (with the map), the city
-// pill and the Menu button.
+// pill (Stage 8: tap for the Travel sheet) and the Menu button.
 import { FEATURES } from '../../config/balance';
 import { CITIES } from '../../data/cities';
+import { PlaneIcon } from '../airport/AirportMedallion';
 import { Medallion } from '../components';
 import { gameDate, money } from '../format/format';
 import { pause, setSpeed, stepWeek } from '../loop';
@@ -77,7 +78,19 @@ export function Hud() {
             <span>Layers</span>
           </button>
         )}
-        <div class="hud-chip hud-city">{city?.name ?? ''}</div>
+        {FEATURES.multiCity ? (
+          <button
+            type="button"
+            class="hud-chip hud-city is-tappable"
+            aria-label={`${city?.name ?? ''}. Travel`}
+            onClick={() => (sheet.value = 'travel')}
+          >
+            <PlaneIcon size={16} filled />
+            <span>{city?.name ?? ''}</span>
+          </button>
+        ) : (
+          <div class="hud-chip hud-city">{city?.name ?? ''}</div>
+        )}
         <button type="button" class="hud-chip hud-menu" onClick={() => (sheet.value = 'menu')}>
           Menu
         </button>

@@ -1,0 +1,128 @@
+/* Flight overlay (SCREENS §18, ART_DIRECTION §1.4): an engraved world map on
+   navy over everything, with the route header on top. */
+.flight {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: var(--vault-deep);
+  color: var(--ivory);
+  overflow: hidden;
+  cursor: pointer;
+  animation: flight-in var(--dur-panel) var(--ease-out);
+  transition: opacity var(--flight-fade, 320ms) var(--ease-out);
+  -webkit-user-select: none;
+  user-select: none;
+}
+.flight.is-fading {
+  opacity: 0;
+  pointer-events: none;
+}
+@keyframes flight-in {
+  from {
+    opacity: 0;
+  }
+}
+.flight-map {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.flight-ocean {
+  fill: var(--vault);
+}
+.flight-grid {
+  fill: none;
+  stroke: var(--brass);
+  opacity: 0.28;
+}
+.flight-grid.is-equator {
+  opacity: 0.45;
+}
+.flight-land {
+  fill: var(--vault-raised);
+  stroke: var(--brass);
+  stroke-linejoin: round;
+  opacity: 0.95;
+}
+.flight-dot {
+  fill: var(--ivory-dim);
+  opacity: 0.7;
+}
+.flight-route {
+  fill: none;
+  stroke: var(--ivory-dim);
+  stroke-linecap: round;
+  opacity: 0.55;
+}
+.flight-route.is-flown {
+  stroke: var(--brass-light);
+  opacity: 1;
+}
+.flight-end {
+  fill: var(--vault-deep);
+  stroke: var(--brass-light);
+}
+.flight-label {
+  fill: var(--ivory);
+  font-family: var(--font-display);
+  font-weight: 700;
+  paint-order: stroke;
+  stroke: var(--vault-deep);
+  stroke-linejoin: round;
+}
+.flight-plane {
+  fill: var(--ivory);
+  stroke: var(--vault-deep);
+  stroke-linejoin: round;
+}
+.flight-head {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  padding: calc(var(--safe-top) + var(--space-5)) calc(var(--safe-right) + var(--space-4))
+    var(--space-5) calc(var(--safe-left) + var(--space-4));
+  text-align: center;
+  background: linear-gradient(var(--vault-deep) 55%, transparent);
+  pointer-events: none;
+}
+.flight-codes {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-3);
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: var(--text-24);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--brass-light);
+}
+.flight-arrow {
+  display: inline-flex;
+  color: var(--ivory);
+}
+.flight-title {
+  margin-top: var(--space-2);
+  font-family: var(--font-display);
+  font-size: var(--text-24);
+  font-weight: 700;
+}
+.flight-sub {
+  margin-top: var(--space-1);
+  font-size: var(--text-14);
+  color: var(--ivory-dim);
+}
+.flight-skip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--safe-bottom) + var(--space-5));
+  text-align: center;
+  font-size: var(--text-12);
+  color: var(--ivory-dim);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  pointer-events: none;
+}

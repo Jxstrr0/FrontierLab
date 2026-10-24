@@ -111,6 +111,23 @@ button.hud-chip {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: var(--text-16);
+  min-width: 0;
+  white-space: nowrap;
+}
+.hud-city > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.hud-city.is-tappable {
+  gap: 6px;
+  padding: 0 var(--space-3) 0 10px;
+}
+.hud-city.is-tappable svg {
+  flex: none;
+  color: var(--brass-light);
+}
+.hud-city.is-tappable:active {
+  background: var(--vault-raised);
 }
 .hud-menu {
   font-weight: 600;
