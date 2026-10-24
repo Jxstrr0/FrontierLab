@@ -28,9 +28,20 @@ export function openScriptedBranch(state: GameState, district?: string): string 
   return r.branchId;
 }
 
+/** Leases the first office listing with Finance, HR and Risk floors (Stage 4). */
+export function leaseScriptedOffice(state: GameState): string | undefined {
+  const listing = Object.values(state.world.officeListings)
+    .filter((l) => !l.officeId && l.cityId === state.world.currentCityId)
+    .sort((a, b) => a.id.localeCompare(b.id))[0];
+  if (!listing) return undefined;
+  const r = cmd.leaseOffice(state, listing.id, ['finance', 'hr', 'risk']);
+  return r.ok ? r.officeId : undefined;
+}
+
 /**
  * The determinism script: seed 42 in Calgary, one branch on day 0, a second at
- * week 40 when cash allows, a price change and a treasury transfer along the way.
+ * week 40 when cash allows, a price change and a treasury transfer along the way, then an HQ office with
+ * three floors at week 80 and a lunch benefit at week 100.
  * `onWeek` runs after every weekly tick.
  */
 export function runScript(weeks: number, onWeek?: (s: GameState, week: number) => void): GameState {
@@ -44,6 +55,8 @@ export function runScript(weeks: number, onWeek?: (s: GameState, week: number) =
     if (week === 20) cmd.setCampaignLevel(s, first, 'charging', 1);
     if (week === 40 && s.company.cash > 500_000) openScriptedBranch(s, 'downtown');
     if (week === 60) cmd.transferToTreasury(s, 100_000);
+    if (week === 80) leaseScriptedOffice(s);
+    if (week === 100) cmd.setBenefit(s, 'lunch', 40);
     onWeek?.(s, week);
   }
   return s;

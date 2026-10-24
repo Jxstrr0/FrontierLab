@@ -6,3 +6,4 @@ export * from './result';
 export * from './settings';
 export * from './staff';
 export * from './treasury';
+export * from './hq';

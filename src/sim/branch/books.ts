@@ -31,7 +31,8 @@ import { creditCycle, depositGrowth, mortgageLgdMult } from '../macro';
 import { clamp } from '../math';
 import { countryOfCity, ftpFor, marketRef } from '../rates';
 import type { Book, Branch, CountryState, GameState } from '../state';
-import { activeModel, RADAR } from '../underwriting';
+import { riskPdMult } from '../hq';
+import { activeModel, appCost, RADAR } from '../underwriting';
 import type { DemandResult, Origination } from './demand';
 import { signupChurnMult, type CampaignEffects } from './marketing';
 import { branchPrice, churnGap, isOffered, priceFactor } from './pricing';
@@ -58,6 +59,8 @@ interface Ctx {
   wk: BranchWeek;
   fx: CampaignEffects;
   creditCycle: number;
+  /** Risk floor shortfall: PD × (1 + 0.4(1 − k′)) (CONTENT §9). */
+  riskPd: number;
 }
 
 export function runBooks(
@@ -68,7 +71,15 @@ export function runBooks(
   wk: BranchWeek,
 ): void {
   const country = countryOfCity(state, branch.cityId);
-  const ctx: Ctx = { state, branch, country, wk, fx, creditCycle: creditCycle(country) };
+  const ctx: Ctx = {
+    state,
+    branch,
+    country,
+    wk,
+    fx,
+    creditCycle: creditCycle(country),
+    riskPd: riskPdMult(state),
+  };
   let applications = 0;
 
   for (const spec of Object.values(PRODUCTS)) {
@@ -102,7 +113,7 @@ export function runBooks(
   runFx(ctx);
 
   // §10.6 underwriting cost and per-account campaign costs (Paperless Pledge)
-  wk.underwriting += applications * activeModel(state).costPerApp;
+  wk.underwriting += applications * appCost(state);
   const accounts = Object.values(branch.books).reduce((sum, b) => sum + b.accounts, 0);
   wk.marketing += accounts * fx.perAccount;
   branch.customers = Math.round(accounts / PRODUCTS_PER_CUSTOMER);
@@ -212,7 +223,6 @@ export function newLoanPd(state: GameState, spec: ProductSpec, price: number, m:
       ADVERSE.above * Math.max(0, (price - m) / ADVERSE.step) -
       ADVERSE.below * Math.max(0, (m - price) / ADVERSE.step),
   );
-  // riskMult = 1 until the Risk floor exists (Stage 4).
   return (
     (spec.basePd ?? 0) *
     (RISK_APPETITE.pdMult[appetite] ?? 1) *
@@ -228,7 +238,7 @@ const blend = (bal: number, rate: number, add: number, addRate: number) =>
   bal + add > 0 ? (bal * rate + add * addRate) / (bal + add) : addRate;
 
 function defaults(ctx: Ctx, spec: ProductSpec, book: Book): void {
-  const dRate = (book.pd * ctx.creditCycle) / WEEKS_PER_YEAR;
+  const dRate = (book.pd * ctx.creditCycle * ctx.riskPd) / WEEKS_PER_YEAR;
   const defaulted = book.balance * dRate;
   const lgdMult = spec.id === 'mortgage' ? mortgageLgdMult(ctx.country) : 1;
   const loss = Math.min(defaulted, defaulted * book.lgd * lgdMult);

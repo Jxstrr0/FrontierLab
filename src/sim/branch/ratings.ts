@@ -1,6 +1,7 @@
 // Branch ratings and reviews (SIMULATION §8): Rates, Products, Service and
 // Branch targets each week, displayed ratings easing toward them, review counts
 // and review cards.
+import { staffMods } from '../hq';
 import {
   BALANCE_WEIGHT_FLOOR,
   BRANCH_RATING_WEIGHTS,
@@ -124,7 +125,7 @@ export function branchTarget(state: GameState, branch: Branch, fx: CampaignEffec
     const over = asset.ageWeeks - asset.lifeWeeks;
     if (over > 0) upkeep += UPKEEP_PENALTY.perStep * Math.floor(over / UPKEEP_PENALTY.stepWeeks);
   }
-  return clamp(q + fx.bumps.branch - upkeep, 1, 5);
+  return clamp(q + fx.bumps.branch + staffMods(state).reputation - upkeep, 1, 5);
 }
 
 /** Recomputes targets, eases displayed ratings toward them and adds reviews. */

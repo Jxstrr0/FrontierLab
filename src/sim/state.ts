@@ -4,12 +4,14 @@
 import type { BuildSpec } from '../data/equipment';
 import type {
   CountryId,
+  DeptId,
   Difficulty,
   DistrictId,
   Id,
   Money,
   Pct,
   Pentagon,
+  HqDeptId,
   Phase,
   Rate,
   RatingCategory,
@@ -20,7 +22,7 @@ import type {
   Week,
 } from '../data/types';
 
-export const SCHEMA_VERSION = 4;
+export const SCHEMA_VERSION = 5;
 
 export interface GameState {
   schemaVersion: number;
@@ -32,12 +34,22 @@ export interface GameState {
   world: World;
   company: Company;
   branches: Record<Id, Branch>;
+  /** Leased HQ offices (Stage 4, SIMULATION §16.1). */
+  offices: Record<Id, Office>;
+  /** HQ departments that have at least one floor (§16.2). */
+  departments: Partial<Record<DeptId, Department>>;
+  /** Coverage of every HQ department, recomputed each week (§16.3–16.4). */
+  hq: HqState;
   people: People;
   products: ProductsState;
   underwriting: UnderwritingState;
   treasury: Treasury;
   loanDesk: { applications: Record<Id, LoanApplication>; loans: Record<Id, BusinessLoan> };
   rivals: Record<Id, RivalBank>;
+  /** HQ brand campaigns and agency packages (§16.10). */
+  marketing: MarketingState;
+  /** Risk floor records: weekly losses by product and regulator reviews (§15, §16). */
+  risk: RiskState;
   /** Foreclosed homes per city at recovery value (SIMULATION §21.3; modes arrive in Stage 7). */
   reo: Record<Id, ReoPool>;
   /** Accumulates P&L lines and cash movements since the last weekly close. */
@@ -104,6 +116,41 @@ export interface World {
   countries: Partial<Record<CountryId, CountryState>>;
   cities: Record<Id, CityState>;
   lots: Record<Id, Lot>;
+  /** Office buildings for lease (Stage 4). */
+  officeListings: Record<Id, OfficeListing>;
+  /** Credit bureaus, marketing agencies and other non-bank buildings on the map. */
+  sites: Record<Id, Site>;
+}
+
+export interface OfficeListing {
+  id: Id;
+  cityId: Id;
+  tile: { x: number; y: number };
+  district: DistrictId;
+  address: string;
+  floors: number;
+  desksPerFloor: 24 | 32;
+  /** Floor area in m². */
+  area: number;
+  weeklyRent: Money;
+  deposit: Money;
+  buildingSeed: number;
+  /** Set while you lease it. */
+  officeId?: Id;
+}
+
+export type SiteKind = 'bureau' | 'agency';
+
+export interface Site {
+  id: Id;
+  cityId: Id;
+  kind: SiteKind;
+  /** Bureau name or agency id in src/data. */
+  refId: string;
+  tile: { x: number; y: number };
+  district: DistrictId;
+  address: string;
+  buildingSeed: number;
 }
 
 export interface CountryState {
@@ -312,6 +359,99 @@ export interface ReviewCard {
   portraitSeed: number;
 }
 
+// ─── HQ ───────────────────────────────────────────────────────────────────────
+
+export type { DeptId, HqDeptId } from '../data/types';
+
+export interface Office {
+  id: Id;
+  listingId: Id;
+  cityId: Id;
+  /** One department per floor slot; null is an empty floor. */
+  floors: (DeptId | null)[];
+  desksPerFloor: 24 | 32;
+  weeklyRent: Money;
+  deposit: Money;
+  sinceWeek: Week;
+}
+
+export interface Department {
+  id: DeptId;
+  staff: number;
+  target: number;
+  /** Annual salary per employee. */
+  salary: Money;
+  skill: Score;
+  morale: Score;
+  quitAccumulator: number;
+}
+
+export interface Coverage {
+  required: number;
+  /** Raw staffing ratio k (0–1.2). */
+  k: number;
+  /** k′ after the founder-mode ramp: the coverage every effect reads. */
+  kPrime: number;
+  /** effect(k′) = k′^0.7, plus up to +5% above full staffing. */
+  eff: number;
+}
+
+export interface HqState {
+  /** Founder-mode ramp, 0 (no requirements) to 1 (§16.3). */
+  ramp: number;
+  coverage: Record<HqDeptId, Coverage>;
+}
+
+// ─── Marketing and risk floors ────────────────────────────────────────────────
+
+export interface BrandCampaign {
+  id: Id;
+  /** Campaign id in src/data/brandCampaigns.ts. */
+  campaignId: string;
+  scope: 'city' | 'country';
+  /** City id or country id. */
+  targetId: string;
+  startWeek: Week;
+}
+
+export interface AgencyPackageRun {
+  id: Id;
+  agencyId: string;
+  packageId: string;
+  cityId: Id;
+  weeksLeft: number;
+  weeksTotal: number;
+  /** Brand boost applied each remaining week. */
+  boostPerWeek: number;
+}
+
+export interface MarketingState {
+  campaigns: BrandCampaign[];
+  packages: AgencyPackageRun[];
+  /** Branch-rating bonus per city from prestige packages: cityId → { bonus, weeksLeft }. */
+  cityBonus: Record<Id, { bonus: number; weeksLeft: number }>;
+}
+
+export interface LossWeek {
+  week: Week;
+  /** Losses and average balance by product id (sbl covers Loan Desk loans). */
+  byProduct: Record<string, { loss: Money; balance: Money }>;
+  /** Expected loss from booked PDs this week, for model performance. */
+  expected: Money;
+}
+
+export interface RegulatorReview {
+  week: Week;
+  passed: boolean;
+  fine: Money;
+}
+
+export interface RiskState {
+  /** Last 13 weeks of losses (§16, Risk floor). */
+  losses: LossWeek[];
+  reviews: RegulatorReview[];
+}
+
 // ─── People, products, underwriting ───────────────────────────────────────────
 
 export interface People {
@@ -319,6 +459,8 @@ export interface People {
   /** Candidate pool per city; refreshes every 4 weeks (SIMULATION §6.5). */
   managerCandidates: Record<Id, Manager[]>;
   candidatesRefreshWeek: Record<Id, Week>;
+  /** HR benefit control values by benefit id (§16.5). */
+  benefits: Record<string, number>;
 }
 
 export interface Manager {
@@ -331,8 +473,38 @@ export interface Manager {
   branchId?: Id;
 }
 
+export interface ProductEntry {
+  id: Id;
+  stars: Stars;
+  developed: boolean;
+  /** Developed products (§16.6): name, base product, template and tier. */
+  name?: string;
+  base?: string;
+  templateId?: string;
+  tier?: DevTier;
+  createdWeek?: Week;
+}
+
+export type DevTier = 'low' | 'medium' | 'premium';
+
+export interface Development {
+  id: Id;
+  name: string;
+  templateId: string;
+  tier: DevTier;
+  weeks: 4 | 8 | 12 | 24 | 48;
+  weeklyBudget: Money;
+  spent: Money;
+  /** Progress in nominal weeks; done at `weeks`. */
+  progress: number;
+  /** Star odds [1★..5★] fixed at the start. */
+  odds: number[];
+  startWeek: Week;
+}
+
 export interface ProductsState {
-  catalog: Record<Id, { id: Id; stars: Stars; developed: boolean }>;
+  catalog: Record<Id, ProductEntry>;
+  developments: Development[];
 }
 
 export interface UnderwritingModel {
@@ -347,6 +519,8 @@ export interface UnderwritingModel {
 
 export interface UnderwritingState {
   activeModelId: Id;
+  /** While switching models (2 weeks), the old model blends out linearly (§16.7). */
+  switching?: { fromId: Id; weeksLeft: number };
   models: Record<Id, UnderwritingModel>;
   loansBooked: number;
 }
@@ -365,6 +539,34 @@ export interface Treasury {
   overnight: Money;
   window: Money;
   windowStigmaWeeks: number;
+  /** Wholesale funding lots bought from the funding market (§13.6). */
+  lots: FundingLot[];
+  offers: FundingOffer[];
+  offersRefreshWeek: Week;
+}
+
+/** Radar order: Cost, Term, Stability, Flexibility, Discretion. */
+export interface FundingLot {
+  id: Id;
+  type: string;
+  counterparty: string;
+  amount: Money;
+  rate: Rate;
+  startWeek: Week;
+  maturityWeek: Week;
+  radar: Pentagon;
+}
+
+export interface FundingOffer {
+  id: Id;
+  type: string;
+  counterparty: string;
+  /** Maximum you can borrow. */
+  amount: Money;
+  rate: Rate;
+  termWeeks: number;
+  radar: Pentagon;
+  expiresWeek: Week;
 }
 
 /** Pentagon order: Management, Track record, Market, Competitiveness, Financial health. */
@@ -461,6 +663,9 @@ export type PnlLine =
   | 'overhead'
   | 'servicing'
   | 'underwriting'
+  | 'hqStaff'
+  | 'benefits'
+  | 'development'
   | 'fines'
   | 'loanLosses'
   | 'depreciation'

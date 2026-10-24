@@ -73,3 +73,18 @@ export const BUREAU_PACKAGES: Record<string, BureauPackageSpec> = {
 };
 
 export const DEFAULT_MODEL_ID = 'clearline_basic';
+
+/** Credit bureau offices by city id (CONTENT §13 "Bureau locations"). TrueMark: every XL city plus Sydney. */
+export const BUREAU_CITIES: Record<string, string[]> = {
+  Clearline: ['tor', 'nyc', 'lon'],
+  Northscore: ['sas', 'cal', 'chi'],
+  'Sentinel Data': ['sfo', 'fra', 'sin'],
+  TrueMark: ['nyc', 'lon', 'tyo', 'syd'],
+};
+
+/** Bureaus with an office in a city. */
+export function bureausIn(cityId: string): string[] {
+  return Object.entries(BUREAU_CITIES)
+    .filter(([, cities]) => cities.includes(cityId))
+    .map(([bureau]) => bureau);
+}

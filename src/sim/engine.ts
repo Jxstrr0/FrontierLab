@@ -16,6 +16,7 @@ import { evaluateCapital } from './capital';
 import { checkFailure } from './failure';
 import { updateAppRating } from './company';
 import { pushEvent, trimEvents } from './events';
+import { runHq } from './hq';
 import { updateMacro } from './macro';
 import { refreshManagerPool } from './people';
 import { ftpLong, ftpShort, updateMarketRefs } from './rates';
@@ -64,7 +65,8 @@ export function weeklyTick(state: GameState): void {
   }
   updateBrandAwareness(state);
   runTreasury(state); // 6
-  updateAppRating(state); // 7
+  runHq(state); // 7
+  updateAppRating(state);
   depreciate(state); // 8
   closeWeek(state); // 9
   evaluateCapital(state); // 10

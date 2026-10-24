@@ -423,8 +423,91 @@ export const RISK_APPETITE = {
 } as const;
 export const DEFAULT_RISK_APPETITE = 3;
 
+// ─── HQ (§16) ─────────────────────────────────────────────────────────────────
+/** Office listings per city by size, and how they're built (§16.1, CONTENT §9). */
+export const OFFICE_LISTINGS = {
+  countBySize: { S: 3, M: 5, L: 7, XL: 9 },
+  /** Share of listings per district (the rest of the city has none). */
+  districts: { financial: 0.5, downtown: 0.3, midtown: 0.2 },
+  floors: [3, 10] as [number, number],
+  /** Chance a building has 32 desks per floor rather than 24. */
+  wideFloorChance: 0.5,
+  /** Floor area per desk, m² (the original's 7-floor, 7,560 m² listing ≈ 45 m² × 24 desks). */
+  areaPerDesk: 45,
+} as const;
+export const OFFICE_RENT_PER_FLOOR = 1_100;
+export const OFFICE_DEPOSIT_WEEKS = 8;
+export const FLOOR_FITOUT = 120_000;
+export const FLOOR_FITOUT_LIFE_WEEKS = 520;
+export const DESKS_PER_FLOOR_OPTIONS = [24, 32] as const;
+export const EXEC_SUITE_DESKS = 7;
+export const INVESTMENT_FLOOR_DESKS = 32;
+/** Releasing a floor or office lets staff above the remaining desks go with this severance. */
+export const SEVERANCE_WEEKS = 4;
+/** Founder-mode ramp: full requirements at this size, or phased in from 3 to 6 branches (§16.3). */
+export const FOUNDER_MODE_ASSETS = 250_000_000;
+export const FOUNDER_RAMP = { fromBranches: 2, overBranches: 4 } as const;
+/**
+ * Required staff per department (CONTENT §9):
+ * base + perBranch × branches + per$ × the department's dollar driver.
+ */
+export const DEPT_REQUIREMENTS = {
+  finance: { base: 2, perBranch: 0.6, perAssets: 1 / 2e9 },
+  hr: { base: 1, perEmployee: 1 / 60 },
+  products: { base: 2, perBranch: 0.3, perDevelopment: 2 },
+  treasury: { base: 1, perFunding: 1 / 1e9 },
+  marketing: { base: 1, perBranch: 0.25, perCampaign: 2 },
+  it: { base: 2, perBranch: 0.4, perAssets: 1 / 5e9 },
+  risk: { base: 2, perBranch: 0.2, perLoans: 1 / 750e6 },
+} as const;
+/** Coverage (§16.4): staffEff, k, k′ and the shortfall curve. */
+export const HQ_COVERAGE = {
+  skillBase: 0.6,
+  skillSlope: 0.4,
+  moraleBase: 0.85,
+  moraleSlope: 0.15,
+  kMax: 1.2,
+  curve: 0.7,
+  /** Above full staffing the effect rises bonusSlope per unit of k, capped at +5%. */
+  bonusSlope: 0.25,
+  bonusCap: 0.05,
+} as const;
+/** Department skill target: like branch staff (§6.3) but from a higher base (HQ officers). */
+export const DEPT_SKILL = { base: 55, wageSwing: 40 } as const;
+/** A new department's starting staff target covers its requirement at this staff efficiency. */
+export const DEPT_DEFAULT_EFF = 0.75;
+/** Coverage effects when short (CONTENT §9). */
+export const HQ_EFFECTS = {
+  /** Statement delay ceil((delayFrom − k′) × 10) weeks below k′ 0.9. */
+  financeDelayFrom: 0.9,
+  financeDelayScale: 10,
+  /** Hiring × k′ (never below this, so floors can always be staffed). */
+  hrHireFloor: 0.25,
+  hrMoralePenalty: 15,
+  devSpeedFloor: 0.3,
+  modelCostPenalty: 0.3,
+  campaignBase: 0.5,
+  riskPd: 0.4,
+  riskFine: 3,
+  /** Loan Desk estimate noise × (1 + this × (1 − k′)). */
+  riskEstimate: 1,
+} as const;
+/** Benefit effects flatten above the stated amount, capped at this multiple (CONTENT §10). */
+export const BENEFIT_CAP = 1.5;
+/** Above the stated amount, effects grow at this fraction of the linear slope. */
+export const BENEFIT_FLATTEN = 0.5;
+/** Remote Fridays: HQ effective staff −3%. */
+export const REMOTE_FRIDAY_STAFF = 0.03;
+
 // ─── IT (§16.9) ───────────────────────────────────────────────────────────────
-export const APP_RATING = { base: 2.0, slope: 2.5, noTeamSkill: 70, ema: 0.05 } as const;
+export const APP_RATING = {
+  base: 2.0,
+  slope: 2.5,
+  noTeamSkill: 70,
+  ema: 0.05,
+  ctoBonus: 0.4,
+  ctoVacancy: 0.3,
+} as const;
 
 // ─── DELEGATION (§17.1) ───────────────────────────────────────────────────────
 export const DELEGATE = {

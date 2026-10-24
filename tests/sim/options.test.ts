@@ -1,3 +1,4 @@
+import { SCHEMA_VERSION } from '../../src/sim/state';
 import { describe, expect, it } from 'vitest';
 import { CHARTER_CAPITAL } from '../../src/config/balance';
 import { advanceWeeks } from '../../src/sim/engine';
@@ -47,7 +48,7 @@ describe('new game options', () => {
     delete meta.startCash;
     s.schemaVersion = 1;
     const up = migrate(s as Record<string, unknown> & { schemaVersion: number });
-    expect(up.schemaVersion).toBe(4);
+    expect(up.schemaVersion).toBe(SCHEMA_VERSION);
     expect(up.meta).toMatchObject({ difficulty: 'normal', competitors: 3, startCash: 750_000 });
   });
 });

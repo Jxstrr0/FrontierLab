@@ -4,7 +4,9 @@
 import { START_CASH } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { isFrontage, nearestFrontage } from '../cityLayout';
-import { SCHEMA_VERSION } from '../state';
+import { fullCoverage } from '../hq';
+import { generateSites } from '../hqSites';
+import { SCHEMA_VERSION, type GameState } from '../state';
 
 type RawSave = Record<string, unknown> & { schemaVersion: number };
 
@@ -53,7 +55,39 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     }
     return s;
   },
+  // 4 → 5: Stage 4 HQ. Adds offices, departments, coverage, benefits, product
+  // developments, funding lots and offers, HQ marketing and risk records, the
+  // new P&L lines, and each city's office listings and map sites.
+  4: (s) => {
+    s.offices = {};
+    s.departments = {};
+    s.hq = { ramp: 0, coverage: fullCoverage() };
+    s.marketing = { campaigns: [], packages: [], cityBonus: {} };
+    s.risk = { losses: [], reviews: [] };
+    (s.people as Record<string, unknown>).benefits = {};
+    (s.products as Record<string, unknown>).developments = [];
+    Object.assign(s.treasury as Record<string, unknown>, {
+      lots: [],
+      offers: [],
+      offersRefreshWeek: -1,
+    });
+    const addLines = (pnl: Record<string, number>) => {
+      for (const line of NEW_PNL_LINES) pnl[line] ??= 0;
+    };
+    addLines((s.ledger as { pnl: Record<string, number> }).pnl);
+    for (const w of (s.history as { weekly: { pnl: Record<string, number> }[] }).weekly) {
+      addLines(w.pnl);
+    }
+    const world = s.world as Record<string, unknown>;
+    world.officeListings = {};
+    world.sites = {};
+    const state = s as unknown as GameState;
+    for (const cityId of Object.keys(state.world.cities).sort()) generateSites(state, cityId);
+    return s;
+  },
 };
+
+const NEW_PNL_LINES = ['hqStaff', 'benefits', 'development'] as const;
 
 type Tile = { x: number; y: number };
 

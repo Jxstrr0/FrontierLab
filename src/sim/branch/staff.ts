@@ -1,10 +1,8 @@
 // Branch staff, morale, skill, quits, hiring and capacity (SIMULATION §6).
 import {
-  ATTRACTION_RANGE,
   BASE_TELLER_WAGE,
   CAPACITY_MORALE,
   CAPACITY_SKILL,
-  HIRE_BASE,
   MORALE,
   QUIT_BASE,
   SERVICE_VISIT_RATE,
@@ -13,6 +11,7 @@ import {
 } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { EQUIPMENT } from '../../data/equipment';
+import { hiresPerWeek, staffMods } from '../hq';
 import { clamp, ema } from '../math';
 import type { Branch, GameState } from '../state';
 import { dpow, dtanh } from '../detmath';
@@ -49,13 +48,15 @@ export function updateStaff(state: GameState, branch: Branch): void {
   const mgr = managerOf(state, branch);
   const ratio = s.wage / marketWage(branch.cityId);
   const people = mgr?.skills.people ?? 50;
+  const mods = staffMods(state);
 
   const moraleTarget = clamp(
     MORALE.base +
       MORALE.wageSwing * dtanh(MORALE.wageSteep * (ratio - 1)) +
       MORALE.managerPeople * (people - 50) -
       MORALE.waitPenalty * Math.max(0, branch.waitIndex - 1) -
-      (mgr ? 0 : MORALE.noManager),
+      (mgr ? 0 : MORALE.noManager) +
+      mods.morale,
     0,
     100,
   );
@@ -64,11 +65,11 @@ export function updateStaff(state: GameState, branch: Branch): void {
   const sTarget = skillTarget(state, branch);
   s.skill =
     s.skill < sTarget
-      ? Math.min(sTarget, s.skill + SKILL.riseWeekly)
+      ? Math.min(sTarget, s.skill + SKILL.riseWeekly * mods.skillRiseMult)
       : Math.max(sTarget, s.skill - SKILL.fallWeekly);
 
   // Quits accumulate fractionally; a person leaves when the accumulator reaches 1.
-  s.quitAccumulator += s.count * QUIT_BASE * dpow(2 - s.morale / 100, 2);
+  s.quitAccumulator += s.count * QUIT_BASE * dpow(2 - s.morale / 100, 2) * mods.quitMult;
   const quits = Math.min(s.count, Math.floor(s.quitAccumulator));
   s.quitAccumulator -= quits;
   s.count -= quits;
@@ -76,9 +77,7 @@ export function updateStaff(state: GameState, branch: Branch): void {
   if (s.count > s.target) {
     s.count = s.target;
   } else if (s.count < s.target) {
-    // HR coverage is 1 until HQ departments exist (Stage 4).
-    const attraction = clamp(ratio, ...ATTRACTION_RANGE);
-    const hires = Math.min(s.target - s.count, HIRE_BASE + Math.floor(2 * attraction));
+    const hires = Math.min(s.target - s.count, hiresPerWeek(ratio, mods));
     if (hires > 0) {
       s.skill = (s.skill * s.count + SKILL.newHireFrac * sTarget * hires) / (s.count + hires);
       s.count += hires;

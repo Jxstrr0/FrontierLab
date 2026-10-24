@@ -18,6 +18,8 @@ import { CITIES } from '../data/cities';
 import { PRODUCTS } from '../data/products';
 import { capitalSnapshot } from './capital';
 import { generateLots } from './citygen';
+import { fullCoverage } from './hq';
+import { generateSites } from './hqSites';
 import { emptyLedger } from './ledger';
 import { initCountry } from './macro';
 import { refreshManagerPool } from './people';
@@ -100,7 +102,14 @@ export function newGame(opts: NewGameOptions): GameState {
     clock: { day: 0, week: 0, speed: 0 },
     rng: {},
     settings: structuredClone(DEFAULT_SETTINGS),
-    world: { currentCityId: city.id, countries: {}, cities: {}, lots: {} },
+    world: {
+      currentCityId: city.id,
+      countries: {},
+      cities: {},
+      lots: {},
+      officeListings: {},
+      sites: {},
+    },
     company: {
       cash: startCash,
       paidInCapital: startCash + CHARTER_CAPITAL,
@@ -122,8 +131,11 @@ export function newGame(opts: NewGameOptions): GameState {
       companyPrices: {},
     },
     branches: {},
-    people: { managers: {}, managerCandidates: {}, candidatesRefreshWeek: {} },
-    products: { catalog: {} },
+    offices: {},
+    departments: {},
+    hq: { ramp: 0, coverage: fullCoverage() },
+    people: { managers: {}, managerCandidates: {}, candidatesRefreshWeek: {}, benefits: {} },
+    products: { catalog: {}, developments: [] },
     underwriting: { activeModelId: model.id, models: { [model.id]: model }, loansBooked: 0 },
     treasury: {
       reserves: CHARTER_CAPITAL,
@@ -137,9 +149,14 @@ export function newGame(opts: NewGameOptions): GameState {
       overnight: 0,
       window: 0,
       windowStigmaWeeks: 0,
+      lots: [],
+      offers: [],
+      offersRefreshWeek: -1,
     },
     loanDesk: { applications: {}, loans: {} },
     rivals: {},
+    marketing: { campaigns: [], packages: [], cityBonus: {} },
+    risk: { losses: [], reviews: [] },
     reo: {},
     ledger: emptyLedger(),
     events: { log: [], scheduled: [] },
@@ -158,6 +175,7 @@ export function newGame(opts: NewGameOptions): GameState {
   const lots = generateLots(state, city.id);
   seedRivals(state, city.id, lots);
   for (const lot of lots) state.world.lots[lot.id] = lot;
+  generateSites(state, city.id);
   updateMarketRefs(state);
   refreshManagerPool(state, city.id, true);
 

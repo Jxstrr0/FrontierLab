@@ -3,6 +3,8 @@
 // switching arrive with the Products floor (Stage 4).
 import { BUREAU_PACKAGES, DATA_INPUTS } from '../data/bureaus';
 import type { Pentagon } from '../data/types';
+import { HQ_EFFECTS } from '../config/balance';
+import { shortfall } from './hq';
 import type { GameState, UnderwritingModel } from './state';
 
 /** Radar index constants: Accuracy, Speed, Inclusion, FraudShield, Fairness. */
@@ -41,4 +43,11 @@ export function activeModel(state: GameState): UnderwritingModel {
 /** Mean of the five radar values (1–10), used by the Products rating (§8). */
 export function modelQuality(m: UnderwritingModel): number {
   return m.radar.reduce((a, b) => a + b, 0) / m.radar.length;
+}
+
+/** Cost per application paid this week: + (1 − k′) × 30% when the Products team is short (CONTENT §9). */
+export function appCost(state: GameState): number {
+  return (
+    activeModel(state).costPerApp * (1 + HQ_EFFECTS.modelCostPenalty * shortfall(state, 'products'))
+  );
 }

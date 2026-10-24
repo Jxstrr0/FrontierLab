@@ -27,6 +27,9 @@ export const PNL_LINES: readonly PnlLine[] = [
   'overhead',
   'servicing',
   'underwriting',
+  'hqStaff',
+  'benefits',
+  'development',
   'fines',
   'loanLosses',
   'depreciation',
@@ -57,6 +60,9 @@ export const OPEX: readonly PnlLine[] = [
   'overhead',
   'servicing',
   'underwriting',
+  'hqStaff',
+  'benefits',
+  'development',
   'fines',
 ];
 /** Lines that don't move corporate cash (§14.3). */
