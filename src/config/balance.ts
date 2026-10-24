@@ -1260,12 +1260,11 @@ export const OWN_STOCK = {
 /**
  * How serious each incident is for your share price, 0–1: the sentiment shock
  * is incidentShock[0] + (incidentShock[1] − incidentShock[0]) × severity
- * (§19.5, −3% to −15%). Types not listed (reminders, city and personal cases)
- * don't move the price. Assumption, decision log.
+ * (§19.5, −3% to −15%). Types not listed (reminders, city and personal cases,
+ * and minor branch mishaps like a viral complaint or a flood) do not move it.
+ * Assumption, decision log.
  */
 export const INCIDENT_PRICE_SEVERITY: Record<string, number> = {
-  VIRAL_COMPLAINT: 0,
-  BRANCH_FLOOD: 0,
   ROBBERY: 0.15,
   ATM_SKIM: 0.15,
   STAFF_WALKOUT: 0.2,
