@@ -40,6 +40,6 @@ describe('engine', () => {
     expect(b.openedWeek).toBe(1);
     expect(b.customers).toBeGreaterThan(500);
     expect(b.books.savings!.balance).toBeGreaterThan(1_000_000);
-    expect(b.pnl).toHaveLength(26);
+    expect(b.pnl).toHaveLength(30);
   });
 });

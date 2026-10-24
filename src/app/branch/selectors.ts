@@ -18,7 +18,7 @@ import { CITIES } from '../../data/cities';
 import { isDeposit, isLoan, type ProductSpec } from '../../data/products';
 import { marketWage, staffNeeded } from '../../sim/branch/staff';
 import type { Book, Branch, BranchPnl, BranchPnlLine, GameState } from '../../sim/state';
-import { delta, money, pct } from '../format/format';
+import { delta, money, pct, percentText } from '../format/format';
 
 /** UI-only thresholds for the advisor's contextual line (not simulation tuning). */
 const ADVISOR = {
@@ -58,31 +58,44 @@ export function moodTone(morale: number): 'good' | 'warn' | 'bad' {
   return morale >= MOOD_BANDS.warn ? 'warn' : 'bad';
 }
 
-/** The advisor's line, picked from the branch's most pressing state (CONTENT §25). */
-export function advisorLine(state: GameState, branch: Branch, openingDate: string): string {
+/**
+ * Everything the advisor could say right now, most pressing first (CONTENT §25).
+ * The panel shows the first; tapping the bar cycles through the rest.
+ */
+export function advisorLines(state: GameState, branch: Branch, openingDate: string): string[] {
   const sym = state.settings.currency;
   if (branch.status === 'fitout') {
-    return `We open on ${openingDate}. Set our rates and staff before the doors open.`;
+    return [`We open on ${openingDate}. Set our rates and staff before the doors open.`];
   }
+  const lines: string[] = [];
   const needed = staffNeeded(branch);
   const s = branch.staff;
   if (s.count < needed && s.target < needed) {
-    return `We're short-handed: ${s.count} of ${needed} desks covered. Can we hire?`;
+    lines.push(`We're short-handed: ${s.count} of ${needed} desks covered. Can we hire?`);
   }
-  if (branch.waitIndex > WAIT_LABELS.long) return "We're slammed. The line's out the door.";
-  if (s.morale < ADVISOR.lowMorale) return "The team's frustrated about pay.";
+  if (branch.waitIndex > WAIT_LABELS.long) lines.push("We're slammed. The line's out the door.");
+  if (s.morale < ADVISOR.lowMorale) lines.push("The team's frustrated about pay.");
   if (branch.ratings.rates < ADVISOR.weakRates) {
-    return 'Customers keep quoting better rates from down the street.';
+    lines.push('Customers keep quoting better rates from down the street.');
   }
   const [prev, last] = branch.pnl.slice(-2);
   if (last && last.income < 0) {
-    return `We lost ${money(-last.income, sym)} last week. Worth a look at the numbers.`;
+    lines.push(`We lost ${money(-last.income, sym)} last week. Worth a look at the numbers.`);
   }
   if (last && prev && last.income > prev.income * (1 + ADVISOR.strongWeekGain) && prev.income > 0) {
-    return `Strong week: income up ${delta(last.income, prev.income, sym).text}.`;
+    lines.push(`Strong week: income up ${delta(last.income, prev.income, sym).text}.`);
   }
-  if (branch.waitIndex < ADVISOR.quietWait) return 'Quiet week. Want to sharpen our rates?';
-  return "Morning, boss. Drawers are balanced and the coffee's on.";
+  const waiting = Object.values(state.loanDesk.applications).filter(
+    (a) => a.branchId === branch.id,
+  ).length;
+  if (waiting > 0) {
+    lines.push(
+      `${waiting} loan application${waiting === 1 ? ' is' : 's are'} waiting at the Loan Desk.`,
+    );
+  }
+  if (branch.waitIndex < ADVISOR.quietWait) lines.push('Quiet week. Want to sharpen our rates?');
+  if (lines.length === 0) lines.push("Morning, boss. Drawers are balanced and the coffee's on.");
+  return lines;
 }
 
 /** Staff stepper bounds (setStaffTarget). */
@@ -136,10 +149,18 @@ export function rangeText(spec: ProductSpec, sym: string): string {
  * Parses a typed price. Rates and % fees accept "3.25" or "3.25%" as percent;
  * a value already inside the product's range (e.g. 0.0325) is taken as is.
  */
+/** Reads a typed price: rates and % fees are typed as percents ("3.25"), fees as whole money. */
 export function parsePrice(spec: ProductSpec, s: string): number {
   const n = Number(s.replace(/[%$\s,]|\/mo|\/yr/g, ''));
   if (spec.priceType === 'feeMonthly' || spec.priceType === 'feeAnnual') return n;
-  return s.includes('%') || n > spec.max ? n / 100 : n;
+  return n / 100;
+}
+
+/** The editable text for a price, in the units parsePrice expects. */
+export function editPrice(spec: ProductSpec, v: number): string {
+  if (spec.priceType === 'feeMonthly' || spec.priceType === 'feeAnnual')
+    return String(Math.round(v));
+  return percentText(v);
 }
 
 export interface UnitView {

@@ -20,7 +20,7 @@ import { creditCycle, loanDemand } from '../macro';
 import { clamp, roundToStep } from '../math';
 import { countryOfCity, ftpShort } from '../rates';
 import { stream, type Rng } from '../rng';
-import type { Branch, BusinessLoan, GameState, LoanApplication } from '../state';
+import type { Branch, BusinessLoan, DeskWeek, GameState, LoanApplication } from '../state';
 import { effectiveAwareness, type CampaignEffects } from './marketing';
 import { branchPrice } from './pricing';
 import { managerOf } from './staff';
@@ -56,6 +56,27 @@ export function riskBand(estPd: number): 'low' | 'medium' | 'high' {
   return 'high';
 }
 
+/** Counts a Loan Desk outcome in the branch's tally for the current week. */
+export function recordDesk(
+  state: GameState,
+  branchId: string,
+  what: Exclude<keyof DeskWeek, 'week'>,
+): void {
+  const branch = state.branches[branchId];
+  if (!branch) return;
+  if (branch.desk.week !== state.clock.week) {
+    branch.desk = { week: state.clock.week, approved: 0, refused: 0, declined: 0, expired: 0 };
+  }
+  branch.desk[what] += 1;
+}
+
+/** This week's Loan Desk outcomes for a branch (zeros if nothing happened yet). */
+export function deskWeek(state: GameState, branch: Branch): DeskWeek {
+  return branch.desk.week === state.clock.week
+    ? branch.desk
+    : { week: state.clock.week, approved: 0, refused: 0, declined: 0, expired: 0 };
+}
+
 /** New applications, expiry, delegated decisions and booked loans for one branch. */
 export function runLoanDesk(
   state: GameState,
@@ -66,8 +87,10 @@ export function runLoanDesk(
   const rng = stream(state, 'loanDesk');
   const week = state.clock.week;
   for (const app of Object.values(state.loanDesk.applications)) {
-    if (app.branchId === branch.id && week >= app.expiresWeek)
+    if (app.branchId === branch.id && week >= app.expiresWeek) {
       delete state.loanDesk.applications[app.id];
+      recordDesk(state, branch.id, 'expired');
+    }
   }
 
   const lot = state.world.lots[branch.lotId];
@@ -170,7 +193,11 @@ export function acceptanceProb(app: LoanApplication, rate: number): number {
 export function offerLoan(state: GameState, app: LoanApplication, rate: number): boolean {
   delete state.loanDesk.applications[app.id];
   const rng = stream(state, 'loanDesk');
-  if (!rng.chance(acceptanceProb(app, rate))) return false;
+  if (!rng.chance(acceptanceProb(app, rate))) {
+    recordDesk(state, app.branchId, 'refused');
+    return false;
+  }
+  recordDesk(state, app.branchId, 'approved');
   const r = rate / WEEKS_PER_YEAR;
   const payment =
     r > 0 ? (app.amount * r) / (1 - dpow(1 + r, -app.termWeeks)) : app.amount / app.termWeeks;
@@ -207,6 +234,7 @@ function decideDelegated(state: GameState, branch: Branch, app: LoanApplication)
   const threshold = LOANDESK.delegatedThresholds[state.company.riskAppetite - 1] ?? 0;
   if (app.estPd > threshold) {
     delete state.loanDesk.applications[app.id];
+    recordDesk(state, branch.id, 'declined');
     return;
   }
   const country = countryOfCity(state, branch.cityId);

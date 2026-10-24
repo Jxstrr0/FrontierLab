@@ -1,6 +1,6 @@
 // Loan Desk commands: approve an application at a rate, or decline it (SIMULATION §11).
 import { PRODUCTS } from '../../data/products';
-import { offerLoan } from '../branch/loanDesk';
+import { offerLoan, recordDesk } from '../branch/loanDesk';
 import { clamp, roundToStep } from '../math';
 import type { GameState } from '../state';
 import { fail, ok, type CommandResult } from './result';
@@ -21,7 +21,9 @@ export function decideApplication(
 }
 
 export function declineApplication(state: GameState, appId: string): CommandResult {
-  if (!state.loanDesk.applications[appId]) return fail('That application has expired.');
+  const app = state.loanDesk.applications[appId];
+  if (!app) return fail('That application has expired.');
   delete state.loanDesk.applications[appId];
+  recordDesk(state, app.branchId, 'declined');
   return ok();
 }

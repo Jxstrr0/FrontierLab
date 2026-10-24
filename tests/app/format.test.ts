@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { delta, gameDate, money, moneyFull, pct, signedPct } from '../../src/app/format/format';
+import {
+  capitalRatioText,
+  delta,
+  gameDate,
+  money,
+  moneyFull,
+  pct,
+  percentText,
+  signedPct,
+} from '../../src/app/format/format';
 
 describe('format', () => {
   it('compacts money for cards and headlines', () => {
@@ -26,5 +35,13 @@ describe('format', () => {
   it('formats game dates in UTC', () => {
     expect(gameDate('2027-01-04', 0)).toBe('4 Jan 2027');
     expect(gameDate('2027-01-04', 28)).toBe('1 Feb 2027');
+  });
+
+  it('prints rates as editable percents and caps the capital ratio', () => {
+    expect(percentText(0.0325)).toBe('3.25');
+    expect(percentText(0.07)).toBe('7');
+    expect(percentText(0.1 + 0.2)).toBe('30');
+    expect(capitalRatioText(0.125)).toBe('12.5%');
+    expect(capitalRatioText(8.4)).toBe('100%+');
   });
 });

@@ -9,7 +9,7 @@ import type { Branch } from '../../sim/state';
 import { Card, CoinRating, RingGauge, Row, Stepper, Toggle } from '../components';
 import { count, money } from '../format/format';
 import { act, useGame } from '../store';
-import { businessLoans, parsePrice, priceText, rangeText, unitView } from './selectors';
+import { businessLoans, editPrice, parsePrice, priceText, rangeText, unitView } from './selectors';
 
 export function ProductCard(p: { branch: Branch; spec: ProductSpec; onLoanDesk: () => void }) {
   const s = useGame();
@@ -67,6 +67,7 @@ export function ProductCard(p: { branch: Branch; spec: ProductSpec; onLoanDesk: 
           step={spec.step}
           format={fmt}
           parse={(t) => parsePrice(spec, t)}
+          editText={(v) => editPrice(spec, v)}
           onChange={(v) => act(cmd.setPrice, branch.id, spec.id, v)}
           hint={priceHint}
           disabled={atHq || delegated}

@@ -20,6 +20,14 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     company.lowCapitalWeeks = 0;
     return s;
   },
+  // 2 → 3: per-branch Loan Desk tallies for the current week.
+  2: (s) => {
+    const branches = s.branches as Record<string, Record<string, unknown>>;
+    for (const b of Object.values(branches)) {
+      b.desk = { week: 0, approved: 0, refused: 0, declined: 0, expired: 0 };
+    }
+    return s;
+  },
 };
 
 /** Upgrades a raw save to the current schema, or throws if it can't. */

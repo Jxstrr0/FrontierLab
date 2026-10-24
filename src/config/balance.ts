@@ -351,7 +351,7 @@ export const ATM_FEE = { usage: 0.25, fee: 2.5 } as const;
 export const FITOUT_DAYS = 7;
 export const LEASE_DEPOSIT_WEEKS = 6;
 export const RENT_TRAFFIC_EXP = 0.6;
-export const BRANCH_PNL_WEEKS = 26;
+export const BRANCH_PNL_WEEKS = 52;
 export const FITOUT_LIFE_WEEKS = 520;
 export const EQUIPMENT_LIFE_WEEKS = 260;
 

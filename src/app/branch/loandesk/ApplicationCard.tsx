@@ -8,9 +8,8 @@ import * as cmd from '../../../sim/commands';
 import { acceptanceProb, riskBand } from '../../../sim/branch/loanDesk';
 import type { LoanApplication } from '../../../sim/state';
 import { Badge, Card, Stepper } from '../../components';
-import { money, pct } from '../../format/format';
+import { money, pct, percentText } from '../../format/format';
 import { act, toast } from '../../store';
-import { recordDecision } from './decisions';
 import { PentagonRosette } from './PentagonRosette';
 import { SectorIcon } from './sectorIcons';
 
@@ -61,13 +60,11 @@ export function ApplicationCard(p: {
         'good',
       );
     } else {
-      recordDecision(app.branchId, p.week, 'wentElsewhere');
       toast('They went elsewhere.', 'info');
     }
   };
   const decline = () => {
-    const r = act(cmd.declineApplication, app.id);
-    if (r.ok) recordDecision(app.branchId, p.week, 'declined');
+    act(cmd.declineApplication, app.id);
   };
 
   return (
@@ -111,6 +108,7 @@ export function ApplicationCard(p: {
         step={spec.step}
         format={pct}
         parse={(s) => Number(s.replace('%', '')) / 100}
+        editText={percentText}
         onChange={setRate}
         hint={`Chance they accept: ${Math.round(chance * 100)}%`}
       />

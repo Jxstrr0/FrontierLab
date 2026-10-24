@@ -20,7 +20,7 @@ import type {
   Week,
 } from '../data/types';
 
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 
 export interface GameState {
   schemaVersion: number;
@@ -226,6 +226,8 @@ export interface Branch {
   /** Load and service figures from the last tick, for the UI. */
   last: { prospects: number; captured: number; served: number; share: number };
   pnl: BranchPnl[];
+  /** Loan Desk outcomes for the current week (schema v3). */
+  desk: DeskWeek;
 }
 
 export interface BranchStaff {
@@ -252,6 +254,16 @@ export interface Ratings {
   branch: Stars;
   overall: Stars;
   reviewCount: number;
+}
+
+/** Loan Desk outcomes in one week; reset when the week changes. */
+export interface DeskWeek {
+  week: Week;
+  approved: number;
+  /** Offers the business turned down. */
+  refused: number;
+  declined: number;
+  expired: number;
 }
 
 export interface Book {

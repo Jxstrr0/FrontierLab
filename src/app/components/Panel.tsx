@@ -2,7 +2,7 @@
 // content and an optional bottom tab bar. Full screen on phones, a right drawer
 // at ≥ 900px. Also the bottom Sheet and centred Modal shells.
 import type { ComponentChildren } from 'preact';
-import { useEffect } from 'preact/hooks';
+import { useEffect, useState } from 'preact/hooks';
 
 export interface Tab<T extends string> {
   id: T;
@@ -15,7 +15,7 @@ export function Panel<T extends string>(p: {
   subtitle?: string;
   icon?: ComponentChildren;
   onClose: () => void;
-  advisor?: { text: string; name?: string };
+  advisor?: { text: string | string[]; name?: string };
   hero?: ComponentChildren;
   tabs?: Tab<T>[];
   tab?: T;
@@ -61,10 +61,17 @@ export function Panel<T extends string>(p: {
   );
 }
 
-/** Advisor speech line with an oval engraved portrait placeholder. */
-export function AdvisorBar(p: { text: string; name?: string }) {
-  return (
-    <div class="advisor">
+/**
+ * Advisor speech line with an oval engraved portrait placeholder. Given several
+ * lines, tapping the bar cycles to the next one.
+ */
+export function AdvisorBar(p: { text: string | string[]; name?: string }) {
+  const lines = typeof p.text === 'string' ? [p.text] : p.text;
+  const [i, setI] = useState(0);
+  const many = lines.length > 1;
+  const line = lines[i % lines.length] ?? '';
+  const body = (
+    <>
       <svg class="advisor-portrait" viewBox="0 0 28 34" aria-hidden="true">
         <ellipse cx="14" cy="17" rx="13" ry="16" />
         <circle cx="14" cy="13" r="5" />
@@ -72,9 +79,26 @@ export function AdvisorBar(p: { text: string; name?: string }) {
       </svg>
       <p class="advisor-text">
         {p.name && <span class="advisor-name">{p.name}: </span>}
-        {p.text}
+        {line}
       </p>
-    </div>
+      {many && (
+        <span class="advisor-more" aria-hidden="true">
+          {(i % lines.length) + 1}/{lines.length}
+        </span>
+      )}
+    </>
+  );
+  return many ? (
+    <button
+      type="button"
+      class="advisor advisor-cycle"
+      aria-label={`Advisor, ${(i % lines.length) + 1} of ${lines.length}. Tap for the next.`}
+      onClick={() => setI(i + 1)}
+    >
+      {body}
+    </button>
+  ) : (
+    <div class="advisor">{body}</div>
   );
 }
 

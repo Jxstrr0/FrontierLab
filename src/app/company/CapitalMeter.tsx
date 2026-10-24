@@ -3,7 +3,7 @@
 // from TIER_THRESHOLDS so the meter always matches the regulator rules.
 import { TIER_THRESHOLDS } from '../../config/balance';
 import type { Tier } from '../../data/types';
-import { pct } from '../format/format';
+import { capitalRatioText } from '../format/format';
 
 export const TIER_LABEL: Record<Tier, string> = {
   strong: 'Strong',
@@ -48,7 +48,11 @@ export function CapitalMeter(p: { ratio: number; tier: Tier }) {
   const marker = Math.max(0, Math.min(1, p.ratio / METER_MAX));
   return (
     <div class="meter">
-      <div class="meter-bar" role="img" aria-label={`Capital ratio ${pct(p.ratio, 1)}, ${p.tier}`}>
+      <div
+        class="meter-bar"
+        role="img"
+        aria-label={`Capital ratio ${capitalRatioText(p.ratio)}, ${p.tier}`}
+      >
         {all.map((b) => (
           <span
             key={b.tier}
