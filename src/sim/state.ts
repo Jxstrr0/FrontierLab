@@ -125,7 +125,12 @@ export interface GameState {
   events: { log: GameEvent[]; scheduled: ScheduledEvent[] };
   history: { weekly: WeeklySnapshot[]; quarterly: QuarterReport[] };
   milestones: Record<string, Week>;
-  flags: { gameOver?: 'takeover' | 'insolvency' };
+  /**
+   * `tutorialStep` (Stage 10, optional so older saves load as-is): undefined =
+   * never offered, 0 = offer prompt, 1–7 = the SCREENS §27 steps, 8 = closing
+   * card, 9 = finished or skipped (src/app/tutorial/steps.ts).
+   */
+  flags: { gameOver?: 'takeover' | 'insolvency'; tutorialStep?: number };
   /** Monotonic counter for generated ids. */
   nextId: number;
 }

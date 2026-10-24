@@ -43,7 +43,9 @@ export function ProductsTab(p: { branch: Branch; onLoanDesk: () => void }) {
           bureau for a better package.
         </p>
       </Card>
-      <Segmented label="Product category" options={CATEGORIES} value={cat} onChange={setCat} />
+      <div data-tutorial="product-category">
+        <Segmented label="Product category" options={CATEGORIES} value={cat} onChange={setCat} />
+      </div>
       {s.company.applyRatesToAll && <p class="muted small">{hqPriceNotice(s, p.branch)}</p>}
       {p.branch.delegation.products && (
         <p class="muted small">Your manager sets products and prices here.</p>

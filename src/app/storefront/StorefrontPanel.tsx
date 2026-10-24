@@ -47,6 +47,7 @@ export function StorefrontPanel(p: { lotId: string }) {
             class="btn btn-primary btn-block"
             disabled={!!blocker}
             onClick={() => openPanel({ type: 'build', lotId: lot.id })}
+            data-tutorial="build-branch"
           >
             Build branch
           </button>

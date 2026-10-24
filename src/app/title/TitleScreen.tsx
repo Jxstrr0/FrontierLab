@@ -3,6 +3,7 @@ import { CornerRosette } from './CornerRosette';
 import { latestSlot, loadFromSlot } from '../saves';
 import { screen, setGame, toast } from '../store';
 import { ToastHost } from '../components';
+import { openCredits } from '../credits/CreditsScreen';
 import { Rosette } from './Rosette';
 import './title.css';
 
@@ -61,6 +62,9 @@ export function TitleScreen() {
             onClick={() => (screen.value = 'settings')}
           >
             Settings
+          </button>
+          <button class="btn btn-secondary" type="button" onClick={() => openCredits('title')}>
+            Credits
           </button>
         </nav>
 

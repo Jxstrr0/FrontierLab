@@ -153,7 +153,8 @@ export function runLoanDesk(
   runBusinessLoans(state, branch, wk, rng, mine);
 }
 
-function generateApplication(state: GameState, branch: Branch, rng: Rng): LoanApplication {
+/** A new application at this branch, drawn from the loanDesk stream (also used by the tutorial). */
+export function generateApplication(state: GameState, branch: Branch, rng: Rng): LoanApplication {
   const lot = state.world.lots[branch.lotId]!;
   const city = CITIES[branch.cityId]!;
   const country = countryOfCity(state, branch.cityId);
