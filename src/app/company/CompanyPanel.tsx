@@ -1,11 +1,114 @@
-// STUB — to be built in Stage 2. See docs/SCREENS.md.
-import { Panel } from '../components';
-import { closePanel } from '../store';
+// Company summary (SCREENS §24): capital ratio and tier, liquidity, the main
+// totals, a private valuation stand-in and simplified statements. The HQ
+// Finance floor will take over the statements later.
+import { useState } from 'preact/hooks';
+import { balanceSheet } from '../../sim/balanceSheet';
+import { capitalSnapshot } from '../../sim/capital';
+import { Badge, Card, Medallion, Panel, Row, SectionTitle, Sheet } from '../components';
+import { money, pct } from '../format/format';
+import { closePanel, useGame } from '../store';
+import { CapitalMeter, TIER_LABEL, TIER_TONE } from './CapitalMeter';
+import { Statements } from './Statements';
+import './company.css';
+
+const EXPLAINERS: { title: string; body: string }[] = [
+  {
+    title: 'Deposits fund loans',
+    body: 'Every deposit your branches take in becomes money Treasury can lend or hold. More deposits mean more room to lend.',
+  },
+  {
+    title: 'Capital limits growth',
+    body: 'Capital is what the bank owns after its debts. The regulator compares it with your risky assets, and the tier decides how freely you can grow.',
+  },
+  {
+    title: 'Liquidity keeps the doors open',
+    body: 'Reserves and government bonds are cash you can reach quickly. If they run too low, Treasury borrows, and borrowing costs money and reputation.',
+  },
+];
 
 export function CompanyPanel() {
+  const s = useGame();
+  const [learn, setLearn] = useState(false);
+  const sym = s.settings.currency;
+  const cap = capitalSnapshot(s);
+  const bs = balanceSheet(s);
+  const liq = s.company.liquidityRatio;
+
   return (
-    <Panel title="Company" onClose={closePanel}>
-      <p class="muted">Coming soon.</p>
+    <Panel
+      title="Company"
+      subtitle={s.meta.bankName}
+      icon={<Medallion ink={s.meta.brandInk} monogram={s.meta.monogram} size={30} />}
+      onClose={closePanel}
+      advisor={{ text: 'Deposits fund loans; capital limits growth.' }}
+    >
+      <div class="stack co-stack">
+        <Card>
+          <div class="cap-head">
+            <div>
+              <div class="muted small">Capital ratio</div>
+              <div class="hero-number">{pct(cap.capitalRatio, 1)}</div>
+            </div>
+            <Badge tone={TIER_TONE[cap.tier]}>{TIER_LABEL[cap.tier]}</Badge>
+          </div>
+          <CapitalMeter ratio={cap.capitalRatio} tier={cap.tier} />
+          <p class="muted small cap-note">
+            Capital divided by risk-weighted assets. Higher tiers cost less to fund; the lowest
+            tiers stop lending and growth.
+          </p>
+        </Card>
+
+        <Card>
+          <Row
+            label="Liquidity ratio"
+            value={liq === null ? 'No deposits yet' : pct(liq, 1)}
+            strong
+          />
+          <Row label="Target" value={pct(s.treasury.liqTarget, 1)} tone="dim" />
+          <p class="muted small cap-note">
+            Reserves and bonds as a share of deposits: the cash you can reach in a hurry.
+          </p>
+        </Card>
+
+        <div>
+          <SectionTitle>Totals</SectionTitle>
+          <Card>
+            <Row label="Assets" value={money(bs.assets, sym)} />
+            <Row label="Deposits" value={money(bs.deposits, sym)} />
+            <Row label="Loans" value={money(bs.loans, sym)} />
+            <Row label="Equity" value={money(bs.equity, sym)} strong />
+            <Row label="Corporate cash" value={money(s.company.cash, sym)} />
+          </Card>
+        </div>
+
+        <Card>
+          <Row label="Private valuation" value={money(bs.equity, sym)} strong />
+          <p class="muted small cap-note">
+            Book equity stands in for your valuation until investors can price the bank.
+          </p>
+        </Card>
+
+        <button type="button" class="btn btn-secondary btn-block" onClick={() => setLearn(true)}>
+          How this works
+        </button>
+
+        <div>
+          <SectionTitle>Statements</SectionTitle>
+          <Statements state={s} />
+        </div>
+      </div>
+      {learn && (
+        <Sheet title="How this works" onClose={() => setLearn(false)}>
+          <div class="stack co-stack">
+            {EXPLAINERS.map((e) => (
+              <div key={e.title}>
+                <h4 class="explain-title">{e.title}</h4>
+                <p class="explain-body">{e.body}</p>
+              </div>
+            ))}
+          </div>
+        </Sheet>
+      )}
     </Panel>
   );
 }
