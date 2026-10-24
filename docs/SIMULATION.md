@@ -823,6 +823,17 @@ Levels 1–5 (Very conservative to Very aggressive):
   - draw or repay any week
 - These are corporate debt and flow through corporate cash.
 
+### 19.10 Currencies (FX)
+A deliberately simple "country up or down" investment (DESIGN §5.12a). Your books stay in one currency.
+- **State:** one index per country, `fx[c]`, starting at 100, quoted against your home country (whose own index stays at 100 and can't be bought).
+- **Weekly move** (tick step 12, after listed prices):
+  - `r = FX_GROWTH_W × (gdp_c − gdp_home)/100/52 + FX_RATE_W × (policy_c − policy_home)/52 + FX_PHASE[phase_c] − FX_PHASE[phase_home] + normal(0, FX_VOL[c])`
+  - `fx[c] *= 1 + r`, then clamped to [FX_MIN, FX_MAX] × its start.
+  - HK is pegged to the US: `fx[HK] = fx[US] × (1 + normal(0, FX_PEG_VOL))`.
+- **Positions:** buy an amount of a currency as the company or personally: `units = amount / fx[c]`; value = `units × fx[c]`. Buying and selling pay FX_SPREAD on the amount (to `commissions` for the company). No carry is paid; the rate differential is already in the drift.
+- **Books:** company positions are investments at value, marked through `investmentGains` like stocks; risk weight FX_RISK_WEIGHT.
+- **News:** a currency moving more than FX_NEWS_MOVE in a week makes the Markets page.
+
 ## 20. Ventures
 
 - **20.1 Startup state:**
@@ -892,7 +903,7 @@ Levels 1–5 (Very conservative to Very aggressive):
   - the jet loses 6% a year
   - a franchise grows with league revenue
 - **Net worth** = personal cash + stocks at market + real estate + other assets.
-- **Travel allowance:** TRAVEL_KM_PER_WEEK = 24,140 km, reset each weekly tick. A flight is allowed only if its great-circle distance ≤ the remaining km. Owning a jet doubles the allowance (assumption).
+- **Travel allowance:** TRAVEL_KM_PER_WEEK = 24,140 km, reset each weekly tick. A flight within the remaining km is free and uses that distance. A longer flight is never refused: it costs FLIGHT_FARE (a flat one-way fare, scaled by the destination city's costIndex) from personal cash and leaves the allowance untouched. Jet flights are always free (assumption).
 - **Insider trading:** a personal trade in your own bank's shares within 2 weeks before a quarter-end has a 15% chance per trade of an investigation. Outcome: fine of max(3× the gain, $250k), overall rating −0.1 for 8 weeks, news.
 - **Auctions:**
   - Each house holds a monthly auction of 3–5 lots, each with an estimate.
