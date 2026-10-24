@@ -1,5 +1,6 @@
-// The temporary city view (ROADMAP Stage 2): districts as collapsible sections,
-// each listing its storefronts with who is in them. Stands in for the Stage 3 map.
+// The city as a list: districts as collapsible sections, each listing its
+// storefronts with who is in them. The Stage 2 city view; with the Stage 3 map
+// it stays as the accessible "List view" (Layers sheet → List view).
 import { useMemo, useState } from 'preact/hooks';
 import { CITIES } from '../../data/cities';
 import { DISTRICT_SPECS } from '../../data/districts';
@@ -21,7 +22,8 @@ const FILTERS: { value: Filter; label: string }[] = [
 
 const naturalOrder = new Intl.Collator('en', { numeric: true });
 
-export function CityList() {
+/** `hideTitle`: inside a panel that already shows the city name. */
+export function CityList(p: { hideTitle?: boolean } = {}) {
   const s = useGame();
   const [filter, setFilter] = useState<Filter>('all');
   const [collapsed, setCollapsed] = useState<Set<DistrictId>>(new Set());
@@ -49,7 +51,7 @@ export function CityList() {
   return (
     <div class="city-list">
       <header class="city-head">
-        <h1 class="city-title">{city?.name ?? 'Your city'}</h1>
+        {!p.hideTitle && <h1 class="city-title">{city?.name ?? 'Your city'}</h1>}
         <p class="muted small">
           {count(lots.length)} storefronts: {count(free)} for lease, {count(mine)} yours,{' '}
           {count(rivals)} rivals

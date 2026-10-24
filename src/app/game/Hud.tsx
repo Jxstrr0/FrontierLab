@@ -1,9 +1,12 @@
 // HUD over the map (SCREENS §0.2): bank medallion and cash (→ Company), the
-// date pill with speed control, the city pill and the Menu button.
+// date pill with speed control, the Layers button (with the map), the city
+// pill and the Menu button.
+import { FEATURES } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { Medallion } from '../components';
 import { gameDate, money } from '../format/format';
 import { pause, setSpeed } from '../loop';
+import { LayerIcon } from '../map/LayerIcon';
 import { openPanel, sheet, useGame } from '../store';
 
 const NEXT_SPEED = { 0: 1, 1: 2, 2: 4, 4: 1 } as const;
@@ -50,6 +53,17 @@ export function Hud() {
         </div>
       </div>
       <div class="hud-bottom">
+        {FEATURES.cityMap && (
+          <button
+            type="button"
+            class="hud-chip hud-layers"
+            aria-label="Map layers"
+            onClick={() => (sheet.value = 'layers')}
+          >
+            <LayerIcon id="branches" size={22} />
+            <span>Layers</span>
+          </button>
+        )}
         <div class="hud-chip hud-city">{city?.name ?? ''}</div>
         <button type="button" class="hud-chip hud-menu" onClick={() => (sheet.value = 'menu')}>
           Menu
