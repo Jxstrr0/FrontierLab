@@ -40,6 +40,8 @@ export interface PinSpec {
   monogram: string;
   /** Brass dot: Loan Desk applications waiting (SCREENS §0.2). */
   badge: boolean;
+  /** Oxblood dot: an unresolved incident at this branch (SCREENS §0.2). */
+  alert?: boolean;
   branchId?: string;
   /** Your office in this building (kind 'hq'). */
   officeId?: string;
@@ -87,13 +89,15 @@ function lotPin(s: GameState, map: CityMap, lot: Lot, pending: Record<string, nu
     const branch = s.branches[occ.id];
     const waiting = pending[occ.id] ?? 0;
     const name = branch?.name ?? lot.address;
+    const alert = s.incidents.active.some((i) => i.scopeKind === 'branch' && i.scope === occ.id);
     return {
       ...base,
       kind: 'mine',
-      label: `Your branch, ${name}${waiting ? `, ${waiting} loan applications waiting` : ''}`,
+      label: `Your branch, ${name}${alert ? ', open incident' : ''}${waiting ? `, ${waiting} loan applications waiting` : ''}`,
       ink: s.meta.brandInk,
       monogram: s.meta.monogram,
       badge: waiting > 0,
+      alert,
       branchId: occ.id,
     };
   }

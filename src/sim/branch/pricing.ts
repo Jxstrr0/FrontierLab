@@ -15,6 +15,7 @@ import { SEGMENT_SPECS } from '../../data/segments';
 import type { SegmentId } from '../../data/types';
 import { clamp } from '../math';
 import type { Branch, GameState } from '../state';
+import { savingsBoost } from '../incident/effects';
 
 const isFee = (spec: ProductSpec) => spec.priceType !== 'rate';
 const isDepositRate = (spec: ProductSpec) =>
@@ -60,11 +61,22 @@ export function churnGap(spec: ProductSpec, price: number, m: number): number {
 
 /** The price a branch actually charges: the HQ price when Apply-to-all is on. */
 export function branchPrice(state: GameState, branch: Branch, productId: string): number {
+  return basePrice(state, branch, productId) + incidentBoost(state, branch, productId);
+}
+
+/** The price the player (or the manager) set, before incident boosts. */
+export function basePrice(state: GameState, branch: Branch, productId: string): number {
   if (state.company.applyRatesToAll) {
     const p = state.company.companyPrices[productId];
     if (p !== undefined) return p;
   }
   return branch.offered[productId]?.price ?? 0;
+}
+
+/** Savings boosts from incident choices: price-war match, bank-run raise (§23). */
+export function incidentBoost(state: GameState, branch: Branch, productId: string): number {
+  const base = state.products.catalog[productId]?.base ?? productId;
+  return base === 'savings' ? savingsBoost(state, branch.cityId) : 0;
 }
 
 export function isOffered(branch: Branch, productId: string): boolean {

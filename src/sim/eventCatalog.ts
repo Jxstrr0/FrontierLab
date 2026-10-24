@@ -78,6 +78,8 @@ export interface EventPayloads {
     cost: Money;
   };
   REG_FINE: { bank: string; amount: Money; reason: string };
+  /** A press angle on an incident with no template of its own (ATM skim denial, viral complaint). */
+  INCIDENT_NEWS: { bank: string; type: string; branchName: string; city: Id };
   BREACH: { bank: string; n: number };
   BANK_RUN: { bank: string };
   BANK_RUN_ENDED: { bank: string };

@@ -437,12 +437,11 @@ export const RISK_LOSS_WEEKS = 13;
 export const DELINQUENCY = { recentWeeks: 4, pipelineWeeks: 13 } as const;
 export const RECAP_DISCOUNT = 0.5;
 /**
- * Game over (DESIGN §5.18). Insolvency: corporate cash below zero for 4 weeks (no
- * corporate credit exists before Stage 5). Takeover: capital ratio below 4.5% for
- * 13 weeks (the 8-week wait plus the 5-week recapitalisation window; the offer
- * itself arrives with incidents).
+ * Game over (DESIGN §5.18). Insolvency: corporate cash below zero for 4 weeks.
+ * Takeover: the capital ratio stays below takeoverCr until the emergency
+ * recapitalisation (RECAP, §15) is declined or fails to lift it in time.
  */
-export const FAILURE = { insolvencyWeeks: 4, takeoverCr: 0.045, takeoverWeeks: 13 } as const;
+export const FAILURE = { insolvencyWeeks: 4, takeoverCr: 0.045 } as const;
 
 // ─── RISK APPETITE (§16.8) ────────────────────────────────────────────────────
 export const RISK_APPETITE = {
@@ -734,8 +733,82 @@ export const RIVAL_LOAN_RISK_WEIGHT = 0.75;
 // ─── RIVAL CORPORATE LENDING (§19.9) ──────────────────────────────────────────
 
 // ─── INCIDENTS (§23) ──────────────────────────────────────────────────────────
+/**
+ * Incident engine (§23, §17.1). Per-incident numbers live in src/data/incidents.ts.
+ * An unresolved incident takes its worst option `deadlineWeeks` after it was raised;
+ * each type waits `cooldownWeeks` per scope before it can fire again.
+ * A delegated manager scores each option by expected cost, with noise
+ * normal(0, managerError × (1 − (People + Ethics)/200)) as a share of that cost;
+ * non-cash effects are valued in weeks of the branch's revenue (at least minWeeklyValue).
+ * Until executives arrive (Stage 6) the CTO's expertise reads as defaultCtoExpertise,
+ * and a branch with no manager reads ethics as defaultEthics.
+ */
+export const INCIDENTS = {
+  deadlineWeeks: 4,
+  cooldownWeeks: 8,
+  managerError: 0.5,
+  minWeeklyValue: 10_000,
+  defaultEthics: 50,
+  defaultCtoExpertise: 50,
+  /** Rating modifiers are clamped to the 1–5 scale like every rating. */
+  ratingMin: 1,
+  ratingMax: 5,
+  /** Morale stays on its 0–100 scale. */
+  moraleMax: 100,
+} as const;
+/**
+ * fraudShield, 0–10 (decision log): itWeight × IT coverage′ + modelWeight × the
+ * active underwriting model's FraudShield (1–10) + the branch ATM's bonus. A
+ * company-level check (card fraud) has no ATM bonus.
+ */
+export const FRAUD_SHIELD = {
+  itWeight: 4,
+  modelWeight: 0.4,
+  max: 10,
+  atmBonus: { atm_none: 0, atm_wall: 0, atm_dual: 0.5, atm_smart: 1, atm_lobby: 1.5 } as Record<
+    string,
+    number
+  >,
+} as const;
 
 // ─── BANK RUNS AND RECAPITALISATION (§13.8, §15) ──────────────────────────────
+/**
+ * Bank runs (§13.8): while the average overall rating is under maxOverall and the
+ * tier is Restricted/Critical or the liquidity ratio is under maxLiquidity, a run
+ * starts with weeklyChance and lasts `weeks`; deposit churn × runMult meanwhile.
+ * BANK_RUN options: the central bank window borrows windowShare × deposits;
+ * the rate raise adds savingsBoost to savings rates everywhere for boostWeeks;
+ * a public statement succeeds with statementBase + statementPerPoint per CR point
+ * above statementFromCr (capped at statementMax) and ends the run.
+ */
+export const BANK_RUN = {
+  maxOverall: 2.6,
+  maxLiquidity: 0.08,
+  weeklyChance: 0.04,
+  weeks: [3, 6] as [number, number],
+  runMult: 6,
+  windowShare: 0.1,
+  savingsBoost: 0.01,
+  boostWeeks: 8,
+  statementBase: 0.3,
+  statementPerPoint: 0.05,
+  statementFromCr: 0.08,
+  statementMax: 0.95,
+} as const;
+/**
+ * Emergency recapitalisation (§15): after offerWeeks in a row below
+ * FAILURE.takeoverCr, the regulator offers forced new shares at RECAP_DISCOUNT of
+ * book value per share, enough to reach targetCr (rounded up to roundTo). Still
+ * below FAILURE.takeoverCr graceWeeks after accepting means a takeover.
+ * minPrice floors the share price when book value is at or below zero.
+ */
+export const RECAP = {
+  offerWeeks: 8,
+  graceWeeks: 5,
+  targetCr: 0.105,
+  roundTo: 1_000,
+  minPrice: 0.01,
+} as const;
 
 // ─── NEWS: THE DAILY LEDGER (§24) ─────────────────────────────────────────────
 

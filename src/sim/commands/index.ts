@@ -10,3 +10,4 @@ export * from './staff';
 export * from './treasury';
 export * from './underwriting';
 export * from './hq';
+export * from './incidents';
