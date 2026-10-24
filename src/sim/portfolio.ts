@@ -3,7 +3,8 @@
 // debt balances and buildings at value. The balance sheet, capital (RWA) and the
 // Investment floor donut all read these, so the portfolio always ties out. Also
 // the mark rule for ventures and buildings: revaluations run inside
-// `withAssetMarks`, which posts the change to P&L in the same step.
+// `withAssetMarks`, which posts the change to P&L in the same step (a
+// company-owned sports club's value too, Stage 9).
 import { fxValue } from './fx';
 import { postPnl } from './ledger';
 import { holdingsValue, securityPrice } from './securities';
@@ -61,6 +62,13 @@ export function realEstateValue(state: GameState, account: Account): number {
   return total;
 }
 
+/** Sports clubs owned by the company or the founder, at value (SCREENS §20). */
+export function franchiseValue(state: GameState, account: Account): number {
+  let total = 0;
+  for (const c of Object.values(state.clubs ?? {})) if (c.owner === account) total += c.value;
+  return total;
+}
+
 export interface PortfolioBreakdown {
   stocks: number;
   ventures: number;
@@ -97,9 +105,12 @@ export function portfolioBreakdown(state: GameState, account: Account): Portfoli
 export function withAssetMarks(state: GameState, change: () => void): void {
   const ventures = venturesValue(state, 'company');
   const buildings = realEstateValue(state, 'company');
+  const clubs = franchiseValue(state, 'company');
   change();
   const dv = venturesValue(state, 'company') - ventures;
   const db = realEstateValue(state, 'company') - buildings;
+  const dc = franchiseValue(state, 'company') - clubs;
   if (dv !== 0) postPnl(state, 'investmentGains', dv);
   if (db !== 0) postPnl(state, 'propertyGains', db);
+  if (dc !== 0) postPnl(state, 'investmentGains', dc);
 }

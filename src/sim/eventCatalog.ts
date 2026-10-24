@@ -200,6 +200,32 @@ export interface EventPayloads {
   JET_BOUGHT: { model: string; price: Money };
   JET_SOLD: { model: string; price: Money };
 
+  // ─── Personal empire (Stage 9; payloads are refined by each system) ───────
+  HOME_BOUGHT: { homeId: string; name: string; price: Money };
+  HOME_SOLD: { homeId: string; name: string; price: Money };
+  HOME_REBUILT: { homeId: string; name: string; value: Money };
+  CAR_BOUGHT: { carId: string; name: string; price: Money };
+  DEALER_SIGNED: { siteId: Id; city: Id; dealer: string };
+  DEALER_ENDED: { siteId: Id; city: Id; dealer: string };
+  AUCTION_PREVIEW: {
+    houseId: string;
+    house: string;
+    itemId: string;
+    item: string;
+    estimate: Money;
+    week: number;
+  };
+  AUCTION_WON: { houseId: string; itemId: string; item: string; price: Money };
+  AUCTION_LOST: { houseId: string; itemId: string; item: string; price: Money };
+  AUCTION_SOLD: { houseId: string; itemId: string; item: string; price: Money };
+  APPRAISAL_DONE: { itemId: string; item: string; genuine: boolean; value: Money };
+  CLUB_BOUGHT: { clubId: string; club: string; owner: 'company' | 'personal'; price: Money };
+  CLUB_SOLD: { clubId: string; club: string; price: Money };
+  CLUB_SEASON: { clubId: string; club: string; league: string; pos: number; record: string };
+  KIT_SPONSOR: { clubId: string; club: string; on: boolean };
+  RICH_LIST: { rank: number; worth: Money; entered: boolean };
+  INSIDER_PROBE_OPENED: { shares: number; side: 'buy' | 'sell' };
+
   // ─── Ventures and conventions (ventures.ts, conventions.ts) ────────────────
   /** You (company or personal) bought an offer lot. */
   VENTURE_INVESTED: { startupId: Id; name: string; account: string; amount: Money; pct: number };

@@ -20,6 +20,9 @@ import { governanceStories } from './newsGovernance';
 import { marketsStories } from './newsMarkets';
 import { mergersStories } from './newsMergers';
 import { lobbyingStories } from './newsLobbying';
+import { auctionStories } from './newsAuctions';
+import { franchiseStories } from './newsFranchise';
+import { personalStories } from './newsPersonal';
 import { realEstateStories } from './newsRealEstate';
 import { venturesStories } from './newsVentures';
 import { fillTemplate } from './newsFormat';
@@ -86,6 +89,9 @@ export function composeNews(state: GameState): void {
     ...venturesStories(ctx),
     ...realEstateStories(ctx),
     ...lobbyingStories(ctx),
+    ...personalStories(ctx),
+    ...auctionStories(ctx),
+    ...franchiseStories(ctx),
     ...politicsStories(ctx),
     ...sports.stories,
     ...housingStories(ctx, rng),

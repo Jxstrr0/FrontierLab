@@ -26,6 +26,10 @@ import { runReo } from './reo';
 import { runVentures, venturesQuarter } from './ventures';
 import { runPersonal } from './personal';
 import { runTravel } from './travel';
+import { insiderQuarter, runPersonalAssets } from './personalAssets';
+import { runAuctions } from './auctions';
+import { runFranchises } from './franchise';
+import { richListYear } from './richList';
 import { checkFailure } from './failure';
 import { updateAppRating } from './company';
 import { pushEvent, trimEvents } from './events';
@@ -112,6 +116,9 @@ export function weeklyTick(state: GameState): void {
   checkFailure(state);
   runPersonal(state); // 11
   runTravel(state); // 11 (allowance reset, jet upkeep, DESIGN §5.17)
+  runPersonalAssets(state); // 11 (homes, cars, collectibles, dealer deals, §22)
+  runAuctions(state); // 11 (auction houses, §22)
+  runFranchises(state); // 11 (sports clubs, SCREENS §20)
   runMarkets(state); // 12
   runFx(state); // 12 (currencies, §19.10)
 
@@ -122,6 +129,7 @@ export function weeklyTick(state: GameState): void {
     marketsQuarter(state); // 13 (listed earnings, IPO listing)
     governanceQuarter(state); // 13 (board meeting unlocks)
     venturesQuarter(state); // 13 (ventures report and raise, §20.2)
+    insiderQuarter(state); // 13 (insider-trading cases, §22)
   }
   if (isYearStart(state.meta.startDate, state.clock.day)) yearEnd(state); // 14
   runIncidents(state); // 15
@@ -169,6 +177,7 @@ function runBranch(state: GameState, branch: Branch, loans: BusinessLoan[]): voi
 
 function yearEnd(state: GameState): void {
   conventionsYear(state); // next year's conventions calendar
+  richListYear(state); // rich list ranking (§22)
   for (const c of Object.values(state.world.countries)) {
     if (c) c.feeIndex *= 1 + c.inflation / 100;
   }

@@ -1,6 +1,11 @@
 // The in-game screen: the city view (the Stage 3 map, or the Stage 2 list when
 // FEATURES.cityMap is off), the HUD, and the overlay layers for panels,
 // modals, the menu and layers sheets, and toasts.
+import { AuctionHousePanel } from '../auction/AuctionHousePanel';
+import { FranchisePanel } from '../franchise/FranchisePanel';
+import { CarDealerPanel } from '../personal/CarDealerPanel';
+import { VacationHomePanel } from '../personal/VacationHomePanel';
+import { WealthPanel } from '../personal/WealthPanel';
 import { AirportPanel } from '../airport/AirportPanel';
 import { FlightOverlay } from '../airport/FlightOverlay';
 import { TravelSheet } from '../airport/TravelSheet';
@@ -120,6 +125,21 @@ function PanelHost() {
     case 'lobbyingFirm':
       return FEATURES.investments ? <LobbyingFirmPanel key={p.siteId} siteId={p.siteId} /> : null;
     // Stage 8 (FEATURES.multiCity): airports and travel.
+    // Stage 9 (FEATURES.personalEmpire): the founder's empire.
+    case 'wealth':
+      return FEATURES.personalEmpire ? <WealthPanel /> : null;
+    case 'vacationHome':
+      return FEATURES.personalEmpire ? (
+        <VacationHomePanel key={p.siteId} siteId={p.siteId} />
+      ) : null;
+    case 'carDealer':
+      return FEATURES.personalEmpire ? <CarDealerPanel key={p.siteId} siteId={p.siteId} /> : null;
+    case 'auctionHouse':
+      return FEATURES.personalEmpire ? (
+        <AuctionHousePanel key={p.siteId} siteId={p.siteId} />
+      ) : null;
+    case 'franchise':
+      return FEATURES.personalEmpire ? <FranchisePanel key={p.clubId} clubId={p.clubId} /> : null;
     case 'airport':
       return FEATURES.multiCity ? <AirportPanel key={p.jet ? 'jet' : 'ap'} jet={p.jet} /> : null;
     case 'company':
