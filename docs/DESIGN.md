@@ -125,6 +125,7 @@ There's no fixed ending. Milestones, the annual rich list and the "fastest growi
   - **Competitors:** 1–5 rival banks in each city, defaulting to the city's usual count (CONTENT §2). Fewer rivals also means fewer rival branches.
   - **Starting cash:** $500k, $750k (default), $1M or $1.25M of spendable cash. Charter capital stays at $2M.
 - Other cities open up through travel (§5.17).
+- **One global enterprise.** You can fly to any city at any time and buy anything there: branches, offices, buildings, stakes, rival banks. Everything you own in every city keeps running every week at once, so the bank grows into a single worldwide business. Start cities differ in market size, rents and rivals, and that difference stays.
 
 ### 5.3 Storefronts and building a branch
 - **For-lease storefronts** show:
@@ -323,6 +324,12 @@ Investment banks on the map, with tabs Market / Equity / M&A:
 - **Lifecycle.** Startups grow, raise up or down rounds, IPO, get acquired, or fail.
 - **Bank twist:** offer **venture debt** instead of buying shares.
 
+### 5.12a Currencies (FX)
+- **A country bet.** Every country's currency is an investment: buy it when you think that country will do well against your home country, sell when you think it will slip. It's deliberately simple, a "country up or down" position, not real currency trading.
+- **What moves it:** the country's growth and interest rate against your home country's, its business cycle (recessions weaken a currency), plus noise. The Hong Kong currency is pegged to the US one.
+- **Where:** a Currencies view at any investment bank (beside the stock market), for the company or personally. Positions appear in the Investment floor portfolio and on the balance sheet.
+- Your operations are still booked in one currency; FX here is only an investment.
+
 ### 5.13 Governance
 - **Quarterly board meeting.** Set the dividend per share and your CEO compensation, then the board votes. Your ownership, company performance and how reasonable the proposal is decide the result.
 - **Regulator caps** dividends in weak capital tiers.
@@ -366,8 +373,9 @@ Investment banks on the map, with tabs Market / Equity / M&A:
 - **Airports.** Every city map has one. Departure boards list destinations with real distances.
 - **Flying** animates across the map and loads the new city.
 - **Where you need to be.** Opening branches or visiting buildings in a city requires being there. Existing branches can be managed from the Branches list anywhere.
-- **Weekly mileage:** you can fly up to 24,140 km per week, as in the original. Remaining mileage shows on every departure board.
-- **Private jet:** adds a "Fly now" option from any map and doubles the weekly mileage (assumption).
+- **Travel is never blocked.** You can fly anywhere at any time.
+- **Weekly mileage:** flights within 24,140 km per week are free, as in the original. Remaining mileage shows on every departure board. Past the allowance, a destination still flies, as a paid one-way ticket from personal cash (the original charges a flat fare).
+- **Private jet:** adds a "Fly now" option from any map, and its flights never cost a ticket (assumption).
 
 ### 5.18 Goals, milestones, failure
 - **Milestones:** first branch, first loan, first profitable quarter, 10 branches, HQ fully staffed, IPO, first acquisition, $1B in deposits, five countries, billionaire founder, rich list #1.
@@ -386,7 +394,7 @@ Investment banks on the map, with tabs Market / Equity / M&A:
 - It's skippable, and hints stay available in the advisor bar.
 
 ## 6. Out of scope for v1
-- FX conversion between currencies (one display currency)
+- FX conversion between currencies (one display currency; currencies exist only as an investment, §5.12a)
 - Multiplayer
 - Derivatives and crypto
 - Real-world street maps
@@ -485,3 +493,5 @@ Add one dated line per decision. Never delete entries; supersede them.
 - 2026-10-24: Your share price: incidents knock sentiment by 3% + 12% × a per-type severity (a routine robbery barely; a data breach or bank run hard; viral complaints, floods, reminders, city and personal cases not at all), because shocking on every branch mishap kept a 50-branch bank 20% below its target. Sentiment stays within 0.4–1.8. The IPO float % is the public's share after listing; the ticker comes from your monogram. An IPO can't be launched while one is pending, placements stop while it is, and a secondary offering is capped at 25% of outstanding. The placement investor is a fund not yet on your cap table. The Employee Stock Plan costs 0.5% of payroll per discount point in cash (not modelled as dilution).
 - 2026-10-24: M&A closing keeps the books balanced by treating the target's cash as D + E − L (less corporate debt you owed it, which is settled, and its lease deposits, which move to you); if that is negative its loans are written down to fair value. Your company's existing stake counts toward the price at market; personal shares are bought out at the offer price. Acquired fit-outs aren't booked as fixed assets. Converted branches get a build by the seller's strategy, full staff with morale −10, a generated manager with every delegation on, every product they can serve, and books split by a mature mix. The rebrand cost is spread over the 8 conversion weeks. A regulator block doesn't start the 4-week retry wait; an accepted deal you can no longer afford lapses. A distressed network's ask is rolled once at failure (P/B 0.4–0.7, floored at $1 a share); while you have an offer pending it isn't split. Converting branches keep the old bank's ink on the map with a progress ring and a "Converting" label.
 - 2026-10-24: The steady balance strategy takes a 25% private placement when its capital ratio is under 13% and cash is short, and launches a 25%-float IPO as soon as eligible; it lists in years 5–6 on seeds 42, 7 and 99.
+- 2026-10-24 (owner): One global enterprise. You can travel to any city at any time and buy any asset there; everything you own in every city runs at once. Supersedes the weekly travel cap: flights inside the 24,140 km weekly allowance are free, flights past it cost a flat one-way fare from personal cash (the original's behaviour), and jet flights are always free.
+- 2026-10-24 (owner): Currencies become an investment category (DESIGN §5.12a, SIMULATION §19.10): a simplified "country up or down" position per foreign currency, traded at investment banks as the company or personally, built with Stage 7. Operations stay in one currency.

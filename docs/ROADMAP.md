@@ -152,6 +152,7 @@ Eleven stages. Each one ends playable and deployed. A stage usually takes severa
 - Real estate: buy, rent and sell, as company or personal
 - REO from mortgage defaults
 - Lobbying firms
+- Currencies (FX) as an investment category: per-country index, positions as company or personal (SIMULATION §19.10)
 
 **Accept:**
 - Portfolio values tie out to the balance sheet and RWA.
@@ -160,7 +161,8 @@ Eleven stages. Each one ends playable and deployed. A stage usually takes severa
 ## Stage 8 — Multi-city and travel
 **Build:**
 - Every v1 city and regional site generated on first visit
-- Airports and departure boards with great-circle distances and the weekly mileage allowance
+- Airports and departure boards with great-circle distances and the weekly mileage allowance (travel is never blocked: past the allowance a flight costs a fare)
+- Play everywhere at once: any city, any time, every asset
 - Flight animation
 - Each country runs its own macro and central bank
 - Remote management through the Branches list

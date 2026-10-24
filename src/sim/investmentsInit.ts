@@ -1,6 +1,7 @@
 // Stage 7 starting state (SIMULATION §20, §21): the venture pipeline and seed
 // startups, the conventions calendar, real estate listings and empty lobbying
 // records. Used by newGame and the 7 → 8 save migration.
+import { emptyFx } from './fx';
 import type {
   ConventionsState,
   GameState,
@@ -31,4 +32,5 @@ export function initInvestments(state: GameState): void {
   state.conventions = emptyConventions();
   state.realEstate = emptyRealEstate();
   state.lobbying = emptyLobbying();
+  state.fx = emptyFx();
 }

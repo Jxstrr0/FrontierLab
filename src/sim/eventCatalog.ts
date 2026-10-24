@@ -181,6 +181,9 @@ export interface EventPayloads {
   /** A failed rival's network goes on sale in M&A (rivalQuarter.ts failureCheck, §18.5). */
   DISTRESSED_SALE: { rivalId: Id; bank: string; ask: Money; pb: number; weeks: number; n: number };
 
+  /** A currency moved ≥ FX.newsMove against your home currency this week (fx.ts, §19.10). */
+  FX_MOVE: { country: string; currency: string; home: string; pct: number };
+
   // ─── Ventures and conventions (ventures.ts, conventions.ts) ────────────────
   /** You (company or personal) bought an offer lot. */
   VENTURE_INVESTED: { startupId: Id; name: string; account: string; amount: Money; pct: number };
