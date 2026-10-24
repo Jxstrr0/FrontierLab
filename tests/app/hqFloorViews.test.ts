@@ -7,6 +7,7 @@ import {
   pointsText,
   runningAt,
   scopeTarget,
+  targetCities,
   targetName,
 } from '../../src/app/hq/marketing/marketingView';
 import {
@@ -84,10 +85,11 @@ describe('treasury formatting', () => {
 });
 
 describe('marketing view', () => {
-  it('targets the current city or its country, by name', () => {
+  it('targets a picked city or its country, by name', () => {
     const s = newGame({ seed: 42, cityId: 'cal' });
-    expect(scopeTarget(s, 'city')).toBe('cal');
-    expect(scopeTarget(s, 'country')).toBe('CA');
+    expect(targetCities(s)).toEqual({ ids: ['cal'], initial: 'cal' });
+    expect(scopeTarget('cal', 'city')).toBe('cal');
+    expect(scopeTarget('cal', 'country')).toBe('CA');
     expect(targetName('city', 'cal')).toBe('Calgary');
     expect(targetName('country', 'CA')).toBe('Canada');
     expect(pointsText(0.012)).toBe('+1.2 pts');

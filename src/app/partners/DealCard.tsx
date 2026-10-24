@@ -12,7 +12,9 @@ import {
   signingFee,
   type PartnershipKind,
 } from '../../sim/partnerships';
-import type { Site } from '../../sim/state';
+import { CITIES } from '../../data/cities';
+import { COUNTRIES } from '../../data/countries';
+import type { Branch, Site } from '../../sim/state';
 import { Card, LineChart, Row } from '../components';
 import { count, money } from '../format/format';
 import { act, toast, useGame } from '../store';
@@ -39,10 +41,16 @@ function Deal(p: { site: Site; kind: PartnershipKind; people: number }) {
   const pkg = pkgPick && options.includes(pkgPick) ? pkgPick : defaultPackage(s, hostId, kind);
   const fee = signingFee(site, kind);
   const curve = expectedCurve(site, kind);
+  const regional = CITIES[site.cityId]?.regional ? CITIES[site.cityId]!.country : undefined;
   const blocker =
     hosts.length === 0
-      ? 'You need an open branch in this city to host the accounts.'
+      ? regional
+        ? `You need an open branch in ${COUNTRIES[regional].name} to host the accounts.`
+        : 'You need an open branch in this city to host the accounts.'
       : cmd.signBlocker(s, site.id, hostId ?? '', pkg ?? '', kind);
+  // Hosts in other cities (a regional site's) carry their city's name.
+  const hostLabel = (b: Branch) =>
+    b.cityId === site.cityId ? b.name : `${b.name} · ${CITIES[b.cityId]?.name ?? b.cityId}`;
   const years = Math.round(PARTNER_CONTRACT_WEEKS / WEEKS_PER_YEAR);
 
   const sign = () => {
@@ -74,7 +82,7 @@ function Deal(p: { site: Site; kind: PartnershipKind; people: number }) {
           <Picker
             label="Host branch"
             value={hostId}
-            options={hosts.map((b) => ({ value: b.id, label: b.name }))}
+            options={hosts.map((b) => ({ value: b.id, label: hostLabel(b) }))}
             onChange={(v) => {
               setHost(v);
               setPkg(undefined);

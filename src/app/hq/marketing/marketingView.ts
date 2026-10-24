@@ -1,27 +1,48 @@
 // View helpers for the Marketing floor and agency panel (SCREENS §10, §15;
-// SIMULATION §7, §16.10): where a campaign would run, which instance is
-// already running, awareness rows by city and the wording for scopes and
-// gains. Reads state but never changes it.
+// SIMULATION §7, §16.10): the cities a campaign can target from HQ, which
+// instance is already running, awareness rows by city and the wording for
+// scopes and gains. Reads state but never changes it.
 import { AGENCIES, BRAND_CAMPAIGNS, type BrandCampaignSpec } from '../../../data/brandCampaigns';
 import { CITIES } from '../../../data/cities';
 import { COUNTRIES } from '../../../data/countries';
 import type { CountryId } from '../../../data/types';
-import { brandGainByCity } from '../../../sim/hqMarketing';
+import { brandGainByCity, campaignCities } from '../../../sim/hqMarketing';
 import type { AgencyPackageRun, BrandCampaign, GameState } from '../../../sim/state';
 
 export type Scope = 'city' | 'country';
 
 export const SCOPE_LABEL: Record<Scope, string> = { city: 'City', country: 'Country' };
 
-/** The city a campaign or package targets: the city you're in. */
-export function homeCityId(state: GameState): string {
-  return state.world.currentCityId;
+/**
+ * The cities you can aim brand campaigns at (home, branch and office cities and
+ * where you stand), with the one the picker opens on: where you are when it's
+ * on the list, else home.
+ */
+export function targetCities(state: GameState): { ids: string[]; initial: string } {
+  const ids = campaignCities(state);
+  const here = state.world.currentCityId;
+  return { ids, initial: ids.includes(here) ? here : (ids[0] ?? state.meta.homeCityId) };
 }
 
-/** The target id for a scope: the current city, or its country. */
-export function scopeTarget(state: GameState, scope: Scope): string {
-  const cityId = homeCityId(state);
+/** The target id for a scope: the picked city, or its country. */
+export function scopeTarget(cityId: string, scope: Scope): string {
   return scope === 'city' ? cityId : (CITIES[cityId]?.country ?? '');
+}
+
+/** Where else a campaign is running, as "Calgary, Canada" (empty when nowhere). */
+export function runningElsewhere(
+  state: GameState,
+  campaignId: string,
+  except: { scope: Scope; targetId: string },
+): string {
+  return state.marketing.campaigns
+    .filter(
+      (c) =>
+        c.campaignId === campaignId &&
+        !(c.scope === except.scope && c.targetId === except.targetId),
+    )
+    .map((c) => targetName(c.scope, c.targetId))
+    .join(', ');
 }
 
 /** Display name for a campaign target (city or country id). */

@@ -1,21 +1,33 @@
 // Marketing floor content (SCREENS §10, DESIGN §5.8.5, SIMULATION §16.10):
 // total weekly brand spend, brand awareness by city (bars), the brand
-// campaign cards and the agency packages running now. Packages are bought at
-// a marketing agency's office on the map (SCREENS §15).
+// campaign cards with a picker for the city (and so country) they target, and
+// the agency packages running now. Packages are bought at a marketing
+// agency's office on the map (SCREENS §15).
+import { useState } from 'preact/hooks';
+import { CITIES } from '../../data/cities';
 import { BRAND_CAMPAIGNS } from '../../data/brandCampaigns';
 import { campaignMult } from '../../sim/hq';
 import { brandCampaignsWeeklyCost, cityBrandBonus } from '../../sim/hqMarketing';
-import { Card, Row, SectionTitle } from '../components';
+import { Card, Chips, Row, SectionTitle } from '../components';
 import { money, pct } from '../format/format';
 import { useGame } from '../store';
 import { BrandCampaignCard } from './marketing/BrandCampaignCard';
-import { awarenessRows, CAMPAIGN_ORDER, pointsText, runNames } from './marketing/marketingView';
+import {
+  awarenessRows,
+  CAMPAIGN_ORDER,
+  pointsText,
+  runNames,
+  targetCities,
+} from './marketing/marketingView';
 import './marketing/marketing.css';
 
 export function MarketingFloor() {
   const s = useGame();
   const sym = s.settings.currency;
   const mult = campaignMult(s);
+  const targets = targetCities(s);
+  const [picked, setPicked] = useState(targets.initial);
+  const cityId = targets.ids.includes(picked) ? picked : targets.initial;
   return (
     <div class="stack mk-floor">
       <SectionTitle>Brand spend</SectionTitle>
@@ -36,8 +48,16 @@ export function MarketingFloor() {
       <AwarenessCard />
 
       <SectionTitle>Brand campaigns</SectionTitle>
+      {targets.ids.length > 1 && (
+        <Chips
+          label="City to run campaigns in"
+          options={targets.ids.map((id) => ({ value: id, label: CITIES[id]?.name ?? id }))}
+          value={cityId}
+          onChange={setPicked}
+        />
+      )}
       {CAMPAIGN_ORDER.map((id) => (
-        <BrandCampaignCard key={id} spec={BRAND_CAMPAIGNS[id]!} />
+        <BrandCampaignCard key={`${id}:${cityId}`} spec={BRAND_CAMPAIGNS[id]!} cityId={cityId} />
       ))}
 
       <SectionTitle>Agency packages</SectionTitle>

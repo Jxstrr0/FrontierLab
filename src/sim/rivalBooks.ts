@@ -29,7 +29,8 @@ import { tileDistance } from './citygen';
 import { creditCycle, loanDemand } from './macro';
 import { clamp } from './math';
 import { countryOfCity } from './rates';
-import { matureDeposits, priceWarBump } from './rivals';
+import { matureDeposits } from './rivals';
+import { priceWarBump } from './rivalPrices';
 import type { GameState, Lot, RivalBank, RivalBranch } from './state';
 
 /** Distance weight from the share formula: w = 1 / (1 + d / 6) (§9.3). */

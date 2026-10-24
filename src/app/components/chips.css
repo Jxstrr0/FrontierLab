@@ -1,0 +1,42 @@
+/* Chip rows (Chips.tsx): pills that scroll sideways on a phone. */
+.chips {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  scrollbar-width: none;
+  /* Let the row scroll to the panel edge without clipping focus rings. */
+  padding: 2px 0;
+}
+.chips::-webkit-scrollbar {
+  display: none;
+}
+.chip {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--tap-min);
+  padding: 0 var(--space-4);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--ivory-dim);
+  font-size: var(--text-14);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.chip.is-active {
+  border-color: var(--brass);
+  color: var(--brass-light);
+}
+.chip:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 2px;
+}
+.chip-hint {
+  font-size: var(--text-12);
+  font-weight: 500;
+  color: var(--ivory-dim);
+  font-variant-numeric: tabular-nums;
+}

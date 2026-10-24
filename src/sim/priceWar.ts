@@ -7,6 +7,7 @@ import { isDeposit, PRODUCTS } from '../data/products';
 import { pushEvent } from './events';
 import { raiseIncident } from './incidents';
 import { clamp } from './math';
+import { rivalPriceInCity } from './rivalPrices';
 import { stream } from './rng';
 import type { GameState } from './state';
 
@@ -72,7 +73,7 @@ export function runPriceWars(state: GameState): void {
           bank: bank.name,
           city,
           bump,
-          savingsRate: bank.prices.savings ?? 0,
+          savingsRate: rivalPriceInCity(state, bank, 'savings', city) ?? 0,
         },
         4,
         city,

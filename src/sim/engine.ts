@@ -42,7 +42,7 @@ import { rivalsQuarter, runRivals } from './rivalAi';
 import { refreshManagerPool } from './people';
 import { ftpLong, ftpShort, updateMarketRefs } from './rates';
 import { regulatorReview } from './riskFloor';
-import { repriceRivalFees, updateRivalPrices } from './rivals';
+import { repriceRivalFees, updateRivalPrices } from './rivalPrices';
 import type { Branch, GameState } from './state';
 import { closeWeek, depreciate, quarterEnd } from './statements';
 import { runTreasury } from './treasury';

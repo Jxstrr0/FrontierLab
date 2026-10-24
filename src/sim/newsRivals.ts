@@ -3,7 +3,17 @@
 // (rivals in your cities first), quarterly earnings, dividends and executive
 // exits, plus the weekly "rate watch" on the best savings rate in your city.
 import { NEWS_PRIORITY as P } from '../config/balance';
-import { cityName, districtName, num, str, type NewsContext, type Story } from './newsStory';
+import { branchPrice, isOffered } from './branch/pricing';
+import { rivalPriceInCity } from './rivalPrices';
+import {
+  busiestCity,
+  cityName,
+  districtName,
+  num,
+  str,
+  type NewsContext,
+  type Story,
+} from './newsStory';
 import { basisPoints, newsAbsPct, newsPct, newsMoney, newsRate } from './newsFormat';
 import type { GameEvent } from './state';
 
@@ -139,20 +149,20 @@ function listText(items: string[]): string {
   return `${items.slice(0, -1).join(', ')} and ${items.at(-1)}`;
 }
 
-/** The best savings rate among rivals in the city on screen (or your busiest city), and yours. */
+/** The best savings rate among rivals in your busiest city (your home city before any branch), and yours. */
 export function rateWatchStory(ctx: NewsContext): Story | undefined {
   const s = ctx.state;
-  const cityId = s.world.currentCityId;
+  const cityId = busiestCity(s) ?? s.meta.homeCityId;
   let leader: { name: string; rate: number } | undefined;
   for (const rival of Object.values(s.rivals)) {
     if (rival.status !== 'active' || !rival.branches.some((b) => b.cityId === cityId)) continue;
-    const rate = (rival.prices.savings ?? 0) + (rival.priceWar[cityId] ?? 0);
+    const rate =
+      (rivalPriceInCity(s, rival, 'savings', cityId) ?? 0) + (rival.priceWar[cityId] ?? 0);
     if (!leader || rate > leader.rate) leader = { name: rival.name, rate };
   }
   if (!leader) return undefined;
   const mine = Object.values(s.branches).find((b) => b.cityId === cityId && b.status === 'open');
-  const slot = mine?.offered.savings;
-  const myRate = slot?.on ? slot.price : undefined;
+  const myRate = mine && isOffered(mine, 'savings') ? branchPrice(s, mine, 'savings') : undefined;
   const yours =
     myRate === undefined
       ? `${ctx.bank} has yet to post a rate here.`
