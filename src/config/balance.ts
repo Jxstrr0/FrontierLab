@@ -1472,7 +1472,7 @@ export const VENTURE_GEN = {
   startRunway: [2, 10] as [number, number],
   profitableCash: 0.08,
   /** Funding history: the last round raised roundShare of post-money, each earlier one stepDown of the next. */
-  historyRoundShare: 0.2,
+  historyRoundShare: 0.12,
   historyStepDown: 0.4,
   /** Years since founding by stage, for generated startups. */
   ageYears: {
