@@ -7,6 +7,8 @@ import { DEPT_SALARY_RANGE, DEPT_SALARY_STEP } from '../../sim/commands';
 import { deptDesks, deptMarketSalary } from '../../sim/hq';
 import type { DeptId, GameState, HqDeptId } from '../../sim/state';
 import { moodTone } from '../branch/selectors';
+import { executiveAdvisor } from '../executive/execSelectors';
+import { seatedExecs } from '../../sim/execSeats';
 
 /** UI-only thresholds for the advisor line (not simulation tuning). */
 const ADVISOR = { lowMorale: 40 } as const;
@@ -93,6 +95,7 @@ const LINES: Record<HqDeptId, [ok: string, short: string]> = {
 
 /** Everything the floor's advisor could say right now, most pressing first. */
 export function deptAdvisor(s: GameState, dept: DeptId): string[] {
+  if (dept === 'executive') return executiveAdvisor(s);
   const d = s.departments[dept];
   const name = DEPARTMENTS[dept].name;
   const lines: string[] = [];
@@ -138,7 +141,8 @@ export function salaryBounds(s: GameState, dept: DeptId) {
 export function deskPicture(s: GameState, dept: DeptId, maxShown: number) {
   const d = s.departments[dept];
   const desks = deptDesks(s, dept);
-  const staff = d?.staff ?? 0;
+  // The Executive suite seats you plus the hired executives.
+  const staff = dept === 'executive' ? 1 + seatedExecs(s).length : (d?.staff ?? 0);
   const shown = Math.min(desks, maxShown);
   const filled = desks > 0 ? Math.round((Math.min(staff, desks) / desks) * shown) : 0;
   return { desks, staff, shown, filled, mood: moodTone(d?.morale ?? 0) };

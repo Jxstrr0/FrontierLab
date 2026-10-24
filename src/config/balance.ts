@@ -910,8 +910,8 @@ export const CORPORATE_LENDING = {
  * A delegated manager scores each option by expected cost, with noise
  * normal(0, managerError × (1 − (People + Ethics)/200)) as a share of that cost;
  * non-cash effects are valued in weeks of the branch's revenue (at least minWeeklyValue).
- * Until executives arrive (Stage 6) the CTO's expertise reads as defaultCtoExpertise,
- * and a branch with no manager reads ethics as defaultEthics.
+ * A branch with no manager reads ethics as defaultEthics; the CTO's expertise
+ * comes from the CTO seat (EXECUTIVES.vacantCtoExpertise while it is empty).
  */
 export const INCIDENTS = {
   deadlineWeeks: 4,
@@ -919,7 +919,6 @@ export const INCIDENTS = {
   managerError: 0.5,
   minWeeklyValue: 10_000,
   defaultEthics: 50,
-  defaultCtoExpertise: 50,
   /** Rating modifiers are clamped to the 1–5 scale like every rating. */
   ratingMin: 1,
   ratingMax: 5,
@@ -1176,6 +1175,97 @@ export const GOVERNANCE = {
   payDelayWeeks: 3,
   watchCap: 0.5,
   meetingsKept: 8,
+} as const;
+
+/**
+ * Executive pay, candidates and grants (§17.2, SCREENS §10.1; assumptions in the
+ * decision log). A candidate asks market × (askBase + askSlope × average skill/100).
+ * Salaries can be set within salaryRange × market. An option's grant-date value
+ * per share is max(price − strike, price × optionMinValue); RSUs are worth the
+ * price. One grant is at most grantMaxPct of shares outstanding.
+ */
+export const EXEC_PAY = {
+  askBase: 0.8,
+  askSlope: 0.4,
+  salaryRange: [0.5, 3] as [number, number],
+  salaryStep: 5_000,
+  optionMinValue: 0.25,
+  grantMaxPct: 0.02,
+  grantStep: 1_000,
+} as const;
+
+/**
+ * Executive delegations (§17.2 table), each run weekly while its toggle is on.
+ * COO: branch operations turns on `cooDelegation` for the manager it hires;
+ * HR benefits, every benefitsEveryWeeks weeks, holds average morale at
+ * moraleTarget (cuts back above moraleTarget + moraleSlack), spending at most
+ * benefitsBudgetShare of the weekly payroll on benefits. CFO: statement delays × cfoDelayFactor (rounded
+ * up); Treasury holds LR within ±lrBand of target, moving the bond share by
+ * bondStep; Dividends proposes dividendPayout of trailing net income. CPO and
+ * CTO: developments of devWeeks at devTier with a weekly budget of at most
+ * devBudgetShare of weekly revenue (trailing revenueWeeks average). CMO: holds
+ * brand awareness near brandTarget (± brandSlack) within brandBudgetShare of
+ * revenue. CRO: every croEveryWeeks weeks, lowers appetite when CR < croMinCr or
+ * the loss rate > croMaxLoss, raises it when CR ≥ croRaiseCr and the loss rate ≤
+ * croRaiseLoss, up to croMaxAppetite.
+ */
+export const EXEC_DELEGATION = {
+  cooDelegation: { staffing: true, products: true, marketing: true, troubles: true, loans: true },
+  moraleTarget: 70,
+  moraleSlack: 5,
+  benefitsEveryWeeks: 4,
+  benefitsBudgetShare: 0.08,
+  cfoDelayFactor: 0.5,
+  lrBand: 0.02,
+  bondStep: 0.05,
+  dividendPayout: 0.4,
+  devWeeks: 12,
+  devTier: 'medium',
+  devBudgetShare: 0.01,
+  revenueWeeks: 13,
+  brandTarget: 0.5,
+  brandSlack: 0.05,
+  brandBudgetShare: 0.03,
+  croEveryWeeks: 4,
+  croMinCr: 0.12,
+  croMaxLoss: 0.012,
+  croRaiseCr: 0.14,
+  croRaiseLoss: 0.009,
+  croMaxAppetite: 4,
+} as const;
+
+/**
+ * Board votes (DESIGN §5.13; the docs give no formula, decision log). The
+ * founder and executive holders vote For; outside holders approve with a ∈ [0,1];
+ * forShare = insiders + (1 − insiders) × a, passing at passShare.
+ * Dividend: payout = dps × shares × 4 ÷ max(NI_ttm, 1). With NI_ttm ≤ 0,
+ * a = lossZero for no dividend, lossPaid otherwise; else a = zero for no
+ * dividend, comfortable up to comfortablePayout, falling linearly to atMax at
+ * maxPayout. CEO pay: market = ceoMarketMult × executive market salary; above
+ * market a = clamp(atMarket − slope × (new/market − 1), range), else atMarket;
+ * − bigRaisePenalty for a raise over bigRaise of current pay; − weakRoePenalty
+ * when ROE_ttm < COE. Proposals: dividend in dpsStep, CEO pay in ceoStep up to
+ * ceoMaxMult × market.
+ */
+export const BOARD_VOTE = {
+  passShare: 0.5,
+  lossZero: 0.9,
+  lossPaid: 0.15,
+  zero: 0.6,
+  comfortable: 0.9,
+  comfortablePayout: 0.6,
+  maxPayout: 1.2,
+  atMax: 0.1,
+  ceoMarketMult: 1.5,
+  atMarket: 0.9,
+  slope: 0.8,
+  range: [0.05, 0.95] as [number, number],
+  bigRaise: 0.25,
+  bigRaisePenalty: 0.2,
+  weakRoePenalty: 0.15,
+  dpsStep: 0.01,
+  ceoStep: 5_000,
+  ceoMaxMult: 4,
 } as const;
 
 // ─── MARKETS (SIMULATION §19) ─────────────────────────────────────────────────

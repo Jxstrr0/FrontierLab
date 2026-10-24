@@ -71,7 +71,10 @@ export function HqPanel(p: { officeId?: string; dept?: DeptId }) {
       onClose={closePanel}
       advisor={
         dept
-          ? { name: `${DEPARTMENTS[dept].name} lead`, text: deptAdvisor(s, dept) }
+          ? {
+              name: dept === 'executive' ? 'Chief of staff' : `${DEPARTMENTS[dept].name} lead`,
+              text: deptAdvisor(s, dept),
+            }
           : { text: 'An empty building, ready for its first team.' }
       }
       hero={dept ? <OfficeInterior dept={dept} /> : undefined}
@@ -100,7 +103,8 @@ export function HqPanel(p: { officeId?: string; dept?: DeptId }) {
         )}
         {dept ? (
           <>
-            <DeptStaffing dept={dept} />
+            {/* The Executive suite's desks are you and six executives, hired on the floor itself. */}
+            {dept !== 'executive' && <DeptStaffing dept={dept} />}
             {dept === 'finance' && <FinanceFloor />}
             {dept === 'hr' && <HrFloor />}
             {dept === 'it' && <ItFloor />}

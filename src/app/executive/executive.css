@@ -1,0 +1,212 @@
+/* Executive floor, profile and board meeting (SCREENS §10, §10.1, §10.2). */
+.exec-board-text {
+  margin: 0;
+  color: var(--ivory-dim);
+  line-height: var(--line-body);
+}
+.exec-board-blocker {
+  margin: 0;
+}
+
+/* ─── Seat grid ─────────────────────────────────────────────────────────── */
+.exec-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+@media (min-width: 600px) {
+  .exec-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+.exec-seat {
+  width: 100%;
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-2);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-card);
+  background: var(--vault-raised);
+  color: var(--ivory);
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+}
+button.exec-seat:active {
+  border-color: var(--brass);
+}
+.exec-seat.is-ceo {
+  border-color: var(--brass);
+  cursor: default;
+}
+.exec-seat.is-empty {
+  border-style: dashed;
+  background: transparent;
+}
+.exec-seat-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-16);
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+.exec-seat-title {
+  font-size: var(--text-12);
+  color: var(--ivory-dim);
+  line-height: 1.3;
+}
+.exec-seat-meta {
+  font-size: var(--text-12);
+}
+.exec-seat-badge {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 1px solid var(--brass);
+  color: var(--brass-light);
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+.exec-seat-hire {
+  margin-top: var(--space-1);
+  padding: 4px var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--brass);
+  color: var(--vault-deep);
+  font-weight: 700;
+  font-size: var(--text-14);
+}
+
+/* ─── People and profile ────────────────────────────────────────────────── */
+.exec-person {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.exec-person-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-20);
+  line-height: 1.2;
+}
+.exec-sheet-intro,
+.exec-note {
+  margin: 0;
+}
+.exec-grants {
+  list-style: none;
+  margin: 0 0 var(--space-3);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.exec-grant {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.exec-grant-head {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+.exec-vest {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--vault-deep);
+  overflow: hidden;
+}
+.exec-vest-fill {
+  display: block;
+  height: 100%;
+  background: var(--jade);
+}
+.exec-grant-form {
+  margin-top: var(--space-3);
+}
+.exec-rsu-note {
+  align-self: center;
+}
+.exec-vest-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-14);
+  font-variant-numeric: tabular-nums;
+}
+.exec-vest-table caption {
+  text-align: left;
+  padding-bottom: var(--space-1);
+}
+.exec-vest-table th,
+.exec-vest-table td {
+  padding: 6px 4px;
+  border-bottom: 1px solid var(--hairline);
+  text-align: right;
+}
+.exec-vest-table th:first-child,
+.exec-vest-table td:first-child,
+.exec-vest-table th:nth-child(2),
+.exec-vest-table td:nth-child(2) {
+  text-align: left;
+}
+.exec-vest-table th {
+  color: var(--ivory-dim);
+  font-weight: 600;
+}
+
+/* ─── Board meeting ─────────────────────────────────────────────────────── */
+.exec-cap-note {
+  margin: var(--space-2) 0 0;
+  padding: var(--space-2) var(--space-3);
+  border-left: 3px solid var(--oxblood);
+  background: rgb(15 24 40 / 40%);
+  color: var(--ivory);
+}
+.exec-tally {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.exec-tally-head {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font-weight: 600;
+}
+.exec-tally-bar {
+  display: flex;
+  height: 14px;
+  border-radius: 7px;
+  overflow: hidden;
+  background: var(--vault-deep);
+}
+.exec-tally-for {
+  background: var(--jade);
+}
+.exec-tally-against {
+  background: var(--oxblood);
+}
+.exec-tally-nums {
+  display: flex;
+  justify-content: space-between;
+  color: var(--ivory-dim);
+  font-variant-numeric: tabular-nums;
+}
+.exec-outcome {
+  margin: 0;
+  padding-left: 1.2em;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}

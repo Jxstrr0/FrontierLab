@@ -40,7 +40,8 @@ export type BranchTab = 'service' | 'products' | 'loandesk' | 'marketing' | 'fin
 export type ModalRoute =
   | { type: 'weekly'; week: number }
   | { type: 'incident' }
-  | { type: 'boardMeeting' }
+  /** `reminder`: opened by the quarterly auto-pause, showing a prompt first (SIMULATION §2). */
+  | { type: 'boardMeeting'; reminder?: boolean }
   | { type: 'gameover' };
 
 export interface Toast {

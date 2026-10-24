@@ -1,17 +1,12 @@
 // Company and city incidents (CONTENT §22): data breach, card fraud, the
 // regulator's audit and letter, price wars, bank runs and the emergency
-// recapitalisation, plus specs for later stages (executives, dividends, the
-// insider probe) that are not raised before their stage arrives.
-import {
-  BANK_RUN as BANK_RUN_P,
-  FAILURE,
-  INCIDENTS,
-  RECAP,
-  WEEKS_PER_YEAR,
-} from '../../config/balance';
+// recapitalisation, the governance cases (executives poached, dividends due;
+// rules in execRules.ts), plus the insider probe, not raised before Stage 9.
+import { BANK_RUN as BANK_RUN_P, FAILURE, RECAP, WEEKS_PER_YEAR } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { INCIDENT_PARAMS, INCIDENT_SPECS } from '../../data/incidents';
 import { totalDeposits } from '../balanceSheet';
+import { ctoExpertise } from '../execSeats';
 import { pushEvent } from '../events';
 import { spend } from '../ledger';
 import { baseId, productSpec } from '../products';
@@ -19,6 +14,7 @@ import type { GameState } from '../state';
 import { applyWindowStigma } from '../treasury';
 import { acceptRecap, endBankRun, recapQuote, statementOdds, takeover } from './capitalEvents';
 import { addEffect, incidentPMult } from './effects';
+import { DIVIDEND_DUE, EXEC_POACHED } from './execRules';
 import { fraudShield, num, ratingHit, type IncidentRule } from './helpers';
 import { compactMoney } from './text';
 
@@ -44,7 +40,7 @@ const DATA_BREACH: IncidentRule = {
     return (
       baseP('DATA_BREACH') *
       (1 + P.DATA_BREACH.itSlope * (1 - it)) *
-      (P.DATA_BREACH.ctoBase - INCIDENTS.defaultCtoExpertise / 100) *
+      (P.DATA_BREACH.ctoBase - ctoExpertise(state) / 100) *
       incidentPMult(state, 'DATA_BREACH', 'company')
     );
   },
@@ -219,9 +215,9 @@ export const COMPANY_RULES: Record<string, IncidentRule> = {
   PRICE_WAR,
   BANK_RUN,
   RECAP_OFFER,
-  // Later stages: executives and dividends (Stage 6), the insider probe (Stage 9).
-  EXEC_POACHED: NOTHING,
-  DIVIDEND_DUE: NOTHING,
+  EXEC_POACHED,
+  DIVIDEND_DUE,
+  // Later stages: the insider probe (Stage 9).
   INSIDER_PROBE: NOTHING,
 };
 
