@@ -76,7 +76,7 @@ export function balanceSheetLines(s: GameState): StatementLine[] {
     { label: 'Lease deposits', value: b.leaseDeposits, kind: 'sub' },
     { label: 'Total assets', value: b.assets, kind: 'total' },
     { label: 'Deposits', value: b.deposits, kind: 'sub' },
-    { label: 'Central bank and overnight funding', value: b.wholesale, kind: 'sub' },
+    { label: 'Wholesale funding', value: b.wholesale, kind: 'sub' },
     { label: 'Taxes payable', value: b.taxPayable, kind: 'sub' },
     { label: 'Total liabilities', value: b.liabilities, kind: 'total' },
     { label: 'Paid-in capital', value: s.company.paidInCapital, kind: 'sub' },

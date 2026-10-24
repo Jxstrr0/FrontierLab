@@ -1,9 +1,6 @@
-// Placeholder cards for floor content that later Stage 4 passes fill in
-// (Treasury, Marketing and Risk floors and the marketing agency site). Each says what is coming and with what,
-// so the floor is honest about what works today.
-//
-// PLACEHOLDER: replace each <FloorPlaceholder> (and the PLACEHOLDER_FLOORS
-// table) with the real floor content as its simulation lands.
+// Placeholder cards for floors whose systems arrive in later stages (Executive
+// in Stage 6, Investment in Stage 7). Each says what is coming, so a floor is
+// honest about what works today. Replace an entry when its floor is built.
 import type { DeptId } from '../../sim/state';
 import { Card } from '../components';
 
@@ -27,27 +24,6 @@ interface PlaceholderSpec {
 
 /** What each not-yet-built floor will hold (SCREENS §10). */
 export const PLACEHOLDER_FLOORS: Partial<Record<DeptId, PlaceholderSpec[]>> = {
-  treasury: [
-    {
-      title: 'Liquidity and funding',
-      arrives: 'Arrives with the Treasury update',
-      body: 'The liquidity gauge and policy, government bonds, your funding inventory and the funding market.',
-    },
-  ],
-  marketing: [
-    {
-      title: 'Brand campaigns',
-      arrives: 'Arrives with the Marketing update',
-      body: 'Brand awareness by city, TV, billboard, podcast and creator campaigns, and your agency packages.',
-    },
-  ],
-  risk: [
-    {
-      title: 'Losses and the regulator',
-      arrives: 'Arrives with the Risk update',
-      body: 'Loss rates by product, delinquency, model performance and regulator reviews.',
-    },
-  ],
   executive: [
     {
       title: 'Board and executives',

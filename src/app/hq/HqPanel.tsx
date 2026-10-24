@@ -17,12 +17,15 @@ import { AddFloorSheet } from './AddFloorSheet';
 import { deptAdvisor } from './deptSelectors';
 import { DeptStaffing } from './DeptStaffing';
 import { FinanceFloor } from './FinanceFloor';
-import { PlaceholderFloor } from './FloorPlaceholder';
+import { PLACEHOLDER_FLOORS, PlaceholderFloor } from './FloorPlaceholder';
 import { HrFloor } from './HrFloor';
 import { ItFloor } from './ItFloor';
+import { MarketingFloor } from './MarketingFloor';
 import { OfficeCard } from './OfficeCard';
 import { OfficeInterior } from './OfficeInterior';
 import { ProductsFloor } from './ProductsFloor';
+import { RiskFloor } from './RiskFloor';
+import { TreasuryFloor } from './TreasuryFloor';
 import { hqDepts, officeAddress, officeList, pickOffice, usedFloors } from './officeSelectors';
 import './hq.css';
 
@@ -101,9 +104,10 @@ export function HqPanel(p: { officeId?: string; dept?: DeptId }) {
             {dept === 'hr' && <HrFloor />}
             {dept === 'it' && <ItFloor />}
             {dept === 'products' && <ProductsFloor />}
-            {dept !== 'finance' && dept !== 'hr' && dept !== 'it' && dept !== 'products' && (
-              <PlaceholderFloor dept={dept} />
-            )}
+            {dept === 'treasury' && <TreasuryFloor />}
+            {dept === 'marketing' && <MarketingFloor />}
+            {dept === 'risk' && <RiskFloor />}
+            {PLACEHOLDER_FLOORS[dept] && <PlaceholderFloor dept={dept} />}
           </>
         ) : (
           <Card>

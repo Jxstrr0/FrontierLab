@@ -1,0 +1,277 @@
+/* Treasury floor styles (SCREENS §10, ART_DIRECTION §1 and §5). */
+.tr-floor .card + .card,
+.tr-floor .stack > .card + .card {
+  margin-top: 0;
+}
+.tr-floor .card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.tr-card-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-16);
+}
+.tr-under {
+  margin: 0;
+  text-align: center;
+}
+.tr-rows {
+  margin-top: var(--space-2);
+}
+
+/* ─── Funding freeze banner ────────────────────────────────────────────── */
+.tr-banner {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--oxblood);
+  border-left-width: 4px;
+  border-radius: var(--radius-card);
+  background: rgb(158 61 61 / 18%);
+  font-size: var(--text-14);
+  line-height: var(--line-body);
+}
+
+/* ─── Liquidity gauge ──────────────────────────────────────────────────── */
+.tr-gauge-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+.tr-gauge {
+  position: relative;
+  height: 14px;
+  margin-top: var(--space-2);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-pill);
+  background: var(--vault-deep);
+  overflow: visible;
+}
+.tr-gauge-danger {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: var(--radius-pill) 0 0 var(--radius-pill);
+  background: repeating-linear-gradient(135deg, rgb(158 61 61 / 35%) 0 2px, transparent 2px 5px);
+}
+.tr-gauge-fill {
+  position: absolute;
+  inset: 2px auto 2px 0;
+  border-radius: var(--radius-pill);
+  background: var(--brass);
+}
+.tr-gauge-below {
+  background: var(--oxblood);
+}
+.tr-gauge-ok {
+  background: var(--jade);
+}
+.tr-gauge-none {
+  background: var(--ivory-dim);
+  opacity: 0.4;
+}
+.tr-gauge-tick {
+  position: absolute;
+  top: -5px;
+  bottom: -5px;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--oxblood);
+}
+.tr-gauge-tick.is-target {
+  background: var(--brass-light);
+}
+.tr-gauge-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  margin-top: var(--space-2);
+  color: var(--ivory-dim);
+}
+.tr-gauge-legend span::before {
+  content: '';
+  display: inline-block;
+  width: 2px;
+  height: 12px;
+  margin-right: 6px;
+  vertical-align: -2px;
+}
+.tr-legend-min::before {
+  background: var(--oxblood);
+}
+.tr-legend-target {
+  color: var(--brass-light);
+}
+.tr-legend-target::before {
+  background: var(--brass-light);
+}
+.tr-gauge-legend .muted::before {
+  display: none;
+}
+
+/* ─── Policy ───────────────────────────────────────────────────────────── */
+.tr-policy .stepper-value {
+  white-space: nowrap;
+}
+
+/* ─── Funding lot and offer cards ──────────────────────────────────────── */
+.tr-fund-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+.tr-fund-name {
+  font-weight: 700;
+  font-size: var(--text-16);
+}
+.tr-fund-rate {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-24);
+  line-height: 1.1;
+  color: var(--brass-light);
+  font-variant-numeric: tabular-nums;
+}
+.tr-fund-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.tr-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+}
+.tr-facts dt {
+  font-size: var(--text-12);
+  color: var(--ivory-dim);
+}
+.tr-facts dd {
+  margin: 0;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.tr-fund-card .badge {
+  align-self: flex-start;
+}
+
+/* Compact funding rosette (shares the RadarRosette look). */
+.fund-rosette {
+  display: block;
+  width: 100%;
+  max-width: 280px;
+  height: auto;
+  margin: 0 auto;
+}
+.fund-rosette .rosette-grid path,
+.fund-rosette .rosette-grid line {
+  fill: none;
+  stroke: var(--brass);
+  stroke-width: 0.6;
+  opacity: 0.35;
+}
+.fund-rosette .rosette-data {
+  fill: var(--brass);
+  fill-opacity: 0.25;
+  stroke: var(--brass);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+.fund-rosette .rosette-dot {
+  fill: var(--brass-light);
+}
+.fund-rosette-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  fill: var(--ivory-dim);
+}
+.fund-rosette .rosette-score {
+  font-weight: 700;
+  fill: var(--brass-light);
+}
+
+/* ─── Amount slider ────────────────────────────────────────────────────── */
+.amount-slider-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.amount-slider-value {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.amount-slider-body {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+.amount-slider-track {
+  flex: 1;
+  min-width: 0;
+}
+.amount-slider-body input[type='range'] {
+  display: block;
+  width: 100%;
+  height: var(--tap-min);
+  margin: 0;
+  background: transparent;
+  accent-color: var(--brass);
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+.amount-slider-body input[type='range']::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--vault-deep);
+  border: 1px solid var(--hairline);
+}
+.amount-slider-body input[type='range']::-moz-range-track {
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--vault-deep);
+  border: 1px solid var(--hairline);
+}
+.amount-slider-body input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 28px;
+  height: 28px;
+  margin-top: -12px;
+  border-radius: 50%;
+  border: 2px solid var(--brass-light);
+  background: var(--brass);
+}
+.amount-slider-body input[type='range']::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--brass-light);
+  background: var(--brass);
+}
+.amount-slider-body input[type='range']:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 2px;
+}
+.amount-slider-max {
+  min-height: var(--tap-min);
+  flex: none;
+}
+.amount-slider-scale {
+  display: flex;
+  justify-content: space-between;
+  margin-top: -8px;
+}
+.amount-slider.is-disabled {
+  opacity: 0.5;
+}
+
+/* ─── Central bank facility ────────────────────────────────────────────── */
+.tr-facility {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--hairline);
+}

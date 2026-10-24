@@ -1,0 +1,96 @@
+/* Risk & Compliance floor styles (SCREENS §10, ART_DIRECTION §1 and §5). */
+.rk-floor .card + .card {
+  margin-top: 0;
+}
+
+/* Loss table as stacked rows (readable at 390 px) */
+.rk-loss-list {
+  list-style: none;
+  margin: var(--space-3) 0 0;
+  padding: 0;
+}
+.rk-loss-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--hairline);
+}
+.rk-loss-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+.rk-loss-name {
+  font-weight: 600;
+}
+.rk-loss-figs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+}
+.rk-loss-figs dt {
+  font-size: var(--text-12);
+  color: var(--ivory-dim);
+}
+.rk-loss-figs dd {
+  margin: 0;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Predicted vs actual bar pair */
+.rk-pair {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-6);
+  padding-top: var(--space-2);
+}
+.rk-pair-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 72px;
+}
+.rk-pair-value {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.rk-pair-track {
+  position: relative;
+  display: block;
+  width: 36px;
+  height: 96px;
+  border-bottom: 1px solid var(--hairline);
+}
+.rk-pair-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  min-height: 2px;
+  border-radius: 2px 2px 0 0;
+}
+.rk-pair-predicted {
+  background: var(--ivory);
+}
+.rk-pair-actual {
+  background: var(--brass);
+}
+.rk-pair-bad {
+  background: var(--oxblood);
+}
+
+/* Regulator */
+.rk-reg-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+.rk-reg-rows {
+  margin-top: var(--space-3);
+}
