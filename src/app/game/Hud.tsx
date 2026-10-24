@@ -1,11 +1,11 @@
 // HUD over the map (SCREENS §0.2): bank medallion and cash (→ Company), the
-// date pill with speed control, the Layers button (with the map), the city
+// date pill with speed control and a next-week step, the Layers button (with the map), the city
 // pill and the Menu button.
 import { FEATURES } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { Medallion } from '../components';
 import { gameDate, money } from '../format/format';
-import { pause, setSpeed } from '../loop';
+import { pause, setSpeed, stepWeek } from '../loop';
 import { LayerIcon } from '../map/LayerIcon';
 import { openPanel, sheet, useGame } from '../store';
 
@@ -40,7 +40,7 @@ export function Hud() {
             onClick={() => setSpeed(paused ? s.settings.defaultSpeed : NEXT_SPEED[s.clock.speed])}
           >
             <span>{gameDate(s.meta.startDate, s.clock.day)}</span>
-            <span class="hud-speed">{paused ? '❚❚' : `${s.clock.speed}×`}</span>
+            {!paused && <span class="hud-speed">{s.clock.speed}×</span>}
           </button>
           <button
             type="button"
@@ -49,6 +49,15 @@ export function Hud() {
             onClick={() => (paused ? setSpeed(s.settings.defaultSpeed) : pause())}
           >
             {paused ? '▶' : '❚❚'}
+          </button>
+          <button
+            type="button"
+            class="hud-step"
+            aria-label="Next week"
+            disabled={!!s.flags.gameOver}
+            onClick={stepWeek}
+          >
+            <NextWeekIcon />
           </button>
         </div>
       </div>
@@ -70,5 +79,15 @@ export function Hud() {
         </button>
       </div>
     </>
+  );
+}
+
+/** Play-to-bar glyph drawn in SVG so iOS doesn't swap it for an emoji. */
+function NextWeekIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+      <path d="M3 3.5 L11 9 L3 14.5 Z" fill="currentColor" />
+      <rect x="12.5" y="3.5" width="2.5" height="11" fill="currentColor" />
+    </svg>
   );
 }
