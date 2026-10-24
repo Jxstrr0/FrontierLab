@@ -102,6 +102,71 @@ export interface EventPayloads {
   };
   GRAD_PROGRAM: { siteId: Id; university: string; cost: Money; started: boolean };
 
+  // ─── Governance and executives (governance.ts, executives.ts) ──────────────
+  BOARD_MEETING: {
+    bank: string;
+    quarter: string;
+    dps: Money;
+    dividendPassed: boolean;
+    salary: Money;
+    salaryPassed: boolean;
+  };
+  /** The board approved a dividend; paid `payWeek` (a DIVIDEND_DUE case reminds you). */
+  DIVIDEND_DECLARED: { bank: string; dps: Money; total: Money; payWeek: number; yieldPct: number };
+  DIVIDEND_PAID: { bank: string; dps: Money; total: Money; personal: Money };
+  EXEC_HIRED: { seat: string; title: string; name: string };
+  /** An executive resigned or was poached (EXEC_POACHED decides first). */
+  EXEC_RESIGNED: { seat: string; title: string; name: string; bank: string };
+  EXEC_FIRED: { seat: string; title: string; name: string; severance: Money };
+
+  // ─── Capital markets (market.ts, equity commands) ─────────────────────────
+  PLACEMENT: { bank: string; investor: string; shares: number; price: Money; raised: Money };
+  IPO_LAUNCHED: {
+    bank: string;
+    adviser: string;
+    price: Money;
+    shares: number;
+    floatPct: number;
+  };
+  IPO_LISTED: {
+    bank: string;
+    ticker: string;
+    exchange: string;
+    price: Money;
+    open: Money;
+    popPct: number;
+    raised: Money;
+  };
+  SECONDARY_OFFERING: { bank: string; shares: number; price: Money; raised: Money };
+  /** A non-bank listed company's quarterly results; `surprisePct` vs expectations. */
+  COMPANY_EARNINGS: {
+    companyId: Id;
+    company: string;
+    ticker: string;
+    eps: number;
+    surprisePct: number;
+    quarter: string;
+  };
+  /** The index moved more than the news threshold this week. */
+  MARKET_MOVE: { index: number; pct: number };
+  /** Your own share price moved sharply (public only). */
+  SHARE_PRICE_MOVE: { bank: string; ticker: string; price: Money; pct: number };
+
+  // ─── M&A (mergers.ts) ─────────────────────────────────────────────────────
+  MERGER_OFFER: { rivalId: Id; bank: string; total: Money; premiumPct: number };
+  MERGER_REJECTED: { rivalId: Id; bank: string; reason: string };
+  MERGER_BLOCKED: { rivalId: Id; bank: string; reason: string };
+  ACQUISITION_CLOSED: {
+    rivalId: Id;
+    bank: string;
+    buyer: string;
+    price: Money;
+    branches: number;
+    goodwill: Money;
+    distressed: boolean;
+  };
+  CONVERSION_DONE: { rivalId: Id; bank: string; buyer: string; branches: number };
+
   // ─── Politics (news.ts) ───────────────────────────────────────────────────
   /** `country` is a CountryId; `policy` and `effect` are copy from src/data/newsWorld.ts. */
   POLICY_PROPOSED: PolicyPayload;

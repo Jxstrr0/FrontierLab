@@ -68,6 +68,8 @@ export function MapView() {
         else if (pin.kind === 'office') openPanel({ type: 'office', listingId: pin.id });
         else if (pin.kind === 'bureau') openPanel({ type: 'bureau', siteId: pin.id });
         else if (pin.kind === 'agency') openPanel({ type: 'agency', siteId: pin.id });
+        else if (pin.kind === 'investmentBank')
+          openPanel({ type: 'investmentBank', siteId: pin.id });
         else openPanel({ type: 'storefront', lotId: pin.id });
       },
       onCluster: (cl) =>

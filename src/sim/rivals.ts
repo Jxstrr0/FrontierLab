@@ -32,6 +32,7 @@ import {
 import { tileDistance } from './citygen';
 import { clamp } from './math';
 import { countryOfCity, defaultPrice, ftpLong, ftpShort } from './rates';
+import { initRivalShares } from './marketInit';
 import { stream, type Rng } from './rng';
 import type { CountryState, GameState, Lot, RivalBank, RivalBranch } from './state';
 import { dpow } from './detmath';
@@ -161,6 +162,7 @@ export function initRivalFinancials(state: GameState, bank: RivalBank): void {
   bank.capitalRatio = cr;
   bank.equity = loans * RIVAL_LOAN_RISK_WEIGHT * cr;
   bank.ceo = `${rng.pick(FIRST_NAMES)} ${rng.pick(LAST_NAMES)}`;
+  initRivalShares(bank);
 }
 
 function ensureRival(state: GameState, spec: RivalSpec, c: CountryState): RivalBank {
@@ -190,6 +192,12 @@ function ensureRival(state: GameState, spec: RivalSpec, c: CountryState): RivalB
     qtd: { revenue: 0, netIncome: 0 },
     quarters: [],
     priceWar: {},
+    shares: 0,
+    price: 0,
+    history: [],
+    high52: 0,
+    low52: 0,
+    sentiment: 1,
   };
   if (spec.ticker) bank.ticker = spec.ticker;
   state.rivals[spec.id] = bank;

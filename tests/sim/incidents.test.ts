@@ -49,8 +49,6 @@ describe('incident catalog', () => {
 
   it('does not raise later-stage incidents yet', () => {
     const { s } = openBank();
-    expect(raiseIncident(s, 'EXEC_POACHED', 'company', 'company')).toBeUndefined();
-    expect(raiseIncident(s, 'DIVIDEND_DUE', 'company', 'company')).toBeUndefined();
     expect(raiseIncident(s, 'INSIDER_PROBE', 'personal', 'personal')).toBeUndefined();
   });
 });

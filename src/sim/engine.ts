@@ -1,6 +1,6 @@
 // Tick orchestration (SIMULATION §2). `advanceDay` moves the clock and resolves
 // scheduled events; every 7th day runs `weeklyTick`, which calls each system in
-// the documented order. Steps 11 and 12 arrive with later stages.
+// the documented order.
 import { DAYS_PER_WEEK } from '../config/balance';
 import { runBooks } from './branch/books';
 import { addBranchCosts, closeBranchWeek } from './branch/branchPnl';
@@ -13,6 +13,11 @@ import { updateStaff } from './branch/staff';
 import { emptyWeek } from './branch/week';
 import { isQuarterStart, isYearStart } from './calendar';
 import { evaluateCapital } from './capital';
+import { runExecutives } from './executives';
+import { governanceQuarter, runGovernance } from './governance';
+import { marketsQuarter, runMarkets } from './market';
+import { runMergers } from './mergers';
+import { runPersonal } from './personal';
 import { checkFailure } from './failure';
 import { updateAppRating } from './company';
 import { pushEvent, trimEvents } from './events';
@@ -84,15 +89,22 @@ export function weeklyTick(state: GameState): void {
   updateAppRating(state);
   runBrandMarketing(state); // 8 (brand marketing)
   runCorporateDebt(state); // 8 (corporate debt)
+  runExecutives(state); // 8 (executives, §17.2)
+  runGovernance(state); // 8 (dividends due)
+  runMergers(state); // 8 (M&A responses and integrations, §19.8)
   depreciate(state); // 8
   closeWeek(state); // 9
   evaluateCapital(state); // 10
   checkFailure(state);
+  runPersonal(state); // 11
+  runMarkets(state); // 12
 
   if (isQuarterStart(state.meta.startDate, state.clock.day)) {
     quarterEnd(state); // 13
     regulatorReview(state); // 13 (§15)
     rivalsQuarter(state); // 13 (rival earnings and failures)
+    marketsQuarter(state); // 13 (listed earnings, IPO listing)
+    governanceQuarter(state); // 13 (board meeting unlocks)
   }
   if (isYearStart(state.meta.startDate, state.clock.day)) yearEnd(state); // 14
   runIncidents(state); // 15

@@ -51,8 +51,9 @@ describe('pin clustering', () => {
 
 /** Feature sets with the HQ stage off and on, whatever the build's flags say. */
 const NO_HQ = { ...FEATURES, hq: false, competition: false };
-const WITH_HQ = { ...FEATURES, hq: true, competition: false };
-const STAGE5 = { ...FEATURES, hq: true, competition: true };
+const WITH_HQ = { ...FEATURES, hq: true, competition: false, capitalMarkets: false };
+const STAGE5 = { ...FEATURES, hq: true, competition: true, capitalMarkets: false };
+const STAGE6 = { ...FEATURES, hq: true, competition: true, capitalMarkets: true };
 
 describe('map pins', () => {
   function setup() {
@@ -228,5 +229,19 @@ describe('map layers', () => {
       boolean
     >;
     expect(availableLayers(none)).toEqual([]);
+  });
+});
+
+describe('Stage 6 pins', () => {
+  it("adds the city's investment bank as a type medallion", () => {
+    const s = newGame({ seed: 42, cityId: 'cal', bankName: 'Pin Bank' });
+    const lots = Object.values(s.world.lots).filter((l) => l.cityId === 'cal');
+    const offices = Object.values(s.world.officeListings).filter((o) => o.cityId === 'cal');
+    const sites = Object.values(s.world.sites).filter((x) => x.cityId === 'cal');
+    const map = generateCityMap(CITIES.cal!, s.meta.seed, lots, { offices, sites });
+    const ib = buildPins(s, map, lots, STAGE6).filter((p) => p.kind === 'investmentBank');
+    expect(ib.map((p) => p.label.split(',')[0])).toEqual(['Ashgrove Capital']);
+    expect(ib[0]!.icon).toBe('investmentBanks');
+    expect(buildPins(s, map, lots, STAGE5).some((p) => p.kind === 'investmentBank')).toBe(false);
   });
 });

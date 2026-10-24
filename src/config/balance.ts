@@ -20,7 +20,7 @@ export const FEATURES = {
   /** Stage 5: rival AI, macro for every country, The Daily Ledger, incidents. */
   competition: true,
   /** Stage 6: governance, executives and capital markets. */
-  capitalMarkets: false,
+  capitalMarkets: true,
   /** Stage 7: ventures, conventions and real estate. */
   investments: false,
   /** Stage 8: every city, airports and travel. */
@@ -1128,3 +1128,123 @@ export const STUDENT_PARTNERSHIP = {
  * and HQ floors (§6.3).
  */
 export const GRAD_PROGRAM = { yearlyCost: 120_000, skillBonus: 10, hireBonus: 1 } as const;
+
+// ─── PERSONAL (SIMULATION §22) ────────────────────────────────────────────────
+export const PERSONAL_TAX = 0;
+
+// ─── EXECUTIVES (SIMULATION §17.2) ────────────────────────────────────────────
+/**
+ * execMult = multBase + multSlope × expertise/100 on the departments in an
+ * executive's domain; an empty CTO seat reads `vacantCtoExpertise`.
+ * Resignation p/week = resignBase × (resignLoyalty − loyalty/100) ×
+ * (pay/market < underpaidRatio ? underpaidMult : 1) × (unvested grants ? grantMult : 1).
+ * Market salary = (salaryBase + salaryPerBillion × total assets in $B) × city
+ * wageIndex, capped at salaryMax (assumption, decision log). Candidates per seat
+ * refresh every `refreshWeeks`; skills roll in `skillRange`.
+ */
+export const EXECUTIVES = {
+  multBase: 0.9,
+  multSlope: 0.25,
+  vacantCtoExpertise: 30,
+  resignBase: 0.002,
+  resignLoyalty: 1.5,
+  underpaidRatio: 0.9,
+  underpaidMult: 2,
+  grantMult: 0.5,
+  salaryBase: 180_000,
+  salaryPerBillion: 60_000,
+  salaryMax: 2_500_000,
+  refreshWeeks: 4,
+  candidatesPerSeat: 3,
+  skillRange: [35, 90] as [number, number],
+  /** EXEC_POACHED counter-offer: salary × (1 + raise), loyalty + loyaltyGain. */
+  counterRaise: 0.25,
+  counterLoyalty: 10,
+  /** Severance on firing, in weeks of salary. */
+  severanceWeeks: 26,
+  /** Grants vest yearly in equal parts over `vestYears`. */
+  vestYears: 4,
+} as const;
+
+// ─── GOVERNANCE (DESIGN §5.13, SIMULATION §15) ────────────────────────────────
+/**
+ * Dividends are paid `payDelayWeeks` after the board declares them (a liability
+ * until then). Watch tier caps a quarter's dividend at watchCap × trailing four
+ * quarters' net income ÷ 4; Restricted and Critical forbid dividends.
+ */
+export const GOVERNANCE = {
+  payDelayWeeks: 3,
+  watchCap: 0.5,
+  meetingsKept: 8,
+} as const;
+
+// ─── MARKETS (SIMULATION §19) ─────────────────────────────────────────────────
+/** Cost of equity (§19.2). */
+export const COE = 0.1;
+/** Private valuation: P/B = clamp(ROE/COE, pb) × discount (§19.2). */
+export const PRIVATE_VALUATION = { pb: [0.5, 2.5] as [number, number], discount: 0.8 } as const;
+/** Private placement (§19.3). */
+export const PLACEMENT = { maxPct: 0.25, discount: 0.9, maxRounds: 3, gapWeeks: 26 } as const;
+/** IPO (§19.4). */
+export const IPO = {
+  minEquity: 25_000_000,
+  profitableQuarters: 4,
+  minFinanceCoverage: 0.8,
+  minRecessionCr: 0.14,
+  floatPct: [0.1, 0.4] as [number, number],
+  roeClamp: [0.5, 3] as [number, number],
+  discount: 0.9,
+} as const;
+export const IPO_MIN_EQUITY = IPO.minEquity;
+/** Your bank and listed rivals while public (§19.5). */
+export const PUBLIC_PRICE = {
+  roeClamp: [0.3, 3] as [number, number],
+  irPenalty: 0.15,
+  sentimentSigma: 0.02,
+  sentimentRevert: 0.05,
+  incidentShock: [0.03, 0.15] as [number, number],
+  earningsShockMax: 0.08,
+  dividendRaise: 0.03,
+  dividendCut: 0.06,
+  ema: 0.15,
+  noise: 0.025,
+} as const;
+/** Secondary offering (§19.6). */
+export const SECONDARY = {
+  discount: 0.03,
+  defaultFee: 0.0455,
+  impact: [0.02, 0.05] as [number, number],
+} as const;
+export const SECONDARY_DISCOUNT = SECONDARY.discount;
+/** Listed companies (§19.1). */
+export const STOCK_MARKET = {
+  shockSigma: 0.018,
+  earningsSurprise: 0.04,
+  priceFloor: 1,
+  historyWeeks: 104,
+  startIndex: 1000,
+} as const;
+/** Trading commission (§19.7). */
+export const COMMISSION = 0.001;
+/** Risk weight on stocks held by the company (§15). */
+export const STOCK_RISK_WEIGHT = 2.5;
+export const QUARTERS_PER_YEAR = 4;
+
+// ─── M&A (SIMULATION §19.8) ───────────────────────────────────────────────────
+export const MERGERS = {
+  reqHealthy: 0.3,
+  reqWatch: 0.15,
+  reqDistressed: -0.2,
+  /** Rival CR below this counts as Watch tier for the premium it requires. */
+  watchCr: 0.105,
+  sigmoidScale: 0.06,
+  retryWeeks: 4,
+  minProFormaCr: 0.105,
+  maxCityShare: 0.35,
+  fastTrackShare: 0.45,
+  conversionWeeks: 8,
+  moraleHit: 10,
+  /** A distressed network's asking price as P/B (§18.5). */
+  distressedPb: [0.4, 0.7] as [number, number],
+} as const;
+export const REBRAND_COST = 60_000;

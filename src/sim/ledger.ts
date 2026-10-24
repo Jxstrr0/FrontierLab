@@ -34,6 +34,13 @@ export const PNL_LINES: readonly PnlLine[] = [
   'incidents',
   'corporateInterest',
   'amortization',
+  'execPay',
+  'grantExpense',
+  'integration',
+  'commissions',
+  'dividendIncome',
+  'investmentGains',
+  'acquisitionGain',
   'loanLosses',
   'depreciation',
   'tax',
@@ -53,6 +60,9 @@ export const FEE_INCOME: readonly PnlLine[] = [
   'atmFees',
   'originationFees',
   'realizedGains',
+  'dividendIncome',
+  'investmentGains',
+  'acquisitionGain',
 ];
 export const OPEX: readonly PnlLine[] = [
   'branchStaff',
@@ -70,6 +80,10 @@ export const OPEX: readonly PnlLine[] = [
   'incidents',
   'corporateInterest',
   'amortization',
+  'execPay',
+  'grantExpense',
+  'integration',
+  'commissions',
 ];
 /** Lines that don't move corporate cash (§14.3). */
 export const NON_CASH: readonly PnlLine[] = [
@@ -77,6 +91,9 @@ export const NON_CASH: readonly PnlLine[] = [
   'depreciation',
   'amortization',
   'realizedGains',
+  'grantExpense',
+  'investmentGains',
+  'acquisitionGain',
 ];
 
 export function emptyLedger(): Ledger {

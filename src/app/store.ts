@@ -25,16 +25,23 @@ export type PanelRoute =
   | { type: 'employer'; siteId: string }
   | { type: 'university'; siteId: string }
   | { type: 'ledger'; week?: number }
+  // Stage 6 (FEATURES.capitalMarkets)
+  | { type: 'investmentBank'; siteId: string; tab?: InvestmentBankTab }
   | { type: 'company' }
   | { type: 'branches' }
   | { type: 'cityList' }
   | { type: 'settings' }
   | { type: 'saves' };
 
+export type InvestmentBankTab = 'market' | 'equity' | 'mna';
+
 export type BranchTab = 'service' | 'products' | 'loandesk' | 'marketing' | 'finance';
 
 export type ModalRoute =
-  { type: 'weekly'; week: number } | { type: 'incident' } | { type: 'gameover' };
+  | { type: 'weekly'; week: number }
+  | { type: 'incident' }
+  | { type: 'boardMeeting' }
+  | { type: 'gameover' };
 
 export interface Toast {
   id: number;

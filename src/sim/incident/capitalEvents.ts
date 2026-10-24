@@ -3,6 +3,7 @@
 // recapitalisation quote, accepting it, and the regulator takeover.
 import { BANK_RUN, FAILURE, RECAP, RECAP_DISCOUNT } from '../../config/balance';
 import { capitalSnapshot } from '../capital';
+import { issueShares } from '../shares';
 import { pushEvent } from '../events';
 import { postCash } from '../ledger';
 import type { GameState } from '../state';
@@ -69,7 +70,11 @@ export function acceptRecap(state: GameState): RecapQuote {
   const c = state.company;
   postCash(state, q.amount, 'financing');
   c.paidInCapital += q.amount;
-  c.sharesOutstanding += q.shares;
+  issueShares(
+    state,
+    { id: 'regulator', name: 'Deposit Protection Fund', kind: 'regulator' },
+    q.shares,
+  );
   c.capitalRatio = capitalSnapshot(state).capitalRatio;
   c.lowCapitalWeeks = 0;
   const week = state.clock.week;
