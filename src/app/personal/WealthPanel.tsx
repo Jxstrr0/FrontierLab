@@ -45,7 +45,9 @@ export function WealthPanel() {
           </div>
           <button type="button" class="pw-rank" onClick={() => setRichList(true)}>
             {rank ? `#${rank} on the Rich List` : 'Not yet on the Rich List'}
-            <span aria-hidden="true"> ›</span>
+            <span class="pw-rank-more" aria-hidden="true">
+              ›
+            </span>
           </button>
         </Card>
         <Card>

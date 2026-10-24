@@ -39,6 +39,9 @@
   font-weight: 600;
   letter-spacing: 0.02em;
 }
+.pw-rank-more {
+  margin-left: var(--space-2);
+}
 .pw-rank:active {
   background: var(--vault-raised);
 }
