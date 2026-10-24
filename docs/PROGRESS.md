@@ -10,6 +10,10 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-10-24 — Next week button
+- **Done:** a ▶| button in the date pill (top right) jumps to the end of the current week, shows the weekly results and pauses, so you can play week by week instead of watching days tick by. It runs through the same simulation steps as normal play, so nothing about the numbers changes. When paused, the pill now shows just the date (the ▶ button already says it's paused).
+- **Next:** Stage 4.
+
 ### 2026-10-24 — Stage 3 built: the engraved city map
 - **Stage / step:** 3 — The city map (Banknote Deco v1)
 - **Done:**

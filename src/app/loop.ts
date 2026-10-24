@@ -1,8 +1,9 @@
 // The real-time game loop (DESIGN §5.1). At 1× one game day passes per second
 // (DAY_MS); 2× and 4× scale that. After each weekly tick it autosaves, shows the
 // weekly results when settings ask for it, and pauses for game over or expiring
-// loan applications. Hidden tabs pause time.
-import { DAY_MS } from '../config/balance';
+// loan applications. Hidden tabs pause time. stepWeek() runs the rest of the
+// current week at once and leaves the game paused, for week-by-week play.
+import { DAY_MS, DAYS_PER_WEEK } from '../config/balance';
 import { isQuarterStart } from '../sim/calendar';
 import { advanceDay } from '../sim/engine';
 import type { GameState } from '../sim/state';
@@ -43,6 +44,19 @@ export function pause(reason?: string): void {
   if (!s) return;
   s.clock.speed = 0;
   if (reason) s.clock.pausedReason = reason;
+  bump();
+}
+
+/** Plays out the days left in this week instantly, then pauses (week-by-week play). */
+export function stepWeek(): void {
+  const s = peekGame();
+  if (!s || s.flags.gameOver || modal.value) return;
+  s.clock.speed = 0;
+  delete s.clock.pausedReason;
+  acc = 0;
+  const week = s.clock.week;
+  for (let i = 0; i < DAYS_PER_WEEK && s.clock.week === week; i++) advanceDay(s);
+  if (s.clock.week !== week) afterWeek(s);
   bump();
 }
 

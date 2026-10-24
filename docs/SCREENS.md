@@ -20,7 +20,8 @@ Every building panel uses the same five parts, mirroring the original's structur
 - **Top-left:** bank medallion + corporate cash. Tap → Company summary (§24).
 - **Top-right:** date pill and speed control.
   - Tap cycles 1× → 2× → 4×. Long-press or the ❚❚ button pauses.
-  - While paused, the pill shows ❚❚ and dims.
+  - While paused, the pill hides the speed and dims.
+  - **Next week** button (▶|): plays out the rest of the week instantly, runs the weekly tick (weekly results, autosave, auto-pause checks) and leaves the game paused. This allows week-by-week play.
 - **Bottom-left:** Layers button.
 - **Bottom-center:** city pill with an engraved flag. Tap → Travel sheet (the nearest airport's departures, plus "Fly now" if you own a jet).
 - **Bottom-right:** Menu.
