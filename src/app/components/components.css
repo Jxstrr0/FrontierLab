@@ -790,3 +790,70 @@
   font-size: 7px;
   fill: var(--ivory-dim);
 }
+
+/* ─── Line chart (ART_DIRECTION §5: 1.5 px strokes, dotted "now") ─────── */
+.linechart svg {
+  width: 100%;
+  height: 140px;
+  display: block;
+  overflow: visible;
+}
+.linechart-axis {
+  stroke: var(--hairline);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.linechart-now {
+  stroke: var(--brass);
+  stroke-width: 1;
+  stroke-dasharray: 2 3;
+  vector-effect: non-scaling-stroke;
+}
+.linechart-line {
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+.linechart-ivory {
+  stroke: var(--ivory);
+}
+.linechart-brass {
+  stroke: var(--brass-light);
+}
+.linechart-jade {
+  stroke: var(--jade);
+}
+.linechart-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--text-12);
+  color: var(--ivory-dim);
+  margin-top: var(--space-1);
+}
+.linechart-legend {
+  display: flex;
+  gap: var(--space-4);
+  justify-content: center;
+  font-size: var(--text-12);
+  margin-top: var(--space-2);
+  color: var(--ivory-dim);
+}
+.lg-line::before {
+  content: '';
+  display: inline-block;
+  width: 14px;
+  height: 2px;
+  margin-right: 6px;
+  vertical-align: 3px;
+}
+.lg-line-ivory::before {
+  background: var(--ivory);
+}
+.lg-line-brass::before {
+  background: var(--brass-light);
+}
+.lg-line-jade::before {
+  background: var(--jade);
+}

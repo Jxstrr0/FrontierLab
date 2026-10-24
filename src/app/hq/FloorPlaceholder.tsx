@@ -1,6 +1,5 @@
 // Placeholder cards for floor content that later Stage 4 passes fill in
-// (Products, Treasury, Marketing and Risk floors, digital projects, the credit
-// bureau and marketing agency sites). Each says what is coming and with what,
+// (Treasury, Marketing and Risk floors and the marketing agency site). Each says what is coming and with what,
 // so the floor is honest about what works today.
 //
 // PLACEHOLDER: replace each <FloorPlaceholder> (and the PLACEHOLDER_FLOORS
@@ -28,18 +27,6 @@ interface PlaceholderSpec {
 
 /** What each not-yet-built floor will hold (SCREENS §10). */
 export const PLACEHOLDER_FLOORS: Partial<Record<DeptId, PlaceholderSpec[]>> = {
-  products: [
-    {
-      title: 'House model',
-      arrives: 'Arrives with the Products update',
-      body: 'Your underwriting model, its rosette and cost per application, and Manage models.',
-    },
-    {
-      title: 'Product lineup and developments',
-      arrives: 'Arrives with the Products update',
-      body: 'Risk appetite, the company lineup with "Apply rates to all branches", the deposits and loans trend, and new product developments.',
-    },
-  ],
   treasury: [
     {
       title: 'Liquidity and funding',

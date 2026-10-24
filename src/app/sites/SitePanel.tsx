@@ -12,6 +12,7 @@ import { FloorPlaceholder } from '../hq/FloorPlaceholder';
 import { LayerMedallion } from '../map/LayerIcon';
 import { siteName } from '../map/pins';
 import { closePanel, useGame } from '../store';
+import { BureauBody } from './BureauBody';
 import { SiteArt } from './SiteArt';
 import './sites.css';
 
@@ -58,7 +59,11 @@ export function SitePanel(p: { siteId: string; kind: SiteKind }) {
       hero={<SiteArt kind={site.kind} />}
     >
       <div class="stack">
-        <FloorPlaceholder title={copy.title} arrives={copy.arrives} body={copy.body} />
+        {site.kind === 'bureau' ? (
+          <BureauBody site={site} />
+        ) : (
+          <FloorPlaceholder title={copy.title} arrives={copy.arrives} body={copy.body} />
+        )}
       </div>
     </Panel>
   );
