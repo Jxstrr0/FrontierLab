@@ -69,6 +69,7 @@ How a lot's values are derived:
 - **Rent:** base × city.rentIndex × (traffic / district traffic)^0.6 × U(0.9, 1.1).
 - **Deposit:** 6 × rent.
 - **incomeIndex:** district income × city.incomeIndex × U(0.9, 1.1).
+- **Position:** a point drawn around the district centre (balance `CITYGEN.layout`), snapped to the nearest free tile facing a street. Streets run every 4th row and column (`CITY_LAYOUT.block`); water cities have a wavy shoreline near the far edge (`CITY_LAYOUT.shore`).
 
 ## 4. Segments
 
