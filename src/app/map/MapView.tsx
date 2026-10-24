@@ -131,7 +131,12 @@ export function MapView() {
     const pKey = pinsKey(pins);
     if (pKey !== keys.current.pins) {
       keys.current.pins = pKey;
-      c.setPins(pins);
+      // Pin medallions are drawn with Preact's render(). Preact may flush this
+      // effect inside MapView's next render, where a nested render() breaks its
+      // hooks, so the pins go in just after the current render finishes.
+      queueMicrotask(() => {
+        if (ctrl.current === c) c.setPins(pins);
+      });
     }
   });
 

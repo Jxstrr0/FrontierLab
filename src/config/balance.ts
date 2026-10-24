@@ -26,7 +26,7 @@ export const FEATURES = {
   /** Stage 8: every city, airports and travel. */
   multiCity: true,
   /** Stage 9: personal wealth, homes, cars, auctions, franchise. */
-  personalEmpire: false,
+  personalEmpire: true,
   /** Stage 10: art pass, tutorial, sound, PWA. */
   polish: false,
 } as const;
@@ -1205,17 +1205,62 @@ export const FRANCHISE = {
   revenueYield: 0.12,
   revenueSplit: { tickets: 0.3, broadcasting: 0.4, merchandise: 0.15, sponsorship: 0.15 },
   opsShare: 0.25,
+  /** Payroll (stars + others) ≈ this share of yearly revenue at seeding. */
   payrollShare: 0.55,
+  /** The five stars' share of that payroll (the reference club: 82M of 132M). */
+  starShare: 0.6,
   leagueGrowth: 0.05,
+  /** Weekly σ of every club's value noise around leagueGrowth/52. */
+  valueNoise: 0.004,
+  /** Your club's value moves up to ± this at season end, by win %. */
   performanceSwing: 0.1,
   kitAwareness: 0.004,
   gamesPerSeason: 40,
+  /** The season runs this many weeks from seasonStartWeek (week of the year). */
+  seasonWeeks: 40,
   seasonStartWeek: 36,
+  /** Finish position: the notional league's size and the win % mapped to 1st and last. */
+  leagueSize: 12,
+  finishWinPct: [0.25, 0.75],
+  /** Win chance = 0.5 + (mean star rating − avgRating) × perRating, clamped to range. */
+  winChance: { avgRating: 81, perRating: 0.025, range: [0.15, 0.85] },
+  /** Football games can be drawn (other sports play to a result). */
+  drawChance: 0.22,
+  /** Fan mood (0–100): start range, per win/loss, weekly pull toward 50, per place above 6.5th at season end. */
+  fanMood: { start: [45, 70], perWin: 0.8, perLoss: 0.8, drift: 0.02, perPlace: 2 },
+  /** Tickets and merchandise × (base + perMood × fanMood/100): 1.0 at mood 50. */
+  fanRevenue: { base: 0.6, perMood: 0.8 },
+  /** Star players: rating range at seeding, contract years, rating drift per season. */
+  starRating: [70, 92],
+  contractYears: [1, 5],
+  ratingDrift: 2,
+  ratingRange: [40, 99],
+  /** σ on win % when seeding each club's last-season finish. */
+  seedFinishNoise: 0.06,
+  /** Salary weight 1 + (rating − salaryPivot) × salaryPerRating, at least salaryFloor. */
+  salaryPivot: 80,
+  salaryPerRating: 0.04,
+  salaryFloor: 0.3,
+  maxStars: 5,
+  /** An empty star slot plays at this rating (releasing a star never makes the side stronger). */
+  replacementRating: 60,
   transferWindows: [
     [1, 4],
     [27, 34],
   ],
+  /** Transfer market while a window is open: players, rating range, fee = salary × feeYears. */
+  marketSize: [4, 6],
+  marketRating: [68, 95],
+  feeYears: [1.5, 3],
+  /** Releasing a star pays this share of the salary left on the contract. */
+  releaseShare: 0.5,
+  /** Offers at or above offerMin × value are accepted (a flat threshold). */
   offerMin: 0.9,
+  /** The offer stepper's floor and step, as shares of the valuation. */
+  offerFloor: 0.8,
+  offerStep: 0.01,
+  /** Selling a club returns value × (1 − saleFee). */
+  saleFee: 0.03,
   riskWeight: 2.5,
 } as const;
 /** Rich list (§22): 50 generated fortunes growing 4–8% a year; ranked at year end. */
