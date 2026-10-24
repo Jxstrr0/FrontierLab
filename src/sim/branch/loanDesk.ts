@@ -25,6 +25,7 @@ import { effectiveAwareness, type CampaignEffects } from './marketing';
 import { branchPrice } from './pricing';
 import { managerOf } from './staff';
 import type { BranchWeek } from './week';
+import { difficultyOf } from '../difficulty';
 
 type Collateral = LoanApplication['collateral'];
 
@@ -146,7 +147,7 @@ function generateApplication(state: GameState, branch: Branch, rng: Rng): LoanAp
       LOANDESK.maxRateSlope * (5 - avg) +
       rng.normal(0, LOANDESK.maxRateSigma),
     pentagon,
-    hiddenPd: pdFromScore(avg, collateral),
+    hiddenPd: pdFromScore(avg, collateral) * difficultyOf(state).lossMult,
     lgd: LOANDESK.collateralLgd[collateral],
     estPd: pdFromScore(avg + rng.normal(0, sigma), collateral) * creditCycle(country),
     createdWeek: state.clock.week,

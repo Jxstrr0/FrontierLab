@@ -23,12 +23,12 @@ Starting values are fictional. Meeting weeks are weeks of the year.
 
 | id | City | Country | Size | Tiles | Lat, Lon | rentIndex | wageIndex | incomeIndex | costIndex | Incumbent | Rivals | Ink | Start |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| sas | Saskatoon | CA | S | 40 | 52.13, −106.67 | 0.55 | 0.88 | 0.95 | 0.85 | 0.25 | 2 | Prairie Ochre | Easy |
-| cal | Calgary | CA | M | 52 | 51.05, −114.07 | 0.75 | 0.98 | 1.10 | 0.95 | 0.32 | 3 | Foothill Olive | Normal |
+| sas | Saskatoon | CA | S | 40 | 52.13, −106.67 | 0.55 | 0.88 | 0.95 | 0.85 | 0.25 | 2 | Prairie Ochre | yes |
+| cal | Calgary | CA | M | 52 | 51.05, −114.07 | 0.75 | 0.98 | 1.10 | 0.95 | 0.32 | 3 | Foothill Olive | yes |
 | van | Vancouver | CA | M | 56 | 49.28, −123.12 | 1.10 | 1.02 | 1.10 | 1.05 | 0.35 | 3 | Harbour Blue | |
-| tor | Toronto | CA | L | 68 | 43.65, −79.38 | 1.15 | 1.05 | 1.15 | 1.05 | 0.40 | 4 | Polymer Teal | Hard |
+| tor | Toronto | CA | L | 68 | 43.65, −79.38 | 1.15 | 1.05 | 1.15 | 1.05 | 0.40 | 4 | Polymer Teal | yes |
 | mtl | Montréal | CA | M | 56 | 45.50, −73.57 | 0.80 | 0.95 | 1.00 | 0.95 | 0.35 | 3 | Rose Granite | |
-| nyc | New York | US | XL | 80 | 40.71, −74.01 | 1.60 | 1.20 | 1.35 | 1.30 | 0.45 | 5 | Federal Green | Expert |
+| nyc | New York | US | XL | 80 | 40.71, −74.01 | 1.60 | 1.20 | 1.35 | 1.30 | 0.45 | 5 | Federal Green | yes |
 | chi | Chicago | US | L | 68 | 41.88, −87.63 | 1.00 | 1.05 | 1.10 | 1.00 | 0.40 | 4 | Lake Steel | |
 | sfo | San Francisco | US | L | 64 | 37.77, −122.42 | 1.55 | 1.25 | 1.45 | 1.30 | 0.40 | 4 | Fog Violet | |
 | sea | Seattle | US | M | 56 | 47.61, −122.33 | 1.15 | 1.15 | 1.30 | 1.10 | 0.35 | 3 | Evergreen | |

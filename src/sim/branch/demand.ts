@@ -32,6 +32,7 @@ import { activeModel, RADAR } from '../underwriting';
 import { effectiveAwareness, type CampaignEffects } from './marketing';
 import { branchPrice, isOffered, priceFactor } from './pricing';
 import { capacity, visitRate } from './staff';
+import { difficultyOf } from '../difficulty';
 
 export interface Origination {
   newAccounts: number;
@@ -140,6 +141,7 @@ export function runDemand(state: GameState, branch: Branch, fx: CampaignEffects)
   const prospects =
     lot.footTraffic *
     PROSPECT_RATE *
+    difficultyOf(state).demandMult *
     (AWARENESS_FLOOR + (1 - AWARENESS_FLOOR) * e) *
     Math.sqrt(loanDemand(country)) *
     (1 - penetration) ** SATURATION_EXP *

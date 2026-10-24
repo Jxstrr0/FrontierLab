@@ -18,6 +18,8 @@ export type SegmentMix = Record<SegmentId, number>;
 export type CategoryId = 'deposits' | 'lending' | 'cards';
 export type DistrictId =
   'financial' | 'downtown' | 'midtown' | 'university' | 'suburbs' | 'industrial' | 'waterfront';
+export type Difficulty = 'easy' | 'normal' | 'hard' | 'expert';
+
 export type Phase = 'expansion' | 'slowdown' | 'recession' | 'recovery';
 export type Tier = 'strong' | 'adequate' | 'watch' | 'restricted' | 'critical';
 export type RatingCategory = 'rates' | 'products' | 'service' | 'branch';

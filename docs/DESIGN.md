@@ -119,11 +119,11 @@ There's no fixed ending. Milestones, the annual rich list and the "fastest growi
 - Real cities with procedurally generated maps, seeded per city, with no real street layouts.
 - Each city has districts with their own foot traffic, demographics, incomes and rents: Financial, Downtown, Midtown, University, Suburbs, Industrial and Waterfront.
 - Pins mark every interactive building. The Layers sheet filters the 14 types in §3.1.
-- The start city sets difficulty:
-  - Saskatoon (Easy): cheap rents, few rivals, small market
-  - Calgary (Normal)
-  - Toronto (Hard)
-  - New York (Expert)
+- **Start cities:** Saskatoon (small market, cheap rents), Calgary, Toronto and New York (biggest market, highest rents). The city sets the market's character, not the difficulty.
+- **New Game options:**
+  - **Difficulty:** Easy, Normal, Hard or Expert. Harder levels mean fewer prospects, better-run rivals with sharper rates, and more loan defaults (SIMULATION §26 `DIFFICULTY`). Normal is the balance reference.
+  - **Competitors:** 1–5 rival banks in each city, defaulting to the city's usual count (CONTENT §2). Fewer rivals also means fewer rival branches.
+  - **Starting cash:** $500k, $750k (default), $1M or $1.25M of spendable cash. Charter capital stays at $2M.
 - Other cities open up through travel (§5.17).
 
 ### 5.3 Storefronts and building a branch
@@ -429,4 +429,5 @@ Add one dated line per decision. Never delete entries; supersede them.
 - 2026-10-24 (owner's call): Keep CONTENT's fee levels; a mature branch earns about $45–70k a week, close to the original's store economics. SIMULATION §25 targets updated to match.
 - 2026-10-24: Stage 1 calibration: CATCHMENT_MULT 2.5 → 1.0, PROSPECT_RATE 0.030 → 0.040, SATURATION_EXP 2.5 → 2.8, price factors use PF_RATE_STEP 0.01, FX_PER_CUSTOMER 1,800 → 900, Loan Desk median amount $120k → $70k, lower deposit and wealth tickets, mortgage approval 0.48 (CONTENT §5).
 - 2026-10-24: Insolvency and game-over checks are deferred to Stage 2, when there is a UI to show them.
+- 2026-10-24 (owner's call): Difficulty is its own New Game setting (Easy, Normal, Hard, Expert) instead of coming from the start city. The wizard also picks 1–5 competitors and a starting cash amount from a small range ($500k–$1.25M). Normal, the city's usual rival count and $750k reproduce the balance reference exactly.
 

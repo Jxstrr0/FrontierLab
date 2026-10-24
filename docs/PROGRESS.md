@@ -4,11 +4,22 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 **Current stage:** 2 — Playable loop in plain UI (next)
 **Live URL:** (after the first deploy) https://jxstrr0.github.io/VaultStreet/
-**Determinism snapshot:** `19e37774caa954` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `1cb1b0083d5917` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-24 — New Game options (Stage 1 addendum)
+- **Stage / step:** 1 addendum, before Stage 2
+- **Done:**
+  - Difficulty (Easy, Normal, Hard, Expert) as its own setting: prospects, rival quality, rival rates and loan default rates scale by level (`DIFFICULTY` in balance.ts).
+  - Competitors: 1–5 rival banks per city; rival branch totals scale with the count.
+  - Starting cash: $500k, $750k, $1M or $1.25M.
+  - Schema v2 with a 1 → 2 migration; `npm run balance` takes `--difficulty`, `--competitors` and `--cash`; 4 new tests (37 total).
+- **Decisions:** the owner asked for difficulties, a 1–5 competitor option and a small range of starting cash. Start cities no longer set the difficulty.
+- **Balance report:** Normal, 3 competitors and $750k reproduce the old run exactly (the old hash matches once the new fields are stripped); the snapshot changed only because saves now carry the new fields. Year-1 deposits (steady, Calgary): Easy $104M, Normal $95M, Hard $73M, Expert $51M; 1 competitor $125M, 5 competitors $47M.
+- **Next:** Stage 2.
 
 ### 2026-10-24 — Stage 1 complete
 - **Date:** 2026-10-24

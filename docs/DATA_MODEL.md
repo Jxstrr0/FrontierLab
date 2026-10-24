@@ -324,7 +324,7 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 | Personal | `buyHome`, `rebuildHome`, `buyCar`, `placeBid`, `appraise`, `consign`, `buyJet`, `buyFranchise`, `setKit`, `signPlayer`, `releasePlayer` |
 | Settings and saves | `updateSettings`, `saveToSlot`, `loadSlot`, `exportCode`, `importCode` |
 
-## 12. Implemented so far (schema v1, Stage 1)
+## 12. Implemented so far (schema v2, Stage 1)
 
 `src/sim/state.ts` is the source of truth; this section records how it differs from the guide above. Later stages add the rest with a schema bump and a migration.
 
@@ -333,6 +333,7 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 - **Added fields:**
   - `ledger`: P&L lines and cash movements since the last weekly close, so commands between ticks land in the right week.
   - `nextId`: counter for generated ids.
+  - `meta.difficulty` (`'easy' | 'normal' | 'hard' | 'expert'`), `meta.competitors` (1–5) and `meta.startCash` (schema v2; migration 1 → 2 fills Normal, the city's usual rival count and $750k).
   - `company.retainedEarnings`, `company.leaseDeposits` (an asset). `company.liquidityRatio` is `null` while there are no deposits.
   - `CountryState`: `hpiHistory`, `prevFtpShort`/`prevFtpLong` (to detect moves), `cardAnchor`, `startPolicy`, `feeIndex`, `marketReturn`, `forceRecessionAtWeek`.
   - `Lot.address`; `Branch.builtDay`, `Branch.last` (prospects, captured, served, share); `ReviewCard` unchanged.

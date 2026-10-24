@@ -1,13 +1,15 @@
 // Creates a fresh GameState (SIMULATION §26 START constants): one city with its
-// lots and rivals, the home country's macro, $750k of corporate cash and $2M of
-// charter capital held in treasury reserves.
+// lots and rivals, the home country's macro, the chosen corporate cash ($750k by
+// default) and $2M of charter capital held in treasury reserves.
 import {
   BOND_SHARE_DEFAULT,
   CHARTER_CAPITAL,
+  COMPETITORS,
   DEFAULT_RISK_APPETITE,
   LIQ_TARGET_DEFAULT,
   START_APP_RATING,
   START_CASH,
+  START_CASH_OPTIONS,
   START_DATE,
   START_SHARES,
 } from '../config/balance';
@@ -24,6 +26,7 @@ import { stream } from './rng';
 import { seedRivals } from './rivals';
 import { SCHEMA_VERSION, type AvatarSpec, type GameState, type Settings } from './state';
 import { packagedModel } from './underwriting';
+import type { Difficulty } from '../data/types';
 
 export interface NewGameOptions {
   seed: number;
@@ -35,6 +38,11 @@ export interface NewGameOptions {
   founderAvatar?: AvatarSpec;
   startDate?: string;
   version?: string;
+  difficulty?: Difficulty;
+  /** Rival banks per city, 1–5; defaults to the city's usual count. */
+  competitors?: number;
+  /** One of START_CASH_OPTIONS. */
+  startCash?: number;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -65,6 +73,13 @@ export function newGame(opts: NewGameOptions): GameState {
   if (!city) throw new Error(`Unknown city ${opts.cityId}`);
   const bankName = opts.bankName ?? 'Vault Street Bank';
   const model = packagedModel(DEFAULT_MODEL_ID);
+  const startCash = opts.startCash ?? START_CASH;
+  if (!(START_CASH_OPTIONS as readonly number[]).includes(startCash)) {
+    throw new Error(`Starting cash must be one of ${START_CASH_OPTIONS.join(', ')}`);
+  }
+  const competitors = Math.round(
+    Math.min(COMPETITORS.max, Math.max(COMPETITORS.min, opts.competitors ?? city.rivals)),
+  );
 
   const state: GameState = {
     schemaVersion: SCHEMA_VERSION,
@@ -78,14 +93,17 @@ export function newGame(opts: NewGameOptions): GameState {
       seed: opts.seed,
       startDate: opts.startDate ?? START_DATE,
       createdWith: opts.version ?? 'dev',
+      difficulty: opts.difficulty ?? 'normal',
+      competitors,
+      startCash,
     },
     clock: { day: 0, week: 0, speed: 0 },
     rng: {},
     settings: structuredClone(DEFAULT_SETTINGS),
     world: { currentCityId: city.id, countries: {}, cities: {}, lots: {} },
     company: {
-      cash: START_CASH,
-      paidInCapital: START_CASH + CHARTER_CAPITAL,
+      cash: startCash,
+      paidInCapital: startCash + CHARTER_CAPITAL,
       retainedEarnings: 0,
       sharesOutstanding: START_SHARES,
       taxPayable: 0,
