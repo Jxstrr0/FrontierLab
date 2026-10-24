@@ -4,7 +4,8 @@ import { BRAND_INKS } from '../../data/brandInks';
 import { CITIES } from '../../data/cities';
 import type { Difficulty } from '../../data/types';
 import { COMPETITORS, START_CASH } from '../../config/balance';
-import type { AvatarSpec } from '../../sim/state';
+import type { AvatarSpec, Settings } from '../../sim/state';
+import { loadPrefs } from '../saves';
 
 export interface Draft {
   bankName: string;
@@ -18,6 +19,8 @@ export interface Draft {
   difficulty: Difficulty;
   competitors: number;
   startCash: number;
+  /** Currency symbol money is shown in (changeable later in Settings). */
+  currency: Settings['currency'];
   seed: number;
 }
 
@@ -47,6 +50,7 @@ export function initialDraft(): Draft {
     difficulty: 'normal',
     competitors: usualCompetitors(cityId),
     startCash: START_CASH,
+    currency: loadPrefs().currency ?? '$',
     seed: randomSeed(),
   };
 }

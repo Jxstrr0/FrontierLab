@@ -61,6 +61,7 @@ export function NewGameWizard() {
       difficulty: draft.difficulty,
       competitors: draft.competitors,
       startCash: draft.startCash,
+      currency: draft.currency,
     });
   const quickStart = () => startGame({ seed: randomSeed(), cityId: 'cal' });
 
