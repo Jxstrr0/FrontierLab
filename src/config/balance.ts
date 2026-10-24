@@ -457,11 +457,10 @@ export const CITYGEN = {
     university: { cx: 0.28, cy: 0.3, spread: 0.1 },
     suburbs: { cx: 0.75, cy: 0.75, spread: 0.2 },
     industrial: { cx: 0.2, cy: 0.78, spread: 0.12 },
-    waterfront: { cx: 0.5, cy: 0.88, spread: 0.1 },
+    waterfront: { cx: 0.5, cy: 0.84, spread: 0.07 },
   },
   /** Keep lots this fraction away from the map edge. */
   edge: 0.03,
-  placementTries: 50,
   maxStreetNumber: 999,
   maxSeed: 2 ** 31 - 1,
   /** Share of storefront lots per district, by city size. */
@@ -503,6 +502,16 @@ export const CITYGEN = {
       waterfront: 0.1,
     },
   },
+} as const;
+
+/** Street grid and shoreline (Stage 3; ART_DIRECTION §2). Lots snap to street frontage. */
+export const CITY_LAYOUT = {
+  /** A street every 4th row and column: 3×3 blocks of buildings between them. */
+  block: 4,
+  /** No lots this many tiles from the map edge. */
+  edgeTiles: 2,
+  /** Shoreline row = tiles × (base + amplitude × cos(2π(waves·x/tiles + phase))). */
+  shore: { base: 0.91, amplitude: 0.025, waves: 1.5 },
 } as const;
 
 // ─── RIVALS (§18, Stage 1 scope) ──────────────────────────────────────────────

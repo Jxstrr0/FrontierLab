@@ -47,7 +47,7 @@ describe('new game options', () => {
     delete meta.startCash;
     s.schemaVersion = 1;
     const up = migrate(s as Record<string, unknown> & { schemaVersion: number });
-    expect(up.schemaVersion).toBe(3);
+    expect(up.schemaVersion).toBe(4);
     expect(up.meta).toMatchObject({ difficulty: 'normal', competitors: 3, startCash: 750_000 });
   });
 });

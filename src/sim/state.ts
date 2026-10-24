@@ -20,7 +20,7 @@ import type {
   Week,
 } from '../data/types';
 
-export const SCHEMA_VERSION = 3;
+export const SCHEMA_VERSION = 4;
 
 export interface GameState {
   schemaVersion: number;
