@@ -23,6 +23,42 @@ export function agenciesInCity(state: GameState, cityId: string): string[] {
     .filter((id, i, all) => all.indexOf(id) === i);
 }
 
+/** A city brand campaigns can reach: generated (you've been there) and not a regional site. */
+const campaignCity = (state: GameState, cityId: string): boolean =>
+  !!state.world.cities[cityId] && !CITIES[cityId]?.regional;
+
+/**
+ * Cities a brand campaign can target from HQ, wherever you stand (DESIGN §5.2):
+ * your home city, every city with one of your branches or offices, and the
+ * city you're in, in that order and without repeats.
+ */
+export function campaignCities(state: GameState): string[] {
+  const ids = [
+    state.meta.homeCityId,
+    ...Object.values(state.branches)
+      .filter((b) => b.status !== 'closed')
+      .map((b) => b.cityId),
+    ...Object.values(state.offices).map((o) => o.cityId),
+    state.world.currentCityId,
+  ];
+  return ids.filter((id, i) => ids.indexOf(id) === i && campaignCity(state, id));
+}
+
+/** Why a campaign can't target a city or country, or undefined when it can. */
+export function campaignTargetBlock(
+  state: GameState,
+  scope: 'city' | 'country',
+  targetId: string,
+): string | undefined {
+  if (scope === 'city') {
+    return campaignCity(state, targetId) ? undefined : 'Pick a city you have flown to.';
+  }
+  const reached = Object.keys(state.world.cities).some(
+    (id) => CITIES[id]?.country === targetId && campaignCity(state, id),
+  );
+  return reached ? undefined : 'Pick a country where you have flown to a city.';
+}
+
 /** Simulated cities a campaign covers: one city, or every simulated city in a country. */
 export function coveredCities(state: GameState, c: BrandCampaign): string[] {
   if (c.scope === 'city') return state.world.cities[c.targetId] ? [c.targetId] : [];

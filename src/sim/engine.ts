@@ -7,7 +7,7 @@ import { runBooks } from './branch/books';
 import { addBranchCosts, closeBranchWeek } from './branch/branchPnl';
 import { runDelegation } from './branch/delegation';
 import { runDemand } from './branch/demand';
-import { pruneLoans, runLoanDesk } from './branch/loanDesk';
+import { loansByBranch, pruneLoans, runLoanDesk } from './branch/loanDesk';
 import { campaignEffects, updateAwareness, updateBrandAwareness } from './branch/marketing';
 import { addReviews, updateRatings } from './branch/ratings';
 import { updateStaff } from './branch/staff';
@@ -42,8 +42,8 @@ import { rivalsQuarter, runRivals } from './rivalAi';
 import { refreshManagerPool } from './people';
 import { ftpLong, ftpShort, updateMarketRefs } from './rates';
 import { regulatorReview } from './riskFloor';
-import { repriceRivalFees, updateRivalPrices } from './rivals';
-import type { Branch, GameState } from './state';
+import { repriceRivalFees, updateRivalPrices } from './rivalPrices';
+import type { Branch, BusinessLoan, GameState } from './state';
 import { closeWeek, depreciate, quarterEnd } from './statements';
 import { runTreasury } from './treasury';
 import { updateModels } from './underwriting';
@@ -84,8 +84,9 @@ export function weeklyTick(state: GameState): void {
   updateRivalPrices(state); // 3 (before references so m(p) is this week's)
   updateMarketRefs(state); // 2
   runRivals(state); // 3 (books, financials, expansion, price wars)
+  const deskLoans = loansByBranch(state);
   for (const branch of Object.values(state.branches)) {
-    if (branch.status === 'open') runBranch(state, branch); // 4
+    if (branch.status === 'open') runBranch(state, branch, deskLoans.get(branch.id) ?? []); // 4
   }
   updateBrandAwareness(state);
   runPartnerships(state); // 5
@@ -139,7 +140,7 @@ export function weeklyTick(state: GameState): void {
 }
 
 /** Tick step 4 for one open branch, in the documented order. */
-function runBranch(state: GameState, branch: Branch): void {
+function runBranch(state: GameState, branch: Branch, loans: BusinessLoan[]): void {
   runDelegation(state, branch);
   updateStaff(state, branch); // 4.1
   const fx = campaignEffects(branch);
@@ -156,7 +157,7 @@ function runBranch(state: GameState, branch: Branch): void {
   };
   const wk = emptyWeek();
   runBooks(state, branch, demand, fx, wk); // 4.6
-  runLoanDesk(state, branch, fx, wk); // 4.7
+  runLoanDesk(state, branch, fx, wk, loans); // 4.7
   let newDepositAccounts = 0;
   for (const [pid, o] of Object.entries(demand.byProduct)) {
     if (productSpec(state, pid)?.category === 'deposits') newDepositAccounts += o.newAccounts;

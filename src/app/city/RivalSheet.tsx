@@ -2,6 +2,8 @@
 // and their rate sheet next to ours (SCREENS §2, CONTENT §25 "Rival branch").
 import { CITIES } from '../../data/cities';
 import { PRODUCTS } from '../../data/products';
+import { branchPrice } from '../../sim/branch/pricing';
+import { rivalPriceInCity } from '../../sim/rivalPrices';
 import type { GameState, RivalBank } from '../../sim/state';
 import { AdvisorBar, Badge, CoinRating, Medallion, Sheet } from '../components';
 import { count, pct } from '../format/format';
@@ -16,16 +18,16 @@ const STRATEGY_LABEL: Record<RivalBank['strategy'], string> = {
 /** Products shown on the rate sheet, in order. */
 const RATE_PRODUCTS = ['savings', 'gic1y', 'personal_loan', 'mortgage'] as const;
 
-/** Our price for a product: the first branch we run that offers it. */
-function ourPrice(s: GameState, productId: string): number | undefined {
-  for (const b of Object.values(s.branches)) {
-    const o = b.offered[productId];
-    if (b.status !== 'closed' && o?.on)
-      return s.company.applyRatesToAll
-        ? (s.company.companyPrices[CITIES[b.cityId]!.country]?.[productId] ?? o.price)
-        : o.price;
-  }
-  return undefined;
+/** Our price for a product: our first branch in the city that offers it, else one in its country. */
+function ourPrice(s: GameState, cityId: string, productId: string): number | undefined {
+  const country = CITIES[cityId]?.country;
+  const open = Object.values(s.branches).filter(
+    (b) => b.status !== 'closed' && b.offered[productId]?.on,
+  );
+  const b =
+    open.find((x) => x.cityId === cityId) ??
+    open.find((x) => CITIES[x.cityId]?.country === country);
+  return b ? branchPrice(s, b, productId) : undefined;
 }
 
 export function RivalSheet(p: { s: GameState; lotId: string; onClose: () => void }) {
@@ -39,8 +41,8 @@ export function RivalSheet(p: { s: GameState; lotId: string; onClose: () => void
       </Sheet>
     );
   }
-  const ours = ourPrice(p.s, 'savings');
-  const theirs = bank.prices.savings;
+  const ours = ourPrice(p.s, lot.cityId, 'savings');
+  const theirs = rivalPriceInCity(p.s, bank, 'savings', lot.cityId);
   const advice =
     theirs !== undefined && ours !== undefined
       ? `This is ${bank.name}'s branch. Their savings rate is ${pct(theirs)}; ours is ${pct(ours)}.`
@@ -72,8 +74,8 @@ export function RivalSheet(p: { s: GameState; lotId: string; onClose: () => void
             <span>Ours</span>
           </div>
           {RATE_PRODUCTS.map((id) => {
-            const theirRate = bank.prices[id];
-            const ourRate = ourPrice(p.s, id);
+            const theirRate = rivalPriceInCity(p.s, bank, id, lot.cityId);
+            const ourRate = ourPrice(p.s, lot.cityId, id);
             return (
               <div class="rate-row">
                 <span class="muted">{PRODUCTS[id]?.name ?? id}</span>

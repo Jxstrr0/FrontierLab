@@ -14,6 +14,7 @@ import { emptyBook } from './branch/books';
 import { companyPrice } from './branch/pricing';
 import { marketWage, skillTarget, staffNeeded } from './branch/staff';
 import { defaultName } from './commands/branches';
+import { seedCountryPrices } from './commands/products';
 import { newId } from './ids';
 import { clamp, roundToStep } from './math';
 import { generateManager } from './people';
@@ -79,7 +80,7 @@ export function convertRivalBranch(
     id,
     cityId: rb.cityId,
     lotId: lot.id,
-    name: defaultName(state, lot.district),
+    name: defaultName(state, lot.district, rb.cityId),
     builtDay: state.clock.day,
     openedWeek: state.clock.week,
     status: 'open',
@@ -156,5 +157,10 @@ export function convertRivalBranch(
 
   state.branches[id] = branch;
   lot.occupant = { type: 'player', id };
+  // First branch in a new country under Apply-to-all: that country gets its own HQ list.
+  const country = countryOfCity(state, rb.cityId).id;
+  if (state.company.applyRatesToAll && !state.company.companyPrices[country]) {
+    seedCountryPrices(state, country, branch);
+  }
   return id;
 }

@@ -142,6 +142,14 @@
 }
 
 /* ─── Lineup cards ─────────────────────────────────────────────────────── */
+.pf-countries {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.pf-note {
+  margin: 0;
+}
 .pf-subtitle {
   margin-bottom: var(--space-1);
 }

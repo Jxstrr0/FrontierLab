@@ -138,28 +138,6 @@
   margin: 0;
   color: var(--ivory-dim);
 }
-.city-filter {
-  display: flex;
-  gap: var(--space-2);
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-.filter-chip {
-  flex: none;
-  min-height: var(--tap-min);
-  padding: 0 var(--space-4);
-  border: 1px solid var(--hairline);
-  border-radius: var(--radius-pill);
-  background: transparent;
-  color: var(--ivory-dim);
-  font-size: var(--text-14);
-  font-weight: 600;
-  cursor: pointer;
-}
-.filter-chip.is-active {
-  border-color: var(--brass);
-  color: var(--brass-light);
-}
 .branch-row {
   display: flex;
   flex-direction: column;

@@ -1,11 +1,23 @@
 // Branches list (SCREENS §25): every branch with its rating, deposits, loans,
-// weekly income and issues, sortable and filterable by city. Tap a row to open it.
+// weekly income and issues, sortable and filterable by city (chips that scroll
+// sideways). Across countries, rows are grouped under each country and every
+// city carries its country code. Tap a row to open it, from any city.
+import { Fragment } from 'preact';
 import { useState } from 'preact/hooks';
 import { CITIES } from '../../data/cities';
-import { Badge, Card, CoinRating, Panel, Segmented } from '../components';
+import { COUNTRIES } from '../../data/countries';
+import { Badge, Card, Chips, CoinRating, Panel, SectionTitle, Segmented } from '../components';
 import { money } from '../format/format';
 import { closePanel, openPanel, useGame } from '../store';
-import { branchRows, sortRows, type SortKey } from './branchRows';
+import {
+  branchRows,
+  countryOrder,
+  filterCities,
+  groupByCountry,
+  sortRows,
+  type BranchRow,
+  type SortKey,
+} from './branchRows';
 import './company.css';
 
 const SORTS: { value: SortKey; label: string }[] = [
@@ -24,8 +36,18 @@ export function BranchesPanel() {
   const [city, setCity] = useState<string>('all');
 
   const all = branchRows(s);
-  const cityIds = [...new Set(all.map((r) => r.cityId))];
+  const cityIds = filterCities(s, all);
+  const order = countryOrder(s, all);
+  const abroad = order.length > 1;
   const rows = sortRows(city === 'all' ? all : all.filter((r) => r.cityId === city), sort, flip);
+  const groups =
+    abroad && city === 'all'
+      ? groupByCountry(order, rows).filter((g) => g.rows.length > 0)
+      : [{ country: null, rows }];
+  const cityLabel = (id: string) => {
+    const name = CITIES[id]?.name ?? id;
+    return abroad ? `${name}, ${CITIES[id]?.country ?? ''}` : name;
+  };
 
   // Tapping the active sort flips its direction; tapping another starts fresh.
   const choose = (key: SortKey) => {
@@ -54,59 +76,73 @@ export function BranchesPanel() {
         </Card>
       ) : (
         <div class="stack co-stack">
-          <div class="city-filter" role="group" aria-label="Filter by city">
-            {['all', ...cityIds].map((id) => (
-              <button
-                key={id}
-                type="button"
-                class={`filter-chip${id === city ? ' is-active' : ''}`}
-                aria-pressed={id === city}
-                onClick={() => setCity(id)}
-              >
-                {id === 'all' ? 'All cities' : (CITIES[id]?.name ?? id)}
-              </button>
-            ))}
-          </div>
+          {cityIds.length > 1 && (
+            <Chips
+              label="Filter by city"
+              value={city}
+              onChange={setCity}
+              options={[
+                { value: 'all', label: 'All cities' },
+                ...cityIds.map((id) => ({
+                  value: id,
+                  label: CITIES[id]?.name ?? id,
+                  hint: abroad ? CITIES[id]?.country : undefined,
+                })),
+              ]}
+            />
+          )}
           <div class="sort-seg">
             <Segmented label="Sort branches" value={sort} onChange={choose} options={sortOptions} />
           </div>
-          {rows.map((r) => (
-            <Card
-              key={r.id}
-              class="branch-row"
-              onClick={() => openPanel({ type: 'branch', branchId: r.id })}
-            >
-              <div class="branch-row-head">
-                <span class="branch-row-name">{r.name}</span>
-                <CoinRating value={r.rating} size={14} />
-              </div>
-              <div class="branch-row-city muted small">{CITIES[r.cityId]?.name ?? r.cityId}</div>
-              <div class="branch-row-stats">
-                <Stat label="Deposits" value={money(r.deposits, sym)} />
-                <Stat label="Loans" value={money(r.loans, sym)} />
-                <Stat
-                  label="Income a week"
-                  value={`${r.income < 0 ? '−' : ''}${money(Math.abs(r.income), sym)}`}
-                  tone={r.income > 0 ? 'good' : r.income < 0 ? 'bad' : undefined}
-                />
-              </div>
-              <div class="branch-row-issues">
-                {r.issues.length === 0 ? (
-                  <Badge tone="good">No issues</Badge>
-                ) : (
-                  r.issues.map((i) => (
-                    <Badge key={i.text} tone={i.tone}>
-                      {i.text}
-                    </Badge>
-                  ))
-                )}
-              </div>
-            </Card>
+          {groups.map((g) => (
+            <Fragment key={g.country ?? 'all'}>
+              {g.country && (
+                <SectionTitle>
+                  {COUNTRIES[g.country].name} · {g.rows.length}
+                </SectionTitle>
+              )}
+              {g.rows.map((r) => (
+                <BranchCard key={r.id} r={r} city={cityLabel(r.cityId)} sym={sym} />
+              ))}
+            </Fragment>
           ))}
           {rows.length === 0 && <p class="muted">No branches in this city.</p>}
         </div>
       )}
     </Panel>
+  );
+}
+
+function BranchCard(p: { r: BranchRow; city: string; sym: string }) {
+  const { r, sym } = p;
+  return (
+    <Card class="branch-row" onClick={() => openPanel({ type: 'branch', branchId: r.id })}>
+      <div class="branch-row-head">
+        <span class="branch-row-name">{r.name}</span>
+        <CoinRating value={r.rating} size={14} />
+      </div>
+      <div class="branch-row-city muted small">{p.city}</div>
+      <div class="branch-row-stats">
+        <Stat label="Deposits" value={money(r.deposits, sym)} />
+        <Stat label="Loans" value={money(r.loans, sym)} />
+        <Stat
+          label="Income a week"
+          value={`${r.income < 0 ? '−' : ''}${money(Math.abs(r.income), sym)}`}
+          tone={r.income > 0 ? 'good' : r.income < 0 ? 'bad' : undefined}
+        />
+      </div>
+      <div class="branch-row-issues">
+        {r.issues.length === 0 ? (
+          <Badge tone="good">No issues</Badge>
+        ) : (
+          r.issues.map((i) => (
+            <Badge key={i.text} tone={i.tone}>
+              {i.text}
+            </Badge>
+          ))
+        )}
+      </div>
+    </Card>
   );
 }
 

@@ -1,8 +1,9 @@
 // Central bank panel (SCREENS §8) for any country: the institution and city,
 // a line from the governor's office, the big policy rate with the last
-// decision and the next meeting, the economy's indicators, the yield curve and
-// — for your home country only — the standing lending facility (the Treasury
-// floor's CentralBankFacility, with its stigma warning on first use).
+// decision and the next meeting (and how many of your branches price off it),
+// the economy's indicators, the yield curve and — for your home country only,
+// wherever you stand — the standing lending facility (the Treasury floor's
+// CentralBankFacility, with its stigma warning on first use).
 import { DAYS_PER_WEEK } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { COUNTRIES } from '../../data/countries';
@@ -75,7 +76,10 @@ export function CentralBankPanel(p: { countryId: CountryId }) {
     );
   }
   const home = homeCountry(s).id === p.countryId;
-  const licensed = Object.values(s.branches).some((b) => CITIES[b.cityId]?.country === p.countryId);
+  const yours = Object.values(s.branches).filter(
+    (b) => b.status !== 'closed' && CITIES[b.cityId]?.country === p.countryId,
+  ).length;
+  const licensed = yours > 0;
   const anchorId = meetingCountry(p.countryId);
   const anchor = s.world.countries[anchorId];
   const next = nextMeetingDay(s, p.countryId);
@@ -124,6 +128,12 @@ export function CentralBankPanel(p: { countryId: CountryId }) {
             value={next !== undefined ? gameDate(s.meta.startDate, next) : '—'}
           />
           <Row label="Inflation target" value={pctPlain(spec.inflationTarget || 0)} tone="dim" />
+          {licensed && (
+            <p class="muted small">
+              Your {yours === 1 ? 'branch' : `${yours} branches`} in {theCountryName(p.countryId)}{' '}
+              {yours === 1 ? 'prices' : 'price'} deposits and loans off this rate.
+            </p>
+          )}
         </Card>
 
         <div>
