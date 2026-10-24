@@ -124,6 +124,7 @@ There's no fixed ending. Milestones, the annual rich list and the "fastest growi
   - **Difficulty:** Easy, Normal, Hard or Expert. Harder levels mean fewer prospects, better-run rivals with sharper rates, and more loan defaults (SIMULATION §26 `DIFFICULTY`). Normal is the balance reference.
   - **Competitors:** 1–5 rival banks in each city, defaulting to the city's usual count (CONTENT §2). Fewer rivals also means fewer rival branches.
   - **Starting cash:** $500k, $750k (default), $1M or $1.25M of spendable cash. Charter capital stays at $2M.
+  - **Currency:** $, C$, £, € or ¥, the symbol money is shown in (as in the original's start options). It changes display only and can be switched later in Settings.
 - Other cities open up through travel (§5.17).
 - **One global enterprise.** You can fly to any city at any time and buy anything there: branches, offices, buildings, stakes, rival banks. Everything you own in every city keeps running every week at once, so the bank grows into a single worldwide business. Start cities differ in market size, rents and rivals, and that difference stays.
 
@@ -495,3 +496,4 @@ Add one dated line per decision. Never delete entries; supersede them.
 - 2026-10-24: The steady balance strategy takes a 25% private placement when its capital ratio is under 13% and cash is short, and launches a 25%-float IPO as soon as eligible; it lists in years 5–6 on seeds 42, 7 and 99.
 - 2026-10-24 (owner): One global enterprise. You can travel to any city at any time and buy any asset there; everything you own in every city runs at once. Supersedes the weekly travel cap: flights inside the 24,140 km weekly allowance are free, flights past it cost a flat one-way fare from personal cash (the original's behaviour), and jet flights are always free.
 - 2026-10-24 (owner): Currencies become an investment category (DESIGN §5.12a, SIMULATION §19.10): a simplified "country up or down" position per foreign currency, traded at investment banks as the company or personally, built with Stage 7. Operations stay in one currency.
+- 2026-10-24 (owner): The New Game options step offers a starting currency ($, C$, £, €, ¥), as the original does. It sets the display symbol only (defaulting to the saved preference); books stay in one currency.
