@@ -36,8 +36,9 @@ export function floorDesks(office: Pick<Office, 'desksPerFloor'>, dept: DeptId):
   return DEPARTMENTS[dept].fixedDesks ?? office.desksPerFloor;
 }
 
-/** Departments whose floors can be fitted out in this build (Stage 4 ones, with their stage on). */
+/** Departments whose floors can be fitted out in this build (HQ on, and each floor's stage on). */
 export function addableDepts(features: Record<FeatureId, boolean> = FEATURES): DeptId[] {
+  if (!features.hq) return [];
   return DEPT_ORDER.filter((d) => deptAvailable(d) && features[DEPARTMENTS[d].feature]);
 }
 

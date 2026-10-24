@@ -2,12 +2,15 @@
 // (DAY_MS); 2× and 4× scale that. After each weekly tick it autosaves, shows the
 // weekly results when settings ask for it, and pauses for game over, expiring
 // loan applications and new incidents (the incident modal opens once the weekly
-// results are closed). Hidden tabs pause time. stepWeek() runs the rest of the
-// current week at once and leaves the game paused, for week-by-week play.
-import { CAPITAL_BUFFER_PP, DAY_MS, DAYS_PER_WEEK } from '../config/balance';
+// results are closed), and once a quarter for the board meeting reminder when
+// there is an Executive floor (after any other modal). Hidden tabs pause time.
+// stepWeek() runs the rest of the current week at once and leaves the game
+// paused, for week-by-week play.
+import { CAPITAL_BUFFER_PP, DAY_MS, DAYS_PER_WEEK, FEATURES } from '../config/balance';
 import { INCIDENT_SPECS } from '../data/incidents';
 import { isQuarterStart } from '../sim/calendar';
 import { advanceDay } from '../sim/engine';
+import { boardDue, quarterLabel } from '../sim/governance';
 import type { GameEvent, GameState } from '../sim/state';
 import { homeCountry } from '../sim/treasury';
 import { CAPITAL_BUFFER_POLICY } from '../data/newsWorld';
@@ -25,6 +28,10 @@ let lastSeen: GameEvent | undefined;
 let promptedCases = new Set<string>();
 /** New cases are waiting for the current modal (weekly results) to close. */
 let casesWaiting = false;
+/** The board meeting reminder is waiting for the other modals to close. */
+let boardWaiting = false;
+/** Quarter label of the last board reminder, so each quarter prompts once. */
+let remindedQuarter: string | undefined;
 
 export function startLoop(): void {
   stopLoop();
@@ -33,6 +40,8 @@ export function startLoop(): void {
   lastSeen = peekGame()?.events.log.at(-1);
   promptedCases = new Set(peekGame()?.incidents.active.map((i) => i.id) ?? []);
   casesWaiting = false;
+  boardWaiting = false;
+  remindedQuarter = undefined;
   timer = setInterval(frame, FRAME_MS);
 }
 
@@ -82,6 +91,10 @@ function frame(): void {
     casesWaiting = false;
     if (s.incidents.active.length > 0 && !s.flags.gameOver) modal.value = { type: 'incident' };
   }
+  if (boardWaiting && !modal.value && !casesWaiting) {
+    boardWaiting = false;
+    if (boardDue(s)) modal.value = { type: 'boardMeeting', reminder: true };
+  }
   if (s.clock.speed === 0 || modal.value || document.hidden) return;
   acc += Math.min(dt, 250) * s.clock.speed;
   let changed = false;
@@ -117,6 +130,20 @@ function afterWeek(s: GameState): void {
     modal.value = { type: 'weekly', week: s.clock.week - 1 };
   }
   promptIncidents(s);
+  promptBoard(s, quarter);
+}
+
+/**
+ * SIMULATION §2 auto-pause: at each quarter start, with an Executive floor and no
+ * meeting held yet, the board meeting reminder opens once (after other modals).
+ */
+function promptBoard(s: GameState, quarterStart: boolean): void {
+  if (!FEATURES.capitalMarkets || !quarterStart || !s.settings.autoPauseIncidents) return;
+  const label = quarterLabel(s);
+  if (remindedQuarter === label || !boardDue(s)) return;
+  remindedQuarter = label;
+  if (modal.value || casesWaiting) boardWaiting = true;
+  else modal.value = { type: 'boardMeeting', reminder: true };
 }
 
 /** SIMULATION §2 auto-pause: new open cases open the incident modal (after any other modal). */

@@ -2,6 +2,7 @@
 // its first floors, add or release floors, release a whole office, and set a
 // department's staff target, salary or an HR benefit.
 import {
+  FEATURES,
   FLOOR_FITOUT,
   FLOOR_FITOUT_LIFE_WEEKS,
   SEVERANCE_WEEKS,
@@ -10,13 +11,16 @@ import {
 import { BENEFITS } from '../../data/benefits';
 import { CITIES } from '../../data/cities';
 import { DEPARTMENTS, HQ_DEPTS } from '../../data/departments';
+import { EXEC_SEAT_ORDER } from '../../data/executives';
 import type { DeptId } from '../../data/types';
 import { assetBookValue } from '../balanceSheet';
+import { refreshExecCandidates } from '../execCandidates';
 import { deptDesks, deptMarketSalary, newDepartment } from '../hq';
 import { newId } from '../ids';
 import { postCash, postPnl, spend } from '../ledger';
 import { roundToStep } from '../math';
 import type { GameState, Office } from '../state';
+import { fireExec } from './executives';
 import { fail, money, ok, type CommandResult } from './result';
 
 /** Salary stepper: $1,000 steps between half and three times the market salary. */
@@ -29,11 +33,12 @@ export function floorFitout(cityId: string): number {
 }
 
 /**
- * Whether a department's floor can be added: the Stage 4 departments. The
- * Executive and Investment floors arrive with their systems (Stages 6 and 7).
+ * Whether a department's floor can be added: the Stage 4 departments, and the
+ * Executive suite with Stage 6. Investment arrives with its system (Stage 7).
  * The UI also hides floors whose FEATURES flag is off.
  */
 export function deptAvailable(id: DeptId): boolean {
+  if (id === 'executive') return FEATURES.capitalMarkets;
   return (HQ_DEPTS as readonly string[]).includes(id);
 }
 
@@ -60,6 +65,8 @@ function fitFloor(state: GameState, office: Office, floor: number, dept: DeptId)
   });
   postCash(state, -cost, 'investing');
   if (!state.departments[dept]) state.departments[dept] = newDepartment(state, dept);
+  // A new Executive suite starts with candidates for every seat (§17.2).
+  if (dept === 'executive') refreshExecCandidates(state, true);
 }
 
 /** Leases a whole office building and fits out a floor for each chosen department. */
@@ -122,6 +129,8 @@ function trimToDesks(state: GameState, dept: DeptId): void {
   if (desks === 0) {
     spend(state, 'hqStaff', (d.staff * d.salary * SEVERANCE_WEEKS) / WEEKS_PER_YEAR);
     delete state.departments[dept];
+    // Without an Executive suite every executive leaves, with severance.
+    if (dept === 'executive') for (const seat of EXEC_SEAT_ORDER) fireExec(state, seat);
     return;
   }
   const over = Math.max(0, d.staff - desks);
