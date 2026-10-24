@@ -13,6 +13,8 @@ export const emptyEmpire = (): PersonalEmpire => ({
   collectibles: [],
   richList: { fortunes: [] },
   insider: { pending: [] },
+  offerLocks: {},
+  netWorthLog: [],
 });
 
 /** Fresh Stage 9 records on a state that has none. */

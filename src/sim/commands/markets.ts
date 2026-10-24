@@ -6,6 +6,7 @@
 // float on the cap table. Equity raises live in marketsEquity.ts.
 import { COMMISSION, TRADING } from '../../config/balance';
 import { PUBLIC_HOLDER } from '../equityIpo';
+import { insiderTrade } from '../insider';
 import { postCash, spend } from '../ledger';
 import { isListedSecurity, SELF_ID, securityPrice, securityShares } from '../securities';
 import { FOUNDER_ID, sharesHeld, transferShares } from '../shares';
@@ -115,5 +116,7 @@ export function trade(
     }
   }
   settle(state, account, shares > 0 ? -value : value, commission);
+  // Stage 9: trading your own shares just before earnings may draw a probe (§22).
+  if (securityId === SELF_ID) insiderTrade(state, shares, price);
   return ok();
 }

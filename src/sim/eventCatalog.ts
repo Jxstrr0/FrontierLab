@@ -205,8 +205,10 @@ export interface EventPayloads {
   HOME_SOLD: { homeId: string; name: string; price: Money };
   HOME_REBUILT: { homeId: string; name: string; value: Money };
   CAR_BOUGHT: { carId: string; name: string; price: Money };
+  CAR_SOLD: { carId: string; name: string; price: Money };
   DEALER_SIGNED: { siteId: Id; city: Id; dealer: string };
-  DEALER_ENDED: { siteId: Id; city: Id; dealer: string };
+  /** `expired`: the term ran out (else you ended it). */
+  DEALER_ENDED: { siteId: Id; city: Id; dealer: string; expired: boolean };
   /** A house listed its next sale (auctions.ts); item = the headline lot, week = sale week. */
   AUCTION_PREVIEW: {
     houseId: string;
@@ -261,8 +263,19 @@ export interface EventPayloads {
   CLUB_SOLD: { clubId: string; club: string; price: Money };
   CLUB_SEASON: { clubId: string; club: string; league: string; pos: number; record: string };
   KIT_SPONSOR: { clubId: string; club: string; on: boolean };
-  RICH_LIST: { rank: number; worth: Money; entered: boolean };
-  INSIDER_PROBE_OPENED: { shares: number; side: 'buy' | 'sell' };
+  /** Year end, when you rank (richList.ts). */
+  RICH_LIST: {
+    rank: number;
+    worth: Money;
+    entered: boolean;
+    prevRank?: number;
+    name: string;
+    bank: string;
+  };
+  /** A quarter-end probe into your own-share trades (insider.ts). */
+  INSIDER_PROBE_OPENED: { shares: number; side: 'buy' | 'sell'; fine: Money; founder: string };
+  /** You paid the probe's fine, settled or after losing the fight (insiderRule.ts). */
+  INSIDER_FINED: { founder: string; bank: string; fine: Money; fought: boolean };
 
   // ─── Ventures and conventions (ventures.ts, conventions.ts) ────────────────
   /** You (company or personal) bought an offer lot. */

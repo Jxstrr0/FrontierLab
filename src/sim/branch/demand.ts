@@ -37,6 +37,7 @@ import { dpow } from '../detmath';
 import { brandSegmentMults } from '../hqMarketing';
 import { isClosed, takeupMult } from '../incident/effects';
 import { affinityOf, allProducts, baseId, starsOf } from '../products';
+import { dealerBoost } from '../personalValues';
 
 export interface Origination {
   newAccounts: number;
@@ -179,7 +180,10 @@ export function runDemand(state: GameState, branch: Branch, fx: CampaignEffects)
     const approval = approvalOf(state, spec);
     const sp = special(state, branch, spec);
     const boost =
-      (spec.category === 'deposits' ? fx.depositTakeUp : 1) * takeupMult(state, baseId(spec));
+      (spec.category === 'deposits' ? fx.depositTakeUp : 1) *
+      takeupMult(state, baseId(spec)) *
+      // Stage 9: a car dealer financing deal in this city refers auto-loan customers (SCREENS §19).
+      dealerBoost(state, branch.cityId, baseId(spec));
     let accounts = 0;
     let volume = 0;
     for (const s of SEGMENTS) {

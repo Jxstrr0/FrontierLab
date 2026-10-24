@@ -1156,8 +1156,16 @@ export const HOMES_CFG = {
   rebuildGain: 0.2,
   /** Offers run from 85% of asking (a linear acceptance ramp to 100%, as buildings). */
   offerMin: 0.85,
+  /** Offer stepper step, as a share of asking. */
+  offerStep: 0.01,
+  /** A refused offer: the seller won't hear another for this many weeks (assumption). */
+  refusalWeeks: 4,
   sellFee: 0.05,
+  /** Purchases at or above this make The Daily Ledger. */
+  newsMin: 10_000_000,
 } as const;
+/** Weekly net worth kept for the Personal Wealth screen's weekly change. */
+export const WEALTH_HISTORY_WEEKS = 53;
 /** Cars: yearly value change (classics gain), upkeep, resale haircut. */
 export const CARS_CFG = {
   depreciation: 0.12,
@@ -1241,7 +1249,13 @@ export const FRANCHISE = {
   riskWeight: 2.5,
 } as const;
 /** Rich list (§22): 50 generated fortunes growing 4–8% a year; ranked at year end. */
-export const RICH_LIST = { size: 50, growth: [0.04, 0.08], fortune: [1.5e9, 120e9] } as const;
+export const RICH_LIST = {
+  size: 50,
+  growth: [0.04, 0.08],
+  fortune: [1.5e9, 120e9],
+  /** Fortunes are rounded to this. */
+  roundTo: 1e6,
+} as const;
 /** Insider trading (§22): trades in your own shares within 2 weeks of a quarter-end. */
 export const INSIDER = {
   windowWeeks: 2,
@@ -1250,6 +1264,9 @@ export const INSIDER = {
   fineMin: 250_000,
   ratingHit: 0.1,
   ratingWeeks: 8,
+  /** Fighting the probe (CONTENT §22 option): even odds of being cleared, else the fine doubles. */
+  fightWin: 0.5,
+  fightLoseMult: 2,
 } as const;
 
 // ─── EXECUTIVES (SIMULATION §17.2) ────────────────────────────────────────────
