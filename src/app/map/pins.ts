@@ -1,5 +1,5 @@
 // Pin data for the map (SCREENS §2, ART_DIRECTION §2): one entry per storefront
-// lot in the current city and, with the HQ stage (FEATURES.hq), per office
+// lot (your branches, rivals and open branch locations) in the current city and, with the HQ stage (FEATURES.hq), per office
 // building, credit bureau and marketing agency, filtered by the Layers
 // settings, with its roof anchor in world px and its accessible label. Also
 // the renderer's occupants (lots and leased offices). Read-only views of
@@ -12,7 +12,7 @@ import { AGENCIES } from '../../data/brandCampaigns';
 import { LEASE_ONLY_KEY, layerOn, type MapLayerId } from '../../data/mapLayers';
 import type { GameState, Lot, OfficeListing, Site } from '../../sim/state';
 
-export type PinKind = 'mine' | 'hq' | 'rival' | 'office' | 'bureau' | 'agency' | 'lease';
+export type PinKind = 'mine' | 'hq' | 'rival' | 'office' | 'bureau' | 'agency' | 'lot';
 
 export interface PinSpec {
   /** Lot, office listing or site id (also the DOM `data-lot-id`). */
@@ -29,11 +29,11 @@ export interface PinSpec {
   branchId?: string;
   /** Your office in this building (kind 'hq'). */
   officeId?: string;
-  /** Type icon for office, bureau and agency pins. */
+  /** Type icon for office, bureau and agency pins (offices also wear the For lease tag). */
   icon?: MapLayerId;
 }
 
-/** Clustering seeds and stacking: yours first, then rivals, then other buildings, storefronts last. */
+/** Clustering seeds and stacking: yours first, then rivals, then other buildings, open locations last. */
 const KIND_ORDER: Record<PinKind, number> = {
   mine: 0,
   hq: 1,
@@ -41,7 +41,7 @@ const KIND_ORDER: Record<PinKind, number> = {
   office: 3,
   bureau: 4,
   agency: 5,
-  lease: 6,
+  lot: 6,
 };
 
 /** Pins drawn in your brand ink, lifted above the rest. */
@@ -90,8 +90,8 @@ function lotPin(s: GameState, map: CityMap, lot: Lot, pending: Record<string, nu
   }
   return {
     ...base,
-    kind: 'lease',
-    label: `For lease, ${lot.address}`,
+    kind: 'lot',
+    label: `Available branch location, ${lot.address}`,
     ink: '',
     monogram: '',
     badge: false,

@@ -43,7 +43,7 @@ You found a bank with a fresh charter: $2,000,000 of charter capital locked in t
 | Coffee Inc 2 | Vault Street | Notes |
 |---|---|---|
 | Coffee shop | Branch | |
-| Property for lease: weekly rent, deposit, foot traffic, area map | Storefront for lease | Adds a demographics panel |
+| Property for lease: weekly rent, deposit, foot traffic, area map | Available location (storefront) | Adds a demographics panel |
 | Build store: exterior, interior, espresso machine, brewer, blender | Build branch: exterior, lobby, teller line, vault, ATM | Each option shows price and quality/productivity stars |
 | Store tabs: Service, Product, Marketing, Finance | Branch tabs: Service, Products, Loan Desk, Marketing, Finance | Loan Desk is new |
 | Staff count, hourly salary, staff skill, staff morale | Same | |
@@ -460,3 +460,4 @@ Add one dated line per decision. Never delete entries; supersede them.
 - 2026-10-24: Benefits: effects scale linearly up to a stated reference amount (Free Lunch $60/wk, Childcare $6k/yr, Volunteer Days $100/wk, Wellness $1,500/yr, Staff Mortgage 1%), then grow at half slope up to 1.5×. Attraction points add to the hiring attraction ratio (+1 point = +0.01). Retention effects multiply quits by (1 − retention) each.
 - 2026-10-24: Stage 4 tuning: per-branch HQ requirements cut about 40% and the Risk PD penalty raised to 1.5 × (1 − k′), so skipping the HQ visibly costs more than staffing one (balance strategy `nohq` ends year 6 ~13% behind `steady`, with loan losses near 2%). Scripted strategies lease their first office at 4 branches and pause expansion until every department reaches 90% coverage.
 - 2026-10-24: HQ UI: model mix sliders always total 100% (moving one rescales the others in proportion) for one-handed play; funding lot cards show their details inline instead of a Details button; the window Borrow slider runs to the larger of $1M and 10% of deposits, with a stigma warning only when no stigma is running; the Treasury floor also carries the one-way "Transfer cash to Treasury".
+- 2026-10-24: Map pins (owner request): open branch locations show a blank "$" medallion and read "Available" in the list, Layers filter and panel title; the "For lease" tag is kept for buildings you rent (office buildings now, with their type icon). Third-party places you deal with but don't rent (credit bureaus, agencies, and investment banks when Stage 7 adds them) keep type medallions.

@@ -17,7 +17,7 @@ type Filter = 'all' | 'lease';
 
 const FILTERS: { value: Filter; label: string }[] = [
   { value: 'all', label: 'All' },
-  { value: 'lease', label: 'For lease only' },
+  { value: 'lease', label: 'Available only' },
 ];
 
 const naturalOrder = new Intl.Collator('en', { numeric: true });
@@ -53,7 +53,7 @@ export function CityList(p: { hideTitle?: boolean } = {}) {
       <header class="city-head">
         {!p.hideTitle && <h1 class="city-title">{city?.name ?? 'Your city'}</h1>}
         <p class="muted small">
-          {count(lots.length)} storefronts: {count(free)} for lease, {count(mine)} yours,{' '}
+          {count(lots.length)} storefronts: {count(free)} available, {count(mine)} yours,{' '}
           {count(rivals)} rivals
         </p>
         <Segmented label="Show storefronts" options={FILTERS} value={filter} onChange={setFilter} />
@@ -174,7 +174,7 @@ function LotRow(p: {
         <span class="muted small">{facts}</span>
       </span>
       <span class="lot-tag">
-        <Badge tone="good">For lease</Badge>
+        <Badge tone="good">Available</Badge>
       </span>
     </button>
   );

@@ -93,7 +93,8 @@ Spend the boldness on the map and the illustrations, the way a banknote's engrav
   - Inside: a type icon (24 px grid).
   - Yours: filled with your brand ink plus your monogram.
   - Rivals: an ivory fill with their ink ring and monogram.
-  - For lease: a rectangular ivory tag with a brass outline, "For lease".
+  - Open branch locations: a blank ivory medallion with a plain "$" in ink, drawn at 80% so branches stand out (half size at the far zoom).
+  - For lease (buildings you rent, such as office buildings): a rectangular ivory tag with a brass outline, the building's type icon and "For lease".
 - **Performance:**
   - Split the map into square screen-space chunks, 256 CSS px at each zoom stop, rendered once to an offscreen canvas at stop × devicePixelRatio. Each chunk draws every tile whose art touches it, back to front, so buildings overlap correctly across chunk edges.
   - In-between zooms scale the nearest stop's chunks; missing chunks show a scaled copy from another stop (or paper) and are painted about 6 ms per frame, nearest the centre first.

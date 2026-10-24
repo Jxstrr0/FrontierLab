@@ -1,6 +1,6 @@
 // The Layers sheet (SCREENS §2, DESIGN §3.1 "Map layers"): an "All" toggle and
 // one toggle per layer whose system exists in this build, plus the Branches
-// layer's "For lease only" filter and a way into the accessible list view.
+// layer's "Available only" filter and a way into the accessible list view.
 // Every change goes through the setSettings command so it saves with the game.
 import { availableLayers, LEASE_ONLY_KEY, layerOn, type MapLayerId } from '../../data/mapLayers';
 import * as cmd from '../../sim/commands';
@@ -38,8 +38,8 @@ export function LayersSheet() {
           <div class="layer-row layer-sub">
             <span class="layer-icon-slot" aria-hidden="true" />
             <Toggle
-              label="For lease only"
-              hint="Hide branches and show only storefronts you can lease."
+              label="Available only"
+              hint="Hide branches and show only open branch locations ($)."
               checked={layers[LEASE_ONLY_KEY] === true}
               disabled={!layerOn(layers, 'branches')}
               onChange={(on) => set({ [LEASE_ONLY_KEY]: on })}
