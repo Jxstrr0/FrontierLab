@@ -396,7 +396,7 @@ Branch counts at start, by city size: S 3–5, M 6–10, L 10–16, XL 16–24 i
 
   Cities not listed borrow the nearest house: Saskatoon and Montréal → Ashgrove Capital, Seattle → Whitlock & Rowe, Frankfurt and Amsterdam → Meridian Partners. Implemented in `src/data/investmentBanks.ts`.
 - **Marketing agencies:** Brightwell Creative, Northwind & Pike, Studio Halcyon. Present in L and XL cities; M cities get one.
-- **Lobbying firms:** Capitol Bridge Advisors (US), Parliament Row Partners (CA, UK), Rue Royale Affairs (EA), Harbourline Policy Group (AU, SG, HK).
+- **Lobbying firms:** Capitol Bridge Advisors (US), Parliament Row Partners (CA, UK), Rue Royale Affairs (EA, and CH by borrowing), Harbourline Policy Group (AU, SG, HK, and JP by borrowing). Campaigns are in SIMULATION §21.6.
 - **Universities:**
   - Named: Prairie State University (Saskatoon), Kingsley University (Toronto), Bow River University (Calgary), Pacific Crest University (Vancouver), Hudson Polytechnic (New York).
   - Elsewhere, generate as "University of {City}" or "{City} Institute of Technology".
@@ -404,7 +404,8 @@ Branch counts at start, by city size: S 3–5, M 6–10, L 10–16, XL 16–24 i
   - Marlowe & Finch (London, New York): 4% counterfeit odds
   - Harrowgate Auctions (Toronto, Chicago): 8%
   - Kanazawa Auctions (Tokyo, Hong Kong): 6%
-- **Convention centre:** one per L and XL city.
+- **Convention centre:** one per L and XL city, plus every city that hosts a convention (Saskatoon, Calgary). Venue names are in `src/data/conventions.ts`; other cities use "{City} Convention Centre".
+- **Property buildings:** 4 / 6 / 8 / 10 per S / M / L / XL city, in any district (SIMULATION §21.5).
 - **Airports** (code, name): SAS Saskatoon Regional · CAL Calgary International · VAN Vancouver International · TOR Toronto Pearson-style "Lakeshore International" · MTL Montréal-Mercier · NYC Liberty International · CHI O'Hare-style "Lakefront International" · SFO Bayview International · SEA Sound International · LON Thameshaven · PAR Charles-Lumière · FRA Rhein-Main · AMS Polder International · ZUR Kloten-Alpen · TYO Haneda-Bay · SYD Harbour Kingsford · SIN Changi-Garden · HKG Lantau Harbour. All fictional names; use the city name in UI where clearer.
 
 ## 17. Stock market (non-bank listed companies)
@@ -470,7 +471,7 @@ Pentagon order: Management, Product maturity, Market size, Competitiveness, Fina
 | Clarion Security | Cybersecurity | 2023 | B | 7, 7, 7, 6, 6 | 120M | Identity verification built for banks |
 | Harvest Ledger | Agtech/Fintech | 2025 | A | 6, 5, 6, 6, 5 | 20M | A marketplace that finances farmers against future harvests |
 
-**Sector growth μ** (quarterly mean): Fintech 0.08, Energy 0.06, Space 0.07, Biotech 0.05, Robotics 0.07, Healthtech 0.06, Agtech 0.05, Quantum 0.06, Proptech 0.05, Consumer 0.06, Materials 0.05, Gaming 0.05, Logistics 0.05, Mobility 0.04, Cybersecurity 0.07.
+**Sector growth μ** (quarterly mean; mature margin, P/S multiple and listed sector are in `src/data/startups.ts`): Energy storage 0.06, Agtech/Fintech 0.065, Fintech 0.08, Energy 0.06, Space 0.07, Biotech 0.05, Robotics 0.07, Healthtech 0.06, Agtech 0.05, Quantum 0.06, Proptech 0.05, Consumer 0.06, Materials 0.05, Gaming 0.05, Logistics 0.05, Mobility 0.04, Cybersecurity 0.07.
 
 ## 19. Conventions (yearly calendar)
 
@@ -480,12 +481,27 @@ Pentagon order: Management, Product maturity, Market size, Competitiveness, Fina
 | Fintech Forward | Toronto | 15 |
 | Big Apple Venture Days | New York | 19 |
 | Ledger Summit | London | 24 |
+| Foothills Founders Fair | Calgary | 28 |
 | Prairie Innovation Expo | Saskatoon | 33 |
 | Bay Capital Week | San Francisco | 38 |
 | Harbour Tech | Sydney | 41 |
 | Asia Money Forum | Singapore | 45 |
 
-Announced in the Ledger 2 weeks before. Active for 1 week.
+Announced in the Ledger 2 weeks before. Active for 1 week. Calgary's fair is our addition so every start city has a convention before travel arrives.
+
+### 19a. Currencies (SIMULATION §19.10)
+
+| Country | Code | Name | Weekly vol | Notes |
+|---|---|---|---|---|
+| CA | CAD | Canadian dollar | 0.6% | |
+| US | USD | US dollar | 0.5% | |
+| UK | GBP | Pound sterling | 0.7% | |
+| EA | EUR | Euro | 0.6% | |
+| CH | CHF | Swiss franc | 0.5% | |
+| JP | JPY | Japanese yen | 0.8% | |
+| AU | AUD | Australian dollar | 0.9% | |
+| SG | SGD | Singapore dollar | 0.4% | |
+| HK | HKD | Hong Kong dollar | 0.5% | pegged to USD |
 
 ## 20. Personal purchases
 

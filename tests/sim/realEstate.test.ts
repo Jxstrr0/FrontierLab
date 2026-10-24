@@ -153,6 +153,18 @@ describe('buying and running a building', () => {
     expect(cmd.offerProperty(s, unlisted.id, 1_000_000, 'company').ok).toBe(false);
   });
 
+  it('blocks company purchases at the Restricted tier, but not private ones', () => {
+    const s = game();
+    fund(s, 50_000_000);
+    const l = firstListing(s);
+    s.company.tier = 'restricted';
+    const r = cmd.offerProperty(s, l.siteId, l.asking, 'company');
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(r.reason).toMatch(/restricted/);
+    s.personal.cash = 50_000_000;
+    expect(cmd.offerProperty(s, l.siteId, l.asking, 'personal').ok).toBe(true);
+  });
+
   it('books a company purchase at value, with the price difference as a property gain', () => {
     const s = game();
     fund(s, 50_000_000);

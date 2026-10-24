@@ -1,7 +1,7 @@
 // Read-only views of one HQ department for its floor (SCREENS §10): coverage
 // in plain words, the advisor's coverage-aware lines (CONTENT §25), salary
 // stepper bounds and the desk picture's numbers. Nothing here mutates GameState.
-import { FOUNDER_RAMP, HQ_COVERAGE } from '../../config/balance';
+import { FOUNDER_RAMP, HQ_COVERAGE, VENTURES } from '../../config/balance';
 import { DEPARTMENTS, HQ_DEPTS } from '../../data/departments';
 import { DEPT_SALARY_RANGE, DEPT_SALARY_STEP } from '../../sim/commands';
 import { deptDesks, deptMarketSalary } from '../../sim/hq';
@@ -116,6 +116,18 @@ export function deptAdvisor(s: GameState, dept: DeptId): string[] {
     else if (cov.status === 'founder')
       lines.push(`We're a small shop, so nobody's counting heads yet. ${ok}`);
     else lines.push(ok);
+  }
+  if (dept === 'investment' && d && d.staff > 0) {
+    // SIMULATION §20.3: the pipeline shows 1 + floor(staff / 4) startups, up to the max.
+    const shown = Math.min(
+      VENTURES.pipelineMax,
+      VENTURES.pipelineBase + Math.floor(d.staff / VENTURES.staffPerExtra),
+    );
+    const more =
+      shown < VENTURES.pipelineMax
+        ? ` Every ${VENTURES.staffPerExtra} more analysts finds another.`
+        : '';
+    lines.push(`We're tracking ${shown} startups that are raising.${more}`);
   }
   if (d) {
     const open = d.target - d.staff;

@@ -390,7 +390,8 @@ Tabs: Overview · Loans · Credit.
 - **Lobbying firm:**
   - campaign cards with cost, success %, exposure risk %, and Lobby
   - the outcome arrives in 4–8 weeks
-  - examples: "Ease the capital buffer by 1pp for 4 quarters", "Fast-track a merger review", "Delay fee-cap legislation"
+  - campaigns: "Ease the capital buffer by 1pp for 4 quarters", "Fast-track a merger review", "Stall the capital buffer bill" (only while one is pending; there is no fee-cap law to delay)
+  - sections: In force, Under way (weeks left), Past campaigns
 - **University:**
   - Student partnership: same as an employer deal, but with student accounts
   - Graduate program: yearly cost ($120k × wageIndex); adds +10 to candidate skill and +1 hire a week
@@ -413,6 +414,7 @@ Tabs: Overview · Loans · Credit.
     - ROI %
   - **Real estate sale:** For Sale toggle
 - **Foreclosed homes** (Company → Real estate): units, value, carrying cost, and Sell all / Rent / Hold.
+- **Map pins:** a building's pin shows only while it's for sale ("For sale" tag, never "For lease") or once you own it (your seal; "Selling" while For Sale is on). Unlisted buildings say "Not for sale right now; listings refresh every 4 weeks".
 
 ## 17. Convention
 
@@ -421,6 +423,7 @@ Tabs: Overview · Loans · Credit.
 - **Hero:** exhibition hall vignette.
 - **Ventures carousel:** exclusive startups.
 - **Networking:** 1–2 cards (an executive candidate, a partnership lead).
+- **Before it opens:** the dates and "Opens in N weeks". The convention centre's pin shows only from the announcement to the end of the event.
 
 ## 18. Airport and travel
 

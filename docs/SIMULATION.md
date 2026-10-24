@@ -37,11 +37,11 @@ How the economy works, step by step. Every CAPS name is a key in `src/config/bal
 5. `partnerships.weekly` (§13.7)
 6. `treasury.weekly` (§13)
 7. `hq.weekly`: floors, coverage, benefits, then developments (§16.6) and underwriting models (custom model refresh, switch countdown, §16.7)
-8. Corporate items: offices, executives, brand marketing, real estate, REO, corporate debt, depreciation (§14, §21)
+8. Corporate items: offices, executives, brand marketing, corporate debt, M&A, real estate, REO, ventures (venture debt payments, rounds closing, the pipeline), conventions, lobbying outcomes, depreciation (§14, §20, §21)
 9. `statements.close`: P&L, cash flow, balance sheet, tax (§14)
 10. `capital.evaluate` and regulator tier (§15)
 11. `personal.weekly` (§22)
-12. `market.weekly`: listed prices, your valuation, portfolios (§19)
+12. `market.weekly`: listed prices, your valuation, portfolios (§19), then currencies (§19.10)
 13. **Quarter-end** (first weekly tick after Mar 31, Jun 30, Sep 30, Dec 31):
     - earnings for every listed company, rival and you
     - dividends declared, paid 3 weeks later
@@ -862,6 +862,14 @@ A deliberately simple "country up or down" investment (DESIGN §5.12a). Your boo
   - Amortizes over 156 weeks.
   - On failure: LGD 0.8.
 - **20.6 Marks:** shares × the latest round price per share. Public → market price. Failed → 0. Acquired → cash.
+- **20.7 Details (Stage 7):**
+  - **Creation:** seed startups get a share price from `VENTURE_GEN.sharePrice[stage]`, a founder plus 1–2 funds on the cap table, 4 quarters of revenue history at post-money ÷ the sector P/S multiple (`src/data/startups.ts`), cash for 2–10 quarters of burn and a funding history (last round 12% of post-money, each earlier one 40% of the next). The generator keeps the pipeline supplied from the name and blurb pools.
+  - **Rounds:** the new shares are offered as two equal lots (a 30% round gives the original's two 15% lots). The round price becomes the mark when the round opens; shares are issued as lots are taken; unsold lots go to a fund at close. Generated startups open their first round at their current valuation.
+  - **Margin:** target = sector margin − `VENTURE_MARGIN.gap` × max(0, 8 − Product maturity) / 8; each quarter closes 25% of the gap. A startup whose cash goes negative fails.
+  - **IPO:** lists at the last round price × U(1.0, 1.5) (`VENTURE_IPO`) with vol 0.45, growth min(4μ, 20%) and no dividend; your stakes move into market holdings at cost, and the listing pop is marked through `investmentGains`.
+  - **Investing** as the company (lots and venture debt) is refused at the Restricted and Critical tiers, like acquisitions. A startup you hold or lend to stays visible wherever you are.
+  - **Housekeeping:** convention exclusives you never backed leave at year end; finished startups you didn't hold keep only the last 12; held ones stay.
+- **20.8 Conventions:** this year's and next year's runs are kept (`state.conventions.runs`), from the CONTENT §19 calendar. Two weeks before opening a run is announced (Ledger story) and 3–6 exclusive startups appear with rounds open through the event; it is open for 1 week. Its startups are visible and buyable only from that city's convention centre while it is open, and never enter the Investment floor pipeline. The convention centre's map pin shows only from announcement to close.
 
 ## 21. Real estate
 
@@ -887,6 +895,17 @@ A deliberately simple "country up or down" investment (DESIGN §5.12a). Your boo
   - **Hold**
   - RWA weight 1.0.
 - **21.4 Ownership:** choose Company or Private at purchase. Private property counts in personal wealth only.
+- **21.5 Details (Stage 7):**
+  - Each city has REAL_ESTATE.buildingsPerCity property buildings (S 4, M 6, L 8, XL 10; 1,500–12,000 m²). Every 4 weeks `max(1, round(0.4 × unowned))` are listed; listings not picked again disappear. An unowned building's occupancy is drawn once from U(0.75, 0.95). Estimates follow cre weekly; asking prices stay fixed.
+  - **Offers** are answered at once. A rejected offer locks that listing until the city's next refresh. The offer stepper runs from 80% of asking up to asking.
+  - **Books:** a company purchase pays investing cash and enters the balance sheet at the estimate; paying more or less than the estimate is posted to `propertyGains` (non-cash), as are weekly revaluations with cre. Rent → `rentalIncome`; maintenance and vacancy → `propertyCosts`. Company purchases are refused at the Restricted and Critical tiers.
+  - Rent can be set from 50% to 160% of market rent in steps of 5 per m². Turning For Sale off cancels a pending sale. A sold building returns to the listable pool.
+  - **REO:** carrying cost is charged in Hold and Rent; selling has none, can't be called off, and includes foreclosures that arrive meanwhile. The 10% haircut at settlement is a property loss. Mode changes don't require being in that city.
+  - Deals of $10M or more make the paper.
+- **21.6 Lobbying** (DESIGN §5.8.10, `src/data/lobbying.ts`, `LOBBYING`):
+  - Campaigns: **Ease the capital buffer** ($2.5M, 55% success, 12% exposure): tier thresholds in that country drop 1pp for 52 weeks. **Fast-track a merger review** ($1.5M, 60%, 10%): the next deal that closes may reach 45% of a city's deposits (MERGERS.fastTrackShare). **Stall the capital buffer bill** ($1.2M, 50%, 15%): only while a capital-buffer bill is pending there; a win makes it fail its vote.
+  - The fee is paid at the start (`lobbying`, opex); the outcome arrives in 4–8 weeks (a stall no later than the vote). One pending campaign per type; a fast-track can't be bought while one is unused.
+  - Exposure is rolled win or lose: a fine of 50% of the fee and −0.03 brand awareness in your cities in that country, plus a Ledger exposé.
 
 ## 22. Personal
 
@@ -1026,5 +1045,9 @@ Group the constants like this, with the defaults shown above:
 - **MARKETS:**
   - `COE`, `IPO_MIN_EQUITY = 25_000_000`, `PRIVATE_DISCOUNT = 0.8`
   - `SECONDARY_DISCOUNT = 0.03`, `REBRAND_COST`, `COMMISSION = 0.001`
-- **PERSONAL:** `PERSONAL_TAX = 0`, `INSIDER_WINDOW_WEEKS = 2`, `INSIDER_PROB = 0.15`, `TRAVEL_KM_PER_WEEK = 24_140`
+- **INVESTMENTS (Stage 7):**
+  - `VENTURES` (pipeline, growth, rounds, failure, IPO and acquisition odds), `VENTURE_DEBT`, `VENTURE_MARGIN`, `VENTURE_GEN`, `VENTURE_IPO`, `VENTURE_NEWS`
+  - `VENTURE_RISK_WEIGHT = 2.5`, `VENTURE_DEBT_RISK_WEIGHT = 1.5`, `PROPERTY_RISK_WEIGHT = 1.0`, `FX_RISK_WEIGHT = 1.0`
+  - `CONVENTIONS`, `REAL_ESTATE`, `REO`, `LOBBYING`, `FX`, `FX_START_INDEX = 100`
+- **PERSONAL:** `PERSONAL_TAX = 0`, `INSIDER_WINDOW_WEEKS = 2`, `INSIDER_PROB = 0.15`, `TRAVEL_KM_PER_WEEK = 24_140`, `FLIGHT_FARE` (Stage 8)
 - **FEATURES:** flags per stage (ROADMAP)
