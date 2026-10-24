@@ -1,0 +1,72 @@
+// Simplified statements for the Company panel (SCREENS §24, no HQ yet): an
+// income statement and cash flow over Week, Quarter or Year, and the balance sheet.
+import { useState } from 'preact/hooks';
+import type { GameState } from '../../sim/state';
+import { Card, Segmented } from '../components';
+import { figure } from '../format/format';
+import {
+  balanceSheetLines,
+  cashFlowStatement,
+  incomeStatement,
+  periodSnapshots,
+  PERIOD_WEEKS,
+  type Period,
+  type StatementLine,
+} from './statementData';
+
+function Lines(p: { lines: StatementLine[] }) {
+  return (
+    <div class="stmt">
+      {p.lines.map((l) => (
+        <div class={`stmt-row stmt-${l.kind ?? 'line'}`} key={l.label}>
+          <span>{l.label}</span>
+          <span class={l.value < 0 ? 'tone-bad' : undefined}>{figure(l.value)}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function Statements(p: { state: GameState }) {
+  const [period, setPeriod] = useState<Period>('week');
+  const snaps = periodSnapshots(p.state, period);
+  const wanted = PERIOD_WEEKS[period];
+  return (
+    <div class="stack co-stack">
+      <Segmented
+        label="Statement period"
+        value={period}
+        onChange={setPeriod}
+        options={[
+          { value: 'week', label: 'Week' },
+          { value: 'quarter', label: 'Quarter' },
+          { value: 'year', label: 'Year' },
+        ]}
+      />
+      {snaps.length === 0 ? (
+        <p class="muted">Statements appear after the first weekly close.</p>
+      ) : (
+        <>
+          <Card>
+            <h4 class="stmt-title">Income statement</h4>
+            <Lines lines={incomeStatement(snaps)} />
+          </Card>
+          <Card>
+            <h4 class="stmt-title">Cash flow</h4>
+            <Lines lines={cashFlowStatement(snaps)} />
+          </Card>
+          <p class="muted small stmt-note">
+            {snaps.length < wanted
+              ? `Based on ${snaps.length} week${snaps.length === 1 ? '' : 's'} of trading so far. `
+              : ''}
+            Amounts in {p.state.settings.currency}.
+          </p>
+        </>
+      )}
+      <Card>
+        <h4 class="stmt-title">Balance sheet</h4>
+        <Lines lines={balanceSheetLines(p.state)} />
+      </Card>
+    </div>
+  );
+}

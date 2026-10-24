@@ -1,0 +1,210 @@
+/* Company summary and Branches list (SCREENS §24, §25). */
+.co-stack > .card + .card {
+  margin-top: 0;
+}
+
+/* ─── Capital meter ────────────────────────────────────────────────────── */
+.cap-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+.cap-note {
+  margin: var(--space-3) 0 0;
+}
+.meter-bar {
+  position: relative;
+  display: flex;
+  height: 14px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-pill);
+  background: var(--vault-deep);
+}
+.meter-band {
+  display: block;
+  height: 100%;
+  border-right: 1px solid var(--vault-deep);
+  opacity: 0.4;
+}
+.meter-band:first-of-type {
+  border-radius: var(--radius-pill) 0 0 var(--radius-pill);
+}
+.meter-band:last-of-type {
+  border-right: 0;
+  border-radius: 0 var(--radius-pill) var(--radius-pill) 0;
+}
+.meter-band.is-current {
+  opacity: 1;
+}
+.meter-critical,
+.meter-restricted {
+  background: var(--oxblood);
+}
+.meter-watch {
+  background: var(--brass);
+}
+.meter-adequate,
+.meter-strong {
+  background: var(--jade);
+}
+.meter-marker {
+  position: absolute;
+  top: -5px;
+  bottom: -5px;
+  width: 3px;
+  margin-left: -1.5px;
+  border-radius: 2px;
+  background: var(--ivory);
+}
+.meter-ticks {
+  position: relative;
+  height: 22px;
+  margin-top: var(--space-1);
+  font-size: var(--text-12);
+  color: var(--ivory-dim);
+}
+.meter-ticks span {
+  position: absolute;
+  top: 2px;
+  transform: translateX(-50%);
+}
+.meter-legend {
+  list-style: none;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  font-size: var(--text-14);
+}
+.meter-legend li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 4px 0;
+  border-bottom: 1px solid rgb(184 145 61 / 12%);
+}
+.meter-legend li:last-child {
+  border-bottom: 0;
+}
+.meter-legend li.is-current {
+  font-weight: 700;
+  color: var(--brass-light);
+}
+
+.explain-title {
+  margin: 0 0 var(--space-1);
+  font-family: var(--font-display);
+  font-size: var(--text-16);
+}
+.explain-body {
+  margin: 0;
+  font-size: var(--text-14);
+  color: var(--ivory-dim);
+}
+
+/* ─── Statements ───────────────────────────────────────────────────────── */
+.stmt-title {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-16);
+}
+.stmt-row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 5px 0;
+  font-size: var(--text-14);
+  font-variant-numeric: tabular-nums;
+  border-bottom: 1px solid rgb(184 145 61 / 10%);
+}
+.stmt-row > span:last-child {
+  text-align: right;
+}
+.stmt-sub {
+  padding-left: var(--space-3);
+  color: var(--ivory-dim);
+}
+.stmt-total {
+  font-weight: 700;
+  border-bottom-color: var(--hairline);
+}
+.stmt-note {
+  margin: 0;
+}
+
+/* ─── Branches list ────────────────────────────────────────────────────── */
+.branches-empty {
+  margin: 0;
+  color: var(--ivory-dim);
+}
+.city-filter {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.filter-chip {
+  flex: none;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-4);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--ivory-dim);
+  font-size: var(--text-14);
+  font-weight: 600;
+  cursor: pointer;
+}
+.filter-chip.is-active {
+  border-color: var(--brass);
+  color: var(--brass-light);
+}
+.branch-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.branch-row-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.branch-row-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-16);
+  line-height: 1.25;
+}
+.branch-row-city {
+  margin-top: -6px;
+}
+.branch-row-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+}
+.branch-stat {
+  display: flex;
+  flex-direction: column;
+}
+.branch-stat-value {
+  font-weight: 700;
+  font-size: var(--text-16);
+}
+.branch-stat-label {
+  font-size: var(--text-12);
+  color: var(--ivory-dim);
+}
+.branch-row-issues {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.sort-seg .segmented-opt {
+  padding: 0;
+  font-size: var(--text-12);
+  white-space: nowrap;
+}
