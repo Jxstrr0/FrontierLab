@@ -179,6 +179,10 @@
   outline: none;
   background: rgb(184 145 61 / 10%);
 }
+.stepper-input:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: -2px;
+}
 .stepper-hint {
   font-size: var(--text-12);
   color: var(--ivory-dim);
@@ -266,6 +270,15 @@
   font-weight: 600;
   cursor: pointer;
   padding: 0 var(--space-2);
+}
+/* The pill is 38px; the hit area reaches into the track's padding to 44px. */
+.segmented-opt {
+  position: relative;
+}
+.segmented-opt::after {
+  content: '';
+  position: absolute;
+  inset: -3px -1px;
 }
 .segmented-opt.is-active {
   background: var(--brass);
@@ -681,6 +694,15 @@
   padding: 0 var(--space-4);
   font-size: var(--text-14);
 }
+/* Drawn at 36px, tapped at 44px (CLAUDE.md: tap targets ≥ 44 px). */
+.btn-small {
+  position: relative;
+}
+.btn-small::after {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
+}
 
 /* ─── Toasts ───────────────────────────────────────────────────────────── */
 .toasts {
@@ -759,7 +781,7 @@
   flex-wrap: wrap;
 }
 .carousel-dot {
-  width: 28px;
+  width: var(--tap-min);
   height: var(--tap-min);
   border: 0;
   padding: 0;

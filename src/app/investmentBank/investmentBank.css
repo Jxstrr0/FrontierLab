@@ -198,10 +198,10 @@
   font-weight: 700;
 }
 .ib-checklist .is-ok .ib-check {
-  color: var(--jade);
+  color: var(--jade-text);
 }
 .ib-checklist .is-no .ib-check {
-  color: var(--oxblood);
+  color: var(--oxblood-text);
 }
 .ib-check-detail {
   text-align: right;

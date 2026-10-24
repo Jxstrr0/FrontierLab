@@ -3,6 +3,7 @@
 // to that card, so it works by swipe, tap or keyboard.
 import { toChildArray, type ComponentChildren } from 'preact';
 import { useRef, useState } from 'preact/hooks';
+import { motionReduced } from '../settings/display';
 
 export function Carousel(p: { children: ComponentChildren; label: string; class?: string }) {
   const strip = useRef<HTMLDivElement>(null);
@@ -28,14 +29,21 @@ export function Carousel(p: { children: ComponentChildren; label: string; class?
   };
   const go = (i: number) =>
     (strip.current?.children[i] as HTMLElement | undefined)?.scrollIntoView({
-      behavior: 'smooth',
+      behavior: motionReduced() ? 'auto' : 'smooth',
       inline: 'center',
       block: 'nearest',
     });
 
   return (
     <div class={`carousel-wrap${p.class ? ` ${p.class}` : ''}`}>
-      <div class="carousel" ref={strip} onScroll={onScroll} role="group" aria-label={p.label}>
+      <div
+        class="carousel"
+        ref={strip}
+        onScroll={onScroll}
+        role="group"
+        aria-label={p.label}
+        tabIndex={0}
+      >
         {items}
       </div>
       {items.length > 1 && (
