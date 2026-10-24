@@ -112,7 +112,15 @@ export interface EventPayloads {
     salaryPassed: boolean;
   };
   /** The board approved a dividend; paid `payWeek` (a DIVIDEND_DUE case reminds you). */
-  DIVIDEND_DECLARED: { bank: string; dps: Money; total: Money; payWeek: number; yieldPct: number };
+  DIVIDEND_DECLARED: {
+    bank: string;
+    dps: Money;
+    /** The previous approved dividend per share (sentiment: raise or cut, §19.5). */
+    prevDps: Money;
+    total: Money;
+    payWeek: number;
+    yieldPct: number;
+  };
   DIVIDEND_PAID: { bank: string; dps: Money; total: Money; personal: Money };
   EXEC_HIRED: { seat: string; title: string; name: string };
   /** An executive resigned or was poached (EXEC_POACHED decides first). */

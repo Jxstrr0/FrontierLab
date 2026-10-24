@@ -13,3 +13,7 @@ export * from './hq';
 export * from './partnerships';
 export * from './corporate';
 export * from './incidents';
+export * from './executives';
+export * from './governance';
+export * from './markets';
+export * from './mergers';

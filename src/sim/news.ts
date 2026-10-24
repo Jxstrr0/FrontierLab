@@ -16,6 +16,9 @@ import { LEDGER_TEMPLATES } from '../data/ledgerTemplates';
 import type { CountryId } from '../data/types';
 import { isoDate } from './calendar';
 import { companyStories } from './newsCompany';
+import { governanceStories } from './newsGovernance';
+import { marketsStories } from './newsMarkets';
+import { mergersStories } from './newsMergers';
 import { fillTemplate } from './newsFormat';
 import {
   centralBankStories,
@@ -74,6 +77,9 @@ export function composeNews(state: GameState): void {
     ...closeStories(ctx),
     ...centralBankStories(ctx),
     ...rivalStories(ctx),
+    ...governanceStories(ctx),
+    ...marketsStories(ctx),
+    ...mergersStories(ctx),
     ...politicsStories(ctx),
     ...sports.stories,
     ...housingStories(ctx, rng),
