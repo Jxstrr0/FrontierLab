@@ -84,6 +84,12 @@
   transform: scale(0.92);
 }
 
+/* Your HQ: a branch-style medallion with an extra brass ring around it. */
+.pin-hq .pin-body {
+  outline: 1.5px solid var(--brass-light);
+  outline-offset: 1.5px;
+}
+
 /* For lease: an ivory tag with a brass outline. */
 .pin-lease {
   width: 76px;

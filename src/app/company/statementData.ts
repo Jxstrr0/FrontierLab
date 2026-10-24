@@ -21,8 +21,13 @@ export interface StatementLine {
   kind?: 'sub' | 'total';
 }
 
-export function periodSnapshots(s: GameState, period: Period): WeeklySnapshot[] {
-  return s.history.weekly.slice(-PERIOD_WEEKS[period]);
+/**
+ * The weekly records a statement period sums. `delayWeeks` leaves out the
+ * newest weeks, which a short-staffed Finance floor hasn't closed yet.
+ */
+export function periodSnapshots(s: GameState, period: Period, delayWeeks = 0): WeeklySnapshot[] {
+  const closed = s.history.weekly.slice(0, Math.max(0, s.history.weekly.length - delayWeeks));
+  return closed.slice(-PERIOD_WEEKS[period]);
 }
 
 function sumPnl(snaps: WeeklySnapshot[]): Record<PnlLine, number> {

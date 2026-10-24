@@ -1,0 +1,330 @@
+/* HQ panel styles (SCREENS §10, ART_DIRECTION §1 and §3). */
+.hq-root > .card + .card {
+  margin-top: 0;
+}
+.hq-note {
+  margin: var(--space-2) 0 0;
+}
+.hq-empty {
+  margin: 0 0 var(--space-3);
+}
+
+/* ─── Office interior hero ─────────────────────────────────────────────── */
+.hq-interior {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: var(--vault-deep);
+}
+.hq-floor {
+  fill: rgb(184 145 61 / 6%);
+  stroke: var(--brass-light);
+  stroke-width: 1;
+  stroke-linejoin: round;
+}
+.hq-wall {
+  fill: rgb(238 231 211 / 4%);
+  stroke: var(--brass-light);
+  stroke-width: 1;
+  stroke-linejoin: round;
+}
+.hq-wall-shade {
+  fill: rgb(15 24 40 / 50%);
+}
+.hq-desk {
+  fill: none;
+  stroke: var(--brass-light);
+  stroke-width: 0.9;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  opacity: 0.45;
+}
+.hq-desk.is-taken {
+  opacity: 1;
+}
+.hq-desk-top {
+  fill: var(--vault-deep);
+}
+.hq-screen {
+  fill: var(--vault-raised);
+}
+.hq-person {
+  stroke: var(--ivory);
+  stroke-width: 0.8;
+}
+.hq-mood-good {
+  fill: var(--jade);
+}
+.hq-mood-warn {
+  fill: var(--brass);
+}
+.hq-mood-bad {
+  fill: var(--oxblood);
+}
+.hq-interior-caption {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  fill: var(--ivory-dim);
+}
+
+/* ─── Office switcher ──────────────────────────────────────────────────── */
+.hq-switcher {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.hq-switch {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: var(--tap-min);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-card);
+  background: var(--vault-deep);
+  color: var(--ivory-dim);
+  text-align: left;
+  cursor: pointer;
+}
+.hq-switch.is-active {
+  border-color: var(--brass);
+  color: var(--ivory);
+}
+.hq-switch-name {
+  font-weight: 700;
+  font-size: var(--text-14);
+}
+
+/* ─── Team and coverage ────────────────────────────────────────────────── */
+.hq-root .stepper-value {
+  white-space: nowrap;
+}
+.hq-staff-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+.hq-coverage {
+  margin-top: var(--space-4);
+}
+.hq-coverage-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-2);
+}
+.hq-coverage-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-16);
+}
+.hq-coverage-text {
+  font-size: var(--text-14);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.hq-meter {
+  position: relative;
+  height: 10px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-pill);
+  background: var(--vault-deep);
+}
+.hq-meter-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: var(--radius-pill);
+  background: var(--brass);
+}
+.hq-meter-ok {
+  background: var(--jade);
+}
+.hq-meter-short {
+  background: var(--oxblood);
+}
+.hq-meter-founder {
+  background: var(--ivory-dim);
+  opacity: 0.6;
+}
+.hq-meter-full {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--brass-light);
+}
+
+/* ─── Finance ──────────────────────────────────────────────────────────── */
+.hq-headline {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-24);
+  line-height: 1.2;
+}
+.hq-delayed-weeks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+.hq-delayed-chip {
+  padding: 2px 10px;
+  border: 1px dashed var(--oxblood);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-12);
+  color: #e07a7a;
+}
+
+/* ─── HR benefits ──────────────────────────────────────────────────────── */
+.hq-benefits .carousel > .hq-benefit {
+  flex-basis: 84%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.hq-benefit-head {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+}
+.hq-benefit-art {
+  flex: none;
+  width: 64px;
+  height: 64px;
+}
+.hq-benefit-ring {
+  fill: none;
+  stroke: var(--brass);
+  stroke-width: 1;
+}
+.hq-benefit-ring-fine {
+  stroke-dasharray: 1.5 2;
+  opacity: 0.7;
+}
+.hq-benefit-line {
+  fill: none;
+  stroke: var(--brass-light);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.hq-benefit-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-16);
+}
+.hq-benefit-desc {
+  margin: var(--space-1) 0 0;
+}
+.hq-benefit-foot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.hq-benefit-effects {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+.hq-benefit-ref {
+  margin: 0;
+}
+.hq-benefit.is-locked .hq-benefit-head {
+  opacity: 0.6;
+}
+
+/* ─── IT ───────────────────────────────────────────────────────────────── */
+.hq-app-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+/* ─── Placeholders ─────────────────────────────────────────────────────── */
+.hq-placeholder {
+  border-style: dashed;
+}
+.hq-placeholder-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+.hq-placeholder-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-16);
+}
+.hq-placeholder-tag {
+  font-size: var(--text-12);
+  color: var(--brass-light);
+}
+
+/* ─── Office card, release and add floor ───────────────────────────────── */
+.hq-floor-list {
+  list-style: none;
+  margin: var(--space-2) 0 0;
+  padding: var(--space-2) 0 0;
+  border-top: 1px solid var(--hairline);
+  font-size: var(--text-14);
+}
+.hq-floor-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 0;
+}
+.hq-release {
+  margin-top: var(--space-4);
+}
+.hq-confirm-list {
+  margin: 0;
+  padding-left: 1.1em;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.hq-sheet-intro {
+  margin: 0 0 var(--space-3);
+}
+.hq-blocker {
+  margin: 0 0 var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-left: 3px solid var(--oxblood);
+  background: var(--vault-raised);
+  border-radius: var(--radius-card);
+}
+.hq-add-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.hq-add-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid rgb(184 145 61 / 15%);
+}
+.hq-add-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.hq-add-name {
+  font-weight: 700;
+}
+.hq-add-btn {
+  flex: none;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-4);
+}
