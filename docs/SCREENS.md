@@ -280,7 +280,7 @@ Tabs: Overview · Loans · Credit.
   - Board meeting card: explanation, last meeting date, Hold meeting (enabled once per quarter)
   - Senior executives grid: seven seats (CEO, COO, CFO, CPO, CMO, CTO, CRO) with portrait, name and title; empty seats show Hire
 - **Investment:**
-  - portfolio value with weekly change, a donut (Stocks, Ventures, Real estate, Venture debt) and List portfolio
+  - portfolio value with weekly change, a donut (Stocks, Ventures, Real estate, Venture debt, Currencies) and List portfolio
   - Ventures carousel (vignette, name, sector, short description, founded, Details)
 - **Add floor sheet:** department choices with descriptions, desks and fit-out cost.
 
@@ -327,7 +327,8 @@ Tabs: Overview · Loans · Credit.
 
 **Market:**
 - the Ledger Composite index card (value, weekly change, sparkline)
-- sector Segmented: Banking, Technology, Energy, Auto, Retail, Real estate
+- sector Segmented: Banking, Technology, Energy, Auto, Retail, Real estate, Currencies
+- **Currencies** (SIMULATION §19.10): one card per foreign currency with flag-free country medallion, name, index vs home with weekly change and sparkline, a one-line "why it's moving" (growth, rates, cycle), your position (company / personal) and Buy / Sell with an amount stepper and Company | Private toggle
 - company card carousel:
   - monogram, name, ticker and exchange
   - sparkline and price
@@ -425,7 +426,7 @@ Tabs: Overview · Loans · Credit.
 - **Header:** airport name; advisor.
 - **Hero:** terminal vignette.
 - **Stats:** flown this week and remaining mileage (weekly allowance).
-- **Departures board:** split-flap styled rows with destination and distance (km or mi). Tap a row to fly: the plane animates across the map, then the destination map loads. Rows beyond the remaining mileage are greyed out ("Not enough mileage this week").
+- **Departures board:** split-flap styled rows with destination and distance (km or mi). Tap a row to fly: the plane animates across the map, then the destination map loads. Rows beyond the remaining mileage stay tappable and show the one-way fare ("$100k ticket"); a confirm says the fare comes from personal cash. Travel is never blocked.
 - **Private jet card:** Buy jet, or Fly now once owned.
 
 ## 19. Vacation home · Car dealer · Auction house

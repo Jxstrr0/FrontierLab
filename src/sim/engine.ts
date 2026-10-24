@@ -16,6 +16,7 @@ import { evaluateCapital } from './capital';
 import { runExecutives } from './executives';
 import { governanceQuarter, runGovernance } from './governance';
 import { marketsQuarter, runMarkets } from './market';
+import { runFx } from './fx';
 import { runMergers } from './mergers';
 import { conventionsYear, runConventions } from './conventions';
 import { runLobbying } from './lobbying';
@@ -108,6 +109,7 @@ export function weeklyTick(state: GameState): void {
   checkFailure(state);
   runPersonal(state); // 11
   runMarkets(state); // 12
+  runFx(state); // 12 (currencies, §19.10)
 
   if (isQuarterStart(state.meta.startDate, state.clock.day)) {
     quarterEnd(state); // 13

@@ -823,6 +823,19 @@ Levels 1–5 (Very conservative to Very aggressive):
   - draw or repay any week
 - These are corporate debt and flow through corporate cash.
 
+### 19.10 Currencies (FX)
+A deliberately simple "country up or down" investment (DESIGN §5.12a). Your books stay in one currency.
+- **State:** a strength level per country, `L[c]`, starting at 100. A currency's rate against your home currency is `fx[c] = L[c] / L[home] × 100`, so your home currency always reads 100 and can't be bought.
+- **Weekly move** (tick step 12, after listed prices), per country:
+  - `r_c = FX.growthW × gdp_c/100/52 + FX.rateW × policy_c/52 + FX.phase[phase_c] + normal(0, vol_c × FX.volMult)`
+  - `L[c] *= 1 + r_c`, clamped to [FX.min, FX.max] × 100.
+  - So `fx[c]` moves by about `r_c − r_home`: growth and rate differentials plus the cycle gap and noise.
+  - HK is pegged to the US: `L[HK] = L[US] × (1 + normal(0, FX.pegVol))`.
+  - Currency volatilities are in `src/data/currencies.ts`.
+- **Positions:** buy an amount of a currency as the company or personally: `units = amount / fx[c]`; value = `units × fx[c]`. Buying and selling pay FX.spread on the amount (to `commissions` for the company). No carry is paid; the rate differential is already in the drift.
+- **Books:** company positions are investments at value, marked through `investmentGains` like stocks; risk weight FX_RISK_WEIGHT (1.0).
+- **News:** a currency moving more than FX.newsMove (2%) in a week makes the Markets page.
+
 ## 20. Ventures
 
 - **20.1 Startup state:**
@@ -892,7 +905,7 @@ Levels 1–5 (Very conservative to Very aggressive):
   - the jet loses 6% a year
   - a franchise grows with league revenue
 - **Net worth** = personal cash + stocks at market + real estate + other assets.
-- **Travel allowance:** TRAVEL_KM_PER_WEEK = 24,140 km, reset each weekly tick. A flight is allowed only if its great-circle distance ≤ the remaining km. Owning a jet doubles the allowance (assumption).
+- **Travel allowance:** TRAVEL_KM_PER_WEEK = 24,140 km, reset each weekly tick. A flight within the remaining km is free and uses that distance. A longer flight is never refused: it costs FLIGHT_FARE (a flat one-way fare, scaled by the destination city's costIndex) from personal cash and leaves the allowance untouched. Jet flights are always free (assumption).
 - **Insider trading:** a personal trade in your own bank's shares within 2 weeks before a quarter-end has a 15% chance per trade of an investigation. Outcome: fine of max(3× the gain, $250k), overall rating −0.1 for 8 weeks, news.
 - **Auctions:**
   - Each house holds a monthly auction of 3–5 lots, each with an estimate.
