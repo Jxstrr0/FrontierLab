@@ -51,6 +51,8 @@ Each site is a small map with an airport and 1–2 employers. There are no store
 | plb | Pilbara (Port Hedland) | AU | −20.31, 118.58 | Red Range Iron |
 | mid | Midland | US | 31.99, −102.08 | Permian Basin Field Services |
 
+Regional maps are 28 tiles, size S, with their own ink (Boreal Umber, Iron Red, Permian Tan). Their employer is a Resource Camp (3,000 staff, income ×1.5).
+
 ## 3. Districts
 Each city's generator mixes these districts in proportions set by city size.
 
@@ -406,7 +408,7 @@ Branch counts at start, by city size: S 3–5, M 6–10, L 10–16, XL 16–24 i
   - Kanazawa Auctions (Tokyo, Hong Kong): 6%
 - **Convention centre:** one per L and XL city, plus every city that hosts a convention (Saskatoon, Calgary). Venue names are in `src/data/conventions.ts`; other cities use "{City} Convention Centre".
 - **Property buildings:** 4 / 6 / 8 / 10 per S / M / L / XL city, in any district (SIMULATION §21.5).
-- **Airports** (code, name): SAS Saskatoon Regional · CAL Calgary International · VAN Vancouver International · TOR Toronto Pearson-style "Lakeshore International" · MTL Montréal-Mercier · NYC Liberty International · CHI O'Hare-style "Lakefront International" · SFO Bayview International · SEA Sound International · LON Thameshaven · PAR Charles-Lumière · FRA Rhein-Main · AMS Polder International · ZUR Kloten-Alpen · TYO Haneda-Bay · SYD Harbour Kingsford · SIN Changi-Garden · HKG Lantau Harbour. All fictional names; use the city name in UI where clearer.
+- **Airports** (code, name): SAS Saskatoon Regional · CAL Calgary International · VAN Vancouver International · TOR Toronto Pearson-style "Lakeshore International" · MTL Montréal-Mercier · NYC Liberty International · CHI O'Hare-style "Lakefront International" · SFO Bayview International · SEA Sound International · LON Thameshaven · PAR Charles-Lumière · FRA Rhein-Main · AMS Polder International · ZUR Kloten-Alpen · TYO Haneda-Bay · SYD Harbour Kingsford · SIN Changi-Garden · HKG Lantau Harbour. Regional sites: FMM Athabasca Field · PHE Port Hedland Strip · MAF Permian Regional. All fictional names; use the city name in UI where clearer.
 
 ## 17. Stock market (non-bank listed companies)
 

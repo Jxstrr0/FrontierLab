@@ -18,7 +18,7 @@ How the economy works, step by step. Every CAPS name is a key in `src/config/bal
 
 **Daily** (1 game day = 1 s at 1×):
 - Advance the date.
-- Resolve scheduled events due today: fit-out done, flight landed, auction closed, dividend paid, offer expired.
+- Resolve scheduled events due today: fit-out done, auction closed, dividend paid, offer expired. (Flights are instant; the flight animation is cosmetic.)
 - Animate the HUD cash and date.
 
 **Weekly** (every 7th day), in this order:
@@ -40,7 +40,7 @@ How the economy works, step by step. Every CAPS name is a key in `src/config/bal
 8. Corporate items: offices, executives, brand marketing, corporate debt, M&A, real estate, REO, ventures (venture debt payments, rounds closing, the pipeline), conventions, lobbying outcomes, depreciation (§14, §20, §21)
 9. `statements.close`: P&L, cash flow, balance sheet, tax (§14)
 10. `capital.evaluate` and regulator tier (§15)
-11. `personal.weekly` (§22)
+11. `personal.weekly` (§22), then `travel.weekly`: reset the km allowance, jet upkeep and depreciation (§22)
 12. `market.weekly`: listed prices, your valuation, portfolios (§19), then currencies (§19.10)
 13. **Quarter-end** (first weekly tick after Mar 31, Jun 30, Sep 30, Dec 31):
     - earnings for every listed company, rival and you
@@ -924,7 +924,8 @@ A deliberately simple "country up or down" investment (DESIGN §5.12a). Your boo
   - the jet loses 6% a year
   - a franchise grows with league revenue
 - **Net worth** = personal cash + stocks at market + real estate + other assets.
-- **Travel allowance:** TRAVEL_KM_PER_WEEK = 24,140 km, reset each weekly tick. A flight within the remaining km is free and uses that distance. A longer flight is never refused: it costs FLIGHT_FARE (a flat one-way fare, scaled by the destination city's costIndex) from personal cash and leaves the allowance untouched. Jet flights are always free (assumption).
+- **Travel allowance:** TRAVEL_KM_PER_WEEK = 24,140 km, reset each weekly tick (step 11). Distances are great-circle km on CONTENT §2 coordinates (Earth radius 6,371 km), rounded to whole km. A flight within the remaining km is free and uses that distance. A longer flight is never refused: it costs FLIGHT_FARE × the destination's costIndex (FLIGHT_FARE = 80,000) from personal cash and leaves the allowance untouched; any part personal cash can't cover is paid by the bank (P&L `travel`, opex). Jet flights are free within the jet's range (Corvid 600: 6,000 km; Albatross 8000: global); longer hops use the normal rules. The jet's upkeep (8%/yr of value) comes from personal cash weekly; it loses 6% a year and resells at value × (1 − JET.resaleHaircut 0.10).
+- **First visit:** the destination is generated on arrival (lots `citygen:{city}`, rivals `rivals:{city}` for every city but the start city, buildings `sites…:{city}`), then gets its first property listings.
 - **Insider trading:** a personal trade in your own bank's shares within 2 weeks before a quarter-end has a 15% chance per trade of an investigation. Outcome: fine of max(3× the gain, $250k), overall rating −0.1 for 8 weeks, news.
 - **Auctions:**
   - Each house holds a monthly auction of 3–5 lots, each with an estimate.
@@ -1049,5 +1050,5 @@ Group the constants like this, with the defaults shown above:
   - `VENTURES` (pipeline, growth, rounds, failure, IPO and acquisition odds), `VENTURE_DEBT`, `VENTURE_MARGIN`, `VENTURE_GEN`, `VENTURE_IPO`, `VENTURE_NEWS`
   - `VENTURE_RISK_WEIGHT = 2.5`, `VENTURE_DEBT_RISK_WEIGHT = 1.5`, `PROPERTY_RISK_WEIGHT = 1.0`, `FX_RISK_WEIGHT = 1.0`
   - `CONVENTIONS`, `REAL_ESTATE`, `REO`, `LOBBYING`, `FX`, `FX_START_INDEX = 100`
-- **PERSONAL:** `PERSONAL_TAX = 0`, `INSIDER_WINDOW_WEEKS = 2`, `INSIDER_PROB = 0.15`, `TRAVEL_KM_PER_WEEK = 24_140`, `FLIGHT_FARE` (Stage 8)
+- **PERSONAL:** `PERSONAL_TAX = 0`, `INSIDER_WINDOW_WEEKS = 2`, `INSIDER_PROB = 0.15`, `TRAVEL_KM_PER_WEEK = 24_140`, `FLIGHT_FARE = 80_000` (× destination costIndex), `EARTH_RADIUS_KM = 6_371`, `JET = { upkeepRate: 0.08, depreciation: 0.06, resaleHaircut: 0.1 }`
 - **FEATURES:** flags per stage (ROADMAP)
