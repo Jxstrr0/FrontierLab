@@ -399,7 +399,7 @@ One `Book` per (branch, product): `accounts`, `balance`, `bookRate`, `pd` (annua
   - fit-out upkeep: 2%/yr × the cost of the exterior and lobby / 52
   - overhead: BRANCH_OVERHEAD ($450) × city.costIndex
   - servicing and underwriting
-- **Branch income** = revenue − expenses. Keep 26 weeks of history.
+- **Branch income** = revenue − expenses. Keep 52 weeks of history (`BRANCH_PNL_WEEKS`) so the branch Finance tab can show a full year.
 - Depreciation is a company-level item, not part of branch income.
 - **Statement line groups:**
   - Revenues: Loan interest, Deposit funding credit, Fees, Wealth & services

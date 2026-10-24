@@ -4,10 +4,9 @@ import { useGame } from '../store';
 import { Badge, Card } from '../components';
 import { money, pct } from '../format/format';
 import { branchPrice } from '../../sim/branch/pricing';
-import { riskBandVisible } from '../../sim/branch/loanDesk';
+import { deskWeek, riskBandVisible } from '../../sim/branch/loanDesk';
 import { ActiveLoans } from './loandesk/ActiveLoans';
 import { ApplicationCard } from './loandesk/ApplicationCard';
-import { weekTally } from './loandesk/decisions';
 import './loandesk/loandesk.css';
 
 export function LoanDeskTab({ branchId }: { branchId: string }) {
@@ -23,11 +22,9 @@ export function LoanDeskTab({ branchId }: { branchId: string }) {
   const loans = Object.values(s.loanDesk.loans).filter(
     (l) => l.branchId === branchId && l.status === 'current',
   );
-  const booked = s.events.log.filter(
-    (e) => e.type === 'LOAN_BOOKED' && e.scope === branchId && e.week === week,
-  ).length;
-  const tally = weekTally(branchId, week);
-  const decided = booked + tally.declined + tally.wentElsewhere;
+  const desk = deskWeek(s, branch);
+  const booked = desk.approved;
+  const decided = desk.approved + desk.refused + desk.declined;
   const rate = decided > 0 ? booked / decided : undefined;
   const balance = loans.reduce((sum, l) => sum + l.balance, 0);
   const defaulted = branch.books.sbl?.last.defaulted ?? 0;
@@ -53,7 +50,7 @@ export function LoanDeskTab({ branchId }: { branchId: string }) {
       <div class="loan-summary">
         <Stat label="Applications" value={String(apps.length)} />
         <Stat label="Approved" value={String(booked)} />
-        <Stat label="Declined" value={String(tally.declined)} />
+        <Stat label="Declined" value={String(desk.declined)} />
         <Stat
           label="Approval rate"
           value={rate === undefined ? '–' : `${Math.round(rate * 100)}%`}

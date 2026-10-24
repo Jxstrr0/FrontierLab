@@ -10,7 +10,7 @@ import { FinanceTab } from './FinanceTab';
 import { LoanDeskTab } from './LoanDeskTab';
 import { MarketingTab } from './MarketingTab';
 import { ProductsTab } from './ProductsTab';
-import { advisorLine, businessLoans, openingDay } from './selectors';
+import { advisorLines, businessLoans, openingDay } from './selectors';
 import { ServiceTab } from './ServiceTab';
 import './branch.css';
 
@@ -40,7 +40,7 @@ export function BranchPanel(p: { branchId: string; tab: BranchTab }) {
         .join(' · ')}
       icon={<Medallion ink={s.meta.brandInk} monogram={s.meta.monogram} size={32} />}
       onClose={closePanel}
-      advisor={{ name: mgr?.name ?? 'Branch advisor', text: advisorLine(s, branch, opening) }}
+      advisor={{ name: mgr?.name ?? 'Branch advisor', text: advisorLines(s, branch, opening) }}
       tabs={tabs}
       tab={p.tab}
       onTab={setTab}

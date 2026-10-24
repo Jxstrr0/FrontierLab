@@ -122,7 +122,7 @@ export interface Branch {
   campaigns: Record<string /*campaignId*/, number /*level, 0 = off*/>;
   signupChurn: { mult: number; weeksLeft: number };
   customers: number; waitIndex: number; capacity: number;
-  pnl: BranchPnl[];                   // last 26 weeks, newest last
+  pnl: BranchPnl[];                   // last 52 weeks, newest last
 }
 export interface Book {
   accounts: number; balance: Money; bookRate: Rate; pd: Rate; lgd: Pct;
@@ -296,7 +296,7 @@ export interface AvatarSpec { head: number; hair: number; facial: number; glasse
   4. Validate the required keys.
   5. Reject codes from a newer version with a clear message.
 - **Size budget:** keep a late-game save under 2 MB uncompressed by:
-  - trimming histories (weekly snapshots 260, Ledger issues 52, review cards 8, pnl 26)
+  - trimming histories (weekly snapshots 260, Ledger issues 52, review cards 8, pnl 52)
   - not storing generated lots for unvisited cities
 - **Quota errors:** catch them and show "Storage full — export your save" in the UI.
 - **Quick check:** a save checksum (simple hash) stored alongside helps detect corruption.
@@ -324,7 +324,7 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 | Personal | `buyHome`, `rebuildHome`, `buyCar`, `placeBid`, `appraise`, `consign`, `buyJet`, `buyFranchise`, `setKit`, `signPlayer`, `releasePlayer` |
 | Settings and saves | `updateSettings`, `saveToSlot`, `loadSlot`, `exportCode`, `importCode` |
 
-## 12. Implemented so far (schema v2, Stage 1)
+## 12. Implemented so far (schema v3, Stage 2)
 
 `src/sim/state.ts` is the source of truth; this section records how it differs from the guide above. Later stages add the rest with a schema bump and a migration.
 
@@ -334,6 +334,8 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
   - `ledger`: P&L lines and cash movements since the last weekly close, so commands between ticks land in the right week.
   - `nextId`: counter for generated ids.
   - `meta.difficulty` (`'easy' | 'normal' | 'hard' | 'expert'`), `meta.competitors` (1–5) and `meta.startCash` (schema v2; migration 1 → 2 fills Normal, the city's usual rival count and $750k).
+  - `Branch.desk` (`DeskWeek`: `week`, `approved`, `refused`, `declined`, `expired`): this week's Loan Desk outcomes, reset when the week turns (schema v3; migration 2 → 3 adds an empty tally).
+  - `company.negativeCashWeeks`, `company.lowCapitalWeeks`: counters for the game-over checks (schema v2).
   - `company.retainedEarnings`, `company.leaseDeposits` (an asset). `company.liquidityRatio` is `null` while there are no deposits.
   - `CountryState`: `hpiHistory`, `prevFtpShort`/`prevFtpLong` (to detect moves), `cardAnchor`, `startPolicy`, `feeIndex`, `marketReturn`, `forceRecessionAtWeek`.
   - `Lot.address`; `Branch.builtDay`, `Branch.last` (prospects, captured, served, share); `ReviewCard` unchanged.

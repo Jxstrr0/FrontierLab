@@ -121,6 +121,7 @@ export function buildBranch(
     capacity: 0,
     last: { prospects: 0, captured: 0, served: 0, share: 0 },
     pnl: [],
+    desk: { week: 0, approved: 0, refused: 0, declined: 0, expired: 0 },
   };
   branch.staff.count = branch.staff.target = staffNeeded(branch);
   for (const spec of Object.values(PRODUCTS)) {

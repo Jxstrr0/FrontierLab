@@ -11,6 +11,8 @@ interface StepperProps {
   format?: (v: number) => string;
   /** Converts a typed string back to a value (defaults to Number). */
   parse?: (s: string) => number;
+  /** Text shown when the player taps to type, in the units parse expects (e.g. 3.25 for 3.25%). */
+  editText?: (v: number) => string;
   label?: string;
   hint?: string;
   disabled?: boolean;
@@ -83,7 +85,7 @@ export function Stepper(p: StepperProps) {
             class="stepper-value"
             disabled={p.disabled}
             onClick={() => {
-              setText(String(p.value));
+              setText((p.editText ?? String)(p.value));
               setEditing(true);
             }}
           >

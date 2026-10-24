@@ -7,7 +7,7 @@ describe('saves', () => {
   it('round-trips through JSON and an export code', () => {
     const s = runScript(60);
     const code = exportCode(s);
-    expect(code.startsWith('VS2:')).toBe(true);
+    expect(code.startsWith('VS3:')).toBe(true);
     const back = importCode(code);
     expect(back).toEqual(s);
     expect(deserialize(serialize(s))).toEqual(s);

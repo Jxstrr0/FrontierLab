@@ -4,11 +4,24 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 **Current stage:** 2 — Playable loop in plain UI (built; awaiting the owner's iPhone check)
 **Live URL:** (after the first deploy) https://jxstrr0.github.io/VaultStreet/
-**Determinism snapshot:** `1a6f96ddc5855e` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `1b00e5e0304fc5` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-24 — Stage 2 gaps closed
+- **Stage / step:** 2 — Playable loop in plain UI (finishing touches before the owner's check)
+- **Done:**
+  - Loan Desk counts now live in the game state (schema v3, migration 2 → 3), so "Declined" and the approval rate survive a reload and include decisions your manager makes.
+  - Branch history keeps 52 weeks, so the Finance tab's "Year" view is a real year.
+  - Typing a price: tapping a rate now shows "3.25" (not "0.0325") and typed numbers are always read as percents; fees show whole money.
+  - The advisor bar cycles through every applicable hint on tap (counter shows 1/3 and so on), including a reminder when loan applications are waiting.
+  - The capital ratio reads "100%+" with a short explanation while the bank has almost no loans.
+  - 55 tests (new: Loan Desk tally and the 2 → 3 migration; rate and ratio formatting).
+- **Determinism snapshot:** `1a6f96ddc5855e` → `1b00e5e0304fc5`. Intended: saves now carry the desk tally and up to 52 weeks of branch history. No formula changed; nothing in the sim reads further back than last week's branch P&L.
+- **Next:** the owner's Stage 2 check on iPhone (two game years, move a save code Safari → Chrome). Then Stage 3.
+- **Known issues:** no hero vignettes, portraits or area mini-map yet (art stages).
 
 ### 2026-10-24 — Stage 2 built
 - **Stage / step:** 2 — Playable loop in plain UI
@@ -27,12 +40,12 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 - **How it was built:** I wrote the foundation (store, loop, saves, components, HUD), then four helper agents built the screens in parallel, each in its own folder, and I reviewed and merged them.
 - **Decisions** (also in DESIGN §7): products show as a vertical list rather than a carousel so every toggle and price is visible on a phone; the product margin ring is revenue kept after funding cost, servicing and expected loss; save storage lives in `src/sim/save/storage.ts` (the only module allowed to touch browser storage).
 - **Next:** the owner plays a two-game-year run on iPhone and moves a save code between iPhone Safari and desktop Chrome (Stage 2 acceptance). Then Stage 3, the engraved city map.
-- **Known issues:**
-  - Loan Desk "declined" and "approval rate" are counted by the screen only, so they reset on reload and miss manager-declined applications. Moving these counters into the sim needs a schema bump.
-  - Branch history keeps 26 weeks, so the branch "Year" statement shows what's on record.
-  - The capital ratio reads in the hundreds of percent before any loans exist (true, but odd-looking).
-  - No hero vignettes, portraits or area mini-map yet (art stages); the advisor bar doesn't cycle hints on tap.
-  - Typing into a rate stepper accepts "3.25" or "0.0325"; it edits the raw value rather than the display value.
+- **Known issues (at the time; all but the art fixed in the next entry):**
+  - Loan Desk "declined" and "approval rate" were counted by the screen only.
+  - Branch history kept 26 weeks.
+  - The capital ratio read in the hundreds of percent before any loans existed.
+  - No hero vignettes, portraits or area mini-map yet (art stages); the advisor bar didn't cycle hints on tap.
+  - Typing into a rate stepper edited the raw value rather than the display value.
 
 ### 2026-10-24 — Cross-engine determinism fix
 - CI failed the determinism snapshot since Stage 1: `Math.pow` with a fractional exponent returns different bits on Node 24 (CI) than Node 22 (local), and browsers can differ the same way.

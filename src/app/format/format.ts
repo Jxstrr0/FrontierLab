@@ -70,3 +70,16 @@ export function shortDate(startDate: string, day: number): string {
   const d = dateOf(startDate, day);
   return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]}`;
 }
+
+/** 0.0325 → "3.25": a rate as an editable percent, without float noise or trailing zeros. */
+export function percentText(v: number): string {
+  return String(Number((v * 100).toFixed(3)));
+}
+
+/**
+ * A capital ratio for display. Before much lending, risk-weighted assets are tiny
+ * and the true ratio runs to hundreds of percent, so anything above 100% reads "100%+".
+ */
+export function capitalRatioText(ratio: number): string {
+  return ratio > 1 ? '100%+' : pct(ratio, 1);
+}

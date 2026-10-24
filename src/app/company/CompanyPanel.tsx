@@ -5,7 +5,7 @@ import { useState } from 'preact/hooks';
 import { balanceSheet } from '../../sim/balanceSheet';
 import { capitalSnapshot } from '../../sim/capital';
 import { Badge, Card, Medallion, Panel, Row, SectionTitle, Sheet } from '../components';
-import { money, pct } from '../format/format';
+import { capitalRatioText, money, pct } from '../format/format';
 import { closePanel, useGame } from '../store';
 import { CapitalMeter, TIER_LABEL, TIER_TONE } from './CapitalMeter';
 import { Statements } from './Statements';
@@ -47,7 +47,7 @@ export function CompanyPanel() {
           <div class="cap-head">
             <div>
               <div class="muted small">Capital ratio</div>
-              <div class="hero-number">{pct(cap.capitalRatio, 1)}</div>
+              <div class="hero-number">{capitalRatioText(cap.capitalRatio)}</div>
             </div>
             <Badge tone={TIER_TONE[cap.tier]}>{TIER_LABEL[cap.tier]}</Badge>
           </div>
@@ -55,6 +55,8 @@ export function CompanyPanel() {
           <p class="muted small cap-note">
             Capital divided by risk-weighted assets. Higher tiers cost less to fund; the lowest
             tiers stop lending and growth.
+            {cap.capitalRatio > 1 &&
+              ' With few loans on the books yet, almost nothing you hold carries risk, so the ratio is off the scale. It settles as lending grows.'}
           </p>
         </Card>
 
