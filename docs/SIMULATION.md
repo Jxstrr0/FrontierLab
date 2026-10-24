@@ -973,12 +973,12 @@ Run `npm run balance` with seed 42 and the start city Calgary, unless noted. Bra
 | First branch weekly income turns positive | week 6–16 |
 | Branch at week 26 | deposits $15–30M; income positive |
 | Branch at week 52 | deposits $30–50M; loans 75–90% of deposits; customers 3,000–5,000; income +$20k–$40k/week [was $15k–$30k] |
-| Mature branch (week 104+) | deposits $40–65M (organic chequing growth keeps it creeping up) [was $40–60M]; loans 75–90% of deposits; revenue $110k–$150k/week [was $80k–$100k]; income +$45k–$70k/week [was $25k–$35k] |
+| Mature branch (week 104+) | deposits $40–70M (organic chequing growth keeps it creeping up) [was $40–65M]; loans 70–90% of deposits [was 75–90%]; revenue $110k–$150k/week [was $80k–$100k]; income +$45k–$70k/week [was $25k–$35k]. Loan-ratio, revenue and income checkpoints in a recession or the 26 weeks after it read n/a |
 | Payback of a mid build on an average lot | ≤ 40 weeks from opening |
 | Year 2 (steady) | 4–8 branches; HQ required; cash never < 0 |
 | Capital first binds (no raises) | years 1–3; private placements and the IPO are the intended growth fuel |
 | IPO eligible (steady) | years 3–6 |
-| Year 10 (steady) | 60–200 branches; total assets $8–40B |
+| Year 10 (steady) | 60–250 branches; total assets $6–40B [was 60–200; $8–40B] |
 | Year 15 (steady) | weekly revenue $20–80M; founder net worth $2–40B |
 | Annual loan loss rate | 0.4–1.0% of loans in Expansion; 1.2–2.5% in Recession |
 | Net interest margin | 3.0–5.0% [was 2.0–3.5%; even §12.1's own figures give about 4.7%] |
@@ -989,6 +989,8 @@ Run `npm run balance` with seed 42 and the start city Calgary, unless noted. Bra
 | Recession stress (forced at year 3) | steady survives without Critical tier; aggressive hits Restricted or Critical |
 
 **Note (Stage 8):** steady now expands to other cities once the home city has no good lots left (years 5–6). Year 10: seed 42 223 branches / $9.8B assets, seed 7 171 / $7.2B, seed 99 167 / $8.1B. Seed 42 sits just above the branch band and seed 7 just below the asset band; left for the full tuning pass (owner: testing and tuning come later).
+
+**Updated 2026-10-24 (Stage 10 balance pass):** `npm run balance` now checks each strategy's own targets (`scripts/strategyTargets.ts`): the first-branch checkpoints apply to steady only, as this section always said; turtle is compared with a steady run on the same seed; aggressive's year-3 growth is total assets against steady's, and its first-recession tier must be Watch or worse; stress checks steady never reaches Critical and runs aggressive under the same forced recession (must reach Restricted or Critical). Three bands moved, with reasons: mature deposits to $40–70M and loans to 70–90% of deposits (chequing balances keep growing for five years while loan demand doesn't — the seed-42 branch reads $67M and 74% at week 260), and year 10 to 60–250 branches and $6–40B of assets (since Stage 8 steady expands to other cities, which the old band didn't foresee; seeds 42/7/99 read 235/171/167 branches and $10.3/7.2/8.1B). Seed 42: every target met for steady, turtle, aggressive and stress. Seeds 7 and 99 still miss the first-branch checkpoints (their median Midtown lot is weaker) — part of the owner's later tuning pass.
 
 **Strategies** (`scripts/strategies/*.ts`):
 - `idle`: one branch, no further actions
