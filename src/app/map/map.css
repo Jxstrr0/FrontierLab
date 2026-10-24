@@ -112,6 +112,13 @@
   opacity: 0.55;
   outline-style: dashed;
 }
+/* The central bank: its own navy, columned-dome medallion, a touch larger (a landmark). */
+.pin-centralBank .pin-body {
+  transform: scale(1.12);
+}
+.map-pin.pin-centralBank:active .pin-body {
+  transform: scale(1.02);
+}
 
 /* Open branch location: a smaller blank "$" medallion, quieter than branches. */
 .pin-lot .pin-body {

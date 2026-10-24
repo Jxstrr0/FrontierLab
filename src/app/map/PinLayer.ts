@@ -14,6 +14,7 @@ import {
   PIN_LIFT_PX,
   PIN_MEDALLION_PX,
 } from '../../config/mapView';
+import { CentralBankMedallion } from '../centralbank/CentralBankMedallion';
 import { Medallion } from '../components';
 import { LayerIcon, LayerMedallion } from './LayerIcon';
 import { worldToScreen, type Size, type ViewCamera } from './camera';
@@ -209,14 +210,16 @@ function makePinElement(p: PinSpec): HTMLButtonElement {
     const body = document.createElement('span');
     body.className = 'pin-body';
     render(
-      p.icon
-        ? h(LayerMedallion, { id: p.icon, size: PIN_MEDALLION_PX })
-        : h(Medallion, {
-            ink: p.ink,
-            monogram: p.monogram,
-            size: PIN_MEDALLION_PX,
-            ring: p.kind === 'rival',
-          }),
+      p.kind === 'centralBank'
+        ? h(CentralBankMedallion, { size: PIN_MEDALLION_PX })
+        : p.icon
+          ? h(LayerMedallion, { id: p.icon, size: PIN_MEDALLION_PX })
+          : h(Medallion, {
+              ink: p.ink,
+              monogram: p.monogram,
+              size: PIN_MEDALLION_PX,
+              ring: p.kind === 'rival',
+            }),
       body,
     );
     el.appendChild(body);
