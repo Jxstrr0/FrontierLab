@@ -22,6 +22,7 @@ import { HrFloor } from './HrFloor';
 import { ItFloor } from './ItFloor';
 import { OfficeCard } from './OfficeCard';
 import { OfficeInterior } from './OfficeInterior';
+import { ProductsFloor } from './ProductsFloor';
 import { hqDepts, officeAddress, officeList, pickOffice, usedFloors } from './officeSelectors';
 import './hq.css';
 
@@ -99,7 +100,8 @@ export function HqPanel(p: { officeId?: string; dept?: DeptId }) {
             {dept === 'finance' && <FinanceFloor />}
             {dept === 'hr' && <HrFloor />}
             {dept === 'it' && <ItFloor />}
-            {dept !== 'finance' && dept !== 'hr' && dept !== 'it' && (
+            {dept === 'products' && <ProductsFloor />}
+            {dept !== 'finance' && dept !== 'hr' && dept !== 'it' && dept !== 'products' && (
               <PlaceholderFloor dept={dept} />
             )}
           </>

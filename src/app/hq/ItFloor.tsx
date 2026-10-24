@@ -2,12 +2,12 @@
 // rating in coins with where the team is steering it (the rating has no
 // weekly history yet, so current and target stand in for the 26-week trend),
 // a short security posture summary (breaches and outages arrive in Stage 5)
-// and a placeholder for digital projects.
+// and the digital projects (developments of type Digital).
 import { appRatingTarget } from '../../sim/company';
 import { cov } from '../../sim/hq';
 import { Card, CoinRating, Row, SectionTitle } from '../components';
 import { useGame } from '../store';
-import { FloorPlaceholder } from './FloorPlaceholder';
+import { DigitalProjects } from './products/DigitalProjects';
 
 /** UI-only bands for the security summary wording (not simulation tuning). */
 const POSTURE = { strong: 1, fair: 0.8 } as const;
@@ -59,11 +59,7 @@ export function ItFloor() {
       </Card>
 
       <SectionTitle>Digital projects</SectionTitle>
-      <FloorPlaceholder
-        title="Digital projects"
-        arrives="Arrives with product development"
-        body="Run app features and platform upgrades as developments of type Digital."
-      />
+      <DigitalProjects />
     </div>
   );
 }

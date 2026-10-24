@@ -1,0 +1,317 @@
+/* Products floor, digital projects and credit bureau models (SCREENS §10, §13). */
+
+/* ─── House model ──────────────────────────────────────────────────────── */
+.pf-model {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.pf-model-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+.pf-model-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-20);
+  line-height: 1.2;
+}
+.pf-model-btn {
+  margin-top: var(--space-2);
+}
+.pf-model-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.pf-model-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid rgb(184 145 61 / 15%);
+}
+.pf-model-item-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.pf-model-item-name {
+  font-weight: 700;
+}
+.pf-item-btn {
+  flex: none;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-4);
+}
+
+/* ─── Mix sliders ──────────────────────────────────────────────────────── */
+.pf-mix {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.pf-mix-row.is-locked {
+  opacity: 0.55;
+}
+.pf-mix-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+.pf-mix-name {
+  font-weight: 600;
+  font-size: var(--text-14);
+}
+.pf-mix-value {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--brass-light);
+}
+.pf-range {
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: var(--tap-min);
+  margin: 0;
+  background: transparent;
+  touch-action: pan-y;
+}
+.pf-range:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 2px;
+}
+.pf-range::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--vault-deep);
+  border: 1px solid var(--hairline);
+}
+.pf-range::-moz-range-track {
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--vault-deep);
+  border: 1px solid var(--hairline);
+}
+.pf-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 28px;
+  height: 28px;
+  margin-top: -12px;
+  border-radius: 50%;
+  background: var(--brass);
+  border: 2px solid var(--brass-light);
+}
+.pf-range::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--brass);
+  border: 2px solid var(--brass-light);
+}
+.pf-range:disabled::-webkit-slider-thumb {
+  background: var(--vault-raised);
+  border-color: var(--hairline);
+}
+
+/* ─── Risk appetite ────────────────────────────────────────────────────── */
+.pf-risk-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+.pf-risk-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-16);
+}
+.pf-risk-ends {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--space-1);
+}
+
+/* ─── Lineup cards ─────────────────────────────────────────────────────── */
+.pf-subtitle {
+  margin-bottom: var(--space-1);
+}
+.pf-delete {
+  margin-top: var(--space-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}
+.pf-trash {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 1.3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ─── Template icons and the New product form ──────────────────────────── */
+.pf-icon {
+  flex: none;
+  fill: none;
+  stroke: var(--brass-light);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.pf-fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.pf-label {
+  display: block;
+  margin-bottom: var(--space-2);
+}
+.pf-type-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+.pf-type {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 56px;
+  padding: var(--space-2);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-card);
+  background: var(--vault-deep);
+  color: var(--ivory);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+.pf-type.is-active {
+  border-color: var(--brass);
+  background: var(--vault-raised);
+  box-shadow: inset 0 0 0 1px var(--brass);
+}
+.pf-type:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.pf-type-text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.pf-type-name {
+  font-size: var(--text-14);
+  font-weight: 600;
+  line-height: 1.25;
+}
+.pf-type-base {
+  font-size: var(--text-12);
+  color: var(--ivory-dim);
+}
+.pf-team {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+}
+.pf-odds-row {
+  display: grid;
+  grid-template-columns: auto 1fr 3em;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 24px;
+}
+.pf-odds-track {
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: var(--vault-deep);
+  border: 1px solid var(--hairline);
+  overflow: hidden;
+}
+.pf-odds-fill {
+  display: block;
+  height: 100%;
+  background: var(--brass);
+}
+.pf-odds-pct {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+/* ─── Developments ─────────────────────────────────────────────────────── */
+.pf-dev {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.pf-dev-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.pf-dev-title {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.pf-dev-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-16);
+}
+.pf-progress {
+  position: relative;
+  height: 10px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-pill);
+  background: var(--vault-deep);
+  overflow: hidden;
+}
+.pf-progress-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--brass);
+}
+.pf-dev-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  color: var(--ivory-dim);
+}
+.pf-dev-cancel {
+  margin-top: var(--space-1);
+}
+
+/* ─── Credit bureau ────────────────────────────────────────────────────── */
+.bu-models .carousel > .bu-model {
+  flex-basis: 88%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.bu-model.is-current {
+  border-color: var(--brass);
+}
+.bu-model-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
