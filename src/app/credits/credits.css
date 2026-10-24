@@ -1,0 +1,52 @@
+/* Credits: an engraved certificate for the title block, then plain lists. */
+.credits {
+  gap: var(--space-3);
+}
+.credits-card {
+  padding: var(--space-5) var(--space-4);
+  text-align: center;
+}
+.credits-wordmark {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: var(--text-32);
+  letter-spacing: 0.08em;
+  /* The engraved logotype is the one place capitals are allowed (ART_DIRECTION §1.2). */
+  text-transform: uppercase;
+  color: var(--ivory);
+}
+.credits-lead {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-20);
+  color: var(--brass-light);
+}
+.credits-role {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-14);
+  color: var(--ivory-dim);
+}
+.credits-role strong {
+  color: var(--ivory);
+  font-weight: 600;
+}
+.credits .section-title {
+  margin-top: var(--space-4);
+}
+.credits-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.credits-list li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.credits-name {
+  font-weight: 600;
+}

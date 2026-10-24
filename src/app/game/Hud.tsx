@@ -48,6 +48,7 @@ export function Hud() {
             <button
               type="button"
               class="hud-pause"
+              data-tutorial="play"
               aria-label={paused ? 'Play' : 'Pause'}
               onClick={() => (paused ? setSpeed(s.settings.defaultSpeed) : pause())}
             >

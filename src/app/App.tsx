@@ -5,6 +5,7 @@ import { GameScreen } from './game/GameScreen';
 import { NewGameWizard } from './newgame/NewGameWizard';
 import { loadPrefs } from './saves';
 import { SavesScreen } from './saves/SavesScreen';
+import { CreditsScreen } from './credits/CreditsScreen';
 import { applyDisplay } from './settings/display';
 import { SettingsScreen } from './settings/SettingsScreen';
 import { peekGame, rev, screen } from './store';
@@ -45,6 +46,8 @@ function CurrentScreen() {
       return <SavesScreen />;
     case 'settings':
       return <SettingsScreen />;
+    case 'credits':
+      return <CreditsScreen />;
     default:
       return <TitleScreen />;
   }

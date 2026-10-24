@@ -195,6 +195,9 @@ function makePinElement(p: PinSpec): HTMLButtonElement {
   el.type = 'button';
   el.className = `map-pin pin-${p.kind}${p.muted ? ' is-muted' : ''}`;
   el.dataset.lotId = p.id;
+  // The tutorial's brass ring finds storefronts and your branches by these (SCREENS §27).
+  if (p.kind === 'lot' || p.kind === 'mine')
+    el.dataset.tutorial = p.kind === 'lot' ? 'open-lot' : 'my-branch';
   // Rival head offices wear the bank's ink as a ring and pennant (map.css).
   if (p.kind === 'rivalHq' && p.ink) el.style.setProperty('--pin-ink', p.ink);
   el.setAttribute('aria-label', p.label);

@@ -123,3 +123,24 @@ export function savePrefs(prefs: Partial<Settings>): void {
     // Preferences are a convenience; ignore storage failures.
   }
 }
+
+const TUTORIAL_SEEN_KEY = `${PREFIX}tutorialSeen`;
+
+/** Whether this browser has finished or skipped the tutorial before (SCREENS §27). */
+export function loadTutorialSeen(): boolean {
+  try {
+    return store()?.getItem(TUTORIAL_SEEN_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+/** Remembers (or forgets, for "show it again") that the tutorial was seen. */
+export function saveTutorialSeen(seen: boolean): void {
+  try {
+    if (seen) store()?.setItem(TUTORIAL_SEEN_KEY, '1');
+    else store()?.removeItem(TUTORIAL_SEEN_KEY);
+  } catch {
+    // A convenience only; ignore storage failures.
+  }
+}

@@ -7,7 +7,7 @@ import type { CommandResult } from '../sim/commands';
 import type { CountryId } from '../data/types';
 import type { DeptId, GameState } from '../sim/state';
 
-export type Screen = 'title' | 'newgame' | 'game' | 'saves' | 'settings';
+export type Screen = 'title' | 'newgame' | 'game' | 'saves' | 'settings' | 'credits';
 
 /** Full-screen panels on phones, a right drawer on desktop (SCREENS §0.1). */
 export type PanelRoute =
@@ -44,7 +44,9 @@ export type PanelRoute =
   | { type: 'branches' }
   | { type: 'cityList' }
   | { type: 'settings' }
-  | { type: 'saves' };
+  | { type: 'saves' }
+  // Stage 10: the credits, opened from Settings in game (from the title it is a screen).
+  | { type: 'credits' };
 
 export type InvestmentBankTab = 'market' | 'equity' | 'mna';
 

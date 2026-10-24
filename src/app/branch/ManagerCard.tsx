@@ -33,7 +33,12 @@ export function ManagerCard({ branch }: { branch: Branch }) {
           <p class="br-mgr-empty muted">
             No manager. Service and morale suffer a little, and nothing can be delegated.
           </p>
-          <button type="button" class="btn btn-primary btn-block" onClick={() => setHiring(true)}>
+          <button
+            type="button"
+            class="btn btn-primary btn-block"
+            onClick={() => setHiring(true)}
+            data-tutorial="hire-manager"
+          >
             Hire a manager
           </button>
         </Card>
@@ -145,6 +150,7 @@ function HireSheet({ branch, onClose }: { branch: Branch; onClose: () => void })
               <button
                 type="button"
                 class="btn btn-primary btn-block"
+                data-tutorial="hire-pick"
                 onClick={() => {
                   if (act(cmd.hireManager, branch.id, m.id).ok) {
                     toast(`${m.name} now runs ${branch.name}.`, 'good');

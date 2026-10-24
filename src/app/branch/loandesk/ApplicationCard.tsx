@@ -10,6 +10,7 @@ import type { LoanApplication } from '../../../sim/state';
 import { Badge, Card, Stepper } from '../../components';
 import { money, pct, percentText } from '../../format/format';
 import { act, toast } from '../../store';
+import { play } from '../../sound/sound';
 import { PentagonRosette } from './PentagonRosette';
 import { SectorIcon } from './sectorIcons';
 
@@ -54,6 +55,7 @@ export function ApplicationCard(p: {
   const approve = () => {
     const r = act(cmd.decideApplication, app.id, rate);
     if (!r.ok) return;
+    play('stamp');
     if (r.accepted) {
       toast(
         `${app.business} took the ${money(app.amount, p.currency)} loan at ${pct(rate)}.`,
@@ -117,7 +119,12 @@ export function ApplicationCard(p: {
         <button type="button" class="btn btn-secondary" onClick={decline}>
           Decline
         </button>
-        <button type="button" class="btn btn-primary" onClick={approve}>
+        <button
+          type="button"
+          class="btn btn-primary"
+          onClick={approve}
+          data-tutorial="loan-approve"
+        >
           Approve
         </button>
       </div>

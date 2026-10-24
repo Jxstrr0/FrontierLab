@@ -33,7 +33,12 @@ export function WeeklyResults(p: { week: number }) {
       onClose={close}
       icon={<Medallion ink={s.meta.brandInk} monogram={s.meta.monogram} size={30} />}
       footer={
-        <button type="button" class="btn btn-primary btn-block" onClick={close}>
+        <button
+          type="button"
+          class="btn btn-primary btn-block"
+          onClick={close}
+          data-tutorial="weekly-continue"
+        >
           Continue
         </button>
       }

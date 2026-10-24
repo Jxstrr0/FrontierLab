@@ -32,7 +32,13 @@ export function Panel<T extends string>(p: {
           <h2 class="panel-title">{p.title}</h2>
           {p.subtitle && <div class="panel-subtitle">{p.subtitle}</div>}
         </div>
-        <button type="button" class="icon-btn" aria-label="Close" onClick={p.onClose}>
+        <button
+          type="button"
+          class="icon-btn"
+          aria-label="Close"
+          onClick={p.onClose}
+          data-tutorial="panel-close"
+        >
           ✕
         </button>
       </header>
@@ -50,6 +56,7 @@ export function Panel<T extends string>(p: {
               class={`panel-tab${t.id === p.tab ? ' is-active' : ''}`}
               aria-current={t.id === p.tab}
               onClick={() => p.onTab?.(t.id)}
+              data-tutorial={`tab-${t.id}`}
             >
               {t.label}
               {t.badge && <span class="dot" aria-label="needs attention" />}
