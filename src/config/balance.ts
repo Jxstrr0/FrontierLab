@@ -14,7 +14,7 @@ export const FEATURES = {
   /** Stage 2: playable founder loop in plain UI (enables New Game / Continue). */
   playableLoop: true,
   /** Stage 3: engraved isometric city map. */
-  cityMap: false,
+  cityMap: true,
   /** Stage 4: HQ offices, departments and operations depth. */
   hq: false,
   /** Stage 5: rival AI, macro for every country, The Daily Ledger, incidents. */

@@ -1,0 +1,213 @@
+/* The city map (SCREENS §2, ART_DIRECTION §2): full-bleed canvas with DOM pins.
+   Pin sizes come from config/mapView.ts as --pin-size, --pin-hit and --pin-lift
+   (set by PinLayer); a pin's (0, 0) is its roof anchor. */
+.game-map {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.map-view {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--paper);
+  touch-action: none;
+  overscroll-behavior: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.map-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.pin-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  contain: layout style;
+}
+
+/* ─── Pins ──────────────────────────────────────────────────────────────── */
+.map-pin {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--pin-hit);
+  height: var(--pin-hit);
+  margin-left: calc(var(--pin-hit) / -2);
+  margin-top: calc(-1 * var(--pin-lift) - var(--pin-hit) / 2);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  touch-action: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+/* A short brass stem from the medallion down to the roof. */
+.map-pin::after {
+  content: '';
+  position: absolute;
+  left: calc(50% - 0.75px);
+  top: calc(50% + var(--pin-size) / 2 - 1px);
+  width: 1.5px;
+  height: calc(var(--pin-lift) - var(--pin-size) / 2 + 1px);
+  background: var(--brass);
+  pointer-events: none;
+}
+.map-pin:focus-visible {
+  outline: none;
+}
+.map-pin:focus-visible > :first-child {
+  outline: 2px solid var(--brass-light);
+  outline-offset: 2px;
+  border-radius: 50%;
+}
+.pin-body {
+  display: block;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgb(15 24 40 / 35%);
+  transition: transform var(--dur-press) var(--ease-out);
+}
+.map-pin:active .pin-body,
+.map-pin:active .pin-tag,
+.map-pin:active .pin-count {
+  transform: scale(0.92);
+}
+
+/* For lease: an ivory tag with a brass outline. */
+.pin-lease {
+  width: 76px;
+  margin-left: -38px;
+}
+.pin-tag {
+  display: block;
+  padding: 2px 6px;
+  border: 1.5px solid var(--brass);
+  border-radius: 3px;
+  background: var(--ivory);
+  color: var(--ledger-ink);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 14px;
+  white-space: nowrap;
+  box-shadow: 0 1px 2px rgb(15 24 40 / 30%);
+  transition: transform var(--dur-press) var(--ease-out);
+}
+.pin-lease::after {
+  top: calc(50% + 9px);
+  height: calc(var(--pin-lift) - 9px);
+}
+/* Far zoom: the tag shrinks to a small brass tag dot. */
+.pin-layer.is-far .pin-lease {
+  width: var(--pin-hit);
+  margin-left: calc(var(--pin-hit) / -2);
+}
+.pin-layer.is-far .pin-tag {
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  border-radius: 2px;
+  background: var(--brass-light);
+  border-color: var(--brass);
+  font-size: 0;
+  transform: rotate(45deg);
+}
+.pin-layer.is-far .map-pin::after {
+  display: none;
+}
+.pin-layer.is-far .map-pin {
+  margin-top: calc(var(--pin-hit) / -2 - 6px);
+}
+
+/* Cluster: a count medallion; brand ink when it holds one of yours. */
+.pin-count {
+  --size: calc(var(--pin-size) + 4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  background: var(--vault-deep);
+  border: 1.5px solid var(--brass);
+  box-shadow:
+    inset 0 0 0 2.5px var(--vault-deep),
+    inset 0 0 0 3.2px var(--brass-light),
+    0 1px 3px rgb(15 24 40 / 35%);
+  color: var(--ivory);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  transition: transform var(--dur-press) var(--ease-out);
+}
+.pin-cluster.has-mine .pin-count {
+  background: var(--pin-ink);
+  box-shadow:
+    inset 0 0 0 2.5px var(--pin-ink),
+    inset 0 0 0 3.2px var(--brass-light),
+    0 1px 3px rgb(15 24 40 / 35%);
+}
+.pin-cluster::after {
+  display: none;
+}
+
+/* Brass dot: loan applications waiting (SCREENS §0.2). */
+.pin-badge {
+  position: absolute;
+  top: calc(50% - var(--pin-size) / 2 - 2px);
+  left: calc(50% + var(--pin-size) / 2 - 8px);
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--brass-light);
+  border: 2px solid var(--vault-deep);
+  pointer-events: none;
+}
+
+/* ─── Layers sheet ─────────────────────────────────────────────────────── */
+.layers {
+  display: flex;
+  flex-direction: column;
+}
+.layer-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  border-bottom: 1px solid rgb(184 145 61 / 15%);
+}
+.layer-row > .toggle {
+  flex: 1;
+}
+.layer-icon-slot {
+  flex: none;
+  width: 28px;
+  display: flex;
+  justify-content: center;
+  color: var(--brass-light);
+}
+.layer-sub {
+  padding-left: var(--space-5);
+}
+.layers-list-btn {
+  margin-top: var(--space-4);
+  width: 100%;
+}
+
+/* HUD Layers button (SCREENS §0.2, bottom-left). */
+.hud-layers {
+  padding: 0 var(--space-3);
+  font-weight: 600;
+}
+.hud-layers .layer-icon {
+  color: var(--brass-light);
+}
