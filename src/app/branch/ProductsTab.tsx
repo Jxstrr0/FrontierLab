@@ -3,8 +3,8 @@
 // carousel so every product's toggle and price stay visible on a phone.
 import { useState } from 'preact/hooks';
 import { CITIES } from '../../data/cities';
-import { COUNTRIES } from '../../data/countries';
 import type { CategoryId } from '../../data/types';
+import { theCountryName } from '../../sim/newsStory';
 import { allProducts } from '../../sim/products';
 import { activeModel } from '../../sim/underwriting';
 import type { Branch, GameState } from '../../sim/state';
@@ -60,7 +60,7 @@ function hqPriceNotice(s: GameState, branch: Branch): string {
   if (priceCountries(s).length < 2) return 'Prices are set at HQ for every branch.';
   const country = CITIES[branch.cityId]?.country;
   return country
-    ? `Prices follow HQ's ${COUNTRIES[country].name} price list.`
+    ? `Prices follow HQ's list for ${theCountryName(country)}.`
     : 'Prices are set at HQ.';
 }
 

@@ -37,9 +37,13 @@ export function BranchesPanel() {
 
   const all = branchRows(s);
   const cityIds = filterCities(s, all);
-  const abroad = countryOrder(s, all).length > 1;
+  const order = countryOrder(s, all);
+  const abroad = order.length > 1;
   const rows = sortRows(city === 'all' ? all : all.filter((r) => r.cityId === city), sort, flip);
-  const groups = abroad && city === 'all' ? groupByCountry(s, rows) : [{ country: null, rows }];
+  const groups =
+    abroad && city === 'all'
+      ? groupByCountry(order, rows).filter((g) => g.rows.length > 0)
+      : [{ country: null, rows }];
   const cityLabel = (id: string) => {
     const name = CITIES[id]?.name ?? id;
     return abroad ? `${name}, ${CITIES[id]?.country ?? ''}` : name;

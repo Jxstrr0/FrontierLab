@@ -1,9 +1,9 @@
 // Rival rate sheets (SIMULATION §5, §18.2–18.3): each rival keeps one sheet,
 // priced in its home country (the country of the first city it serves), that
 // follows FTP moves with deposit beta and drifts toward its strategy target.
-// In another country the sheet is read through `rivalPriceIn`, which keeps the
-// rival's spread over the default price and moves it onto the local default, so
-// a rival in several countries prices off each country's own central bank.
+// In another country `rivalPriceIn` prices it at its strategy target for that
+// country, so a rival in several countries prices off each country's own
+// central bank and one country's moves never reach another.
 import {
   CARD_REPRICE_GAP,
   DEPOSIT_BETA_DOWN,
@@ -55,9 +55,9 @@ export function rivalHomeCountry(state: GameState, rival: RivalBank): CountrySta
 
 /**
  * A rival's price for a product in a country. At home it is the sheet itself;
- * elsewhere rates keep their spread over the default rule and fees their ratio
- * to the default fee, applied to that country's default (DESIGN §5.2: each
- * country's central bank drives its own market).
+ * elsewhere the rival prices at its strategy target for that country (no lag),
+ * so another country's rate moves never leak in (DESIGN §5.2: each country's
+ * central bank drives its own market).
  */
 export function rivalPriceIn(
   state: GameState,
@@ -70,15 +70,8 @@ export function rivalPriceIn(
   const home = rivalHomeCountry(state, rival);
   const local = country ? state.world.countries[country] : undefined;
   if (raw === undefined || !spec || !home || !local || home.id === local.id) return raw;
-  const homeDefault = defaultPrice(spec, home);
-  const localDefault = defaultPrice(spec, local);
-  const moved =
-    spec.priceType === 'rate'
-      ? raw - homeDefault + localDefault
-      : homeDefault > 0
-        ? (raw * localDefault) / homeDefault
-        : raw;
-  return clamp(moved, spec.min, spec.max);
+  const edge = difficultyOf(state).rivalRateEdge;
+  return rivalTargetPrice(spec, rival.strategy, local, edge, priceWarBump(rival));
 }
 
 /** A rival's price in the country of a city. */

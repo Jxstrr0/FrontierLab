@@ -1,5 +1,5 @@
 // Shared helpers for scripted strategies: choosing lots, building, hiring and
-// pricing through commands.
+// pricing through commands, for branches in every city the bank runs.
 import { RIVAL_RADIUS } from '../../src/config/balance';
 import { REFERENCE_BUILDS, type BuildSpec } from '../../src/data/equipment';
 import { PRODUCTS } from '../../src/data/products';
@@ -22,16 +22,39 @@ export function averageLot(state: GameState): Lot | undefined {
   return free[Math.floor(free.length / 2)] ?? freeLots(state)[0];
 }
 
-/** Best free lot by traffic × income per dollar of rent, outside our own branches' catchment. */
-export function bestLot(state: GameState): Lot | undefined {
-  const own = Object.values(state.branches).map((b) => state.world.lots[b.lotId]!);
+/** A lot's appeal before crowding: foot traffic × income per √rent. */
+export const lotScore = (lot: Lot): number =>
+  (lot.footTraffic * lot.incomeIndex) / Math.sqrt(lot.weeklyRent);
+
+/**
+ * A free lot worth a branch: at least GOOD_LOT_SHARE of the best lot's appeal
+ * in its city (occupied lots included), so the last few weak corners are left
+ * and the player moves on to another city instead.
+ */
+const GOOD_LOT_SHARE = 0.25;
+
+export function goodLots(state: GameState, cityId = state.world.currentCityId): Lot[] {
+  const all = Object.values(state.world.lots).filter((l) => l.cityId === cityId);
+  const best = Math.max(0, ...all.map(lotScore));
+  return all.filter((l) => !l.occupant && lotScore(l) >= GOOD_LOT_SHARE * best);
+}
+
+/**
+ * Best free lot in the city you're in by appeal, outside our own branches'
+ * catchment; `goodOnly` keeps to goodLots.
+ */
+export function bestLot(state: GameState, goodOnly = false): Lot | undefined {
+  // Tiles are per city, so only our branches in this city crowd a lot.
+  const own = Object.values(state.branches)
+    .map((b) => state.world.lots[b.lotId]!)
+    .filter((l) => l.cityId === state.world.currentCityId);
   let best: Lot | undefined;
   let bestScore = -Infinity;
-  for (const lot of freeLots(state)) {
+  for (const lot of goodOnly ? goodLots(state) : freeLots(state)) {
     const near = own.filter(
       (o) => Math.hypot(o.tile.x - lot.tile.x, o.tile.y - lot.tile.y) < RIVAL_RADIUS,
     ).length;
-    const score = (lot.footTraffic * lot.incomeIndex) / Math.sqrt(lot.weeklyRent) / (1 + near);
+    const score = lotScore(lot) / (1 + near);
     if (score > bestScore) {
       bestScore = score;
       best = lot;
@@ -40,6 +63,7 @@ export function bestLot(state: GameState): Lot | undefined {
   return best;
 }
 
+/** Free lots in the city you're in. */
 export function freeLots(state: GameState): Lot[] {
   return Object.values(state.world.lots).filter(
     (l) => !l.occupant && l.cityId === state.world.currentCityId,

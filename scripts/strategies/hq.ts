@@ -1,7 +1,8 @@
 // HQ upkeep for scripted strategies (SIMULATION §25 "HQ floors staffed to 100%"):
 // lease an office once requirements start phasing in, add a floor per
-// department in priority order as cash allows, and keep every department's
-// staff target at what full coverage needs.
+// department in priority order as cash allows (leasing another building when
+// the first is full), and keep every department's staff target at what full
+// coverage needs.
 import { HQ_COVERAGE } from '../../src/config/balance';
 import { HQ_DEPTS } from '../../src/data/departments';
 import type { HqDeptId } from '../../src/data/types';
@@ -29,6 +30,8 @@ const HEADROOM = 1.15;
 const LEASE_AT_RAMP = 0.5;
 /** Staff each department for this coverage k′. */
 const TARGET_K = 0.95;
+/** Office buildings worth leasing have at least this many floors. */
+const MIN_FLOORS = 7;
 
 export function manageHq(state: GameState): void {
   const ramp = founderRamp(state);
@@ -48,11 +51,16 @@ export function manageHq(state: GameState): void {
   }
 }
 
+/** The cheapest free office building in the city you're in with at least `floors` floors. */
+function cheapestListing(state: GameState, floors: number) {
+  return Object.values(state.world.officeListings)
+    .filter((l) => !l.officeId && l.cityId === state.world.currentCityId && l.floors >= floors)
+    .sort((a, b) => a.weeklyRent - b.weeklyRent)[0];
+}
+
 function ensureFloors(state: GameState): void {
   if (Object.keys(state.offices).length === 0) {
-    const listing = Object.values(state.world.officeListings)
-      .filter((l) => !l.officeId && l.cityId === state.world.currentCityId && l.floors >= 7)
-      .sort((a, b) => a.weeklyRent - b.weeklyRent)[0];
+    const listing = cheapestListing(state, MIN_FLOORS);
     if (!listing) return;
     const first = PRIORITY.slice(0, 3);
     const quote = cmd.officeQuote(state, listing.id, first.length);
@@ -64,9 +72,20 @@ function ensureFloors(state: GameState): void {
   if (missing) addFloorFor(state, missing);
 }
 
+/**
+ * Fits out a floor for a department, in the first office with a free floor;
+ * when every floor is in use (a big bank outgrows one building), leases
+ * another office in the city you're in for it.
+ */
 function addFloorFor(state: GameState, id: HqDeptId): void {
   const office = Object.values(state.offices).find((o) => o.floors.includes(null));
-  if (!office) return;
+  if (!office) {
+    const listing = cheapestListing(state, MIN_FLOORS);
+    if (!listing) return;
+    if (state.company.cash > cmd.officeQuote(state, listing.id, 1).total * LEASE_BUFFER)
+      cmd.leaseOffice(state, listing.id, [id]);
+    return;
+  }
   if (state.company.cash < cmd.floorFitout(office.cityId) * CASH_BUFFER) return;
   cmd.addFloor(state, office.id, id);
 }
