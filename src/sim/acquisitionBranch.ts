@@ -11,6 +11,7 @@ import { ACQUIRED_BUILDS, ACQUIRED_DEPOSIT_MIX, ACQUIRED_LOAN_MIX } from '../dat
 import { PRODUCTS, type ProductSpec } from '../data/products';
 import { splitByMix } from './acquisitionPlan';
 import { emptyBook } from './branch/books';
+import { companyPrice } from './branch/pricing';
 import { marketWage, skillTarget, staffNeeded } from './branch/staff';
 import { defaultName } from './commands/branches';
 import { newId } from './ids';
@@ -36,7 +37,7 @@ function startsOn(state: GameState, spec: ProductSpec, branch: Branch): boolean 
 
 /** Your price for a product: the HQ price when Apply-to-all is on, else the default. */
 function startPrice(state: GameState, spec: ProductSpec, cityId: string): number {
-  const hq = state.company.applyRatesToAll ? state.company.companyPrices[spec.id] : undefined;
+  const hq = state.company.applyRatesToAll ? companyPrice(state, cityId, spec.id) : undefined;
   return hq ?? roundToStep(defaultPrice(spec, countryOfCity(state, cityId)), spec.step);
 }
 

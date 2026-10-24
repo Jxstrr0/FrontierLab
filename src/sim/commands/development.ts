@@ -100,7 +100,7 @@ export function deleteProduct(state: GameState, productId: string): CommandResul
     delete branch.books[productId];
     delete branch.offered[productId];
   }
-  delete state.company.companyPrices[productId];
+  for (const list of Object.values(state.company.companyPrices)) if (list) delete list[productId];
   if (state.company.companyOffered) delete state.company.companyOffered[productId];
   delete state.products.catalog[productId];
   return ok();

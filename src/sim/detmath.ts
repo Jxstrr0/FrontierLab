@@ -158,3 +158,29 @@ export function derf(x: number): number {
 export function normalCdf(x: number): number {
   return 0.5 * (1 + derf(x / Math.SQRT2));
 }
+
+/** Sine, via the cosine (moderate arguments). */
+export const dsin = (x: number): number => dcos(x - HALF_PI);
+
+const TAN_PI_12 = 0.2679491924311227;
+const SQRT3 = Math.sqrt(3);
+
+/** Arctangent: reduced to |x| ≤ tan(π/12), then a Taylor series. */
+export function datan(x: number): number {
+  if (Number.isNaN(x)) return NaN;
+  if (x < 0) return -datan(-x);
+  if (x > 1) return HALF_PI - datan(1 / x);
+  if (x > TAN_PI_12) return Math.PI / 6 + datan((x * SQRT3 - 1) / (x + SQRT3));
+  // atan(x) = Σ (−1)^n x^(2n+1) / (2n+1); |x| ≤ 0.268 converges by n = 13.
+  const x2 = x * x;
+  let p = 0;
+  for (let n = 13; n >= 0; n--) p = 1 / (2 * n + 1) - x2 * p;
+  return x * p;
+}
+
+/** Arccosine on [−1, 1]: acos(x) = 2·atan(√((1 − x)/(1 + x))). */
+export function dacos(x: number): number {
+  const c = Math.min(1, Math.max(-1, x));
+  if (c === -1) return Math.PI;
+  return 2 * datan(Math.sqrt((1 - c) / (1 + c)));
+}

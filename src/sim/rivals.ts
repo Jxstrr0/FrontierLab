@@ -3,6 +3,7 @@
 // follow FTP with deposit beta. Expansion, closures and failures live in rivalAi.ts.
 import {
   CARD_REPRICE_GAP,
+  COMPETITORS,
   DEPOSIT_BETA_DOWN,
   DEPOSIT_BETA_UP,
   DEPOSIT_LAG_WEEKS,
@@ -82,18 +83,34 @@ function monogramOf(name: string): string {
   return (second ? first[0]! + second[0]! : first.slice(0, 2)).toUpperCase();
 }
 
-/** Picks the rivals for a city and places their branches on free lots. */
+/**
+ * Rival banks for a city: the start city uses the New Game choice; a city
+ * visited later shifts its usual count by the same amount (DESIGN §5.2).
+ */
+export function competitorsFor(state: GameState, cityId: string): number {
+  const city = CITIES[cityId];
+  if (!city) throw new Error(`Unknown city ${cityId}`);
+  if (cityId === state.meta.homeCityId) return state.meta.competitors;
+  const shift = state.meta.competitors - (CITIES[state.meta.homeCityId]?.rivals ?? city.rivals);
+  return Math.round(clamp(city.rivals + shift, COMPETITORS.min, COMPETITORS.max));
+}
+
+/**
+ * Picks the rivals for a city and places their branches on free lots. The
+ * start city draws from the shared `rivals` stream; cities generated later use
+ * `rivals:{cityId}` so a visit never shifts the weekly rival draws.
+ */
 export function seedRivals(state: GameState, cityId: string, lots: Lot[]): void {
   const city = CITIES[cityId];
   if (!city) throw new Error(`Unknown city ${cityId}`);
-  const rng = stream(state, 'rivals');
+  const rng = stream(state, cityId === state.meta.homeCityId ? 'rivals' : `rivals:${cityId}`);
   const country = countryOfCity(state, cityId);
 
   const candidates = shuffle(
     Object.values(RIVALS).filter((r) => r.home.includes(city.country)),
     rng,
   ).sort((a, b) => STRATEGY_ORDER.indexOf(a.strategy) - STRATEGY_ORDER.indexOf(b.strategy));
-  const chosen = candidates.slice(0, state.meta.competitors);
+  const chosen = candidates.slice(0, competitorsFor(state, cityId));
   const qualityShift = difficultyOf(state).rivalQuality;
 
   // Branch totals are per city size for the city's usual rival count; scale to the chosen count.

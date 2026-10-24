@@ -1,5 +1,6 @@
 // A small sheet about a rival's branch: who they are, how their branch is rated
 // and their rate sheet next to ours (SCREENS §2, CONTENT §25 "Rival branch").
+import { CITIES } from '../../data/cities';
 import { PRODUCTS } from '../../data/products';
 import type { GameState, RivalBank } from '../../sim/state';
 import { AdvisorBar, Badge, CoinRating, Medallion, Sheet } from '../components';
@@ -20,7 +21,9 @@ function ourPrice(s: GameState, productId: string): number | undefined {
   for (const b of Object.values(s.branches)) {
     const o = b.offered[productId];
     if (b.status !== 'closed' && o?.on)
-      return s.company.applyRatesToAll ? (s.company.companyPrices[productId] ?? o.price) : o.price;
+      return s.company.applyRatesToAll
+        ? (s.company.companyPrices[CITIES[b.cityId]!.country]?.[productId] ?? o.price)
+        : o.price;
   }
   return undefined;
 }

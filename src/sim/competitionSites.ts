@@ -83,6 +83,13 @@ export function generateCompetitionSites(state: GameState, cityId: string): void
   const named = (type: string) =>
     rng.pick(EMPLOYER_NAMES[type] ?? [EMPLOYER_TYPES[type]!.label]).replace('{city}', city.name);
 
+  // A regional site has only its named employers (CONTENT §2).
+  if (city.regional) {
+    for (const e of city.regional.employers)
+      add('employer', e.name, EMPLOYER_TYPES[e.type]!.district, info(e.type, e.name));
+    return;
+  }
+
   // City Hall always, a port in waterfront cities, named employers, then common types.
   const types: [string, string][] = [['cityHall', named('cityHall')]];
   if (city.water) types.push(['port', named('port')]);

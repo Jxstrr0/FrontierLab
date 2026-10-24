@@ -156,11 +156,17 @@ export function healthTarget(state: GameState, p: Partnership, host: Branch): nu
   );
 }
 
-/** Open branches in a city that could host a partnership, ones offering `productId` first. */
+/**
+ * Open branches that could host a partnership, ones offering `productId` first:
+ * in the city, or anywhere in the country for a regional site (no storefronts).
+ */
 export function hostCandidates(state: GameState, cityId: string, productId?: string): Branch[] {
   const offers = (b: Branch) => (productId && isOffered(b, productId) ? 0 : 1);
+  const regional = CITIES[cityId]?.regional ? CITIES[cityId]!.country : undefined;
+  const here = (b: Branch) =>
+    regional ? CITIES[b.cityId]?.country === regional : b.cityId === cityId;
   return Object.values(state.branches)
-    .filter((b) => b.status === 'open' && b.cityId === cityId)
+    .filter((b) => b.status === 'open' && here(b))
     .sort((a, b) => offers(a) - offers(b) || a.id.localeCompare(b.id));
 }
 

@@ -30,9 +30,7 @@ import type { CountryState, GameState } from './state';
 
 /** The country whose central bank the treasury deals with (the home city's). */
 export function homeCountry(state: GameState): CountryState {
-  const firstBranch = Object.values(state.branches)[0];
-  const cityId = firstBranch?.cityId ?? state.world.currentCityId;
-  const c = state.world.countries[CITIES[cityId]!.country];
+  const c = state.world.countries[CITIES[state.meta.homeCityId]!.country];
   if (!c) throw new Error('Home country not simulated');
   return c;
 }

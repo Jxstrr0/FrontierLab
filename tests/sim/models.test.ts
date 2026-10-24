@@ -108,7 +108,7 @@ describe('company lineup', () => {
     expect(cmd.setCompanyPrice(s, 'savings', 0.03).ok).toBe(false);
     const own = branch.offered.savings!.price;
     expect(cmd.setApplyRatesToAll(s, true).ok).toBe(true);
-    expect(s.company.companyPrices.savings).toBe(own);
+    expect(s.company.companyPrices.CA!.savings).toBe(own);
     expect(cmd.setCompanyPrice(s, 'savings', 0.0312)).toEqual({ ok: true, price: 0.031 });
     expect(branchPrice(s, branch, 'savings')).toBe(0.031);
     expect(cmd.setOffered(s, branchId, 'mortgage', true)).toEqual({

@@ -59,7 +59,7 @@ export function lastAssets(state: GameState): number {
  * HQ city's wageIndex, capped at salaryMax (assumption, decision log).
  */
 export function execMarketSalary(state: GameState): number {
-  const cityId = Object.values(state.offices)[0]?.cityId ?? state.world.currentCityId;
+  const cityId = Object.values(state.offices)[0]?.cityId ?? state.meta.homeCityId;
   const wage = CITIES[cityId]?.wageIndex ?? 1;
   const e = EXECUTIVES;
   const raw = (e.salaryBase + (e.salaryPerBillion * Math.max(0, lastAssets(state))) / 1e9) * wage;

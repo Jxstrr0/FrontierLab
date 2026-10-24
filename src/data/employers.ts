@@ -56,6 +56,13 @@ export const EMPLOYER_TYPES: Record<string, EmployerType> = {
     incomeMult: 1.0,
     district: 'waterfront',
   },
+  resourceCamp: {
+    id: 'resourceCamp',
+    label: 'Resource Camp',
+    employees: 3000,
+    incomeMult: 1.5,
+    district: 'industrial',
+  },
   potashMine: {
     id: 'potashMine',
     label: 'Potash Mine',
