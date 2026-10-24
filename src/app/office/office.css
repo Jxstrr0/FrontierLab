@@ -1,0 +1,32 @@
+/* Office for lease panel (SCREENS §9). */
+.office-art {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: var(--vault-deep);
+}
+.office-intro {
+  margin: calc(var(--space-2) * -1) 0 0;
+}
+.office-depts .office-dept + .office-dept {
+  border-top: 1px solid rgb(184 145 61 / 15%);
+}
+.office-dept .toggle {
+  padding: var(--space-2) 0;
+}
+.office-full,
+.office-note {
+  margin: var(--space-2) 0 0;
+}
+.office-blocker {
+  margin: 0;
+  text-align: center;
+  color: var(--ivory);
+}
+.office-cash {
+  margin: 0;
+  text-align: center;
+}
+.office-footer {
+  gap: var(--space-2);
+}

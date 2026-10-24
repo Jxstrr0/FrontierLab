@@ -1,6 +1,7 @@
-// DOM pins over the map canvas (ART_DIRECTION §2): medallions for branches,
-// brass tags for storefronts for lease, and count medallions for clusters at
-// the far zoom. Plain DOM managed imperatively: elements are created when the
+// DOM pins over the map canvas (ART_DIRECTION §2): medallions for branches
+// and your HQ, type medallions for offices for lease, credit bureaus and
+// agencies, brass tags for storefronts for lease, and count medallions for
+// clusters at the far zoom. Plain DOM managed imperatively: elements are created when the
 // pin set changes and only their transforms are touched per frame, so a pan
 // never re-renders Preact. Each pin is a real <button> (tap, keyboard, label).
 import { h, render } from 'preact';
@@ -12,9 +13,10 @@ import {
   PIN_MEDALLION_PX,
 } from '../../config/mapView';
 import { Medallion } from '../components';
+import { LayerMedallion } from './LayerIcon';
 import { worldToScreen, type Size, type ViewCamera } from './camera';
 import { clusterLevel, clusterPins, clusterRadius, type Cluster } from './cluster';
-import type { PinSpec } from './pins';
+import { isYours, type PinSpec } from './pins';
 
 export interface PinTargets {
   onPin(pin: PinSpec): void;
@@ -72,8 +74,8 @@ export class PinLayer {
       if (old && old.key === key) continue;
       old?.el.remove();
       const el = makePinElement(p);
-      // Your branches always on top; otherwise lower on the map draws in front.
-      el.style.zIndex = String(stackOrder(p.y, p.kind === 'mine'));
+      // Your branches and HQ always on top; otherwise lower on the map draws in front.
+      el.style.zIndex = String(stackOrder(p.y, isYours(p)));
       this.host.appendChild(el);
       this.els.set(p.id, { el, x: p.x, y: p.y, shown: '', key });
     }
@@ -142,12 +144,7 @@ export class PinLayer {
     for (const c of this.clusters) {
       if (c.members.length === 1) continue;
       const el = makeClusterElement(c);
-      el.style.zIndex = String(
-        stackOrder(
-          c.y,
-          c.members.some((m) => m.kind === 'mine'),
-        ),
-      );
+      el.style.zIndex = String(stackOrder(c.y, c.members.some(isYours)));
       this.host.appendChild(el);
       this.clusterEls.set(c.key, { el, x: c.x, y: c.y, shown: '', key: c.key });
     }
@@ -190,12 +187,14 @@ function makePinElement(p: PinSpec): HTMLButtonElement {
     const body = document.createElement('span');
     body.className = 'pin-body';
     render(
-      h(Medallion, {
-        ink: p.ink,
-        monogram: p.monogram,
-        size: PIN_MEDALLION_PX,
-        ring: p.kind === 'rival',
-      }),
+      p.icon
+        ? h(LayerMedallion, { id: p.icon, size: PIN_MEDALLION_PX })
+        : h(Medallion, {
+            ink: p.ink,
+            monogram: p.monogram,
+            size: PIN_MEDALLION_PX,
+            ring: p.kind === 'rival',
+          }),
       body,
     );
     el.appendChild(body);
@@ -208,7 +207,7 @@ function makePinElement(p: PinSpec): HTMLButtonElement {
 function makeClusterElement(c: Cluster<PinSpec>): HTMLButtonElement {
   const el = document.createElement('button');
   el.type = 'button';
-  const mine = c.members.filter((m) => m.kind === 'mine');
+  const mine = c.members.filter(isYours);
   el.className = `map-pin pin-cluster${mine.length ? ' has-mine' : ''}`;
   if (mine[0]) el.style.setProperty('--pin-ink', mine[0].ink);
   el.dataset.cluster = c.key;

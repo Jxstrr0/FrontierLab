@@ -45,6 +45,41 @@ describe('city map generation', () => {
   });
 });
 
+describe('offices and sites on the map (Stage 4)', () => {
+  it('marks office and site tiles, keeps lots, and keeps landmarks and parks off them', () => {
+    for (const id of Object.keys(CITIES)) {
+      const s = newGame({ seed: 11, cityId: id });
+      const lots = Object.values(s.world.lots).filter((l) => l.cityId === id);
+      const offices = Object.values(s.world.officeListings).filter((o) => o.cityId === id);
+      const sites = Object.values(s.world.sites).filter((x) => x.cityId === id);
+      const map = generateCityMap(CITIES[id]!, 11, lots, { offices, sites });
+      for (const o of offices) {
+        const t = tileAt(map, o.tile.x, o.tile.y)!;
+        expect(t.kind).toBe('office');
+        expect(t.officeId).toBe(o.id);
+        expect(t.floors).toBeGreaterThan(o.floors);
+      }
+      for (const x of sites) {
+        const t = tileAt(map, x.tile.x, x.tile.y)!;
+        expect(t.kind).toBe('site');
+        expect(t.siteId).toBe(x.id);
+        expect(t.siteKind).toBe(x.kind);
+      }
+      for (const lot of lots) expect(tileAt(map, lot.tile.x, lot.tile.y)!.kind).toBe('lot');
+      expect(map.landmarks).toHaveLength(4);
+    }
+  });
+
+  it('draws the same map without places as before Stage 4', () => {
+    const s = newGame({ seed: 11, cityId: 'cal' });
+    const lots = Object.values(s.world.lots).filter((l) => l.cityId === 'cal');
+    const a = generateCityMap(CITIES.cal!, 11, lots);
+    const b = generateCityMap(CITIES.cal!, 11, lots, {});
+    expect(Buffer.from(a.kind)).toEqual(Buffer.from(b.kind));
+    expect(a.officeAt.size + a.siteAt.size).toBe(0);
+  });
+});
+
 describe('isometric projection', () => {
   it('round-trips a tile centre', () => {
     const c = tileCenter(52, 10, 7);

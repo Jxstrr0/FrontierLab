@@ -25,6 +25,8 @@ export type DrawItem =
 const KIND_PARK = TILE_KINDS.indexOf('park');
 const KIND_LOT = TILE_KINDS.indexOf('lot');
 const KIND_BUILDING = TILE_KINDS.indexOf('building');
+const KIND_OFFICE = TILE_KINDS.indexOf('office');
+const KIND_SITE = TILE_KINDS.indexOf('site');
 
 export interface TileRange {
   x0: number;
@@ -77,8 +79,10 @@ export function footprintBounds(
 export function tileHeightPx(map: CityMap, index: number): number {
   const kind = map.kind[index];
   if (kind === KIND_PARK) return ROOF_EXTRA_STOREYS * STOREY_PX;
-  if (kind !== KIND_BUILDING && kind !== KIND_LOT) return 0;
-  const flag = kind === KIND_LOT ? FLAG_PX : 0;
+  if (kind !== KIND_BUILDING && kind !== KIND_LOT && kind !== KIND_OFFICE && kind !== KIND_SITE)
+    return 0;
+  // Storefronts and offices can fly your roof flag.
+  const flag = kind === KIND_LOT || kind === KIND_OFFICE ? FLAG_PX : 0;
   return (map.floors[index]! + ROOF_EXTRA_STOREYS) * STOREY_PX + flag;
 }
 

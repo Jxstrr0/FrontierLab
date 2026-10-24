@@ -1,9 +1,12 @@
-// Simplified statements for the Company panel (SCREENS §24, no HQ yet): an
-// income statement and cash flow over Week, Quarter or Year, and the balance sheet.
+// Company statements (SCREENS §10 Finance floor, §24 Company summary): an
+// income statement and cash flow over Week, Quarter or Year, and the balance
+// sheet. On the Finance floor, weeks a short-staffed team hasn't closed yet
+// show as "Delayed" (delayWeeks).
 import { useState } from 'preact/hooks';
 import type { GameState } from '../../sim/state';
 import { Card, Segmented } from '../components';
 import { figure } from '../format/format';
+import { useGame } from '../store';
 import {
   balanceSheetLines,
   cashFlowStatement,
@@ -27,9 +30,13 @@ function Lines(p: { lines: StatementLine[] }) {
   );
 }
 
-export function Statements(p: { state: GameState }) {
+export function Statements(p: { state: GameState; delayWeeks?: number }) {
+  // Subscribe to game changes: the state object never changes identity, so
+  // without this a weekly tick wouldn't re-render the statements.
+  useGame();
   const [period, setPeriod] = useState<Period>('week');
-  const snaps = periodSnapshots(p.state, period);
+  const delay = p.delayWeeks ?? 0;
+  const snaps = periodSnapshots(p.state, period, delay);
   const wanted = PERIOD_WEEKS[period];
   return (
     <div class="stack co-stack">
@@ -43,6 +50,15 @@ export function Statements(p: { state: GameState }) {
           { value: 'year', label: 'Year' },
         ]}
       />
+      {delay > 0 && (
+        <div class="stmt-delayed" role="status">
+          <span class="stmt-delayed-tag">Delayed</span>
+          <span class="small">
+            The latest {delay === 1 ? 'week is' : `${delay} weeks are`} still being closed. More
+            finance staff will catch the books up.
+          </span>
+        </div>
+      )}
       {snaps.length === 0 ? (
         <p class="muted">Statements appear after the first weekly close.</p>
       ) : (
