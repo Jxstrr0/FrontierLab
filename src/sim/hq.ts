@@ -81,9 +81,14 @@ export function requiredStaff(state: GameState, id: HqDeptId): number {
   const wholesale = totalWholesale(state);
   const r = DEPT_REQUIREMENTS;
   switch (id) {
-    // +4 once public arrives with Stage 6.
+    // +4 once listed: investor relations and quarterly filings (CONTENT §9).
     case 'finance':
-      return r.finance.base + r.finance.perBranch * branches + r.finance.perAssets * assets;
+      return (
+        r.finance.base +
+        r.finance.perBranch * branches +
+        r.finance.perAssets * assets +
+        (state.stock.status === 'public' ? r.finance.public : 0)
+      );
     case 'hr':
       return r.hr.base + r.hr.perEmployee * employeeCount(state);
     case 'products':
@@ -241,7 +246,7 @@ export function staffMods(state: GameState): StaffMods {
   };
   for (const spec of Object.values(BENEFITS)) {
     const v = b[spec.id] ?? 0;
-    if (v <= 0 || spec.publicOnly) continue;
+    if (v <= 0 || (spec.publicOnly && state.stock.status !== 'public')) continue;
     const e = spec.effects;
     const moraleGain = scaledEffect(v, spec.ref, e.morale ?? 0);
     if (spec.hqOnly) mods.hqMorale += moraleGain;
@@ -283,7 +288,10 @@ export function benefitWeeklyCost(state: GameState, id: string, value: number): 
           WEEKS_PER_YEAR
         );
       }
-      // Employee Stock Plan: dilution cost, public only (Stage 6).
+      // Employee Stock Plan, public only: 0.5 × discount × payroll a year (CONTENT §10).
+      if (id === 'espp' && state.stock.status === 'public') {
+        return (BENEFIT_RULES.esppPayrollCost * value * annualPayroll(state)) / WEEKS_PER_YEAR;
+      }
       return 0;
     case 'toggle':
       return 0;

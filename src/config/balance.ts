@@ -481,7 +481,7 @@ export const FOUNDER_RAMP = { fromBranches: 2, overBranches: 4 } as const;
  * base + perBranch × branches + per$ × the department's dollar driver.
  */
 export const DEPT_REQUIREMENTS = {
-  finance: { base: 2, perBranch: 0.35, perAssets: 1 / 2e9 },
+  finance: { base: 2, perBranch: 0.35, perAssets: 1 / 2e9, public: 4 },
   hr: { base: 1, perEmployee: 1 / 80 },
   products: { base: 2, perBranch: 0.2, perDevelopment: 2 },
   treasury: { base: 1, perFunding: 1 / 1e9 },
@@ -846,13 +846,12 @@ export const RIVAL_REVIEWS_PER_WEEK = 2;
  */
 export const RIVAL_PAYOUT = { ratio: 0.45, maxRatio: 0.8, excessShare: 0.5 } as const;
 /**
- * Notional shares until the stock market arrives (Stage 6): book value per share
- * is fixed and price = book × clamp(ROE_ttm / coe, pb) (like §19.2).
+ * Rival share counts are fixed at the start: starting equity ÷ bookPerShare, so
+ * every rival starts at a $20 book value per share. Prices then follow §19.5
+ * (listed) or book value (private), see src/sim/marketRivals.ts.
  */
 export const RIVAL_NOTIONAL_SHARE = {
   bookPerShare: 20,
-  coe: 0.1,
-  pb: [0.5, 2.5] as [number, number],
 } as const;
 export const RIVAL_EXEC_RESIGN_CHANCE = 0.03;
 /**
@@ -1209,23 +1208,79 @@ export const PUBLIC_PRICE = {
   ema: 0.15,
   noise: 0.025,
 } as const;
-/** Secondary offering (§19.6). */
+/** Secondary offering (§19.6). maxPct caps one issue (assumption, like a placement round). */
 export const SECONDARY = {
   discount: 0.03,
   defaultFee: 0.0455,
   impact: [0.02, 0.05] as [number, number],
+  maxPct: 0.25,
 } as const;
 export const SECONDARY_DISCOUNT = SECONDARY.discount;
-/** Listed companies (§19.1). */
+/**
+ * Listed companies (§19.1). Earnings weeks add normal(0, earningsSurprise) plus
+ * a tilt of earningsTilt × the sector's annual μ for the phase (assumption: a
+ * tenth of the year's drift, so recessions bring misses). A surprise of at
+ * least notableSurprise makes the paper. The index makes news when it moves
+ * at least indexMoveNews in a week.
+ */
 export const STOCK_MARKET = {
   shockSigma: 0.018,
   earningsSurprise: 0.04,
+  earningsTilt: 0.1,
+  notableSurprise: 0.06,
+  indexMoveNews: 0.03,
   priceFloor: 1,
   historyWeeks: 104,
   startIndex: 1000,
+  /** Weeks in the 52-week high/low window. */
+  rangeWeeks: 52,
+  /** Generated top fund holders per listed company and their stake range. */
+  fundHolders: 3,
+  fundStake: [0.02, 0.09] as [number, number],
 } as const;
 /** Trading commission (§19.7). */
 export const COMMISSION = 0.001;
+/**
+ * Trading limits (assumption, decision log): your company and you together
+ * may own at most maxStake of any listed company or rival; a bigger stake
+ * would be a takeover, which goes through M&A.
+ */
+export const TRADING = { maxStake: 0.3 } as const;
+/**
+ * Your share price (§19.5) beyond PUBLIC_PRICE: sentiment stays inside
+ * sentimentRange; quarter-on-quarter earnings growth of earningsGrowthRef or
+ * more gives the full ±earningsShockMax; a weekly move of moveNews or more is a
+ * SHARE_PRICE_MOVE story.
+ */
+export const OWN_STOCK = {
+  sentimentRange: [0.4, 1.8] as [number, number],
+  earningsGrowthRef: 0.25,
+  moveNews: 0.08,
+} as const;
+/**
+ * How serious each incident is for your share price, 0–1: the sentiment shock
+ * is incidentShock[0] + (incidentShock[1] − incidentShock[0]) × severity
+ * (§19.5, −3% to −15%). Types not listed (reminders, city and personal cases)
+ * don't move the price. Assumption, decision log.
+ */
+export const INCIDENT_PRICE_SEVERITY: Record<string, number> = {
+  VIRAL_COMPLAINT: 0,
+  BRANCH_FLOOD: 0,
+  ROBBERY: 0.15,
+  ATM_SKIM: 0.15,
+  STAFF_WALKOUT: 0.2,
+  EXEC_POACHED: 0.25,
+  BIG_DEFAULT: 0.35,
+  CARD_FRAUD: 0.45,
+  MIS_SELLING: 0.6,
+  REGULATOR_AUDIT: 0.6,
+  REGULATOR_LETTER: 0.75,
+  DATA_BREACH: 0.85,
+  BANK_RUN: 1,
+  RECAP_OFFER: 1,
+};
+/** Listed and public: Finance k′ below minKPrime files late, fined fineRate × quarterly revenue (CONTENT §9). */
+export const LATE_FILING = { minKPrime: 0.6, fineRate: 0.0002 } as const;
 /** Risk weight on stocks held by the company (§15). */
 export const STOCK_RISK_WEIGHT = 2.5;
 export const QUARTERS_PER_YEAR = 4;

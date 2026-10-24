@@ -9,6 +9,7 @@ import {
   STOCK_MARKET,
 } from '../config/balance';
 import { EXCHANGES, SECTOR_BETA, STOCKS } from '../data/stocks';
+import { fundHolders } from './marketHolders';
 import { FOUNDER_ID } from './shares';
 import type {
   ExecutivesState,
@@ -40,7 +41,7 @@ export function initMarket(): MarketState {
       history: [s.startPrice],
       high52: s.startPrice,
       low52: s.startPrice,
-      topHolders: [],
+      topHolders: fundHolders(s.id),
     };
   }
   return {

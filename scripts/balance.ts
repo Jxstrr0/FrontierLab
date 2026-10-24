@@ -11,6 +11,7 @@ import type { Difficulty } from '../src/data/types';
 import type { Branch, GameState } from '../src/sim/state';
 import { hqStaff } from '../src/sim/hq';
 import { summarize } from '../src/sim/ledger';
+import { founderStake } from '../src/sim/shares';
 import { STRATEGIES } from './strategies';
 
 interface Args {
@@ -276,6 +277,23 @@ function run(): void {
     ok: minCash >= 0,
     target: '≥ 0',
   });
+  // §25 "IPO eligible (steady): years 3–6": the week the IPO listed (steady lists as soon as eligible).
+  const listed = state.stock.listedWeek;
+  if (strategy.name === 'steady' && args.years >= 6) {
+    checks.push({
+      label: 'IPO listed (week)',
+      value: listed === undefined ? '—' : String(listed),
+      ok: inRange(listed, 104, 312),
+      target: 'years 3–6 (weeks 104–312)',
+    });
+  }
+  console.log(
+    `\nEquity: ${state.stock.placements.length} placement(s), ` +
+      (listed === undefined
+        ? 'not listed'
+        : `listed week ${listed} (year ${Math.floor(listed / 52) + 1}) as ${state.stock.ticker}`) +
+      `, founder stake ${P(founderStake(state))}, share price ${state.stock.price.toFixed(2)}`,
+  );
   checks.push({
     label: 'Balance identity gap',
     value: maxIdentityGap.toFixed(4),

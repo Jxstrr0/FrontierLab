@@ -1,5 +1,5 @@
 // Rival quarter-end and failures (SIMULATION §18.5): quarterly earnings,
-// dividends for listed rivals, the occasional CEO change, and the recession
+// dividends for listed rivals (paid to your holdings), the occasional CEO change, and the recession
 // failure check. A failed rival is distressed for 8 weeks (its network would be
 // offered for sale), then its branches are split among the other rivals in each
 // city, or closed where there are none.
@@ -8,13 +8,13 @@ import {
   RIVAL_FAILURE,
   RIVAL_FINANCE,
   RIVAL_LOAN_RISK_WEIGHT,
-  RIVAL_NOTIONAL_SHARE,
   RIVAL_PAYOUT,
 } from '../config/balance';
 import { CITIES } from '../data/cities';
 import { FIRST_NAMES, LAST_NAMES } from '../data/names';
 import { previousQuarter } from './calendar';
 import { pushEvent } from './events';
+import { payHolders } from './marketStocks';
 import { clamp } from './math';
 import { stream, type Rng } from './rng';
 import { rivalCapitalRatio, rivalLoans } from './rivalBooks';
@@ -70,22 +70,16 @@ function report(state: GameState, bank: RivalBank, quarter: string): void {
   );
 }
 
-/** Notional share price: book per share × clamp(ROE_ttm / COE) (Stage 6 replaces it). */
+/** A rival's share price: market price if listed, book value if private (src/sim/marketRivals.ts). */
 export function rivalSharePrice(bank: RivalBank): number {
-  const n = RIVAL_NOTIONAL_SHARE;
-  const recent = bank.quarters.slice(-QUARTERS_PER_YEAR);
-  // Annualise when fewer than four quarters have been reported.
-  const ttm =
-    recent.reduce((x, q) => x + q.netIncome, 0) * (QUARTERS_PER_YEAR / Math.max(1, recent.length));
-  const roe = bank.equity > 0 ? ttm / bank.equity : 0;
-  return n.bookPerShare * clamp(roe / n.coe, ...n.pb);
+  return bank.price;
 }
 
 /**
  * Dividend = clamp(excessShare × excess, ratio × NI, maxRatio × NI), capped at
  * the excess over the strategy's capital target and paid only when profitable,
  * so the capital ratio settles near its target. Every rival pays; listed ones
- * announce it, per notional share.
+ * announce it and pay your company's and your own holdings (§19.1).
  */
 function payDividend(state: GameState, bank: RivalBank, quarter: string): void {
   const netIncome = bank.quarters[bank.quarters.length - 1]?.netIncome ?? 0;
@@ -97,12 +91,11 @@ function payDividend(state: GameState, bank: RivalBank, quarter: string): void {
     excess,
     clamp(p.excessShare * excess, p.ratio * netIncome, p.maxRatio * netIncome),
   );
-  const shares = bank.equity / RIVAL_NOTIONAL_SHARE.bookPerShare;
-  const dps = dividend / shares;
-  const price = rivalSharePrice(bank);
+  const dps = dividend / Math.max(1, bank.shares);
   bank.equity -= dividend;
   bank.capitalRatio = rivalCapitalRatio(bank);
   if (!bank.listed) return;
+  payHolders(state, bank.id, dps);
   pushEvent(
     state,
     'RIVAL_DIVIDEND',
@@ -110,7 +103,7 @@ function payDividend(state: GameState, bank: RivalBank, quarter: string): void {
       rivalId: bank.id,
       company: bank.name,
       dps,
-      yieldPct: ((dps * QUARTERS_PER_YEAR) / price) * 100,
+      yieldPct: bank.price > 0 ? ((dps * QUARTERS_PER_YEAR) / bank.price) * 100 : 0,
       quarter,
     },
     1,

@@ -145,6 +145,8 @@ export interface EventPayloads {
     popPct: number;
     raised: Money;
   };
+  /** A pending IPO no longer qualified at the quarter-end listing and was pulled. */
+  IPO_WITHDRAWN: { bank: string; reason: string };
   SECONDARY_OFFERING: { bank: string; shares: number; price: Money; raised: Money };
   /** A non-bank listed company's quarterly results; `surprisePct` vs expectations. */
   COMPANY_EARNINGS: {
