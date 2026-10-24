@@ -243,7 +243,7 @@ function signed(r: number): string {
 }
 
 /** Deposits, loans (including Loan Desk business loans) and customers at a branch. */
-export function branchBalances(state: GameState, branch: Branch, specs: ProductSpec[]) {
+export function branchBalances(state: GameState, branch: Branch, specs: readonly ProductSpec[]) {
   let deposits = 0;
   let loans = 0;
   let aum = 0;
