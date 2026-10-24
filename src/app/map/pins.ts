@@ -47,6 +47,8 @@ export interface PinSpec {
   icon?: MapLayerId;
   /** The central bank pin's country. */
   countryId?: CountryId;
+  /** Employer or university you partner with: a brand-ink seal on the medallion (ink = brand ink). */
+  partner?: boolean;
 }
 
 /** Clustering seeds and stacking: yours first, then rivals, then other buildings, open locations last. */
@@ -165,22 +167,33 @@ const SITE_ICON: Record<Site['kind'], MapLayerId> = {
 
 const SITE_LAYER: Record<Site['kind'], MapLayerId> = SITE_ICON;
 
+/** You hold a partnership (or the graduate program) at this employer or university. */
+export function isPartnerSite(s: GameState, site: Site): boolean {
+  if (site.kind !== 'employer' && site.kind !== 'university') return false;
+  if (s.company.gradProgram?.siteId === site.id) return true;
+  return Object.values(s.partnerships).some((p) => p.siteId === site.id && p.status === 'active');
+}
+
 function sitePin(s: GameState, map: CityMap, site: Site): PinSpec {
   const at = anchor(map, site.tile);
+  const partner = isPartnerSite(s, site);
   const suffix =
-    site.kind === 'agency' ? ', marketing agency' : site.kind === 'employer' ? ', employer' : '';
+    (site.kind === 'agency' ? ', marketing agency' : site.kind === 'employer' ? ', employer' : '') +
+    (partner ? ', your partner' : '');
   const rival = site.kind === 'rivalHq' ? s.rivals[site.refId] : undefined;
-  return {
+  const pin: PinSpec = {
     id: site.id,
     kind: site.kind,
     x: at.x,
     y: at.y,
     label: `${siteName(s, site)}${suffix}, ${site.address}`,
-    ink: rival?.ink ?? '',
+    ink: rival?.ink ?? (partner ? s.meta.brandInk : ''),
     monogram: rival?.monogram ?? '',
     badge: false,
     icon: SITE_ICON[site.kind],
   };
+  if (partner) pin.partner = true;
+  return pin;
 }
 
 /** The central bank landmark (one per city; it speaks for the city's country). */
