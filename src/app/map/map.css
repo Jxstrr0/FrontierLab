@@ -9,6 +9,9 @@
 .map-view {
   position: absolute;
   inset: 0;
+  /* Own stacking context: pin z-order stays below the HUD, panels and sheets. */
+  isolation: isolate;
+  z-index: 0;
   overflow: hidden;
   background: var(--paper);
   touch-action: none;
