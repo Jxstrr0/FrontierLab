@@ -1,0 +1,200 @@
+/* Loan Desk tab (SCREENS §5.3). */
+.loandesk .card + .card {
+  margin-top: 0;
+}
+.loandesk-note,
+.loandesk-empty {
+  margin: 0;
+  font-size: var(--text-14);
+  color: var(--ivory-dim);
+}
+.loandesk-foot {
+  margin: calc(var(--space-2) * -1) 0 0;
+}
+
+.loan-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-card);
+  background: var(--vault-deep);
+}
+.loan-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: var(--space-3) var(--space-2);
+  text-align: center;
+  border-right: 1px solid rgb(184 145 61 / 18%);
+  border-bottom: 1px solid rgb(184 145 61 / 18%);
+}
+.loan-stat:nth-child(3n) {
+  border-right: 0;
+}
+.loan-stat:nth-child(n + 4) {
+  border-bottom: 0;
+}
+.loan-stat-value {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-20);
+  line-height: 1.15;
+}
+.loan-stat-label {
+  font-size: var(--text-12);
+  color: var(--ivory-dim);
+}
+
+.chip {
+  flex: none;
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-12);
+  font-weight: 600;
+  color: var(--ivory-dim);
+  border: 1px solid var(--hairline);
+  white-space: nowrap;
+}
+.chip-warn {
+  color: var(--brass-light);
+  border-color: var(--brass);
+}
+
+.loan-app {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.loan-app-head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+.loan-app-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--hairline);
+  background: var(--vault-deep);
+  color: var(--brass-light);
+}
+.loan-app-title {
+  flex: 1;
+  min-width: 0;
+}
+.loan-app-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-16);
+  line-height: 1.25;
+}
+.loan-app-ask {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-3);
+}
+.loan-app-amount {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-24);
+}
+.loan-app-pay {
+  font-size: var(--text-14);
+  color: var(--ivory-dim);
+}
+.loan-app-pay strong {
+  color: var(--ivory);
+}
+.loan-app-actions {
+  margin-top: var(--space-1);
+}
+
+.rosette {
+  display: block;
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
+}
+.rosette-grid path,
+.rosette-grid line {
+  fill: none;
+  stroke: var(--brass);
+  stroke-width: 0.6;
+  opacity: 0.35;
+}
+.rosette-data {
+  fill: var(--brass);
+  fill-opacity: 0.25;
+  stroke: var(--brass);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+.rosette-dot {
+  fill: var(--brass-light);
+}
+.rosette-label {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  fill: var(--ivory-dim);
+}
+.rosette-score {
+  font-weight: 700;
+  fill: var(--brass-light);
+}
+
+.loan-list-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+.loan-list-toggle > span:first-child {
+  display: flex;
+  flex-direction: column;
+}
+.loan-list-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-16);
+}
+.loan-list-caret {
+  color: var(--brass-light);
+}
+.loan-rows {
+  list-style: none;
+  margin: var(--space-3) 0 0;
+  padding: 0;
+}
+.loan-row {
+  padding: var(--space-2) 0;
+  border-top: 1px solid rgb(184 145 61 / 14%);
+}
+.loan-row-main,
+.loan-row-sub {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+}
+.loan-row-name {
+  font-size: var(--text-14);
+  font-weight: 600;
+}
+.loan-row-balance {
+  font-weight: 700;
+  font-size: var(--text-14);
+}
