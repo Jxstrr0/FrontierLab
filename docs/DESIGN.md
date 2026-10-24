@@ -1,0 +1,419 @@
+# Vault Street — Game Design
+
+Source of truth for intent. Formulas and numbers live in `SIMULATION.md`, screens in `SCREENS.md`, data in `CONTENT.md`. Last updated 2026-10-23.
+
+---
+
+## 1. Pitch
+
+You found a bank with a fresh charter: $2,000,000 of charter capital locked in the treasury and $750,000 to spend. Lease a storefront, build your first branch, set your rates and fees, hire tellers and a branch manager, and start gathering deposits. Lend them out, carefully. Ride the interest-rate cycle, build a headquarters, take the bank public, buy your rivals, and expand into the world's financial capitals. Your personal fortune grows alongside: homes, cars, collectibles, a jet, a sports franchise, and a climb up the rich list.
+
+- **Working title:** Vault Street. Alternatives on file: Basis Point, Prime Rate.
+- **Repo:** `VaultStreet`.
+- **Audience:** players of mobile tycoon and management sims who like numbers they can act on. Built for short phone sessions or long desktop sessions.
+
+## 2. Pillars
+
+1. **Faithful tycoon structure.** Coffee Inc 2's loop carries over system for system: city map → location → tabbed location screen → HQ floors → capital markets → personal empire (§3).
+2. **Real banking, made legible.** Deposits fund loans, loans default, capital caps growth, and rates move. Every bank mechanic shows up as a number in the original's UI language: coins (stars), bars, margin rings, pentagons and income statements.
+3. **Decisions, not chores.** Delegation exists at every level (branch managers, executives, auto-funding), so the game scales from one branch to five hundred.
+4. **Phone-first.** Every screen fits a phone in portrait, and a game week is a natural micro-session.
+5. **One bold look.** The world is engraved like a banknote; the interface is a quiet deco vault (ART_DIRECTION).
+
+## 3. Faithfulness contract
+
+- **Keep identical in structure.** Everything in the mapping table (§3.1). Where the original has a screen, field, toggle or flow, Vault Street has its banking equivalent in the same place in the hierarchy, using the same kind of control.
+- **Change.** The industry, all names and writing, all art and iconography, and the default currency ($, switchable in settings).
+- **Add (bank twists).** Each must be explainable in one sentence and shown with existing UI patterns:
+  - Balance sheet and **capital ratio** with regulator tiers (§5.6)
+  - **Liquidity** and wholesale funding, with funding freezes and bank runs (§5.6, §5.8.4)
+  - **Central banks** per country and a **business cycle** that moves rates, defaults and demand (§5.7)
+  - **Deposit beta:** rivals pass on only part of a rate hike to savers (§5.9)
+  - **Loan Desk:** individual business loan applications using the startup pentagon (§5.4.3)
+  - **Adverse selection:** charging far above market attracts riskier borrowers (§5.4.2)
+  - **Government bonds** that lose market value when rates rise (§5.8.4)
+  - **Foreclosed homes (REO)** from defaulted mortgages (§5.11)
+  - **Payroll partnerships** in place of plantations (§5.8.4)
+  - **Venture debt** alongside equity investing (§5.12)
+  - **Insider-trading** risk on your personal trades (§5.16)
+  - **Regulator approval** on mergers, and **lobbying** (§5.10, §5.8.10)
+
+### 3.1 Mapping table
+
+| Coffee Inc 2 | Vault Street | Notes |
+|---|---|---|
+| Coffee shop | Branch | |
+| Property for lease: weekly rent, deposit, foot traffic, area map | Storefront for lease | Adds a demographics panel |
+| Build store: exterior, interior, espresso machine, brewer, blender | Build branch: exterior, lobby, teller line, vault, ATM | Each option shows price and quality/productivity stars |
+| Store tabs: Service, Product, Marketing, Finance | Branch tabs: Service, Products, Loan Desk, Marketing, Finance | Loan Desk is new |
+| Staff count, hourly salary, staff skill, staff morale | Same | |
+| Store manager: People, Product, Marketing, Ethics; four delegation toggles; fire manager | Branch manager: same skills; Staffing & wages, Products & rates, Branch marketing, Branch troubles, Loan approvals | One extra toggle |
+| Reviews: Price, Product, Service, Atmosphere, plus review cards | Rates, Products, Service, Branch, plus review cards | |
+| Menu tabs: Hot, Cold, Food | Deposits, Lending, Cards & Services | |
+| Product card: rating, on menu, sales last week, unit cost, margin ring, price | Product card: rating, offered, new accounts last week, balance, funding cost, margin ring, rate or fee | |
+| Company blend (radar, price per lb), Manage Blends; blend quality feeds product ratings | House underwriting model (radar, cost per application), Manage Models; model quality feeds the Products rating | |
+| Roasters selling packaged blends and roasting your custom blend | Credit bureaus selling scoring models and hosting your custom model | Map layer |
+| Coffee bean inventory: lots, harvest year, price/lb, quantity, radar | Funding inventory: lots, maturity, rate, amount, radar | Treasury floor |
+| Plantations: hectares, yield curve, "year X of Y", replant | Payroll partnerships: employees, deposit curve, "year X of Y", renew | Employers layer |
+| Ten marketing campaigns with levels and weekly costs | Ten branch campaigns with levels and weekly costs | See CONTENT |
+| HQ floors: Finance, HR, Product, Supply, Marketing, IT, Executive, Investment, Add Floor | Finance, HR, Products, Treasury, Marketing, IT & Security, Risk & Compliance, Executive, Investment, Add Floor | Risk is new |
+| Understaffing warnings from floor advisors | Same, plus coverage % per floor | |
+| HR employee benefits carousel | Same, plus Staff Mortgage Discount | |
+| Develop new product: type, target price, 4/8/12/24/48 weeks, weekly budget, star odds | Same, with bank product templates | |
+| Force the prices to all stores | Apply rates to all branches | |
+| Commercial bank: business loans, line of credit | Rival bank HQ: corporate loans and credit line | You borrow corporate cash |
+| Central bank rate headlines | Central bank building per country, plus headlines | Rates drive the economy |
+| Investment bank: Market, Equity, M&A | Same | Private placement and IPO added |
+| Secondary offering: shares, price, fees (4.55%), proceeds | Same | |
+| Stock card: price chart, market cap, dividend, 52w range, P/E, top shareholders, trade | Same | |
+| Coffee companies M&A | Rival bank M&A | Regulator approval required |
+| Competitor store: reviews, menu prices | Rival branch: reviews, rate sheet | |
+| Weekly results with cash flow and newspaper (Top, Retail, Business, Market, Politics, Sports) | Weekly results with The Daily Ledger (Top, Banking, Business, Markets, Politics, Sports) | |
+| Company incidents ("case 1 of 1") | Incidents | Bank-specific cases |
+| Executive floor: board meeting, dividends, CEO pay, six seats (CEO, COO, CFO, CPO, CMO, CTO), delegation, option/RSU grants | Same six, plus a Chief Risk Officer as a seventh seat | Regulator can cap dividends |
+| Investment floor: ventures, benchmark pentagon, funding rounds, company/private toggle | Same | Plus venture debt |
+| Conventions | Fintech and finance conventions | |
+| Real estate: buy, rent per m², occupancy, ROI, for sale | Same | Plus foreclosed homes |
+| Airports, departures board with distances, weekly mileage limit, private jet | Same | |
+| Vacation homes (can rebuild), car dealer | Same | Dealer financing tab added |
+| Auction house: upcoming auctions, your items, appraisal, counterfeit | Same | |
+| Football franchise: club, uniform, players, transfers, finance | Sports franchise, simplified | Kit sponsorship boosts brand |
+| Personal wealth: salary, total assets donut, stocks, real estate, other assets | Same | Plus rich list |
+| Settings, save slots, cloud sync | Settings, save slots, export/import save code | |
+| Map layers (13 types) | 14 types: Branches, Offices, Real Estate, Credit Bureaus, Banks, Investment Banks, Marketing Agencies, Conventions, Lobbying Firms, Sports Teams, Auto Dealers, Auction Houses, Universities, Employers | |
+
+## 4. Loops and arc
+
+### 4.1 Weekly loop
+1. Read the weekly results and The Ledger.
+2. Spot what changed: a central bank move, a rival price war, a branch running hot.
+3. Act: adjust rates, staff and campaigns; approve business loans; top up funding.
+4. Expand: lease, build, hire.
+
+### 4.2 Quarterly loop
+- Quarter-end earnings arrive for you, rivals and listed companies.
+- Board meeting: set the dividend and CEO pay.
+- Dividends are paid three weeks later.
+- Regulator review.
+- Startups report results and raise new rounds.
+
+### 4.3 Arc
+| Phase | Typical years | Shape |
+|---|---|---|
+| 1. Founder | 0–2 | One city, 1–4 branches, private. Learn deposits, then lending, then capital. No HQ needed while tiny ("founder mode"). |
+| 2. Regional | 1–5 | First HQ office and floors, 5–30 branches, treasury and partnerships, Loan Desk volume. Capital starts to bind, so private placements come in. |
+| 3. Public | 3–10 | IPO, board votes and share price, buying small rivals, more cities in your country, real estate and ventures. The personal empire begins. |
+| 4. Global | 8+ | New countries with their own central banks, hundreds of branches, big M&A, jets and franchises, the rich list. |
+
+There's no fixed ending. Milestones, the annual rich list and the "fastest growing banks" ranking provide goals. You can fail through regulatory takeover or insolvency (§5.18).
+
+## 5. Systems
+
+### 5.1 Time
+- The date sits top-right. Speeds are Pause, 1×, 2× and 4× (1× = one day per second).
+- The economy settles weekly; quarters and central bank meetings follow the calendar.
+- Weekly results pop up every week by default (setting: every week, every quarter, or off).
+- The game auto-pauses for decisions: incidents, board meetings, and (optional setting) expiring loan applications.
+
+### 5.2 World and map
+- Real cities with procedurally generated maps, seeded per city, with no real street layouts.
+- Each city has districts with their own foot traffic, demographics, incomes and rents: Financial, Downtown, Midtown, University, Suburbs, Industrial and Waterfront.
+- Pins mark every interactive building. The Layers sheet filters the 14 types in §3.1.
+- The start city sets difficulty:
+  - Saskatoon (Easy): cheap rents, few rivals, small market
+  - Calgary (Normal)
+  - Toronto (Hard)
+  - New York (Expert)
+- Other cities open up through travel (§5.17).
+
+### 5.3 Storefronts and building a branch
+- **For-lease storefronts** show:
+  - weekly rent, security deposit and foot traffic
+  - demographics: students, young professionals, families, retirees, businesses
+  - income level and homeowner share
+  - the count and average rating of nearby rival branches
+- **Build Branch.** Pick five components: Exterior, Lobby, Teller line, Vault and ATM. Each option shows its price and coins for quality and productivity (vault: security).
+  - Lobby tier sets the number of advisor offices. Wealth Advice needs at least one, and mortgages sell better with more.
+  - After the cost summary comes a one-week fit-out ("Opening soon"; an assumption, since the original's build time wasn't visible), then a grand-opening awareness boost.
+- **Closing a branch:**
+  - You get back the lease deposit minus two weeks' rent, plus 30% of equipment value.
+  - Accounts move to your nearest branch in the city, with extra churn, or leave if there is none.
+
+### 5.4 Running a branch
+Five tabs. Coffee Inc has four; the Loan Desk is the bank addition.
+
+#### 5.4.1 Service
+- **Customer reviews:** overall rating plus Rates, Products, Service and Branch, with a carousel of review cards that mention real causes ("Free espresso while I signed my mortgage? Fine, you win.").
+- **Staff:** count and hourly wage steppers, skill and morale bars, and a wait indicator (Short / Busy / Long).
+- **Branch manager:**
+  - Portrait and the four skills: People, Product, Marketing, Ethics.
+  - Manager since, and an annual salary stepper.
+  - Delegation toggles: Staffing & wages, Products & rates, Branch marketing, Branch troubles, Loan approvals.
+  - Fire or hire (a choice of three candidates).
+
+#### 5.4.2 Products
+- **House underwriting model card** at the top, like the original's company blend.
+- **Category control:** Deposits / Lending / Cards & Services.
+- **Product cards** show:
+  - coins for product quality and an Offered toggle
+  - new accounts last week with the change, and the balance
+  - funding cost, a margin ring and the spread
+  - a price stepper (interest rate or fee)
+- **Pricing trade-offs:**
+  - Savers chase rates and borrowers chase low rates.
+  - Fees drive away students first.
+  - Charging far above market brings in riskier borrowers (adverse selection).
+- **v1 catalog:**
+  - Deposits: Everyday Chequing, High-Interest Savings, 1-Year GIC, Student Account, Business Account
+  - Lending: Personal Loan, Auto Loan, Mortgage, Line of Credit, Small Business Loan (via the Loan Desk)
+  - Cards & Services: Credit Card, Wealth Advice, Safe Deposit Box, FX & Wires
+- Product development adds variants (§5.8.3), which carry a delete icon like the original's.
+
+#### 5.4.3 Loan Desk
+- Local businesses apply each week. Each application shows:
+  - business name and sector
+  - amount, term and collateral
+  - the most they'll pay
+  - a pentagon: Management, Track record, Market, Competitiveness, Financial health
+- Approve at a rate you choose, decline, or let it expire after two weeks.
+- An estimated risk band appears only with a Risk & Compliance floor or a manager with Product skill ≥ 60.
+- **Delegated decisions** follow the manager's Product skill and Ethics plus the company risk appetite.
+- Approved loans are tracked individually, and big defaults make the news.
+
+#### 5.4.4 Marketing
+- Ten campaigns, each with levels and costs (CONTENT): Free Lobby Coffee, Charging Station, Saturday Hours, Sign-Up Bonus, Paperless Pledge, Direct Mail, Money Workshops, Community Sponsors, Social Media, Local Paid Search.
+- Campaigns build awareness, nudge ratings and target customer segments.
+- The Sign-Up Bonus trades more new deposits for flightier customers.
+
+#### 5.4.5 Finance
+- Branch revenue and branch income, each with its weekly change.
+- A five-week paired bar chart.
+- The branch income statement (Week / Quarter / Year).
+- Balances: deposits, loans and customers.
+
+### 5.5 Customers and competition
+1. **Prospects.** Each branch draws prospects from foot traffic, scaled by awareness and by how much of the neighbourhood already banks with you (saturation).
+2. **Share.** Prospects split by overall rating between you, nearby rival branches, your own nearby branches (cannibalisation), and the city's big incumbent banks.
+3. **Capacity.** Teller stations × productivity, plus ATMs, adjusted by staffing, skill and morale, caps how many you serve. Overflow becomes long waits and poor Service reviews.
+4. **Products.** New customers choose products by segment affinity, price versus market, product quality and loan approval.
+
+### 5.6 The bank layer
+Shown to the player in one place, the Company summary:
+- **Deposits fund loans.** Customer deposits aren't your money. They sit in the treasury as liquid assets or get lent out, and you earn the spread.
+- **Corporate cash** (top bar) is the company's own money: profit, capital raised and corporate borrowing. It pays for branches, salaries, acquisitions and dividends. Deposits can never be spent as corporate cash.
+- **Charter capital.** The bank starts with $2M of charter capital held in the treasury. It counts toward equity and liquidity but can never be spent. Together with the $750k of spendable cash, this keeps the founder phase to one branch, maybe two, like the original's £320k start.
+- **Funding transfer rate.** Inside each branch, deposits earn a funding credit and loans pay a funding charge at the central bank rate. Each branch's income therefore shows whether it gathers cheap money and lends it well.
+- **Liquidity.** Liquid assets must stay at or above 10% of deposits; the player sets a higher target in Treasury. On a shortfall, Treasury borrows overnight (auto-funding); without funding, new lending freezes.
+- **Capital ratio** = equity ÷ risk-weighted assets.
+  - Loans consume capital: mortgages lightly, business loans fully, equity stakes heavily.
+  - Grow capital by keeping profits or issuing shares.
+
+  | Tier | Ratio | Effect |
+  |---|---|---|
+  | Strong | ≥ 14% | Cheaper funding |
+  | Adequate | ≥ 10.5% | No restrictions |
+  | Watch | ≥ 8% | Dividends capped |
+  | Restricted | ≥ 6% | No dividends, no new branches or acquisitions, lending halved |
+  | Critical | < 6% | No new lending, fines. Too long below 4.5% means regulator takeover. |
+- **Bank runs.** A terrible reputation plus weak capital or liquidity can trigger a run. Deposits flee fast until you respond.
+
+### 5.7 Macro and central banks
+- **Cycle.** Every country moves through expansion, slowdown, recession and recovery.
+- **Central bank.** Each country's central bank (real institution names, simulated decisions) meets eight times a year; some meet four times. Policy follows inflation and growth.
+- **Effects.** The cycle moves loan demand, default rates, house prices, the yield curve (which inverts before recessions), stock prices and deposit growth.
+- **On the map.** The central bank building shows the country dashboard and offers an emergency lending facility, which carries stigma.
+
+### 5.8 HQ and offices
+- **Offices.** Lease office buildings (floors, area, weekly rent, deposit). Each floor holds one department. Desks per floor depend on the building (24 or 32, as in the original); Investment floors have 32 and the Executive suite 7. Departments can span floors and offices.
+- **Each department shows:**
+  - employees (n / desks) and open positions
+  - annual salary
+  - skill and morale
+  - coverage: staffing versus what the company's size requires
+- An advisor calls out shortfalls.
+- **Founder mode:** with two or fewer branches nothing is required. Requirements phase in from three to six branches.
+
+#### 5.8.1 Finance
+- Company statements (income, balance sheet, cash flow; Week/Quarter/Year), a revenue and net income chart, and a capital and liquidity summary.
+- Understaffed:
+  - statements are delayed
+  - an investor-relations discount hits your share price
+  - late filings are fined once you're public
+
+#### 5.8.2 HR
+- Benefits carousel: Tuition Support, Pension Match, Employee Stock Plan, Childcare Support, Free Lunch & Snacks, Volunteer Days, Staff Mortgage Discount, Wellness Program, Remote Fridays.
+- Each shows cost per employee, estimated weekly cost and its effects. Benefits apply to everyone.
+- Understaffed: hiring slows and morale drifts down.
+
+#### 5.8.3 Products
+- House underwriting model: a radar (Accuracy, Speed, Inclusion, Fraud shield, Fairness) and cost per application. Manage Models mixes data sources. Model quality nudges every branch's Products rating, as the blend does in the original. Custom models can also be commissioned at a credit bureau, like a custom blend at a roaster.
+- Risk appetite, five levels.
+- Company product lineup with "Apply rates to all branches".
+- Product development: type, target price tier, 4/8/12/24/48 weeks and a weekly budget, with a live star-odds table.
+- A company-wide deposits and loans trend chart.
+
+#### 5.8.4 Treasury
+- **Liquidity:** a gauge and the policy settings (target liquidity, bond share, auto-funding).
+- **Government bonds:** market value, yield and unrealised gain or loss.
+- **Funding inventory:** one card per lot with counterparty, type, rate, amount, maturity, and a radar (Cost, Term, Stability, Flexibility, Discretion).
+- **Funding market:** offers refresh every two weeks. A strong treasury team and capital ratio bring more and better offers.
+- **Payroll partnerships:** employer, employees, "Year 3 of 7", deposit curve and relationship health. Renew or let lapse.
+
+#### 5.8.5 Marketing
+Brand awareness by city, brand campaigns (TV, billboards, podcasts, creators, arena naming rights) and agency packages.
+
+#### 5.8.6 IT & Security
+- The mobile app rating feeds the Products rating and reduces branch visits.
+- Losing the CTO drags the app rating down until the seat is filled.
+- Breach and outage odds.
+- Digital projects, run as developments of type Digital.
+
+#### 5.8.7 Risk & Compliance (new floor)
+- Shows loss rates by product, delinquency, model performance and regulator status.
+- Understaffed: higher defaults, more fines and worse delegated loan decisions.
+
+#### 5.8.8 Executive
+- Quarterly board meeting.
+- Senior executives: COO, CFO, CPO, CMO and CTO, as in the original, plus a Chief Risk Officer as a seventh seat.
+- Each profile has skills (Leadership, Expertise, Loyalty), delegation toggles, salary, stock option and RSU grants with vesting, and a fire button.
+
+#### 5.8.9 Investment
+- Company portfolio: stocks, ventures, real estate and venture debt.
+- Ventures pipeline. More staff finds more startups.
+
+#### 5.8.10 Outside HQ: agencies, lobbyists, universities
+- **Marketing agencies** sell city-wide campaign packages.
+- **Lobbying firms** push regulatory changes at a price, with a chance of failing and a chance of a Ledger exposé.
+- **Universities** offer student-account partnerships and a graduate program that improves hiring pools.
+
+### 5.9 Rivals
+- **Who they are.** Each city has rival banks with a strategy (Incumbent, Disruptor, Premium or Community). Each has branches on the map, published rate sheets, reviews, quarterly earnings, dividends and executives, plus share prices if listed.
+- **How they behave:**
+  - expand into strong neighbourhoods and close losing branches
+  - react to price wars
+  - pass rate hikes to savers slowly (deposit beta)
+- **Failures.** Weak rivals can fail in recessions; their branch networks go up for distressed sale.
+- **Corporate lending.** Rival bank HQs (Banks layer) lend to your company: business loans and a line of credit. This is corporate cash, never deposits.
+
+### 5.10 Capital markets
+Investment banks on the map, with tabs Market / Equity / M&A:
+- **Market:**
+  - sector tabs: Banking, Technology, Energy, Auto, Retail, Real Estate
+  - company cards: price chart, market cap, dividend and yield, 52-week range, P/E, top shareholders
+  - trade from the company or the personal account
+- **Equity:**
+  - While private: private placements, selling up to 25% per round.
+  - IPO once eligible: equity ≥ $25M, four profitable quarters, a finance team in place, and capital at least Adequate.
+  - After listing: secondary offerings showing new shares, price per share, gross proceeds, underwriting fee and capital raised.
+- **M&A:**
+  - Buy rival banks with an offer price and premium.
+  - Acceptance depends on the premium and the target's health.
+  - The regulator checks your post-deal capital and local market share.
+  - Acquired branches convert to your brand over eight weeks.
+- After the IPO, your share price tracks book value × (ROE ÷ cost of equity), moved by news, earnings and sentiment.
+
+### 5.11 Real estate
+- **Buy buildings** as the company or personally. Listings show size, estimated value, market rent, occupancy and asking price.
+- **Run them.** Set rent per m² and occupancy responds. Weekly rent, maintenance and vacancy costs give ROI. List any building for sale.
+- **Foreclosures.** Defaulted mortgages leave foreclosed homes (REO) in each city. Sell them (fast, at a discount), rent them out, or hold.
+
+### 5.12 Ventures and conventions
+- **Where startups come from.** The Investment floor surfaces startups that are raising money. Conventions show exclusive ones; they're announced in the Ledger, sit on the map for a week, and must be attended in person.
+- **Startup screen:** description, founded, CEO, pre-money valuation, benchmark pentagon, quarterly financials, the current round with two offer lots (invest as Company or Private), funding history, top shareholders.
+- **Lifecycle.** Startups grow, raise up or down rounds, IPO, get acquired, or fail.
+- **Bank twist:** offer **venture debt** instead of buying shares.
+
+### 5.13 Governance
+- **Quarterly board meeting.** Set the dividend per share and your CEO compensation, then the board votes. Your ownership, company performance and how reasonable the proposal is decide the result.
+- **Regulator caps** dividends in weak capital tiers.
+- **Dividends** are paid three weeks after declaration; an incident reminds you to keep the cash.
+- **Executives** can resign or be poached; equity grants improve loyalty.
+
+### 5.14 Incidents
+- Case-based modals ("Case 1 of 2") with two or three choices:
+  - robbery and ATM skimming
+  - data breach, card fraud ring and mis-selling
+  - regulator audit and insider-trading probe
+  - viral complaint, staff walkout and branch flood
+  - executive poached and price war
+  - bank-run rumour and big default
+  - dividend reminders
+- Branch incidents can be delegated to managers.
+
+### 5.15 The Daily Ledger
+- The newspaper sits in the weekly results and is archived in the menu.
+- Tabs: Top / Banking / Business / Markets / Politics / Sports.
+- Articles come from real simulation events:
+  - branch openings
+  - central bank decisions with GDP figures
+  - earnings, dividends and executive moves
+  - conventions, rankings, fines and failures
+  - housing, auctions and sports
+
+### 5.16 Personal layer
+- **Founder profile:** name, avatar, title and salary.
+- **Personal cash** comes from salary, dividends, rents and trades.
+- **Spend it on:**
+  - vacation homes (which can be rebuilt to raise their value) and cars
+  - collectibles from auction houses (appraise them to discover counterfeits)
+  - a private jet
+  - a sports franchise, whose kit sponsorship boosts your bank's brand
+- **Personal Wealth screen:** total assets with weekly change, a donut (cash, stocks, real estate, other), and holdings with cost basis and gains.
+- **Annual rich list.**
+- **Insider trading:** trading your own bank's stock just before earnings risks an investigation.
+
+### 5.17 Travel
+- **Airports.** Every city map has one. Departure boards list destinations with real distances.
+- **Flying** animates across the map and loads the new city.
+- **Where you need to be.** Opening branches or visiting buildings in a city requires being there. Existing branches can be managed from the Branches list anywhere.
+- **Weekly mileage:** you can fly up to 24,140 km per week, as in the original. Remaining mileage shows on every departure board.
+- **Private jet:** adds a "Fly now" option from any map and doubles the weekly mileage (assumption).
+
+### 5.18 Goals, milestones, failure
+- **Milestones:** first branch, first loan, first profitable quarter, 10 branches, HQ fully staffed, IPO, first acquisition, $1B in deposits, five countries, billionaire founder, rich list #1.
+- **Failure:**
+  - **Regulatory takeover:** Critical capital for too long, after an emergency recapitalisation offer is declined or fails.
+  - **Insolvency:** corporate cash below zero for four weeks with no credit available.
+- The game-over screen is a Ledger front page.
+
+### 5.19 Settings and saves
+- Settings: currency symbol, distance units, weekly results frequency, default speed, auto-pause, sound, reduced motion, text size, founder avatar.
+- Autosave every week plus three manual slots.
+- Export/import save code to move a game between devices.
+
+### 5.20 Onboarding
+- The first branch manager guides the opening steps: lease, build, set the savings rate, hire a manager, read the weekly results, start lending, approve a business loan.
+- It's skippable, and hints stay available in the advisor bar.
+
+## 6. Out of scope for v1
+- FX conversion between currencies (one display currency)
+- Multiplayer
+- Derivatives and crypto
+- Real-world street maps
+- App Store packaging
+- Voice acting
+
+## 7. Decision log
+Add one dated line per decision. Never delete entries; supersede them.
+
+- 2026-10-23: Working title Vault Street, repo `VaultStreet`, GitHub Pages hosting.
+- 2026-10-23: Stack: Vite + TypeScript + Preact + Canvas 2D, deployed via GitHub Actions. Matches the studio's Season Ticket workflow.
+- 2026-10-23: Daily clock with a weekly economic tick, plus quarterly and calendar events (SIMULATION §2).
+- 2026-10-23: Loan Desk added as a fifth branch tab.
+- 2026-10-23: Coffee supply chain becomes Treasury funding; plantations become payroll partnerships; company blend becomes the underwriting model; roasters become credit bureaus.
+- 2026-10-23: The commercial bank becomes rival bank corporate lending, plus a central bank building per country.
+- 2026-10-23: Default currency symbol $, switchable in settings; no FX in v1.
+- 2026-10-23: Corporate cash is kept separate from the banking book; deposits can't be spent (SIMULATION §13–15).
+- 2026-10-23: Art direction "Banknote Deco": an engraved currency-style world with a deco vault UI.
+- 2026-10-23: Start cities Saskatoon (Easy), Calgary (Normal), Toronto (Hard), New York (Expert).
+- 2026-10-23 (review): Executive seats follow the original's six (CEO, COO, CFO, CPO, CMO, CTO), plus a CRO as a seventh. The Executive suite has 7 desks.
+- 2026-10-23 (review): Start with $750k to spend plus $2M of charter capital locked in the treasury, so the founder phase begins with one branch, maybe two, like the original's £320k start.
+- 2026-10-23 (review): Faster branch ramp (3× intake, stronger saturation) so a mid build pays back in under ~40 weeks, keeping the original's expansion snowball.
+- 2026-10-23 (review): Company loans target about 80% of deposits (mortgage approval lowered to 0.42).
+- 2026-10-23 (review): Loan Desk applicants accept up to FTP + 5–5.5%.
+- 2026-10-23 (review): Product development uses 4/8/12/24/48-week terms and a weekly budget; reference odds 29/40/27/4/0.
+- 2026-10-23 (review): Weekly travel allowance of 24,140 km, as in the original.
+- 2026-10-23 (review): The house model's quality feeds the Products rating, as the blend does in the original. Custom models can be hosted at a credit bureau.
+- 2026-10-23 (review): The app rating defaults to about 3.75 without an IT team. A CTO vacancy drags it down until the seat is filled.
+- 2026-10-23 (review): Vacation homes can be rebuilt (option seen in the original; effects assumed).
+- 2026-10-23 (review): Assumptions not seen in the recordings: one-week fit-out, 1 day per second at 1×, executive skill names, jet mileage bonus.
