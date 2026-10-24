@@ -19,8 +19,8 @@ import {
 } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { EQUIPMENT } from '../../data/equipment';
-import { needsApproval, PRODUCTS, type ProductSpec } from '../../data/products';
-import { AFFINITY, BUSINESS_ACCT_BIZ_TICKET_MULT, SEGMENT_SPECS } from '../../data/segments';
+import { needsApproval, type ProductSpec } from '../../data/products';
+import { BUSINESS_ACCT_BIZ_TICKET_MULT, SEGMENT_SPECS } from '../../data/segments';
 import { SEGMENTS, type SegmentId } from '../../data/types';
 import { tileDistance } from '../citygen';
 import { loanDemand } from '../macro';
@@ -34,6 +34,7 @@ import { branchPrice, isOffered, priceFactor } from './pricing';
 import { capacity, visitRate } from './staff';
 import { difficultyOf } from '../difficulty';
 import { dpow } from '../detmath';
+import { affinityOf, allProducts, baseId, starsOf } from '../products';
 
 export interface Origination {
   newAccounts: number;
@@ -114,14 +115,14 @@ export function approvalOf(state: GameState, spec: ProductSpec): number {
 function special(state: GameState, branch: Branch, spec: ProductSpec): number {
   const lot = state.world.lots[branch.lotId];
   const offices = EQUIPMENT[branch.build.lobby]?.advisorOffices ?? 0;
-  if (spec.id === 'mortgage') {
+  if (baseId(spec) === 'mortgage') {
     const m = MORTGAGE_SPECIAL;
     return (
       ((lot?.homeownerShare ?? 0) / m.homeownerRef) *
       clamp(m.base + m.perOffice * offices, m.min, m.max)
     );
   }
-  if (spec.kind === 'wealth') return offices > 0 ? 1 : 0;
+  if (spec.kind === 'wealth') return offices > 0 || spec.noAdvisorOffice ? 1 : 0;
   if (spec.kind === 'safebox') {
     const boxes = EQUIPMENT[branch.build.vault]?.boxes ?? 0;
     return (branch.books[spec.id]?.accounts ?? 0) < boxes ? 1 : 0;
@@ -164,18 +165,19 @@ export function runDemand(state: GameState, branch: Branch, fx: CampaignEffects)
 
   // §9.6 take-up per offered product
   const byProduct: Record<string, Origination> = {};
-  for (const spec of Object.values(PRODUCTS)) {
+  for (const spec of allProducts(state)) {
     if (spec.kind === 'sbl' || spec.kind === 'fx' || !isOffered(branch, spec.id)) continue;
     const price = branchPrice(state, branch, spec.id);
     const m = marketRef(state, branch.cityId, spec.id);
-    const stars = state.products.catalog[spec.id]?.stars ?? spec.startStars;
+    const stars = starsOf(state, spec);
+    const affinity = affinityOf(spec);
     const approval = approvalOf(state, spec);
     const sp = special(state, branch, spec);
     const boost = spec.category === 'deposits' ? fx.depositTakeUp : 1;
     let accounts = 0;
     let volume = 0;
     for (const s of SEGMENTS) {
-      const aff = AFFINITY[spec.id]?.[s] ?? 0;
+      const aff = affinity?.[s] ?? 0;
       if (aff <= 0 || newBySeg[s] <= 0) continue;
       const q = Math.min(
         TAKEUP_CAP,
@@ -184,11 +186,12 @@ export function runDemand(state: GameState, branch: Branch, fx: CampaignEffects)
           (STARS_TAKEUP.base + STARS_TAKEUP.slope * stars) *
           approval *
           sp *
-          boost,
+          boost *
+          (spec.takeUpMult ?? 1),
       );
       const n = newBySeg[s] * q;
       const ticketMult =
-        spec.id === 'business_acct' && s === 'BIZ'
+        baseId(spec) === 'business_acct' && s === 'BIZ'
           ? BUSINESS_ACCT_BIZ_TICKET_MULT
           : SEGMENT_SPECS[s].ticketMult[spec.category];
       accounts += n;

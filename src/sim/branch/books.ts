@@ -38,6 +38,7 @@ import { signupChurnMult, type CampaignEffects } from './marketing';
 import { branchPrice, churnGap, isOffered, priceFactor } from './pricing';
 import type { BranchWeek } from './week';
 import { difficultyOf } from '../difficulty';
+import { allProducts, baseId } from '../products';
 
 const NONE: Origination = { newAccounts: 0, newVolume: 0, approval: 1 };
 
@@ -82,7 +83,7 @@ export function runBooks(
   };
   let applications = 0;
 
-  for (const spec of Object.values(PRODUCTS)) {
+  for (const spec of allProducts(state)) {
     if (spec.kind === 'sbl' || spec.kind === 'fx') continue;
     const book = (branch.books[spec.id] ??= emptyBook());
     const before = book.accounts;
@@ -240,14 +241,15 @@ const blend = (bal: number, rate: number, add: number, addRate: number) =>
 function defaults(ctx: Ctx, spec: ProductSpec, book: Book): void {
   const dRate = (book.pd * ctx.creditCycle * ctx.riskPd) / WEEKS_PER_YEAR;
   const defaulted = book.balance * dRate;
-  const lgdMult = spec.id === 'mortgage' ? mortgageLgdMult(ctx.country) : 1;
+  const isMortgage = baseId(spec) === 'mortgage';
+  const lgdMult = isMortgage ? mortgageLgdMult(ctx.country) : 1;
   const loss = Math.min(defaulted, defaulted * book.lgd * lgdMult);
   const recovery = defaulted - loss;
   book.balance -= defaulted;
   book.accounts -= book.accounts * dRate;
   book.last.defaulted = defaulted;
   ctx.wk.losses += loss;
-  if (spec.id === 'mortgage') addReo(ctx, recovery);
+  if (isMortgage) addReo(ctx, recovery);
   else moveReserves(ctx, recovery);
 }
 
@@ -278,7 +280,7 @@ function runAmortizing(ctx: Ctx, spec: ProductSpec, book: Book, orig: Originatio
   if (book.balance > 0) {
     const principal = book.balance / (spec.termWeeks ?? WEEKS_PER_YEAR);
     const prepayRate =
-      spec.id === 'mortgage' || spec.id === 'auto_loan'
+      baseId(spec) === 'mortgage' || baseId(spec) === 'auto_loan'
         ? PREPAY_BASE +
           PREPAY_REFI.slope *
             Math.max(0, (book.bookRate - m - PREPAY_REFI.threshold) / ADVERSE.step)
@@ -288,7 +290,8 @@ function runAmortizing(ctx: Ctx, spec: ProductSpec, book: Book, orig: Originatio
     book.balance -= out;
     moveReserves(ctx, out);
   }
-  if (spec.id === 'mortgage') book.bookRate += (price - book.bookRate) / MORTGAGE_REPRICE_WEEKS;
+  if (baseId(spec) === 'mortgage')
+    book.bookRate += (price - book.bookRate) / MORTGAGE_REPRICE_WEEKS;
   defaults(ctx, spec, book);
   wk.loanInterest += perWeek(book.balance * book.bookRate);
   wk.fundingCharge += perWeek(book.balance * ftpFor(spec, ctx.country));
@@ -322,7 +325,10 @@ function runRevolving(ctx: Ctx, spec: ProductSpec, book: Book, orig: Origination
   wk.fundingCharge += perWeek(book.balance * ftpFor(spec, ctx.country));
   if (spec.spendPerMonth) {
     wk.cardFees +=
-      (book.accounts * spec.spendPerMonth * INTEREST_PERIODS.monthsPerYear * INTERCHANGE) /
+      (book.accounts *
+        spec.spendPerMonth *
+        INTEREST_PERIODS.monthsPerYear *
+        (spec.interchange ?? INTERCHANGE)) /
       WEEKS_PER_YEAR;
   }
   if (spec.annualFee) wk.cardFees += perWeek(book.accounts * spec.annualFee);

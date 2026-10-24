@@ -16,6 +16,7 @@ import { evaluateCapital } from './capital';
 import { checkFailure } from './failure';
 import { updateAppRating } from './company';
 import { pushEvent, trimEvents } from './events';
+import { runDevelopments } from './development';
 import { runHq } from './hq';
 import { updateMacro } from './macro';
 import { refreshManagerPool } from './people';
@@ -24,7 +25,8 @@ import { repriceRivalFees, updateRivalPrices } from './rivals';
 import type { Branch, GameState } from './state';
 import { closeWeek, depreciate, quarterEnd } from './statements';
 import { runTreasury } from './treasury';
-import { PRODUCTS } from '../data/products';
+import { updateModels } from './underwriting';
+import { productSpec } from './products';
 
 /** Advances one game day; runs the weekly tick on every 7th day. */
 export function advanceDay(state: GameState): void {
@@ -66,6 +68,8 @@ export function weeklyTick(state: GameState): void {
   updateBrandAwareness(state);
   runTreasury(state); // 6
   runHq(state); // 7
+  runDevelopments(state);
+  updateModels(state);
   updateAppRating(state);
   depreciate(state); // 8
   closeWeek(state); // 9
@@ -106,7 +110,7 @@ function runBranch(state: GameState, branch: Branch): void {
   runLoanDesk(state, branch, fx, wk); // 4.7
   let newDepositAccounts = 0;
   for (const [pid, o] of Object.entries(demand.byProduct)) {
-    if (PRODUCTS[pid]?.category === 'deposits') newDepositAccounts += o.newAccounts;
+    if (productSpec(state, pid)?.category === 'deposits') newDepositAccounts += o.newAccounts;
   }
   addBranchCosts(state, branch, fx, wk, newDepositAccounts);
   closeBranchWeek(state, branch, wk); // 4.8

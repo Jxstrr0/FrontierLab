@@ -346,5 +346,11 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
   - `people.managerCandidates` and `candidatesRefreshWeek` are keyed by city.
 - **Changed:** rival rate sheets live on `RivalBank.prices` (one sheet per bank), not per branch. `RivalBranch` carries `cityId` and `overall`.
 - **Commands:** `leaseStorefront` is folded into `buildBranch`, which leases and builds in one step (DESIGN §7). Stage 1 also has `renameBranch`, `fireManager`, `setManagerSalary`, `setRiskAppetite`, `decideApplication` and `declineApplication`.
+- **Products floor (schema 5, Stage 4):**
+  - `ProductEntry` (not `ProductDef`): `id`, `stars`, `developed`, plus `name`, `base`, `templateId`, `tier`, `createdWeek` for developed products (ids `dev_N`). Full specs are built on demand by `src/sim/products.ts` (`productSpec`, `allProducts`).
+  - `Development.progress` (nominal weeks) instead of `progressWeeks`, plus `startWeek`; ids `proj_N`.
+  - Optional, absent until first used: `products.digitalDone` (completed digital templates), `company.companyOffered` (HQ lineup), `UnderwritingModel.hostedBy` (bureau-hosted custom models; ids `model_N`).
+  - `UnderwritingState.switching = { fromId, weeksLeft }` (the old model blending out) instead of `switchingTo`; `activeModelId` is the new model from the moment you switch.
+  - Commands: `startDevelopment`, `cancelDevelopment`, `deleteProduct` (`commands/development.ts`); `buyBureauModel`, `commissionBureauModel`, `saveCustomModel`, `activateModel` (`commands/underwriting.ts`); `setApplyRatesToAll`, `setCompanyPrice`, `setCompanyOffered` (`commands/products.ts`).
 - **Saves:** `src/sim/save/serialize.ts` has `serialize`, `deserialize` (with migrations and a required-keys check), `checksum` (cyrb53) and `exportCode`/`importCode`. localStorage slots arrive with the Stage 2 UI.
 
