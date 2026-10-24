@@ -357,6 +357,8 @@ export const EQUIPMENT_LIFE_WEEKS = 260;
 
 // ─── TREASURY (§13) ───────────────────────────────────────────────────────────
 export const LIQ_MIN = 0.1;
+/** Reserves earn the policy rate minus this spread (the central bank's deposit facility, §13.4). */
+export const RESERVE_RATE_SPREAD = 0.005;
 export const LIQ_TARGET_DEFAULT = 0.15;
 export const LIQ_TARGET_RANGE: [number, number] = [0.1, 0.4];
 export const LIQ_REPAY_BUFFER = 0.05;

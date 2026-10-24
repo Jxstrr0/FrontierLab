@@ -443,7 +443,7 @@ The balance script should land near this; §25 targets match it. Treat it as cal
 - **Duration:** BOND_DURATION = 4.0 years. When the country's `FTP_long` changes by Δ in a week, `Bd_market ×= 1 − 4.0 × Δ`.
 - **Unrealized gain/loss** = market − book. It counts in equity (§14.4). Selling realizes it pro rata.
 - **Bond coupon** cash = `book × bookYield / 52`.
-- **Reserves** earn the policy rate: `R × policy / 52` cash in.
+- **Reserves** earn the deposit-facility rate, RESERVE_RATE_SPREAD (0.50%) below policy: `R × max(0, policy − 0.005) / 52` cash in (Stage 5; keeps a deposits-only bank well behind a lender).
 - Bonds pull to par: each week, close 1/208 of the market–book gap.
 
 ### 13.5 Shortfall handling
