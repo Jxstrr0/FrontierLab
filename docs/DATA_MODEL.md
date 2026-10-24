@@ -324,7 +324,7 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 | Personal | `buyHome`, `rebuildHome`, `buyCar`, `placeBid`, `appraise`, `consign`, `buyJet`, `buyFranchise`, `setKit`, `signPlayer`, `releasePlayer` |
 | Settings and saves | `updateSettings`, `saveToSlot`, `loadSlot`, `exportCode`, `importCode` |
 
-## 12. Implemented so far (schema v3, Stage 2)
+## 12. Implemented so far (schema v4, Stage 3)
 
 `src/sim/state.ts` is the source of truth; this section records how it differs from the guide above. Later stages add the rest with a schema bump and a migration.
 
@@ -334,6 +334,8 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
   - `ledger`: P&L lines and cash movements since the last weekly close, so commands between ticks land in the right week.
   - `nextId`: counter for generated ids.
   - `meta.difficulty` (`'easy' | 'normal' | 'hard' | 'expert'`), `meta.competitors` (1–5) and `meta.startCash` (schema v2; migration 1 → 2 fills Normal, the city's usual rival count and $750k).
+  - Schema v4 changes no shape: migration 3 → 4 moves lots onto tiles facing the Stage 3 street grid (lots already on frontage stay put).
+  - The drawable city (streets, water, parks, landmarks, building heights) is not saved: `src/art/citygen.ts` regenerates it from the save seed, the city and its lots.
   - `Branch.desk` (`DeskWeek`: `week`, `approved`, `refused`, `declined`, `expired`): this week's Loan Desk outcomes, reset when the week turns (schema v3; migration 2 → 3 adds an empty tally).
   - `company.negativeCashWeeks`, `company.lowCapitalWeeks`: counters for the game-over checks (schema v2).
   - `company.retainedEarnings`, `company.leaseDeposits` (an asset). `company.liquidityRatio` is `null` while there are no deposits.
