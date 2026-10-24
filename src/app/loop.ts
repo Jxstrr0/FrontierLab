@@ -87,8 +87,10 @@ function afterWeek(s: GameState): void {
   }
 }
 
+/** Applications the next weekly tick will expire (it drops those with expiresWeek ≤ week). */
 function expiringApplications(s: GameState): number {
-  return Object.values(s.loanDesk.applications).filter((a) => a.expiresWeek <= s.clock.week).length;
+  return Object.values(s.loanDesk.applications).filter((a) => a.expiresWeek <= s.clock.week + 1)
+    .length;
 }
 
 const EVENT_TEXT: Record<string, (p: Record<string, unknown>) => string> = {
