@@ -15,9 +15,13 @@ export interface BalanceSheet {
   reo: number;
   fixedAssets: number;
   leaseDeposits: number;
+  /** Unamortized partnership signing fees (deducted from CET1, §15). */
+  intangibles: number;
   assets: number;
   deposits: number;
   wholesale: number;
+  /** Business loans and drawn credit lines from rival banks (§19.9). */
+  corporateDebt: number;
   taxPayable: number;
   liabilities: number;
   equity: number;
@@ -30,14 +34,38 @@ export function assetBookValue(a: { cost: number; lifeWeeks: number; ageWeeks: n
   return a.cost * Math.max(0, 1 - a.ageWeeks / a.lifeWeeks);
 }
 
+/** Branch deposit books plus partnership mini-books (§13.7). */
 export function totalDeposits(state: GameState): number {
-  let total = 0;
+  let total = partnershipDeposits(state);
   for (const b of Object.values(state.branches)) {
     for (const [pid, book] of Object.entries(b.books)) {
       const spec = productSpec(state, pid);
       if (spec && isDeposit(spec)) total += book.balance;
     }
   }
+  return total;
+}
+
+/** Balances held in payroll and student partnership mini-books. */
+export function partnershipDeposits(state: GameState): number {
+  let total = 0;
+  for (const p of Object.values(state.partnerships)) total += p.balance;
+  return total;
+}
+
+/** Unamortized partnership signing fees. */
+export function intangibleAssets(state: GameState): number {
+  let total = 0;
+  for (const p of Object.values(state.partnerships)) total += p.unamortized;
+  return total;
+}
+
+/** Corporate debt owed to rival banks: loan balances plus drawn lines. */
+export function corporateDebtTotal(state: GameState): number {
+  const d = state.corporateDebt;
+  let total = 0;
+  for (const l of Object.values(d.loans)) total += l.balance;
+  for (const l of Object.values(d.lines)) total += l.drawn;
   return total;
 }
 
@@ -69,10 +97,13 @@ export function balanceSheet(state: GameState): BalanceSheet {
   const loans = loanTotals(state).total;
   const reo = Object.values(state.reo).reduce((sum, p) => sum + p.value, 0);
   const fixedAssets = c.fixedAssets.reduce((sum, a) => sum + assetBookValue(a), 0);
-  const assets = c.cash + t.reserves + t.bondsMarket + loans + reo + fixedAssets + c.leaseDeposits;
+  const intangibles = intangibleAssets(state);
+  const assets =
+    c.cash + t.reserves + t.bondsMarket + loans + reo + fixedAssets + c.leaseDeposits + intangibles;
   const deposits = totalDeposits(state);
   const wholesale = totalWholesale(state);
-  const liabilities = deposits + wholesale + c.taxPayable;
+  const corporateDebt = corporateDebtTotal(state);
+  const liabilities = deposits + wholesale + corporateDebt + c.taxPayable;
   const aoci = t.bondsMarket - t.bondsBook;
   return {
     cash: c.cash,
@@ -82,9 +113,11 @@ export function balanceSheet(state: GameState): BalanceSheet {
     reo,
     fixedAssets,
     leaseDeposits: c.leaseDeposits,
+    intangibles,
     assets,
     deposits,
     wholesale,
+    corporateDebt,
     taxPayable: c.taxPayable,
     liabilities,
     equity: assets - liabilities,

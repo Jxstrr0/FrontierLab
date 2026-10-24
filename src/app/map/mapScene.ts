@@ -36,7 +36,10 @@ export function mapPlaces(s: GameState, cityId: string): MapPlaces {
   if (!FEATURES.hq) return {};
   return {
     offices: Object.values(s.world.officeListings).filter((o) => o.cityId === cityId),
-    sites: Object.values(s.world.sites).filter((x) => x.cityId === cityId),
+    sites: Object.values(s.world.sites).filter(
+      (x) =>
+        x.cityId === cityId && (FEATURES.competition || x.kind === 'bureau' || x.kind === 'agency'),
+    ),
   };
 }
 

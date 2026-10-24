@@ -1,6 +1,6 @@
 // Tick orchestration (SIMULATION §2). `advanceDay` moves the clock and resolves
 // scheduled events; every 7th day runs `weeklyTick`, which calls each system in
-// the documented order. Steps 5, 11, 12, 15 and 16 arrive with later stages.
+// the documented order. Steps 11 and 12 arrive with later stages.
 import { DAYS_PER_WEEK } from '../config/balance';
 import { runBooks } from './branch/books';
 import { addBranchCosts, closeBranchWeek } from './branch/branchPnl';
@@ -21,6 +21,11 @@ import { runDevelopments } from './development';
 import { runHq } from './hq';
 import { runBrandMarketing } from './hqMarketing';
 import { updateMacro } from './macro';
+import { runCorporateDebt } from './corporateDebt';
+import { runIncidents } from './incidents';
+import { composeNews } from './news';
+import { runPartnerships } from './partnerships';
+import { rivalsQuarter, runRivals } from './rivalAi';
 import { refreshManagerPool } from './people';
 import { ftpLong, ftpShort, updateMarketRefs } from './rates';
 import { regulatorReview } from './riskFloor';
@@ -65,10 +70,12 @@ export function weeklyTick(state: GameState): void {
   updateMacro(state); // 1
   updateRivalPrices(state); // 3 (before references so m(p) is this week's)
   updateMarketRefs(state); // 2
+  runRivals(state); // 3 (books, financials, expansion, price wars)
   for (const branch of Object.values(state.branches)) {
     if (branch.status === 'open') runBranch(state, branch); // 4
   }
   updateBrandAwareness(state);
+  runPartnerships(state); // 5
   runTreasury(state); // 6
   refreshFundingOffers(state); // 6 (§13.6 market, after this week's flows)
   runHq(state); // 7
@@ -76,6 +83,7 @@ export function weeklyTick(state: GameState): void {
   updateModels(state);
   updateAppRating(state);
   runBrandMarketing(state); // 8 (brand marketing)
+  runCorporateDebt(state); // 8 (corporate debt)
   depreciate(state); // 8
   closeWeek(state); // 9
   evaluateCapital(state); // 10
@@ -84,8 +92,11 @@ export function weeklyTick(state: GameState): void {
   if (isQuarterStart(state.meta.startDate, state.clock.day)) {
     quarterEnd(state); // 13
     regulatorReview(state); // 13 (§15)
+    rivalsQuarter(state); // 13 (rival earnings and failures)
   }
   if (isYearStart(state.meta.startDate, state.clock.day)) yearEnd(state); // 14
+  runIncidents(state); // 15
+  composeNews(state); // 16
 
   for (const cityId of Object.keys(state.world.cities)) refreshManagerPool(state, cityId);
   for (const c of Object.values(state.world.countries)) {

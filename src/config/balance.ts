@@ -18,7 +18,7 @@ export const FEATURES = {
   /** Stage 4: HQ offices, departments and operations depth. */
   hq: true,
   /** Stage 5: rival AI, macro for every country, The Daily Ledger, incidents. */
-  competition: false,
+  competition: true,
   /** Stage 6: governance, executives and capital markets. */
   capitalMarkets: false,
   /** Stage 7: ventures, conventions and real estate. */
@@ -704,3 +704,39 @@ export const WAGE_RANGE: [number, number] = [0.5, 3];
 export const MAX_STAFF_MULT = 3;
 export const MANAGER_SALARY_RANGE: [number, number] = [0.5, 3];
 export const BRANCH_NAME_MAX = 32;
+
+// ═══ STAGE 5: COMPETITION, MACRO AND NEWS ═════════════════════════════════════
+// Each system below owns its own section; keep additions inside the right one.
+
+// ─── STAGE 5 MAP SITES (CONTENT §14, §16) ─────────────────────────────────────
+/** Chance an employer's payroll already sits with one of the city's rivals. */
+export const EMPLOYER_PARTNER_CHANCE = 0.6;
+
+// ─── RIVAL AI (§18) ───────────────────────────────────────────────────────────
+/** Starting capital ratio range by strategy (§18.5, simplified financials). */
+export const RIVAL_START_CR: Record<
+  'incumbent' | 'disruptor' | 'premium' | 'community',
+  [number, number]
+> = {
+  incumbent: [0.125, 0.14],
+  premium: [0.13, 0.15],
+  community: [0.105, 0.125],
+  disruptor: [0.08, 0.1],
+};
+/** A mature rival branch's deposits at quality RIVAL_QUALITY_REF and incomeIndex 1 (§18.1). */
+export const RIVAL_MATURE_DEPOSITS = 45_000_000;
+export const RIVAL_QUALITY_REF = 3.4;
+/** Rival loans per $ of deposits (their LDR). */
+export const RIVAL_LDR = 0.82;
+/** Risk weight on a rival's loans for its capital ratio. */
+export const RIVAL_LOAN_RISK_WEIGHT = 0.75;
+
+// ─── RIVAL CORPORATE LENDING (§19.9) ──────────────────────────────────────────
+
+// ─── INCIDENTS (§23) ──────────────────────────────────────────────────────────
+
+// ─── BANK RUNS AND RECAPITALISATION (§13.8, §15) ──────────────────────────────
+
+// ─── NEWS: THE DAILY LEDGER (§24) ─────────────────────────────────────────────
+
+// ─── PARTNERSHIPS AND UNIVERSITIES (§13.7) ────────────────────────────────────

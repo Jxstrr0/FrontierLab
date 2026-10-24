@@ -4,6 +4,7 @@
 // components read it (via useGame) to re-render.
 import { signal } from '@preact/signals';
 import type { CommandResult } from '../sim/commands';
+import type { CountryId } from '../data/types';
 import type { DeptId, GameState } from '../sim/state';
 
 export type Screen = 'title' | 'newgame' | 'game' | 'saves' | 'settings';
@@ -17,6 +18,13 @@ export type PanelRoute =
   | { type: 'hq'; officeId?: string; dept?: DeptId }
   | { type: 'bureau'; siteId: string }
   | { type: 'agency'; siteId: string }
+  // Stage 5 (FEATURES.competition)
+  | { type: 'rivalBranch'; lotId: string }
+  | { type: 'rivalHq'; siteId: string; tab?: 'overview' | 'loans' | 'credit' }
+  | { type: 'centralBank'; countryId: CountryId }
+  | { type: 'employer'; siteId: string }
+  | { type: 'university'; siteId: string }
+  | { type: 'ledger'; week?: number }
   | { type: 'company' }
   | { type: 'branches' }
   | { type: 'cityList' }
@@ -25,7 +33,8 @@ export type PanelRoute =
 
 export type BranchTab = 'service' | 'products' | 'loandesk' | 'marketing' | 'finance';
 
-export type ModalRoute = { type: 'weekly'; week: number } | { type: 'gameover' };
+export type ModalRoute =
+  { type: 'weekly'; week: number } | { type: 'incident' } | { type: 'gameover' };
 
 export interface Toast {
   id: number;

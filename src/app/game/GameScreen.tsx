@@ -22,6 +22,13 @@ import { modal, panel, sheet } from '../store';
 import { StorefrontPanel } from '../storefront/StorefrontPanel';
 import { GameOverModal } from '../weekly/GameOverModal';
 import { WeeklyResults } from '../weekly/WeeklyResults';
+import { CentralBankPanel } from '../centralbank/CentralBankPanel';
+import { IncidentModal } from '../incidents/IncidentModal';
+import { LedgerArchivePanel } from '../ledger/LedgerArchivePanel';
+import { EmployerPanel } from '../partners/EmployerPanel';
+import { UniversityPanel } from '../partners/UniversityPanel';
+import { RivalBranchPanel } from '../rivals/RivalBranchPanel';
+import { RivalHqPanel } from '../rivals/RivalHqPanel';
 import { Hud } from './Hud';
 import { MenuSheet } from './MenuSheet';
 import './game.css';
@@ -70,6 +77,21 @@ function PanelHost() {
     case 'bureau':
     case 'agency':
       return FEATURES.hq ? <SitePanel key={p.siteId} siteId={p.siteId} kind={p.type} /> : null;
+    // Stage 5 (FEATURES.competition): rivals, the central bank, employers, the Ledger archive.
+    case 'rivalBranch':
+      return FEATURES.competition ? <RivalBranchPanel key={p.lotId} lotId={p.lotId} /> : null;
+    case 'rivalHq':
+      return FEATURES.competition ? (
+        <RivalHqPanel key={p.siteId} siteId={p.siteId} tab={p.tab ?? 'overview'} />
+      ) : null;
+    case 'centralBank':
+      return FEATURES.competition ? <CentralBankPanel countryId={p.countryId} /> : null;
+    case 'employer':
+      return FEATURES.competition ? <EmployerPanel key={p.siteId} siteId={p.siteId} /> : null;
+    case 'university':
+      return FEATURES.competition ? <UniversityPanel key={p.siteId} siteId={p.siteId} /> : null;
+    case 'ledger':
+      return FEATURES.competition ? <LedgerArchivePanel week={p.week} /> : null;
     case 'company':
       return <CompanyPanel />;
     case 'branches':
@@ -87,5 +109,6 @@ function ModalHost() {
   const m = modal.value;
   if (!m) return null;
   if (m.type === 'weekly') return <WeeklyResults week={m.week} />;
+  if (m.type === 'incident') return FEATURES.competition ? <IncidentModal /> : null;
   return <GameOverModal />;
 }

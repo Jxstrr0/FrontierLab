@@ -31,6 +31,9 @@ export const PNL_LINES: readonly PnlLine[] = [
   'benefits',
   'development',
   'fines',
+  'incidents',
+  'corporateInterest',
+  'amortization',
   'loanLosses',
   'depreciation',
   'tax',
@@ -64,9 +67,17 @@ export const OPEX: readonly PnlLine[] = [
   'benefits',
   'development',
   'fines',
+  'incidents',
+  'corporateInterest',
+  'amortization',
 ];
 /** Lines that don't move corporate cash (§14.3). */
-export const NON_CASH: readonly PnlLine[] = ['loanLosses', 'depreciation', 'realizedGains'];
+export const NON_CASH: readonly PnlLine[] = [
+  'loanLosses',
+  'depreciation',
+  'amortization',
+  'realizedGains',
+];
 
 export function emptyLedger(): Ledger {
   const pnl = {} as Record<PnlLine, number>;

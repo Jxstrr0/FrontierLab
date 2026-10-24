@@ -29,7 +29,13 @@ export const FLOORS: Record<DistrictId, [number, number]> = {
 /** Office buildings for lease draw this many storeys above their leasable floors (lobby, crown). */
 export const OFFICE_ART_EXTRA_STOREYS = 2;
 /** Storeys of credit bureau and marketing agency buildings (Stage 4). */
-export const SITE_STOREYS = { bureau: 5, agency: 4 } as const;
+export const SITE_STOREYS = {
+  bureau: 5,
+  agency: 4,
+  rivalHq: 8,
+  employer: 4,
+  university: 3,
+} as const;
 
 /** Share of lot-free blocks that become parks, by district. */
 export const PARK_SHARE: Record<DistrictId, number> = {
