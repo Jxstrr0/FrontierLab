@@ -1,0 +1,82 @@
+/* Sports franchise panel (SCREENS §20): offer card, shirt hero, kit swatches, player cards. */
+.fr-center {
+  margin: 0;
+  text-align: center;
+}
+.fr-note {
+  margin: var(--space-2) 0 0;
+}
+.fr-offer {
+  gap: var(--space-3);
+}
+.fr-hero {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-2) 0;
+}
+.kit-shirt {
+  display: block;
+  filter: drop-shadow(0 2px 4px rgb(0 0 0 / 35%));
+}
+.kit-monogram {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.fr-swatch-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+}
+.fr-swatch-label {
+  font-size: var(--text-14);
+  color: var(--ivory-dim);
+}
+.fr-swatches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--tap-min), 1fr));
+  gap: var(--space-2);
+}
+.fr-swatch {
+  min-width: var(--tap-min);
+  min-height: var(--tap-min);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-card);
+  cursor: pointer;
+}
+.fr-swatch.is-active {
+  outline: 2px solid var(--brass-light);
+  outline-offset: 2px;
+}
+.fr-player-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: var(--space-1);
+}
+.fr-player-name {
+  font-family: var(--font-display);
+  font-size: var(--text-16);
+  color: var(--ivory);
+}
+.fr-rating {
+  min-width: 36px;
+  padding: 2px var(--space-2);
+  border: 1px solid var(--brass);
+  border-radius: var(--radius-pill);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  color: var(--brass-light);
+}
+.fr-player-btn {
+  margin-top: var(--space-2);
+}
+.fr-window {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}

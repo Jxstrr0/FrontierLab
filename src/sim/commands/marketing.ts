@@ -4,6 +4,7 @@
 // marketing agency's office in the city you're in (no floor needed).
 import { AGENCIES, BRAND_CAMPAIGNS } from '../../data/brandCampaigns';
 import { CITIES } from '../../data/cities';
+import { ownsClubIn } from '../franchise';
 import { agenciesInCity, campaignTargetBlock, hasMarketingFloor } from '../hqMarketing';
 import { newId } from '../ids';
 import { spend } from '../ledger';
@@ -25,8 +26,8 @@ export function startBrandCampaign(
   if (!hasMarketingFloor(state)) return fail('Brand campaigns need a Marketing floor at HQ.');
   const spec = BRAND_CAMPAIGNS[order.campaignId];
   if (!spec) return fail('That campaign is not available.');
-  if (spec.needsFranchise)
-    return fail(`${spec.name} needs a sports franchise in the city, and you don't own one yet.`);
+  if (spec.needsFranchise && !ownsClubIn(state, order.targetId))
+    return fail(`${spec.name} needs a sports franchise you own in the city.`);
   if (!spec.scopes.includes(order.scope))
     return fail(`${spec.name} runs per ${spec.scopes.join(' or ')}, not per ${order.scope}.`);
   const where = campaignTargetBlock(state, order.scope, order.targetId);
