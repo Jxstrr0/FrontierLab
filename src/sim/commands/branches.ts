@@ -1,6 +1,9 @@
-// Branch commands: lease a storefront and build a branch on it, rename a branch.
+// Branch commands: lease a storefront and build a branch on it, rename or close a branch.
 import {
   BRANCH_NAME_MAX,
+  CLOSE_RECOVERY,
+  CLOSE_RENT_WEEKS,
+  CLOSE_RETENTION,
   EQUIPMENT_LIFE_WEEKS,
   FITOUT_DAYS,
   FITOUT_LIFE_WEEKS,
@@ -11,7 +14,9 @@ import {
 } from '../../config/balance';
 import { DISTRICT_SPECS } from '../../data/districts';
 import { BUILD_SLOTS, EQUIPMENT, isFitout, type BuildSpec } from '../../data/equipment';
-import { PRODUCTS } from '../../data/products';
+import { isDeposit, isLoan, PRODUCTS } from '../../data/products';
+import { assetBookValue } from '../balanceSheet';
+import { tileDistance } from '../citygen';
 import { emptyBook } from '../branch/books';
 import { campaignEffects } from '../branch/marketing';
 import { branchTarget, productsTarget, ratesTarget, serviceTarget } from '../branch/ratings';
@@ -19,10 +24,10 @@ import { marketWage, staffNeeded } from '../branch/staff';
 import { overallOf } from '../rivals';
 import { pushEvent } from '../events';
 import { newId } from '../ids';
-import { postCash, spend } from '../ledger';
+import { postCash, postPnl, spend } from '../ledger';
 import { roundToStep } from '../math';
 import { countryOfCity, defaultPrice } from '../rates';
-import type { Branch, GameState } from '../state';
+import type { Book, Branch, GameState } from '../state';
 import { fail, money, ok, type CommandResult } from './result';
 
 /** Itemized cost of a build on a lot: parts, lease deposit and the first week's rent. */
@@ -178,4 +183,121 @@ export function renameBranch(state: GameState, branchId: string, name: string): 
   if (!trimmed) return fail('Give the branch a name.');
   branch.name = trimmed.slice(0, BRANCH_NAME_MAX);
   return ok();
+}
+
+/** The nearest other branch in the same city, which takes over a closed branch's accounts. */
+function successor(state: GameState, branch: Branch): Branch | undefined {
+  const lot = state.world.lots[branch.lotId];
+  let best: Branch | undefined;
+  let bestD = Infinity;
+  for (const other of Object.values(state.branches)) {
+    if (other.id === branch.id || other.cityId !== branch.cityId) continue;
+    const otherLot = state.world.lots[other.lotId];
+    const d = lot && otherLot ? tileDistance(lot, otherLot) : Infinity;
+    if (d < bestD || (d === bestD && best && other.id < best.id)) {
+      best = other;
+      bestD = d;
+    }
+  }
+  return best;
+}
+
+function hasLoans(state: GameState, branch: Branch): boolean {
+  const books = Object.entries(branch.books).some(([pid, b]) => {
+    const spec = PRODUCTS[pid];
+    return spec && isLoan(spec) && b.balance > 0;
+  });
+  return books || Object.values(state.loanDesk.loans).some((l) => l.branchId === branch.id);
+}
+
+/** What closing a branch returns and where its accounts go (DESIGN §5.3). */
+export function closeQuote(state: GameState, branchId: string) {
+  const branch = state.branches[branchId];
+  if (!branch) return undefined;
+  const target = successor(state, branch);
+  const book = state.company.fixedAssets
+    .filter((a) => a.ownerId === branchId)
+    .reduce((sum, a) => sum + assetBookValue(a), 0);
+  const recovery = book * CLOSE_RECOVERY;
+  const forfeit = Math.min(branch.lease.deposit, branch.lease.weeklyRent * CLOSE_RENT_WEEKS);
+  const depositRefund = branch.lease.deposit - forfeit;
+  const blocker =
+    !target && hasLoans(state, branch)
+      ? 'This is your only branch in the city, so its loans have nowhere to go.'
+      : null;
+  return {
+    targetId: target?.id,
+    targetName: target?.name,
+    equipmentBook: book,
+    recovery,
+    depositRefund,
+    forfeit,
+    cashBack: recovery + depositRefund,
+    retention: target ? CLOSE_RETENTION : 0,
+    blocker,
+  };
+}
+
+/** Moves a share of a book into another, blending rates and risk by balance. */
+function mergeBook(into: Book, from: Book, share: number): void {
+  const add = from.balance * share;
+  const total = into.balance + add;
+  if (total > 0) {
+    into.bookRate = (into.balance * into.bookRate + add * from.bookRate) / total;
+    into.pd = (into.balance * into.pd + add * from.pd) / total;
+    into.lgd = (into.balance * into.lgd + add * from.lgd) / total;
+  }
+  into.balance = total;
+  into.accounts += Math.round(from.accounts * share);
+}
+
+/**
+ * Closes a branch: returns the lease deposit minus two weeks' rent plus 30% of
+ * its equipment's book value. Loans move to the nearest branch in the city;
+ * accounts and deposits follow with extra churn, or leave if there is none.
+ */
+export function closeBranch(
+  state: GameState,
+  branchId: string,
+): CommandResult<{ movedTo?: string }> {
+  const branch = state.branches[branchId];
+  const quote = closeQuote(state, branchId);
+  if (!branch || !quote) return fail('That branch no longer exists.');
+  if (quote.blocker) return fail(quote.blocker);
+  const target = quote.targetId ? state.branches[quote.targetId] : undefined;
+
+  for (const [pid, from] of Object.entries(branch.books)) {
+    const spec = PRODUCTS[pid];
+    if (!spec) continue;
+    const share = isLoan(spec) ? 1 : quote.retention;
+    // Deposits that leave the bank are paid out of treasury reserves.
+    if (isDeposit(spec)) state.treasury.reserves -= from.balance * (1 - share);
+    if (target) mergeBook((target.books[pid] ??= emptyBook()), from, share);
+  }
+  if (target) {
+    target.customers += Math.round(branch.customers * quote.retention);
+    for (const loan of Object.values(state.loanDesk.loans)) {
+      if (loan.branchId === branchId) loan.branchId = target.id;
+    }
+  }
+  for (const app of Object.values(state.loanDesk.applications)) {
+    if (app.branchId === branchId) delete state.loanDesk.applications[app.id];
+  }
+
+  // Equipment: recover 30% of book value and write off the rest.
+  state.company.fixedAssets = state.company.fixedAssets.filter((a) => a.ownerId !== branchId);
+  postCash(state, quote.recovery, 'investing');
+  postPnl(state, 'depreciation', quote.equipmentBook - quote.recovery);
+  // Lease: the deposit comes back less the forfeited rent.
+  state.company.leaseDeposits -= branch.lease.deposit;
+  postCash(state, branch.lease.deposit, 'investing');
+  spend(state, 'rent', quote.forfeit);
+
+  if (branch.managerId) delete state.people.managers[branch.managerId];
+  const lot = state.world.lots[branch.lotId];
+  if (lot) delete lot.occupant;
+  state.events.scheduled = state.events.scheduled.filter((e) => e.payload.branchId !== branchId);
+  delete state.branches[branchId];
+  pushEvent(state, 'BRANCH_CLOSED', { branchId, name: branch.name, movedTo: target?.name }, 2);
+  return ok(target ? { movedTo: target.id } : {});
 }

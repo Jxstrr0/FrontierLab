@@ -343,6 +343,10 @@ export const EQUIP_MAINT = 0.06;
 export const FITOUT_UPKEEP = 0.02;
 export const BRANCH_OVERHEAD = 450;
 export const CLOSE_RECOVERY = 0.3;
+/** Closing a branch forfeits this many weeks' rent from the lease deposit (DESIGN §5.3). */
+export const CLOSE_RENT_WEEKS = 2;
+/** Share of accounts and deposits that follow a closed branch to the nearest one (assumption). */
+export const CLOSE_RETENTION = 0.85;
 export const ATM_FEE = { usage: 0.25, fee: 2.5 } as const;
 export const FITOUT_DAYS = 7;
 export const LEASE_DEPOSIT_WEEKS = 6;
