@@ -3,5 +3,6 @@ export * from './branches';
 export * from './loanDesk';
 export * from './products';
 export * from './result';
+export * from './settings';
 export * from './staff';
 export * from './treasury';
