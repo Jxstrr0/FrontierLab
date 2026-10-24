@@ -188,7 +188,7 @@ What *Coffee Inc 2* does, recorded from the owner's gameplay screen recordings (
 ## 11. Travel
 - Airports per city.
 - Departures board styled like split-flap, listing destinations with distances (e.g. Paris 348 km from London; plantation regions 5,760–6,405 km).
-- **Weekly mileage limit:** the airport shows "Flown this week" and "Remaining mileage": 0 km flown / 24,140 km remaining at the start of a week, then 6,753 / 17,387 after one flight. Travel is capped per week.
+- **Weekly mileage limit:** the airport shows "Flown this week" and "Remaining mileage": 0 km flown / 24,140 km remaining at the start of a week, then 6,753 / 17,387 after one flight. Free travel is capped per week; past it the board says "Please choose a destination. A one-way flight will cost £80,000" and a destination list (by region, with a world map) still lets you fly.
 - A flight animates across the map, then the destination map loads.
 - Private Jet card ("fly anywhere on your schedule, at a price").
 
