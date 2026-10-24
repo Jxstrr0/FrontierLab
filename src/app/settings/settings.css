@@ -1,0 +1,23 @@
+/* Settings layout. */
+.settings {
+  gap: var(--space-2);
+}
+.setting {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+}
+.setting-label {
+  font-size: var(--text-14);
+  color: var(--ivory-dim);
+}
+.settings .section-title {
+  margin-top: var(--space-5);
+}
+.settings .section-title:first-child {
+  margin-top: 0;
+}
+.settings-done {
+  margin-top: var(--space-4);
+}

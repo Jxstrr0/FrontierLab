@@ -1,0 +1,12 @@
+/* Panels opened from the title (settings, saves) sit in a centred column; in game
+   they use the normal panel: full screen on phones, a drawer on desktop. */
+.standalone .panel {
+  left: 0;
+  right: 0;
+  width: min(560px, 100%);
+  min-width: 0;
+  margin: 0 auto;
+  border-left: 1px solid var(--hairline);
+  border-right: 1px solid var(--hairline);
+  animation-name: panel-in;
+}
