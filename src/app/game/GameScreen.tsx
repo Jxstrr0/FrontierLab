@@ -136,7 +136,7 @@ function PanelHost() {
       return FEATURES.personalEmpire ? <CarDealerPanel key={p.siteId} siteId={p.siteId} /> : null;
     case 'auctionHouse':
       return FEATURES.personalEmpire ? (
-        <AuctionHousePanel key={p.siteId} siteId={p.siteId} />
+        <AuctionHousePanel key={p.siteId} siteId={p.siteId} tab={p.tab} />
       ) : null;
     case 'franchise':
       return FEATURES.personalEmpire ? <FranchisePanel key={p.clubId} clubId={p.clubId} /> : null;
