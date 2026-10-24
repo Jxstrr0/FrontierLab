@@ -3,6 +3,7 @@
 import {
   CHARTER_MIN_EQUITY,
   FIXED_ASSET_RISK_WEIGHT,
+  FX_RISK_WEIGHT,
   OP_RISK_MULT,
   PROPERTY_RISK_WEIGHT,
   REO_RISK_WEIGHT,
@@ -62,6 +63,7 @@ export function capitalSnapshot(state: GameState): CapitalSnapshot {
     bs.ventures * VENTURE_RISK_WEIGHT +
     bs.ventureDebt * VENTURE_DEBT_RISK_WEIGHT +
     bs.realEstate * PROPERTY_RISK_WEIGHT +
+    bs.currencies * FX_RISK_WEIGHT +
     OP_RISK_MULT * Math.max(0, trailingNetRevenue(state));
   const capitalRatio = cet1 / Math.max(rwa, 1);
   const tier =

@@ -25,6 +25,7 @@ import { initCountries } from './macro';
 import { generateCapitalMarketSites } from './capitalSites';
 import { generateCompetitionSites } from './competitionSites';
 import { generateInvestmentSites } from './investmentSites';
+import { emptyFx } from './fx';
 import {
   emptyConventions,
   emptyLobbying,
@@ -200,6 +201,7 @@ export function newGame(opts: NewGameOptions): GameState {
     conventions: emptyConventions(),
     realEstate: emptyRealEstate(),
     lobbying: emptyLobbying(),
+    fx: emptyFx(),
     ledger: emptyLedger(),
     events: { log: [], scheduled: [] },
     history: { weekly: [], quarterly: [] },

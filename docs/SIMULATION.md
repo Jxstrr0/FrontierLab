@@ -825,14 +825,16 @@ Levels 1–5 (Very conservative to Very aggressive):
 
 ### 19.10 Currencies (FX)
 A deliberately simple "country up or down" investment (DESIGN §5.12a). Your books stay in one currency.
-- **State:** one index per country, `fx[c]`, starting at 100, quoted against your home country (whose own index stays at 100 and can't be bought).
-- **Weekly move** (tick step 12, after listed prices):
-  - `r = FX_GROWTH_W × (gdp_c − gdp_home)/100/52 + FX_RATE_W × (policy_c − policy_home)/52 + FX_PHASE[phase_c] − FX_PHASE[phase_home] + normal(0, FX_VOL[c])`
-  - `fx[c] *= 1 + r`, then clamped to [FX_MIN, FX_MAX] × its start.
-  - HK is pegged to the US: `fx[HK] = fx[US] × (1 + normal(0, FX_PEG_VOL))`.
-- **Positions:** buy an amount of a currency as the company or personally: `units = amount / fx[c]`; value = `units × fx[c]`. Buying and selling pay FX_SPREAD on the amount (to `commissions` for the company). No carry is paid; the rate differential is already in the drift.
-- **Books:** company positions are investments at value, marked through `investmentGains` like stocks; risk weight FX_RISK_WEIGHT.
-- **News:** a currency moving more than FX_NEWS_MOVE in a week makes the Markets page.
+- **State:** a strength level per country, `L[c]`, starting at 100. A currency's rate against your home currency is `fx[c] = L[c] / L[home] × 100`, so your home currency always reads 100 and can't be bought.
+- **Weekly move** (tick step 12, after listed prices), per country:
+  - `r_c = FX.growthW × gdp_c/100/52 + FX.rateW × policy_c/52 + FX.phase[phase_c] + normal(0, vol_c × FX.volMult)`
+  - `L[c] *= 1 + r_c`, clamped to [FX.min, FX.max] × 100.
+  - So `fx[c]` moves by about `r_c − r_home`: growth and rate differentials plus the cycle gap and noise.
+  - HK is pegged to the US: `L[HK] = L[US] × (1 + normal(0, FX.pegVol))`.
+  - Currency volatilities are in `src/data/currencies.ts`.
+- **Positions:** buy an amount of a currency as the company or personally: `units = amount / fx[c]`; value = `units × fx[c]`. Buying and selling pay FX.spread on the amount (to `commissions` for the company). No carry is paid; the rate differential is already in the drift.
+- **Books:** company positions are investments at value, marked through `investmentGains` like stocks; risk weight FX_RISK_WEIGHT (1.0).
+- **News:** a currency moving more than FX.newsMove (2%) in a week makes the Markets page.
 
 ## 20. Ventures
 

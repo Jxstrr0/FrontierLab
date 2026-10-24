@@ -41,6 +41,7 @@ import type {
 } from './marketsTypes';
 import type {
   ConventionsState,
+  FxState,
   LobbyingState,
   RealEstateState,
   VenturesState,
@@ -109,6 +110,8 @@ export interface GameState {
   realEstate: RealEstateState;
   /** Lobbying campaigns and their effects (DESIGN §5.8.10). */
   lobbying: LobbyingState;
+  /** Currency strength levels and positions (SIMULATION §19.10). */
+  fx: FxState;
   /** Accumulates P&L lines and cash movements since the last weekly close. */
   ledger: Ledger;
   events: { log: GameEvent[]; scheduled: ScheduledEvent[] };
