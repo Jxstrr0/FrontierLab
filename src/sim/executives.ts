@@ -5,6 +5,7 @@
 // commands/executives.ts; seat lookups other systems read are in execSeats.ts.
 import { WEEKS_PER_YEAR } from '../config/balance';
 import { EXEC_SEATS } from '../data/executives';
+import { BENEFIT_RULES } from '../data/benefits';
 import { refreshExecCandidates } from './execCandidates';
 import {
   cfoTreasury,
@@ -62,11 +63,13 @@ function rollResignations(state: GameState): void {
   if (execs.length === 0) return;
   const rng = stream(state, 'execs');
   const market = execMarketSalary(state);
+  const espp = state.stock.status === 'public' && (state.people.benefits.espp ?? 0) > 0;
+  const loyaltyBonus = espp ? BENEFIT_RULES.esppLoyalty : 0;
   const rivals = Object.values(state.rivals)
     .filter((r) => r.status === 'active')
     .sort((a, b) => a.id.localeCompare(b.id));
   for (const exec of execs) {
-    if (!rng.chance(resignChance(exec, market))) continue;
+    if (!rng.chance(resignChance(exec, market, loyaltyBonus))) continue;
     const rival = rivals.length > 0 ? rng.pick(rivals).name : 'A rival bank';
     raiseIncident(state, 'EXEC_POACHED', 'company', exec.seat, {
       seat: exec.seat,

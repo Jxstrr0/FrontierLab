@@ -78,12 +78,14 @@ export function hasUnvested(exec: Executive): boolean {
 /**
  * §17.2 weekly resignation probability:
  * 0.002 × (1.5 − loyalty/100) × (pay/market < 0.9 ? 2 : 1) × (unvested grants ? 0.5 : 1).
+ * `loyaltyBonus` adds the Employee Stock Plan's +5 (CONTENT §10).
  */
-export function resignChance(exec: Executive, market: number): number {
+export function resignChance(exec: Executive, market: number, loyaltyBonus = 0): number {
   const e = EXECUTIVES;
+  const loyalty = Math.min(100, exec.loyalty + loyaltyBonus);
   const underpaid = exec.salary / Math.max(1, market) < e.underpaidRatio ? e.underpaidMult : 1;
   const grants = hasUnvested(exec) ? e.grantMult : 1;
-  return Math.max(0, e.resignBase * (e.resignLoyalty - exec.loyalty / 100) * underpaid * grants);
+  return Math.max(0, e.resignBase * (e.resignLoyalty - loyalty / 100) * underpaid * grants);
 }
 
 /** Seat title and short code (CEO for the founder). */
