@@ -1,0 +1,150 @@
+/* The temporary city list and the rival sheet (ROADMAP Stage 2). */
+.city-list {
+  max-width: 720px;
+  margin: 0 auto;
+}
+.city-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+.city-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-32);
+  line-height: 1.1;
+}
+.city-head p {
+  margin: 0;
+}
+
+.district {
+  margin-bottom: var(--space-3);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-card);
+  background: var(--vault);
+  overflow: hidden;
+}
+.district-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 56px;
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  background: var(--vault-raised);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.district-head:active {
+  background: var(--vault-deep);
+}
+.district-caret {
+  flex: none;
+  width: 16px;
+  color: var(--brass-light);
+}
+.district-titles {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.district-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-16);
+}
+
+.lot-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.lot-list li + li {
+  border-top: 1px solid rgb(184 145 61 / 15%);
+}
+.lot-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 64px;
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.lot-row:active {
+  background: var(--vault-raised);
+}
+.lot-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.lot-address {
+  font-size: var(--text-14);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lot-occupant {
+  font-size: var(--text-14);
+  color: var(--brass-light);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lot-rival {
+  color: var(--ivory);
+}
+.lot-tag {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+.lot-empty {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1.5px dashed var(--hairline);
+}
+
+.rival-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.rival-head > div {
+  flex: 1;
+}
+.rate-head,
+.rate-row {
+  display: grid;
+  grid-template-columns: 1fr 4.5em 4.5em;
+  gap: var(--space-2);
+  padding: 6px 0;
+  font-size: var(--text-14);
+  border-bottom: 1px solid rgb(184 145 61 / 12%);
+}
+.rate-head {
+  color: var(--brass-light);
+  font-weight: 600;
+}
+.rate-head span:not(:first-child),
+.rate-row span:not(:first-child) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
