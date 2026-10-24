@@ -2,13 +2,32 @@
 
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
-**Current stage:** 2 — Playable loop in plain UI (built; awaiting the owner's iPhone check)
+**Current stage:** 3 — The city map (built; awaiting the owner's iPhone check). Stage 2's check is still open too.
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `1b00e5e0304fc5` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `0acda65581fd17` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-24 — Stage 3 built: the engraved city map
+- **Stage / step:** 3 — The city map (Banknote Deco v1)
+- **Done:**
+  - Street grid and shoreline (`src/sim/cityLayout.ts`): a street every 4th row and column, a wavy shore in water cities. Storefront lots now snap to tiles facing a street. Schema v4 moves older saves' lots onto the grid.
+  - The drawable city (`src/art/citygen.ts`): streets, water, parks, filler buildings by district, and four landmarks (central bank, clock tower quad, stadium, airport; scenery for now). Seeded from the save, so a city looks the same every session.
+  - The engraved renderer (`src/art/`): city-ink linework, three hatch densities, paper with a guilloche wave and a microprint ring with the city name, water with wave lines, quays and piers, stippled parks with spiral trees, and building styles for all seven districts. Storefronts have glazed ground floors; your branches fly a brand-ink flag and rival branches have striped awnings in their ink.
+  - The map view (`src/app/map/`): drag to pan with a fling glide, pinch and double-tap to zoom, wheel zoom on desktop. Pins for your branches, rivals and storefronts for lease open their panels; a drag that starts on a pin pans instead. Zoomed out, pins group into numbered clusters. The Layers sheet (bottom-left button) has All, Branches, a "For lease only" filter and the old list as "List view"; choices are saved.
+  - 97 tests (new: street layout and lot snapping, city map generation, projection, chunk maths, painter order, the chunk cache budget, camera, pins, clustering, layers).
+- **How it was built:** I wrote the layout, city generator, projection and the renderer contract; two helper agents then built the renderer and the map view in parallel against that contract, and I reviewed, fixed small style slips (all-caps tags, drop shadows) and merged.
+- **Performance:** in Chrome at iPhone size with the CPU slowed 4×, panning over painted map costs under 1 ms a frame (3 ms worst); panning fast into unpainted parts of New York (the biggest city) averages 13 ms with a 33 ms worst. Pin updates take 0.1–0.8 ms for 110 pins.
+- **Determinism snapshot:** `1b00e5e0304fc5` → `0acda65581fd17`. Intended: lots moved onto street frontage. The balance report stays inside every target.
+- **Next:** the owner checks Stage 3 on iPhone: smooth panning in a big city (try New York or Tokyo), every pin tappable, layer toggles staying put, sharp on the retina screen. Stage 2's check can happen in the same session.
+- **Known issues:**
+  - Tested only in Chrome's phone emulation; WebKit isn't available here, so iPhone Safari is untested (pinch blocking, text-size handling).
+  - Fast zoom-out into an unpainted area briefly shows plain paper before the art fills in.
+  - Neighbouring "For lease" tags can overlap at zoom 1; the top one wins the tap.
+  - The camera doesn't allow for the desktop panel covering the right side of the map.
+  - Waterfront buildings are all glass towers (no warehouses yet).
 
 ### 2026-10-24 — Stage 2 gaps closed
 - **Stage / step:** 2 — Playable loop in plain UI (finishing touches before the owner's check)
