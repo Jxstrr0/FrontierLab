@@ -469,7 +469,13 @@
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  animation: fade-in var(--dur-panel) var(--ease-out);
+  /* Only the tint fades; fading the scrim's opacity would fade its sheet too. */
+  animation: scrim-in var(--dur-panel) var(--ease-out);
+}
+@keyframes scrim-in {
+  from {
+    background-color: transparent;
+  }
 }
 @keyframes fade-in {
   from {
@@ -488,7 +494,14 @@
   border-bottom: 0;
   border-radius: 14px 14px 0 0;
   padding-bottom: var(--safe-bottom);
-  animation: panel-in var(--dur-panel) var(--ease-out);
+  /* Slides up solid while only the scrim fades: a sheet that faded in let the
+     screen behind it (often a panel mid-update) show through. */
+  animation: sheet-in var(--dur-panel) var(--ease-out);
+}
+@keyframes sheet-in {
+  from {
+    transform: translateY(100%);
+  }
 }
 .sheet-grip {
   width: 40px;
