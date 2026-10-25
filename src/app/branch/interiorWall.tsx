@@ -3,6 +3,8 @@
 // fortress with bolts), the safe-deposit wall that grows with the vault, and
 // the bank's plaque over the counter. Decals in wall units (x along the wall,
 // up is −y) for the IsoRoom's back wall.
+import { logoPath, logoTextShift } from '../../art/logoShapes';
+import type { LogoShape } from '../../data/types';
 
 /** The vault door on the back wall (decal units), by fit-out; the back-office safe has none. */
 export function VaultDoor(p: { x: number; s: number; id: string }) {
@@ -86,13 +88,25 @@ export function DepositBoxes(p: { x: number; s: number; boxes: number }) {
   );
 }
 
-/** The bank's plaque over the counter: a medallion in the brand ink with the monogram. */
-export function BrandPlaque(p: { x: number; y: number; r: number; ink: string; monogram: string }) {
+/** The bank's plaque over the counter: its mark in the brand ink and logo shape. */
+export function BrandPlaque(p: {
+  x: number;
+  y: number;
+  r: number;
+  ink: string;
+  monogram: string;
+  shape: LogoShape;
+}) {
   return (
     <g>
-      <circle cx={p.x} cy={p.y} r={p.r + 1.6} class="art-paper art-line art-fine" />
-      <circle cx={p.x} cy={p.y} r={p.r} style={{ fill: p.ink }} class="in-brand" />
-      <text x={p.x} y={p.y + 2.4} text-anchor="middle" class="in-brand-text">
+      <path d={logoPath(p.shape, p.x, p.y, p.r + 1.6)} class="art-paper art-line art-fine" />
+      <path d={logoPath(p.shape, p.x, p.y, p.r)} style={{ fill: p.ink }} class="in-brand" />
+      <text
+        x={p.x}
+        y={p.y + 2.4 + logoTextShift(p.shape, p.r)}
+        text-anchor="middle"
+        class="in-brand-text"
+      >
         {p.monogram}
       </text>
     </g>

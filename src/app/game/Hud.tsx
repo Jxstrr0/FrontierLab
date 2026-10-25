@@ -28,7 +28,7 @@ export function Hud() {
           class="hud-chip hud-bank"
           onClick={() => openPanel({ type: 'company' })}
         >
-          <Medallion ink={s.meta.brandInk} monogram={s.meta.monogram} size={30} />
+          <Medallion ink={s.meta.brandInk} monogram={s.meta.monogram} shape={s.meta.logoShape} size={30} />
           <span class="hud-cash">
             <span class="hud-cash-label">Cash</span>
             <span class={`hud-cash-value${s.company.cash < 0 ? ' tone-bad' : ''}`}>

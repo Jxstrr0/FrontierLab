@@ -227,6 +227,19 @@ Chosen on New Game (`src/data/houseStyles.ts`); every branch front wears it, wha
 | garden | Market Street | rounded painted board, italic | hanging lanterns | pots of flowers in the brand ink | brand ink with a wreath | pennant |
 | civic | Civic Stone | capitals cut into a stone band | sconces (lamp standards on the steps of Classic Columns) | classical urns | dark bronze, panelled | bordered rectangle |
 
+### 7b. Logo shapes
+
+Chosen on New Game (`src/data/logoShapes.ts`); the outline of the bank's mark everywhere it appears: the medallion in the top bar and panel icons, the seal on every branch front, the plaque over the counter and the mark over an owned building's door. Rivals keep the round medallion. Outlines are drawn by `src/art/logoShapes.ts`.
+
+| id | Name | Outline |
+|---|---|---|
+| round | Coin | the classic round medallion (the default, and what every bank wore before v20) |
+| shield | Shield | heraldic shield, square-topped, pointed foot |
+| lozenge | Lozenge | a diamond on its point |
+| hex | Hexagon | six sides, flat top and bottom |
+| plaque | Plaque | a square with cut corners |
+| rosette | Rosette | twelve scallops, like a wax seal |
+
 ## 8. Branch campaigns
 
 | id | Name | Levels: label (cost) | Effects per level |

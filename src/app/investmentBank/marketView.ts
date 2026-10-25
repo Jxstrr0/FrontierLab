@@ -4,6 +4,7 @@
 import { QUARTERS_PER_YEAR, STOCK_MARKET } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { EXCHANGES, type SectorId } from '../../data/stocks';
+import type { LogoShape } from '../../data/types';
 import { topHolders, type HolderRow } from '../../sim/marketHolders';
 import { priceEarnings } from '../../sim/marketStocks';
 import { rivalNetIncomeTtm } from '../../sim/marketRivals';
@@ -19,6 +20,8 @@ export interface SecurityView {
   exchange: string;
   monogram: string;
   ink: string;
+  /** Your bank's logo shape; rivals are drawn round. */
+  shape?: LogoShape;
   price: number;
   history: number[];
   marketCap: number;
@@ -91,6 +94,7 @@ function bankingSecurities(state: GameState): SecurityView[] {
       exchange: st.exchange ?? '',
       monogram: state.meta.monogram,
       ink: state.meta.brandInk,
+      shape: state.meta.logoShape,
       price: st.price,
       history: st.history,
       marketCap: st.price * state.company.sharesOutstanding,

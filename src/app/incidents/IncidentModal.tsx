@@ -41,7 +41,7 @@ export function IncidentModal() {
       title="Incident"
       class="incident-modal"
       onClose={close}
-      icon={<Medallion ink={s.meta.brandInk} monogram={s.meta.monogram} size={30} />}
+      icon={<Medallion ink={s.meta.brandInk} monogram={s.meta.monogram} shape={s.meta.logoShape} size={30} />}
       footer={
         inc.scopeKind === 'branch' ? (
           <button

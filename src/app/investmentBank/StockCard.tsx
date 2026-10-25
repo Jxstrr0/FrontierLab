@@ -10,7 +10,7 @@ export function StockCard(p: { view: SecurityView; sym: string; onTrade: () => v
   return (
     <Card class="ib-card">
       <div class="ib-card-head">
-        <Medallion ink={v.ink} monogram={v.monogram} size={40} />
+        <Medallion ink={v.ink} monogram={v.monogram} shape={v.shape} size={40} />
         <div class="ib-card-title">
           <div class="ib-card-name">{v.name}</div>
           <div class="muted small">

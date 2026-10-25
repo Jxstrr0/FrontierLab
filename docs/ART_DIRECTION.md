@@ -131,6 +131,7 @@ Every city has its own look (`src/data/cityLooks.ts`), so no two maps read alike
   - Modern Glass: mullion grid
   - Classic Columns: pediment and four columns
   - Deco Tower Front: stepped crown and sunburst over the door
+  - **Logo shape** (CONTENT §7b), chosen on New Game: the bank's mark is one outline everywhere (`art/logoShapes.ts`), so the medallion in the top bar, the seal on the front, the plaque over the counter and the mark on an owned building all match. Round, shield, lozenge, hexagon, cut-corner plaque or a twelve-scallop rosette; rivals stay round.
   - **House style** (CONTENT §7a), chosen on New Game, dresses whichever option you built: the name sign (with the bank's full name), the door, the lamps, the planters and the roof flag. Each composition marks where they go (`FacadeAnchors` in `branch/houseStyleArt.tsx`), so a style reads the same on every front and no two banks on a street look alike.
   - Street life: two passers-by stroll the pavement, the flag stirs and garden lanterns and plants sway; all of it stops with reduced motion.
 - **HQ floors:** an isometric cut-away office. **Desks and people reflect actual staffing** (filled desks vs empty), so understaffing is visible at a glance.

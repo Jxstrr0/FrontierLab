@@ -4,11 +4,19 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 **Current stage:** 10 — Art pass, onboarding, polish, launch (built and live; awaiting the owner's iPhone check). All ten roadmap stages are built. Still open: the owner's testing and tuning pass, an Add to Home Screen test on a real iPhone, and the Vault Street card on Kelbo.Website (in a separate session in that repo).
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `0c2a99c12fc3fb` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `1bdfb320d06bb3` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-25 — Logo shapes on the start page (v0.10.12)
+- **Owner's ask:** different logo shapes for the bank on the start page.
+- **Logo shape.** Step 1 of New Game has a new **Logo shape** row between the monogram and the brand ink: six chips, each a small medallion in that shape with your monogram and ink, so you see the choice before you make it. The shapes are **Coin** (the classic round medallion), **Shield**, **Lozenge** (a diamond), **Hexagon**, **Plaque** (a square with cut corners) and **Rosette** (a scalloped wax seal). The big preview at the top and the confirm step use it.
+- **One outline everywhere.** A single function (`src/art/logoShapes.ts`) draws the outline, so the medallion in the top bar and on every panel, the seal on each branch front, the plaque over the counter inside, the mark over an owned building's door and your own stock card all share the shape. Map pins keep their crest, and rivals keep the round medallion; a branch still converting from a rival wears the old round seal until it is done.
+- **Existing saves:** schema v20 (migration 19 → 20) sets `round`, so an older bank looks exactly as it did. The slot cards record the shape too.
+- **Balance:** no change. The determinism snapshot moved `0c2a99c12fc3fb` → `1bdfb320d06bb3` only because the save gained `meta.logoShape`; with it removed the hash matches exactly.
+- **Checked** all six shapes on the New Game step and on a branch's front and Inside views at 390×844, with no console errors. 738 tests (new: shape stored, round default, migration 19 → 20, every outline closes), lint, typecheck and build clean.
 
 ### 2026-10-25 — House styles for branch fronts, cheaper rerolls (v0.10.11)
 - **Owner's asks:** make staff rerolls 25% cheaper per reroll; do the building exterior too, stylized per company, with the style chosen at the start of the game.

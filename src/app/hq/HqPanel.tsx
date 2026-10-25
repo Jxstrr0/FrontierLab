@@ -83,7 +83,7 @@ export function HqPanel(p: { officeId?: string; dept?: DeptId }) {
     <Panel
       title={`${s.meta.bankName} HQ`}
       subtitle={[officeAddress(s, office), city].filter(Boolean).join(' · ')}
-      icon={<Medallion ink={s.meta.brandInk} monogram={s.meta.monogram} size={32} />}
+      icon={<Medallion ink={s.meta.brandInk} monogram={s.meta.monogram} shape={s.meta.logoShape} size={32} />}
       actions={
         <button type="button" class="hq-office-btn" onClick={() => setOfficeOpen(true)}>
           <Icon name="office" size={18} />

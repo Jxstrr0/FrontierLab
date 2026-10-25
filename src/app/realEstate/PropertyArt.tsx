@@ -3,6 +3,9 @@
 // board while listed and your bank's seal over the door once you own it.
 import { memo } from 'preact/compat';
 import { rect } from '../../art/engrave';
+import { logoPath, logoTextShift } from '../../art/logoShapes';
+import { DEFAULT_LOGO_SHAPE } from '../../data/logoShapes';
+import type { LogoShape } from '../../data/types';
 import { Face, Hatch, Vignette } from '../components';
 
 /** Floor space per drawn storey, and the storey limits. */
@@ -14,6 +17,7 @@ export const PropertyArt = memo(function PropertyArt(p: {
   status: 'owned' | 'listed' | 'none';
   ink?: string;
   monogram?: string;
+  shape?: LogoShape;
 }) {
   const storeys = Math.max(STOREYS.min, Math.min(STOREYS.max, Math.round(p.sqm / SQM_PER_STOREY)));
   const top = 132 - 14 - storeys * STOREYS.h;
@@ -51,10 +55,14 @@ export const PropertyArt = memo(function PropertyArt(p: {
       <path d={`M${x + 46} 132v-14h20v14M${x + 56} 118v14`} class="art-line art-fine" />
       {p.status === 'owned' && p.ink && (
         <g>
-          <circle cx={x + 56} cy="111" r="5" style={{ fill: p.ink }} class="art-brand" />
+          <path
+            d={logoPath(p.shape ?? DEFAULT_LOGO_SHAPE, x + 56, 111, 5)}
+            style={{ fill: p.ink }}
+            class="art-brand"
+          />
           <text
             x={x + 56}
-            y="113"
+            y={113 + logoTextShift(p.shape ?? DEFAULT_LOGO_SHAPE, 5)}
             text-anchor="middle"
             class="art-brand-text"
             style={{ fontSize: '4.5px' }}

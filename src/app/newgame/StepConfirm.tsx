@@ -15,7 +15,12 @@ export function StepConfirm(p: { draft: Draft; patch: (d: Partial<Draft>) => voi
     <div class="stack">
       <Card class="summary">
         <div class="summary-head">
-          <Medallion ink={draft.brandInk} monogram={draft.monogram} size={72} />
+          <Medallion
+            ink={draft.brandInk}
+            monogram={draft.monogram}
+            shape={draft.logoShape}
+            size={72}
+          />
           <div class="summary-titles">
             <div class="summary-name">{draft.bankName.trim()}</div>
             <div class="small muted">Founded by {draft.founderName.trim()}</div>

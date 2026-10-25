@@ -48,6 +48,7 @@ export function PropertyPanel(p: { siteId: string }) {
           status={view.kind}
           ink={s.meta.brandInk}
           monogram={s.meta.monogram}
+          shape={s.meta.logoShape}
         />
       }
     >

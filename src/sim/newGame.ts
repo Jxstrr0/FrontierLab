@@ -42,8 +42,9 @@ import { SCHEMA_VERSION, type AvatarSpec, type GameState, type Settings } from '
 import { packagedModel } from './underwriting';
 import { generateCity } from './worldGen';
 import { emptyEmpire, initPersonalEmpire } from './personalInit';
-import type { Difficulty, HouseStyle } from '../data/types';
+import type { Difficulty, HouseStyle, LogoShape } from '../data/types';
 import { HOUSE_STYLE_IDS } from '../data/houseStyles';
+import { DEFAULT_LOGO_SHAPE } from '../data/logoShapes';
 
 export interface NewGameOptions {
   seed: number;
@@ -53,6 +54,8 @@ export interface NewGameOptions {
   brandInk?: string;
   /** The branch fronts' house style; defaults to one picked from the seed. */
   houseStyle?: HouseStyle;
+  /** The outline of the bank's mark; defaults to the round medallion. */
+  logoShape?: LogoShape;
   founderName?: string;
   founderAvatar?: AvatarSpec;
   startDate?: string;
@@ -121,6 +124,7 @@ export function newGame(opts: NewGameOptions): GameState {
       startCash,
       homeCityId: city.id,
       houseStyle: opts.houseStyle ?? HOUSE_STYLE_IDS[opts.seed % HOUSE_STYLE_IDS.length]!,
+      logoShape: opts.logoShape ?? DEFAULT_LOGO_SHAPE,
     },
     clock: { day: 0, week: 0, speed: 0 },
     rng: {},

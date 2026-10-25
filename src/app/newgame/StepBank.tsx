@@ -1,9 +1,11 @@
-// Wizard step 1: bank name, monogram, brand ink and a live medallion preview,
-// then the house style every branch front will share, with a live front.
+// Wizard step 1: bank name, monogram, logo shape and brand ink with a live
+// medallion preview, then the house style every branch front will share, with
+// a live front.
 import { BRAND_INKS } from '../../data/brandInks';
 import { Medallion } from '../components';
 import { CITIES } from '../../data/cities';
 import { HOUSE_STYLES } from '../../data/houseStyles';
+import { LOGO_SHAPES } from '../../data/logoShapes';
 import { BranchArt } from '../branch/BranchArt';
 import { MONOGRAM_LENGTH, NAME_MAX, monogramFor, type Draft } from './draft';
 
@@ -27,7 +29,12 @@ export function StepBank(p: { draft: Draft; patch: (d: Partial<Draft>) => void }
   return (
     <div class="stack">
       <div class="preview">
-        <Medallion ink={draft.brandInk} monogram={draft.monogram || '··'} size={104} />
+        <Medallion
+          ink={draft.brandInk}
+          monogram={draft.monogram || '··'}
+          shape={draft.logoShape}
+          size={104}
+        />
         <div class="preview-text">
           <div class="preview-name">{draft.bankName.trim() || 'Your bank'}</div>
           <div class="small muted">{inkName} ink</div>
@@ -66,6 +73,32 @@ export function StepBank(p: { draft: Draft; patch: (d: Partial<Draft>) => void }
       </label>
 
       <fieldset class="field">
+        <legend class="field-label">Logo shape</legend>
+        <div class="logo-grid" role="radiogroup" aria-label="Logo shape">
+          {LOGO_SHAPES.map((l) => (
+            <button
+              type="button"
+              role="radio"
+              aria-checked={l.id === draft.logoShape}
+              class={`ink${l.id === draft.logoShape ? ' is-active' : ''}`}
+              onClick={() => patch({ logoShape: l.id })}
+            >
+              <Medallion
+                ink={draft.brandInk}
+                monogram={draft.monogram || '··'}
+                shape={l.id}
+                size={36}
+              />
+              <span class="ink-name">{l.name}</span>
+            </button>
+          ))}
+        </div>
+        <span class="field-hint">
+          {LOGO_SHAPES.find((l) => l.id === draft.logoShape)?.description}
+        </span>
+      </fieldset>
+
+      <fieldset class="field">
         <legend class="field-label">Brand ink</legend>
         <div class="ink-grid" role="radiogroup" aria-label="Brand ink">
           {BRAND_INKS.map((ink) => (
@@ -95,6 +128,7 @@ export function StepBank(p: { draft: Draft; patch: (d: Partial<Draft>) => void }
             style={draft.houseStyle}
             brandInk={draft.brandInk}
             monogram={draft.monogram || '··'}
+            logoShape={draft.logoShape}
             ink={CITIES[draft.cityId]?.ink}
           />
         </div>

@@ -14,7 +14,8 @@ import { Columns, Deco } from './facadesGrand';
 import { Brick, GlassFront, Storefront } from './facadesLow';
 import { grow, Lamp, NameSign, Planter, StyleDoor, StyleFlag } from './houseStyleArt';
 import { Standing } from '../components/isoPeople';
-import type { HouseStyle } from '../../data/types';
+import { DEFAULT_LOGO_SHAPE } from '../../data/logoShapes';
+import type { HouseStyle, LogoShape } from '../../data/types';
 import '../components/interior.css';
 import './houseStyle.css';
 
@@ -202,13 +203,19 @@ export const BranchArt = memo(function BranchArt(p: {
   /** The name on the sign and the house style that dresses the front. */
   bankName: string;
   style: HouseStyle;
+  /** The outline of the seal; defaults to round (rivals' fronts, old saves). */
+  logoShape?: LogoShape;
   /** Ink of the bank whose flag flies (an acquired branch converting). */
   flagInk?: string;
   fitout?: boolean;
   ink?: string;
 }) {
   const facade = FACADES[p.exterior] ?? FACADES.ext_storefront!;
-  const brand: Brand = { ink: p.brandInk, monogram: p.monogram };
+  const brand: Brand = {
+    ink: p.brandInk,
+    monogram: p.monogram,
+    shape: p.logoShape ?? DEFAULT_LOGO_SHAPE,
+  };
   const name = EQUIPMENT[p.exterior]?.name ?? 'Branch';
   const a = facade.anchors;
   return (
