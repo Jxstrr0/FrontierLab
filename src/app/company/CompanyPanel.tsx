@@ -1,4 +1,4 @@
-// Company summary (SCREENS §24): capital ratio and tier, liquidity, the main
+// Company summary (SCREENS §24): "Where to look", capital ratio and tier, liquidity, the main
 // totals, your share price or private valuation with the cap table and your
 // personal line (ShareSummary.tsx), and simplified statements, with a link to
 // the full statements on the HQ Finance floor once you have one.
@@ -14,6 +14,7 @@ import { CapitalFixes } from './CapitalFixes';
 import { CapitalMeter, TIER_LABEL, TIER_TONE } from './CapitalMeter';
 import { ShareSummary } from './ShareSummary';
 import { Statements } from './Statements';
+import { WhereToLook } from './WhereToLook';
 import './company.css';
 
 const EXPLAINERS: { title: string; body: string }[] = [
@@ -48,6 +49,7 @@ export function CompanyPanel() {
       advisor={{ text: 'Deposits fund loans; capital limits growth.' }}
     >
       <div class="stack co-stack">
+        <WhereToLook s={s} />
         <Card>
           <div class="cap-head">
             <div>

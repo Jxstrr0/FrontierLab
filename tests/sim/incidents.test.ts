@@ -8,9 +8,16 @@ import { branchPrice } from '../../src/sim/branch/pricing';
 import * as cmd from '../../src/sim/commands';
 import { weeklyTick } from '../../src/sim/engine';
 import { addEffect, isClosed, riskCoverageBonus } from '../../src/sim/incident/effects';
-import { hasRule, incidentChance, raiseIncident, runIncidents } from '../../src/sim/incidents';
+import {
+  hasRule,
+  incidentChance,
+  raiseIncident,
+  runIncidents,
+  troublesDelegatedToCoo,
+} from '../../src/sim/incidents';
 import { hashSeed } from '../../src/sim/rng';
 import { exportCode, importCode } from '../../src/sim/save/serialize';
+import { execGame, hire } from '../helpers/executives';
 import { openBank } from '../helpers/incidents';
 
 const ROLLED = Object.values(INCIDENT_SPECS)
@@ -252,5 +259,33 @@ describe('incident saves', () => {
     s.incidents.bankRunWeeksLeft = 3;
     expect(s.incidents.effects.length).toBeGreaterThan(0);
     expect(importCode(exportCode(s))).toEqual(s);
+  });
+});
+
+describe('COO Company troubles (§17.2)', () => {
+  it('settles company cases at once, but never the ones marked yours', () => {
+    const s = execGame();
+    hire(s, 'coo');
+    expect(troublesDelegatedToCoo(s, INCIDENT_SPECS.DATA_BREACH!)).toBe(true);
+    expect(troublesDelegatedToCoo(s, INCIDENT_SPECS.PRICE_WAR!)).toBe(true);
+    expect(troublesDelegatedToCoo(s, INCIDENT_SPECS.BANK_RUN!)).toBe(false);
+    expect(troublesDelegatedToCoo(s, INCIDENT_SPECS.EXEC_POACHED!)).toBe(false);
+    expect(troublesDelegatedToCoo(s, INCIDENT_SPECS.RECAP_OFFER!)).toBe(false);
+    expect(troublesDelegatedToCoo(s, INCIDENT_SPECS.ROBBERY!)).toBe(false);
+    raiseIncident(s, 'DATA_BREACH', 'company', 'company', { affected: 500, fine: 20_000 });
+    expect(s.incidents.active).toHaveLength(0);
+    const done = s.events.log.find((e) => e.type === 'INCIDENT_RESOLVED');
+    expect(done?.payload).toMatchObject({ type: 'DATA_BREACH', by: 'executive' });
+    expect(Math.abs(balanceSheet(s).equity - balanceSheet(s).expectedEquity)).toBeLessThan(1);
+  });
+
+  it('leaves company cases to you with the delegation off or no COO', () => {
+    const s = execGame();
+    raiseIncident(s, 'DATA_BREACH', 'company', 'company', { affected: 500, fine: 20_000 });
+    expect(s.incidents.active).toHaveLength(1);
+    hire(s, 'coo');
+    cmd.setExecDelegation(s, 'coo', 'troubles', false);
+    raiseIncident(s, 'CARD_FRAUD', 'company', 'company', { loss: 5_000 });
+    expect(s.incidents.active).toHaveLength(2);
   });
 });

@@ -695,7 +695,7 @@ Levels 1–5 (Very conservative to Very aggressive):
 
 | Exec | Domain | Delegations |
 |---|---|---|
-| COO | HR, all branches | **Branch operations:** auto-hires managers for new branches and turns on default delegation. **HR benefits:** keeps average morale ≥ 70 at least cost. **HR division:** auto-staffs every floor to 100% coverage. |
+| COO | HR, all branches | **Expansion:** opens branches for you in the cities you mark for growth (one at most every 4 weeks, in the growth city with the most room, at the busiest free storefront clear of your other branches, in your usual fit-out, keeping 8 weeks of costs in cash). **Company troubles:** settles company and city incidents the way a delegated manager would (§17.1), valuing effects in weeks of company revenue with error shrinking with Expertise; cases marked `yours` (bank run, rescue offer, poached executives) always come to you. **Branch operations:** auto-hires managers for new branches and turns on default delegation. **HR benefits:** keeps average morale ≥ 70 at least cost. **HR division:** auto-staffs every floor to 100% coverage. |
 | CFO | Finance, Treasury | Halves statement delays. **Treasury:** auto-funding, bond share and buying funding offers to keep LR within ±2pp of target. **Capital:** at Watch or worse, sells the company's stocks and steps risk appetite down every 4 weeks (unless the CRO runs appetite); at Restricted or Critical, or under the charter floor, sells new shares through the cheapest investment bank (private placement while private, within the round limits; secondary once listed), sized to reach 12% plus any regulator buffer. **Dividends:** proposes a dividend at board meetings. |
 | CPO | Products | **Pricing:** keeps the company lineup priced like a delegated manager (§17.1) when Apply-to-all is on. **Developments:** starts one when none is running, within a budget cap of 1% of revenue. **Models:** switches to the bureau package with the best defaults saved per dollar. |
 | CTO | IT | App rating bonus (§16.9); runs digital projects. An empty seat applies the vacancy penalty. |
@@ -704,7 +704,9 @@ Levels 1–5 (Very conservative to Very aggressive):
 
 **Resignation:** weekly probability `0.002 × (1.5 − loyalty/100) × (pay/market < 0.9 ? 2 : 1) × (unvested grants ? 0.5 : 1)`. Triggers the `EXEC_POACHED` incident.
 
-**Candidate pools** refresh every 4 weeks. A University Graduate Program adds +10 to candidate skills.
+**Candidate pools** refresh every 4 weeks. A University Graduate Program adds +10 to candidate skills. Candidates come with every delegation on; a seat remembers the toggles its last holder left, and the next hire for that seat starts with those (schema v13), so a resignation never silently changes how the bank is run.
+
+**Growth cities and "Open now":** `setGrowthCity` marks a city the COO may build in (only cities you have visited, not regional sites); hiring a COO with Expansion on, or switching it on, with none marked seeds the list with the cities you already have branches in. `cooOpenBranch(cityId)` has a seated COO build their usual pick at once, needing only the cash for the build (no reserve, no cadence); it works from any city, because the COO travels for you.
 
 ### 17.3 Board meeting (Stage 6)
 - **When:** once per calendar quarter, with an Executive suite. The loop pauses once per quarter to remind you (after weekly results and incidents).
@@ -720,7 +722,7 @@ Levels 1–5 (Very conservative to Very aggressive):
 - **execMult** multiplies the department's staff effectiveness (§16.4) for the seat's departments: COO → HR, CFO → Finance and Treasury, CPO → Products, CMO → Marketing, CTO → IT, CRO → Risk. Expertise under 40 lowers it below 1. Leadership only feeds the asking salary in v1.
 - **Grants:** a grant is at most 2% of outstanding shares; it vests 25% a year. Grant-date value: the share price (RSU) or max(price − strike, 25% of price) (option), expensed straight-line as non-cash `grantExpense` with paid-in capital rising by the same amount. Vested RSUs issue shares; vested options are exercised whenever in the money (the strike comes in as cash). Leaving forfeits the unvested part; booked expense isn't reversed.
 - **Employee Stock Plan** (public only) adds +5 to executive loyalty in the resignation formula.
-- **Delegation details:** `EXEC_DELEGATION` in balance.ts (COO benefits spending ≤ 8% of payroll; CFO dividend proposal 40% of trailing net income; CPO/CTO developments of 12 weeks at Medium within 1% of revenue; CMO awareness 45–55% within 3% of revenue; CRO steps appetite every 4 weeks, at most 4; CFO Capital targets `cfoTargetCr` 12% in raise steps of 1% of the bank).
+- **Delegation details:** `EXEC_DELEGATION` in balance.ts (COO benefits spending ≤ 8% of payroll; CFO dividend proposal 40% of trailing net income; CPO/CTO developments of 12 weeks at Medium within 1% of revenue; CMO awareness 45–55% within 3% of revenue; CRO steps appetite every 4 weeks, at most 4; CFO Capital targets `cfoTargetCr` 12% in raise steps of 1% of the bank; COO Expansion `expansionEveryWeeks` 4, `expansionReserveWeeks` 8 of weekly costs (revenue less net income, averaged over `revenueWeeks`), `expansionMinRoom` 0.2 of §9.2 room, lot score footTraffic × min(1, distance to your nearest branch ÷ `expansionSpacing` 12 tiles), never past `CITY_BRANCH_GUIDE`; COO Company troubles option error `troublesError` 0.5 × (1 − Expertise/100)).
 
 ## 18. Rivals
 

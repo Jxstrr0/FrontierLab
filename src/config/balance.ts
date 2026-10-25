@@ -1437,6 +1437,36 @@ export const EXEC_DELEGATION = {
   /** CFO Capital (§17.2): acts at Watch or worse, raises equity at Restricted or worse, aims for 12%. */
   cfoTargetCr: 0.12,
   cfoRaiseStep: 0.01,
+  /**
+   * COO Expansion (§17.2): one branch at most every expansionEveryWeeks, only in
+   * a growth city with room ≥ expansionMinRoom and fewer branches than its
+   * guide, keeping expansionReserveWeeks of weekly costs in cash after the
+   * build. Lots score footTraffic × min(1, distance to your nearest branch ÷
+   * expansionSpacing tiles).
+   */
+  expansionEveryWeeks: 4,
+  expansionReserveWeeks: 8,
+  expansionMinRoom: 0.2,
+  expansionSpacing: 12,
+  /** COO Company troubles: option error shrinks with the COO's expertise like a manager's skills. */
+  troublesError: 0.5,
+} as const;
+
+/**
+ * "Where to look" (SCREENS §24, decision log 2026-10-25): the Company screen
+ * ranks what most needs you. A branch counts as losing money after lossWeeks
+ * weekly closes in the red once it is past its grand opening; a rating under
+ * lowRating, average morale under lowMorale, city awareness under lowAwareness
+ * (with a branch there) and liquidity more than liqBand under target are flagged.
+ */
+export const ATTENTION = {
+  lossWeeks: 4,
+  lowRating: 2.5,
+  lowMorale: 50,
+  lowAwareness: 0.2,
+  liqBand: 0.03,
+  /** How many items the Company screen shows. */
+  shown: 3,
 } as const;
 
 /**

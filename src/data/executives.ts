@@ -32,6 +32,18 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
         description: 'Hires a manager for every new branch and turns on default delegation.',
       },
       {
+        id: 'expansion',
+        label: 'Expansion',
+        description:
+          'Opens a branch every 4 weeks in a growth city with room to grow: the busiest free storefront, your usual fit-out, while 8 weeks of costs stay in cash.',
+      },
+      {
+        id: 'troubles',
+        label: 'Company troubles',
+        description:
+          'Settles company and city cases the way a trusted manager would. Bank runs, rescues and your executives still come to you.',
+      },
+      {
         id: 'hrBenefits',
         label: 'HR benefits',
         description: 'Keeps average morale at 70 or better at the least cost.',

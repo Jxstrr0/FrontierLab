@@ -8,6 +8,7 @@ import { EXEC_SEATS } from '../data/executives';
 import { BENEFIT_RULES } from '../data/benefits';
 import { refreshExecCandidates } from './execCandidates';
 import { cfoCapital } from './execDelegationsCapital';
+import { cooExpansion } from './execDelegationsGrowth';
 import {
   cfoTreasury,
   cpoDevelopments,
@@ -31,6 +32,7 @@ import type { ExecSeat, GameState } from './state';
 
 /** Delegations in the order they run each week: [seat, toggle id, routine]. */
 const DELEGATIONS: [ExecSeat, string, (s: GameState) => void][] = [
+  ['coo', 'expansion', cooExpansion],
   ['coo', 'branchOps', cooBranchOps],
   ['coo', 'hrDivision', cooDivision],
   ['coo', 'hrBenefits', cooBenefits],

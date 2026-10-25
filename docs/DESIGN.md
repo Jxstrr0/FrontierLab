@@ -278,7 +278,8 @@ Brand awareness by city, brand campaigns (TV, billboards, podcasts, creators, ar
 #### 5.8.8 Executive
 - Quarterly board meeting.
 - Senior executives: COO, CFO, CPO, CMO and CTO, as in the original, plus a Chief Risk Officer as a seventh seat.
-- Each profile has skills (Leadership, Expertise, Loyalty), delegation toggles, salary, stock option and RSU grants with vesting, and a fire button.
+- Each profile has skills (Leadership, Expertise, Loyalty), delegation toggles, salary, stock option and RSU grants with vesting, and a fire button. Delegations are on from the day of hire, and a seat remembers its last holder's toggles.
+- The COO can run expansion (branches in the cities you mark for growth) and settle company-level troubles, so a player who wants to run only the top of the bank can.
 
 #### 5.8.9 Investment
 - Company portfolio: stocks, ventures, real estate and venture debt.
@@ -557,3 +558,5 @@ Add one dated line per decision. Never delete entries; supersede them.
 - 2026-10-25: The newspaper is renamed The Weekly Ledger (owner's ask). It always came out once a week, one issue per weekly close; only the masthead said Daily. No change to when it appears.
 - 2026-10-25: Time passes only on the map (owner's ask: the clock kept running, and the weekly results popped up, while reading a branch or HQ screen). Any open panel, sheet or modal holds the clock; the pending incident and board prompts also wait for the map. The speed setting is untouched, so play resumes as it was.
 - 2026-10-25: The CFO gets a Capital delegation (owner's ask: a steady CFO should be able to steer the bank back to a safe ratio). It uses only the player's own levers: sell company stocks and trim risk appetite at Watch, sell new shares sized to reach 12% at Restricted or Critical. Off by default, like every delegation.
+- 2026-10-25: Hands-off play (owner's ask: run the top of the bank and leave branch-level decisions to hired staff). The COO gets **Expansion** (builds for you in the cities you mark for growth: the growth city with the most room, the busiest free storefront clear of your other branches, your usual fit-out, one every 4 weeks, keeping 8 weeks of costs in cash) and **Company troubles** (settles company and city cases like a delegated manager, in weeks of company revenue, error shrinking with Expertise). Bank runs, the rescue offer and poached executives are marked `yours` and always reach you: the owner wants to keep those calls. No automatic rehiring of poached executives (owner's call), but a seat remembers its last holder's toggles and every new hire starts with all delegations on, so a departure never silently changes how the bank is run. "Open now" on the COO's profile has them build in any visited city at once, because the COO travels for you; you still cannot build where you are not.
+- 2026-10-25: "Where to look" on the Company screen (owner's ask: a weakest-link view instead of more automation). A pure ranking (`src/sim/attention.ts`) of what most needs you, worst first, each a tap away; thresholds in `ATTENTION`. Deliberately not a fifth speed or "play to quarter end": the owner wants to keep paying some attention.

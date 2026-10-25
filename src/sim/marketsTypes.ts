@@ -53,6 +53,16 @@ export interface ExecutivesState {
   candidatesRefreshWeek: Week;
   /** True once a CTO has been hired: an empty CTO seat then drags the app rating (§16.9). */
   hadCto: boolean;
+  /**
+   * The delegation toggles a seat's last holder left behind (schema v13): a new
+   * hire for that seat starts with the same switches, so a departure never
+   * silently changes how the bank is run.
+   */
+  remembered: Partial<Record<ExecSeat, Record<string, boolean>>>;
+  /** Cities the COO may open branches in (Expansion delegation, §17.2), by city id. */
+  growthCities: Record<Id, boolean>;
+  /** Week of the COO's last branch build (Expansion cadence); -1 before the first. */
+  lastExpansionWeek: Week;
 }
 
 // ─── Board and dividends (DESIGN §5.13, SCREENS §10.2) ────────────────────────

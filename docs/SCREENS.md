@@ -294,6 +294,7 @@ Tabs: Overview · Loans · Credit.
 - portrait, name, title, hired date
 - Leadership, Expertise and Loyalty bars
 - delegation toggles for the role
+- COO only: **Growth cities**: every city you have visited, home first, each with a switch (may the Expansion delegation build here) and an **Open now** button that has the COO build their usual pick at once; the hint under each city shows the next storefront and its cost, or why nothing can be built there
 - annual salary stepper
 - grants list: type, shares, strike, vesting progress
 - **Add grant:**
@@ -490,6 +491,7 @@ Tabs: Overview · Loans · Credit.
 
 ## 24. Company summary (menu → Company)
 
+- **Where to look** at the top: the three things that most need you, worst first (Urgent / Watch / Note), each a tap to the right screen: capital tier, open cases, liquidity under target, expiring loan applications, branches losing money for 4 weeks, ratings under 2.5, understaffing, loan losses over the CRO ceiling, morale under 50, branches without a manager, empty executive seats, switched-off delegations, low awareness. "All clear" when nothing qualifies. Ranking in `src/sim/attention.ts`, thresholds in `ATTENTION`.
 - capital ratio with tier badge and a meter with thresholds
 - at Watch, Restricted or Critical, a "How to fix this" checklist under the meter (`src/data/capitalFixes.ts`): sell new shares at an investment bank (Private placement, or Secondary offering once listed), sell company stocks and startup stakes, turn risk appetite down, hold off on growth and dividends; at Critical, a line on the emergency rescue
 - liquidity ratio

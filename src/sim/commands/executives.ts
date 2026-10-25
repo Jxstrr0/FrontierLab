@@ -1,9 +1,11 @@
 // Executive commands (SIMULATION §17.2, SCREENS §10.1): hire from a seat's
 // candidate pool, fire (severance in weeks of salary, P&L execPay), set salary,
 // switch delegations and add stock option or RSU grants. All need an Executive
-// floor at HQ.
+// floor at HQ. Also the COO's growth cities and "Open a branch now" (§17.2).
 import { EXEC_PAY, EXECUTIVES, WEEKS_PER_YEAR } from '../../config/balance';
+import { CITIES } from '../../data/cities';
 import { EXEC_SEATS } from '../../data/executives';
+import { canGrowIn, expansionPlan, seedGrowthCities } from '../execDelegationsGrowth';
 import { grantFairValue } from '../execGrants';
 import { seatExecutive, vacateSeat } from '../execSeatChanges';
 import { execMarketSalary, hasExecFloor } from '../execSeats';
@@ -11,6 +13,7 @@ import { newId } from '../ids';
 import { spend } from '../ledger';
 import { roundToStep } from '../math';
 import type { EquityGrant, ExecSeat, GameState } from '../state';
+import { buildBranch } from './branches';
 import { fail, money, ok, type CommandResult } from './result';
 
 const NO_FLOOR = 'Executives work from the Executive floor. Add one at HQ first.';
@@ -40,6 +43,7 @@ export function hireExec(state: GameState, seat: ExecSeat, candidateId: string):
   const exec = state.executives.candidates[seat]?.find((c) => c.id === candidateId);
   if (!exec) return fail('That candidate has taken another job.');
   seatExecutive(state, exec);
+  seedGrowthCities(state);
   return ok();
 }
 
@@ -74,7 +78,30 @@ export function setExecDelegation(
   if (!exec) return fail('Hire an executive for that seat first.');
   if (!EXEC_SEATS[seat].delegations.some((d) => d.id === id)) return fail('Unknown delegation.');
   exec.delegations[id] = on;
+  seedGrowthCities(state);
   return ok();
+}
+
+/** Marks a city the COO may (or may not) open branches in. Only cities you have been to. */
+export function setGrowthCity(state: GameState, cityId: string, on: boolean): CommandResult {
+  if (!CITIES[cityId]) return fail('Unknown city.');
+  if (!canGrowIn(state, cityId)) return fail('You have not been to this city yet.');
+  if (on) state.executives.growthCities[cityId] = true;
+  else delete state.executives.growthCities[cityId];
+  return ok();
+}
+
+/** Asks the COO to open a branch in a city now (their usual pick, needing only the build's cash). */
+export function cooOpenBranch(
+  state: GameState,
+  cityId: string,
+): CommandResult<{ branchId: string }> {
+  if (!state.executives.seats.coo) return fail('You need a COO to open branches for you.');
+  const plan = expansionPlan(state, cityId, false);
+  if (plan.blocker || !plan.lot || !plan.build) return fail(plan.blocker ?? 'Nothing to build.');
+  const r = buildBranch(state, { lotId: plan.lot.id, build: plan.build, via: 'coo' });
+  if (r.ok) state.executives.lastExpansionWeek = state.clock.week;
+  return r;
 }
 
 /** Most shares one grant may carry: EXEC_PAY.grantMaxPct of shares outstanding. */
