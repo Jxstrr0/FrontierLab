@@ -153,7 +153,7 @@ After the wizard, the map opens with the tutorial (§27).
   - portrait and name
   - Manager skills bars: People, Product, Marketing, Ethics
   - "Manager since {date}"
-  - Annual salary stepper, its hint showing market pay (SIMULATION §6.5) and the range, and a line under it: "Underpaid: rivals are more likely to poach them" (oxblood), "Paid about market" or "Well paid…", plus "Your COO reviews this pay once a year" while the COO's Pay reviews is on
+  - Annual salary stepper, its hint showing market pay (SIMULATION §6.5) and the range, and a line under it: "Underpaid: rivals are more likely to poach them" (oxblood), "Paid about market" or "Well paid…", plus "Your COO reviews this pay once a quarter" while the COO's Pay reviews is on
   - Delegation toggles: Staffing & wages · Products & rates · Branch marketing · Branch troubles · Loan approvals
   - Fire manager (confirm)
   - **With no manager:** "Hire a manager" opens a sheet of 3 candidate cards (skills, salary ask, Hire). Below the cards, "New candidates · $fee" pays a recruiter for 3 new ones (the fee doubles each time until the free refresh, which the note under it counts down); before your first hire, the tutorial guide stays as the first card.
