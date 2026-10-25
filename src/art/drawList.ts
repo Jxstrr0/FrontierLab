@@ -6,6 +6,7 @@
 import {
   FLAG_PX,
   LANDMARK_MAX_PX,
+  SIGNATURE_MAX_PX,
   ROOF_EXTRA_STOREYS,
   SHADOW_TILES_PER_PX,
   STOREY_PX,
@@ -17,6 +18,7 @@ import { TILE_KINDS } from './citygen';
 import { tileTop, worldToTile } from './iso';
 import type { Rect } from './chunkGrid';
 import { rectsOverlap } from './chunkGrid';
+import { streetLifeHeight } from './streetLife';
 
 export type DrawItem =
   | { type: 'tile'; x: number; y: number; bounds: Rect; order: number }
@@ -77,6 +79,8 @@ export function footprintBounds(
 
 /** The tallest a tile's drawing may reach, in world px (0 for flat ground). */
 export function tileHeightPx(map: CityMap, index: number): number {
+  const life = streetLifeHeight(map, index);
+  if (life !== undefined) return life;
   const kind = map.kind[index];
   if (kind === KIND_PARK) return ROOF_EXTRA_STOREYS * STOREY_PX;
   if (kind !== KIND_BUILDING && kind !== KIND_LOT && kind !== KIND_OFFICE && kind !== KIND_SITE)
@@ -92,8 +96,14 @@ export function orderKey(x: number, y: number, size: number, tiles: number): num
 }
 
 /** The tallest anything on this map may draw, for padding chunk queries. */
+/** The tallest a landmark may draw: signatures (towers, masts, pylons) reach higher. */
+export function landmarkHeightPx(site: LandmarkSite): number {
+  return site.id === 'signature' ? SIGNATURE_MAX_PX : LANDMARK_MAX_PX;
+}
+
 export function maxItemHeight(map: CityMap): number {
-  let max = map.landmarks.length > 0 ? LANDMARK_MAX_PX : 0;
+  let max = 0;
+  for (const site of map.landmarks) max = Math.max(max, landmarkHeightPx(site));
   for (let i = 0; i < map.kind.length; i++) max = Math.max(max, tileHeightPx(map, i));
   return max;
 }
@@ -128,7 +138,7 @@ export function itemsInRect(map: CityMap, rect: Rect, maxHeight: number): DrawIt
     }
   }
   for (const site of map.landmarks) {
-    const bounds = footprintBounds(n, site.x, site.y, site.size, LANDMARK_MAX_PX);
+    const bounds = footprintBounds(n, site.x, site.y, site.size, landmarkHeightPx(site));
     if (rectsOverlap(bounds, rect)) {
       out.push({ type: 'landmark', site, bounds, order: orderKey(site.x, site.y, site.size, n) });
     }

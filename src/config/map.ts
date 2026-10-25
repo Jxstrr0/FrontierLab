@@ -26,6 +26,9 @@ export const FLOORS: Record<DistrictId, [number, number]> = {
   waterfront: [2, 6],
 };
 
+/** Layout 2: the city look's skyline multiplies filler storeys in these districts. */
+export const SKYLINE_DISTRICTS: readonly DistrictId[] = ['financial', 'downtown'];
+
 /** Office buildings for lease draw this many storeys above their leasable floors (lobby, crown). */
 export const OFFICE_ART_EXTRA_STOREYS = 2;
 /** Storeys of credit bureau and marketing agency buildings (Stage 4). */
@@ -95,5 +98,10 @@ export const ROOF_EXTRA_STOREYS = 4;
 export const FLAG_PX = 14;
 /** Tallest a landmark may draw above its block, in world px. */
 export const LANDMARK_MAX_PX = 150;
+/** Signature landmarks (towers, masts, bridge pylons) may reach this high, in world px. */
+export const SIGNATURE_MAX_PX = 240;
+/** Street life (layout 2): how high avenue trees and plaza fountains reach, in world px. */
+export const AVENUE_TREE_PX = 16;
+export const FOUNTAIN_PX = 14;
 /** Cast shadows run along +x for this many tiles per world px of height. */
 export const SHADOW_TILES_PER_PX = 0.006;
