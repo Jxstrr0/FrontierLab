@@ -10,6 +10,7 @@
 import {
   FAR_ZOOM_BELOW,
   PIN_CAPTION_FROM_ZOOM,
+  PIN_COIN_DOT_SCALE,
   PIN_COIN_LIFT_PX,
   PIN_COIN_PX,
   PIN_CREST_CROWN_PX,
@@ -73,6 +74,7 @@ const FAR_SCALES: Record<string, number> = {
   '--far-seal': PIN_FAR_SCALE.landmark,
   '--far-coin': PIN_FAR_SCALE.coin,
   '--far-tag': PIN_FAR_SCALE.tag,
+  '--dot-coin': PIN_COIN_DOT_SCALE,
 };
 
 export class PinLayer {

@@ -4,6 +4,7 @@
 import type { ComponentChildren } from 'preact';
 import { useRef, useState } from 'preact/hooks';
 import { avatarFromSeed } from '../../art/portraits';
+import type { IconName } from '../../art/icons';
 import type { AvatarSpec } from '../../sim/state';
 import { useDialog } from './dialog';
 import { Icon } from './Icon';
@@ -13,12 +14,16 @@ export interface Tab<T extends string> {
   id: T;
   label: string;
   badge?: boolean;
+  /** Drawn over the label; when any tab has one the bar becomes an icon bar. */
+  icon?: IconName;
 }
 
 export function Panel<T extends string>(p: {
   title: string;
   subtitle?: string;
   icon?: ComponentChildren;
+  /** Extra header buttons, before Close. */
+  actions?: ComponentChildren;
   onClose: () => void;
   advisor?: { text: string | string[]; name?: string; avatar?: AvatarSpec };
   hero?: ComponentChildren;
@@ -38,6 +43,7 @@ export function Panel<T extends string>(p: {
           <h2 class="panel-title">{p.title}</h2>
           {p.subtitle && <div class="panel-subtitle">{p.subtitle}</div>}
         </div>
+        {p.actions}
         <button
           type="button"
           class="icon-btn"
@@ -57,7 +63,10 @@ export function Panel<T extends string>(p: {
       </div>
       {p.footer && <div class="panel-footer">{p.footer}</div>}
       {p.tabs && p.tab && (
-        <nav class="panel-tabs" aria-label="Sections">
+        <nav
+          class={`panel-tabs${p.tabs.some((t) => t.icon) ? ' has-icons' : ''}`}
+          aria-label="Sections"
+        >
           {p.tabs.map((t) => (
             <button
               type="button"
@@ -66,7 +75,8 @@ export function Panel<T extends string>(p: {
               onClick={() => p.onTab?.(t.id)}
               data-tutorial={`tab-${t.id}`}
             >
-              {t.label}
+              {t.icon && <Icon name={t.icon} size={22} class="panel-tab-icon" />}
+              {t.icon ? <span class="panel-tab-label">{t.label}</span> : t.label}
               {t.badge && <span class="dot" aria-label="needs attention" />}
             </button>
           ))}

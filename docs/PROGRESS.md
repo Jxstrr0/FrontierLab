@@ -10,6 +10,17 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-10-25 — HQ and map symbols clean-up
+- **Owner's picks (popups):** an icon floor bar and an Office sheet for the HQ; one pin size, words only at close zoom, compact office tags and quieter open-spot dots for the map. Not picked, so not done: tidier executive cards, a shorter HQ illustration, smaller rival crests.
+- **HQ:**
+  - The cramped row of words at the bottom is now an icon over a short label for each floor, scrolling sideways. Five new icons: ledger (Finance), card (Products), screen (IT), briefcase (Executive) and plus (Add floor).
+  - The address, floor list, rent and the Release floor / Release office buttons left the bottom of every floor. They're now in an **Office** sheet from the button in the HQ header. The release confirms work as before.
+- **Map:**
+  - Crests, round badges, tags and seals now share one footprint (about 28 px), so nothing shouts over the rest. Seals went from 40 to 32 px and crests from 30 × 34 to 26 × 30.
+  - Text under pins ("Sale wk 4", "Converting", bank names) and the words on tags ("For lease") show only at close zoom. Office tags are compact glyph tags until then.
+  - Open branch spots are small brass dots on the roof; the "$" coin appears at close zoom. They keep their full tap target.
+- **Checked** at 390×844 in the browser: HQ floors, the Office sheet and its release confirm, and the map at far, normal and close zoom. No console errors; all 672 tests pass, lint and types clean. Added a `?debug` helper, `__vs.importSave(code)`, to open a saved game code for screenshots.
+
 ### 2026-10-25 — Recap no longer see-through when it opens
 - **Done:** when the week ended with a panel open, the weekly recap faded in over it and both showed through each other for a moment (the owner's screen recording). The backdrop's fade was fading the recap too. Now only the dark backdrop fades, and every bottom sheet and pop-up slides up as a solid card. Checked at 390×844: no see-through frames, no console errors, all 672 tests pass.
 

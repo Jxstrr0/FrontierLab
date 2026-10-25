@@ -91,10 +91,12 @@ Spend the boldness on the map and the illustrations, the way a banknote's engrav
 - **Your branches** add a small brand-ink flag on the roof.
 - **Pins** (DOM; SCREENS §2). Silhouette first, then colour, then glyph, so a pin reads at a glance and without relying on hue:
   - **Crest** (shield): banks. Yours filled with your brand ink and monogram; rivals ivory with their ink ring and monogram; head offices add a brass crown.
-  - **Coin**: open branch locations. A small ivory "$" coin with a milled edge (half size at the far zoom).
+  - **Coin**: open branch locations. A small ivory "$" coin with a milled edge at close zoom; nearer out, a quiet brass dot on the roof with no stem.
   - **Medallion**: places. A round coin filled with the type's own ink (`--type-*` tokens in tokens.css: oxblood, vermilion, teal, cobalt, plum, magenta, forest …) with an ivory glyph. Every glyph and caption on its ink reaches 4.5:1 (tested).
-  - **Price tag**: things you rent or buy. A pointed tag with a punched hole: offices in light brass with dark ink ("For lease"), buildings and vacation homes in their type ink.
-  - **Seal**: landmarks (central bank, airport, stadium). 40 px, scalloped.
+  - **Price tag**: things you rent or buy. A pointed tag with a punched hole: offices in light brass with dark ink, buildings and vacation homes in their type ink. Compact (just the glyph) until close zoom, where it adds its words ("For lease").
+  - **Seal**: landmarks (central bank, airport, stadium). 32 px, scalloped.
+  - **One footprint:** crests (26 × 30), medallions (28), tags (22 high) and seals (32) are all about the same size, so no kind of pin shouts over the others.
+  - **Words at close zoom only:** captions, notes ("Sale wk 4", "For sale", "Converting") and tag words appear from close zoom (PIN_CAPTION_FROM_ZOOM); the normal view is symbols only.
   - The same per-type ink marks that type everywhere it appears: map pins, the Layers legend and panel headers.
   - Stacking, bottom to top: coins, tags, places and rivals, landmarks, yours.
 - **Performance:**

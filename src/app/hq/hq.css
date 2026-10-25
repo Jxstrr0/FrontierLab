@@ -327,3 +327,27 @@
   min-height: var(--tap-min);
   padding: 0 var(--space-4);
 }
+
+/* ─── Header Office button ─────────────────────────────────────────────── */
+.hq-office-btn {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--ivory);
+  font: inherit;
+  font-size: var(--text-14);
+  font-weight: 600;
+  cursor: pointer;
+}
+.hq-office-btn .icon {
+  color: var(--brass-light);
+}
+.hq-office-btn:active {
+  background: rgb(184 145 61 / 15%);
+}

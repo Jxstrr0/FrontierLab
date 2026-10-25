@@ -100,7 +100,7 @@ After the wizard, the map opens with the tutorial (§27).
   - **price tag** = something to rent or buy: offices ("For lease"), buildings ("For sale", "Selling", "Owned"), vacation homes.
   - **seal** = a landmark (central bank, airport, stadium): larger, scalloped.
 - **Captions** from zoom 1.5: places show their type ("Credit bureau") in the type's ink; rival branches show the bank's short name. Captions follow the Text size setting.
-- At the far zoom, nearby pins cluster, but only like with like (yours, rivals, open locations, places, tags; landmarks never cluster). A cluster shows a fanned stack of up to three member marks with a count chip; open locations collapse into a quiet "$ ×N". Its label names what's inside.
+- At the far zoom, nearby pins cluster, but only like with like (yours, rivals, open locations, places, tags; landmarks never cluster). A cluster shows a fanned stack of up to three member marks with a count chip; open locations collapse into a quiet brass dot "×N". Its label names what's inside.
 - Tap a pin to open its panel. Tapping empty map does nothing.
 - **Layers sheet:** a key to the five pin shapes, then an "All" toggle plus one toggle per type (14). Each row shows the actual pins it toggles. Toggles persist in settings.
 
@@ -230,8 +230,9 @@ Tabs: Overview · Loans · Credit.
 
 ## 10. HQ
 
-- **Header:** "{Bank} HQ" with the address. Shows an office switcher if you have more than one.
-- **Bottom tabs** (only departments you have): Finance · HR · Products · Treasury · Marketing · IT · Risk · Executive · Investment · + Add floor.
+- **Header:** "{Bank} HQ" with the address, and an **Office** button. Shows an office switcher if you have more than one.
+- **Office sheet** (from the header button): address, floors in use, weekly rent, which department sits on each floor, then **Release floor · {department}** (the floor you're on; "Close HR floor" on HR) and **Release office**, each with its confirm.
+- **Bottom icon bar** (only departments you have): an icon over a short label for each floor, scrolling sideways when they don't fit. Finance (ledger) · HR (people) · Products (card) · Treasury (vault) · Marketing (megaphone) · IT (screen) · Risk (shield) · Executive (briefcase) · Investment (rising chart) · Add floor (plus).
 
 **Every department floor shows:**
 - **hero:** engraved isometric office interior whose desk count reflects staffing
@@ -364,7 +365,7 @@ Tabs: Overview · Loans · Credit.
   - Offer merger
 - The response arrives the next week.
 - Below the cards: integrations in progress (bank, branches, weeks left) and completed deals.
-- **Converting branches (Stage 6):** while an acquired branch converts, its map pin keeps the old bank's ink and monogram with a brass progress ring and a "Converting" label; the branch panel shows the old medallion and a "Converting from X: N weeks left" banner.
+- **Converting branches (Stage 6):** while an acquired branch converts, its map pin keeps the old bank's ink and monogram with a brass progress ring and (at close zoom) a "Converting" label; the branch panel shows the old medallion and a "Converting from X: N weeks left" banner.
 
 ## 13. Credit bureau
 - Header and advisor.
