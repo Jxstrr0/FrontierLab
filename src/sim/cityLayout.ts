@@ -1,11 +1,13 @@
-// The fixed street and shoreline layout of a city's tile grid (ART_DIRECTION §2,
-// DESIGN §5.2). Pure functions of the city spec, with no randomness, so the sim
-// (lot placement) and the map art (streets, water) always agree.
-// Streets run along every CITY_LAYOUT.block-th row and column, leaving square
-// blocks of buildings between them. Storefront lots sit on block tiles that face
-// a street; the inner tile of each block is left for the map art.
+// The street and shoreline layout of a city's tile grid (ART_DIRECTION §2,
+// DESIGN §5.2), shared by the sim (lot placement) and the map art (streets,
+// water). Streets run along every CITY_LAYOUT.block-th row and column, leaving
+// square blocks of buildings between them; storefront lots sit on block tiles
+// that face a street. Each city's resolved geometry (water form, bridges, big
+// park, district centres) comes from cityGeo.ts at the city's layout version;
+// the helpers here read it. shoreRow is layout 1's original shoreline.
 import { CITY_LAYOUT } from '../config/balance';
 import type { CitySpec } from '../data/cities';
+import type { CityGeometry } from './cityGeo';
 import { dcos } from './detmath';
 
 const TWO_PI = 6.283185307179586;
@@ -17,7 +19,7 @@ function cityPhase(cityId: string): number {
   return h / 3600;
 }
 
-/** First water row in column x (the grid's y runs toward the shore), or Infinity. */
+/** Layout 1: first water row in column x (the grid's y runs toward the shore), or Infinity. */
 export function shoreRow(city: CitySpec, x: number): number {
   if (!city.water) return Infinity;
   const s = CITY_LAYOUT.shore;
@@ -25,31 +27,22 @@ export function shoreRow(city: CitySpec, x: number): number {
   return Math.round(city.tiles * (s.base + s.amplitude * wave));
 }
 
-export function isWater(city: CitySpec, x: number, y: number): boolean {
-  return y >= shoreRow(city, x);
+export function inGrid(geo: { tiles: number }, x: number, y: number): boolean {
+  return x >= 0 && y >= 0 && x < geo.tiles && y < geo.tiles;
 }
 
-export function isStreet(city: CitySpec, x: number, y: number): boolean {
-  if (isWater(city, x, y)) return false;
-  return x % CITY_LAYOUT.block === 0 || y % CITY_LAYOUT.block === 0;
+export function isWater(geo: CityGeometry, x: number, y: number): boolean {
+  return inGrid(geo, x, y) && geo.water[y * geo.tiles + x] === 1;
 }
 
-export function inGrid(city: CitySpec, x: number, y: number): boolean {
-  return x >= 0 && y >= 0 && x < city.tiles && y < city.tiles;
+/** A land street tile (bridges over water are not streets). */
+export function isStreet(geo: CityGeometry, x: number, y: number): boolean {
+  return inGrid(geo, x, y) && geo.street[y * geo.tiles + x] === 1;
 }
 
-/** A building tile with a street on at least one side, inside the edge margin. */
-export function isFrontage(city: CitySpec, x: number, y: number): boolean {
-  const m = CITY_LAYOUT.edgeTiles;
-  if (x < m || y < m || x >= city.tiles - m || y >= city.tiles - m) return false;
-  if (isWater(city, x, y) || isStreet(city, x, y)) return false;
-  const near = [
-    [x + 1, y],
-    [x - 1, y],
-    [x, y + 1],
-    [x, y - 1],
-  ] as const;
-  return near.some(([nx, ny]) => inGrid(city, nx, ny) && isStreet(city, nx, ny));
+/** A building tile with a land street on at least one side, inside the edge margin. */
+export function isFrontage(geo: CityGeometry, x: number, y: number): boolean {
+  return inGrid(geo, x, y) && geo.frontage[y * geo.tiles + x] === 1;
 }
 
 /**
@@ -57,23 +50,26 @@ export function isFrontage(city: CitySpec, x: number, y: number): boolean {
  * Ties go to the first tile found, so the result is deterministic.
  */
 export function nearestFrontage(
-  city: CitySpec,
+  geo: CityGeometry,
   x: number,
   y: number,
   used: Set<string>,
 ): { x: number; y: number } | undefined {
+  const n = geo.tiles;
   let best: { x: number; y: number } | undefined;
   let bestD = Infinity;
-  for (let r = 0; r < city.tiles; r++) {
+  for (let r = 0; r < n; r++) {
     // A tile on ring r is at least r away; stop once no closer tile can appear.
     if (best && r > bestD) break;
     for (let dy = -r; dy <= r; dy++) {
-      for (let dx = -r; dx <= r; dx++) {
-        if (Math.max(Math.abs(dx), Math.abs(dy)) !== r) continue;
+      const ty = y + dy;
+      if (ty < 0 || ty >= n) continue;
+      // Only the ring's edge: every column on the top and bottom rows, else the two sides.
+      const step = Math.abs(dy) === r ? 1 : 2 * r;
+      for (let dx = -r; dx <= r; dx += Math.max(step, 1)) {
         const tx = x + dx;
-        const ty = y + dy;
-        if (!inGrid(city, tx, ty) || used.has(`${tx},${ty}`)) continue;
-        if (!isFrontage(city, tx, ty)) continue;
+        if (tx < 0 || tx >= n || geo.frontage[ty * n + tx] !== 1) continue;
+        if (used.has(`${tx},${ty}`)) continue;
         const d = Math.sqrt(dx * dx + dy * dy);
         if (d < bestD) {
           bestD = d;

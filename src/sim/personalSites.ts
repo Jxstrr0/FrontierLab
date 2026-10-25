@@ -10,8 +10,7 @@ import { auctionHouseIn } from '../data/collectibles';
 import { homesIn } from '../data/homes';
 import { STREET_KINDS, STREET_NAMES } from '../data/names';
 import type { DistrictId } from '../data/types';
-import { nearestFrontage } from './cityLayout';
-import { clamp } from './math';
+import { geometryFor, placeNear } from './cityPlacement';
 import { stream } from './rng';
 import type { GameState, Site, SiteKind } from './state';
 
@@ -27,20 +26,12 @@ export function generatePersonalSites(state: GameState, cityId: string): void {
   for (const o of Object.values(state.world.officeListings)) if (o.cityId === cityId) mark(o.tile);
   for (const s of Object.values(state.world.sites)) if (s.cityId === cityId) mark(s.tile);
 
+  const geo = geometryFor(state, cityId);
   const add = (kind: SiteKind, key: string, refId: string, district: DistrictId): void => {
     const id = `site_${cityId}_${kind}_${key}`;
     if (state.world.sites[id]) return;
     const d = district === 'waterfront' && !city.water ? 'suburbs' : district;
-    const at = CITYGEN.layout[d];
-    const px = Math.round(
-      clamp(rng.normal(at.cx, at.spread), CITYGEN.edge, 1 - CITYGEN.edge) * (city.tiles - 1),
-    );
-    const py = Math.round(
-      clamp(rng.normal(at.cy, at.spread), CITYGEN.edge, 1 - CITYGEN.edge) * (city.tiles - 1),
-    );
-    const tile = nearestFrontage(city, px, py, used);
-    if (!tile) throw new Error(`No room for another building in ${city.name}`);
-    mark(tile);
+    const tile = placeNear(city, geo, d, rng, used);
     const site: Site = {
       id,
       cityId,

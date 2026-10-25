@@ -15,8 +15,7 @@ import {
 } from '../data/employers';
 import { STREET_KINDS, STREET_NAMES } from '../data/names';
 import type { DistrictId } from '../data/types';
-import { nearestFrontage } from './cityLayout';
-import { clamp } from './math';
+import { geometryFor, placeNear } from './cityPlacement';
 import { stream, type Rng } from './rng';
 import type { EmployerInfo, GameState, Site, SiteKind } from './state';
 
@@ -31,19 +30,10 @@ export function generateCompetitionSites(state: GameState, cityId: string): void
   for (const o of Object.values(state.world.officeListings)) if (o.cityId === cityId) mark(o.tile);
   for (const s of Object.values(state.world.sites)) if (s.cityId === cityId) mark(s.tile);
 
+  const geo = geometryFor(state, cityId);
   const place = (district: DistrictId) => {
     const d = district === 'waterfront' && !city.water ? 'industrial' : district;
-    const at = CITYGEN.layout[d];
-    const px = Math.round(
-      clamp(rng.normal(at.cx, at.spread), CITYGEN.edge, 1 - CITYGEN.edge) * (city.tiles - 1),
-    );
-    const py = Math.round(
-      clamp(rng.normal(at.cy, at.spread), CITYGEN.edge, 1 - CITYGEN.edge) * (city.tiles - 1),
-    );
-    const spot = nearestFrontage(city, px, py, used);
-    if (!spot) throw new Error(`No room for another building in ${city.name}`);
-    mark(spot);
-    return { tile: spot, district: d };
+    return { tile: placeNear(city, geo, d, rng, used), district: d };
   };
   const add = (kind: SiteKind, refId: string, district: DistrictId, employer?: EmployerInfo) => {
     const { tile, district: d } = place(district);

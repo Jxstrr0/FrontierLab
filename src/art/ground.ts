@@ -5,9 +5,10 @@
 // neighbouring chunks continue each other's lines exactly.
 import { CITY_LAYOUT } from '../config/balance';
 import type { Rect } from './chunkGrid';
+import { DECOR } from './cityDecor';
 import { TILE_KINDS, type CityMap } from './citygen';
 import { tileRangeForRect } from './drawList';
-import type { Engraver } from './engraver';
+import type { Engraver, Vec3 } from './engraver';
 import { stipple } from './flora';
 import { artRng, mixSeed } from './prng';
 import { waterLayer } from './water';
@@ -23,6 +24,9 @@ const GROUND = {
   ringGapTiles: 0.32,
   ringFontPx: 4.6,
   ringAlpha: 0.7,
+  /** Plaza paving: setts per tile side, and line opacity. */
+  plazaSetts: 4,
+  plazaAlpha: 0.32,
 } as const;
 
 const K = Object.fromEntries(TILE_KINDS.map((k, i) => [k, i])) as Record<
@@ -71,7 +75,8 @@ function tiles(e: Engraver, map: CityMap, r: Rect): void {
         continue;
       }
       if (k === K.water) continue;
-      if (k === K.park) {
+      if (k === K.park && map.decor[y * n + x]! & DECOR.plaza) plazaPaving(e, x, y);
+      else if (k === K.park) {
         e.origin(x, y);
         stipple(e, [0.04, 0.04, 0.96, 0.96], artRng(mixSeed(map.seed[y * n + x]!, 7)), 1.4);
       }
@@ -101,6 +106,25 @@ function tiles(e: Engraver, map: CityMap, r: Rect): void {
   c.strokeStyle = e.inks.inkA(GROUND.dashAlpha);
   strokeAll(dashes);
   c.setLineDash([]);
+}
+
+/** Layout-2 plazas: square paving setts in a fine grid of ink lines. */
+function plazaPaving(e: Engraver, x: number, y: number): void {
+  if (e.lod === 0) return;
+  const segs: [Vec3, Vec3][] = [];
+  const step = 1 / GROUND.plazaSetts;
+  for (let k = step; k < 1 - 1e-6; k += step) {
+    segs.push([
+      [x + k, y, 0],
+      [x + k, y + 1, 0],
+    ]);
+    segs.push([
+      [x, y + k, 0],
+      [x + 1, y + k, 0],
+    ]);
+  }
+  e.origin(0, 0);
+  e.segments(segs, e.inks.detail * 0.7, GROUND.plazaAlpha);
 }
 
 /** The microprint ring: two rules around the city with its name between them. */

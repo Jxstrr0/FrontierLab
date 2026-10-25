@@ -4,6 +4,7 @@ import { generateCityMap, tileAt } from '../../src/art/citygen';
 import {
   footprintBounds,
   itemsInRect,
+  landmarkHeightPx,
   maxItemHeight,
   orderKey,
   tileBounds,
@@ -13,7 +14,15 @@ import {
 import { tileTop, worldSize } from '../../src/art/iso';
 import { CITIES } from '../../src/data/cities';
 import { newGame } from '../../src/sim/newGame';
-import { FLAG_PX, LANDMARK_MAX_PX, ROOF_EXTRA_STOREYS, STOREY_PX } from '../../src/config/map';
+import {
+  AVENUE_TREE_PX,
+  FLAG_PX,
+  LANDMARK_MAX_PX,
+  ROOF_EXTRA_STOREYS,
+  SIGNATURE_MAX_PX,
+  STOREY_PX,
+} from '../../src/config/map';
+import { DECOR } from '../../src/art/cityDecor';
 
 function mapFor(cityId: string, seed = 42) {
   const s = newGame({ seed, cityId });
@@ -35,7 +44,7 @@ function allItems(map: ReturnType<typeof mapFor>) {
   for (const s of map.landmarks) {
     out.push({
       key: `l${s.id}`,
-      bounds: footprintBounds(map.tiles, s.x, s.y, s.size, LANDMARK_MAX_PX),
+      bounds: footprintBounds(map.tiles, s.x, s.y, s.size, landmarkHeightPx(s)),
     });
   }
   return out;
@@ -46,11 +55,15 @@ describe('draw list', () => {
     for (let i = 0; i < sas.kind.length; i++) {
       const t = tileAt(sas, i % sas.tiles, Math.floor(i / sas.tiles))!;
       const h = tileHeightPx(sas, i);
-      if (t.kind === 'street' || t.kind === 'water' || t.kind === 'landmark') expect(h).toBe(0);
+      const avenue = (sas.decor[i]! & DECOR.avenue) !== 0;
+      if (t.kind === 'street') expect(h).toBe(avenue ? AVENUE_TREE_PX : 0);
+      if (t.kind === 'water' || t.kind === 'landmark') expect(h).toBe(0);
       if (t.kind === 'building') expect(h).toBe((t.floors + ROOF_EXTRA_STOREYS) * STOREY_PX);
       if (t.kind === 'lot') expect(h).toBe((t.floors + ROOF_EXTRA_STOREYS) * STOREY_PX + FLAG_PX);
     }
     expect(maxItemHeight(sas)).toBeGreaterThanOrEqual(LANDMARK_MAX_PX);
+    // Signature landmarks (towers, masts, bridge pylons) get more headroom.
+    expect(maxItemHeight(sas)).toBeGreaterThanOrEqual(SIGNATURE_MAX_PX);
   });
 
   it('bounds a tile from its roof down to its diamond and cast shadow', () => {
