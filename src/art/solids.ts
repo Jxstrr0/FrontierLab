@@ -108,7 +108,7 @@ export function gable(
         [a1, b1, z1],
         [a0, b1, z1],
       ],
-      'dense',
+      'roofMedium',
     );
   } else {
     const am = (a0 + a1) / 2;
@@ -120,7 +120,7 @@ export function gable(
         [a1, b1, z1],
         [a1, b0, z1],
       ],
-      'dense',
+      'roofMedium',
     );
     e.poly(
       [

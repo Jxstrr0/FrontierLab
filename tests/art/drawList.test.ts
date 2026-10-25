@@ -4,7 +4,7 @@ import { generateCityMap, tileAt } from '../../src/art/citygen';
 import {
   footprintBounds,
   itemsInRect,
-  landmarkHeightPx,
+  landmarkBounds,
   maxItemHeight,
   orderKey,
   tileBounds,
@@ -19,7 +19,7 @@ import {
   FLAG_PX,
   LANDMARK_MAX_PX,
   ROOF_EXTRA_STOREYS,
-  SIGNATURE_MAX_PX,
+  SIGNATURE_HEIGHT_PX,
   STOREY_PX,
 } from '../../src/config/map';
 import { DECOR } from '../../src/art/cityDecor';
@@ -44,7 +44,7 @@ function allItems(map: ReturnType<typeof mapFor>) {
   for (const s of map.landmarks) {
     out.push({
       key: `l${s.id}`,
-      bounds: footprintBounds(map.tiles, s.x, s.y, s.size, landmarkHeightPx(s)),
+      bounds: landmarkBounds(map.tiles, s),
     });
   }
   return out;
@@ -63,7 +63,9 @@ describe('draw list', () => {
     }
     expect(maxItemHeight(sas)).toBeGreaterThanOrEqual(LANDMARK_MAX_PX);
     // Signature landmarks (towers, masts, bridge pylons) get more headroom.
-    expect(maxItemHeight(sas)).toBeGreaterThanOrEqual(SIGNATURE_MAX_PX);
+    expect(maxItemHeight(sas)).toBeGreaterThanOrEqual(
+      SIGNATURE_HEIGHT_PX[sas.landmarks.find((l) => l.id === 'signature')!.signature!],
+    );
   });
 
   it('bounds a tile from its roof down to its diamond and cast shadow', () => {

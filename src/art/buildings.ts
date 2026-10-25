@@ -1,15 +1,26 @@
-// Procedural buildings per district (ART_DIRECTION §2 table). Each tile's look
-// comes only from its art seed, so a city draws the same way every session and
-// in every chunk. Storefront lots get a glazed ground floor; the player's lots
-// fly a brand-ink roof flag and rivals' lots carry an awning in their ink.
+// Procedural buildings per district (ART_DIRECTION §2 table), shaped by the
+// city's local style (§2.1, styleProfiles.ts): each district's fabric is a
+// styled row, house or tower, or the district's classic building. Each tile's
+// look comes only from its art seed, so a city draws the same way every
+// session and in every chunk. Storefront lots get a glazed ground floor; the
+// player's lots fly a brand-ink roof flag and rivals' lots carry an awning in
+// their ink.
 import { FLAG_PX, STOREY_PX } from '../config/map';
+import { frontageAt } from './blockRows';
 import { downtownMidrise, financialTower, waterfrontGlass, type Shell } from './buildingsTall';
 import { industrialShed, midtownRow, suburbanHouse, universityHall } from './buildingsLow';
-import type { TileInfo } from './citygen';
+import type { CityMap, TileInfo } from './citygen';
 import type { Engraver, Vec3 } from './engraver';
 import type { LotOccupant } from './mapRenderer';
-import { artRng } from './prng';
-import { onFace, type Face } from './solids';
+import { artRng, mixSeed, type ArtRng } from './prng';
+import { gableHouse } from './gables';
+import { spire } from './rooftop';
+import { castShadow, onFace, type Face } from './solids';
+import { styledHouse } from './styleHouses';
+import { barrelShed, grainElevator } from './styleIndustry';
+import { STYLE_PROFILES, type Fabric } from './styleProfiles';
+import { rowBuilding } from './styleRows';
+import { styledTower } from './styleTowers';
 
 /** Visual tuning for storefronts and occupant marks. */
 const SHOP = {
@@ -22,13 +33,72 @@ const SHOP = {
   flagHeight: 6,
 } as const;
 
+/** Walls may rise this many storeys above the tile's floors (roofs need the rest). */
+const WALL_CAP_STOREYS = 2;
+
 /** Draws the building (or storefront) standing on one tile. */
-export function drawBuilding(e: Engraver, t: TileInfo, occupant: LotOccupant | undefined): void {
+export function drawBuilding(
+  e: Engraver,
+  t: TileInfo,
+  occupant: LotOccupant | undefined,
+  map: CityMap,
+): void {
   e.origin(t.x, t.y);
   const rng = artRng(t.seed);
   const lot = t.kind === 'lot';
   // Storefronts need walls tall enough to glaze.
   const floors = lot ? Math.max(2, t.floors) : t.floors;
+  const shell = styled(e, t, floors, rng, lot, map) ?? classic(e, t, floors, rng, lot);
+  if (!lot) return;
+  for (const face of ['left', 'right'] as const) shopfront(e, face, shell);
+  if (occupant?.type === 'rival') {
+    for (const face of ['left', 'right'] as const) awning(e, face, shell, occupant.ink);
+  }
+  if (occupant?.type === 'player') roofFlag(e, shell.roof, occupant.ink);
+}
+
+/** The style's building for this tile, or undefined to use the classic one. */
+function styled(
+  e: Engraver,
+  t: TileInfo,
+  floors: number,
+  rng: ArtRng,
+  lot: boolean,
+  map: CityMap,
+): Shell | undefined {
+  const profile = STYLE_PROFILES[e.style];
+  const pick = artRng(mixSeed(t.seed, 3));
+  if (t.district === 'industrial') {
+    if (profile.industry === 'elevator' && pick.chance(0.5)) return grainElevator(e, floors, rng);
+    if (profile.industry === 'barrel') return barrelShed(e, rng);
+    return undefined;
+  }
+  if (t.district === 'midtown' && !lot && pick.chance(profile.spireChance))
+    return church(e, floors);
+  let fabric: Fabric | undefined = profile.fabric[t.district];
+  while (fabric?.kind === 'mix') fabric = pick.chance(fabric.p) ? fabric.a : fabric.b;
+  if (!fabric || fabric.kind === 'classic') return undefined;
+  const cap = t.floors + WALL_CAP_STOREYS;
+  if (fabric.kind === 'row') {
+    return rowBuilding(e, floors, cap, frontageAt(map, t.x, t.y), fabric.spec, rng, lot);
+  }
+  if (fabric.kind === 'house') return styledHouse(e, fabric.house, cap, rng);
+  return styledTower(e, fabric.tower, floors, rng);
+}
+
+/** A small church: a gabled nave with a spire at its front end. */
+function church(e: Engraver, floors: number): Shell {
+  const wall = Math.min(2, floors) * STOREY_PX;
+  const r: [number, number, number, number] = [0.16, 0.3, 0.7, 0.7];
+  const h = (floors + 3.6) * STOREY_PX;
+  castShadow(e, 0.16, 0.3, 0.9, 0.7, h);
+  gableHouse(e, r, wall, 16, true);
+  spire(e, 0.8, 0.5, 0, h);
+  return { rect: r, wall, roof: [0.8, 0.5, h] };
+}
+
+/** The district's classic building (ART_DIRECTION §2 table). */
+function classic(e: Engraver, t: TileInfo, floors: number, rng: ArtRng, lot: boolean): Shell {
   let shell: Shell;
   switch (t.district) {
     case 'financial':
@@ -53,12 +123,7 @@ export function drawBuilding(e: Engraver, t: TileInfo, occupant: LotOccupant | u
       shell = industrialShed(e, floors, rng);
       break;
   }
-  if (!lot) return;
-  for (const face of ['left', 'right'] as const) shopfront(e, face, shell);
-  if (occupant?.type === 'rival') {
-    for (const face of ['left', 'right'] as const) awning(e, face, shell, occupant.ink);
-  }
-  if (occupant?.type === 'player') roofFlag(e, shell.roof, occupant.ink);
+  return shell;
 }
 
 /** A glazed ground floor: paper glass, mullions, a door and a heavy lintel. */
