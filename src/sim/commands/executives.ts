@@ -2,7 +2,7 @@
 // candidate pool, fire (severance in weeks of salary, P&L execPay), set salary,
 // switch delegations and add stock option or RSU grants. All need an Executive
 // floor at HQ. Also the COO's growth cities and "Open a branch now" (§17.2).
-import { EXEC_PAY, EXECUTIVES, WEEKS_PER_YEAR } from '../../config/balance';
+import { EXEC_PAY, EXECUTIVES, PAY_REVIEW, WEEKS_PER_YEAR } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { EXEC_SEATS } from '../../data/executives';
 import { canGrowIn, expansionPlan, seedGrowthCities } from '../execDelegationsGrowth';
@@ -10,6 +10,7 @@ import { grantFairValue } from '../execGrants';
 import { seatExecutive, vacateSeat } from '../execSeatChanges';
 import { execMarketSalary, hasExecFloor } from '../execSeats';
 import { newId } from '../ids';
+import { payReviewsOn, runPayReview } from '../payReviews';
 import { spend } from '../ledger';
 import { roundToStep } from '../math';
 import type { EquityGrant, ExecSeat, GameState } from '../state';
@@ -79,6 +80,23 @@ export function setExecDelegation(
   if (!EXEC_SEATS[seat].delegations.some((d) => d.id === id)) return fail('Unknown delegation.');
   exec.delegations[id] = on;
   seedGrowthCities(state);
+  // Switching Pay reviews on runs the first review at once.
+  if (seat === 'coo' && id === 'payReviews' && on) runPayReview(state);
+  return ok();
+}
+
+/**
+ * Sets the pay premium over market that the COO's Pay reviews aim for
+ * (PAY_REVIEW.premiumRange, in premiumStep steps); with Pay reviews on, pay
+ * moves to it at once.
+ */
+export function setPayPremium(state: GameState, premium: number): CommandResult {
+  const [lo, hi] = PAY_REVIEW.premiumRange;
+  const p = Math.round(premium / PAY_REVIEW.premiumStep) * PAY_REVIEW.premiumStep;
+  if (!Number.isFinite(premium) || p < lo - 1e-9 || p > hi + 1e-9)
+    return fail(`Pick a premium from ${Math.round(lo * 100)}% to +${Math.round(hi * 100)}%.`);
+  state.executives.payPremium = Number(p.toFixed(2));
+  if (payReviewsOn(state)) runPayReview(state);
   return ok();
 }
 

@@ -53,6 +53,12 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
         label: 'HR division',
         description: 'Staffs every HQ floor to full coverage.',
       },
+      {
+        id: 'payReviews',
+        label: 'Pay reviews',
+        description:
+          'Once a year sets every executive and branch manager to market pay plus your pay premium, so pay keeps rising with the market and rivals struggle to poach them.',
+      },
     ],
   },
   cfo: {
@@ -83,6 +89,12 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
         id: 'dividends',
         label: 'Dividends',
         description: 'Proposes a dividend at each board meeting.',
+      },
+      {
+        id: 'guidance',
+        label: 'Branch guidance: funding',
+        description:
+          'With the CRO, steers delegated managers: every 4 weeks raises their deposit rates while liquidity is under target and trims them when it is well above.',
       },
     ],
   },
@@ -151,6 +163,12 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
         id: 'loanPolicy',
         label: 'Loan Desk policy',
         description: 'Decides Loan Desk applications at branches without a delegated manager.',
+      },
+      {
+        id: 'guidance',
+        label: 'Branch guidance: lending',
+        description:
+          'With the CFO, steers delegated managers: every 4 weeks makes loans dearer and approvals stricter while capital or losses miss target, and looser when both are healthy.',
       },
     ],
   },

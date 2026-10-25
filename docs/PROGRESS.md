@@ -4,11 +4,20 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 **Current stage:** 10 — Art pass, onboarding, polish, launch (built and live; awaiting the owner's iPhone check). All ten roadmap stages are built. Still open: the owner's testing and tuning pass, an Add to Home Screen test on a real iPhone, and the Vault Street card on Kelbo.Website (in a separate session in that repo).
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `009a66bf5840b5` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `1744ec22a99c2a` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-25 — CFO + CRO branch guidance, COO pay reviews, managers can be poached (v0.10.5)
+- **Owner's asks:** (A) let the CFO and CRO jointly change how branch managers handle products and risk; (B) a C-suite toggle that pays executives and branch managers market ± a percentage you set, rising every year, so they're harder to poach.
+- **A. Branch guidance.** The CFO and the CRO each have a new switch, "Branch guidance: funding" and "Branch guidance: lending". Every 4 weeks the CFO nudges the deposit rates of managers you've delegated "Products & rates" to: up when liquidity is under target, down when it's well above. The CRO nudges their loan rates and Loan Desk approvals: dearer and stricter when capital is under 12% or losses run high, a little looser when both are healthy. Steps are 0.10 pp; deposits never go above the funding cost and loans never below it. Their profiles show the guidance in force. With a switch off, that half goes back to neutral.
+- **B. Pay reviews.** The COO has a new "Pay reviews" switch and a **Pay premium over market** stepper (−10% to +30%, default +5%). Once a year, and right away when you switch it on or change the premium, every executive and branch manager is set to market pay plus the premium. Manager market pay now rises 3% a year with their time at the bank, so fixed pay drifts behind.
+- **Poaching.** To make pay matter, rival banks can now poach branch managers: rarely at market pay, three times as often under 90% of market, half as often at 110% or more. You get a toast, the branch's delegations come back to you, and the COO's Branch operations (if on) hires a replacement. Executives paid 110%+ of market are now half as likely to resign. The manager card shows market pay and whether they're underpaid.
+- **Existing saves:** schema v15 (migration 14 → 15). Your current CFO, CRO and COO get the new switches **off**, so nothing changes until you flip them; "Where to look" will count them as switched-off delegations. New hires start with them on.
+- **Balance:** the 10-year runs (steady, aggressive, turtle; seed 42) stay inside every target. The balance bot now rehires poached managers, as an owner would. The determinism snapshot moved `009a66bf5840b5` → `1744ec22a99c2a` (new fields and manager poaching).
+- **Tests:** 717 (guidance steps, caps and reset; prices and approvals move; migration 14 → 15; market pay and tenure; poaching odds and hand-back; pay reviews and the premium range; the well-paid resignation factor). Lint, typecheck and build clean. Checked at 390×844: the COO's premium stepper, the CRO's guidance readout and an underpaid manager's card, with no console errors.
 
 ### 2026-10-25 — Developer payment, bigger starting cash, real currency conversion (v0.10.4)
 - **Owner's asks:** (A) a $10,000,000 payment in a developer settings toggle; (B) raise the starting cash a little; (C) make the currencies worth the same as each other instead of 1:1.

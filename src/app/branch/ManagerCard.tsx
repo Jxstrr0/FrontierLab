@@ -1,5 +1,5 @@
-// Branch manager card (SCREENS §5.1): skills, salary, the five delegation
-// toggles and Fire; with no manager, a Hire button that opens the candidate sheet.
+// Branch manager card (SCREENS §5.1): skills, salary against market pay (rivals
+// poach the underpaid, §17.1), the five delegation toggles and Fire; with no manager, a Hire button that opens the candidate sheet.
 // Closing the sheet without hiring deals new candidates for next time.
 import { useState } from 'preact/hooks';
 import { managerOf } from '../../sim/branch/staff';
@@ -17,7 +17,13 @@ import {
 } from '../components';
 import { gameDate, moneyFull, moneyStepper } from '../format/format';
 import { act, toast, useGame } from '../store';
-import { dayOfWeek, salaryBounds, SALARY_STEP } from './selectors';
+import { dayOfWeek, managerPayView, salaryBounds, SALARY_STEP } from './selectors';
+
+const STANDING: Record<string, string> = {
+  underpaid: 'Underpaid: rivals are more likely to poach them.',
+  fair: 'Paid about market.',
+  wellPaid: 'Well paid: rivals are less likely to poach them.',
+};
 
 const DELEGATIONS: [keyof Delegation, string][] = [
   ['staffing', 'Staffing & wages'],
@@ -65,6 +71,8 @@ export function ManagerCard({ branch }: { branch: Branch }) {
   }
 
   const salary = salaryBounds(branch.cityId);
+  const pay = managerPayView(s, mgr);
+  const reviews = !!s.executives.seats.coo?.delegations.payReviews;
   return (
     <section>
       <SectionTitle>Branch manager</SectionTitle>
@@ -88,8 +96,12 @@ export function ManagerCard({ branch }: { branch: Branch }) {
             step={SALARY_STEP}
             {...moneyStepper(sym)}
             onChange={(v) => act(cmd.setManagerSalary, branch.id, v)}
-            hint={`${moneyFull(salary.min, sym)} to ${moneyFull(salary.max, sym)}`}
+            hint={`Market ${moneyFull(pay.market, sym)} · ${moneyFull(salary.min, sym)} to ${moneyFull(salary.max, sym)}`}
           />
+          <p class={`small ${pay.standing === 'underpaid' ? 'tone-bad' : 'muted'}`}>
+            {STANDING[pay.standing]}
+            {reviews ? ' Your COO reviews this pay once a year.' : ''}
+          </p>
           <div>
             <div class="muted small">Let your manager handle</div>
             {DELEGATIONS.map(([key, label]) => (

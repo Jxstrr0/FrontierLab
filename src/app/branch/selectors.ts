@@ -5,8 +5,7 @@ import {
   DAYS_PER_WEEK,
   FITOUT_DAYS,
   INTEREST_PERIODS,
-  MANAGER_BASE_SALARY,
-  MANAGER_SALARY_RANGE,
+  MANAGER_PAY,
   MAX_STAFF_MULT,
   WAGE_RANGE,
   WAGE_STEP,
@@ -14,11 +13,11 @@ import {
   WEEKS_PER_YEAR,
 } from '../../config/balance';
 import type { CampaignCost } from '../../data/campaigns';
-import { CITIES } from '../../data/cities';
 import { isDeposit, isLoan, type ProductSpec } from '../../data/products';
 import { deskWeek } from '../../sim/branch/loanDesk';
 import { marketWage, staffNeeded } from '../../sim/branch/staff';
-import type { Book, Branch, BranchPnl, BranchPnlLine, GameState } from '../../sim/state';
+import { managerMarketSalary, managerSalaryBounds } from '../../sim/payReviews';
+import type { Book, Branch, BranchPnl, BranchPnlLine, GameState, Manager } from '../../sim/state';
 import {
   delta,
   exactMoney,
@@ -40,8 +39,8 @@ const ADVISOR = {
 /** UI-only morale bands for the staff mood figures (jade / brass / oxblood). */
 const MOOD_BANDS = { good: 60, warn: 40 } as const;
 
-/** Manager salary stepper step, in currency units. */
-export const SALARY_STEP = 1000;
+/** Manager salary stepper step (MANAGER_PAY.salaryStep). */
+export const SALARY_STEP = MANAGER_PAY.salaryStep;
 
 const MONTHS_PER_YEAR = INTEREST_PERIODS.monthsPerYear;
 
@@ -125,12 +124,25 @@ export function wageBounds(cityId: string) {
 }
 
 /** Manager salary stepper bounds (setManagerSalary). */
-export function salaryBounds(cityId: string) {
-  const ref = (CITIES[cityId]?.wageIndex ?? 1) * MANAGER_BASE_SALARY;
-  return {
-    min: Math.ceil((ref * MANAGER_SALARY_RANGE[0]) / SALARY_STEP) * SALARY_STEP,
-    max: Math.floor((ref * MANAGER_SALARY_RANGE[1]) / SALARY_STEP) * SALARY_STEP,
-  };
+export const salaryBounds = managerSalaryBounds;
+
+export interface ManagerPayView {
+  market: number;
+  /** How pay compares with market for poaching (§17.1). */
+  standing: 'underpaid' | 'fair' | 'wellPaid';
+}
+
+/** A manager's market pay and where their salary stands against it. */
+export function managerPayView(s: GameState, mgr: Manager): ManagerPayView {
+  const market = managerMarketSalary(s, mgr);
+  const ratio = mgr.salary / Math.max(1, market);
+  const standing =
+    ratio < MANAGER_PAY.underpaidRatio
+      ? 'underpaid'
+      : ratio >= MANAGER_PAY.wellPaidRatio
+        ? 'wellPaid'
+        : 'fair';
+  return { market, standing };
 }
 
 /** Formats a product price: a rate, a monthly or annual fee, or a % fee. */

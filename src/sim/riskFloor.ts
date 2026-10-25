@@ -218,3 +218,15 @@ export function regulatorReview(state: GameState): RegulatorReview {
   }
   return review;
 }
+
+/** Annualized loss rate across every loan product (last 13 weeks). */
+export function companyLossRate(state: GameState): number {
+  let losses = 0;
+  let balanceWeeks = 0;
+  for (const r of lossTable(state)) {
+    losses += r.losses;
+    balanceWeeks += r.avgBalance * r.weeks;
+  }
+  // Σ (average balance × weeks) is the balance-weeks, so this is a yearly rate.
+  return balanceWeeks > 0 ? (losses / balanceWeeks) * WEEKS_PER_YEAR : 0;
+}

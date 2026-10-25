@@ -1,7 +1,8 @@
 // Executives (SIMULATION §17.2), tick step 8: candidate pools, weekly payroll
 // (P&L execPay, cash), equity grants (execGrants.ts), the delegations each
-// executive has switched on (execDelegations*.ts) and resignations, which raise
-// the EXEC_POACHED incident. Hiring, firing and grants are player commands in
+// executive has switched on (execDelegations*.ts, payReviews.ts), the CFO and
+// CRO's branch guidance (branchGuidance.ts) and resignations, which raise the
+// EXEC_POACHED incident. Hiring, firing and grants are player commands in
 // commands/executives.ts; seat lookups other systems read are in execSeats.ts.
 import { WEEKS_PER_YEAR } from '../config/balance';
 import { EXEC_SEATS } from '../data/executives';
@@ -23,7 +24,9 @@ import {
   cooDivision,
   croAppetite,
 } from './execDelegationsPeople';
+import { runBranchGuidance } from './branchGuidance';
 import { runGrants } from './execGrants';
+import { cooPayReviews } from './payReviews';
 import { delegationOn, execMarketSalary, resignChance, seatedExecs } from './execSeats';
 import { raiseIncident } from './incidents';
 import { spend } from './ledger';
@@ -36,6 +39,7 @@ const DELEGATIONS: [ExecSeat, string, (s: GameState) => void][] = [
   ['coo', 'branchOps', cooBranchOps],
   ['coo', 'hrDivision', cooDivision],
   ['coo', 'hrBenefits', cooBenefits],
+  ['coo', 'payReviews', cooPayReviews],
   ['cfo', 'treasury', cfoTreasury],
   ['cfo', 'capital', cfoCapital],
   ['cfo', 'shares', cfoShares],
@@ -59,6 +63,7 @@ export function runExecutives(state: GameState): void {
   if (pay > 0) spend(state, 'execPay', pay);
   runGrants(state);
   for (const [seat, id, run] of DELEGATIONS) if (delegationOn(state, seat, id)) run(state);
+  runBranchGuidance(state);
   rollResignations(state);
 }
 
