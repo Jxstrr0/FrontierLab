@@ -315,7 +315,7 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 | Offices and departments | `leaseOffice`, `addFloor`, `releaseFloor`, `setDeptTarget`, `setDeptSalary`, `setBenefit` |
 | Products floor | `startDevelopment`, `cancelDevelopment`, `deleteProduct`, `setRiskAppetite`, `buyBureauModel`, `commissionBureauModel`, `saveCustomModel`, `activateModel` |
 | Treasury | `setTreasuryPolicy`, `borrowOffer`, `repayLot`, `transferToTreasury`, `borrowWindow`, `repayWindow` |
-| Partnerships and partners | `signPartnership` (payroll or student), `renewPartnership`, `releasePartnership`, `startGradProgram`, `endGradProgram`, `signDealerDeal`, `endDealerDeal` |
+| Partnerships and partners | `signPartnership` (payroll or student), `renewPartnership`, `releasePartnership`, `startGradProgram`, `endGradProgram` |
 | Marketing and lobbying | `startBrandCampaign`, `buyAgencyPackage`, `startLobbying` (was `lobby`) |
 | Corporate borrowing | `acceptCorporateLoan`, `repayCorporateLoan`, `drawCredit`, `repayCredit` |
 | Capital markets | `trade(account, securityId, shares)`, `privatePlacement(bankId, pct)`, `launchIpo(bankId, floatPct)`, `secondaryOffering(bankId, pct)`, `offerMerger(rivalId, pricePerShare)` |
@@ -325,7 +325,7 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 | Personal | `offerHome`, `rebuildHome`, `sellHome`, `buyCar`, `sellCar`, `placeBid`, `clearBid`, `appraiseCollectible`, `consignCollectible`, `withdrawConsignment`, `buyJet`, `sellJet`, `buyClub`, `sellClub`, `setKit`, `setKitSponsor`, `signPlayer`, `releasePlayer` |
 | Settings and saves | `setSettings`, `setFounderAvatar`; saves are not commands: `saveToSlot`, `loadFromSlot` (`src/sim/save/storage.ts`), `exportCode`, `importCode` (`serialize.ts`) |
 
-## 12. Implemented so far (schema v14)
+## 12. Implemented so far (schema v15)
 
 `src/sim/state.ts` is the source of truth; this section records how it differs from the guide above. Later stages add the rest with a schema bump and a migration.
 
@@ -340,6 +340,7 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 - **Schema v12 adds** (audit follow-up): `DeskWeek.arrived` (applications that arrived this week), `RivalBank.execs` (the CFO/COO/CRO bench: `{ title, name }[]`), `WeeklySnapshot.appRating` (for the IT floor's trend) and, optional, `Book.last.defaultedLoans` (business loans that defaulted in the week). `milestones` now fills (id → week reached). Migration 11 → 12 draws every rival's bench from the `rivalBench` stream, adds `arrived: 0` to every desk tally and records milestones already reached without news.
 - **Schema v13 adds** (hands-off play): `executives.remembered` (per seat, the delegation toggles its last holder left; applied to the next hire), `executives.growthCities` (city id → true: where the COO's Expansion may build) and `executives.lastExpansionWeek` (-1 before the first COO build). `IncidentSpec.yours` and `NEW_BRANCH.by` ('coo') are data, not state. Migration 12 → 13 adds the three fields and switches every waiting candidate's delegations on (the new default).
 - **Schema v14 adds:** `company.lastBuild` (optional `BuildSpec`: the fit-out of your last own build; the build sheet and the COO's Expansion start from it) and the CFO's `shares` delegation (Share sales, split out of Capital). Migration 13 → 14 sets a seated CFO's and the remembered CFO toggles' `shares` to their `capital`, switches it on for waiting CFO candidates, and fills `lastBuild` from the newest branch.
+- **Schema v15 removes** (content trim): `dealerDeals` and the `dealerFees` P&L line (dealer financing is gone), and the `hold` value of `ReoPool.mode` (now `'rent' | 'selling'`). Migration 14 → 15 deletes `dealerDeals`, folds `dealerFees` into `marketing` in the open ledger and every weekly snapshot, drops `DEALER_*` events from the log, turns held REO pools into rented ones, retypes funding lots and offers (`brokered` → `term_interbank`, `senior_bond` → `covered_bond`, with the new type's radar), and renames a running `grand_opening` agency package to `street_team`.
 - **Not yet present:** nothing from the v1 plan.
 - **Added fields:**
   - `ledger`: P&L lines and cash movements since the last weekly close, so commands between ticks land in the right week.

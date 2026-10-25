@@ -29,7 +29,7 @@ describe('v7 save migration', () => {
     expect(sites.filter((x) => x.kind === 'lobbyingFirm').map((x) => x.refId)).toEqual([
       'parliamentRow',
     ]);
-    expect(s.reo.cal!.mode).toBe('hold');
+    expect(s.reo.cal!.mode).toBe('rent'); // held in v7, renting since schema 15
     expect(s.reo.cal!.hpiRef).toBeGreaterThan(0);
     expect(s.ledger.pnl.rentalIncome).toBe(0);
     expect(s.lobbying.campaigns).toEqual([]);

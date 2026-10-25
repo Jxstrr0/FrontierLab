@@ -1,15 +1,17 @@
 // Risk appetite (SCREENS §10, SIMULATION §16.8): a 1–5 switch with the level's
-// plain name and a one-line effect on loan volume and defaults.
+// plain name, a one-line effect on loan volume and defaults, and a note when
+// the CRO or the CFO is steering it too.
 import * as cmd from '../../../sim/commands';
 import { Card, Segmented } from '../../components';
 import { act, useGame } from '../../store';
-import { RISK_LABELS, riskHint } from './productSelectors';
+import { RISK_LABELS, riskHint, riskSteering } from './productSelectors';
 
 const LEVELS = RISK_LABELS.map((_, i) => ({ value: String(i + 1), label: String(i + 1) }));
 
 export function RiskAppetite() {
   const s = useGame();
   const level = s.company.riskAppetite;
+  const steering = riskSteering(s);
   return (
     <Card>
       <div class="pf-risk-head">
@@ -27,6 +29,7 @@ export function RiskAppetite() {
         <span>{RISK_LABELS[RISK_LABELS.length - 1]}</span>
       </div>
       <p class="small hq-note">{riskHint(level)}</p>
+      {steering && <p class="small muted">{steering}</p>}
     </Card>
   );
 }

@@ -1,6 +1,6 @@
 // The Company panel's Real estate section (SCREENS §16, §24): the bank's
 // buildings with value and weekly net (tap to open one), and foreclosed homes
-// per city with units, value, weekly carrying cost and Hold / Rent / Sell all
+// per city with units, value, weekly carrying cost and Rent / Sell all
 // (Sell all asks for confirmation; once started it can't be called off).
 import { useState } from 'preact/hooks';
 import { REO } from '../../config/balance';
@@ -93,7 +93,6 @@ function ReoCard({ row, sym }: { row: ReoRow; sym: string }) {
         <Segmented
           label={`Foreclosed homes in ${row.city}`}
           options={[
-            { value: 'hold', label: 'Hold' },
             { value: 'rent', label: 'Rent' },
             { value: 'selling', label: 'Sell all' },
           ]}

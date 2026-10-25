@@ -1,7 +1,7 @@
-// Foreclosed homes (SIMULATION §21.3): value follows hpi, Hold and Rent carry
-// 6%/yr, Rent earns 4.5%/yr at 90% occupancy, Sell all settles at 90% of value
+// Foreclosed homes (SIMULATION §21.3): value follows hpi, a rented pool carries
+// 6%/yr and earns 4.5%/yr at 90% occupancy, Sell all settles at 90% of value
 // in 1–4 weeks and can't be called off, and later foreclosures start a fresh
-// Hold pool. The balance identity holds throughout.
+// rented pool. The balance identity holds throughout.
 import { describe, expect, it } from 'vitest';
 import { REO } from '../../src/config/balance';
 import { balanceSheet } from '../../src/sim/balanceSheet';
@@ -10,10 +10,10 @@ import { newGame } from '../../src/sim/newGame';
 import { reoWeek, runReo } from '../../src/sim/reo';
 import type { GameState } from '../../src/sim/state';
 
-function setup(mode: 'hold' | 'rent' = 'hold') {
+function setup() {
   const s = newGame({ seed: 42, cityId: 'cal', bankName: 'Reo Bank' });
   const hpi = s.world.countries.CA!.hpi;
-  s.reo.cal = { units: 20, value: 5_200_000, mode, hpiRef: hpi };
+  s.reo.cal = { units: 20, value: 5_200_000, mode: 'rent', hpiRef: hpi };
   s.company.paidInCapital += 5_200_000;
   return s;
 }
@@ -25,9 +25,8 @@ function identity(s: GameState) {
 
 describe('foreclosed homes', () => {
   it('works out carrying cost and rent by mode', () => {
-    const pool = { units: 1, value: 5_200_000, mode: 'hold' as const, hpiRef: 100 };
-    expect(reoWeek(pool)).toEqual({ carrying: 6_000, rent: 0 });
-    const rent = reoWeek({ ...pool, mode: 'rent' });
+    const pool = { units: 1, value: 5_200_000, mode: 'rent' as const, hpiRef: 100 };
+    const rent = reoWeek(pool);
     expect(rent.carrying).toBeCloseTo(6_000, 9);
     expect(rent.rent).toBeCloseTo(((5_200_000 * 0.045) / 52) * 0.9, 9);
     expect(reoWeek({ ...pool, mode: 'selling' })).toEqual({ carrying: 0, rent: 0 });
@@ -41,13 +40,14 @@ describe('foreclosed homes', () => {
     runReo(s);
     expect(s.reo.cal!.value).toBeCloseTo(5_720_000, 4);
     expect(s.ledger.pnl.propertyGains).toBeCloseTo(520_000, 4);
+    const week = reoWeek(s.reo.cal!);
     expect(s.ledger.pnl.propertyCosts).toBeCloseTo((5_720_000 * REO.carryingCost) / 52, 4);
-    expect(s.company.cash).toBeCloseTo(cash - (5_720_000 * REO.carryingCost) / 52, 4);
+    expect(s.company.cash).toBeCloseTo(cash - week.carrying + week.rent, 4);
     identity(s);
   });
 
-  it('earns rent in Rent mode', () => {
-    const s = setup('rent');
+  it('earns rent while rented', () => {
+    const s = setup();
     runReo(s);
     expect(s.ledger.pnl.rentalIncome).toBeCloseTo(((5_200_000 * 0.045) / 52) * 0.9, 4);
     identity(s);
@@ -74,6 +74,6 @@ describe('foreclosed homes', () => {
     expect(s.ledger.cash.investing).toBeCloseTo(6_000_000 * REO.sellPrice, 4);
     expect(s.ledger.pnl.propertyGains).toBeCloseTo(-600_000, 4);
     expect(s.events.log.some((e) => e.type === 'REO_SOLD')).toBe(true);
-    expect(cmd.setReoMode(s, 'cal', 'hold').ok).toBe(false);
+    expect(cmd.setReoMode(s, 'cal', 'rent').ok).toBe(false);
   });
 });

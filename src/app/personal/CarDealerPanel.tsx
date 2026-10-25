@@ -1,19 +1,11 @@
-// SCREENS §19 car dealer, tabs Showroom | Dealer financing. Showroom: a
-// carousel of cars (name, price, flavour line, Buy with personal cash, in this
-// city). Dealer financing: the bank pays the dealer a yearly fee to refer
-// auto-loan customers to its branches in this city (fee, term, expected
-// volume, Sign / End deal).
+// SCREENS §19 car dealer: the showroom, a carousel of cars (name, price,
+// flavour line, Buy with personal cash, in this city).
 import { useState } from 'preact/hooks';
-import { CARS_CFG, DEALER_FINANCING, WEEKS_PER_YEAR } from '../../config/balance';
+import { CARS_CFG } from '../../config/balance';
 import { CARS, type CarSpec } from '../../data/cars';
 import { CITIES } from '../../data/cities';
 import * as cmd from '../../sim/commands';
-import {
-  activeDealerDeal,
-  carUpkeepWeekly,
-  dealerExpectedVolume,
-  openBranchesIn,
-} from '../../sim/personalValues';
+import { carUpkeepWeekly } from '../../sim/personalValues';
 import type { Site } from '../../sim/state';
 import { Badge, Card, Carousel, Confirm, Panel, Row } from '../components';
 import { money, pct } from '../format/format';
@@ -23,13 +15,9 @@ import { CarArt } from './CarArt';
 import './personal.css';
 import { ShowroomArt } from './ShowroomArt';
 
-type DealerTab = 'showroom' | 'financing';
-
-export function CarDealerPanel(p: { siteId: string; tab?: DealerTab }) {
+export function CarDealerPanel(p: { siteId: string }) {
   const s = useGame();
   const site = s.world.sites[p.siteId];
-  // Local tab state: the route's `tab` only picks the first one shown.
-  const [tab, setTab] = useState<DealerTab>(p.tab ?? 'showroom');
   if (site?.kind !== 'autoDealer') {
     return (
       <Panel title="Car dealer" onClose={closePanel}>
@@ -45,14 +33,8 @@ export function CarDealerPanel(p: { siteId: string; tab?: DealerTab }) {
       onClose={closePanel}
       advisor={{ text: 'Our finest machines. Something for the weekend?' }}
       hero={<ShowroomArt />}
-      tabs={[
-        { id: 'showroom', label: 'Showroom' },
-        { id: 'financing', label: 'Dealer financing' },
-      ]}
-      tab={tab}
-      onTab={setTab}
     >
-      {tab === 'showroom' ? <Showroom site={site} /> : <Financing site={site} />}
+      <Showroom site={site} />
     </Panel>
   );
 }
@@ -120,92 +102,6 @@ function Showroom(p: { site: Site }) {
             const r = act(cmd.buyCar, p.site.id, buying.id);
             setBuying(null);
             if (r.ok) toast(`The ${buying.name} is yours.`, 'good');
-          }}
-        />
-      )}
-    </div>
-  );
-}
-
-function Financing(p: { site: Site }) {
-  const s = useGame();
-  const sym = s.settings.currency;
-  const [ending, setEnding] = useState(false);
-  const city = CITIES[p.site.cityId]?.name ?? 'this city';
-  const deal = activeDealerDeal(s, p.site.id);
-  const branches = openBranchesIn(s, p.site.cityId);
-  const volume = dealerExpectedVolume(s, p.site.cityId);
-  const weeklyFee = DEALER_FINANCING.feePerYear / WEEKS_PER_YEAR;
-  const blocker =
-    p.site.cityId !== s.world.currentCityId
-      ? 'You need to be in this city to sign.'
-      : branches === 0
-        ? `Open a branch in ${city} first: the dealer refers customers to it.`
-        : null;
-  return (
-    <div class="stack">
-      <p class="muted small">
-        {p.site.refId} sends its car buyers to your branches in {city} for an auto loan. The bank
-        pays the referral fee.
-      </p>
-      <Card>
-        <Row label="Fee" value={`${money(DEALER_FINANCING.feePerYear, sym)} a year`} />
-        <Row label="Paid weekly" value={money(weeklyFee, sym)} tone="dim" />
-        <Row
-          label="Term"
-          value={`${Math.round(DEALER_FINANCING.termWeeks / WEEKS_PER_YEAR)} years`}
-        />
-        <Row
-          label="Auto-loan demand"
-          value={`+${pct(DEALER_FINANCING.demandBoost, 0)}`}
-          tone="good"
-        />
-        <Row label={`Your branches in ${city}`} value={String(branches)} />
-        <Row
-          label="Expected volume"
-          value={
-            volume > 0
-              ? `+${money(volume, sym)} new loans / week`
-              : branches > 0
-                ? 'Offer auto loans first'
-                : '—'
-          }
-        />
-      </Card>
-      {deal ? (
-        <Card>
-          <Row label="Status" value="Signed" tone="good" />
-          <Row label="Ends in" value={`${Math.max(1, deal.endWeek - s.clock.week)} weeks`} />
-          <button type="button" class="btn btn-secondary btn-block" onClick={() => setEnding(true)}>
-            End deal
-          </button>
-        </Card>
-      ) : (
-        <>
-          <button
-            type="button"
-            class="btn btn-primary btn-block"
-            disabled={!!blocker}
-            onClick={() => {
-              if (act(cmd.signDealerDeal, p.site.id).ok)
-                toast(`Signed with ${p.site.refId}.`, 'good');
-            }}
-          >
-            Sign
-          </button>
-          {blocker && <p class="small tone-bad pw-center">{blocker}</p>}
-        </>
-      )}
-      {ending && (
-        <Confirm
-          title="End the deal?"
-          body={<p>Referrals stop and so does the fee, from next week.</p>}
-          confirmLabel="End deal"
-          danger
-          onCancel={() => setEnding(false)}
-          onConfirm={() => {
-            setEnding(false);
-            act(cmd.endDealerDeal, p.site.id);
           }}
         />
       )}

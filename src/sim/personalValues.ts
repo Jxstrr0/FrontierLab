@@ -1,13 +1,11 @@
-// What the founder's homes and cars are worth and cost (SIMULATION §22), and
-// what a car-dealer financing deal does (SCREENS §19). Pure functions of the
-// state: the weekly step (personalAssets.ts), the commands and the UI all read
-// these, so a price on screen is the price the command charges.
-import { CARS_CFG, DEALER_FINANCING, HOMES_CFG, WEEKS_PER_YEAR } from '../config/balance';
+// What the founder's homes and cars are worth and cost (SIMULATION §22). Pure
+// functions of the state: the weekly step (personalAssets.ts), the commands and
+// the UI all read these, so a price on screen is the price the command charges.
+import { CARS_CFG, HOMES_CFG, WEEKS_PER_YEAR } from '../config/balance';
 import { CARS } from '../data/cars';
 import { HOMES } from '../data/homes';
 import type { CountryId } from '../data/types';
 import { clamp } from './math';
-import { baseId, productSpec } from './products';
 import type { GameState, OwnedCar, OwnedHome, Site } from './state';
 
 /** A country's house price index (100 = the start). */
@@ -69,45 +67,3 @@ export function carYearlyChange(carId: string): number {
 export const carUpkeepWeekly = (value: number) => (value * CARS_CFG.upkeepRate) / WEEKS_PER_YEAR;
 /** What a dealer pays for your car: value less the resale haircut. */
 export const carResale = (car: Pick<OwnedCar, 'value'>) => car.value * (1 - CARS_CFG.resaleHaircut);
-
-/** The dealer financing deal signed at this dealer, while it runs. */
-export function activeDealerDeal(state: GameState, siteId: string) {
-  const deal = state.dealerDeals[siteId];
-  return deal && state.clock.week < deal.endWeek ? deal : undefined;
-}
-
-/**
- * Auto-loan take-up multiplier at your branches in a city (SCREENS §19): a running
- * dealer financing deal there refers customers, × (1 + DEALER_FINANCING.demandBoost).
- * 1 for every other product and city.
- */
-export function dealerBoost(state: GameState, cityId: string, baseProductId: string): number {
-  if (baseProductId !== 'auto_loan') return 1;
-  for (const deal of Object.values(state.dealerDeals ?? {})) {
-    if (deal.cityId === cityId && state.clock.week < deal.endWeek)
-      return 1 + DEALER_FINANCING.demandBoost;
-  }
-  return 1;
-}
-
-/** Your open branches in a city. */
-export function openBranchesIn(state: GameState, cityId: string): number {
-  return Object.values(state.branches).filter((b) => b.cityId === cityId && b.status === 'open')
-    .length;
-}
-
-/**
- * Expected extra auto-loan volume a week from a deal in this city: last week's
- * new auto loans at your branches there × the boost (SCREENS §19 "expected volume").
- */
-export function dealerExpectedVolume(state: GameState, cityId: string): number {
-  let volume = 0;
-  for (const b of Object.values(state.branches)) {
-    if (b.cityId !== cityId || b.status !== 'open') continue;
-    for (const [pid, book] of Object.entries(b.books)) {
-      const spec = productSpec(state, pid);
-      if (spec && baseId(spec) === 'auto_loan') volume += book.last.newVolume;
-    }
-  }
-  return volume * DEALER_FINANCING.demandBoost;
-}
