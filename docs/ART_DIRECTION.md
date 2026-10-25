@@ -132,6 +132,16 @@ Every city has its own look (`src/data/cityLooks.ts`), so no two maps read alike
   - Classic Columns: pediment and four columns
   - Deco Tower Front: stepped crown and sunburst over the door
 - **HQ floors:** an isometric cut-away office. **Desks and people reflect actual staffing** (filled desks vs empty), so understaffing is visible at a glance.
+  - The room: plank floor (carpet for the Executive suite), walls with skirting and cornice, cut tops inked solid like an architect's section, mullioned windows throwing pale daylight across the floor, a clock and a door.
+  - Workers sit at screens facing away from the viewer, each with their own hair and desk clutter, tinted by team mood; empty desks are dashed with the chair pushed in.
+  - Each department furnishes its floor: Finance cabinets and certificates, HR a water cooler and pinboard, Products a whiteboard sketch, Treasury and IT a live ticker (IT also blinking server racks), Marketing posters and an easel, Risk a safe and a chart, the Executive suite books, a sofa, a painting and a huddle table.
+  - Busy floors come alive: someone walks the front aisle with a folder, two colleagues chat at the back, and a well-staffed floor's huddle table has people at it.
+- **Branch interior** (the Inside view on a branch or the build preview): an isometric cut-away banking hall drawn from the fit-out.
+  - The teller line takes its option's shape: a glazed counter (Two-Window, Standard), an open express counter, separate service pods, or concierge desks with seated staff and clients.
+  - The lobby sets the floor (tiles, planks, carpet, a marble checker) and the number of glass advisor offices along the left wall.
+  - The vault sits on the back wall in its style (steel door; round time-lock with a dial; fortress door with bolts) beside a safe-deposit wall that grows with the box count, or a strongbox for the back-office safe. ATMs stand by the left wall, and the bank's monogram plaque hangs over the counter in the brand ink.
+  - Live figures fill it: tellers first, then advisors, then a greeter, tinted by staff morale, and a queue as long as the wait behind brass posts and a rope, with a sofa of waiting customers when it is busy. A branch in fit-out shows a ladder and boxes and nobody inside.
+- **Interior motion:** quiet and small. People breathe and type (under a pixel), screens flicker, IT lights blink, plants sway, clock hands turn, and a walker or arriving customer crosses the room. All of it stops with reduced motion (system or in-game setting).
 - **Other buildings:** one composition each — investment bank (trading floor), central bank (dome and steps), credit bureau (server racks and filing cabinets), airport (terminal and tail fins), auction house (gallery with podium), car dealer (showroom), convention (hall with booths), university (quad), employer (by type), stadium.
 - **Products, campaigns and benefits:** small spot illustrations (80×80) in a single ink.
 
