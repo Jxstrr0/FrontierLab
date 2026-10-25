@@ -55,6 +55,8 @@ export function BuildPanel(p: { lotId: string }) {
         hero={
           <BranchHero
             build={build}
+            bankName={s.meta.bankName}
+            style={s.meta.houseStyle}
             brandInk={s.meta.brandInk}
             monogram={s.meta.monogram}
             ink={CITIES[lot.cityId]?.ink}

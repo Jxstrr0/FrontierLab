@@ -174,7 +174,7 @@ These are read by other systems:
 - `served = captured × clamp((C − visitRate × customers) / captured, 0, 1)`
 
 ### 6.5 Branch managers
-- **Hiring.** Hire from 3 candidates; the pool refreshes free every 4 weeks. **Paid reroll** (`rerollManagerCandidates`, drawn from the `people` stream): a recruiter deals 3 new candidates for CANDIDATE_REROLL.feeShare (10%) × the city's manager market pay (MANAGER_BASE_SALARY × wageIndex), rounded to $100; each further reroll before the free refresh multiplies the fee by CANDIDATE_REROLL.growth (2). The free refresh resets the count; a paid reroll doesn't move its date. The fee is posted to `managers`. Until your first manager is hired, the first candidate (the tutorial guide) is kept.
+- **Hiring.** Hire from 3 candidates; the pool refreshes free every 4 weeks. **Paid reroll** (`rerollManagerCandidates`, drawn from the `people` stream): a recruiter deals 3 new candidates for CANDIDATE_REROLL.feeShare (7.5%; 10% before 2026-10-25) × the city's manager market pay (MANAGER_BASE_SALARY × wageIndex), rounded to $100; each further reroll before the free refresh multiplies the fee by CANDIDATE_REROLL.growth (2). The free refresh resets the count; a paid reroll doesn't move its date. The fee is posted to `managers`. Until your first manager is hired, the first candidate (the tutorial guide) is kept.
   - Skills: People, Product, Marketing and Ethics, each drawn from normal(60, 15) and clamped to 25–98.
   - Salary ask: `MANAGER_BASE_SALARY (72,000) × city.wageIndex × (0.7 + 0.6 × avgSkill/100)`.
 - **People** lifts morale and skill (§6.2, §6.3) and the Service rating (§8).

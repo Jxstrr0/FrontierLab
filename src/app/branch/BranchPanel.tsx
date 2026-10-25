@@ -59,6 +59,8 @@ export function BranchPanel(p: { branchId: string; tab: BranchTab }) {
       hero={
         <BranchHero
           build={branch.build}
+          bankName={conv?.name ?? s.meta.bankName}
+          style={s.meta.houseStyle}
           brandInk={conv?.ink ?? s.meta.brandInk}
           monogram={conv?.monogram ?? s.meta.monogram}
           ink={CITIES[branch.cityId]?.ink}

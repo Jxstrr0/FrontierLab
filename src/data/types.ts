@@ -12,6 +12,8 @@ export type Stars = number;
 export type Score = number;
 /** 0–1 */
 export type Pct = number;
+/** The look every branch front shares (houseStyles.ts), chosen at New Game. */
+export type HouseStyle = 'heritage' | 'deco' | 'modern' | 'garden' | 'civic';
 export type CountryId = 'CA' | 'US' | 'UK' | 'EA' | 'CH' | 'JP' | 'AU' | 'SG' | 'HK' | 'RU';
 export type SegmentId = 'STU' | 'YP' | 'FAM' | 'RET' | 'BIZ';
 export type SegmentMix = Record<SegmentId, number>;

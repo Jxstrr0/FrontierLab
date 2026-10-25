@@ -73,6 +73,7 @@ Wealth · Company · Branches · Portfolio · The Ledger (archive) · Milestones
    - monogram (2 letters, auto-filled from the name)
    - brand ink (8 swatches)
    - live medallion preview
+   - **house style** (5 chips: Old Exchange, Jazz Age, Clean Line, Market Street, Civic Stone) under a live storefront wearing your name, ink and the style, with the style's one-line description; the confirm step lists it
 2. **Founder:** name and the avatar builder (portrait parts, §ART).
 3. **Start city:** a Segmented row of regions (Canada / U.S. / Europe / Asia-Pacific), opening on the chosen city's region, then a card for each city in that region (all 20 cities with storefronts), each with:
    - the country (euro-area cities show their own country)

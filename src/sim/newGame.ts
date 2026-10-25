@@ -42,7 +42,8 @@ import { SCHEMA_VERSION, type AvatarSpec, type GameState, type Settings } from '
 import { packagedModel } from './underwriting';
 import { generateCity } from './worldGen';
 import { emptyEmpire, initPersonalEmpire } from './personalInit';
-import type { Difficulty } from '../data/types';
+import type { Difficulty, HouseStyle } from '../data/types';
+import { HOUSE_STYLE_IDS } from '../data/houseStyles';
 
 export interface NewGameOptions {
   seed: number;
@@ -50,6 +51,8 @@ export interface NewGameOptions {
   bankName?: string;
   monogram?: string;
   brandInk?: string;
+  /** The branch fronts' house style; defaults to one picked from the seed. */
+  houseStyle?: HouseStyle;
   founderName?: string;
   founderAvatar?: AvatarSpec;
   startDate?: string;
@@ -117,6 +120,7 @@ export function newGame(opts: NewGameOptions): GameState {
       competitors,
       startCash,
       homeCityId: city.id,
+      houseStyle: opts.houseStyle ?? HOUSE_STYLE_IDS[opts.seed % HOUSE_STYLE_IDS.length]!,
     },
     clock: { day: 0, week: 0, speed: 0 },
     rng: {},

@@ -209,7 +209,7 @@ export const MANAGER_SALARY_SPREAD = { base: 0.7, slope: 0.6 } as const;
  * first reroll costs feeShare × the role's market salary, and each further one
  * before the pool's free refresh multiplies the fee by `growth`.
  */
-export const CANDIDATE_REROLL = { feeShare: 0.1, growth: 2 } as const;
+export const CANDIDATE_REROLL = { feeShare: 0.075, growth: 2 } as const;
 export const MANAGER_MARKETING = { base: 0.8, slope: 0.4 } as const;
 export const NO_MANAGER_SERVICE = 0.3;
 

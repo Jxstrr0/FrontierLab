@@ -13,6 +13,7 @@ import type {
   Pct,
   Pentagon,
   HqDeptId,
+  HouseStyle,
   Phase,
   Rate,
   RatingCategory,
@@ -53,7 +54,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState, DealerDeal } from './personalTypes';
 
-export const SCHEMA_VERSION = 18;
+export const SCHEMA_VERSION = 19;
 
 export interface GameState {
   schemaVersion: number;
@@ -153,6 +154,8 @@ export interface Meta {
   startCash: number;
   /** The start city (schema v9): the bank's domicile — home central bank, tax, exchange. */
   homeCityId: Id;
+  /** The look every branch front shares (schema v19), chosen at New Game. */
+  houseStyle: HouseStyle;
 }
 
 export interface Clock {

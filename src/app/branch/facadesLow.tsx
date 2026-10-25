@@ -1,7 +1,7 @@
 // Branch exteriors, part 1 (ART_DIRECTION §3, CONTENT §7): Plain Storefront
 // (awning and big window), Heritage Brick (arched windows) and Modern Glass
 // (mullion grid), drawn in the vignette's 320 × 150 box with the ground at
-// y = 132 and the bank's seal on each.
+// y = 132. The name sign, lamps and planters come from the house style.
 import { hatch, poly, rect, type Pt } from '../../art/engrave';
 import { Face, Hatch } from '../components/Vignette';
 import { arch, Glass, Seal, type Brand } from './facadeParts';
@@ -15,7 +15,7 @@ const AWNING_STRIPES = Array.from({ length: 8 }, (_, k) => [
 ]) as Pt[][];
 const SCALLOPS = `M88 94${'q4.5 5 9 0'.repeat(16)}`;
 
-export function Storefront(b: Brand) {
+export function Storefront(_b: Brand) {
   return (
     <g>
       <Face
@@ -29,9 +29,6 @@ export function Storefront(b: Brand) {
       />
       <Face pts={rect(92, 56, 136, 76)} />
       <Face pts={rect(88, 50, 144, 6)} density="medium" />
-      <path d="M100 60h120v14H100z" class="art-line art-fine" />
-      <path d="M106 67h40M174 67h40" class="art-line art-fine" />
-      <Seal x={160} y={67} r={6} brand={b} />
       <Face
         pts={[
           [96, 78],
@@ -117,8 +114,8 @@ export function Brick(b: Brand) {
           <path d={`M${x} 94v34M${x - 17} 112h34M${x - 19} 128h38`} class="art-line art-fine" />
         </g>
       ))}
-      <Face pts={arch(147, 132, 26, 36)} density="dense" angle={90} />
-      <path d="M151 130v-16h7v16M162 130v-16h7v16M160 102l0 4" class="art-line art-fine" />
+      <Face pts={arch(147, 132, 26, 30)} density="dense" angle={90} />
+      <path d="M151 130v-14h7v14M162 130v-14h7v14M160 102.5v3" class="art-line art-fine" />
       <path d="M236 62h18M250 62v3" class="art-line" />
       <Seal x={250} y={72} r={7} brand={b} />
       <Face pts={rect(142, 128, 36, 4)} />
