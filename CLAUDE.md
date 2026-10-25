@@ -125,6 +125,9 @@ Don't add other runtime dependencies without a clear reason. Log every addition,
 ## When something isn't specified
 Check REFERENCE_NOTES.md for how the original handles it, then pick the simplest option consistent with DESIGN's pillars. Implement it and add a one-line entry to DESIGN's decision log.
 
+## Commits
+Author commits as the owner so they count on their GitHub profile. At the start of a session, run `git config user.name "Jxstrr0"` and `git config user.email "322161611+Jxstrr0@users.noreply.github.com"`, and keep the Co-Authored-By trailer for Claude in each message.
+
 ## Don't
 - Use real bank, brand or company names, logos, or real people.
 - Add monetization, telemetry or network calls.
