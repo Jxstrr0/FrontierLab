@@ -9,6 +9,12 @@ import { Toggle } from '../components';
 import { money } from '../format/format';
 import { act, toast } from '../store';
 
+/** Your branches in a city, open or being built (closed ones don't count). */
+function branchCount(s: GameState, cityId: string): number {
+  return Object.values(s.branches).filter((b) => b.cityId === cityId && b.status !== 'closed')
+    .length;
+}
+
 export function GrowthCities(p: { s: GameState }) {
   const { s } = p;
   const sym = s.settings.currency;
@@ -30,12 +36,16 @@ export function GrowthCities(p: { s: GameState }) {
         {cities.map((id) => {
           const plan = expansionPlan(s, id, false);
           const ready = !plan.blocker && plan.lot;
+          const count = branchCount(s, id);
+          const have = `${count} ${count === 1 ? 'branch' : 'branches'}`;
           return (
             <li key={id} class="growth-row">
               <Toggle
                 label={`${CITIES[id]?.name ?? id}${id === home ? ' (home)' : ''}`}
                 hint={
-                  ready ? `Next: ${plan.lot!.address}, ${money(plan.total, sym)}` : plan.blocker
+                  ready
+                    ? `${have}. Next: ${plan.lot!.address}, ${money(plan.total, sym)}`
+                    : `${have}. ${plan.blocker}`
                 }
                 checked={!!s.executives.growthCities[id]}
                 onChange={(v) => act(cmd.setGrowthCity, id, v)}

@@ -10,6 +10,10 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-10-25 — Branch counts on Growth cities (v0.10.15)
+- **Owner's ask:** show how many branches you already have in each city on the COO's Growth cities list.
+- Each city's hint now starts with your count there, e.g. "3 branches. Next: 622 Lantern Road, €320K" (or the reason nothing can be built). Branches being built count; closed ones don't, matching the city coverage check. UI only, no state or save change; SCREENS §10.1 updated.
+
 ### 2026-10-25 — Reorder the HQ tabs (v0.10.14)
 - **Owner's ask:** be able to reorder the HQ tabs.
 - **Tab order.** The Office sheet (the Office button at the top of HQ) gains a **Tab order** card: the floors you have, in the order their tabs run along the bottom bar, each with ▲ ▼ arrows (44 px round buttons) that move it past its neighbour, and a **Reset order** button once anything has moved. Moves skip departments you have no floor for, and a floor you add later slots in where the usual order puts it. Arrows rather than dragging: the tab bar already scrolls sideways under a thumb, so a drag there would fight it.
