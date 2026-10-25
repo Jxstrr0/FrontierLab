@@ -10,6 +10,10 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-10-25 — Version number 0.9.0
+- **Done:** the title screen read v0.0.1, left over from Stage 0. It now reads **v0.9.0** (set in `package.json`; the title screen and new saves read it from there). All ten stages are built, so this is the pre-launch build; **1.0.0** is for launch, once the owner's iPhone check and tuning pass are done.
+- **Next:** bump the version with each release from here (`npm version <x.y.z> --no-git-tag-version`).
+
 ### 2026-10-25 — Audit: everything built, gaps closed
 - **Stage / step:** post-launch audit (owner: "make sure everything is built and nothing has been missed … report issues to me before fixing"). Every system in DESIGN §3.1 was already in the game except milestones. The audit found a handful of rule gaps and loose ends, reported them, and the owner chose yes or no on each in popups.
 - **Weekly recap holds time:** time already stopped while the recap was open. The HUD now shows that too: the play icon, with no speed, until you tap Continue.
