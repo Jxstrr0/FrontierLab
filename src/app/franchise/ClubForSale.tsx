@@ -6,7 +6,7 @@ import { SPORT_LABEL } from '../../data/franchises';
 import * as cmd from '../../sim/commands';
 import { ordinal } from '../../sim/newsFormat';
 import { Card, Row, SectionTitle, Segmented, Stepper } from '../components';
-import { money, moneyFull, pct } from '../format/format';
+import { money, moneyFull, moneyStepper, pct } from '../format/format';
 import { act, toast, useGame } from '../store';
 import { offerBounds, type ClubView } from './franchiseView';
 
@@ -62,7 +62,7 @@ export function ClubForSale({ view }: { view: ClubView }) {
             max={bounds.max}
             step={bounds.step}
             onChange={setOffer}
-            format={(v) => moneyFull(v, sym)}
+            {...moneyStepper(sym)}
             hint={`${pct(offer / club.value, 0)} of valuation`}
           />
           <button

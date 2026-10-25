@@ -9,7 +9,7 @@ import { referencePrice, requiredPremium } from '../../sim/mergerPricing';
 import { roundToStep } from '../../sim/math';
 import type { RivalBank } from '../../sim/state';
 import { Medallion, Row, Sheet, Stepper } from '../components';
-import { count, money, signedPct } from '../format/format';
+import { count, exactMoney, money, moneyStepper, signedPct } from '../format/format';
 import { act, toast, useGame } from '../store';
 import { boardHint, referenceLabel } from './mnaSelectors';
 
@@ -27,7 +27,7 @@ export function OfferSheet(p: { bank: RivalBank; onClose: () => void }) {
   const quote = cmd.mergerQuote(s, bank.id, price);
   if (!quote) return null;
   const { plan } = quote;
-  const perShare = (v: number) => `${sym}${v.toFixed(2)}`;
+  const perShare = (v: number) => exactMoney(v, sym);
   const offer = () => {
     const r = act(cmd.offerMerger, bank.id, price);
     if (r.ok) {
@@ -54,8 +54,7 @@ export function OfferSheet(p: { bank: RivalBank; onClose: () => void }) {
           max={max}
           step={step}
           onChange={setPrice}
-          format={perShare}
-          editText={(v) => v.toFixed(2)}
+          {...moneyStepper(sym, exactMoney)}
           hint={`${perShare(min)} – ${perShare(max)}`}
         />
         <Row

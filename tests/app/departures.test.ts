@@ -55,7 +55,7 @@ describe('departure rows', () => {
     expect(row.quote.mode).toBe('fare');
     const fare = Math.round(FLIGHT_FARE * CITIES.lon!.costIndex);
     expect(row.quote.fare).toBe(fare);
-    expect(fareLabel(row.quote, 'C$')).toBe('C$104K ticket');
+    expect(fareLabel(row.quote, 'C$')).toBe('C$140K ticket');
   });
 
   it('quotes the jet within its range and the normal rules beyond', () => {
@@ -98,7 +98,7 @@ describe('labels', () => {
         { mode: 'fare', fare: 124_000, bankPays: 84_000, firstVisit: false },
         'C$',
       ),
-    ).toBe('Welcome to London · Ticket C$124K (the bank paid C$84.0K)');
+    ).toBe('Welcome to London · Ticket C$167K (the bank paid C$113K)');
     expect(
       arrivalText('Tokyo', { mode: 'jet', fare: 0, bankPays: 0, firstVisit: false }, '$'),
     ).toBe('Welcome to Tokyo');

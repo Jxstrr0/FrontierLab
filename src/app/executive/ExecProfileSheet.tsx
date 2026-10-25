@@ -17,7 +17,7 @@ import {
   Toggle,
   Portrait,
 } from '../components';
-import { count, gameDate, moneyFull } from '../format/format';
+import { count, exactMoney, gameDate, moneyFull, moneyStepper } from '../format/format';
 import { act, toast, useGame } from '../store';
 import { ExecGrantForm } from './ExecGrantForm';
 import { GrowthCities } from './GrowthCities';
@@ -81,7 +81,7 @@ export function ExecProfileSheet(p: { seat: ExecSeat; onClose: () => void }) {
             min={pay.min}
             max={pay.max}
             step={pay.step}
-            format={(v) => moneyFull(v, sym)}
+            {...moneyStepper(sym)}
             onChange={(v) => act(cmd.setExecSalary, p.seat, v)}
             hint={`Market ${moneyFull(pay.market, sym)}. Underpaid executives are easier to poach.`}
           />
@@ -105,10 +105,7 @@ export function ExecProfileSheet(p: { seat: ExecSeat; onClose: () => void }) {
                           {g.type === 'rsu' ? 'RSU' : 'Stock option'} · {count(g.shares)} shares
                         </span>
                         {g.type === 'option' && (
-                          <span class="muted small">
-                            Strike {sym}
-                            {g.strike.toFixed(2)}
-                          </span>
+                          <span class="muted small">Strike {exactMoney(g.strike, sym)}</span>
                         )}
                       </div>
                       <div

@@ -9,7 +9,7 @@ import { DISTRICT_SPECS } from '../../data/districts';
 import * as cmd from '../../sim/commands';
 import type { PropertyListing, Site } from '../../sim/state';
 import { Card, Panel, Row, SectionTitle, Segmented, Stepper } from '../components';
-import { count, money, moneyFull, pct } from '../format/format';
+import { count, money, moneyFull, moneyStepper, pct } from '../format/format';
 import { LayerMedallion } from '../map/LayerIcon';
 import { act, closePanel, toast, useGame } from '../store';
 import { OwnedProperty } from './OwnedProperty';
@@ -125,7 +125,7 @@ function ForSale(p: { site: Site; listing: PropertyListing; marketRent: number }
             max={bounds.max}
             step={bounds.step}
             onChange={setOffer}
-            format={(v) => moneyFull(v, sym)}
+            {...moneyStepper(sym)}
             hint={`${pct(offer / listing.asking, 0)} of asking`}
           />
           <button

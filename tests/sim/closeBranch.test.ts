@@ -8,7 +8,7 @@ import { newGame } from '../../src/sim/newGame';
 import { openScriptedBranch } from '../helpers/scenario';
 
 function twoBranches() {
-  const s = newGame({ seed: 11, cityId: 'cal', startCash: 1_250_000 });
+  const s = newGame({ seed: 11, cityId: 'cal', startCash: 1_500_000 });
   const a = openScriptedBranch(s, 'midtown');
   const b = openScriptedBranch(s, 'downtown');
   advanceWeeks(s, 30);

@@ -13,6 +13,7 @@ import { productSpec } from '../products';
 import type { Branch, GameState } from '../state';
 import { addEffect, incidentPMult } from './effects';
 import { bumpMorale, fraudShield, nextVault, num, ratingHit, type IncidentRule } from './helpers';
+import { newsExact } from '../newsFormat';
 import { compactMoney } from './text';
 
 const P = INCIDENT_PARAMS;
@@ -258,7 +259,7 @@ const STAFF_WALKOUT: IncidentRule = {
   prepare(state, scope, data) {
     const b = branchOf(state, scope);
     const wage = roundToStep((b?.staff.wage ?? 0) * (1 + P.STAFF_WALKOUT.wageRaise), WAGE_STEP);
-    data.wage = `${state.settings.currency}${wage.toFixed(2)}`;
+    data.wage = newsExact(wage, state.settings.currency);
   },
   costs: (state, scope) => ({
     raise: 0,

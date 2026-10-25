@@ -7,7 +7,7 @@ import * as cmd from '../../sim/commands';
 import type { Account } from '../../sim/portfolio';
 import type { Startup } from '../../sim/state';
 import { Badge, Card, Row, SectionTitle, Segmented, Stepper } from '../components';
-import { count, money, moneyFull, pct, percentText } from '../format/format';
+import { count, money, moneyFull, moneyStepper, pct, percentText } from '../format/format';
 import { act, toast, useGame } from '../store';
 import { accountCash, debtBounds, investBlock, raising } from './startupView';
 
@@ -98,7 +98,7 @@ function VentureDebtCard(p: { startup: Startup; account: Account; block?: string
               min={0}
               max={b.maxAmount}
               step={b.amountStep}
-              format={(v) => money(v, sym)}
+              {...moneyStepper(sym, money)}
               onChange={setAmount}
               hint={`Up to ${money(b.maxAmount, sym)}`}
             />

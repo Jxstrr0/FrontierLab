@@ -6,7 +6,7 @@ Source of truth for intent. Formulas and numbers live in `SIMULATION.md`, screen
 
 ## 1. Pitch
 
-You found a bank with a fresh charter: $2,000,000 of charter capital locked in the treasury and $750,000 to spend. Lease a storefront, build your first branch, set your rates and fees, hire tellers and a branch manager, and start gathering deposits. Lend them out, carefully. Ride the interest-rate cycle, build a headquarters, take the bank public, buy your rivals, and expand into the world's financial capitals. Your personal fortune grows alongside: homes, cars, collectibles, a jet, a sports franchise, and a climb up the rich list.
+You found a bank with a fresh charter: $2,000,000 of charter capital locked in the treasury and $900,000 to spend. Lease a storefront, build your first branch, set your rates and fees, hire tellers and a branch manager, and start gathering deposits. Lend them out, carefully. Ride the interest-rate cycle, build a headquarters, take the bank public, buy your rivals, and expand into the world's financial capitals. Your personal fortune grows alongside: homes, cars, collectibles, a jet, a sports franchise, and a climb up the rich list.
 
 - **Working title:** Vault Street. Alternatives on file: Basis Point, Prime Rate.
 - **Repo:** `VaultStreet`.
@@ -124,7 +124,7 @@ There's no fixed ending. Milestones, the annual rich list and the "fastest growi
 - **New Game options:**
   - **Difficulty:** Easy, Normal, Hard or Expert. Harder levels mean fewer prospects, better-run rivals with sharper rates, and more loan defaults (SIMULATION §26 `DIFFICULTY`). Normal is the balance reference.
   - **Competitors:** 1–5 rival banks in each city, defaulting to the city's usual count (CONTENT §2). Fewer rivals also means fewer rival branches.
-  - **Starting cash:** $500k, $750k (default), $1M or $1.25M of spendable cash. Charter capital stays at $2M.
+  - **Starting cash:** $600k, $900k (default), $1.2M or $1.5M of spendable cash. Charter capital stays at $2M.
   - **Currency:** $, C$, £, € or ¥, the symbol money is shown in (as in the original's start options). It changes display only and can be switched later in Settings.
 - Other cities open up through travel (§5.17).
 - **One global enterprise.** You can fly to any city at any time and buy anything there: branches, offices, buildings, stakes, rival banks. Everything you own in every city keeps running every week at once, so the bank grows into a single worldwide business. Start cities differ in market size, rents and rivals, and that difference stays.
@@ -204,7 +204,7 @@ Five tabs. Coffee Inc has four; the Loan Desk is the bank addition.
 Shown to the player in one place, the Company summary:
 - **Deposits fund loans.** Customer deposits aren't your money. They sit in the treasury as liquid assets or get lent out, and you earn the spread.
 - **Corporate cash** (top bar) is the company's own money: profit, capital raised and corporate borrowing. It pays for branches, salaries, acquisitions and dividends. Deposits can never be spent as corporate cash.
-- **Charter capital.** The bank starts with $2M of charter capital held in the treasury. It counts toward equity and liquidity but can never be spent. Together with the $750k of spendable cash, this keeps the founder phase to one branch, maybe two, like the original's £320k start.
+- **Charter capital.** The bank starts with $2M of charter capital held in the treasury. It counts toward equity and liquidity but can never be spent. Together with the $900k of spendable cash, this keeps the founder phase to one branch, maybe two, like the original's £320k start.
 - **Funding transfer rate.** Inside each branch, deposits earn a funding credit and loans pay a funding charge at the central bank rate. Each branch's income therefore shows whether it gathers cheap money and lends it well.
 - **Liquidity.** Liquid assets must stay at or above 10% of deposits; the player sets a higher target in Treasury. On a shortfall, Treasury borrows overnight (auto-funding); without funding, new lending freezes.
 - **Capital ratio** = equity ÷ risk-weighted assets.
@@ -565,3 +565,6 @@ Add one dated line per decision. Never delete entries; supersede them.
 - 2026-10-25 (owner's ask): The CFO's new-share sales are their own switch, **Share sales**, apart from **Capital** (stock sales and risk appetite), so you can let the CFO guard the ratio without diluting you. A save's CFO keeps what Capital did (migration 13 → 14); new hires start with both on. The CFO never launches the IPO; that stays your call.
 - 2026-10-25 (owner's ask): The build sheet starts from the fit-out you last built with (`company.lastBuild`, schema v14), and the COO's Expansion builds it too. Only your own builds set it; the COO's don't.
 - 2026-10-25: Sheets and modals render in one overlay layer at the top of #app, not inside the screen that opens them (owner's recording: on iPhone a sheet inside a panel's scrolling content was clipped to it and scrolling broke). The layer stays inside #app so text size still applies.
+- 2026-10-25 (owner's ask): Starting cash up about 20%: $600k / $900k (default) / $1.2M / $1.5M, from $500k–$1.25M. Charter capital stays $2M. The balance run (seed 42, steady) stays inside every target. Old v1 saves still migrate with the $750k they started with.
+- 2026-10-25 (owner's ask): The currency setting converts money instead of only swapping the symbol. Fixed rates per symbol ($ 1, C$ 1.35, £ 0.80, € 0.90, ¥ 150), so every starting amount is worth the same in any currency and the currencies are no longer 1:1. The sim keeps its books in dollars and its numbers are unchanged; only what you see and type converts. Fixed rates (not the FX market's moving ones) keep prices from wobbling week to week.
+- 2026-10-25 (owner's ask): Settings has a Developer section with a "Developer tools" switch (per device, not saved in the game) and a button that pays $10,000,000 into corporate cash for testing. It's posted as paid-in capital, so the balance identity holds and the founder's stake doesn't change.

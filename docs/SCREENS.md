@@ -35,6 +35,7 @@ Wealth · Company · Branches · Portfolio · The Ledger (archive) · Milestones
 - **Money:**
   - cards and headlines: compact (`$1.48B`, `$29.8M`, `$83.7K`)
   - statements: full (`1,482,140,000`)
+  - **currency:** the books are kept in one money (dollars). The chosen symbol converts every amount on screen, in news and in incident text at fixed rates (`CURRENCY_RATES` in `src/data/settingsOptions.ts`: $ 1, C$ 1.35, £ 0.80, € 0.90, ¥ 150), so every currency is worth the same and none is 1:1 with another. Typed money (steppers, the currency trade amount) is entered in the chosen currency and converted back. Exact prices keep two decimals, except yen, which has none (`¥675`).
 - **Deltas:** `+$1,663 (+3%)`, jade when positive and oxblood when negative. Text only, no arrows.
 - **Rates:** two decimals with % (`3.25%`). Rate steppers move in 0.05pp steps; fee steppers in $1 (or $5 for annual fees).
 - **Ratings:** coin row plus a number (`4.3`).
@@ -81,7 +82,7 @@ Wealth · Company · Branches · Portfolio · The Ledger (archive) · Milestones
 4. **Game options:**
    - Difficulty: Segmented (Easy / Normal / Hard / Expert) with a one-line description of each
    - Competitors: Stepper 1–5 (defaults to the city's usual count)
-   - Starting cash: Segmented ($500K / $750K / $1M / $1.25M)
+   - Starting cash: Segmented ($600K / $900K / $1.2M / $1.5M), shown in the chosen currency (¥90M / ¥135M / ¥180M / ¥225M)
    - Currency: Segmented ($ / C$ / £ / € / ¥), defaulting to the saved preference; the display symbol only, changeable later in Settings
 5. **Confirm:**
    - summary
@@ -519,6 +520,7 @@ Tabs: Overview · Loans · Credit.
   - auto-pause on incidents and on expiring applications
   - sound, reduced motion, text size (100 / 115 / 130%)
   - edit founder avatar
+  - **Developer:** a "Developer tools" switch, saved on this device only (not in the game save). When on, in a game, a button adds `DEV_PAYMENT` ($10,000,000) to corporate cash as paid-in capital (`devPayment` command; no shares issued, the books still balance). From the title screen it only notes that the tools work inside a game.
 - **Saves:**
   - autosave card
   - 3 slot cards (bank name, date, cash; Save here / Load / Delete)

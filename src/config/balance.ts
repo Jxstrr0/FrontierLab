@@ -40,8 +40,10 @@ export const START_DATE = '2027-01-04';
 
 // ─── START ────────────────────────────────────────────────────────────────────
 /** Default spendable cash; the New Game wizard offers START_CASH_OPTIONS. */
-export const START_CASH = 750_000;
-export const START_CASH_OPTIONS = [500_000, 750_000, 1_000_000, 1_250_000] as const;
+export const START_CASH = 900_000;
+export const START_CASH_OPTIONS = [600_000, 900_000, 1_200_000, 1_500_000] as const;
+/** The Settings developer tools' one-tap payment into corporate cash (SCREENS §26). */
+export const DEV_PAYMENT = 10_000_000;
 /** Rival banks in each city (the wizard's competitor count); clamped to the rivals available. */
 export const COMPETITORS = { min: 1, max: 5 } as const;
 

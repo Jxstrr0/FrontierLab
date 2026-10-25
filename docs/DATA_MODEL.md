@@ -344,7 +344,7 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 - **Added fields:**
   - `ledger`: P&L lines and cash movements since the last weekly close, so commands between ticks land in the right week.
   - `nextId`: counter for generated ids.
-  - `meta.difficulty` (`'easy' | 'normal' | 'hard' | 'expert'`), `meta.competitors` (1–5) and `meta.startCash` (schema v2; migration 1 → 2 fills Normal, the city's usual rival count and $750k).
+  - `meta.difficulty` (`'easy' | 'normal' | 'hard' | 'expert'`), `meta.competitors` (1–5) and `meta.startCash` (schema v2; migration 1 → 2 fills Normal, the city's usual rival count and $750k, what every v1 game started with).
   - Schema v4 changes no shape: migration 3 → 4 moves lots onto tiles facing the Stage 3 street grid (lots already on frontage stay put).
   - The drawable city (streets, water, parks, landmarks, building heights) is not saved: `src/art/citygen.ts` regenerates it from the save seed, the city and its lots.
   - `Branch.desk` (`DeskWeek`: `week`, `arrived` (v12), `approved`, `refused`, `declined`, `expired`): this week's Loan Desk outcomes, reset when the week turns (schema v3; migration 2 → 3 adds an empty tally).

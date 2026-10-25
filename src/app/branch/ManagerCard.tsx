@@ -15,7 +15,7 @@ import {
   Stepper,
   Toggle,
 } from '../components';
-import { gameDate, moneyFull } from '../format/format';
+import { gameDate, moneyFull, moneyStepper } from '../format/format';
 import { act, toast, useGame } from '../store';
 import { dayOfWeek, salaryBounds, SALARY_STEP } from './selectors';
 
@@ -86,7 +86,7 @@ export function ManagerCard({ branch }: { branch: Branch }) {
             min={salary.min}
             max={salary.max}
             step={SALARY_STEP}
-            format={(v) => moneyFull(v, sym)}
+            {...moneyStepper(sym)}
             onChange={(v) => act(cmd.setManagerSalary, branch.id, v)}
             hint={`${moneyFull(salary.min, sym)} to ${moneyFull(salary.max, sym)}`}
           />

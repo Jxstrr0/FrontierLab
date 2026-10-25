@@ -1,13 +1,17 @@
 // Number, money, rate and date formatting (SCREENS §0.4). Pure functions; the
-// currency symbol comes from settings.
+// currency symbol comes from settings, and money converts to that currency at
+// the fixed rates in CURRENCY_RATES.
+import { exactMoney, fromCurrency, toCurrency } from '../../data/settingsOptions';
 import { dateOf } from '../../sim/calendar';
+
+export { exactMoney, fromCurrency, toCurrency };
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 /** Compact money for cards and headlines: $1.48B, $29.8M, $83.7K, $950. */
 export function money(x: number, symbol = '$'): string {
   const sign = x < 0 ? '−' : '';
-  const a = Math.abs(x);
+  const a = Math.abs(toCurrency(x, symbol));
   if (a >= 1e9) return `${sign}${symbol}${trim(a / 1e9)}B`;
   if (a >= 1e6) return `${sign}${symbol}${trim(a / 1e6)}M`;
   if (a >= 1e4) return `${sign}${symbol}${trim(a / 1e3)}K`;
@@ -17,13 +21,32 @@ export function money(x: number, symbol = '$'): string {
 /** Full money for statements: $1,482,140. */
 export function moneyFull(x: number, symbol = '$'): string {
   const sign = x < 0 ? '−' : '';
-  return `${sign}${symbol}${Math.round(Math.abs(x)).toLocaleString('en-US')}`;
+  return `${sign}${symbol}${Math.round(Math.abs(toCurrency(x, symbol))).toLocaleString('en-US')}`;
+}
+
+/**
+ * Stepper props for a money value: shows it with `show` (moneyFull by default)
+ * and lets the player type an amount in the chosen currency.
+ */
+export function moneyStepper(
+  symbol: string,
+  show: (x: number, symbol: string) => string = moneyFull,
+): {
+  format: (v: number) => string;
+  editText: (v: number) => string;
+  parse: (t: string) => number;
+} {
+  return {
+    format: (v) => show(v, symbol),
+    editText: (v) => String(Number(toCurrency(v, symbol).toFixed(2))),
+    parse: (t) => fromCurrency(Number(t.replace(/[^0-9.]/g, '')), symbol),
+  };
 }
 
 /** Statement figure without a symbol: 1,482,140 or (12,500) style negatives as −12,500. */
-export function figure(x: number): string {
+export function figure(x: number, symbol = '$'): string {
   const sign = x < 0 ? '−' : '';
-  return `${sign}${Math.round(Math.abs(x)).toLocaleString('en-US')}`;
+  return `${sign}${Math.round(Math.abs(toCurrency(x, symbol))).toLocaleString('en-US')}`;
 }
 
 function trim(v: number): string {
@@ -56,7 +79,8 @@ export function delta(
   const tone = d > 0 ? 'good' : d < 0 ? 'bad' : 'flat';
   const sign = d > 0 ? '+' : d < 0 ? '−' : '';
   const rel = prev !== 0 ? ` (${sign}${Math.abs(Math.round((d / Math.abs(prev)) * 100))}%)` : '';
-  return { text: `${sign}${symbol}${Math.round(Math.abs(d)).toLocaleString('en-US')}${rel}`, tone };
+  const shown = Math.round(Math.abs(toCurrency(d, symbol))).toLocaleString('en-US');
+  return { text: `${sign}${symbol}${shown}${rel}`, tone };
 }
 
 /** "Mon 4 Jan 2027" style date for a game day. */

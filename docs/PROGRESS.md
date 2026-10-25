@@ -4,11 +4,20 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 **Current stage:** 10 — Art pass, onboarding, polish, launch (built and live; awaiting the owner's iPhone check). All ten roadmap stages are built. Still open: the owner's testing and tuning pass, an Add to Home Screen test on a real iPhone, and the Vault Street card on Kelbo.Website (in a separate session in that repo).
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `0f42b6c195480e` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `009a66bf5840b5` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-25 — Developer payment, bigger starting cash, real currency conversion (v0.10.4)
+- **Owner's asks:** (A) a $10,000,000 payment in a developer settings toggle; (B) raise the starting cash a little; (C) make the currencies worth the same as each other instead of 1:1.
+- **A. Developer tools.** Settings has a new **Developer** section. Switch on "Developer tools" (remembered on this device only, not in your save) and, inside a game, a button adds $10,000,000 to company cash. It counts as money the owner put in (paid-in capital), so the books still balance and no shares are issued. Command: `devPayment` in `src/sim/commands/dev.ts`; amount `DEV_PAYMENT` in `balance.ts`.
+- **B. Starting cash** is up about 20%: $600K / **$900K** (default) / $1.2M / $1.5M (was $500K / $750K / $1M / $1.25M). The 10-year balance run still lands inside every target.
+- **C. Currencies.** Before, picking ¥ just put a ¥ in front of the same number, so ¥750K was the same as $750K. Now each symbol has a fixed exchange rate ($ 1, C$ 1.35, £ 0.80, € 0.90, ¥ 150) and every amount converts: the starting cash reads $900K, C$1.22M, £720K, €810K or ¥135M, all the same value. This covers the top bar, panels, statements, news, incidents, and anything you type (wages, prices, dividends, offers, currency trades), which is typed in your currency and converted back. Yen shows no cents. The game's own numbers are unchanged; only what you see converts. The rates live in `src/data/settingsOptions.ts`.
+- **Save format:** unchanged (no new state). The determinism snapshot moved `0f42b6c195480e` → `009a66bf5840b5` only because of the bigger starting cash: with the old $750K it reproduces the old hash.
+- **Tests:** 706 (currency conversion and typed money, the developer payment keeps the books balanced). Lint, typecheck and balance clean. Checked at 390×844 with ¥ selected: the button reads "Add ¥1.50B to company cash", cash went $900K → $10.9M, no console errors.
+- **Not converted:** a few plain-sentence refusal messages from commands (e.g. "You need $332,000") still print in dollars.
 
 ### 2026-10-25 — CFO share sales on their own switch; the build sheet remembers your fit-out (v0.10.3)
 - **Owner's asks:** (A) a separate CFO toggle for private offerings and share sales; (B) the build sheet should remember the last branch's parts instead of resetting the vault, lobby and the rest.

@@ -3,7 +3,6 @@
 // which upgrades a save from oldVersion to oldVersion + 1.
 import { initPersonalEmpire } from '../personalInit';
 import { generatePersonalSites } from '../personalSites';
-import { START_CASH } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { cityGeometry } from '../cityGeo';
 import { isFrontage, nearestFrontage } from '../cityLayout';
@@ -23,6 +22,9 @@ import { SCHEMA_VERSION, type GameState } from '../state';
 
 type RawSave = Record<string, unknown> & { schemaVersion: number };
 
+/** Every v1 game started with this much; START_CASH has since moved (v0.10.4). */
+const V1_START_CASH = 750_000;
+
 export const migrations: Record<number, (s: RawSave) => RawSave> = {
   // 1 → 2: New Game options (difficulty, competitor count, starting cash).
   1: (s) => {
@@ -30,7 +32,7 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     const world = s.world as { currentCityId: string };
     meta.difficulty = 'normal';
     meta.competitors = CITIES[world.currentCityId]?.rivals ?? 3;
-    meta.startCash = START_CASH;
+    meta.startCash = V1_START_CASH;
     const company = s.company as Record<string, unknown>;
     company.negativeCashWeeks = 0;
     company.lowCapitalWeeks = 0;

@@ -8,7 +8,7 @@ import { useState } from 'preact/hooks';
 import * as cmd from '../../sim/commands';
 import type { BoardMeeting } from '../../sim/state';
 import { Medallion, Modal, Row, SectionTitle, Stepper } from '../components';
-import { moneyFull, pct } from '../format/format';
+import { exactMoney, moneyFull, moneyStepper, pct } from '../format/format';
 import { act, modal, useGame } from '../store';
 import { BoardTally } from './BoardTally';
 import { CEO_STEP, DPS_STEP, boardCard, dividendYield, meetingView, payout } from './execSelectors';
@@ -87,7 +87,7 @@ export function BoardMeetingModal() {
           <SectionTitle>Dividends</SectionTitle>
           <Row
             label="Current dividend"
-            value={`${sym}${s.governance.dividendPerShare.toFixed(2)} · yield ${pct(dividendYield(s, s.governance.dividendPerShare), 1)}`}
+            value={`${exactMoney(s.governance.dividendPerShare, sym)} · yield ${pct(dividendYield(s, s.governance.dividendPerShare), 1)}`}
           />
           <Stepper
             label="New dividend per share"
@@ -95,9 +95,7 @@ export function BoardMeetingModal() {
             min={0}
             max={view.cap ?? Math.max(1, view.price)}
             step={DPS_STEP}
-            format={(v) => `${sym}${v.toFixed(2)}`}
-            parse={(t) => Number(t.replace(/[^0-9.]/g, ''))}
-            editText={(v) => v.toFixed(2)}
+            {...moneyStepper(sym, exactMoney)}
             onChange={setDps}
             hint={`Yield ${pct(dividendYield(s, dps), 1)} · payout ${ratio === null ? 'n/a (no profit)' : pct(ratio, 0)}`}
           />
@@ -113,7 +111,7 @@ export function BoardMeetingModal() {
             min={0}
             max={view.ceoMax}
             step={CEO_STEP}
-            format={(v) => moneyFull(v, sym)}
+            {...moneyStepper(sym)}
             onChange={setSalary}
             hint={`Market rate ${moneyFull(view.ceoMarket, sym)}`}
           />
