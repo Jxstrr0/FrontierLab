@@ -127,6 +127,7 @@ After the wizard, the map opens with the tutorial (§27).
 - **Summary:**
   - itemized parts, lease deposit and first week's rent
   - total vs available cash
+  - cash after build, and the cash cover it leaves (weeks of running costs, `src/sim/cashCover.ts`); both turn red with a warning line when under `ATTENTION.cashCoverWeeks`, because a new branch loses money for its first couple of months
   - **Build** button, then "Opening in 1 week" on the pin
 
 ## 5. Branch panel
@@ -491,10 +492,11 @@ Tabs: Overview · Loans · Credit.
 
 ## 24. Company summary (menu → Company)
 
-- **Where to look** at the top: the three things that most need you, worst first (Urgent / Watch / Note), each a tap to the right screen: capital tier, open cases, liquidity under target, expiring loan applications, branches losing money for 4 weeks, ratings under 2.5, understaffing, loan losses over the CRO ceiling, morale under 50, branches without a manager, empty executive seats, switched-off delegations, low awareness. "All clear" when nothing qualifies. Ranking in `src/sim/attention.ts`, thresholds in `ATTENTION`.
+- **Where to look** at the top: the three things that most need you, worst first (Urgent / Watch / Note), each a tap to the right screen: capital tier, corporate cash below zero or under `ATTENTION.cashCoverWeeks` of running costs, open cases, a lending freeze or liquidity under the minimum (or under target with auto-funding off), expiring loan applications, branches losing money for 4 weeks, ratings under 2.5, understaffing, loan losses over the CRO ceiling, morale under 50, branches without a manager, empty executive seats, switched-off delegations, low awareness. "All clear" when nothing qualifies. Ranking in `src/sim/attention.ts`, thresholds in `ATTENTION`.
 - capital ratio with tier badge and a meter with thresholds
 - at Watch, Restricted or Critical, a "How to fix this" checklist under the meter (`src/data/capitalFixes.ts`): sell new shares at an investment bank (Private placement, or Secondary offering once listed), sell company stocks and startup stakes, turn risk appetite down, hold off on growth and dividends; at Critical, a line on the emergency rescue
-- liquidity ratio
+- **Cash** card: corporate cash, running costs a week and **cash cover** (weeks of running costs; red under `ATTENTION.cashCoverWeeks`)
+- liquidity ratio with the Treasury gauge's status badge, the target, overnight borrowing when any, and a line saying whether auto-funding is holding the target
 - totals: assets, deposits, loans, equity
 - share price or private valuation, with the 52-week range, market cap, your stake and top shareholders
 - a Personal line: personal cash plus holdings

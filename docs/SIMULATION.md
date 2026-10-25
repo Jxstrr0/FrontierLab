@@ -449,11 +449,11 @@ The balance script should land near this; §25 targets match it. Treat it as cal
 - Bonds pull to par: each week, close 1/208 of the market–book gap.
 
 ### 13.5 Shortfall handling
-After all flows, if `L < LIQ_MIN × deposits`:
-- **Auto-funding ON:**
-  1. Borrow overnight interbank up to OVERNIGHT_LIMIT = `0.10 × deposits × ratingMult` at `policy + 0.0020 + ratingSpread + treasuryPenalty`.
-  2. Beyond that, borrow from the central bank window at `policy + 0.0100`. Window stigma: overall rating −0.05 on every branch for 4 weeks, and a 20% chance per week of a `WINDOW_USE` news event.
-- **Auto-funding OFF or limits exhausted:** **funding freeze.** `fundingGate = 0` until `LR ≥ LIQ_MIN + 0.02`.
+After all flows:
+- **Auto-funding ON** (default), if `L < liqTarget × deposits`:
+  1. Borrow overnight interbank to bring L up to `liqTarget × deposits`, within OVERNIGHT_LIMIT = `0.10 × deposits × ratingMult`, at `policy + 0.0020 + ratingSpread + treasuryPenalty`. So the ratio holds at the player's target by itself as loans outgrow deposits (changed 2026-10-25; before, only the minimum was defended and the ratio drifted under target for years).
+  2. If L is still under `LIQ_MIN × deposits` once overnight is capped, borrow the rest of that minimum shortfall from the central bank window at `policy + 0.0100`. Window stigma: overall rating −0.05 on every branch for 4 weeks, and a 20% chance per week of a `WINDOW_USE` news event.
+- **Auto-funding OFF:** nothing is borrowed. If `L < LIQ_MIN × deposits`: **funding freeze.** `fundingGate = 0` until `LR ≥ LIQ_MIN + 0.02`.
 
 If `L > liqTarget + 0.05`: repay central bank window borrowing first, then overnight.
 

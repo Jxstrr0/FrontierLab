@@ -4,11 +4,20 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 **Current stage:** 10 — Art pass, onboarding, polish, launch (built and live; awaiting the owner's iPhone check). All ten roadmap stages are built. Still open: the owner's testing and tuning pass, an Add to Home Screen test on a real iPhone, and the Vault Street card on Kelbo.Website (in a separate session in that repo).
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `0c95376ab09fe5` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `09b8b0090c6bba` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-25 — Cash and liquidity are easier to keep in hand early (v0.10.2)
+- **Owner's note:** "the cash float seems hard to keep under control early game", meaning both the Cash figure in the top bar and the liquidity ratio.
+- **What was happening.** A trace of a fresh $750k game: one mid branch leaves $411k and the bank loses money for its first 8 weeks, so cash bottoms at $374k in week 8 and then climbs. A second branch opened in week 2 takes cash to about $0 for six weeks. Nothing on screen said what the bank costs to run each week or how long cash would last. Separately, the liquidity ratio slid from 23% at the end of year one to 14% in year three as loans outgrew deposits: Treasury only defended the 10% minimum, so the ratio sat under the 15% target for years and the only early lever was the one-way transfer, which drains corporate cash.
+- **Cash cover.** The bank's running costs a week and the weeks of them cash would pay for now show on the Company screen (a Cash card under the capital meter), and the build sheet shows "Cash after build" and the cover it would leave, in red with a warning line under 8 weeks (`ATTENTION.cashCoverWeeks`). "Where to look" flags cash under 8 weeks of costs as Watch and cash below zero as Urgent. It is the same measure the COO uses for their expansion reserve, now in `src/sim/cashCover.ts`. Building is never blocked by it; you asked to keep paying attention.
+- **Liquidity holds its target.** With auto-funding on (the default), Treasury now borrows overnight each week to keep the ratio at your target, within the overnight limit; the central bank window still covers only what the 10% minimum lacks. With auto-funding off nothing is borrowed, as before. The Company screen's liquidity card shows the Treasury gauge's status, any overnight borrowing and whether auto-funding is holding the target. "Where to look" now flags a lending freeze, a ratio under the minimum, or a ratio under target only when auto-funding is off. Cost: a small interest drag (borrowing at about policy + 0.2% to hold reserves earning policy − 0.5%); the steady 10-year balance run stays inside every target, with the same pre-existing week-52 income warning as before.
+- **Determinism snapshot** `0c95376ab09fe5` → `09b8b0090c6bba` (the treasury change; intended). No save format change.
+- **Tests:** 700 (3 Treasury target tests, 1 attention test, 1 cash-cover test). Lint, typecheck and build clean. Checked at 390×844 in a browser: the Company cash and liquidity cards, the build sheet with 37 weeks of cover and with 7 weeks (red, warning line), and the Watch item at 4 weeks of cover. No console errors.
+- **Docs:** SIMULATION §13.5, SCREENS §4 and §24, DESIGN decision log (two entries).
 
 ### 2026-10-25 — Sheets scroll properly on iPhone (v0.10.1)
 - **Fixed (owner's recording):** on the COO's profile, opened from the HQ Executive floor, scrolling stopped working partway and the sheet's own title disappeared. On iPhone, a sheet opened from inside a screen was being drawn inside that screen's scrolling area. It got clipped under the screen's header and tab bar, and two scroll areas fought over each swipe.

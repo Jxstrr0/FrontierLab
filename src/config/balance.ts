@@ -1465,6 +1465,8 @@ export const ATTENTION = {
   lowMorale: 50,
   lowAwareness: 0.2,
   liqBand: 0.03,
+  /** Cash under this many weeks of running costs is flagged (and warned about on the build sheet). */
+  cashCoverWeeks: 8,
   /** How many items the Company screen shows. */
   shown: 3,
 } as const;
