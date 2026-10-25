@@ -1,7 +1,11 @@
 // ROADMAP Stage 5 acceptance: a 10-year steady run (seed 42, Calgary) includes
 // at least one recession, with visibly higher loan defaults than in expansion.
+// Defaults are read against Canada's phase while every branch is Canadian:
+// once the city-wide pool (SIMULATION §9.2) sends the bank abroad, its loans
+// follow other countries' cycles.
 import { describe, expect, it } from 'vitest';
 import { WEEKS_PER_YEAR } from '../../src/config/balance';
+import { CITIES } from '../../src/data/cities';
 import { advanceWeeks } from '../../src/sim/engine';
 import { newGame } from '../../src/sim/newGame';
 import { steady } from '../../scripts/strategies';
@@ -11,9 +15,12 @@ describe('recession acceptance', () => {
     const s = newGame({ seed: 42, cityId: 'cal' });
     steady.setup(s);
     const byPhase: Record<string, { losses: number; loanWeeks: number }> = {};
+    let abroad = false;
     for (let w = 0; w < 10 * WEEKS_PER_YEAR; w++) {
       advanceWeeks(s, 1);
       steady.weekly(s);
+      abroad ||= Object.values(s.branches).some((b) => CITIES[b.cityId]?.country !== 'CA');
+      if (abroad) continue;
       const snap = s.history.weekly.at(-1)!;
       // Skip the founder phase, when one branch's book is too small to read.
       if (w < WEEKS_PER_YEAR || snap.totals.loans <= 0) continue;

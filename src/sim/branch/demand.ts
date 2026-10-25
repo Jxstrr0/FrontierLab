@@ -38,6 +38,7 @@ import { brandSegmentMults } from '../hqMarketing';
 import { isClosed, takeupMult } from '../incident/effects';
 import { affinityOf, allProducts, baseId, starsOf } from '../products';
 import { dealerBoost } from '../personalValues';
+import { cityRoom } from './cityMarket';
 
 export interface Origination {
   newAccounts: number;
@@ -150,6 +151,8 @@ export function runDemand(state: GameState, branch: Branch, fx: CampaignEffects)
     (AWARENESS_FLOOR + (1 - AWARENESS_FLOOR) * e) *
     Math.sqrt(loanDemand(country)) *
     dpow(1 - penetration, SATURATION_EXP) *
+    // §9.2: the city-wide pool shared by all your branches in the city.
+    cityRoom(state, branch.cityId) *
     noise(rng, DEMAND_NOISE) *
     // A branch closed by an incident (flood repairs, walkout) serves no one (§23).
     (isClosed(state, branch.id) ? 0 : 1);

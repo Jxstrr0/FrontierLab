@@ -1,13 +1,15 @@
 // Expanding across cities for scripted strategies (DESIGN §5.2 "one global
 // enterprise", ROADMAP Stage 8): build in the city you're in while it has a
-// good free lot; once it runs out, fly to the next city in a fixed order (the
-// home country's other cities nearest first, then every other city by distance
-// from home; regional sites never) and carry on there. Deterministic: the order
+// good free lot and room for another branch (CITY_BRANCH_GUIDE); once it runs
+// out, fly to the next city in a fixed order (the home country's other cities
+// nearest first, then every other city by distance from home; regional sites
+// never) and carry on there. Deterministic: the order
 // depends only on the home city, and the choice only on the map.
 import { CITIES } from '../../src/data/cities';
 import * as cmd from '../../src/sim/commands';
 import { cityDistanceKm } from '../../src/sim/geo';
 import type { GameState, Lot } from '../../src/sim/state';
+import { cityBranchGuide } from '../../src/sim/branch/cityMarket';
 import { isGenerated } from '../../src/sim/worldGen';
 import { bestLot, goodLots } from './common';
 
@@ -22,9 +24,16 @@ export function expansionOrder(home: string): string[] {
   return [home, ...domestic, ...abroad];
 }
 
-/** A city still worth building in: not yet visited (so unknown), or with a good free lot. */
-function hasRoom(state: GameState, cityId: string): boolean {
-  return !isGenerated(state, cityId) || goodLots(state, cityId).length > 0;
+/**
+ * A city still worth building in: not yet visited (so unknown), or with a good
+ * free lot and fewer of our branches than the city supports (CITY_BRANCH_GUIDE).
+ */
+export function hasRoom(state: GameState, cityId: string): boolean {
+  if (!isGenerated(state, cityId)) return true;
+  const ours = Object.values(state.branches).filter(
+    (b) => b.cityId === cityId && b.status !== 'closed',
+  ).length;
+  return ours < cityBranchGuide(cityId) && goodLots(state, cityId).length > 0;
 }
 
 /**

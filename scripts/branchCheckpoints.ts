@@ -94,8 +94,8 @@ export function branchCheckpoints(m: BranchMetrics): Check[] {
   for (const wk of [104, 156, 208, 260]) {
     const s = m.at[wk];
     if (!s) continue;
-    // §25: earnings still climb with deposits through years 2–3; the full mature band applies from week 208.
-    const [revLo, incLo] = wk < 208 ? [95e3, 38e3] : [110e3, 45e3];
+    // §25: one mature band; the city-wide pool (§9.2) levels the first branch off once home fills up.
+    const [revLo, incLo] = [95e3, 38e3];
     checks.push({
       label: `Week ${wk} deposits`,
       value: M(s.dep),
