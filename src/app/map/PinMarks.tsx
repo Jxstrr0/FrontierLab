@@ -40,18 +40,23 @@ export function Glyph(p: {
 const SHIELD = 'M3 4.6Q15 1.2 27 4.6V15.4c0 8-5.5 13.3-12 16.4C8.5 28.7 3 23.4 3 15.4z';
 const SHIELD_INNER =
   'M5.8 7Q15 4.4 24.2 7V15.4c0 6.5-4.3 10.9-9.2 13.4C10.1 26.3 5.8 21.9 5.8 15.4z';
+// A glyph centred in the shield, in its 30 × 34 units.
+const CREST_GLYPH = { cy: 15.6, px: 15, stroke: 1.7 };
 // A three-point crown above the shield (head offices), in the box's negative y.
 const CROWN = 'M8.2 5 6.6-1.4l4 2.8L15-3.6l4.4 5 4-2.8L21.8 5z';
 
 /**
  * A bank crest: yours filled with your brand ink, a rival's ivory ringed in
- * its ink, both with the bank's monogram. `crowned` marks a head office.
+ * its ink, both with the bank's monogram. `crowned` marks a head office, and
+ * `icon` replaces the monogram on the places you own (HQ, property, home, club).
  */
 export function Crest(p: {
   ink: string;
   monogram: string;
   rival?: boolean;
   crowned?: boolean;
+  /** A glyph in place of the monogram (places you own). */
+  icon?: IconName;
   /** Width in px (height follows the 30 × 34 box). */
   width?: number;
 }) {
@@ -85,16 +90,27 @@ export function Crest(p: {
         stroke-dasharray={p.rival ? undefined : '1 1.2'}
         stroke-linejoin="round"
       />
-      <text
-        x="15"
-        y="16.2"
-        text-anchor="middle"
-        dominant-baseline="central"
-        class="medallion-text"
-        fill={p.rival ? p.ink : 'var(--ivory)'}
-      >
-        {p.monogram}
-      </text>
+      {p.icon ? (
+        <Glyph
+          icon={p.icon}
+          cx={15}
+          cy={CREST_GLYPH.cy}
+          px={CREST_GLYPH.px}
+          stroke={CREST_GLYPH.stroke}
+          color="var(--ivory)"
+        />
+      ) : (
+        <text
+          x="15"
+          y="16.2"
+          text-anchor="middle"
+          dominant-baseline="central"
+          class="medallion-text"
+          fill={p.rival ? p.ink : 'var(--ivory)'}
+        >
+          {p.monogram}
+        </text>
+      )}
     </svg>
   );
 }

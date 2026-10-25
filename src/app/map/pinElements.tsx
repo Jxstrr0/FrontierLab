@@ -7,7 +7,15 @@
 import { render, type VNode } from 'preact';
 import { CLUSTER_MARK_PX, CLUSTER_STACK_MAX, PIN_MEDALLION_PX } from '../../config/mapView';
 import { LayerMedallion } from './LayerIcon';
-import { captionOf, clusterGroup, MARKERS, markerOf, shapeOf, type MarkerId } from './markers';
+import {
+  captionOf,
+  clusterGroup,
+  MARKERS,
+  markerOf,
+  ownedGlyph,
+  pinShape,
+  type MarkerId,
+} from './markers';
 import { Crest, LandmarkSeal, LotCoin, TagMark } from './PinMarks';
 import type { Cluster } from './cluster';
 import type { PinKind, PinSpec } from './pins';
@@ -15,14 +23,14 @@ import type { PinKind, PinSpec } from './pins';
 const isRivalKind = (k: PinKind) => k === 'rival' || k === 'rivalHq';
 const isCrowned = (k: PinKind) => k === 'hq' || k === 'rivalHq';
 
-/** The words inside a price tag: For lease, For sale, Selling, Rebuilding or Owned. */
+/** The words inside a price tag: For lease or For sale (yours are crests, not tags). */
 function tagText(p: PinSpec): string {
   if (p.kind === 'office') return 'For lease';
-  return p.tag ?? (p.partner ? 'Owned' : '');
+  return p.tag ?? '';
 }
 
 function markFor(p: PinSpec): VNode {
-  const shape = shapeOf(p.kind);
+  const shape = pinShape(p);
   const marker = markerOf(p.kind);
   if (shape === 'crest')
     return (
@@ -31,6 +39,7 @@ function markFor(p: PinSpec): VNode {
         monogram={p.monogram}
         rival={isRivalKind(p.kind)}
         crowned={isCrowned(p.kind)}
+        icon={p.owned ? ownedGlyph(p.kind) : undefined}
       />
     );
   if (shape === 'coin' || !marker) return <LotCoin />;
@@ -48,7 +57,7 @@ function span(cls: string, text?: string): HTMLSpanElement {
 }
 
 export function makePinElement(p: PinSpec): HTMLButtonElement {
-  const shape = shapeOf(p.kind);
+  const shape = pinShape(p);
   const el = document.createElement('button');
   el.type = 'button';
   el.className = `map-pin pin-${p.kind} shape-${shape}${p.muted ? ' is-muted' : ''}`;
@@ -60,7 +69,8 @@ export function makePinElement(p: PinSpec): HTMLButtonElement {
   el.style.display = 'none';
   // Captions are printed in the place type's ink; rivals' and light inks' in plain ink.
   const marker = markerOf(p.kind);
-  if (marker && !MARKERS[marker].glyph) el.style.setProperty('--cap-ink', MARKERS[marker].ink);
+  if (marker && !p.owned && !MARKERS[marker].glyph)
+    el.style.setProperty('--cap-ink', MARKERS[marker].ink);
 
   const body = span('pin-body');
   render(markFor(p), body);
@@ -149,13 +159,16 @@ function clusterMark(group: string, members: PinSpec[]): VNode {
     );
   }
   if (group === 'yours' || group === 'rival') {
-    const banks = distinct(members, (m) => m.ink);
+    // Your places all share one ink, so lead with a branch (monogram) when there is one.
+    const lead = members.find((m) => m.kind === 'mine') ?? members[0]!;
+    const banks = distinct([lead, ...members], (m) => m.ink);
     return (
       <Stack
         marks={banks.map((m, i) => (
           <Crest
             ink={m.ink}
             monogram={i === 0 ? m.monogram : ''}
+            icon={i === 0 && m.kind !== 'mine' ? ownedGlyph(m.kind) : undefined}
             rival={isRivalKind(m.kind)}
             width={CLUSTER_MARK_PX.crest}
           />
@@ -193,7 +206,13 @@ export function clusterLabel(group: string, members: PinSpec[]): string {
   else if (group === 'yours') {
     const hq = members.some((m) => m.kind === 'hq');
     const branches = members.filter((m) => m.kind === 'mine').length;
-    what = `Your ${branches} branch${branches === 1 ? '' : 'es'}${hq ? ' and HQ' : ''}`;
+    const places = members.filter((m) => m.kind !== 'mine' && m.kind !== 'hq').length;
+    const parts = [
+      branches ? `${branches} branch${branches === 1 ? '' : 'es'}` : '',
+      hq ? 'HQ' : '',
+      places ? `${places} other place${places === 1 ? '' : 's'}` : '',
+    ].filter(Boolean);
+    what = `Your ${parts.length > 1 ? `${parts.slice(0, -1).join(', ')} and ${parts.at(-1)}` : parts[0]}`;
   } else if (group === 'rival') what = `${n} rival bank buildings: ${names}`;
   else what = `${n} places: ${names}`;
   const waiting = members.some((m) => m.badge) ? ', loan applications waiting' : '';

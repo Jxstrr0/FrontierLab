@@ -116,7 +116,7 @@ export class PinLayer {
       old?.el.remove();
       const el = makePinElement(p);
       // Yours always on top, open locations at the bottom; otherwise lower on the map in front.
-      el.style.zIndex = String(stackOrder(p.y, stackTier(p.kind)));
+      el.style.zIndex = String(stackOrder(p.y, stackTier(p.kind, p.owned)));
       this.host.appendChild(el);
       this.els.set(p.id, { el, x: p.x, y: p.y, shown: '', key });
     }
@@ -191,7 +191,7 @@ export class PinLayer {
     for (const c of this.clusters) {
       if (c.members.length === 1) continue;
       const el = makeClusterElement(c);
-      el.style.zIndex = String(stackOrder(c.y, stackTier(c.members[0]!.kind)));
+      el.style.zIndex = String(stackOrder(c.y, stackTier(c.members[0]!.kind, c.members[0]!.owned)));
       this.host.appendChild(el);
       this.clusterEls.set(c.key, { el, x: c.x, y: c.y, shown: '', key: c.key });
     }

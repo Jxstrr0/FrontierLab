@@ -1,7 +1,9 @@
 // The map's shape language (ART_DIRECTION §2 Pins, §7 Icons): every pin kind
 // gets a silhouette players learn once, and every kind of place its own ink,
 // glyph and short caption.
-//   crest     — banks: your branches and HQ (brand ink), rival branches and head offices (ivory, their ink)
+//   crest     — banks: your branches and HQ (brand ink), rival branches and head offices (ivory, their ink).
+//               Every place you own (HQ, property, vacation home, club) is a brand-ink crest
+//               with its own glyph in place of the monogram.
 //   coin      — open branch locations: a small, quiet "$"
 //   medallion — places you deal with: a round coin in the type's ink with an ivory glyph
 //   tag       — buildings you rent or buy: a price tag in the type's ink
@@ -144,15 +146,27 @@ export function shapeOf(kind: PinKind): MarkShape {
   return m ? MARKERS[m].shape : 'medallion';
 }
 
+/** The glyph on the crest of a place you own (HQ, property, vacation home, club). */
+export function ownedGlyph(kind: PinKind): IconName | undefined {
+  if (kind === 'hq') return 'office';
+  const m = KIND_MARKER[kind];
+  return m ? MARKERS[m].icon : undefined;
+}
+
+/** A pin's silhouette: places you own wear your crest, whatever their type. */
+export const pinShape = (p: { kind: PinKind; owned?: boolean }): MarkShape =>
+  p.owned ? 'crest' : shapeOf(p.kind);
+
 /** Pins in your brand ink, lifted above the rest. */
-const isYoursKind = (kind: PinKind): boolean => kind === 'mine' || kind === 'hq';
+const isYoursKind = (kind: PinKind, owned = false): boolean =>
+  owned || kind === 'mine' || kind === 'hq';
 
 /**
  * Which pins may merge into one cluster at the far zoom: only like with like,
  * so a cluster can show what it holds. Landmarks never merge.
  */
-export function clusterGroup(p: { id: string; kind: PinKind }): string {
-  if (isYoursKind(p.kind)) return 'yours';
+export function clusterGroup(p: { id: string; kind: PinKind; owned?: boolean }): string {
+  if (isYoursKind(p.kind, p.owned)) return 'yours';
   const shape = shapeOf(p.kind);
   if (shape === 'crest') return 'rival';
   if (shape === 'coin') return 'lot';
@@ -164,8 +178,8 @@ export function clusterGroup(p: { id: string; kind: PinKind }): string {
  * Stacking tiers: open locations lowest, then the wide price tags, places and
  * rivals, landmarks, and yours on top.
  */
-export function stackTier(kind: PinKind): number {
-  if (isYoursKind(kind)) return 4;
+export function stackTier(kind: PinKind, owned = false): number {
+  if (isYoursKind(kind, owned)) return 4;
   const shape = shapeOf(kind);
   return shape === 'coin' ? 0 : shape === 'tag' ? 1 : shape === 'landmark' ? 3 : 2;
 }

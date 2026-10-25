@@ -32,7 +32,7 @@ describe('stadium pins', () => {
     s.personal.cash = 2e9;
     expect(cmd.buyClub(s, 'bighorns', s.clubs.bighorns!.value, 'personal').ok).toBe(true);
     const [mine] = stadiumPins(s, map);
-    expect(mine!.partner).toBe(true);
+    expect(mine!.owned).toBe(true);
     expect(mine!.tag).toBeUndefined();
     expect(mine!.ink).toBe(s.meta.brandInk);
     expect(mine!.label).toMatch(/your club/);
