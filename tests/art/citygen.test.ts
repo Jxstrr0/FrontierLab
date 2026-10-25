@@ -19,7 +19,7 @@ describe('city map generation', () => {
     expect(Buffer.from(a.seed)).not.toEqual(Buffer.from(c.seed));
   });
 
-  it('marks every lot and places all four landmarks (only the airport at regional sites)', () => {
+  it('marks every lot and places all five landmarks (only the airport at regional sites)', () => {
     for (const id of Object.keys(CITIES)) {
       const { map, lots } = mapFor(id);
       for (const lot of lots) {
@@ -31,7 +31,7 @@ describe('city map generation', () => {
       expect(map.landmarks.map((l) => l.id).sort()).toEqual(
         CITIES[id]!.regional
           ? ['airport']
-          : ['airport', 'centralBank', 'clockTower', 'stadium'].sort(),
+          : ['airport', 'centralBank', 'clockTower', 'signature', 'stadium'],
       );
       for (const lm of map.landmarks)
         expect(tileAt(map, lm.x + 1, lm.y + 1)!.kind).toBe('landmark');
@@ -68,7 +68,7 @@ describe('offices and sites on the map (Stage 4)', () => {
         expect(t.siteKind).toBe(x.kind);
       }
       for (const lot of lots) expect(tileAt(map, lot.tile.x, lot.tile.y)!.kind).toBe('lot');
-      expect(map.landmarks).toHaveLength(CITIES[id]!.regional ? 1 : 4);
+      expect(map.landmarks).toHaveLength(CITIES[id]!.regional ? 1 : 5);
     }
   });
 
