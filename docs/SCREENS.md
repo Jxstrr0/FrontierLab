@@ -91,15 +91,16 @@ After the wizard, the map opens with the tutorial (§27).
 ## 2. Map
 
 - **Canvas map:** isometric engraved city with pinch zoom (3 levels plus continuous), pan, and inertia.
-- **Pins** are DOM medallions positioned over the canvas:
-  - yours: brand ink with monogram
-  - rivals: their brand color ring
-  - open branch locations: a blank "$" medallion
-  - buildings for rent (office buildings): brass "For lease" tag with the type icon
-  - building for sale and special buildings (bureaus, agencies, investment banks): type icons
-- At the far zoom level, nearby pins cluster with a count.
+- **Pins** are DOM marks positioned over the canvas. The shape says the category, the colour and glyph say the type (ART_DIRECTION §2 Pins):
+  - **crest** (shield) = a bank. Yours: filled with your brand ink and monogram. Rivals: ivory with their ink ring and monogram. Head offices (your HQ, rival HQs) wear a small brass crown.
+  - **coin** = an open branch location: a small ivory "$" coin, quieter than everything else.
+  - **medallion** = a place you deal with (bureau, investment bank, agency, convention, lobbying firm, employer, university, car dealer, auction house): filled with the type's own ink, ivory glyph.
+  - **price tag** = something to rent or buy: offices ("For lease"), buildings ("For sale", "Selling", "Owned"), vacation homes.
+  - **seal** = a landmark (central bank, airport, stadium): larger, scalloped.
+- **Captions** from zoom 1.5: places show their type ("Credit bureau") in the type's ink; rival branches show the bank's short name. Captions follow the Text size setting.
+- At the far zoom, nearby pins cluster, but only like with like (yours, rivals, open locations, places, tags; landmarks never cluster). A cluster shows a fanned stack of up to three member marks with a count chip; open locations collapse into a quiet "$ ×N". Its label names what's inside.
 - Tap a pin to open its panel. Tapping empty map does nothing.
-- **Layers sheet:** an "All" toggle plus one toggle per type (14) with icons. Toggles persist in settings.
+- **Layers sheet:** a key to the five pin shapes, then an "All" toggle plus one toggle per type (14). Each row shows the actual pins it toggles. Toggles persist in settings.
 
 ## 3. Available location (storefront)
 
