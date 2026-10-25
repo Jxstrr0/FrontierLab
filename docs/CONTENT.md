@@ -21,7 +21,7 @@ Starting values are fictional. Meeting weeks are weeks of the year.
 
 ## 2. Cities (v1)
 
-| id | City | Country | Size | Tiles | Lat, Lon | rentIndex | wageIndex | incomeIndex | costIndex | Incumbent | Rivals | Ink | Start |
+| id | City | Country | Size | Tiles | Lat, Lon | rentIndex | wageIndex | incomeIndex | costIndex | Incumbent | Rivals | Ink | Original start |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | sas | Saskatoon | CA | S | 40 | 52.13, −106.67 | 0.55 | 0.88 | 0.95 | 0.85 | 0.25 | 2 | Prairie Ochre | yes |
 | cal | Calgary | CA | M | 52 | 51.05, −114.07 | 0.75 | 0.98 | 1.10 | 0.95 | 0.32 | 3 | Foothill Olive | yes |

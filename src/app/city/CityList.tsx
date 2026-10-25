@@ -51,7 +51,7 @@ export function CityList(p: { hideTitle?: boolean } = {}) {
 
   return (
     <div class="city-list">
-      <header class="city-head">
+      <header class="citylist-head">
         {!p.hideTitle && <h1 class="city-title">{city?.name ?? 'Your city'}</h1>}
         <p class="muted small">
           {count(lots.length)} storefronts: {count(free)} available, {count(mine)} yours,{' '}
