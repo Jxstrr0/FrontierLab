@@ -4,11 +4,12 @@
 // screen to open. Pure: reads state, mutates nothing. Thresholds in
 // ATTENTION (balance.ts); the capital tiers and the CRO's loss target are the
 // ones the rest of the sim already uses.
-import { ATTENTION, EXEC_DELEGATION, GRAND_OPENING_WEEKS } from '../config/balance';
+import { ATTENTION, EXEC_DELEGATION, GRAND_OPENING_WEEKS, LIQ_MIN } from '../config/balance';
 import { CITIES } from '../data/cities';
 import { EXEC_SEAT_ORDER, EXEC_SEATS } from '../data/executives';
 import type { DeptId } from '../data/types';
 import { staffNeeded } from './branch/staff';
+import { cashCoverWeeks } from './cashCover';
 import { averageMorale, companyLossRate } from './execDelegationsPeople';
 import { hasExecFloor } from './execSeats';
 import type { Branch, GameState } from './state';
@@ -72,18 +73,65 @@ export function attentionItems(state: GameState): AttentionItem[] {
     });
   }
 
-  // Liquidity under target.
+  // Corporate cash: below zero, or thin against running costs.
+  const cover = cashCoverWeeks(state);
+  if (state.company.cash < 0) {
+    items.push({
+      id: 'cash',
+      tone: 'bad',
+      weight: 95,
+      title: 'Corporate cash below zero',
+      detail: `Four weeks in the red with no credit to draw is insolvency (week ${state.company.negativeCashWeeks + 1} now).`,
+      route: { kind: 'company' },
+    });
+  } else if (cover !== null && cover < ATTENTION.cashCoverWeeks) {
+    items.push({
+      id: 'cash',
+      tone: 'warn',
+      weight: 65,
+      title: `Cash covers ${cover < 1 ? 'under 1 week' : `${Math.floor(cover)} week${Math.floor(cover) === 1 ? '' : 's'}`} of costs`,
+      detail:
+        'Wages, rent and salaries would use it up in that time; hold off on builds until there is more cover.',
+      route: { kind: 'company' },
+    });
+  }
+
+  // Liquidity: a freeze, under the minimum, or under target with nothing topping it up.
   const liq = state.company.liquidityRatio;
-  if (liq !== null && liq < state.treasury.liqTarget - ATTENTION.liqBand) {
+  const t = state.treasury;
+  const liqRoute = {
+    kind: 'hq',
+    dept: state.departments.treasury ? 'treasury' : undefined,
+  } as const;
+  if (t.freeze) {
     items.push({
       id: 'liquidity',
-      tone: state.treasury.freeze ? 'bad' : 'warn',
-      weight: state.treasury.freeze ? 85 : 60,
+      tone: 'bad',
+      weight: 85,
+      title: 'Lending frozen',
+      detail:
+        'Liquid assets are under the minimum and auto-funding is off, so branches cannot make new loans.',
+      route: liqRoute,
+    });
+  } else if (liq !== null && liq < LIQ_MIN) {
+    items.push({
+      id: 'liquidity',
+      tone: 'warn',
+      weight: 70,
+      title: 'Liquidity under the minimum',
+      detail:
+        'Treasury is borrowing from the central bank window to cover it, which costs reputation.',
+      route: liqRoute,
+    });
+  } else if (liq !== null && !t.autoFunding && liq < t.liqTarget - ATTENTION.liqBand) {
+    items.push({
+      id: 'liquidity',
+      tone: 'warn',
+      weight: 60,
       title: 'Liquidity under target',
-      detail: state.treasury.freeze
-        ? 'The funding market has frozen; Treasury is leaning on the central bank.'
-        : 'Treasury has less quick cash than its target; it will borrow to make it up.',
-      route: { kind: 'hq', dept: state.departments.treasury ? 'treasury' : undefined },
+      detail:
+        'Auto-funding is off, so nothing tops it up: borrow on the Treasury floor or turn auto-funding on.',
+      route: liqRoute,
     });
   }
 

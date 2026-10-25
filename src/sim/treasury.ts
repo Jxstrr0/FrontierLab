@@ -98,28 +98,32 @@ export function applyWindowStigma(state: GameState, amount: number): void {
   }
 }
 
-/** §13.5: borrow overnight, then from the window; without auto-funding, freeze lending. */
+/**
+ * §13.5: with auto-funding on, borrow overnight up to the limit to hold liquid
+ * assets at the player's target, and go to the central bank window only for
+ * whatever the minimum still lacks. Without auto-funding, nothing is borrowed
+ * and a shortfall under the minimum freezes lending.
+ */
 function handleShortfall(state: GameState, deposits: number): void {
   const t = state.treasury;
+  const L = liquidAssets(state);
   const minL = LIQ_MIN * deposits;
-  let need = minL - liquidAssets(state);
-  if (need <= 0) {
-    if (t.freeze && liquidAssets(state) >= (LIQ_MIN + FREEZE_RELEASE) * deposits) t.freeze = false;
-    return;
-  }
+  const targetL = t.liqTarget * deposits;
+  if (t.freeze && L >= (LIQ_MIN + FREEZE_RELEASE) * deposits) t.freeze = false;
   if (!t.autoFunding) {
-    t.freeze = true;
+    if (L < minL) t.freeze = true;
     return;
   }
+  if (L >= targetL) return;
   const limit = OVERNIGHT_LIMIT * deposits * OVERNIGHT_LIMIT_MULT[state.company.tier];
-  const overnight = Math.max(0, Math.min(need, limit - t.overnight));
+  const overnight = Math.max(0, Math.min(targetL - L, limit - t.overnight));
   t.overnight += overnight;
   t.reserves += overnight;
-  need -= overnight;
-  if (need > 0) {
-    t.window += need;
-    t.reserves += need;
-    applyWindowStigma(state, need);
+  const underMin = minL - L - overnight;
+  if (underMin > 0) {
+    t.window += underMin;
+    t.reserves += underMin;
+    applyWindowStigma(state, underMin);
   }
   t.freeze = false;
 }

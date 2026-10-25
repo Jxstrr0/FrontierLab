@@ -1,16 +1,18 @@
-// Company summary (SCREENS §24): "Where to look", capital ratio and tier, liquidity, the main
+// Company summary (SCREENS §24): "Where to look", capital ratio and tier, cash cover, liquidity, the main
 // totals, your share price or private valuation with the cap table and your
 // personal line (ShareSummary.tsx), and simplified statements, with a link to
 // the full statements on the HQ Finance floor once you have one.
 import { useState } from 'preact/hooks';
-import { FEATURES } from '../../config/balance';
+import { ATTENTION, FEATURES, LIQ_MIN, LIQ_REPAY_BUFFER } from '../../config/balance';
 import { balanceSheet } from '../../sim/balanceSheet';
 import { capitalSnapshot } from '../../sim/capital';
+import { cashCoverWeeks, weeklyCosts } from '../../sim/cashCover';
 import { Badge, Card, Medallion, Panel, Row, SectionTitle, Sheet } from '../components';
 import { capitalRatioText, money, pct } from '../format/format';
 import { RealEstateCard } from '../realEstate/RealEstateCard';
 import { closePanel, openPanel, useGame } from '../store';
 import { CapitalFixes } from './CapitalFixes';
+import { LIQUIDITY_STATUS, liquidityGauge } from '../hq/treasury/treasuryView';
 import { CapitalMeter, TIER_LABEL, TIER_TONE } from './CapitalMeter';
 import { ShareSummary } from './ShareSummary';
 import { Statements } from './Statements';
@@ -28,9 +30,21 @@ const EXPLAINERS: { title: string; body: string }[] = [
   },
   {
     title: 'Liquidity keeps the doors open',
-    body: 'Reserves and government bonds are cash you can reach quickly. If they run too low, Treasury borrows, and borrowing costs money and reputation.',
+    body: 'Reserves and government bonds are cash you can reach quickly. With auto-funding on, Treasury borrows overnight to hold your target; only a fall under the 10% minimum costs reputation.',
+  },
+  {
+    title: 'Cash cover',
+    body: 'Corporate cash pays the wages, rent and salaries. Cash cover is how many weeks of those running costs it would last. A new branch loses money for its first couple of months, so build with cover to spare.',
   },
 ];
+
+/** 0.4 → "Under 1 week", 7.6 → "7 weeks", 52+ → "A year or more". */
+export function coverText(weeks: number): string {
+  if (weeks < 1) return 'Under 1 week';
+  if (weeks >= 52) return 'A year or more';
+  const n = Math.floor(weeks);
+  return `${n} week${n === 1 ? '' : 's'}`;
+}
 
 export function CompanyPanel() {
   const s = useGame();
@@ -39,6 +53,11 @@ export function CompanyPanel() {
   const cap = capitalSnapshot(s);
   const bs = balanceSheet(s);
   const liq = s.company.liquidityRatio;
+  const gauge = liquidityGauge(liq, LIQ_MIN, s.treasury.liqTarget, LIQ_REPAY_BUFFER);
+  const liqStatus = LIQUIDITY_STATUS[gauge.status];
+  const costs = weeklyCosts(s);
+  const cover = cashCoverWeeks(s);
+  const coverTone = cover === null ? 'dim' : cover < ATTENTION.cashCoverWeeks ? 'bad' : 'good';
 
   return (
     <Panel
@@ -69,14 +88,49 @@ export function CompanyPanel() {
         </Card>
 
         <Card>
+          <div class="cap-head">
+            <div>
+              <div class="muted small">Corporate cash</div>
+              <div class={`hero-number${s.company.cash < 0 ? ' tone-bad' : ''}`}>
+                {money(s.company.cash, sym)}
+              </div>
+            </div>
+          </div>
           <Row
-            label="Liquidity ratio"
-            value={liq === null ? 'No deposits yet' : pct(liq, 1)}
+            label="Running costs"
+            value={costs > 0 ? `${money(costs, sym)} / week` : 'Measuring'}
+            tone="dim"
+          />
+          <Row
+            label="Cash cover"
+            value={cover === null ? '—' : coverText(cover)}
+            tone={coverTone}
             strong
           />
-          <Row label="Target" value={pct(s.treasury.liqTarget, 1)} tone="dim" />
           <p class="muted small cap-note">
-            Reserves and bonds as a share of deposits: the cash you can reach in a hurry.
+            How long cash would pay the wages, rent and salaries at the last few weeks' pace. A new
+            branch loses money for its first couple of months, so keep about{' '}
+            {ATTENTION.cashCoverWeeks} weeks in hand before you build.
+          </p>
+        </Card>
+
+        <Card>
+          <div class="cap-head">
+            <div>
+              <div class="muted small">Liquidity ratio</div>
+              <div class="hero-number">{liq === null ? '—' : pct(Math.max(0, liq), 1)}</div>
+            </div>
+            <Badge tone={liqStatus.tone}>{liqStatus.label}</Badge>
+          </div>
+          <Row label="Target" value={pct(s.treasury.liqTarget, 1)} tone="dim" />
+          {s.treasury.overnight > 0 && (
+            <Row label="Overnight borrowing" value={money(s.treasury.overnight, sym)} tone="dim" />
+          )}
+          <p class="muted small cap-note">
+            Reserves and bonds as a share of deposits: the cash you can reach in a hurry.{' '}
+            {s.treasury.autoFunding
+              ? 'Auto-funding holds the target by borrowing overnight, so it looks after itself.'
+              : 'Auto-funding is off, so nothing tops it up when it slips.'}
           </p>
         </Card>
 
@@ -87,7 +141,6 @@ export function CompanyPanel() {
             <Row label="Deposits" value={money(bs.deposits, sym)} />
             <Row label="Loans" value={money(bs.loans, sym)} />
             <Row label="Equity" value={money(bs.equity, sym)} strong />
-            <Row label="Corporate cash" value={money(s.company.cash, sym)} />
           </Card>
         </div>
 

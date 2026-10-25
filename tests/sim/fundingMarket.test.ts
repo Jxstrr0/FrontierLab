@@ -2,7 +2,13 @@
 // borrowing, interest, maturities, early repayment, the central bank window and
 // bond mark-to-market (ROADMAP Stage 4 acceptance).
 import { describe, expect, it } from 'vitest';
-import { FUNDING_OFFERS, FUNDING_REFRESH_WEEKS, LIQ_MIN } from '../../src/config/balance';
+import {
+  FUNDING_OFFERS,
+  FUNDING_REFRESH_WEEKS,
+  LIQ_MIN,
+  OVERNIGHT_LIMIT,
+  OVERNIGHT_LIMIT_MULT,
+} from '../../src/config/balance';
 import { FUNDING_TYPES } from '../../src/data/fundingTypes';
 import { balanceSheet, totalDeposits } from '../../src/sim/balanceSheet';
 import * as cmd from '../../src/sim/commands';
@@ -150,7 +156,8 @@ describe('funding lots', () => {
     const s = bankWithFloors(['treasury']);
     const t = s.treasury;
     const deposits = totalDeposits(s);
-    Object.assign(t, { bondsMarket: 0, bondsBook: 0, overnight: 0, window: 0 });
+    // Target at the minimum, so only the §13.5 shortfall itself is borrowed.
+    Object.assign(t, { bondsMarket: 0, bondsBook: 0, overnight: 0, window: 0, liqTarget: LIQ_MIN });
     t.reserves = LIQ_MIN * deposits + 1_000_000;
     t.lots.push({
       id: 'fl_x',
@@ -218,6 +225,54 @@ describe('funding lots', () => {
       expect(identityGap(s)).toBeLessThan(1);
       expect(s.treasury.lots.every((l) => l.maturityWeek > s.clock.week)).toBe(true);
     }
+  });
+});
+
+describe('auto-funding holds the target (§13.5)', () => {
+  const bare = (autoFunding: boolean, lr: number) => {
+    const s = bankWithFloors(['treasury']);
+    const t = s.treasury;
+    const deposits = totalDeposits(s);
+    Object.assign(t, { bondsMarket: 0, bondsBook: 0, overnight: 0, window: 0, autoFunding });
+    t.reserves = lr * deposits;
+    homeCountry(s).prevFtpLong = ftpLong(homeCountry(s));
+    return { s, t, deposits };
+  };
+
+  it('borrows overnight up to the target, not just the minimum', () => {
+    const { s, t, deposits } = bare(true, 0.12);
+    runTreasury(s);
+    expect(t.overnight).toBeCloseTo((t.liqTarget - 0.12) * deposits, 0);
+    expect(t.window).toBe(0);
+    expect(t.freeze).toBe(false);
+    expect(liquidAssets(s)).toBeCloseTo(t.liqTarget * deposits, 0);
+  });
+
+  it('the window covers only what the minimum still lacks once overnight is capped', () => {
+    const { s, t, deposits } = bare(true, 0.02);
+    const limit = OVERNIGHT_LIMIT * deposits * OVERNIGHT_LIMIT_MULT[s.company.tier];
+    runTreasury(s);
+    expect(t.overnight).toBeCloseTo(Math.min((t.liqTarget - 0.02) * deposits, limit), 0);
+    expect(t.window).toBeCloseTo(Math.max(0, (LIQ_MIN - 0.02) * deposits - t.overnight), 0);
+    expect(liquidAssets(s)).toBeGreaterThanOrEqual(LIQ_MIN * deposits - 1);
+    // Overnight at the cap and still under the minimum: the window takes the rest of the minimum only.
+    const capped = bare(true, 0.05);
+    capped.t.overnight =
+      OVERNIGHT_LIMIT * capped.deposits * OVERNIGHT_LIMIT_MULT[capped.s.company.tier];
+    runTreasury(capped.s);
+    expect(capped.t.window).toBeCloseTo((LIQ_MIN - 0.05) * capped.deposits, 0);
+    expect(liquidAssets(capped.s)).toBeCloseTo(LIQ_MIN * capped.deposits, 0);
+  });
+
+  it('without auto-funding, under target borrows nothing; under the minimum freezes', () => {
+    const a = bare(false, 0.12);
+    runTreasury(a.s);
+    expect(a.t.overnight).toBe(0);
+    expect(a.t.freeze).toBe(false);
+    const b = bare(false, 0.08);
+    runTreasury(b.s);
+    expect(b.t.overnight).toBe(0);
+    expect(b.t.freeze).toBe(true);
   });
 });
 

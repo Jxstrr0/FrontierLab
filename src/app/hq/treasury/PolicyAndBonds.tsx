@@ -47,8 +47,8 @@ export function TreasuryPolicyCard() {
         label="Auto-funding"
         hint={
           t.autoFunding
-            ? 'Shortfalls borrow overnight, then from the central bank'
-            : 'Shortfalls freeze lending instead of borrowing'
+            ? 'Borrows overnight to hold the target; the central bank covers the minimum'
+            : 'Nothing tops up the target; a fall under the minimum freezes lending'
         }
         checked={t.autoFunding}
         onChange={(v) => act(cmd.setTreasuryPolicy, { autoFunding: v })}

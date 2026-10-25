@@ -13,6 +13,9 @@ import { SlotIcon } from './SlotIcon';
 import './build.css';
 import { BranchArt } from '../branch/BranchArt';
 import { CITIES } from '../../data/cities';
+import { ATTENTION } from '../../config/balance';
+import { cashCoverWeeks } from '../../sim/cashCover';
+import { coverText } from '../company/CompanyPanel';
 
 export function BuildPanel(p: { lotId: string }) {
   const s = useGame();
@@ -32,6 +35,9 @@ export function BuildPanel(p: { lotId: string }) {
   const quote = cmd.buildQuote(s, p.lotId, build);
   const blocker = cmd.buildBlocker(s, p.lotId, build);
   const short = s.company.cash < quote.total;
+  const after = s.company.cash - quote.total;
+  const cover = short ? null : cashCoverWeeks(s, after);
+  const thin = cover !== null && cover < ATTENTION.cashCoverWeeks;
 
   const doBuild = () => {
     const r = act(cmd.buildBranch, { lotId: p.lotId, build });
@@ -113,8 +119,25 @@ export function BuildPanel(p: { lotId: string }) {
               value={moneyFull(s.company.cash, sym)}
               tone={short ? 'bad' : 'good'}
             />
+            <Row
+              label="Cash after build"
+              value={short ? 'Short' : moneyFull(after, sym)}
+              tone={short || thin ? 'bad' : 'good'}
+              strong
+            />
+            {cover !== null && (
+              <Row
+                label="Cash cover after"
+                value={`${coverText(cover)} of costs`}
+                tone={thin ? 'bad' : 'dim'}
+              />
+            )}
           </Card>
-          <p class="muted small">The branch opens after a one-week fit-out.</p>
+          <p class="muted small">
+            The branch opens after a one-week fit-out.
+            {thin &&
+              ` A new branch loses money for its first couple of months; this would leave under ${ATTENTION.cashCoverWeeks} weeks of running costs in hand.`}
+          </p>
         </div>
       </Panel>
       {picking && (

@@ -11,6 +11,7 @@ import { CITIES } from '../data/cities';
 import { REFERENCE_BUILDS, type BuildSpec } from '../data/equipment';
 import { cityBranchGuide, cityRoom } from './branch/cityMarket';
 import { tileDistance } from './citygen';
+import { weeklyCosts } from './cashCover';
 import { buildBlocker, buildBranch, buildQuote } from './commands/branches';
 import { isGenerated } from './worldGen';
 import type { GameState, Lot } from './state';
@@ -55,13 +56,6 @@ function branchesIn(state: GameState, cityId: string): number {
   for (const b of Object.values(state.branches))
     if (b.cityId === cityId && b.status !== 'closed') n += 1;
   return n;
-}
-
-/** Average weekly costs over the delegation's revenue window (revenue less net income). */
-export function weeklyCosts(state: GameState): number {
-  const recent = state.history.weekly.slice(-X.revenueWeeks);
-  if (recent.length === 0) return 0;
-  return recent.reduce((s, w) => s + Math.max(0, w.revenue - w.netIncome), 0) / recent.length;
 }
 
 /** Cash the COO keeps back: expansionReserveWeeks of weekly costs. */

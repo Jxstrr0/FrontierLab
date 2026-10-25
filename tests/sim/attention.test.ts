@@ -29,6 +29,23 @@ describe('attention items', () => {
     expect(items.find((i) => i.id === 'managers')).toBeDefined();
   });
 
+  it('flags thin cash against running costs, and cash below zero as urgent', () => {
+    const { s } = openBank();
+    const ids = () => attentionItems(s).map((i) => i.id);
+    s.history.weekly.length = 0;
+    expect(ids()).not.toContain('cash');
+    s.history.weekly.push({ revenue: 10_000, netIncome: -5_000 } as never);
+    s.company.cash = 30_000;
+    const thin = attentionItems(s).find((i) => i.id === 'cash')!;
+    expect(thin.tone).toBe('warn');
+    expect(thin.title).toBe('Cash covers 2 weeks of costs');
+    expect(thin.route).toEqual({ kind: 'company' });
+    s.company.cash = 30_000 * ATTENTION.cashCoverWeeks;
+    expect(ids()).not.toContain('cash');
+    s.company.cash = -1;
+    expect(attentionItems(s)[0]).toMatchObject({ id: 'cash', tone: 'bad' });
+  });
+
   it('points at empty seats and switched-off delegations once there is an Executive floor', () => {
     const s = execGame();
     expect(attentionItems(s).find((i) => i.id === 'seats')?.route).toEqual({
