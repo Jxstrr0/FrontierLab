@@ -1434,6 +1434,9 @@ export const EXEC_DELEGATION = {
   croRaiseCr: 0.14,
   croRaiseLoss: 0.009,
   croMaxAppetite: 4,
+  /** CFO Capital (§17.2): acts at Watch or worse, raises equity at Restricted or worse, aims for 12%. */
+  cfoTargetCr: 0.12,
+  cfoRaiseStep: 0.01,
 } as const;
 
 /**

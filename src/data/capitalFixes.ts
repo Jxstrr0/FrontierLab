@@ -16,6 +16,7 @@ export const OTHER_FIXES: readonly string[] = [
   'Sell stocks and startup stakes the company holds. They count 2.5× against your capital.',
   'Turn risk appetite down on the HQ Products floor so new loans are safer.',
   'Hold off on new branches, property and dividends while profits rebuild capital.',
+  'Or seat a CFO on the Executive floor and switch on Capital: they will do all of this for you.',
 ];
 
 /** The extra warning at Critical (SIMULATION §15, emergency recapitalisation). */

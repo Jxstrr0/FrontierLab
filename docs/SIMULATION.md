@@ -696,7 +696,7 @@ Levels 1–5 (Very conservative to Very aggressive):
 | Exec | Domain | Delegations |
 |---|---|---|
 | COO | HR, all branches | **Branch operations:** auto-hires managers for new branches and turns on default delegation. **HR benefits:** keeps average morale ≥ 70 at least cost. **HR division:** auto-staffs every floor to 100% coverage. |
-| CFO | Finance, Treasury | Halves statement delays. **Treasury:** auto-funding, bond share and buying funding offers to keep LR within ±2pp of target. **Dividends:** proposes a dividend at board meetings. |
+| CFO | Finance, Treasury | Halves statement delays. **Treasury:** auto-funding, bond share and buying funding offers to keep LR within ±2pp of target. **Capital:** at Watch or worse, sells the company's stocks and steps risk appetite down every 4 weeks (unless the CRO runs appetite); at Restricted or Critical, or under the charter floor, sells new shares through the cheapest investment bank (private placement while private, within the round limits; secondary once listed), sized to reach 12% plus any regulator buffer. **Dividends:** proposes a dividend at board meetings. |
 | CPO | Products | **Pricing:** keeps the company lineup priced like a delegated manager (§17.1) when Apply-to-all is on. **Developments:** starts one when none is running, within a budget cap of 1% of revenue. **Models:** switches to the bureau package with the best defaults saved per dollar. |
 | CTO | IT | App rating bonus (§16.9); runs digital projects. An empty seat applies the vacancy penalty. |
 | CRO | Risk | Tunes risk appetite to hold CR ≥ 12% and the annualized loss rate ≤ 1.2% (expansion target); Loan Desk policy. |
@@ -720,7 +720,7 @@ Levels 1–5 (Very conservative to Very aggressive):
 - **execMult** multiplies the department's staff effectiveness (§16.4) for the seat's departments: COO → HR, CFO → Finance and Treasury, CPO → Products, CMO → Marketing, CTO → IT, CRO → Risk. Expertise under 40 lowers it below 1. Leadership only feeds the asking salary in v1.
 - **Grants:** a grant is at most 2% of outstanding shares; it vests 25% a year. Grant-date value: the share price (RSU) or max(price − strike, 25% of price) (option), expensed straight-line as non-cash `grantExpense` with paid-in capital rising by the same amount. Vested RSUs issue shares; vested options are exercised whenever in the money (the strike comes in as cash). Leaving forfeits the unvested part; booked expense isn't reversed.
 - **Employee Stock Plan** (public only) adds +5 to executive loyalty in the resignation formula.
-- **Delegation details:** `EXEC_DELEGATION` in balance.ts (COO benefits spending ≤ 8% of payroll; CFO dividend proposal 40% of trailing net income; CPO/CTO developments of 12 weeks at Medium within 1% of revenue; CMO awareness 45–55% within 3% of revenue; CRO steps appetite every 4 weeks, at most 4).
+- **Delegation details:** `EXEC_DELEGATION` in balance.ts (COO benefits spending ≤ 8% of payroll; CFO dividend proposal 40% of trailing net income; CPO/CTO developments of 12 weeks at Medium within 1% of revenue; CMO awareness 45–55% within 3% of revenue; CRO steps appetite every 4 weeks, at most 4; CFO Capital targets `cfoTargetCr` 12% in raise steps of 1% of the bank).
 
 ## 18. Rivals
 
