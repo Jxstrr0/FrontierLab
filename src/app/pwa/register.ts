@@ -9,7 +9,8 @@
 // and the page reloads into the new version at once, so a player doesn't need
 // a second launch to see it. Mid-game it waits until the player quits to the
 // title. Coming back to the app (iOS resumes it without reloading) checks for
-// a new deploy.
+// a new deploy, and the title screen's "Check for updates" button asks on demand
+// (checkForUpdate).
 import { effect, signal } from '@preact/signals';
 import { peekGame, screen, toast, type Screen } from '../store';
 
@@ -25,6 +26,15 @@ export function canApplyUpdate(current: Screen, gameLoaded: boolean): boolean {
 
 /** A new version has installed and is waiting to take over. */
 const updateWaiting = signal(false);
+/** The live registration, once registered (production only). */
+let registration: ServiceWorkerRegistration | null = null;
+/** Set once a waiting worker has been asked to take over; its arrival reloads the page. */
+let applying = false;
+/** How long a tapped check waits for a new version to finish downloading. */
+const INSTALL_WAIT_MS = 30_000;
+
+/** What a tapped update check found. */
+export type UpdateCheck = 'updating' | 'latest' | 'offline';
 
 export function registerServiceWorker(): void {
   if (!import.meta.env.PROD || !('serviceWorker' in navigator)) return;
@@ -63,7 +73,7 @@ function watchForUpdates(reg: ServiceWorkerRegistration): void {
     if (document.visibilityState === 'visible') void reg.update().catch(() => undefined);
   });
 
-  let applying = false;
+  registration = reg;
   sw.addEventListener('controllerchange', () => {
     if (applying) location.reload();
   });
@@ -71,11 +81,54 @@ function watchForUpdates(reg: ServiceWorkerRegistration): void {
   effect(() => {
     if (!updateWaiting.value || applying) return;
     if (canApplyUpdate(screen.value, peekGame() !== null)) {
-      applying = true;
-      reg.waiting?.postMessage('skipWaiting');
+      applyWaiting(reg);
     } else if (!told && screen.value === 'game') {
       told = true;
       toast('A new version is ready. It loads when you quit to the title screen.', 'info', 5000);
     }
+  });
+}
+
+/** Asks the waiting worker to take over; the page reloads when it does. */
+function applyWaiting(reg: ServiceWorkerRegistration): void {
+  if (!reg.waiting) return;
+  applying = true;
+  reg.waiting.postMessage('skipWaiting');
+}
+
+/**
+ * The title screen's "Check for updates": asks the site for a newer version and,
+ * if there is one, downloads it and reloads into it. Without a worker (dev,
+ * `?nosw`, a first visit still installing) it simply reloads the page.
+ */
+export async function checkForUpdate(): Promise<UpdateCheck> {
+  const reg = registration;
+  if (!reg || !navigator.serviceWorker.controller) {
+    location.reload();
+    return 'updating';
+  }
+  if (!reg.waiting) {
+    try {
+      await reg.update();
+    } catch {
+      return 'offline';
+    }
+    await installed(reg.installing);
+  }
+  if (!reg.waiting) return 'latest';
+  applyWaiting(reg);
+  return 'updating';
+}
+
+/** Resolves once a downloading worker finishes (or fails, or takes too long). */
+function installed(worker: ServiceWorker | null): Promise<void> {
+  if (!worker || worker.state !== 'installing') return Promise.resolve();
+  return new Promise((resolve) => {
+    const timer = setTimeout(resolve, INSTALL_WAIT_MS);
+    worker.addEventListener('statechange', () => {
+      if (worker.state === 'installing') return;
+      clearTimeout(timer);
+      resolve();
+    });
   });
 }

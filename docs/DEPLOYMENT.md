@@ -76,6 +76,7 @@ jobs:
 ## PWA (built in Stage 10)
 - `public/manifest.webmanifest` with `start_url: "./"` and `scope: "./"`, so it works under `/VaultStreet/`. Icons at 192, 512 and maskable are drawn by `scripts/icons.ts`.
 - A service worker (`src/app/pwa/sw.js`) is written to `dist/sw.js` at build time by `src/app/pwa/swPlugin.ts`. It precaches every file of that build under a build-versioned cache name. A new deploy downloads in the background (also checked whenever the app comes back to the foreground). If the player is on the title screen with no game loaded, the page switches to it and reloads straight away; mid-game, it waits until they quit to the title, or the next launch.
+- The title screen's **Check for updates** button asks for a new deploy on demand. If one is found it downloads and the page reloads into it; otherwise a toast says you have the latest version (or that the site couldn't be reached).
 - Add `?nosw` to the URL to run without the service worker (and unregister an old one) when testing.
 - Still to test on a real iPhone: Share → Add to Home Screen, then launch offline.
 

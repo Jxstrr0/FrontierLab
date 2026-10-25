@@ -64,7 +64,7 @@ Wealth · Company · Branches · Portfolio · The Ledger (archive) · Milestones
 **Title screen:**
 - engraved logo lockup "Vault Street"
 - Continue (latest autosave), New Game, Load, Settings
-- version string, "A Longlight Interactive game"
+- version string, "A Longlight Interactive game", and a **Check for updates** button: it asks the site for a newer version and reloads into it, or says you have the latest (handy in the home-screen app, which iOS often resumes rather than reloading)
 
 **New Game wizard** (5 steps, with Back and Next):
 1. **Your bank:**
