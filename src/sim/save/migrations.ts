@@ -365,6 +365,12 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     ex.brandTarget ??= EXEC_DELEGATION.brandTarget;
     return s;
   },
+  // v22: the HQ tabs can be arranged. An empty order is the usual DEPT_ORDER.
+  21: (s) => {
+    const state = s as unknown as GameState;
+    state.settings.hqTabOrder ??= [];
+    return s;
+  },
 };
 
 const STAGE9_PNL_LINES = ['franchiseRevenue', 'franchiseCosts', 'dealerFees'] as const;

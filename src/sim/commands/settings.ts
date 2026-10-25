@@ -1,6 +1,9 @@
-// Player settings and the founder's look (SCREENS §26). Settings are validated
-// as a whole before anything changes, so a bad patch leaves the state untouched.
+// Player settings and the founder's look (SCREENS §26), and the order of the
+// HQ tabs (SCREENS §10). Settings are validated as a whole before anything
+// changes, so a bad patch leaves the state untouched.
 import { AVATAR_PARTS } from '../../data/avatarParts';
+import { DEPARTMENTS, DEPT_ORDER } from '../../data/departments';
+import { hqTabOrder, visibleHqTabs } from '../hqTabs';
 import {
   CURRENCY_SYMBOLS,
   DEFAULT_SPEEDS,
@@ -8,7 +11,7 @@ import {
   TEXT_SCALES,
   WEEKLY_RESULTS_MODES,
 } from '../../data/settingsOptions';
-import type { AvatarSpec, GameState, Settings } from '../state';
+import type { AvatarSpec, DeptId, GameState, Settings } from '../state';
 import { fail, ok } from './result';
 
 const oneOf = (list: readonly unknown[], v: unknown) => list.includes(v);
@@ -30,6 +33,12 @@ const CHECKS: { [K in keyof Settings]: (v: unknown) => string | null } = {
     v && typeof v === 'object' && Object.values(v).every(isBool)
       ? null
       : 'Each map layer is on or off.',
+  hqTabOrder: (v) =>
+    Array.isArray(v) &&
+    v.every((d) => typeof d === 'string' && d in DEPARTMENTS) &&
+    new Set(v).size === v.length
+      ? null
+      : 'The HQ tab order lists each department at most once.',
 };
 
 /** Changes one or more settings. */
@@ -42,6 +51,36 @@ export function setSettings(state: GameState, patch: Partial<Settings>) {
   }
   Object.assign(state.settings, patch);
   return ok();
+}
+
+/**
+ * Moves an HQ tab one place up (−1) or down (+1) among the floors you have:
+ * it is lifted out of the full order and set down just past its visible
+ * neighbour, so departments without a floor keep their places and slot in
+ * where DEPT_ORDER puts them when you add them.
+ */
+export function moveHqTab(state: GameState, dept: DeptId, dir: -1 | 1) {
+  if (!(dept in DEPARTMENTS)) return fail('Unknown department.');
+  const visible = visibleHqTabs(state);
+  const at = visible.indexOf(dept);
+  if (at < 0) return fail('That department has no floor yet.');
+  const other = visible[at + dir];
+  if (!other) return ok();
+  const order = hqTabOrder(state).filter((d) => d !== dept);
+  order.splice(order.indexOf(other) + (dir > 0 ? 1 : 0), 0, dept);
+  state.settings.hqTabOrder = order;
+  return ok();
+}
+
+/** Puts the HQ tabs back in DEPT_ORDER. */
+export function resetHqTabOrder(state: GameState) {
+  state.settings.hqTabOrder = [];
+  return ok();
+}
+
+/** True when the tabs are not in DEPT_ORDER. */
+export function hqTabsRearranged(state: GameState): boolean {
+  return hqTabOrder(state).some((d, i) => d !== DEPT_ORDER[i]);
 }
 
 /** Changes the founder's portrait parts; `shade` keeps its current value. */
