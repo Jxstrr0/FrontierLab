@@ -6,7 +6,9 @@ Lease a storefront, build your first branch, set your rates and hire your teller
 
 Plays on phones and desktops. Built with Vite, TypeScript and Preact; deployed with GitHub Pages.
 
-**Play:** https://jxstrr0.github.io/VaultStreet/ (live after the first deploy; adjust if the repo name differs)
+**Play:** https://jxstrr0.github.io/VaultStreet/
+
+**On iPhone:** open the link in Safari, tap Share → Add to Home Screen, then launch it from the icon to play full screen. After the first visit it works offline, and new versions arrive on the next launch.
 
 ## Docs
 
