@@ -1,6 +1,7 @@
 // Root component. Holds the in-app screen stack (no URL routes; DEPLOYMENT.md).
 // Only the title screen is in the first download; the other screens are
 // separate chunks, fetched in the background once the title is up.
+import { OverlayRoot } from './components/Overlays';
 import { useEffect } from 'preact/hooks';
 import { DEFAULT_SETTINGS } from '../sim/newGame';
 import { lazy, whenIdle } from './lazy';
@@ -31,6 +32,7 @@ export function App() {
     <>
       <DisplaySync />
       <CurrentScreen />
+      <OverlayRoot />
     </>
   );
 }

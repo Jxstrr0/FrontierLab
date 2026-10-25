@@ -1,8 +1,10 @@
 // Panel shell (SCREENS §0.1): header, advisor bar, optional hero, scrolling
 // content and an optional bottom tab bar. Full screen on phones, a right drawer
-// at ≥ 900px. Also the bottom Sheet and centred Modal shells.
+// at ≥ 900px. Also the bottom Sheet and centred Modal shells, which render into
+// the overlay layer (Overlays.tsx) rather than where they are declared.
 import type { ComponentChildren } from 'preact';
 import { useRef, useState } from 'preact/hooks';
+import { Overlay } from './Overlays';
 import { avatarFromSeed } from '../../art/portraits';
 import type { AvatarSpec } from '../../sim/state';
 import { useDialog } from './dialog';
@@ -108,27 +110,29 @@ export function Sheet(p: { title?: string; onClose: () => void; children: Compon
   const ref = useRef<HTMLDivElement>(null);
   useDialog(ref, p.onClose, true);
   return (
-    <div class="scrim" onClick={(e) => e.target === e.currentTarget && p.onClose()}>
-      <div
-        class="sheet"
-        role="dialog"
-        aria-modal="true"
-        aria-label={p.title}
-        tabIndex={-1}
-        ref={ref}
-      >
-        <div class="sheet-grip" aria-hidden="true" />
-        {p.title && (
-          <header class="sheet-header">
-            <h2 class="sheet-title">{p.title}</h2>
-            <button type="button" class="icon-btn" aria-label="Close" onClick={p.onClose}>
-              <Icon name="close" size={20} />
-            </button>
-          </header>
-        )}
-        <div class="sheet-content">{p.children}</div>
+    <Overlay>
+      <div class="scrim" onClick={(e) => e.target === e.currentTarget && p.onClose()}>
+        <div
+          class="sheet"
+          role="dialog"
+          aria-modal="true"
+          aria-label={p.title}
+          tabIndex={-1}
+          ref={ref}
+        >
+          <div class="sheet-grip" aria-hidden="true" />
+          {p.title && (
+            <header class="sheet-header">
+              <h2 class="sheet-title">{p.title}</h2>
+              <button type="button" class="icon-btn" aria-label="Close" onClick={p.onClose}>
+                <Icon name="close" size={20} />
+              </button>
+            </header>
+          )}
+          <div class="sheet-content">{p.children}</div>
+        </div>
       </div>
-    </div>
+    </Overlay>
   );
 }
 
@@ -144,28 +148,30 @@ export function Modal(p: {
   const ref = useRef<HTMLDivElement>(null);
   useDialog(ref, p.onClose, true);
   return (
-    <div class="scrim scrim-modal">
-      <div
-        class={`modal${p.class ? ` ${p.class}` : ''}`}
-        role="dialog"
-        aria-modal="true"
-        aria-label={p.title}
-        tabIndex={-1}
-        ref={ref}
-      >
-        <header class="modal-header">
-          {p.icon}
-          <h2 class="modal-title">{p.title}</h2>
-          {p.onClose && (
-            <button type="button" class="icon-btn" aria-label="Close" onClick={p.onClose}>
-              <Icon name="close" size={20} />
-            </button>
-          )}
-        </header>
-        <div class="modal-content">{p.children}</div>
-        {p.footer && <div class="modal-footer">{p.footer}</div>}
+    <Overlay>
+      <div class="scrim scrim-modal">
+        <div
+          class={`modal${p.class ? ` ${p.class}` : ''}`}
+          role="dialog"
+          aria-modal="true"
+          aria-label={p.title}
+          tabIndex={-1}
+          ref={ref}
+        >
+          <header class="modal-header">
+            {p.icon}
+            <h2 class="modal-title">{p.title}</h2>
+            {p.onClose && (
+              <button type="button" class="icon-btn" aria-label="Close" onClick={p.onClose}>
+                <Icon name="close" size={20} />
+              </button>
+            )}
+          </header>
+          <div class="modal-content">{p.children}</div>
+          {p.footer && <div class="modal-footer">{p.footer}</div>}
+        </div>
       </div>
-    </div>
+    </Overlay>
   );
 }
 
