@@ -305,7 +305,7 @@ Tabs: Overview · Loans · Credit.
   - CMO · Brand campaigns: **Awareness target** 40% / 50% / 60% / 70%, tagline "Campaigns +$25.0K/wk (2.1% of revenue, budget 3%) · pushes 3 of 6 cities · +9% new customers" ("· held back by the budget" when a city can't be afforded; "Needs a Marketing floor at HQ." without one)
 - CFO and CRO: **Branch guidance now**: the deposit and loan rate offsets and how much stricter or looser approvals are, noting which switch is off
 - COO, CMO and CPO: **Branch guidance now**: the COO's wage and headcount change, the CMO's campaign push, or the CPO's fee change and whether the lineup is wider or narrower, noting when the switch is off
-- COO only: **Growth cities**: every city you have visited, home first, each with a switch (may the Expansion delegation build here) and an **Open now** button that has the COO build their usual pick at once; the hint under each city shows the next storefront and its cost, or why nothing can be built there
+- COO only: **Growth cities**: every city you have visited, home first, each with a switch (may the Expansion delegation build here) and an **Open now** button that has the COO build their usual pick at once; the hint under each city shows how many branches you already have there (open or being built), then the next storefront and its cost, or why nothing can be built there
 - annual salary stepper
 - grants list: type, shares, strike, vesting progress
 - **Add grant:**
