@@ -56,10 +56,32 @@ export const EMPLOYER_TYPES: Record<string, EmployerType> = {
     incomeMult: 1.0,
     district: 'waterfront',
   },
+  /** Regional sites before the audit fixes used one shared type; kept so older saves still read. */
   resourceCamp: {
     id: 'resourceCamp',
     label: 'Resource Camp',
     employees: 3000,
+    incomeMult: 1.5,
+    district: 'industrial',
+  },
+  oilSands: {
+    id: 'oilSands',
+    label: 'Oil Sands Camp',
+    employees: 4000,
+    incomeMult: 1.6,
+    district: 'industrial',
+  },
+  ironMine: {
+    id: 'ironMine',
+    label: 'Iron Ore Mine',
+    employees: 3000,
+    incomeMult: 1.7,
+    district: 'industrial',
+  },
+  shaleField: {
+    id: 'shaleField',
+    label: 'Shale Field Services',
+    employees: 2500,
     incomeMult: 1.5,
     district: 'industrial',
   },

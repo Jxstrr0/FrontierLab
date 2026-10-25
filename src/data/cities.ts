@@ -401,7 +401,7 @@ export const CITIES: Record<string, CitySpec> = {
     inkName: 'Boreal Umber',
     water: false,
     airport: { code: 'FMM', name: 'Athabasca Field' },
-    regional: { employers: [{ name: 'Athabasca Sands Camp', type: 'resourceCamp' }] },
+    regional: { employers: [{ name: 'Athabasca Sands Camp', type: 'oilSands' }] },
   }),
   plb: c({
     id: 'plb',
@@ -421,7 +421,7 @@ export const CITIES: Record<string, CitySpec> = {
     inkName: 'Iron Red',
     water: true,
     airport: { code: 'PHE', name: 'Port Hedland Strip' },
-    regional: { employers: [{ name: 'Red Range Iron', type: 'resourceCamp' }] },
+    regional: { employers: [{ name: 'Red Range Iron', type: 'ironMine' }] },
   }),
   mid: c({
     id: 'mid',
@@ -441,7 +441,7 @@ export const CITIES: Record<string, CitySpec> = {
     inkName: 'Permian Tan',
     water: false,
     airport: { code: 'MAF', name: 'Permian Regional' },
-    regional: { employers: [{ name: 'Permian Basin Field Services', type: 'resourceCamp' }] },
+    regional: { employers: [{ name: 'Permian Basin Field Services', type: 'shaleField' }] },
   }),
 };
 

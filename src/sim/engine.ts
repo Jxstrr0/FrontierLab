@@ -1,6 +1,7 @@
 // Tick orchestration (SIMULATION §2). `advanceDay` moves the clock and resolves
 // scheduled events; every 7th day runs `weeklyTick`, which calls each system in
 // the documented order.
+import { checkMilestones } from './milestones';
 import { DAYS_PER_WEEK } from '../config/balance';
 import { CITIES } from '../data/cities';
 import { runBooks } from './branch/books';
@@ -134,6 +135,7 @@ export function weeklyTick(state: GameState): void {
   if (isYearStart(state.meta.startDate, state.clock.day)) yearEnd(state); // 14
   runIncidents(state); // 15
   recordNetWorth(state); // 15 (the Personal Wealth screen's weekly change, §22)
+  checkMilestones(state); // 15 (DESIGN §5.18)
   composeNews(state); // 16
 
   for (const cityId of Object.keys(state.world.cities)) {

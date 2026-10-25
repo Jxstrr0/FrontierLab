@@ -22,6 +22,8 @@ export interface EventPayloads {
   DIGITAL_PROJECT_DONE: { templateId: string; name: string };
   PRODUCT_DEVELOPED: { productId: string; name: string; stars: number };
   GAME_OVER: { reason: 'takeover' | 'insolvency' };
+  /** A milestone reached this week (DESIGN §5.18; src/data/milestones.ts). */
+  MILESTONE: { id: string; title: string };
 
   // ─── Macro (macro.ts) ─────────────────────────────────────────────────────
   /** Every central bank meeting, held or moved. `change` 0 means a hold. */
@@ -269,6 +271,8 @@ export interface EventPayloads {
   CLUB_SOLD: { clubId: string; club: string; price: Money; owner: 'company' | 'personal' };
   CLUB_SEASON: { clubId: string; club: string; league: string; pos: number; record: string };
   KIT_SPONSOR: { clubId: string; club: string; on: boolean };
+  /** Arena Naming Rights started at a club you own (CONTENT §11). */
+  NAMING_RIGHTS: { clubId: string; cityId: Id };
   /** You signed a star from the transfer market (commands/franchise.ts). */
   CLUB_SIGNED: { clubId: string; club: string; player: string; position: string; fee: Money };
   /** Year end, when you rank (richList.ts). */

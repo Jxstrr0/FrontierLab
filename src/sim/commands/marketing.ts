@@ -4,7 +4,8 @@
 // marketing agency's office in the city you're in (no floor needed).
 import { AGENCIES, BRAND_CAMPAIGNS } from '../../data/brandCampaigns';
 import { CITIES } from '../../data/cities';
-import { ownsClubIn } from '../franchise';
+import { pushEvent } from '../events';
+import { clubIn, ownsClubIn } from '../franchise';
 import { agenciesInCity, campaignTargetBlock, hasMarketingFloor } from '../hqMarketing';
 import { newId } from '../ids';
 import { spend } from '../ledger';
@@ -45,6 +46,9 @@ export function startBrandCampaign(
     targetId: order.targetId,
     startWeek: state.clock.week,
   });
+  // CONTENT §11: naming rights make the paper.
+  const club = spec.needsFranchise ? clubIn(state, order.targetId) : undefined;
+  if (club) pushEvent(state, 'NAMING_RIGHTS', { clubId: club, cityId: order.targetId }, 1);
   return ok({ id });
 }
 

@@ -299,6 +299,13 @@ const BANK_TEMPLATES = {
       b: 'Police are appealing for witnesses after the {bank} branch was robbed.',
     },
   ],
+  MILESTONE: [
+    { h: '{bank} reaches a milestone: {title}', b: '{line}' },
+    {
+      h: 'Milestone for {bank}: {title}',
+      b: '{line} Staff marked the moment with cake in the break room.',
+    },
+  ],
   INCIDENT_BRANCH_FLOOD: [
     {
       h: 'Floodwater closes {scope}',

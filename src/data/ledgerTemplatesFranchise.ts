@@ -34,6 +34,16 @@ export const FRANCHISE_TEMPLATES = {
       b: '{owner} has sold up for {price}.',
     },
   ],
+  NAMING_RIGHTS: [
+    {
+      h: '{bank} puts its name on the {stadium}',
+      b: 'Home of {club}, the ground will carry the bank’s name for as long as the deal runs. Some fans say they will never call it that.',
+    },
+    {
+      h: '{stadium} gets a banking makeover',
+      b: '{bank} bought the naming rights to the home of {club}. New signs go up before the next home game.',
+    },
+  ],
   KIT_SPONSOR: [
     {
       h: '{bank} name goes on {club} shirts',

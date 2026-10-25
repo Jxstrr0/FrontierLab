@@ -1801,3 +1801,21 @@ export const FX = {
 /** Risk weight on company currency positions (§15). */
 export const FX_RISK_WEIGHT = 1.0;
 export const FX_START_INDEX = 100;
+
+// ─── MILESTONES (DESIGN §5.18) ────────────────────────────────────────────────
+export const MILESTONE_GOALS = {
+  branches: 10,
+  deposits: 1_000_000_000,
+  countries: 5,
+  founderWorth: 1_000_000_000,
+} as const;
+/** Departments that must all be fully staffed (coverage k′ ≥ 1) for "HQ fully staffed". */
+export const MILESTONE_HQ_DEPTS = [
+  'finance',
+  'hr',
+  'products',
+  'treasury',
+  'marketing',
+  'it',
+  'risk',
+] as const;
