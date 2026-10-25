@@ -309,6 +309,32 @@ describe('delegation defaults and seat memory (schema v13)', () => {
   });
 });
 
+describe('migration 13 → 14', () => {
+  it('splits Share sales out of the CFO’s Capital switch without changing what it does', () => {
+    const s = execGame();
+    const cfo = hire(s, 'cfo');
+    cfo.delegations.capital = false;
+    s.executives.remembered.cfo = { treasury: true, capital: true, dividends: true };
+    refreshExecCandidates(s, true);
+    const raw = JSON.parse(JSON.stringify(s)) as Record<string, unknown> & {
+      schemaVersion: number;
+    };
+    const ex = raw.executives as GameState['executives'];
+    delete ex.seats.cfo!.delegations.shares;
+    for (const c of ex.candidates.cfo ?? []) delete c.delegations.shares;
+    const company = raw.company as GameState['company'];
+    delete company.lastBuild;
+    raw.schemaVersion = 13;
+    const up = migrate(raw) as unknown as GameState;
+    expect(up.schemaVersion).toBe(SCHEMA_VERSION);
+    expect(up.executives.seats.cfo!.delegations.shares).toBe(false);
+    expect(up.executives.remembered.cfo!.shares).toBe(true);
+    expect(up.executives.candidates.cfo![0]!.delegations.shares).toBe(true);
+    const newest = Object.values(up.branches).sort((a, b) => b.builtDay - a.builtDay)[0];
+    expect(up.company.lastBuild).toEqual(newest?.build);
+  });
+});
+
 describe('migration 12 → 13', () => {
   it('adds the new executive fields and switches waiting candidates on', () => {
     const s = execGame();

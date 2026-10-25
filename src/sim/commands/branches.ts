@@ -156,6 +156,7 @@ export function buildBranch(
     branch.books[spec.id] = emptyBook();
   }
   state.branches[id] = branch;
+  if (!args.via) state.company.lastBuild = { ...args.build };
   lot.occupant = { type: 'player', id };
   // First branch in a new country under Apply-to-all: that country gets its own HQ list.
   if (state.company.applyRatesToAll && !state.company.companyPrices[country.id]) {

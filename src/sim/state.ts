@@ -53,7 +53,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState, DealerDeal } from './personalTypes';
 
-export const SCHEMA_VERSION = 13;
+export const SCHEMA_VERSION = 14;
 
 export interface GameState {
   schemaVersion: number;
@@ -362,6 +362,8 @@ export interface Company {
   companyOffered?: Record<string, boolean>;
   /** University graduate program (Stage 5). */
   gradProgram?: GradProgram;
+  /** The fit-out you last built with (schema v14): the build sheet and the COO start from it. */
+  lastBuild?: BuildSpec;
 }
 
 export interface FixedAsset {

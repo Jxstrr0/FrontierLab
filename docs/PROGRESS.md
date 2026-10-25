@@ -4,11 +4,19 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 **Current stage:** 10 — Art pass, onboarding, polish, launch (built and live; awaiting the owner's iPhone check). All ten roadmap stages are built. Still open: the owner's testing and tuning pass, an Add to Home Screen test on a real iPhone, and the Vault Street card on Kelbo.Website (in a separate session in that repo).
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `09b8b0090c6bba` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `0f42b6c195480e` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-25 — CFO share sales on their own switch; the build sheet remembers your fit-out (v0.10.3)
+- **Owner's asks:** (A) a separate CFO toggle for private offerings and share sales; (B) the build sheet should remember the last branch's parts instead of resetting the vault, lobby and the rest.
+- **A. Share sales.** The CFO's old Capital switch did two things: protect the ratio (sell company stocks, trim risk appetite) and sell new shares, which dilutes your stake. They are now two switches. **Capital** keeps the first part. **Share sales** sells new shares when the bank falls to Restricted or Critical (under 8%), sized to get back to 12%: a private placement while you're private, a secondary offering once listed. The CFO never launches your IPO; that stays your decision. Your current CFO keeps doing exactly what they did (Share sales starts matching their Capital switch); new hires start with both on, as every delegation does.
+- **B. Last fit-out.** The build sheet now opens with the parts of the last branch you built. Before your first build it still picks the mid build if you can afford it, then basic. The COO's Expansion builds the same fit-out. Only your own builds change it; the COO's don't. Existing saves start from your newest branch's parts.
+- **Save format:** schema v14 (`company.lastBuild`, the CFO's `shares` toggle) with migration 13 → 14. The determinism snapshot moved `09b8b0090c6bba` → `0f42b6c195480e` only because of the new fields: removing them reproduces the old hash, so play is unchanged.
+- **Tests:** 703 (CFO with Share sales off sells stocks but never shares; the last-build memory; migration 13 → 14). Lint, typecheck and build clean. Checked at 390×844: built a branch with a Fortress Vault, and the next build sheet opened with the same five parts; the CFO's profile shows the four switches. No console errors.
+- **Docs:** SIMULATION §17.2 table and §17.4, SCREENS §4, DATA_MODEL v14, DESIGN decision log (two entries).
 
 ### 2026-10-25 — Cash and liquidity are easier to keep in hand early (v0.10.2)
 - **Owner's note:** "the cash float seems hard to keep under control early game", meaning both the Cash figure in the top bar and the liquidity ratio.

@@ -7,7 +7,7 @@ import { WEEKS_PER_YEAR } from '../config/balance';
 import { EXEC_SEATS } from '../data/executives';
 import { BENEFIT_RULES } from '../data/benefits';
 import { refreshExecCandidates } from './execCandidates';
-import { cfoCapital } from './execDelegationsCapital';
+import { cfoCapital, cfoShares } from './execDelegationsCapital';
 import { cooExpansion } from './execDelegationsGrowth';
 import {
   cfoTreasury,
@@ -38,6 +38,7 @@ const DELEGATIONS: [ExecSeat, string, (s: GameState) => void][] = [
   ['coo', 'hrBenefits', cooBenefits],
   ['cfo', 'treasury', cfoTreasury],
   ['cfo', 'capital', cfoCapital],
+  ['cfo', 'shares', cfoShares],
   ['cto', 'digital', ctoDigital],
   ['cpo', 'developments', cpoDevelopments],
   ['cpo', 'models', cpoModels],
