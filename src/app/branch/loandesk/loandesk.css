@@ -116,39 +116,6 @@
   margin-top: var(--space-1);
 }
 
-.rosette {
-  display: block;
-  width: 100%;
-  max-width: 360px;
-  margin: 0 auto;
-}
-.rosette-grid path,
-.rosette-grid line {
-  fill: none;
-  stroke: var(--brass);
-  stroke-width: 0.6;
-  opacity: 0.35;
-}
-.rosette-data {
-  fill: var(--brass);
-  fill-opacity: 0.25;
-  stroke: var(--brass);
-  stroke-width: 1.5;
-  stroke-linejoin: round;
-}
-.rosette-dot {
-  fill: var(--brass-light);
-}
-.rosette-label {
-  font-family: var(--font-ui);
-  font-size: 12px;
-  fill: var(--ivory-dim);
-}
-.rosette-score {
-  font-weight: 700;
-  fill: var(--brass-light);
-}
-
 .loan-list-toggle {
   display: flex;
   align-items: center;

@@ -7,7 +7,7 @@ import type { ComponentChildren } from 'preact';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { TUTORIAL, TUTORIAL_TEXT } from '../../data/tutorial';
 import type { AvatarSpec } from '../../sim/state';
-import { FounderPortrait } from '../newgame/AvatarPicker';
+import { Portrait } from '../components/Portrait';
 import { modal, panel, useGame } from '../store';
 import { acceptTutorial, finishTutorial, skipTutorial, tutorialMemo } from './controller';
 import { guideOf, observe } from './observe';
@@ -132,7 +132,7 @@ function Bar(p: {
     <aside ref={p.barRef} class={`tut-bar is-${p.dock}`} aria-label="Tutorial">
       <div class="tut-row">
         <span class="tut-portrait">
-          <FounderPortrait avatar={p.who.avatar} size={44} />
+          <Portrait avatar={p.who.avatar} size={44} />
         </span>
         <div class="tut-body">
           <div class="tut-head">

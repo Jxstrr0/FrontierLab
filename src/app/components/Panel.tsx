@@ -3,7 +3,11 @@
 // at ≥ 900px. Also the bottom Sheet and centred Modal shells.
 import type { ComponentChildren } from 'preact';
 import { useRef, useState } from 'preact/hooks';
+import { avatarFromSeed } from '../../art/portraits';
+import type { AvatarSpec } from '../../sim/state';
 import { useDialog } from './dialog';
+import { Icon } from './Icon';
+import { Portrait } from './Portrait';
 
 export interface Tab<T extends string> {
   id: T;
@@ -16,7 +20,7 @@ export function Panel<T extends string>(p: {
   subtitle?: string;
   icon?: ComponentChildren;
   onClose: () => void;
-  advisor?: { text: string | string[]; name?: string };
+  advisor?: { text: string | string[]; name?: string; avatar?: AvatarSpec };
   hero?: ComponentChildren;
   tabs?: Tab<T>[];
   tab?: T;
@@ -41,10 +45,12 @@ export function Panel<T extends string>(p: {
           onClick={p.onClose}
           data-tutorial="panel-close"
         >
-          ✕
+          <Icon name="close" size={20} />
         </button>
       </header>
-      {p.advisor && <AdvisorBar text={p.advisor.text} name={p.advisor.name} />}
+      {p.advisor && (
+        <AdvisorBar text={p.advisor.text} name={p.advisor.name} avatar={p.advisor.avatar} />
+      )}
       <div class="panel-content" tabIndex={0}>
         {p.hero && <div class="panel-hero">{p.hero}</div>}
         {p.children}
@@ -71,21 +77,22 @@ export function Panel<T extends string>(p: {
 }
 
 /**
- * Advisor speech line with an oval engraved portrait placeholder. Given several
- * lines, tapping the bar cycles to the next one.
+ * Advisor speech line with the speaker's engraved portrait (theirs when they
+ * are a person in the game, otherwise one drawn from their name). Given
+ * several lines, tapping the bar cycles to the next one.
  */
-export function AdvisorBar(p: { text: string | string[]; name?: string }) {
+export function AdvisorBar(p: { text: string | string[]; name?: string; avatar?: AvatarSpec }) {
   const lines = typeof p.text === 'string' ? [p.text] : p.text;
   const [i, setI] = useState(0);
   const many = lines.length > 1;
   const line = lines[i % lines.length] ?? '';
   const body = (
     <>
-      <svg class="advisor-portrait" viewBox="0 0 28 34" aria-hidden="true">
-        <ellipse cx="14" cy="17" rx="13" ry="16" />
-        <circle cx="14" cy="13" r="5" />
-        <path d="M5 29c2-6 6-8 9-8s7 2 9 8" />
-      </svg>
+      <Portrait
+        avatar={p.avatar ?? avatarFromSeed(p.name ?? 'advisor')}
+        size={32}
+        class="advisor-portrait"
+      />
       <p class="advisor-text">
         {p.name && <span class="advisor-name">{p.name}: </span>}
         {line}
@@ -130,7 +137,7 @@ export function Sheet(p: { title?: string; onClose: () => void; children: Compon
           <header class="sheet-header">
             <h2 class="sheet-title">{p.title}</h2>
             <button type="button" class="icon-btn" aria-label="Close" onClick={p.onClose}>
-              ✕
+              <Icon name="close" size={20} />
             </button>
           </header>
         )}
@@ -166,7 +173,7 @@ export function Modal(p: {
           <h2 class="modal-title">{p.title}</h2>
           {p.onClose && (
             <button type="button" class="icon-btn" aria-label="Close" onClick={p.onClose}>
-              ✕
+              <Icon name="close" size={20} />
             </button>
           )}
         </header>

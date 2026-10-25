@@ -1,6 +1,7 @@
 // Small single-ink spot illustrations for the HR benefits (ART_DIRECTION §3,
-// "Products, campaigns and benefits"): engraved line art on an 80 × 80 plate
-// with a guilloche-style double ring. One drawing per benefit id.
+// "Products, campaigns and benefits"): one drawing per benefit id on the
+// shared 80 × 80 spot plate (components/SpotArt).
+import { SpotArt } from '../components/SpotArt';
 const ART: Record<string, string> = {
   // Mortarboard over an open book.
   tuition:
@@ -29,11 +30,5 @@ const ART: Record<string, string> = {
 };
 
 export function BenefitArt(p: { id: string }) {
-  return (
-    <svg class="hq-benefit-art" viewBox="0 0 80 80" aria-hidden="true">
-      <circle cx="40" cy="40" r="38" class="hq-benefit-ring" />
-      <circle cx="40" cy="40" r="34.5" class="hq-benefit-ring hq-benefit-ring-fine" />
-      <path d={ART[p.id] ?? ART.wellness} class="hq-benefit-line" />
-    </svg>
-  );
+  return <SpotArt d={ART[p.id] ?? ART.wellness} size={64} class="hq-benefit-art" />;
 }

@@ -16,6 +16,10 @@
   align-items: center;
   gap: var(--space-2);
 }
+.mk-campaign-head .mk-campaign-name {
+  flex: 1;
+  min-width: 0;
+}
 .mk-campaign-name {
   font-family: var(--font-display);
   font-weight: 700;

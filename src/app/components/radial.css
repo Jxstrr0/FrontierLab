@@ -1,0 +1,146 @@
+/* Radial visuals and icons (ART_DIRECTION §5, §7): the guilloche
+   RadarRosette, the engraved Donut with its city-ink palette, and the shared
+   icon sizing. */
+
+/* ─── RadarRosette ─────────────────────────────────────────────────────── */
+.rosette {
+  display: block;
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
+}
+.fund-rosette {
+  display: block;
+  width: 100%;
+  max-width: 280px;
+  height: auto;
+  margin: 0 auto;
+}
+.rosette-grid path,
+.rosette-grid line {
+  fill: none;
+  stroke: var(--brass);
+  stroke-width: 0.6;
+  opacity: 0.4;
+}
+.rosette-data {
+  fill: var(--brass);
+  fill-opacity: 0.25;
+  stroke: var(--brass);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+.rosette-dot {
+  fill: var(--brass-light);
+}
+.rosette-label,
+.fund-rosette-label {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  fill: var(--ivory-dim);
+}
+.rosette-score {
+  font-weight: 700;
+  fill: var(--brass-light);
+}
+
+/* ─── Donut ────────────────────────────────────────────────────────────── */
+/* A palette derived from the city inks (ART_DIRECTION §1.1), lifted toward
+   ivory so each reads on navy. */
+:root {
+  --donut-ochre: color-mix(in srgb, #8a6a2c 55%, var(--ivory));
+  --donut-green: color-mix(in srgb, #2e5e4e 50%, var(--ivory));
+  --donut-plum: color-mix(in srgb, #5b3b66 45%, var(--ivory));
+  --donut-coral: color-mix(in srgb, #a65a45 55%, var(--ivory));
+  --donut-blue: color-mix(in srgb, #2f5d8a 45%, var(--ivory));
+  --donut-teal: color-mix(in srgb, #2c6e7f 45%, var(--ivory));
+}
+.inv-donut {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin: var(--space-3) 0;
+}
+.inv-donut svg {
+  flex: none;
+  width: 140px;
+  height: 140px;
+}
+.inv-donut-track {
+  fill: none;
+  stroke: var(--vault-deep);
+}
+.inv-donut-rim {
+  fill: none;
+  stroke: var(--hairline);
+  stroke-width: 0.8;
+}
+.inv-donut-seg {
+  fill: var(--slice);
+}
+/* Fine diagonal engraving inside each segment. */
+.inv-donut-engrave {
+  fill: none;
+  stroke: var(--vault-deep);
+  stroke-width: 0.6;
+  opacity: 0.45;
+}
+.inv-donut-total {
+  fill: var(--ivory);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15px;
+}
+.inv-donut-caption {
+  fill: var(--ivory-dim);
+  font-size: 10px;
+}
+.inv-legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font-size: var(--text-12);
+}
+.inv-legend li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.inv-legend-label {
+  flex: 1;
+  min-width: 0;
+}
+.inv-legend-value {
+  font-variant-numeric: tabular-nums;
+}
+.inv-swatch {
+  flex: none;
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--slice);
+}
+@media (max-width: 360px) {
+  .inv-donut {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .inv-donut svg {
+    align-self: center;
+  }
+}
+
+/* ─── Icons ────────────────────────────────────────────────────────────── */
+.icon {
+  flex: none;
+  display: block;
+}
+.icon-btn .icon {
+  margin: auto;
+}

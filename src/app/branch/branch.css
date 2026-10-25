@@ -53,22 +53,6 @@
   font-size: var(--text-14);
   line-height: var(--line-body);
 }
-.br-mini-portrait,
-.br-portrait {
-  flex: none;
-  fill: none;
-  stroke: var(--brass-light);
-  stroke-width: 1.2;
-}
-.br-mini-portrait {
-  width: 28px;
-  height: 34px;
-}
-.br-portrait {
-  width: 40px;
-  height: 48px;
-}
-
 /* ─── Service: staff ───────────────────────────────────────────────────── */
 .br-staff-head {
   display: flex;
@@ -156,7 +140,11 @@
   gap: var(--space-3);
 }
 .br-product-title {
+  flex: 1;
   min-width: 0;
+}
+.br-product-spot {
+  margin-top: 2px;
 }
 .br-product-name {
   font-family: var(--font-display);
@@ -198,6 +186,11 @@
 }
 .br-campaign.is-on {
   border-color: var(--brass);
+}
+.br-campaign-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
 }
 .br-campaign-name {
   font-weight: 600;

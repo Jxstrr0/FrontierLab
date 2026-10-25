@@ -1,10 +1,4 @@
 /* Office for lease panel (SCREENS §9). */
-.office-art {
-  display: block;
-  width: 100%;
-  height: auto;
-  background: var(--vault-deep);
-}
 .office-intro {
   margin: calc(var(--space-2) * -1) 0 0;
 }

@@ -1,5 +1,6 @@
 // Certificate card (ART_DIRECTION §1.3): brass hairline, an inner hairline 3px
-// inside, and small corner diamonds.
+// inside and small engraved corner rosettes (components.css), plus the section
+// rule with its centred diamond, section titles, rows and badges.
 import type { ComponentChildren } from 'preact';
 
 export function Card(props: { children: ComponentChildren; class?: string; onClick?: () => void }) {
@@ -18,7 +19,9 @@ export function Card(props: { children: ComponentChildren; class?: string; onCli
 export function Rule() {
   return (
     <div class="rule" aria-hidden="true">
-      <span>◆</span>
+      <svg width="9" height="9" viewBox="0 0 10 10">
+        <path d="M5 0.5 9.5 5 5 9.5 0.5 5z" fill="currentColor" />
+      </svg>
     </div>
   );
 }

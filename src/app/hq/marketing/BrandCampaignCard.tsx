@@ -10,7 +10,7 @@ import * as cmd from '../../../sim/commands';
 import { brandCampaignCost } from '../../../sim/hqMarketing';
 import { campaignMult } from '../../../sim/hq';
 import type { SegmentId } from '../../../data/types';
-import { Badge, Card, Row, Segmented } from '../../components';
+import { Badge, Card, Row, Segmented, SpotArt } from '../../components';
 import { dayOfWeek } from '../../branch/selectors';
 import { money, shortDate } from '../../format/format';
 import { act, toast, useGame } from '../../store';
@@ -53,6 +53,7 @@ export function BrandCampaignCard({ spec, cityId }: { spec: BrandCampaignSpec; c
   return (
     <Card class={`mk-campaign${blocker ? ' is-locked' : ''}`}>
       <div class="mk-campaign-head">
+        <SpotArt group="brand" id={spec.id} size={44} />
         <div class="mk-campaign-name">{spec.name}</div>
         {running ? (
           <Badge tone="good">Running</Badge>

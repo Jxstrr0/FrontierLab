@@ -1,8 +1,10 @@
-// Auction house line art (ART_DIRECTION §3, engraved brass lines on the vault
-// ground): a small icon per collectible category for lot and item cards, the
-// red "FAKE" stamp laid over a counterfeit, and the saleroom vignette (rostrum,
-// easel and raised paddles) for the panel hero.
+// Auction house art (ART_DIRECTION §3): a small brass icon per collectible
+// category for lot and item cards, the red "FAKE" stamp laid over a
+// counterfeit, and the saleroom vignette (rostrum, easel and raised paddles)
+// engraved in the city ink for the panel hero.
+import { rect } from '../../art/engrave';
 import type { CollectibleSpec } from '../../data/collectibles';
+import { Face, Hatch, Vignette } from '../components';
 import '../storefront/storefront.css';
 
 const ICONS: Record<CollectibleSpec['category'], string> = {
@@ -50,31 +52,42 @@ const PADDLES = [52, 92, 228, 268];
 
 export function AuctionArt() {
   return (
-    <svg class="au-art" viewBox="0 0 320 130" role="img" aria-label="A saleroom with a rostrum">
-      <rect x="0" y="0" width="320" height="130" class="art-ground" />
-      <path d="M0 116h320" class="art-line" />
-      {/* Panelled back wall and a chandelier. */}
-      <path d="M20 116V24h280v92M20 24l20-12h240l20 12" class="art-line art-fine" />
-      <path d="M160 12v10M146 30h28M150 30l-4 8M170 30l4 8M160 22v8" class="art-line art-fine" />
-      {/* Rostrum with the auctioneer and gavel. */}
-      <path d="M136 116V78h48v38M132 78h56M144 92h32" class="art-line" />
-      <path d="M160 52a6 6 0 1 0 .1 0M150 78c1-10 5-14 10-14s9 4 10 14" class="art-line" />
-      <path d="M172 62l10-6M180 52l6 8" class="art-line" />
-      {/* Easel with the lot on view. */}
-      <path d="M214 116l12-50 12 50M226 66v50M210 50h32v26h-32z" class="art-line" />
-      <path d="M216 56h20v14h-20z" class="art-line art-fine" />
-      {/* Bidders with raised paddles. */}
-      {PADDLES.map((x, i) => (
-        <g key={x}>
-          <path
-            d={`M${x} 98a5 5 0 1 0 .1 0M${x - 9} 116c1-8 4-11 9-11s8 3 9 11`}
-            class="art-line art-fine"
-          />
-          {i % 2 === 0 && (
-            <path d={`M${x + 8} 104l4-14M${x + 9} 84a5 5 0 1 0 .1 0`} class="art-line" />
-          )}
-        </g>
-      ))}
-    </svg>
+    <Vignette label="A saleroom with a rostrum">
+      <g transform="translate(0 16)">
+        <path d="M0 116h320" class="art-line" />
+        {/* Panelled back wall and a chandelier. */}
+        <Hatch pts={rect(20, 90, 280, 26)} density="light" angle={90} />
+        <path d="M20 90h280" class="art-line art-fine" />
+        <path d="M20 116V24h280v92M20 24l20-12h240l20 12" class="art-line art-fine" />
+        {[40, 100, 196, 256].map((x) => (
+          <path d={`M${x} 40h28v40h-28z`} class="art-paper" />
+        ))}
+        {[40, 100, 196, 256].map((x) => (
+          <path d={`M${x} 40h28v40h-28zM${x + 4} 44h20v32h-20z`} class="art-line art-fine" />
+        ))}
+        <path d="M160 12v10M146 30h28M150 30l-4 8M170 30l4 8M160 22v8" class="art-line art-fine" />
+        {/* Rostrum with the auctioneer and gavel. */}
+        <Face pts={rect(136, 78, 48, 38)} density="medium" angle={90} />
+        <Face pts={rect(132, 74, 56, 4)} />
+        <path d="M144 92h32" class="art-line art-fine" />
+        <path d="M160 52a6 6 0 1 0 .1 0M150 78c1-10 5-14 10-14s9 4 10 14" class="art-line" />
+        <path d="M172 62l10-6M180 52l6 8" class="art-line" />
+        {/* Easel with the lot on view. */}
+        <path d="M214 116l12-50 12 50M226 66v50M210 50h32v26h-32z" class="art-line" />
+        <Face pts={rect(216, 56, 20, 14)} density="dense" angle={-30} outline="fine" />
+        {/* Bidders with raised paddles. */}
+        {PADDLES.map((x, i) => (
+          <g key={x}>
+            <path
+              d={`M${x} 98a5 5 0 1 0 .1 0M${x - 9} 116c1-8 4-11 9-11s8 3 9 11`}
+              class="art-line art-fine"
+            />
+            {i % 2 === 0 && (
+              <path d={`M${x + 8} 104l4-14M${x + 9} 84a5 5 0 1 0 .1 0`} class="art-line" />
+            )}
+          </g>
+        ))}
+      </g>
+    </Vignette>
   );
 }

@@ -1,0 +1,92 @@
+/* Engraved portraits (ART_DIRECTION §4): dark ink hatching on ivory paper in
+   a brass guilloche oval. Skin tones arrive inline from src/art/portraits.ts. */
+.portrait {
+  --portrait-ink: #22252b;
+  flex: none;
+  display: block;
+}
+.portrait .pt-paper {
+  fill: var(--ivory);
+}
+.portrait .pt-ground {
+  fill: none;
+  stroke: var(--portrait-ink);
+  stroke-width: 0.35;
+  opacity: 0.22;
+}
+.portrait .pt-frame {
+  fill: none;
+  stroke: var(--brass);
+  stroke-width: 1.8;
+}
+.portrait .pt-frame-in {
+  fill: none;
+  stroke: var(--brass);
+  stroke-width: 0.9;
+}
+.portrait .pt-guil {
+  fill: none;
+  stroke: var(--brass);
+  stroke-width: 0.45;
+}
+.portrait .pt-skin {
+  stroke: none;
+}
+.portrait .pt-cloth {
+  fill: var(--ivory);
+  stroke: none;
+}
+.portrait .pt-hair {
+  fill: var(--portrait-ink);
+  fill-opacity: 0.3;
+  stroke: none;
+}
+.portrait .pt-line {
+  fill: none;
+  stroke: var(--portrait-ink);
+  stroke-width: 0.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.portrait .pt-fine {
+  stroke-width: 0.48;
+}
+.portrait .pt-brow {
+  stroke-width: 0.9;
+}
+.portrait .pt-glass {
+  stroke-width: 0.65;
+}
+.portrait .pt-hatch {
+  fill: none;
+  stroke: var(--portrait-ink);
+  stroke-width: 0.34;
+  stroke-linecap: round;
+  opacity: 0.9;
+}
+.portrait .pt-dots {
+  fill: none;
+  stroke: var(--portrait-ink);
+  stroke-width: 0.75;
+  stroke-linecap: round;
+  opacity: 0.7;
+}
+.portrait .pt-solid {
+  fill: var(--portrait-ink);
+}
+/* Tiny plates: heavier lines so they survive at 28–40 px. */
+.portrait.is-coarse .pt-line {
+  stroke-width: 1.35;
+}
+.portrait.is-coarse .pt-fine {
+  stroke-width: 0.95;
+}
+.portrait.is-coarse .pt-hatch {
+  stroke-width: 0.62;
+}
+.portrait.is-coarse .pt-frame {
+  stroke-width: 3;
+}
+.portrait.is-coarse .pt-frame-in {
+  stroke-width: 1.4;
+}

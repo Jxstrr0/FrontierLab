@@ -1,8 +1,9 @@
 // Branch Service tab (SCREENS §5.1): customer reviews, staff controls and the
 // branch manager card.
+import { avatarFromSeed } from '../../art/portraits';
 import * as cmd from '../../sim/commands';
 import type { Branch, ReviewCard } from '../../sim/state';
-import { Badge, Card, CoinRating, SectionTitle, StatBar, Stepper } from '../components';
+import { Badge, Card, CoinRating, SectionTitle, StatBar, Stepper, Portrait } from '../components';
 import { count, shortDate } from '../format/format';
 import { act, useGame } from '../store';
 import { ManagerCard } from './ManagerCard';
@@ -79,17 +80,9 @@ export function ReviewCardView({ card }: { card: ReviewCard }) {
   );
 }
 
-/** A small engraved oval portrait; the seed picks a head and shoulder shape. */
+/** The reviewer's small engraved portrait, drawn from the card's seed. */
 function MiniPortrait({ seed }: { seed: number }) {
-  const head = 4 + (seed % 3);
-  const shoulders = 7 + ((seed >> 3) % 4);
-  return (
-    <svg class="br-mini-portrait" viewBox="0 0 28 34" aria-hidden="true">
-      <ellipse cx="14" cy="17" rx="13" ry="16" />
-      <circle cx="14" cy="13" r={head} />
-      <path d={`M${14 - shoulders} 29c2-6 ${shoulders - 3}-8 ${shoulders}-8s7 2 ${shoulders} 8`} />
-    </svg>
-  );
+  return <Portrait avatar={avatarFromSeed(seed)} size={32} />;
 }
 
 function Staff({ branch }: { branch: Branch }) {

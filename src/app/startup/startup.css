@@ -2,22 +2,6 @@
 .st-art {
   flex: none;
 }
-.st-art-ring {
-  fill: none;
-  stroke: var(--brass);
-  stroke-width: 1;
-}
-.st-art-ring-fine {
-  stroke-dasharray: 1.5 2;
-  opacity: 0.7;
-}
-.st-art-line {
-  fill: none;
-  stroke: var(--brass-light);
-  stroke-width: 1.6;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
 
 .st-carousel .carousel > .st-card {
   flex-basis: 84%;

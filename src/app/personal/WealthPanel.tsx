@@ -4,10 +4,8 @@
 // the Stocks, Real estate and Other assets sections (WealthSections.tsx).
 import { useState } from 'preact/hooks';
 import { netWorthWeeklyChange } from '../../sim/personalAssets';
-import { Card, Panel, Row } from '../components';
+import { Card, Donut, Panel, Portrait, Row } from '../components';
 import { delta, money } from '../format/format';
-import { Donut } from '../investment/Donut';
-import { FounderPortrait } from '../newgame/AvatarPicker';
 import { closePanel, useGame } from '../store';
 import { RichListSheet } from './RichListSheet';
 import { wealthSlices } from './wealthView';
@@ -36,7 +34,7 @@ export function WealthPanel() {
       <div class="stack">
         <Card>
           <div class="pw-profile">
-            <FounderPortrait avatar={s.meta.founderAvatar} size={64} />
+            <Portrait avatar={s.meta.founderAvatar} size={64} />
             <div class="pw-profile-text">
               <div class="pw-name">{s.meta.founderName}</div>
               <div class="muted small">CEO, {s.meta.bankName}</div>
