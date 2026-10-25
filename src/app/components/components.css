@@ -353,8 +353,10 @@
 }
 .panel-content {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  /* A swipe that reaches the end stops here instead of dragging the page. */
+  overscroll-behavior: contain;
   padding: var(--space-4);
   padding-bottom: calc(var(--space-6) + var(--safe-bottom));
 }
@@ -614,7 +616,10 @@
 }
 .sheet-content,
 .modal-content {
+  flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 0 var(--space-4) var(--space-4);
 }
 .modal-footer {

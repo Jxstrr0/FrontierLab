@@ -10,6 +10,12 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-10-25 — Sheets scroll properly on iPhone (v0.10.1)
+- **Fixed (owner's recording):** on the COO's profile, opened from the HQ Executive floor, scrolling stopped working partway and the sheet's own title disappeared. On iPhone, a sheet opened from inside a screen was being drawn inside that screen's scrolling area. It got clipped under the screen's header and tab bar, and two scroll areas fought over each swipe.
+- Every sheet, confirm and popup now opens in a layer of its own at the top of the app, outside any scrolling screen. Their scroll areas also stop at their ends instead of dragging whatever is behind them. Nothing changes in how they look.
+- **Code:** `src/app/components/Overlays.tsx` (the layer, mounted last in `App.tsx`); `Sheet` and `Modal` in `Panel.tsx` render through it. CSS drops the deprecated `-webkit-overflow-scrolling` from panel content and adds `overscroll-behavior: contain` to panel, sheet and modal content.
+- Checked in a browser at 390×844: the COO sheet mounts in the new layer, its header stays fixed while the content scrolls to the bottom, the HQ screen behind does not move, the Fire confirm stacks on top, and Cancel then Escape close them in order. 695 tests pass, no console errors. The iPhone behaviour itself can only be confirmed on your phone.
+
 ### 2026-10-25 — Run the top of the bank (v0.10.0)
 - **Done (owner's ask):** four changes so you can run the top of the bank and leave the branches to hired staff.
   1. **COO Expansion.** A new switch on the COO's profile. Each week they may open one branch for you in a city you have marked for growth: the growth city with the most room, the busiest free storefront that isn't on top of one of yours, your usual fit-out (your newest branch's build, else the mid or basic reference build), at most one every 4 weeks, and only while 8 weeks of running costs stay in cash. **Growth cities** sit under the switch: every city you have visited, each with a toggle and an **Open now** button that has the COO build there at once (needing only the cash for the build). Switching Expansion on with nothing marked starts with the cities you already have branches in. You still cannot build where you are not; the COO can, because they travel for you.
