@@ -1,7 +1,8 @@
-// HQ panel (SCREENS §10): header "{Bank} HQ" with the office's address and an
+// HQ panel (SCREENS §10): header "{Bank} HQ" with the office's address, an
+// Office button (floors, rent and the release actions in a sheet) and an
 // office switcher when you lease more than one, the floor's lead as advisor,
-// the engraved office interior, and bottom tabs for each department you have
-// (in DEPT_ORDER) plus "+ Add floor". Every floor opens with the shared team
+// the engraved office interior, and a bottom icon bar with each department you
+// have (in DEPT_ORDER) plus "Add floor". Every floor opens with the shared team
 // controls and coverage (the Executive suite hires on the floor itself), then
 // that department's own content. Without an office, it explains how to lease
 // one.
@@ -9,8 +10,9 @@ import { useState } from 'preact/hooks';
 import { CITIES } from '../../data/cities';
 import { DEPARTMENTS } from '../../data/departments';
 import * as cmd from '../../sim/commands';
+import type { IconName } from '../../art/icons';
 import type { DeptId } from '../../sim/state';
-import { Card, Medallion, Panel, type Tab } from '../components';
+import { Card, Icon, Medallion, Panel, type Tab } from '../components';
 import { LayerMedallion } from '../map/LayerIcon';
 import { act, closePanel, openPanel, useGame } from '../store';
 import { AddFloorSheet } from './AddFloorSheet';
@@ -22,7 +24,7 @@ import { InvestmentFloor } from '../investment/InvestmentFloor';
 import { HrFloor } from './HrFloor';
 import { ItFloor } from './ItFloor';
 import { MarketingFloor } from './MarketingFloor';
-import { OfficeCard } from './OfficeCard';
+import { OfficeSheet } from './OfficeSheet';
 import { OfficeInterior } from './OfficeInterior';
 import { ProductsFloor } from './ProductsFloor';
 import { RiskFloor } from './RiskFloor';
@@ -45,17 +47,31 @@ const TAB_LABEL: Record<DeptId, string> = {
   investment: 'Investment',
 };
 
+/** Each floor's icon in the bottom bar (src/art/icons.ts). */
+const TAB_ICON: Record<DeptId, IconName> = {
+  finance: 'ledger',
+  hr: 'people',
+  products: 'card',
+  treasury: 'vault',
+  marketing: 'agency',
+  it: 'monitor',
+  risk: 'shield',
+  executive: 'briefcase',
+  investment: 'investmentBank',
+};
+
 export function HqPanel(p: { officeId?: string; dept?: DeptId }) {
   const s = useGame();
   const [adding, setAdding] = useState(false);
+  const [officeOpen, setOfficeOpen] = useState(false);
   const office = pickOffice(s, p.officeId);
   if (!office) return <NoHq />;
   const offices = officeList(s);
   const depts = hqDepts(s);
   const dept = p.dept && depts.includes(p.dept) ? p.dept : depts[0];
   const tabs: Tab<TabId>[] = [
-    ...depts.map((d) => ({ id: d, label: TAB_LABEL[d] })),
-    { id: 'add', label: '+ Add floor' },
+    ...depts.map((d) => ({ id: d, label: TAB_LABEL[d], icon: TAB_ICON[d] })),
+    { id: 'add', label: 'Add floor', icon: 'plus' },
   ];
   const onTab = (t: TabId) => {
     if (t === 'add') setAdding(true);
@@ -68,6 +84,12 @@ export function HqPanel(p: { officeId?: string; dept?: DeptId }) {
       title={`${s.meta.bankName} HQ`}
       subtitle={[officeAddress(s, office), city].filter(Boolean).join(' · ')}
       icon={<Medallion ink={s.meta.brandInk} monogram={s.meta.monogram} size={32} />}
+      actions={
+        <button type="button" class="hq-office-btn" onClick={() => setOfficeOpen(true)}>
+          <Icon name="office" size={18} />
+          Office
+        </button>
+      }
       onClose={closePanel}
       advisor={
         dept
@@ -123,8 +145,10 @@ export function HqPanel(p: { officeId?: string; dept?: DeptId }) {
             </button>
           </Card>
         )}
-        <OfficeCard office={office} dept={dept} />
       </div>
+      {officeOpen && (
+        <OfficeSheet office={office} dept={dept} onClose={() => setOfficeOpen(false)} />
+      )}
       {adding && <AddFloorSheet office={office} onClose={() => setAdding(false)} />}
     </Panel>
   );

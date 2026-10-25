@@ -171,6 +171,7 @@ export function LotCoin(p: { size?: number }) {
     <svg class="medallion coin" width={size} height={size} viewBox="0 0 22 22" aria-hidden="true">
       <circle cx="11" cy="11" r="10" fill="var(--ivory)" stroke="var(--brass)" stroke-width="1.4" />
       <circle
+        class="coin-ring"
         cx="11"
         cy="11"
         r="8.2"

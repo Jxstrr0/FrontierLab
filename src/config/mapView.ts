@@ -50,21 +50,29 @@ export const CLUSTER_LEVELS_PER_OCTAVE = 4;
 /** Tapping a cluster zooms here, where no pins cluster. */
 export const CLUSTER_EXPAND_ZOOM = 1;
 
-/** Pin geometry (ART_DIRECTION §2): medallion size and the hit box around it. */
-export const PIN_MEDALLION_PX = 30;
+/**
+ * Pin geometry (ART_DIRECTION §2): medallion size and the hit box around it.
+ * Medallions, crests, tags and seals share one footprint (about 28 px) so no
+ * kind of pin shouts over the others.
+ */
+export const PIN_MEDALLION_PX = 28;
 export const PIN_HIT_PX = 44;
 /** The medallion floats this far above the roof anchor (centre to anchor). */
 export const PIN_LIFT_PX = 20;
 /** Bank crests (your branches and rivals'): width and height; a head office adds a crown on top. */
-export const PIN_CREST_PX = { w: 30, h: 34 } as const;
+export const PIN_CREST_PX = { w: 26, h: 30 } as const;
 export const PIN_CREST_CROWN_PX = 6;
-export const PIN_CREST_LIFT_PX = 22;
-/** Landmark seals (central bank, airport, stadium): larger than medallions. */
-export const PIN_LANDMARK_PX = 40;
-export const PIN_LANDMARK_LIFT_PX = 27;
-/** Open branch locations: a small "$" coin. */
+export const PIN_CREST_LIFT_PX = 21;
+/** Landmark seals (central bank, airport, stadium): a touch larger than medallions. */
+export const PIN_LANDMARK_PX = 32;
+export const PIN_LANDMARK_LIFT_PX = 23;
+/**
+ * Open branch locations: a "$" coin at close zoom (from PIN_CAPTION_FROM_ZOOM);
+ * nearer out, a small brass dot on the roof, the coin scaled by PIN_COIN_DOT_SCALE.
+ */
 export const PIN_COIN_PX = 22;
 export const PIN_COIN_LIFT_PX = 15;
+export const PIN_COIN_DOT_SCALE = 0.45;
 /** Price tags (rent or buy): height and lift. */
 export const PIN_TAG_PX = 22;
 export const PIN_TAG_LIFT_PX = 19;
@@ -81,7 +89,10 @@ export const PIN_FAR_SCALE = {
 export const CLUSTER_MARK_PX = { crest: 26, medallion: 25, coin: 14 } as const;
 /** At most this many distinct marks fan out in a cluster stack. */
 export const CLUSTER_STACK_MAX = 3;
-/** From this zoom up, places show a short caption under the pin ("Credit bureau"). */
+/**
+ * From this zoom up, places show a short caption under the pin ("Credit bureau"),
+ * notes ("Sale wk 4"), the words on price tags ("For lease") and the coins' "$".
+ */
 export const PIN_CAPTION_FROM_ZOOM = 1.5;
 /** Words dropped from a rival bank's name for the caption under its crest. */
 export const RIVAL_CAPTION_GENERIC_WORDS = [

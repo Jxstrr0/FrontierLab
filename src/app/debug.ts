@@ -13,6 +13,7 @@ import { listPendingIpo } from '../sim/equityIpo';
 import { listLots } from '../sim/auctions';
 import { act, bump, modal, openPanel, peekGame, screen, setGame } from './store';
 import { newGame } from '../sim/newGame';
+import { importCode } from '../sim/save/serialize';
 import { startFlight } from './airport/flight';
 import { activeMap } from './map/MapView';
 import { loadFromSlot, saveToSlot, type SlotId } from './saves';
@@ -66,6 +67,11 @@ export function installDebug(): void {
     save(slot: SlotId = '1') {
       const s = peekGame();
       return s ? saveToSlot(slot, s) : 'No game';
+    },
+    /** Opens a save code (an exported save, e.g. a tests/fixtures file) in the game screen. */
+    importSave(code: string) {
+      setGame(importCode(code.trim()));
+      screen.value = 'game';
     },
     /** Loads a slot into the game screen. */
     load(slot: SlotId = '1') {

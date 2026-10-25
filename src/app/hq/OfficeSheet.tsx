@@ -1,12 +1,13 @@
-// The office footer on every HQ floor (SCREENS §10): which department sits on
-// each floor of the building, its rent, and the two release actions, each with
-// a confirm that spells out what happens (staff above the remaining desks let
-// go with severance, fit-out written off, the deposit back for a whole office).
+// The Office sheet, opened from the HQ header's Office button (SCREENS §10):
+// which department sits on each floor of the building, its rent, and the two
+// release actions, each with a confirm that spells out what happens (staff
+// above the remaining desks let go with severance, fit-out written off, the
+// deposit back for a whole office).
 import { useState } from 'preact/hooks';
 import { DEPARTMENTS } from '../../data/departments';
 import * as cmd from '../../sim/commands';
 import type { DeptId, Office } from '../../sim/state';
-import { Card, Confirm, Row, SectionTitle } from '../components';
+import { Card, Confirm, Row, Sheet } from '../components';
 import { money } from '../format/format';
 import { act, openPanel, useGame } from '../store';
 import {
@@ -19,7 +20,7 @@ import {
   usedFloors,
 } from './officeSelectors';
 
-export function OfficeCard(p: { office: Office; dept?: DeptId }) {
+export function OfficeSheet(p: { office: Office; dept?: DeptId; onClose: () => void }) {
   const s = useGame();
   const sym = s.settings.currency;
   const [ask, setAsk] = useState<'floor' | 'office' | null>(null);
@@ -31,6 +32,7 @@ export function OfficeCard(p: { office: Office; dept?: DeptId }) {
 
   const releaseFloor = () => {
     setAsk(null);
+    p.onClose();
     if (!target || !p.dept) return;
     if (act(cmd.releaseFloor, target.officeId, target.floor).ok) {
       const left = hqDepts(s);
@@ -39,41 +41,51 @@ export function OfficeCard(p: { office: Office; dept?: DeptId }) {
   };
   const releaseOffice = () => {
     setAsk(null);
+    p.onClose();
     if (act(cmd.releaseOffice, o.id).ok) openPanel({ type: 'hq' });
   };
 
-  return (
-    <section>
-      <SectionTitle>Office</SectionTitle>
-      <Card>
-        <Row label="Address" value={officeAddress(s, o)} />
-        <Row label="Floors in use" value={`${usedFloors(o)} of ${o.floors.length}`} />
-        <Row label="Weekly rent" value={money(o.weeklyRent, sym)} />
-        <ol class="hq-floor-list" aria-label="Floors">
-          {o.floors.map((f, i) => (
-            <li class={f ? '' : 'muted'}>
-              <span>Floor {i + 1}</span>
-              <span>{f ? DEPARTMENTS[f].name : 'Empty'}</span>
-            </li>
-          ))}
-        </ol>
-      </Card>
-      <div class="grid-2 hq-release">
-        {p.dept && (
+  // One layer at a time: a confirm replaces the sheet rather than stacking on it.
+  if (ask === null)
+    return (
+      <Sheet title="Office" onClose={p.onClose}>
+        <Card>
+          <Row label="Address" value={officeAddress(s, o)} />
+          <Row label="Floors in use" value={`${usedFloors(o)} of ${o.floors.length}`} />
+          <Row label="Weekly rent" value={money(o.weeklyRent, sym)} />
+          <ol class="hq-floor-list" aria-label="Floors">
+            {o.floors.map((f, i) => (
+              <li class={f ? '' : 'muted'}>
+                <span>Floor {i + 1}</span>
+                <span>{f ? DEPARTMENTS[f].name : 'Empty'}</span>
+              </li>
+            ))}
+          </ol>
+        </Card>
+        <div class="stack hq-release">
+          {p.dept && (
+            <button
+              type="button"
+              class="btn btn-secondary btn-block"
+              disabled={!floorPreview}
+              onClick={() => setAsk('floor')}
+            >
+              {p.dept === 'hr' ? 'Close HR floor' : `Release floor · ${deptName}`}
+            </button>
+          )}
           <button
             type="button"
             class="btn btn-secondary btn-block"
-            disabled={!floorPreview}
-            onClick={() => setAsk('floor')}
+            onClick={() => setAsk('office')}
           >
-            {p.dept === 'hr' ? 'Close HR floor' : 'Release floor'}
+            Release office
           </button>
-        )}
-        <button type="button" class="btn btn-secondary btn-block" onClick={() => setAsk('office')}>
-          Release office
-        </button>
-      </div>
+        </div>
+      </Sheet>
+    );
 
+  return (
+    <>
       {ask === 'floor' && floorPreview && (
         <Confirm
           title={`Release a ${deptName} floor?`}
@@ -135,6 +147,6 @@ export function OfficeCard(p: { office: Office; dept?: DeptId }) {
           }
         />
       )}
-    </section>
+    </>
   );
 }

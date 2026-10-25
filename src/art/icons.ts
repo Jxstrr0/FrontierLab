@@ -48,6 +48,13 @@ export const ICON_PATHS = {
   teller: 'M3 20h18M4 20V9h16v11M8 9V5h8v4M8 13h3v3H8zM13 13h3v3h-3z',
   chart: 'M4 4v16h16M7 15l4-5 3 3 5-7',
   shield: 'M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6zM9 12l2 2 4-4',
+  // HQ floors: an open ledger (Finance), a bank card (Products), a screen with
+  // its rating line (IT) and a briefcase (Executive suite).
+  ledger:
+    'M4 5h6a2 2 0 0 1 2 2v13a2 2 0 0 0-2-2H4zM20 5h-6a2 2 0 0 0-2 2v13a2 2 0 0 1 2-2h6zM6.5 9h3M6.5 12h3M14.5 9h3M14.5 12h3',
+  card: 'M3 6h18v12H3zM3 10h18M6 14.5h4M14 14.5h4',
+  monitor: 'M4 5h16v11H4zM9 20h6M12 16v4M8 12.5l2.5-3 2 2 3.5-4',
+  briefcase: 'M4 8h16v11H4zM9 8V5h6v3M4 13h16M11 12.5v2h2v-2',
   warning: 'M12 4l9 16H3zM12 10v4.5M12 17.5h.01',
   trade: 'M4 8h13l-3-3M20 16H7l3 3',
   handshake: 'M3 11l4-4 3 2 3-2 4 0 4 4M3 11l5 5 2-1 2 2 2-1 2 1 5-6M10 9l3 3M13 12l2 2',
@@ -68,6 +75,7 @@ export const ICON_PATHS = {
   menu: 'M4 7h16M4 12h16M4 17h16',
   layers: 'M12 4 3 9l9 5 9-5zM3 13.5l9 5 9-5',
   close: 'M6 6l12 12M18 6 6 18',
+  plus: 'M12 5v14M5 12h14',
   pause: 'M8.5 5v14M15.5 5v14',
   play: 'M7 5l12 7-12 7z',
   fast: 'M4 6l8 6-8 6zM12 6l8 6-8 6z',
