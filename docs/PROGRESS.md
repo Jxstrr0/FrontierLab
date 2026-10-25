@@ -4,11 +4,33 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 **Current stage:** 10 — Art pass, onboarding, polish, launch (built and live; awaiting the owner's iPhone check). All ten roadmap stages are built. Still open: the owner's testing and tuning pass, an Add to Home Screen test on a real iPhone, and the Vault Street card on Kelbo.Website (in a separate session in that repo).
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `18c44acb4c1d33` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `1d8a4c9537a73c` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-25 — A city tops out at 5–12 branches
+- **Stage / step:** post-launch balance (owner request: "most banks don't have 30 branches per city, they have 5–12 or so, depending on city size"). Also logged the owner's call that branch equipment stays fixed after the build.
+- **Problem:** every branch brought in its own lot's foot traffic, and a second branch nearby mostly took customers from the city's other banks. In a test, a small city kept paying for about 30 branches and a medium one for about 40.
+- **Done:**
+  - **One customer pool per city** (SIMULATION §9.2). Each city has a pool of people who might bank with you: 32,000 for a small city, 38,000 medium, 50,000 large, 72,000 extra large. As your branches there fill it up, every branch in that city gets fewer new prospects. A lone first branch hardly notices.
+  - **Result** (test: N branches on the best lots, 5 years, 3 seeds). Total profit levels off at about **5 branches in Saskatoon**, **7–9 in Calgary**, **9–12 in Toronto** and **12–15 in New York**. Past that, a new branch adds little or loses money.
+  - **You can see it.** The "Available location" panel has a "Your bank in {city}" card ("4 of about 5" branches and a Market reached bar). The advisor warns you when the city is well covered. The city list shows the same line.
+  - **Scripted test players** stop at the advised count and fly on. A 10-year steady game now ends with 153 branches spread across 18 cities, where before it had 210 branches in 5 cities. Profit and equity are a little higher.
+- **Checks:**
+  - tsc, eslint, prettier, 643 tests and the build all pass. New `tests/sim/cityMarket.test.ts`.
+  - The recession test now reads loan defaults only while the bank is still in Canada, because it now goes abroad by year 5.
+  - **Determinism:** the snapshot changed on purpose, from `078a7f43a079dc` to `1d8a4c9537a73c`.
+  - **Balance:**
+    - The 20-seed panel is all in range.
+    - Turtle, aggressive, stress and nohq pass.
+    - Steady seed 42 misses one check: the first branch's week-208 income is $27k (one bad week; weeks 104–156 and 260 are fine at $53k). The median panel is the judge, as before.
+  - **Targets changed** (SIMULATION §25): the first branch now levels off once the home city fills, so the higher week-208+ band ($110k revenue / $45k income) became one band from week 104 ($95k+ / $38k+).
+  - Screenshot of the storefront panel at 390×844; no console errors.
+- **Saves:** no format change. Reach is worked out from your customers, so existing games pick it up. A city that already holds lots of branches will see new customers slow down there.
+- **Dependencies:** none added.
+
 
 ### 2026-10-25 — Clearer map icons and a look of its own for every city
 - **Stage / step:** post-launch polish (owner request: "unique icon visual clarity, easier to determine what's what" and "each city more unique and detailed", plus "maybe adding some unique colour to the icons")

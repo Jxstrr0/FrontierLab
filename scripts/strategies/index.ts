@@ -5,7 +5,7 @@ import { forceRecession } from './stress';
 import { averageLot, bestLot, buildCost, followDefaults, openBranch } from './common';
 import { manageEquity } from './equity';
 import { hqReady, manageHq } from './hq';
-import { cityFull, nextExpansionLot } from './expansion';
+import { cityFull, hasRoom, nextExpansionLot } from './expansion';
 import type { Strategy } from './types';
 import * as cmd from '../../src/sim/commands';
 import type { GameState } from '../../src/sim/state';
@@ -32,6 +32,7 @@ function expand(
   const { hq = true, travel = true } = opts;
   if (hq && !hqReady(state)) return;
   if (travel && cityFull(state) && state.company.capitalRatio <= minCr) return;
+  if (!travel && !hasRoom(state, state.world.currentCityId)) return;
   const lot = travel ? nextExpansionLot(state) : bestLot(state);
   if (!lot) return;
   if (state.company.cash > mult * buildCost(state, lot) && state.company.capitalRatio > minCr) {
@@ -63,7 +64,7 @@ export const turtle: Strategy = {
     followDefaults(s);
     manageHq(s);
     for (const app of Object.values(s.loanDesk.applications)) cmd.declineApplication(s, app.id);
-    const lot = bestLot(s);
+    const lot = hasRoom(s, s.world.currentCityId) ? bestLot(s) : undefined;
     if (lot && hqReady(s) && s.company.cash > 2 * buildCost(s, lot)) {
       const id = openBranchTurtle(s, lot.id);
       if (id) cmd.setDelegation(s, id, 'loans', false);

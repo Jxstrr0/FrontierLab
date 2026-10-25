@@ -15,6 +15,7 @@ import { CAMPAIGNS } from '../../data/campaigns';
 import { EQUIPMENT } from '../../data/equipment';
 import type { ProductSpec } from '../../data/products';
 import { loanDemand } from '../macro';
+import { cityRoom } from './cityMarket';
 import { clamp, roundToStep } from '../math';
 import { countryOfCity, defaultPrice, ftpFor, marketRef } from '../rates';
 import { stream, type Rng } from '../rng';
@@ -126,7 +127,8 @@ function delegateMarketing(state: GameState, branch: Branch): void {
     (1 - AWARENESS_FLOOR) *
     (1 - b) *
     Math.sqrt(loanDemand(country)) *
-    dpow(1 - pen, SATURATION_EXP);
+    dpow(1 - pen, SATURATION_EXP) *
+    cityRoom(state, branch.cityId);
   const share = branch.last.share;
   const H = DELEGATE.marketingHorizon;
   const steady = (g: number) => (g * mult) / (AWARENESS_DECAY + g * mult);

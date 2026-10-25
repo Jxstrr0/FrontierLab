@@ -235,7 +235,9 @@ Targets are computed each week. Displayed ratings follow them with `ema(rating, 
 - `penetration = customers / population`
 
 ### 9.2 Prospects
-`P = footTraffic × PROSPECT_RATE (0.040) × (0.25 + 0.75 × e) × loanDemand^0.5 × (1 − penetration)^SATURATION_EXP (2.8) × noise(±5%)`. (Stage 1 tuning: 0.030 → 0.040 and 2.5 → 2.8.)
+`P = footTraffic × PROSPECT_RATE (0.040) × (0.25 + 0.75 × e) × loanDemand^0.5 × (1 − penetration)^SATURATION_EXP (2.8) × cityRoom × noise(±5%)`. (Stage 1 tuning: 0.030 → 0.040 and 2.5 → 2.8.)
+
+**City-wide pool (added 2026-10-25):** `cityRoom = 1 − reach^CITY_SATURATION_EXP (3)`, where `reach = clamp(your customers across every branch in the city ÷ CITY_MARKET[size], 0, 1)` and `CITY_MARKET = { S: 32,000, M: 38,000, L: 50,000, XL: 72,000 }` (`src/sim/branch/cityMarket.ts`). Without it each lot brought its own foot traffic, so profit kept rising until almost every lot in a city was yours (about 30 branches in a small city). With it, total profit levels off at about 5 branches in a small city, 7–9 in a medium one, 9–12 in a large one and 12–15 in an extra-large one, and extra branches mostly split customers with your own. A first branch alone barely feels it (reach ≈ 0.3 → room 0.97). `CITY_BRANCH_GUIDE = { S: 5, M: 7, L: 9, XL: 12 }` is advice only: the storefront panel and the scripted strategies use it. Delegated marketing (§17.1) uses the same multiplier.
 
 **Pacing intent:** like the original's stores, a branch should reach most of its mature size within about a year, with most of the growth in the first six months, rather than compounding for a decade. High intake plus strong saturation does that, so a mid build pays back in under ~40 weeks.
 
@@ -961,7 +963,7 @@ A deliberately simple "country up or down" investment (DESIGN §5.12a). Your boo
 
 Run `npm run balance` with seed 42 and the start city Calgary, unless noted. Branch checkpoints read the first branch of the steady strategy, built on an "average lot" (the median-rent free lot in Midtown). Weekly revenue and income checkpoints use a 4-week average, so a single large default doesn't swing them.
 
-**Updated 2026-10-25 (cross-seed calibration):** the first-branch checkpoints describe a typical city, so they are judged on the median of 20 cities: `npm run balance -- --years 5 --seeds 1-20` runs steady once per seed, prints each seed's key numbers and checks every band against the median (`scripts/branchCheckpoints.ts`). One city's "average lot" can sit 30–40% above or below the median (seeds 7, 8 and 16 below; 14 and 17 above), which is the map doing its job, not drift. A single-seed run still prints its own first-branch checks for reference. The median city meets every band; its revenue and income keep climbing with deposits through years 2–3 ($101k/$40k at week 104, $112k/$46k at week 208), so the full mature earnings band applies from week 208 and weeks 104–156 use $95k+ revenue and $38k+ income.
+**Updated 2026-10-25 (cross-seed calibration):** the first-branch checkpoints describe a typical city, so they are judged on the median of 20 cities: `npm run balance -- --years 5 --seeds 1-20` runs steady once per seed, prints each seed's key numbers and checks every band against the median (`scripts/branchCheckpoints.ts`). One city's "average lot" can sit 30–40% above or below the median (seeds 7, 8 and 16 below; 14 and 17 above), which is the map doing its job, not drift. A single-seed run still prints its own first-branch checks for reference. The median city meets every band; its revenue and income keep climbing with deposits through years 2–3 ($101k/$40k at week 104, $112k/$46k at week 208). Since the city-wide pool (§9.2) the home city fills at about 7 branches, so the first branch levels off at about $100–105k revenue and $40–43k income, and one band ($95k+ / $38k+) applies from week 104.
 
 **Note (Stage 5):** the branch checkpoints are a seed-42 reference and assume Expansion. With every country simulated, seed 42's path has a recession at weeks 97–134 and policy cuts to 1.5%, so week 156 reads about $90k revenue / $41k income (below band) before recovering inside it by week 208. Other seeds (e.g. 7, 99) already missed the first-branch checkpoints in Stage 4 because their median Midtown lot is weaker; a cross-seed calibration is open.
 
@@ -975,7 +977,7 @@ Run `npm run balance` with seed 42 and the start city Calgary, unless noted. Bra
 | First branch weekly income turns positive | week 6–16 |
 | Branch at week 26 | deposits $15–30M; income positive |
 | Branch at week 52 | deposits $30–50M; loans 75–90% of deposits; customers 3,000–5,000; income +$20k–$40k/week [was $15k–$30k] |
-| Mature branch (week 104+) | deposits $40–70M (organic chequing growth keeps it creeping up) [was $40–65M]; loans 70–90% of deposits [was 75–90%]; revenue $110k–$150k/week from week 208, $95k–$150k at weeks 104–156 [was $80k–$100k]; income +$45k–$70k/week from week 208, +$38k–$70k at weeks 104–156 [was $25k–$35k]. Loan-ratio, revenue and income checkpoints in a recession or the 26 weeks after it read n/a |
+| Mature branch (week 104+) | deposits $40–70M (organic chequing growth keeps it creeping up) [was $40–65M]; loans 70–90% of deposits [was 75–90%]; revenue $95k–$150k/week [was $110k+ from week 208]; income +$38k–$70k/week [was +$45k+ from week 208]. Since the city-wide customer pool (§9.2, 2026-10-25) the home city fills at about 7 branches by year 4, so the first branch levels off instead of climbing through years 4–5. Loan-ratio, revenue and income checkpoints in a recession or the 26 weeks after it read n/a |
 | Payback of a mid build on an average lot | ≤ 40 weeks from opening |
 | Year 2 (steady) | 4–8 branches; HQ required; cash never < 0 |
 | Capital first binds (no raises) | years 1–3; private placements and the IPO are the intended growth fuel |
@@ -1034,6 +1036,7 @@ Group the constants like this, with the defaults shown above:
 - **MARKETING:** `AWARENESS_DECAY`, `BRAND_DECAY`, `GRAND_OPENING_BONUS`
 - **DEMAND:**
   - `PROSPECT_RATE`, `CATCHMENT_MULT`, `SATURATION_EXP`, `RIVAL_RADIUS`
+  - `CITY_MARKET`, `CITY_SATURATION_EXP`, `CITY_BRANCH_GUIDE`
   - `PRODUCTS_PER_CUSTOMER`, `REVIEW_RATE`, `FEE_STEP_MIN`
 - **BOOKS:**
   - `GIC_RENEW_BASE`, `PREPAY_BASE`, `INTERCHANGE`

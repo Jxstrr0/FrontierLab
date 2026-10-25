@@ -111,6 +111,7 @@ After the wizard, the map opens with the tutorial (§27).
   - weekly rent (/week) and security deposit (upfront)
   - foot traffic (/week)
   - **Demographics:** five bars (Students, Young professionals, Families, Retirees, Businesses), plus income level (Low / Mid / High, with the index in small type) and homeowners %
+  - **Your bank in {city}:** your branches here against the advice for a city this size ("4 of about 5") and a Market reached bar (SIMULATION §9.2). When the city is well covered (at the advised count, or 80% reached) the advisor adds that another branch would mostly split customers with your own.
   - **Nearby competition:** rival branch count within the radius and their average coins
   - **Area map:** a mini district map with this lot highlighted
 - **Button:** Build branch.

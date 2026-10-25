@@ -7,9 +7,9 @@ import { DISTRICT_SPECS } from '../../data/districts';
 import { DISTRICTS, type DistrictId } from '../../data/types';
 import type { GameState, Lot } from '../../sim/state';
 import { Badge, Medallion, Segmented } from '../components';
-import { count, money } from '../format/format';
+import { count, money, pct } from '../format/format';
 import { openPanel, useGame } from '../store';
-import { average, cityLots } from './lotInfo';
+import { average, cityCoverage, cityLots } from './lotInfo';
 import { RivalSheet } from './RivalSheet';
 import './city.css';
 
@@ -38,6 +38,7 @@ export function CityList(p: { hideTitle?: boolean } = {}) {
   const free = lots.filter((l) => !l.occupant).length;
   const mine = lots.filter((l) => l.occupant?.type === 'player').length;
   const rivals = lots.length - free - mine;
+  const cover = cityCoverage(s, s.world.currentCityId);
 
   // Applications waiting at each branch (brass dot).
   const pending = pendingByBranch(s);
@@ -55,6 +56,10 @@ export function CityList(p: { hideTitle?: boolean } = {}) {
         <p class="muted small">
           {count(lots.length)} storefronts: {count(free)} available, {count(mine)} yours,{' '}
           {count(rivals)} rivals
+        </p>
+        <p class="muted small">
+          Market reached {pct(cover.reach, 0)} · {count(cover.ours)} of about {count(cover.guide)}{' '}
+          branches
         </p>
         <Segmented label="Show storefronts" options={FILTERS} value={filter} onChange={setFilter} />
       </header>

@@ -1,9 +1,11 @@
 // Available branch location (SCREENS §3): what a lot offers (rent, traffic, who lives
 // and works nearby, the competition) and a Build branch button.
+import { CITIES } from '../../data/cities';
 import { SEGMENTS } from '../../data/types';
 import * as cmd from '../../sim/commands';
 import { cheapestBuild } from '../build/builds';
 import {
+  cityCoverage,
   cityLots,
   districtName,
   incomeLabel,
@@ -29,6 +31,13 @@ export function StorefrontPanel(p: { lotId: string }) {
   }
   const sym = s.settings.currency;
   const near = nearbyCompetition(s, lot);
+  const cityName = CITIES[lot.cityId]?.name ?? 'this city';
+  const cover = cityCoverage(s, lot.cityId);
+  const advice =
+    storefrontAdvice(lot, cityLots(s)) +
+    (cover.full
+      ? ` ${cityName} is well covered already: another branch here would mostly split customers with your own. Another city may pay better.`
+      : '');
   // The cheapest build tells us whether any build is possible here right now.
   const blocker = cmd.buildBlocker(s, p.lotId, cheapestBuild());
 
@@ -37,7 +46,7 @@ export function StorefrontPanel(p: { lotId: string }) {
       title="Available location"
       subtitle={`${lot.address} · ${districtName(lot)}`}
       onClose={closePanel}
-      advisor={{ text: storefrontAdvice(lot, cityLots(s)) }}
+      advisor={{ text: advice }}
       hero={<StorefrontArt />}
       footer={
         <div class="stack">
@@ -83,6 +92,15 @@ export function StorefrontPanel(p: { lotId: string }) {
             }
           />
           <Row label="Homeowners" value={pct(lot.homeownerShare, 0)} />
+        </Card>
+
+        <SectionTitle>Your bank in {cityName}</SectionTitle>
+        <Card>
+          <Row
+            label="Your branches here"
+            value={`${count(cover.ours)} of about ${count(cover.guide)}`}
+          />
+          <StatBar label="Market reached" value={cover.reach * 100} display={pct(cover.reach, 0)} />
         </Card>
 
         <SectionTitle>Nearby competition</SectionTitle>

@@ -266,6 +266,16 @@ export const DEMAND_NOISE = 0.05;
 export const SHARE_EXP = 2.2;
 export const RIVAL_RADIUS = 12;
 export const DISTANCE_FALLOFF = 6;
+/**
+ * The city-wide customer pool (§9.2): how many customers your bank can win in
+ * a city of each size, across all your branches there. Prospects shrink by
+ * (1 − (customers in city ÷ CITY_MARKET)^CITY_SATURATION_EXP), so a city tops
+ * out at a handful of branches, like a real bank's network.
+ */
+export const CITY_MARKET = { S: 32_000, M: 38_000, L: 50_000, XL: 72_000 } as const;
+export const CITY_SATURATION_EXP = 3;
+/** Advice only (UI and scripted strategies): about how many branches a city of each size supports. */
+export const CITY_BRANCH_GUIDE = { S: 5, M: 7, L: 9, XL: 12 } as const;
 export const TAKEUP_CAP = 0.95;
 export const STARS_TAKEUP = { base: 0.6, slope: 0.2 } as const;
 export const MORTGAGE_SPECIAL = {
