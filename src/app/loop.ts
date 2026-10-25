@@ -3,7 +3,8 @@
 // weekly results when settings ask for it, and pauses for game over, expiring
 // loan applications and new incidents (the incident modal opens once the weekly
 // results are closed), and once a quarter for the board meeting reminder when
-// there is an Executive floor (after any other modal). Hidden tabs pause time.
+// there is an Executive floor (after any other modal). Hidden tabs hold time,
+// and so does any open panel, sheet or modal: the clock runs only on the map.
 // stepWeek() runs the rest of the current week at once and leaves the game
 // paused, for week-by-week play.
 import { CAPITAL_BUFFER_PP, DAY_MS, DAYS_PER_WEEK, FEATURES } from '../config/balance';
@@ -18,7 +19,7 @@ import { saveToSlot } from './saves';
 import { play } from './sound/sound';
 import { autosave } from './saves/autosave';
 import { reportSaveError } from './saves/saveError';
-import { bump, modal, peekGame, toast } from './store';
+import { bump, clockHeld, modal, peekGame, toast } from './store';
 import { MNA_BAD_EVENTS, MNA_EVENT_TEXT } from './investmentBank/mnaToasts';
 import { VENTURE_BAD_EVENTS, VENTURE_EVENT_TEXT } from './startup/ventureToasts';
 import { AUCTION_BAD_EVENTS, AUCTION_EVENT_TEXT } from './auction/auctionToasts';
@@ -91,16 +92,17 @@ function frame(): void {
   last = now;
   const s = peekGame();
   if (!s) return;
-  // Hand over from the weekly results to the incident modal, never stacking them.
-  if (casesWaiting && !modal.value) {
+  // Hand over from the weekly results to the incident modal, never stacking
+  // them, and only once the player is back on the map.
+  if (casesWaiting && !clockHeld()) {
     casesWaiting = false;
     if (s.incidents.active.length > 0 && !s.flags.gameOver) modal.value = { type: 'incident' };
   }
-  if (boardWaiting && !modal.value && !casesWaiting) {
+  if (boardWaiting && !clockHeld() && !casesWaiting) {
     boardWaiting = false;
     if (boardDue(s)) modal.value = { type: 'boardMeeting', reminder: true };
   }
-  if (s.clock.speed === 0 || modal.value || document.hidden) return;
+  if (s.clock.speed === 0 || clockHeld() || document.hidden) return;
   acc += Math.min(dt, 250) * s.clock.speed;
   let changed = false;
   while (acc >= DAY_MS && s.clock.speed > 0) {

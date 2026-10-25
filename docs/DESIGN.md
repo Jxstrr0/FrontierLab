@@ -114,6 +114,7 @@ There's no fixed ending. Milestones, the annual rich list and the "fastest growi
 - The economy settles weekly; quarters and central bank meetings follow the calendar.
 - Weekly results pop up every week by default (setting: every week, every quarter, or off).
 - The game auto-pauses for decisions: incidents, board meetings, and (optional setting) expiring loan applications.
+- Time passes only on the map. Any open panel, sheet or popup holds the clock, and it resumes at the same speed when you return to the map, so results and prompts never land on top of a screen you are reading.
 
 ### 5.2 World and map
 - Real cities with procedurally generated maps, seeded per city, with no real street layouts.
@@ -553,4 +554,5 @@ Add one dated line per decision. Never delete entries; supersede them.
 - 2026-10-25: Owned places on the map (owner's ask): your HQ, property, vacation homes and clubs are brand-ink crests with their own glyph (office, building, villa, trophy) instead of type-coloured tags and seals with an "Owned" word. Partners stay type medallions with the tick, since you don't own them.
 - 2026-10-25: Manager candidates regenerate whenever you close the hire sheet without hiring (owner's ask), on top of the 4-weekly refresh. The tutorial guide stays as the first candidate until your first hire, since the tutorial says they're on the list.
 - 2026-10-25: A weak capital ratio says how to fix it (owner's ask): the Daily Ledger's capital story names the levers, and the Company summary and Finance floor show a "How to fix this" checklist under the meter at Watch or worse.
+- 2026-10-25: Time passes only on the map (owner's ask: the clock kept running, and the weekly results popped up, while reading a branch or HQ screen). Any open panel, sheet or modal holds the clock; the pending incident and board prompts also wait for the map. The speed setting is untouched, so play resumes as it was.
 - 2026-10-25: The CFO gets a Capital delegation (owner's ask: a steady CFO should be able to steer the bank back to a safe ratio). It uses only the player's own levers: sell company stocks and trim risk appetite at Watch, sell new shares sized to reach 12% at Restricted or Critical. Off by default, like every delegation.

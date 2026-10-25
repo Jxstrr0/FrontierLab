@@ -9,15 +9,15 @@ import { gameDate, money } from '../format/format';
 import { pause, setSpeed, stepWeek } from '../loop';
 import { CasesChip } from '../incidents/CasesChip';
 import { LayerIcon } from '../map/LayerIcon';
-import { modal, openPanel, sheet, useGame } from '../store';
+import { clockHeld, openPanel, sheet, useGame } from '../store';
 
 const NEXT_SPEED = { 0: 1, 1: 2, 2: 4, 4: 1 } as const;
 
 export function Hud() {
   const s = useGame();
   const paused = s.clock.speed === 0;
-  // A decision popup (weekly results, incident, board…) holds the clock (loop.ts), so the pill reads paused too.
-  const held = paused || modal.value !== null;
+  // Any panel, sheet or popup holds the clock (loop.ts), so the pill reads paused too.
+  const held = paused || clockHeld();
   const sym = s.settings.currency;
   const city = CITIES[s.world.currentCityId];
   return (

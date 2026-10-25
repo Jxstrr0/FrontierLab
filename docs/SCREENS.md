@@ -14,13 +14,13 @@ Every building panel uses the same five parts, mirroring the original's structur
 4. **Content:** scrolls.
 5. **Bottom tab bar:** when the panel has tabs. The current tab sits in a brass pill and is scrolled to the middle whenever it changes. When the tabs don't all fit, the bar scrolls sideways and a side with hidden tabs fades under a chevron (tap to page that way). The five branch tabs fit at 390 px.
 
-**Phone vs desktop:** on phones, panels slide up full-screen. On screens ≥ 900 px wide, they open as a right drawer, `min(480px, 40vw)` wide, over the map. Modals are centered cards; on phones they become bottom sheets.
+**Phone vs desktop:** on phones, panels slide up full-screen. On screens ≥ 900 px wide, they open as a right drawer, `min(480px, 40vw)` wide, over the map. Modals are centered cards; on phones they become bottom sheets. While any panel, sheet or modal is open the game clock holds (DESIGN §5.1); it resumes when you close it.
 
 ### 0.2 HUD (over the map)
 - **Top-left:** bank medallion + corporate cash. Tap → Company summary (§24).
 - **Top-right:** date pill and speed control.
   - Tap cycles 1× → 2× → 4×. Long-press or the ❚❚ button pauses.
-  - While paused, the pill hides the speed and dims.
+  - While paused, the pill hides the speed and dims. It also reads paused while a panel, sheet or popup is open, since the clock runs only on the map.
   - **Next week** button (▶|): plays out the rest of the week instantly, runs the weekly tick (weekly results, autosave, auto-pause checks) and leaves the game paused. This allows week-by-week play.
 - **Bottom-left:** Layers button.
 - **Bottom-center:** city pill with an engraved flag. Tap → Travel sheet (the nearest airport's departures, plus "Fly now" if you own a jet).

@@ -60,7 +60,7 @@ How the economy works, step by step. Every CAPS name is a key in `src/config/bal
 
 **Central bank meetings:** each country meets on the fixed week-of-year list in CONTENT (Countries table). A meeting in a given week is processed inside step 1.
 
-**Auto-pause** when any of these needs a decision: an unresolved incident, the weekly results modal (if enabled), the board meeting reminder (once per quarter), or Loan Desk applications expiring this week (optional setting).
+**Auto-pause** when any of these needs a decision: an unresolved incident, the weekly results modal (if enabled), the board meeting reminder (once per quarter), or Loan Desk applications expiring this week (optional setting). The clock also holds, without changing the speed setting, while any panel or sheet is open: days pass only on the map.
 
 ## 3. RNG and determinism
 

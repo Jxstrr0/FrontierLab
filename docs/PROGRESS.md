@@ -10,6 +10,12 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-10-25 — Time passes only on the map (v0.9.7)
+- **Fixed (owner's recording):** the clock kept running while a branch, HQ or menu screen was open, so the weekly results and the board meeting popped up on top of whatever you were reading. Now any open panel, sheet (Menu, Layers, Travel) or popup holds the clock. Nothing changes about your speed setting: close the screen and play carries on at the same speed. The incident and board prompts that queue behind the weekly results also wait until you are back on the map.
+- On desktop, where panels open as a side drawer over the map, the date pill reads paused while the drawer is open.
+- **Code:** one rule, `clockHeld()` in `src/app/store.ts`, read by the loop (`src/app/loop.ts`) and the HUD. New test `tests/app/clockHeld.test.ts`.
+- Checked in a browser at 390×844: with a branch panel open for two seconds at 4× the day did not move; it resumed on close. 683 tests pass, no console errors.
+
 ### 2026-10-25 — A CFO who steers capital back to safety (v0.9.6)
 - **Done (owner's ask):** the CFO has a new **Capital** switch on their profile (Executive floor → tap the CFO). With it on, they watch the capital ratio every week and act when it slips:
   - **Watch or worse (under 10.5%):** sells the stocks the company holds and turns risk appetite down a step every 4 weeks (unless your CRO already runs risk appetite).
