@@ -1,4 +1,4 @@
-// The Daily Ledger's Stage 9 stories (SIMULATION §24): your club's season
+// The Weekly Ledger's Stage 9 stories (SIMULATION §24): your club's season
 // finish (CONTENT §23 SPORTS), buying or selling a club, putting your bank on
 // the shirt, and a signing. Only your clubs make the paper here; the national
 // leagues have their own sports desk (newsSports.ts).

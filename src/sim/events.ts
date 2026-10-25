@@ -1,5 +1,5 @@
 // The weekly event log: systems push typed events during a tick, and the
-// weekly results and (later) The Daily Ledger read them (CLAUDE.md, News and events).
+// weekly results and (later) The Weekly Ledger read them (CLAUDE.md, News and events).
 import { EVENT_LOG_WEEKS } from '../config/balance';
 import type { GameEvent, GameState } from './state';
 

@@ -1,4 +1,4 @@
-// The Daily Ledger's templates for auction stories (Stage 9, CONTENT §23):
+// The Weekly Ledger's templates for auction stories (Stage 9, CONTENT §23):
 // sale previews, record prices, the founder's wins and sales, and a collector
 // stung by a fake. Merged into LEDGER_TEMPLATES via ledgerTemplatesEmpire.ts.
 import type { LedgerTemplate } from './ledgerTemplates';

@@ -1,4 +1,4 @@
-// The Daily Ledger's weak-capital story says how to fix it (SIMULATION §15):
+// The Weekly Ledger's weak-capital story says how to fix it (SIMULATION §15):
 // private banks are pointed at a private placement, listed ones at a secondary.
 import { describe, expect, it } from 'vitest';
 import { LEDGER_TEMPLATES } from '../../src/data/ledgerTemplates';

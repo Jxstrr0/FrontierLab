@@ -1,4 +1,4 @@
-// The Daily Ledger's headline and body templates for your bank
+// The Weekly Ledger's headline and body templates for your bank
 // (CONTENT §23). Tokens are in {braces} and are filled by src/sim/news*.ts;
 // each story type has 2–4 variants so the same subject never reads the same
 // two weeks running. Fictional names only. Rival templates live in

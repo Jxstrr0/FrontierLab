@@ -1,4 +1,4 @@
-// The Daily Ledger's templates for M&A stories (Stage 6, CONTENT §23): your
+// The Weekly Ledger's templates for M&A stories (Stage 6, CONTENT §23): your
 // offers and their answers, closings, finished conversions and distressed
 // sales. Merged into LEDGER_TEMPLATES via ledgerTemplatesCapital.ts.
 import type { LedgerTemplate } from './ledgerTemplates';

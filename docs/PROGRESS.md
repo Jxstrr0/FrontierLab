@@ -10,6 +10,11 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-10-25 — The Weekly Ledger (v0.9.8)
+- **Done (owner's ask):** the newspaper is now called **The Weekly Ledger**. It already came out once a week (one issue per weekly close, numbered by week, shown in the weekly results and kept under Menu → The Ledger); only the name said Daily. Nothing about its timing changed.
+- The rename covers the masthead, the archive screen, the tutorial line, the lobbying warning and every mention in the design docs. Older entries in this log keep the old name as written at the time.
+- Checked the masthead at 390×844: it still fits on one line. 683 tests pass and the determinism snapshot is unchanged (the name was never part of saved story text).
+
 ### 2026-10-25 — Time passes only on the map (v0.9.7)
 - **Fixed (owner's recording):** the clock kept running while a branch, HQ or menu screen was open, so the weekly results and the board meeting popped up on top of whatever you were reading. Now any open panel, sheet (Menu, Layers, Travel) or popup holds the clock. Nothing changes about your speed setting: close the screen and play carries on at the same speed. The incident and board prompts that queue behind the weekly results also wait until you are back on the map.
 - On desktop, where panels open as a side drawer over the map, the date pill reads paused while the drawer is open.

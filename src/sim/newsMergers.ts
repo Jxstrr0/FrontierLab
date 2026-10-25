@@ -1,4 +1,4 @@
-// M&A stories in The Daily Ledger (Stage 6, SIMULATION §24): your offers
+// M&A stories in The Weekly Ledger (Stage 6, SIMULATION §24): your offers
 // (only the big ones make the paper), rejections, regulator blocks, deals that
 // fall through, closings (front page of Banking), finished conversions, and a
 // failed rival's network going on sale (BANK_FAILURE in newsRivals.ts covers

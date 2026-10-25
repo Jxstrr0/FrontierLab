@@ -1,4 +1,4 @@
-// Sports for The Daily Ledger (SIMULATION §24 priority 6, §2 step 14): every
+// Sports for The Weekly Ledger (SIMULATION §24 priority 6, §2 step 14): every
 // country's fictional league (src/data/newsWorld.ts) plays three games a week
 // all year. The paper reports the match of the week from the leagues of the
 // countries you operate in, and at year end the champions, before records reset.

@@ -1,5 +1,5 @@
 // The event catalog: every event type systems push into `state.events.log`
-// (via pushEvent in events.ts) and the payload it carries. The Daily Ledger
+// (via pushEvent in events.ts) and the payload it carries. The Weekly Ledger
 // (news.ts), toasts and the weekly results read events through these shapes.
 // Money in currency units, rates as decimals, percentages as plain numbers
 // (2.5 = 2.5%). Add a line here whenever a system starts emitting a new type.

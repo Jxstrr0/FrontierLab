@@ -1,4 +1,4 @@
-// The Daily Ledger's templates for real estate stories (Stage 7, CONTENT §23):
+// The Weekly Ledger's templates for real estate stories (Stage 7, CONTENT §23):
 // big building deals by the bank or its founder, and foreclosed homes sold off
 // city by city. Merged into LEDGER_TEMPLATES via ledgerTemplatesInvestments.ts.
 import type { LedgerTemplate } from './ledgerTemplates';

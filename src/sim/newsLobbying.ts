@@ -1,4 +1,4 @@
-// Lobbying stories in The Daily Ledger (Stage 7, SIMULATION §24): an exposé
+// Lobbying stories in The Weekly Ledger (Stage 7, SIMULATION §24): an exposé
 // when the paper uncovers one of your campaigns (front page), and a brief when
 // a campaign quietly wins or loses.
 import { NEWS_PRIORITY as P } from '../config/balance';

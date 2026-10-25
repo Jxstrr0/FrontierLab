@@ -1,4 +1,4 @@
-// Real estate stories in The Daily Ledger (Stage 7, SIMULATION §24): big
+// Real estate stories in The Weekly Ledger (Stage 7, SIMULATION §24): big
 // building purchases and sales (REAL_ESTATE.newsMin and up), by the bank or by
 // its founder privately, and a city's foreclosed homes sold off in one lot.
 import { NEWS_PRIORITY as P, REAL_ESTATE } from '../config/balance';

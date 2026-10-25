@@ -1,4 +1,4 @@
-// Shared pieces for The Daily Ledger's composer (SIMULATION §24): the story
+// Shared pieces for The Weekly Ledger's composer (SIMULATION §24): the story
 // candidate every source produces, the context they read (your bank's name,
 // currency, home country, the countries and cities you operate in) and small
 // name lookups. Stories carry a template key, a subject and raw tokens; news.ts

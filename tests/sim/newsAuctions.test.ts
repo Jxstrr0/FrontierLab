@@ -1,4 +1,4 @@
-// Auction stories in The Daily Ledger (SIMULATION §24): previews, your wins and
+// Auction stories in The Weekly Ledger (SIMULATION §24): previews, your wins and
 // a discovered fake, with every template token filled.
 import { describe, expect, it } from 'vitest';
 import { COLLECTIBLES } from '../../src/data/collectibles';

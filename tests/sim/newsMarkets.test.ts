@@ -1,4 +1,4 @@
-// Markets stories in The Daily Ledger (Stage 6): your capital raises and
+// Markets stories in The Weekly Ledger (Stage 6): your capital raises and
 // listing make the paper with the right numbers, notable earnings run, and a
 // sharp week for the Ledger Composite replaces the routine market wrap.
 import { describe, expect, it } from 'vitest';

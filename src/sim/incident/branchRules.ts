@@ -19,7 +19,7 @@ const P = INCIDENT_PARAMS;
 const baseP = (type: string) => INCIDENT_SPECS[type]?.baseP ?? 0;
 const branchOf = (state: GameState, id: string): Branch | undefined => state.branches[id];
 
-/** Chance an incident's press angle reaches The Daily Ledger. */
+/** Chance an incident's press angle reaches The Weekly Ledger. */
 function maybeNews(
   state: GameState,
   chance: number,

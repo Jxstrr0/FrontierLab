@@ -1,4 +1,4 @@
-// Auction stories in The Daily Ledger (Stage 9, SIMULATION §24 "conventions and
+// Auction stories in The Weekly Ledger (Stage 9, SIMULATION §24 "conventions and
 // auctions"): a preview when a house lists its next sale, record prices, the
 // founder's wins and consignment sales, and a gentle story when an appraisal
 // unmasks a fake.

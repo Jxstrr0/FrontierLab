@@ -1,5 +1,5 @@
 // Stage 5 state types (schema v6): payroll and student partnerships, corporate
-// debt from rival banks, incidents with their timed effects, The Daily Ledger's
+// debt from rival banks, incidents with their timed effects, The Weekly Ledger's
 // issues and the price-war tracker. Re-exported from state.ts; kept here so
 // state.ts stays readable. See docs/DATA_MODEL.md §6 and §8.
 import type { CountryId, Id, Money, Rate, Week } from '../data/types';
@@ -132,7 +132,7 @@ export interface IncidentsState {
   recap?: { offeredWeek: Week; declined?: boolean; acceptedWeek?: Week };
 }
 
-// ─── The Daily Ledger (SIMULATION §24) ────────────────────────────────────────
+// ─── The Weekly Ledger (SIMULATION §24) ────────────────────────────────────────
 
 export type LedgerTab = 'banking' | 'business' | 'markets' | 'politics' | 'sports';
 

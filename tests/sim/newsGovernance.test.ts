@@ -1,4 +1,4 @@
-// Governance stories in The Daily Ledger (SIMULATION §24): a declared dividend,
+// Governance stories in The Weekly Ledger (SIMULATION §24): a declared dividend,
 // a rejected pay rise and executive comings and goings make the business pages;
 // a routine meeting does not.
 import { describe, expect, it } from 'vitest';

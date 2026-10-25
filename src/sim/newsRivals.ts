@@ -1,4 +1,4 @@
-// Rival banks in The Daily Ledger (SIMULATION §24, priorities 3 and 4):
+// Rival banks in The Weekly Ledger (SIMULATION §24, priorities 3 and 4):
 // branch openings and closures, price wars, failures and network carve-ups
 // (rivals in your cities first), quarterly earnings, dividends and executive
 // exits, plus the weekly "rate watch" on the best savings rate in your city.

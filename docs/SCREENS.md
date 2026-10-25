@@ -464,7 +464,7 @@ Tabs: Overview · Loans · Credit.
 - **Header:** bank medallion, "Weekly results", ✕.
 - **Headline figures:** weekly revenue and weekly net income, each with weekly change.
 - **Cash flow:** Cash from operations, Investing, Financing, Net cash flow.
-- **The Daily Ledger card:**
+- **The Weekly Ledger card:**
   - masthead and date
   - tabs: Top | Banking | Business | Markets | Politics | Sports
   - two-column article grid (icon vignette, headline, 1–2 sentence body)

@@ -2,7 +2,7 @@
 // the CONTENT §26 pools, a source of wealth, worth log-uniform in
 // RICH_LIST.fortune), each growing by U(RICH_LIST.growth) a year. At each year
 // end you are ranked by net worth among them (no rank below the last place)
-// and a RICH_LIST event reaches The Daily Ledger. Stream: `richList`.
+// and a RICH_LIST event reaches The Weekly Ledger. Stream: `richList`.
 import { RICH_LIST } from '../config/balance';
 import { FIRST_NAMES, LAST_NAMES } from '../data/names';
 import { RICH_SOURCES } from '../data/richList';

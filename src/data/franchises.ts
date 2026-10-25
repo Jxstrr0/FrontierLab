@@ -1,6 +1,6 @@
 // Sports franchises (docs/CONTENT.md §20 "Sports franchises"): one club per
 // listed city, playing at the city's stadium. Each plays in a fictional league
-// of its sport (separate from the Daily Ledger's national leagues). Also the
+// of its sport (separate from the Weekly Ledger's national leagues). Also the
 // positions each sport fields, the kit palette, the clubs' starting kits and
 // the outside owners' name shapes. All names are original.
 export type Sport = 'hockey' | 'football' | 'basketball' | 'baseball' | 'rugby';

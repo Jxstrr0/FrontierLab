@@ -118,7 +118,7 @@ Eleven stages. Each one ends playable and deployed. A stage usually takes severa
 - Full rival AI (§18): expansion, closures, price wars, failures and distressed sales
 - Rival branch and rival HQ panels, including corporate lending (§19.9)
 - Central banks and meetings for every country in the data
-- The Daily Ledger generator, tabs and archive
+- The Weekly Ledger generator, tabs and archive
 - Incident system with every v1 incident and delegation
 - Review card templates
 - Payroll partnerships and the Employers layer (§13.7)

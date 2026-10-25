@@ -87,7 +87,7 @@ export interface GameState {
   corporateDebt: CorporateDebt;
   /** Open incidents, cooldowns and timed effects (§23). */
   incidents: IncidentsState;
-  /** The Daily Ledger archive (§24). */
+  /** The Weekly Ledger archive (§24). */
   news: NewsState;
   /** Price-war tracking (§18.6). */
   competition: CompetitionState;
