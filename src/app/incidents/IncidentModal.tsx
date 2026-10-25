@@ -2,11 +2,12 @@
 // telling the story, a "Case 1 of N" pager, two or three choices with their cost
 // and effect, and for branch cases a link to hand them to the branch manager.
 import { useEffect, useState } from 'preact/hooks';
+import { avatarFromSeed } from '../../art/portraits';
 import { INCIDENT_SPECS } from '../../data/incidents';
 import * as cmd from '../../sim/commands';
 import { optionBlocker, troublesDelegated } from '../../sim/incidents';
 import type { GameState, Incident } from '../../sim/state';
-import { Medallion, Modal } from '../components';
+import { Medallion, Modal, Portrait } from '../components';
 import { gameDate, money } from '../format/format';
 import { act, modal, openPanel, toast, useGame } from '../store';
 import './incidents.css';
@@ -62,11 +63,7 @@ export function IncidentModal() {
       </div>
       <section class="inc-case" aria-live="polite">
         <div class="inc-teller">
-          {inc.scopeKind === 'branch' ? (
-            <Portrait />
-          ) : (
-            <Medallion ink={s.meta.brandInk} monogram={s.meta.monogram} size={44} />
-          )}
+          <Portrait avatar={tellerAvatar(s, inc)} size={44} />
           <div>
             <h3 class="inc-title">{spec?.title ?? inc.type}</h3>
             <div class="inc-teller-name">{tellerName(s, inc)}</div>
@@ -157,12 +154,9 @@ function tellerName(s: GameState, inc: Incident): string {
   return troublesDelegated(s, inc.scope) ? `${mgr.name}, branch manager` : mgr.name;
 }
 
-function Portrait() {
-  return (
-    <svg class="inc-portrait" viewBox="0 0 28 34" aria-hidden="true">
-      <ellipse cx="14" cy="17" rx="13" ry="16" />
-      <circle cx="14" cy="13" r="5" />
-      <path d="M5 29c2-6 6-8 9-8s7 2 9 8" />
-    </svg>
-  );
+/** The speaker's portrait: the branch manager's own, otherwise one drawn from the role. */
+function tellerAvatar(s: GameState, inc: Incident) {
+  const b = inc.scopeKind === 'branch' ? s.branches[inc.scope] : undefined;
+  const mgr = b?.managerId ? s.people.managers[b.managerId] : undefined;
+  return mgr?.portrait ?? avatarFromSeed(`${tellerName(s, inc)}:${inc.scope}`);
 }

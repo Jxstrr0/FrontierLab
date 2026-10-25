@@ -5,7 +5,16 @@ import { MANAGER_POOL_REFRESH_WEEKS } from '../../config/balance';
 import { managerOf } from '../../sim/branch/staff';
 import * as cmd from '../../sim/commands';
 import type { Branch, Delegation, Manager } from '../../sim/state';
-import { Card, Confirm, SectionTitle, Sheet, StatBar, Stepper, Toggle } from '../components';
+import {
+  Card,
+  Confirm,
+  Portrait,
+  SectionTitle,
+  Sheet,
+  StatBar,
+  Stepper,
+  Toggle,
+} from '../components';
 import { gameDate, moneyFull } from '../format/format';
 import { act, toast, useGame } from '../store';
 import { dayOfWeek, salaryBounds, SALARY_STEP } from './selectors';
@@ -49,7 +58,7 @@ export function ManagerCard({ branch }: { branch: Branch }) {
       <Card>
         <div class="stack">
           <div class="br-mgr-head">
-            <Portrait />
+            <Portrait avatar={mgr.portrait} size={48} />
             <div>
               <div class="br-mgr-name">{mgr.name}</div>
               <div class="muted small">
@@ -111,16 +120,6 @@ function Skills({ mgr }: { mgr: Manager }) {
   );
 }
 
-function Portrait() {
-  return (
-    <svg class="br-portrait" viewBox="0 0 28 34" aria-hidden="true">
-      <ellipse cx="14" cy="17" rx="13" ry="16" />
-      <circle cx="14" cy="13" r="5" />
-      <path d="M5 29c2-6 6-8 9-8s7 2 9 8" />
-    </svg>
-  );
-}
-
 function HireSheet({ branch, onClose }: { branch: Branch; onClose: () => void }) {
   const s = useGame();
   const pool = s.people.managerCandidates[branch.cityId] ?? [];
@@ -135,7 +134,7 @@ function HireSheet({ branch, onClose }: { branch: Branch; onClose: () => void })
           <Card>
             <div class="stack">
               <div class="br-mgr-head">
-                <Portrait />
+                <Portrait avatar={m.portrait} size={48} />
                 <div>
                   <div class="br-mgr-name">{m.name}</div>
                   <div class="muted small">Asks {moneyFull(m.salary, sym)} a year</div>

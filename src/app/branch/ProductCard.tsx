@@ -7,6 +7,7 @@ import * as cmd from '../../sim/commands';
 import { countryOfCity, ftpFor, marketRef } from '../../sim/rates';
 import type { Branch } from '../../sim/state';
 import { Card, CoinRating, RingGauge, Row, Stepper, Toggle } from '../components';
+import { SpotArt } from '../components/SpotArt';
 import { count, money } from '../format/format';
 import { act, useGame } from '../store';
 import { partnerTotals } from '../partners/partnerView';
@@ -39,6 +40,7 @@ export function ProductCard(p: { branch: Branch; spec: ProductSpec; onLoanDesk: 
   return (
     <Card class={`br-product${offered ? '' : ' is-off'}`}>
       <div class="br-product-head">
+        <SpotArt group="product" id={spec.id} size={48} class="br-product-spot" />
         <div class="br-product-title">
           <div class="br-product-name">{spec.name}</div>
           <CoinRating value={stars} size={14} />

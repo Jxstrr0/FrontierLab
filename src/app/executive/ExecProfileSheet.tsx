@@ -5,9 +5,17 @@
 import { useState } from 'preact/hooks';
 import * as cmd from '../../sim/commands';
 import type { ExecSeat } from '../../sim/state';
-import { Card, Confirm, SectionTitle, Sheet, StatBar, Stepper, Toggle } from '../components';
+import {
+  Card,
+  Confirm,
+  SectionTitle,
+  Sheet,
+  StatBar,
+  Stepper,
+  Toggle,
+  Portrait,
+} from '../components';
 import { count, gameDate, moneyFull } from '../format/format';
-import { FounderPortrait } from '../newgame/AvatarPicker';
 import { act, toast, useGame } from '../store';
 import { ExecGrantForm } from './ExecGrantForm';
 import { dayOf, execSalaryStepper, seatSpec, vestProgress } from './execSelectors';
@@ -27,7 +35,7 @@ export function ExecProfileSheet(p: { seat: ExecSeat; onClose: () => void }) {
       <Sheet title={spec.title} onClose={p.onClose}>
         <div class="stack">
           <div class="exec-person">
-            <FounderPortrait avatar={exec.portrait} size={72} />
+            <Portrait avatar={exec.portrait} size={72} />
             <div>
               <div class="exec-person-name">{exec.name}</div>
               <div class="muted small">

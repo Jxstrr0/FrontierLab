@@ -5,9 +5,8 @@ import { EXECUTIVES } from '../../config/balance';
 import { DEPARTMENTS } from '../../data/departments';
 import * as cmd from '../../sim/commands';
 import type { ExecSeat } from '../../sim/state';
-import { Card, Sheet, StatBar } from '../components';
+import { Card, Sheet, StatBar, Portrait } from '../components';
 import { moneyFull } from '../format/format';
-import { FounderPortrait } from '../newgame/AvatarPicker';
 import { act, toast, useGame } from '../store';
 import { seatSpec } from './execSelectors';
 
@@ -31,7 +30,7 @@ export function ExecHireSheet(p: { seat: ExecSeat; onClose: () => void }) {
           <Card>
             <div class="stack">
               <div class="exec-person">
-                <FounderPortrait avatar={c.portrait} size={56} />
+                <Portrait avatar={c.portrait} size={56} />
                 <div>
                   <div class="exec-person-name">{c.name}</div>
                   <div class="muted small">Asks {moneyFull(c.salary, sym)} a year</div>

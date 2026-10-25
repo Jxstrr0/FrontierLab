@@ -1,10 +1,4 @@
 /* Available location panel (SCREENS §3). */
-.storefront-art {
-  display: block;
-  width: 100%;
-  height: auto;
-  background: var(--vault-deep);
-}
 .art-ground {
   fill: var(--vault-deep);
 }

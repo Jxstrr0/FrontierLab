@@ -1,11 +1,5 @@
 /* Auction house panel (SCREENS §19): saleroom hero, lot cards, item cards
    with the red FAKE stamp, results list. */
-.au-art {
-  display: block;
-  width: 100%;
-  height: auto;
-  background: var(--vault-deep);
-}
 .au-icon {
   position: relative;
   flex: 0 0 auto;

@@ -10,6 +10,7 @@ import { closePanel, openPanel, useGame, type InvestmentBankTab } from '../store
 import { EquityTab } from './EquityTab';
 import { MarketTab } from './MarketTab';
 import { MnaTab } from './MnaTab';
+import { InvestmentBankArt } from './InvestmentBankArt';
 
 const TABS: Tab<InvestmentBankTab>[] = [
   { id: 'market', label: 'Market' },
@@ -38,6 +39,7 @@ export function InvestmentBankPanel(p: { siteId: string; tab: InvestmentBankTab 
       icon={<LayerMedallion id="investmentBanks" size={32} />}
       onClose={closePanel}
       advisor={{ text: `Welcome to ${bank.name}. Raising capital or buying a competitor?` }}
+      hero={<InvestmentBankArt />}
       tabs={TABS}
       tab={p.tab}
       onTab={setTab}

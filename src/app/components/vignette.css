@@ -1,0 +1,135 @@
+/* Engraved vignettes and spot art (ART_DIRECTION §1.3, §3): city ink on ivory
+   paper with a 2% grain. The ink arrives as --art-ink on the svg. */
+:root {
+  /* 2% paper grain for ivory surfaces (ART_DIRECTION §1.3). */
+  --paper-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .08 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.vignette {
+  --art-ink: #2e5e4e;
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  background-color: var(--ivory);
+  background-image: var(--paper-grain);
+  color: var(--art-ink);
+}
+.vg-sky {
+  fill: none;
+  stroke: var(--art-ink);
+  stroke-width: 0.5;
+  opacity: 0.18;
+}
+.vg-fore {
+  fill: none;
+  stroke: var(--art-ink);
+  stroke-width: 0.5;
+  opacity: 0.3;
+}
+.vg-frame {
+  fill: none;
+  stroke: var(--brass);
+  stroke-width: 0.8;
+  opacity: 0.7;
+}
+
+/* Shared art classes inside a vignette. */
+.vignette .art-ground {
+  fill: none;
+}
+.vignette .art-line {
+  fill: none;
+  stroke: var(--art-ink);
+  stroke-width: 1.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.vignette .art-fine {
+  stroke-width: 0.7;
+}
+.vignette .art-faint {
+  opacity: 0.45;
+}
+.vignette .art-hatch {
+  fill: none;
+  stroke: var(--art-ink);
+  stroke-width: 0.5;
+  stroke-linecap: round;
+  opacity: 0.85;
+}
+.vignette .art-paper {
+  fill: var(--ivory);
+  stroke: none;
+}
+.vignette .art-tint {
+  fill: var(--art-ink);
+  opacity: 0.1;
+  stroke: none;
+}
+.vignette .art-solid {
+  fill: var(--art-ink);
+  stroke: none;
+}
+.vignette .art-dots {
+  fill: none;
+  stroke: var(--art-ink);
+  stroke-width: 1.1;
+  stroke-linecap: round;
+  opacity: 0.6;
+}
+.vignette .art-text {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  fill: var(--art-ink);
+}
+.vignette .art-sign {
+  font-size: 12px;
+}
+.vignette .art-small {
+  font-size: 7px;
+  font-weight: 500;
+  fill: var(--art-ink);
+}
+.vignette .art-brand {
+  stroke: var(--art-ink);
+  stroke-width: 0.8;
+}
+.vignette .art-brand-text {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 8px;
+  fill: var(--ivory);
+}
+
+/* Panel hero: the plate sits flush under the advisor bar with a brass rule. */
+.panel-hero .vignette {
+  border-bottom: 1px solid var(--hairline);
+}
+
+/* 80 × 80 spot illustrations (products, campaigns, benefits): a single ink
+   on a small ivory plate with a double ring. */
+.spot-art {
+  flex: none;
+  display: block;
+  border-radius: 50%;
+  background-color: var(--ivory);
+  background-image: var(--paper-grain);
+}
+.spot-ring {
+  fill: none;
+  stroke: var(--brass);
+  stroke-width: 1.5;
+}
+.spot-ring-fine {
+  stroke-width: 0.6;
+  stroke-dasharray: 1.4 1.6;
+}
+.spot-line {
+  fill: none;
+  stroke: var(--art-ink);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}

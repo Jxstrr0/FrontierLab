@@ -14,7 +14,25 @@ const numbered = (word: string, n: number) =>
 
 export const AVATAR_PARTS: readonly AvatarPartSpec[] = [
   { part: 'head', label: 'Head shape', names: ['Oval', 'Round', 'Square', 'Narrow'] },
-  { part: 'hair', label: 'Hair', names: numbered('Style', 12) },
+  {
+    part: 'hair',
+    label: 'Hair',
+    // Order matches the portrait generator's styles (src/art/portraitParts.ts).
+    names: [
+      'Short crop',
+      'Side part',
+      'Buzz cut',
+      'Bald crown',
+      'Curly top',
+      'Afro',
+      'Bob',
+      'Long',
+      'Bun',
+      'Ponytail',
+      'Wavy',
+      'Locs',
+    ],
+  },
   {
     part: 'facial',
     label: 'Facial hair',

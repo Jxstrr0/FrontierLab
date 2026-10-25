@@ -157,41 +157,6 @@
   align-self: flex-start;
 }
 
-/* Compact funding rosette (shares the RadarRosette look). */
-.fund-rosette {
-  display: block;
-  width: 100%;
-  max-width: 280px;
-  height: auto;
-  margin: 0 auto;
-}
-.fund-rosette .rosette-grid path,
-.fund-rosette .rosette-grid line {
-  fill: none;
-  stroke: var(--brass);
-  stroke-width: 0.6;
-  opacity: 0.35;
-}
-.fund-rosette .rosette-data {
-  fill: var(--brass);
-  fill-opacity: 0.25;
-  stroke: var(--brass);
-  stroke-width: 1.5;
-  stroke-linejoin: round;
-}
-.fund-rosette .rosette-dot {
-  fill: var(--brass-light);
-}
-.fund-rosette-label {
-  font-family: var(--font-ui);
-  font-size: 11px;
-  fill: var(--ivory-dim);
-}
-.fund-rosette .rosette-score {
-  font-weight: 700;
-  fill: var(--brass-light);
-}
-
 /* ─── Amount slider ────────────────────────────────────────────────────── */
 .amount-slider-head {
   display: flex;

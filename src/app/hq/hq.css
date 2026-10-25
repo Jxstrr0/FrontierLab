@@ -10,47 +10,48 @@
 }
 
 /* ─── Office interior hero ─────────────────────────────────────────────── */
-.hq-interior {
-  display: block;
-  width: 100%;
-  height: auto;
-  background: var(--vault-deep);
-}
+/* Engraved in the city ink on ivory (the Vignette supplies --art-ink). */
 .hq-floor {
-  fill: rgb(184 145 61 / 6%);
-  stroke: var(--brass-light);
-  stroke-width: 1;
+  fill: var(--ivory);
+  stroke: var(--art-ink);
+  stroke-width: 1.1;
   stroke-linejoin: round;
 }
 .hq-wall {
-  fill: rgb(238 231 211 / 4%);
-  stroke: var(--brass-light);
-  stroke-width: 1;
+  fill: var(--ivory);
+  stroke: var(--art-ink);
+  stroke-width: 1.1;
   stroke-linejoin: round;
-}
-.hq-wall-shade {
-  fill: rgb(15 24 40 / 50%);
 }
 .hq-desk {
   fill: none;
-  stroke: var(--brass-light);
+  stroke: var(--art-ink);
   stroke-width: 0.9;
   stroke-linejoin: round;
   stroke-linecap: round;
-  opacity: 0.45;
+  stroke-dasharray: 1.6 1.4;
+  opacity: 0.55;
 }
 .hq-desk.is-taken {
   opacity: 1;
+  stroke-dasharray: none;
 }
 .hq-desk-top {
-  fill: var(--vault-deep);
+  fill: var(--ivory);
 }
 .hq-screen {
-  fill: var(--vault-raised);
+  fill: var(--art-ink);
+  fill-opacity: 0.35;
+}
+.hq-chair {
+  fill: none;
 }
 .hq-person {
-  stroke: var(--ivory);
+  stroke: var(--art-ink);
   stroke-width: 0.8;
+}
+.hq-head {
+  fill: var(--ivory);
 }
 .hq-mood-good {
   fill: var(--jade);
@@ -64,7 +65,8 @@
 .hq-interior-caption {
   font-family: var(--font-ui);
   font-size: 10px;
-  fill: var(--ivory-dim);
+  font-weight: 600;
+  fill: var(--art-ink);
 }
 
 /* ─── Office switcher ──────────────────────────────────────────────────── */
@@ -198,22 +200,6 @@
   flex: none;
   width: 64px;
   height: 64px;
-}
-.hq-benefit-ring {
-  fill: none;
-  stroke: var(--brass);
-  stroke-width: 1;
-}
-.hq-benefit-ring-fine {
-  stroke-dasharray: 1.5 2;
-  opacity: 0.7;
-}
-.hq-benefit-line {
-  fill: none;
-  stroke: var(--brass-light);
-  stroke-width: 1.6;
-  stroke-linecap: round;
-  stroke-linejoin: round;
 }
 .hq-benefit-name {
   margin: 0;
