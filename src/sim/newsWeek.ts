@@ -1,7 +1,9 @@
 // Your bank's weekly close in The Daily Ledger (SIMULATION §24, §14): the
 // week's revenue and net income (the same figures as the weekly results),
-// quarter results on the first tick of a quarter, and a weak capital tier.
+// quarter results on the first tick of a quarter, and a weak capital tier
+// with what to do about it.
 import { NEWS_PRIORITY as P } from '../config/balance';
+import { CAPITAL_FIX_NEWS } from '../data/capitalFixes';
 import { TIER_COPY } from '../data/newsWorld';
 import { isQuarterStart } from './calendar';
 import { newsMoney, newsRate } from './newsFormat';
@@ -58,7 +60,12 @@ export function closeStories(ctx: NewsContext): Story[] {
         subject: 'you',
         icon: 'shield',
         priority: snap.tier === 'watch' ? P.companyRoutine : P.companyAlarm,
-        tokens: { bank: ctx.bank, cr: newsRate(snap.capitalRatio, 1), tier },
+        tokens: {
+          bank: ctx.bank,
+          cr: newsRate(snap.capitalRatio, 1),
+          tier,
+          fix: CAPITAL_FIX_NEWS[s.stock.status],
+        },
       }),
     );
   }

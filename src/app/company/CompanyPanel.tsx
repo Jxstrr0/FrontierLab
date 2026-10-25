@@ -10,6 +10,7 @@ import { Badge, Card, Medallion, Panel, Row, SectionTitle, Sheet } from '../comp
 import { capitalRatioText, money, pct } from '../format/format';
 import { RealEstateCard } from '../realEstate/RealEstateCard';
 import { closePanel, openPanel, useGame } from '../store';
+import { CapitalFixes } from './CapitalFixes';
 import { CapitalMeter, TIER_LABEL, TIER_TONE } from './CapitalMeter';
 import { ShareSummary } from './ShareSummary';
 import { Statements } from './Statements';
@@ -62,6 +63,7 @@ export function CompanyPanel() {
             {cap.capitalRatio > 1 &&
               ' With few loans on the books yet, almost nothing you hold carries risk, so the ratio is off the scale. It settles as lending grows.'}
           </p>
+          <CapitalFixes tier={cap.tier} listing={s.stock.status} />
         </Card>
 
         <Card>

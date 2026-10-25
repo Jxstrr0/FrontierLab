@@ -10,6 +10,13 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-10-25 — The capital warning says how to fix it (v0.9.5)
+- **Done (owner's ask):** when your capital ratio is low, the game now tells you what to do about it.
+  - **The Daily Ledger story** ("Thin cushion at …", "Regulator puts … on watch") now ends with the fixes: sell new shares through an investment bank, sell the stocks the bank holds, or turn risk appetite down.
+  - **Company summary and HQ Finance floor:** at Watch, Restricted or Critical, a "How to fix this" checklist appears under the capital meter. It lists four steps in order: sell new shares (Private placement while private, Secondary offering once listed), sell company stocks and startup stakes, lower risk appetite, and hold off on branches, property and dividends. At Critical it adds a red line about the emergency rescue offer.
+- **Code:** the wording lives in `src/data/capitalFixes.ts`; the checklist is `src/app/company/CapitalFixes.tsx`; the news story gets a new `{fix}` token in `src/sim/newsWeek.ts`.
+- **Checked** at 390×844 with a Critical bank: the checklist shows under the meter with no console errors. New test `tests/sim/capitalFixNews.test.ts`; all 676 tests pass and the determinism snapshot is unchanged.
+
 ### 2026-10-25 — Fresh manager candidates on reopen (v0.9.4)
 - **Done (owner's ask):** closing the "Hire a manager" sheet without hiring now deals a new set of candidates, so reopening it shows new people. The sheet's footer now says "Not keen on anyone? Close this and reopen it to see new candidates." instead of a countdown.
 - **The tutorial guide stays:** until you hire your first manager, the first candidate is your guide (the tutorial says "I'm on the list too"), so they stay on the list and only the other two change.
