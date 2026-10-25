@@ -4,7 +4,7 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 **Current stage:** 10 — Art pass, onboarding, polish, launch (built and live; awaiting the owner's iPhone check). All ten roadmap stages are built. Still open: the owner's testing and tuning pass, an Add to Home Screen test on a real iPhone, and the Vault Street card on Kelbo.Website (in a separate session in that repo).
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `1bdfb320d06bb3` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `0c8122394b4893` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
@@ -15,7 +15,8 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 - **Logo shape.** Step 1 of New Game has a new **Logo shape** row between the monogram and the brand ink: six chips, each a small medallion in that shape with your monogram and ink, so you see the choice before you make it. The shapes are **Coin** (the classic round medallion), **Shield**, **Lozenge** (a diamond), **Hexagon**, **Plaque** (a square with cut corners) and **Rosette** (a scalloped wax seal). The big preview at the top and the confirm step use it.
 - **One outline everywhere.** A single function (`src/art/logoShapes.ts`) draws the outline, so the medallion in the top bar and on every panel, the seal on each branch front, the plaque over the counter inside, the mark over an owned building's door and your own stock card all share the shape. Map pins keep their crest, and rivals keep the round medallion; a branch still converting from a rival wears the old round seal until it is done.
 - **Existing saves:** schema v20 (migration 19 → 20) sets `round`, so an older bank looks exactly as it did. The slot cards record the shape too.
-- **Balance:** no change. The determinism snapshot moved `0c2a99c12fc3fb` → `1bdfb320d06bb3` only because the save gained `meta.logoShape`; with it removed the hash matches exactly.
+- **Stronger hiring pools (owner's ask: slightly more very good candidates).** Branch manager skills now roll from normal(62, 16) instead of normal(60, 15) (MANAGER_SKILL), so about one candidate skill in eight is 80+ rather than one in eleven, with the share of weak rolls about the same. Executive skills roll in 35–93 instead of 35–90 (EXECUTIVES.skillRange), so about one in five is 80+ rather than one in six. The graduate program bonus and the clamps are unchanged.
+- **Balance:** the 20-seed 5-year steady panel and all four 10-year strategies on seed 42 stay in range. The determinism snapshot moved twice: `0c2a99c12fc3fb` → `1bdfb320d06bb3` for the new `meta.logoShape` field (verified by stripping it), then → `0c8122394b4893` for the manager skill change, which is intended.
 - **Checked** all six shapes on the New Game step and on a branch's front and Inside views at 390×844, with no console errors. 738 tests (new: shape stored, round default, migration 19 → 20, every outline closes), lint, typecheck and build clean.
 
 ### 2026-10-25 — House styles for branch fronts, cheaper rerolls (v0.10.11)
