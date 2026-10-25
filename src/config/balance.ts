@@ -202,7 +202,7 @@ export const START_STAFF_MORALE = 70;
 /** Manager candidates (§6.5). */
 export const MANAGER_POOL_SIZE = 3;
 export const MANAGER_POOL_REFRESH_WEEKS = 4;
-export const MANAGER_SKILL = { mean: 60, sd: 15, min: 25, max: 98 } as const;
+export const MANAGER_SKILL = { mean: 62, sd: 16, min: 25, max: 98 } as const;
 export const MANAGER_SALARY_SPREAD = { base: 0.7, slope: 0.6 } as const;
 /**
  * Paying a recruiter for a fresh candidate list (SIMULATION §6.5, §17.2): the
@@ -1368,7 +1368,7 @@ export const EXECUTIVES = {
   salaryMax: 2_500_000,
   refreshWeeks: 4,
   candidatesPerSeat: 3,
-  skillRange: [35, 90] as [number, number],
+  skillRange: [35, 93] as [number, number],
   /** EXEC_POACHED counter-offer: salary × (1 + raise), loyalty + loyaltyGain. */
   counterRaise: 0.25,
   counterLoyalty: 10,
