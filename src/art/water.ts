@@ -1,8 +1,11 @@
 // Water for the engraved map (ART_DIRECTION §2): a pale tint of the city ink
 // with horizontal wavy guilloche lines at 50% ink (printPatterns.ts), a hatched quay wall where
-// land meets water, a dotted promenade rail and piers at street ends.
+// land meets water, a dotted promenade rail and piers at street ends. Works on
+// any water shape; layout 2 adds bridges, piers in every direction and boats
+// (bridges.ts).
 import { CITY_LAYOUT } from '../config/balance';
 import type { Rect } from './chunkGrid';
+import { drawWaterLife } from './bridges';
 import { TILE_KINDS, type CityMap } from './citygen';
 import { tileRangeForRect } from './drawList';
 import type { Engraver, Vec3 } from './engraver';
@@ -17,6 +20,7 @@ const WATER = {
   pierDeck: 1.5,
   /** Piers reach this many tiles beyond their tile; widen chunk queries by it. */
   reachTiles: 3,
+  waterlineAlpha: 0.85,
 } as const;
 
 const KIND_WATER = TILE_KINDS.indexOf('water');
@@ -54,6 +58,7 @@ export function waterLayer(e: Engraver, map: CityMap, r: Rect): void {
   c.fillStyle = e.inks.waterPrint;
   c.fill();
   shore(e, map, range, isWater);
+  if (map.layout > 1) drawWaterLife(e, map, range);
 }
 
 function shore(
@@ -66,12 +71,36 @@ function shore(
   const q = WATER.quayPx;
   const ri = WATER.railInset;
   const rails: [Vec3, Vec3][] = [];
+  // Layout 2: a firm ink waterline all round, so rivers and canals read at a glance.
+  const waterline: [Vec3, Vec3][] = [];
   for (let y = range.y0; y <= range.y1; y++) {
     for (let x = range.x0; x <= range.x1; x++) {
       if (isWater(x, y)) continue;
       e.origin(x, y);
       const front = isWater(x, y + 1);
       const right = isWater(x + 1, y);
+      if (map.layout > 1) {
+        if (front)
+          waterline.push([
+            [x, y + 1, -q],
+            [x + 1, y + 1, -q],
+          ]);
+        if (right)
+          waterline.push([
+            [x + 1, y, -q],
+            [x + 1, y + 1, -q],
+          ]);
+        if (isWater(x, y - 1))
+          waterline.push([
+            [x, y, 0],
+            [x + 1, y, 0],
+          ]);
+        if (isWater(x - 1, y))
+          waterline.push([
+            [x, y, 0],
+            [x, y + 1, 0],
+          ]);
+      }
       if (front) {
         e.poly(
           [
@@ -104,14 +133,16 @@ function shore(
           [x + 1 - ri, y + 1, 0],
         ]);
       }
-      // A pier runs out from each street that ends at the water.
-      if (front && map.kind[y * n + x] === KIND_STREET && x % CITY_LAYOUT.block === 0) {
+      // Layout 1: a pier runs out from each street that ends at the water.
+      const street = map.kind[y * n + x] === KIND_STREET;
+      if (map.layout === 1 && front && street && x % CITY_LAYOUT.block === 0) {
         pier(e, x, y, isWater);
       }
     }
   }
+  e.origin(0, 0);
+  e.segments(waterline, e.inks.outline, WATER.waterlineAlpha);
   if (e.lod > 0) {
-    e.origin(0, 0);
     e.ctx.setLineDash([1.2, 1.6]);
     e.segments(rails, e.inks.detail * 1.2, 0.6);
     e.ctx.setLineDash([]);

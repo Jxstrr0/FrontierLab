@@ -80,7 +80,7 @@ const look = (l: CityLook) => l;
 export const CITY_LOOKS: Record<string, CityLook> = {
   sas: look({
     water: 'river',
-    arrange: { turn: 0, mirror: false },
+    arrange: { turn: 2, mirror: true },
     style: 'prairie',
     signature: 'chateauHotel',
     tint: '#C9A962',
@@ -88,7 +88,7 @@ export const CITY_LOOKS: Record<string, CityLook> = {
   }),
   cal: look({
     water: 'river',
-    arrange: { turn: 1, mirror: false },
+    arrange: { turn: 0, mirror: false },
     style: 'prairie',
     signature: 'needleTower',
     tint: '#A9B57A',

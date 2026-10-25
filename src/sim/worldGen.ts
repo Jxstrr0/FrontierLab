@@ -3,6 +3,7 @@
 // city, so every city is the same in a given save no matter when you first fly
 // there. A regional site gets only its airport and named employers. Used by
 // newGame for the start city and by travelTo for every other destination.
+import { LATEST_LAYOUT, type LayoutVersion } from '../config/cityGeo';
 import { CITIES } from '../data/cities';
 import { generateCapitalMarketSites } from './capitalSites';
 import { generateLots } from './citygen';
@@ -24,16 +25,23 @@ export const isGenerated = (state: GameState, cityId: string): boolean =>
  * Generates a city once: lots and rivals, then each stage's buildings in the
  * order the start city has always used (so start-city saves never move).
  * `firstListings` seeds buildings for sale; newGame leaves it to initInvestments.
+ * `layout` picks the street layout (cityGeo.ts); new cities get LATEST_LAYOUT.
  */
 export function generateCity(
   state: GameState,
   cityId: string,
-  opts: { firstListings?: boolean } = {},
+  opts: { firstListings?: boolean; layout?: LayoutVersion } = {},
 ): void {
   const city = CITIES[cityId];
   if (!city) throw new Error(`Unknown city ${cityId}`);
   if (isGenerated(state, cityId)) return;
-  state.world.cities[cityId] = { id: cityId, generated: true, brandAwareness: 0, marketRef: {} };
+  state.world.cities[cityId] = {
+    id: cityId,
+    generated: true,
+    layout: opts.layout ?? LATEST_LAYOUT,
+    brandAwareness: 0,
+    marketRef: {},
+  };
   if (city.regional) {
     generateCompetitionSites(state, cityId);
     updateMarketRefs(state);

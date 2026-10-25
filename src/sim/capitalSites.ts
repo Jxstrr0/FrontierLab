@@ -6,8 +6,7 @@ import { CITYGEN } from '../config/balance';
 import { CITIES } from '../data/cities';
 import { investmentBanksIn } from '../data/investmentBanks';
 import { STREET_KINDS, STREET_NAMES } from '../data/names';
-import { nearestFrontage } from './cityLayout';
-import { clamp } from './math';
+import { geometryFor, placeNear } from './cityPlacement';
 import { stream } from './rng';
 import type { GameState, Site } from './state';
 
@@ -22,19 +21,11 @@ export function generateCapitalMarketSites(state: GameState, cityId: string): vo
   for (const o of Object.values(state.world.officeListings)) if (o.cityId === cityId) mark(o.tile);
   for (const s of Object.values(state.world.sites)) if (s.cityId === cityId) mark(s.tile);
 
-  const at = CITYGEN.layout.financial;
+  const geo = geometryFor(state, cityId);
   for (const bankId of investmentBanksIn(cityId)) {
     const id = `site_${cityId}_investmentBank_${bankId}`;
     if (state.world.sites[id]) continue;
-    const px = Math.round(
-      clamp(rng.normal(at.cx, at.spread), CITYGEN.edge, 1 - CITYGEN.edge) * (city.tiles - 1),
-    );
-    const py = Math.round(
-      clamp(rng.normal(at.cy, at.spread), CITYGEN.edge, 1 - CITYGEN.edge) * (city.tiles - 1),
-    );
-    const tile = nearestFrontage(city, px, py, used);
-    if (!tile) throw new Error(`No room for another building in ${city.name}`);
-    mark(tile);
+    const tile = placeNear(city, geo, 'financial', rng, used);
     const site: Site = {
       id,
       cityId,

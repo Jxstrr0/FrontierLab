@@ -1,8 +1,10 @@
 // Dev-only map lab (maplab.html): renders one city full-window with the
 // engraved renderer, drag-to-pan, wheel zoom and an fps / ms readout, for
 // visual iteration and scripted screenshots. Params: ?city=sas&zoom=1&seed=42
-// &cx=20&cy=20 (tile to centre on) &hud=0 (hide readout). Never shipped.
+// &cx=20&cy=20 (tile to centre on) &hud=0 (hide readout) &layout=1 (old saves'
+// shared grid). Never shipped.
 import '@fontsource/public-sans/600.css';
+import { LATEST_LAYOUT } from '../../config/cityGeo';
 import { ZOOM_MAX, ZOOM_MIN } from '../../config/map';
 import { CITIES } from '../../data/cities';
 import { newGame } from '../../sim/newGame';
@@ -19,12 +21,13 @@ const params = new URLSearchParams(location.search);
 const cityId = params.get('city') ?? 'sas';
 const seed = Number(params.get('seed') ?? 42);
 const city = CITIES[cityId] ?? CITIES.sas!;
-const state = newGame({ seed, cityId: city.id });
+const layout = params.get('layout') === '1' ? 1 : LATEST_LAYOUT;
+const state = newGame({ seed, cityId: city.id, layout });
 const lots = Object.values(state.world.lots).filter((l) => l.cityId === city.id);
 // Stage 4 offices and sites; the first office shows as leased (roof flag).
 const offices = Object.values(state.world.officeListings).filter((o) => o.cityId === city.id);
 const sites = Object.values(state.world.sites).filter((x) => x.cityId === city.id);
-const map = generateCityMap(city, seed, lots, { offices, sites });
+const map = generateCityMap(city, seed, lots, { offices, sites, layout });
 
 // Rivals keep their lots; the player takes the free lots nearest the centre.
 const occupants: Record<string, LotOccupant> = {};
@@ -56,8 +59,8 @@ const ctx = canvas.getContext('2d')!;
 const cam: Camera = { x: 0, y: 0, zoom: Number(params.get('zoom') ?? 1) };
 const focus = tileCenter(
   map.tiles,
-  Number(params.get('cx') ?? city.tiles / 2),
-  Number(params.get('cy') ?? city.tiles / 2),
+  Number(params.get('cx') ?? map.geo.focus.x),
+  Number(params.get('cy') ?? map.geo.focus.y),
 );
 cam.x = focus.x - innerWidth / 2 / cam.zoom;
 cam.y = focus.y - innerHeight / 2 / cam.zoom;

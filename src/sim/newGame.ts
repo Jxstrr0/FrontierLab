@@ -37,6 +37,7 @@ import {
   initMarket,
 } from './marketInit';
 import { emptyCorporateDebt } from './corporateDebt';
+import type { LayoutVersion } from '../config/cityGeo';
 import { SCHEMA_VERSION, type AvatarSpec, type GameState, type Settings } from './state';
 import { packagedModel } from './underwriting';
 import { generateCity } from './worldGen';
@@ -60,6 +61,8 @@ export interface NewGameOptions {
   startCash?: number;
   /** Currency symbol money is shown in (Settings). */
   currency?: Settings['currency'];
+  /** The start city's street layout (cityGeo.ts); tests use 1 to check old saves' layout. */
+  layout?: LayoutVersion;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -220,7 +223,7 @@ export function newGame(opts: NewGameOptions): GameState {
   }
 
   initCountries(state, city.country);
-  generateCity(state, city.id);
+  generateCity(state, city.id, { layout: opts.layout });
 
   const cap = capitalSnapshot(state);
   state.company.capitalRatio = cap.capitalRatio;

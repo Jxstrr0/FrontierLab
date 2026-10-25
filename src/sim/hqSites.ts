@@ -13,8 +13,7 @@ import { bureausIn } from '../data/bureaus';
 import { CITIES } from '../data/cities';
 import { STREET_KINDS, STREET_NAMES } from '../data/names';
 import type { DistrictId } from '../data/types';
-import { nearestFrontage } from './cityLayout';
-import { clamp } from './math';
+import { geometryFor, placeNear } from './cityPlacement';
 import { stream, type Rng } from './rng';
 import type { GameState, OfficeListing, Site, SiteKind } from './state';
 
@@ -32,19 +31,8 @@ export function generateSites(state: GameState, cityId: string): void {
   for (const lot of Object.values(state.world.lots)) {
     if (lot.cityId === cityId) used.add(`${lot.tile.x},${lot.tile.y}`);
   }
-  const place = (district: DistrictId) => {
-    const at = CITYGEN.layout[district];
-    const px = Math.round(
-      clamp(rng.normal(at.cx, at.spread), CITYGEN.edge, 1 - CITYGEN.edge) * (city.tiles - 1),
-    );
-    const py = Math.round(
-      clamp(rng.normal(at.cy, at.spread), CITYGEN.edge, 1 - CITYGEN.edge) * (city.tiles - 1),
-    );
-    const spot = nearestFrontage(city, px, py, used);
-    if (!spot) throw new Error(`No room for another building in ${city.name}`);
-    used.add(`${spot.x},${spot.y}`);
-    return spot;
-  };
+  const geo = geometryFor(state, cityId);
+  const place = (district: DistrictId) => placeNear(city, geo, district, rng, used);
 
   const total = OFFICE_LISTINGS.countBySize[city.size];
   let index = 0;
