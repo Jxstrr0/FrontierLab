@@ -4,7 +4,7 @@
 import { FEATURES } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { PlaneIcon } from '../airport/AirportMedallion';
-import { Medallion } from '../components';
+import { Icon, Medallion } from '../components';
 import { gameDate, money } from '../format/format';
 import { pause, setSpeed, stepWeek } from '../loop';
 import { CasesChip } from '../incidents/CasesChip';
@@ -52,7 +52,11 @@ export function Hud() {
               aria-label={paused ? 'Play' : 'Pause'}
               onClick={() => (paused ? setSpeed(s.settings.defaultSpeed) : pause())}
             >
-              {paused ? '▶' : '❚❚'}
+              <Icon
+                name={paused ? 'play' : 'pause'}
+                size={20}
+                class={paused ? 'icon-solid' : undefined}
+              />
             </button>
             <button
               type="button"
@@ -93,7 +97,8 @@ export function Hud() {
           <div class="hud-chip hud-city">{city?.name ?? ''}</div>
         )}
         <button type="button" class="hud-chip hud-menu" onClick={() => (sheet.value = 'menu')}>
-          Menu
+          <Icon name="menu" size={20} />
+          <span>Menu</span>
         </button>
       </div>
     </>

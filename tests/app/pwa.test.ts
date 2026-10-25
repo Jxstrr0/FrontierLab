@@ -4,7 +4,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { cacheVersion, fillWorker, precacheList } from '../../src/app/pwa/precache';
-import { wantsServiceWorker } from '../../src/app/pwa/register';
+import { canApplyUpdate, wantsServiceWorker } from '../../src/app/pwa/register';
 import { isSuperseded } from '../../src/app/saves/autosave';
 import type { SaveMeta } from '../../src/sim/save/storage';
 
@@ -75,5 +75,15 @@ describe('isSuperseded', () => {
     expect(isSuperseded(100, meta(200))).toBe(true);
     expect(isSuperseded(200, meta(100))).toBe(false);
     expect(isSuperseded(100, null)).toBe(false);
+  });
+});
+
+describe('canApplyUpdate', () => {
+  it('reloads into a new version only on the title screen with no game loaded', () => {
+    expect(canApplyUpdate('title', false)).toBe(true);
+    expect(canApplyUpdate('title', true)).toBe(false);
+    expect(canApplyUpdate('game', true)).toBe(false);
+    expect(canApplyUpdate('newgame', false)).toBe(false);
+    expect(canApplyUpdate('settings', false)).toBe(false);
   });
 });

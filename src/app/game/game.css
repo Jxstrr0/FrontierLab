@@ -25,6 +25,13 @@
   padding-right: calc(var(--safe-right) + var(--space-3));
   pointer-events: none;
 }
+/* On wide screens a panel opens as a side drawer: the HUD steps aside so the
+   date, speed controls and Menu stay visible next to it. */
+@media (min-width: 900px) {
+  .game:has(.panel) :is(.hud-top, .hud-bottom) {
+    right: var(--drawer-w);
+  }
+}
 .hud-top {
   top: 0;
   padding-top: calc(var(--safe-top) + var(--space-3));
@@ -91,8 +98,17 @@ button.hud-chip {
 }
 .hud-pause {
   width: var(--tap-min);
+  display: grid;
+  place-items: center;
   border-left: 1px solid var(--hairline) !important;
   color: var(--brass-light) !important;
+}
+/* The shared icons are line drawings; the play control reads better solid. */
+.hud-pause .icon {
+  stroke-width: 2.5;
+}
+.hud-pause .icon-solid {
+  fill: currentColor;
 }
 .hud-step {
   width: var(--tap-min);
@@ -132,6 +148,9 @@ button.hud-chip {
 .hud-menu {
   font-weight: 600;
   padding: 0 var(--space-5);
+}
+.hud-menu .icon {
+  color: var(--brass-light);
 }
 .menu-list {
   display: flex;
