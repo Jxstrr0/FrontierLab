@@ -55,7 +55,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState, DealerDeal } from './personalTypes';
 
-export const SCHEMA_VERSION = 21;
+export const SCHEMA_VERSION = 22;
 
 export interface GameState {
   schemaVersion: number;
@@ -179,6 +179,8 @@ export interface Settings {
   reducedMotion: boolean;
   textScale: 1 | 1.15 | 1.3;
   layers: Record<string, boolean>;
+  /** The HQ bottom tabs in the order you arranged them (schema v22); departments not listed follow in DEPT_ORDER. */
+  hqTabOrder: DeptId[];
 }
 
 export interface AvatarSpec {

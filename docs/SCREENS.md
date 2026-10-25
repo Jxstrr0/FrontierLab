@@ -237,7 +237,7 @@ Tabs: Overview · Loans · Credit.
 ## 10. HQ
 
 - **Header:** "{Bank} HQ" with the address, and an **Office** button. Shows an office switcher if you have more than one.
-- **Office sheet** (from the header button): address, floors in use, weekly rent, which department sits on each floor, then **Release floor · {department}** (the floor you're on; "Close HR floor" on HR) and **Release office**, each with its confirm.
+- **Office sheet** (from the header button): address, floors in use, weekly rent, which department sits on each floor; a **Tab order** card listing the floors you have in the order their tabs run along the bottom bar, each with ▲ ▼ arrows (44 px) to move it past its neighbour, and **Reset order** once any has moved (the order is saved with the game; departments you add later slot in where the usual order puts them); then **Release floor · {department}** (the floor you're on; "Close HR floor" on HR) and **Release office**, each with its confirm.
 - **Bottom icon bar** (only departments you have): an icon over a short label for each floor, scrolling sideways when they don't fit. Finance (ledger) · HR (people) · Products (card) · Treasury (vault) · Marketing (megaphone) · IT (screen) · Risk (shield) · Executive (briefcase) · Investment (rising chart) · Add floor (plus).
 
 **Every department floor shows:**

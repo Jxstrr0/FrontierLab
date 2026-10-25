@@ -82,6 +82,7 @@ export const DEFAULT_SETTINGS: Settings = {
   reducedMotion: false,
   textScale: 1,
   layers: {},
+  hqTabOrder: [],
 };
 
 const DEFAULT_AVATAR: AvatarSpec = {

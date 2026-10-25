@@ -78,6 +78,8 @@ export const ICON_PATHS = {
   plus: 'M12 5v14M5 12h14',
   chevronLeft: 'M15 5l-7 7 7 7',
   chevronRight: 'M9 5l7 7-7 7',
+  chevronUp: 'M5 15l7-7 7 7',
+  chevronDown: 'M5 9l7 7 7-7',
   pause: 'M8.5 5v14M15.5 5v14',
   play: 'M7 5l12 7-12 7z',
   fast: 'M4 6l8 6-8 6zM12 6l8 6-8 6z',

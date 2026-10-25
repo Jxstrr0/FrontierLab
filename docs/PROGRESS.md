@@ -4,11 +4,18 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 **Current stage:** 10 — Art pass, onboarding, polish, launch (built and live; awaiting the owner's iPhone check). All ten roadmap stages are built. Still open: the owner's testing and tuning pass, an Add to Home Screen test on a real iPhone, and the Vault Street card on Kelbo.Website (in a separate session in that repo).
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `1ca6909f9fa30a` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `12dd4c303e05ab` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-25 — Reorder the HQ tabs (v0.10.14)
+- **Owner's ask:** be able to reorder the HQ tabs.
+- **Tab order.** The Office sheet (the Office button at the top of HQ) gains a **Tab order** card: the floors you have, in the order their tabs run along the bottom bar, each with ▲ ▼ arrows (44 px round buttons) that move it past its neighbour, and a **Reset order** button once anything has moved. Moves skip departments you have no floor for, and a floor you add later slots in where the usual order puts it. Arrows rather than dragging: the tab bar already scrolls sideways under a thumb, so a drag there would fight it.
+- **Saved with the game.** `settings.hqTabOrder` (schema v22; migration 21 → 22 sets an empty list, which means the usual order). Two commands, `moveHqTab` and `resetHqTabOrder`; `setSettings` also validates the list (each department at most once). The HQ panel reads the order through one shared helper (`src/sim/hqTabs.ts`), and the tab labels and icons moved to `tabIcons.ts` so the Office sheet can show the same icons.
+- **Determinism:** the snapshot moved `1ca6909f9fa30a` → `12dd4c303e05ab` for the new settings field only (verified by stripping it).
+- **Checked** the Office sheet at 390×844: moving a floor reorders the bottom tabs at once, Reset restores the usual order, no console errors. New tests: default order, moves skip missing floors and stop at the ends, unbuilt departments keep their place, refusals and reset, setting validation, migration 21 → 22.
 
 ### 2026-10-25 — Delegation dials (v0.10.13)
 - **Owner's ask:** keep simple delegations as yes/no switches, and give the ones with a target a stepped slider (HR benefits morale 70 / 80 / 90, pay reviews quarterly or annual, brand campaigns' awareness 50 / 60…) with a small tagline under it showing the company impact ("+6% cost, 5 morale").
