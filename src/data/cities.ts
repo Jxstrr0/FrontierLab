@@ -22,6 +22,12 @@ export interface CitySpec {
   ink: string;
   inkName: string;
   start?: Difficulty;
+  /**
+   * How crowded the city is (default 1): scales every lot's foot traffic and
+   * the city-wide customer pool (CITY_MARKET), so a dense city packs more
+   * customers into each branch's catchment (CONTENT §2).
+   */
+  density?: number;
   /** Whether the city has a waterfront district. */
   water: boolean;
   /** The city's airport (CONTENT §2 airports); every map has one. */
@@ -381,6 +387,46 @@ export const CITIES: Record<string, CitySpec> = {
     inkName: 'Jade Harbour',
     water: true,
     airport: { code: 'HKG', name: 'Lantau Harbour' },
+  }),
+  mos: c({
+    id: 'mos',
+    name: 'Moscow',
+    country: 'RU',
+    size: 'XL',
+    tiles: 84,
+    lat: 55.76,
+    lon: 37.62,
+    rentIndex: 1.05,
+    wageIndex: 0.7,
+    incomeIndex: 0.85,
+    costIndex: 0.8,
+    incumbent: 0.5,
+    rivals: 5,
+    ink: '#8C2F2F',
+    inkName: 'Brick Crimson',
+    density: 1.35,
+    water: true,
+    airport: { code: 'MOW', name: 'Vnukovo Fields' },
+  }),
+  spb: c({
+    id: 'spb',
+    name: 'St Petersburg',
+    country: 'RU',
+    size: 'L',
+    tiles: 64,
+    lat: 59.94,
+    lon: 30.31,
+    rentIndex: 0.85,
+    wageIndex: 0.65,
+    incomeIndex: 0.9,
+    costIndex: 0.75,
+    incumbent: 0.42,
+    rivals: 4,
+    ink: '#3E6A8A',
+    inkName: 'Neva Blue',
+    density: 1.15,
+    water: true,
+    airport: { code: 'LED', name: 'Pulkovo-Neva' },
   }),
   // Regional sites (CONTENT §2): small maps with an airport and named employers.
   fmm: c({

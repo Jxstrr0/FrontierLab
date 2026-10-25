@@ -156,6 +156,21 @@ export const LEAGUES: Record<CountryId, LeagueSpec> = {
       club('harbourlights', 'Harbour Lights', 0.37),
     ],
   },
+  RU: {
+    id: 'rhl_ru',
+    name: 'Northern Ice League',
+    score: [0, 7],
+    draws: false,
+    extraTime: ' in overtime',
+    clubs: [
+      club('kremenets', 'Kremenets Bears', 0.63),
+      club('nevawolves', 'Neva Wolves', 0.58),
+      club('birchgrove', 'Birch Grove Lynx', 0.52),
+      club('volgastars', 'Volga Stars', 0.47),
+      club('uralforge', 'Ural Forge', 0.42),
+      club('whitenights', 'White Nights', 0.37),
+    ],
+  },
 };
 
 /** Fictional, neutral parties per country; each poll and proposal names one. */
@@ -169,6 +184,7 @@ export const PARTIES: Record<CountryId, string[]> = {
   AU: ['Southern Union', 'Common Ground Party', 'Coastal Party'],
   SG: ['Unity Party', 'Harbour Party', 'Progress Coalition'],
   HK: ['Harbour Party', 'Civic Alliance', 'Forward Union'],
+  RU: ['Union of Regions', 'Northern Front', 'Common Ground Party'],
 };
 
 export interface PolicySpec {
@@ -250,6 +266,7 @@ export const INDEX_NAMES: Record<CountryId, string> = {
   AU: 'Ledger Australia Index',
   SG: 'Ledger Singapore Index',
   HK: 'Ledger Hong Kong Index',
+  RU: 'Ledger Russia Index',
 };
 
 /** What analysts blame for a year of rising or falling home prices, by phase. */

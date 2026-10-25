@@ -52,11 +52,14 @@ export function generateLots(state: GameState, cityId: string, total: number): L
       // tile facing a street (cityPlacement).
       const { x, y } = placeNear(city, geo, district, rng, used, 'lot');
 
-      const footTraffic = Math.round(spec.footTraffic * rng.range(...LOT_TRAFFIC_NOISE));
+      // A dense city scales traffic up (CitySpec.density); rent follows only the
+      // lot's noise, since the city's rent level is already its rentIndex.
+      const typical = spec.footTraffic * (city.density ?? 1);
+      const footTraffic = Math.round(typical * rng.range(...LOT_TRAFFIC_NOISE));
       const weeklyRent = Math.round(
         spec.baseRent *
           city.rentIndex *
-          dpow(footTraffic / spec.footTraffic, RENT_TRAFFIC_EXP) *
+          dpow(footTraffic / typical, RENT_TRAFFIC_EXP) *
           rng.range(...LOT_RENT_NOISE),
       );
       index += 1;

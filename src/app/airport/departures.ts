@@ -28,6 +28,7 @@ export const REGION_OF: Record<CountryId, Exclude<RegionId, 'all'>> = {
   AU: 'asiaPacific',
   SG: 'asiaPacific',
   HK: 'asiaPacific',
+  RU: 'europe',
 };
 
 export const REGION_OPTIONS: { value: RegionId; label: string }[] = [

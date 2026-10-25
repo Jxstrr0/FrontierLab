@@ -74,7 +74,7 @@ Wealth · Company · Branches · Portfolio · The Ledger (archive) · Milestones
    - brand ink (8 swatches)
    - live medallion preview
 2. **Founder:** name and the avatar builder (portrait parts, §ART).
-3. **Start city:** a Segmented row of regions (Canada / U.S. / Europe / Asia-Pacific), opening on the chosen city's region, then a card for each city in that region (all 18 cities with storefronts), each with:
+3. **Start city:** a Segmented row of regions (Canada / U.S. / Europe / Asia-Pacific), opening on the chosen city's region, then a card for each city in that region (all 20 cities with storefronts), each with:
    - the country (euro-area cities show their own country)
    - average rent, usual rival count, market size, policy rate
    - a one-line flavour

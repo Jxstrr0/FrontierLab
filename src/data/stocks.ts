@@ -279,4 +279,5 @@ export const EXCHANGES: Record<CountryId, string> = {
   AU: 'Coral Exchange',
   SG: 'Lion City Exchange',
   HK: 'Pearl Exchange',
+  RU: 'Neva Exchange',
 };

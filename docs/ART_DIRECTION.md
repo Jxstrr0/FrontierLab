@@ -38,6 +38,7 @@ Spend the boldness on the map and the illustrations, the way a banknote's engrav
 | Chicago | Lake Steel #3F5F78 | Sydney | Coral #A65A45 |
 | San Francisco | Fog Violet #5E5878 | Singapore | Orchid #7A4A85 |
 | Seattle | Evergreen #355E45 | Hong Kong | Jade Harbour #2F7A6A |
+| Moscow | Brick Crimson #8C2F2F | St Petersburg | Neva Blue #3E6A8A |
 
 **Brand inks.** The player picks one of 8: Vault Blue #2C4A7A, Emerald #2F7D5B, Garnet #8E2F3E, Royal Purple #5A3E7A, Copper #A8643A, Slate #4A5568, Gold #A88A2E, Teal #2A7A80. Rival brand inks are in CONTENT.
 
@@ -116,7 +117,7 @@ Every city has its own look (`src/data/cityLooks.ts`), so no two maps read alike
 - **Big park** (`bigPark`): New York and Montréal get a park of 2×2 or 2×3 blocks between the financial district and the university.
 - **Skyline** (`skyline`): scales the storeys of financial and downtown filler buildings.
 - **Local style** (`style`): one of 14 vernaculars (prairie, glass, brick, painted, coastal, terrace, mansard, timber, canal, alpine, dense, colonial, tropical, outback). It changes rooflines (gables, mansards, stepped and bell gables, flat roofs with tanks), proportions, facade marks (chimney stacks, bay windows, fire escapes, shutters, verandahs, half-timbering, arcades), suburban houses, towers, industry and trees. Rows on neighbouring tiles join into continuous terraces around a court.
-- **Signature landmark** (`signature`): one engraved one-of-a-kind building per city, described generically (a giant observation wheel, an iron lattice tower, a tall broadcast tower, a shell-roofed harbour hall …), never by a real name. Drawn with heavier lines so it reads at zoom 0.5. Water's-edge kinds sit on the block with the most open water beside them. Heights per kind are `SIGNATURE_HEIGHT_PX`.
+- **Signature landmark** (`signature`): one engraved one-of-a-kind building per city, described generically (a giant observation wheel, an iron lattice tower, a tall broadcast tower, a shell-roofed harbour hall, a stepped stone tower with a needle spire, a church crowned with onion domes …), never by a real name. Drawn with heavier lines so it reads at zoom 0.5. Water's-edge kinds sit on the block with the most open water beside them. Heights per kind are `SIGNATURE_HEIGHT_PX`.
 - **Tint underprint** (`tint`): a pale second ink, like a banknote's underprint. Roof slopes get hatching over tinted paper, flat roofs a tinted fill, and lawns, yards and tree crowns a see-through wash. It stays restrained (about a third of the way from paper to tint) so the map still reads as an engraving.
 - **Street life:** tree-lined avenues, plazas with fountains, and park furniture (paths, a fountain, pond, bandstand or statue in the middle of each park block).
 - **Old saves:** cities generated before this change keep their original map (layout 1, see DATA_MODEL `CityState.layout`); new games and cities first visited later use these looks (layout 2).

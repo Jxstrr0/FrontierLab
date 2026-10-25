@@ -74,7 +74,7 @@ describe('departure rows', () => {
   it('filters by part of the world', () => {
     const s = game();
     const eu = departureRows(s, false, 'europe').map((r) => r.id);
-    expect(eu.sort()).toEqual(['ams', 'fra', 'lon', 'par', 'zur']);
+    expect(eu.sort()).toEqual(['ams', 'fra', 'lon', 'mos', 'par', 'spb', 'zur']);
     expect(departureRows(s, false, 'asiaPacific').every((r) => r.region === 'asiaPacific')).toBe(
       true,
     );

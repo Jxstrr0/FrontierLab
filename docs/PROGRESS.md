@@ -4,11 +4,22 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 **Current stage:** 10 — Art pass, onboarding, polish, launch (built and live; awaiting the owner's iPhone check). All ten roadmap stages are built. Still open: the owner's testing and tuning pass, an Add to Home Screen test on a real iPhone, and the Vault Street card on Kelbo.Website (in a separate session in that repo).
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `1744ec22a99c2a` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `18e729fd965135` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-25 — Moscow and St Petersburg (v0.10.6)
+- **Owner's ask:** add Moscow as a start city and a city in general, with a huge, high-density urban presence; add St Petersburg too.
+- **A new country, Russia.** Its central bank is the Bank of Russia, at 6% (higher than anywhere else; neutral 5%). Savers earn more and loans pay more there. The ruble is the most volatile currency at the investment banks. Five original rival banks are based there (Volga State Bank and Birchcrest Bank, both listed, plus Komet, Ambermark Private and Neva Savings Union). There's also a lobbying firm, an auction house (Sokolov & Lind), a stock exchange, an ice hockey league and political parties for the Ledger.
+- **Moscow** is an extra-large city (the biggest grid, 84 tiles), with a river, a big park, cream-stone blocks and a new landmark: a stepped stone tower with a needle spire. **St Petersburg** is a large canal city with a church of onion domes. Both show under the **Europe** tab on New Game, with low wages and modest rents.
+- **"High density" is a real mechanic.** Cities have a new `density` setting (default 1). Moscow is 1.35 and St Petersburg 1.15: every storefront sees that much more foot traffic, the city's pool of possible customers is that much bigger, and the advice for how many branches a city supports rises with it (Moscow about 16, Tokyo 12).
+- **Why Russia's inflation target is 2%, not the real 4%.** The game's economy model centres every country's inflation near 2%. With a 4% target the central bank kept cutting to the floor, which made loans boom past deposits. At 2% the rate holds around 6–7.5%.
+- **Keeping old worlds the same.** Russia rolls its economy and currency from its own random streams. Adding it doesn't change when Canada or the US hit recessions in existing seeds (the first try did, and a 10-year test run lost its recession).
+- **Existing saves:** schema v16 (migration 15 → 16) adds Russia's economy and currency. You can fly to Moscow and St Petersburg from any save.
+- **Balance:** the 10-year runs (steady, aggressive and turtle; seed 42, Calgary) stay inside every target. Starting in Moscow lands inside the first-branch bands, with revenue a little above them thanks to the high rates. St Petersburg runs lean, like Saskatoon and Montréal. The determinism snapshot moved `1744ec22a99c2a` → `18e729fd965135` (Russia joins the news, currency and rival rolls).
+- **Tests:** 724 (new: a Moscow start with Russian rivals and denser lots, a year in Moscow with balanced books, flying to St Petersburg, Russia's own streams and migration 15 → 16). Lint, typecheck and build clean. Checked both maps at 390×844 with no console errors.
 
 ### 2026-10-25 — CFO + CRO branch guidance, COO pay reviews, managers can be poached (v0.10.5)
 - **Owner's asks:** (A) let the CFO and CRO jointly change how branch managers handle products and risk; (B) a C-suite toggle that pays executives and branch managers market ± a percentage you set, rising every year, so they're harder to poach.

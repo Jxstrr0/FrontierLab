@@ -18,7 +18,9 @@ import { emptyCorporateDebt } from '../corporateDebt';
 import { initCountries } from '../macro';
 import { checkMilestones } from '../milestones';
 import { initRivalBench, initRivalFinancials, seedMatureBooks } from '../rivals';
-import { PAY_REVIEW } from '../../config/balance';
+import { FX_START_INDEX, PAY_REVIEW } from '../../config/balance';
+import { COUNTRIES } from '../../data/countries';
+import type { CountryId } from '../../data/types';
 import { SCHEMA_VERSION, type ExecSeat, type GameState } from '../state';
 
 type RawSave = Record<string, unknown> & { schemaVersion: number };
@@ -294,6 +296,20 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
       const mem = ex.remembered[seat];
       if (mem) mem[id] ??= false;
       for (const c of ex.candidates[seat] ?? []) c.delegations[id] ??= true;
+    }
+    return s;
+  },
+  // v16: Russia joins the world (Moscow and St Petersburg). Its economy starts
+  // fresh from the macro stream, as initCountries does for a new game, and its
+  // currency starts level with where the others began.
+  15: (s) => {
+    const state = s as unknown as GameState;
+    const home = CITIES[Object.values(state.branches)[0]?.cityId ?? state.world.currentCityId];
+    if (home) initCountries(state, home.country);
+    for (const c of Object.keys(COUNTRIES) as CountryId[]) {
+      if (state.fx.level[c] !== undefined) continue;
+      state.fx.level[c] = FX_START_INDEX;
+      state.fx.history[c] = [FX_START_INDEX];
     }
     return s;
   },

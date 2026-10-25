@@ -62,12 +62,13 @@ export function runFx(state: GameState): void {
     const spec = CURRENCIES[c];
     const country = state.world.countries[c];
     if (spec.peggedTo || !country) continue;
+    const draw = COUNTRIES[c].ownStream ? stream(state, `fx:${c}`) : rng;
     // SIMULATION §19.10: growth and rate pull, cycle drift, noise; rates against home follow.
     const r =
       (FX.growthW * country.gdp) / 100 / WEEKS_PER_YEAR +
       (FX.rateW * country.policyRate) / WEEKS_PER_YEAR +
       FX.phase[country.phase] +
-      rng.normal(0, spec.vol * FX.volMult);
+      draw.normal(0, spec.vol * FX.volMult);
     const level = (state.fx.level[c] ?? FX_START_INDEX) * (1 + r);
     state.fx.level[c] = clamp(level, FX.min * FX_START_INDEX, FX.max * FX_START_INDEX);
   }
