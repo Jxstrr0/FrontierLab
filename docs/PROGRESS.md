@@ -4,11 +4,26 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 **Current stage:** 10 — Art pass, onboarding, polish, launch (built and live; awaiting the owner's iPhone check). All ten roadmap stages are built. Still open: the owner's testing and tuning pass, an Add to Home Screen test on a real iPhone, and the Vault Street card on Kelbo.Website (in a separate session in that repo).
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `03b9402390e27e` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `0c2a99c12fc3fb` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-25 — House styles for branch fronts, cheaper rerolls (v0.10.11)
+- **Owner's asks:** make staff rerolls 25% cheaper per reroll; do the building exterior too, stylized per company, with the style chosen at the start of the game.
+- **Rerolls:** the first paid reroll now costs 7.5% of the role's market pay instead of 10%, so every reroll is 25% cheaper (a Calgary manager about $5,300 then $10,600; a first executive about $13,200). It still doubles until the free 4-weekly list.
+- **House style.** Step 1 of New Game has a new **House style** choice under the brand ink, with a live storefront showing your name and colours:
+  - **Old Exchange:** gilt letters on a dark fascia, carriage lanterns, box trees, a brand-ink panelled door.
+  - **Jazz Age:** a stepped sign in capitals with chevrons, globe lamps, tall urns, a glazed door with brass bands and a sunburst, a swallowtail flag.
+  - **Clean Line:** slim lower-case letters with a brand-ink tile, light bars, a trough of grasses, a glass door, a hanging banner.
+  - **Market Street:** a rounded painted sign, hanging lanterns that sway, pots of flowers, a brand-ink door with a wreath, a pennant.
+  - **Civic Stone:** capitals cut into a stone band, sconces (lamp standards on the Classic Columns steps), classical urns, a dark bronze door.
+  - It dresses all five exterior options. Your full bank name is on every branch's sign, so your branches look like yours and nobody else's.
+- **Livelier fronts:** two passers-by stroll the pavement and the flag stirs. Motion stops with reduced motion.
+- **Existing saves:** schema v19 (migration 18 → 19) picks a style from the game's seed. Quick Start does the same.
+- **Balance:** no change. The determinism snapshot moved `03b9402390e27e` → `0c2a99c12fc3fb` only because the save gained `meta.houseStyle`; with it removed the hash matches exactly.
+- **Checked** every style on every exterior at 390×844 and the New Game step, with no console errors. 734 tests (new: style stored, seed default, migration 18 → 19), lint, typecheck and build clean.
 
 ### 2026-10-25 — Livelier HQ floors and a branch Inside view (v0.10.10)
 - **Owner's ask:** upgrade the office and branch interior art: same style, more alive, higher quality.

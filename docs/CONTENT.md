@@ -215,6 +215,18 @@ Reference builds:
 - **Mid:** $332k (brick, comfort, standard, steel, wall ATM).
 - **Premium:** $883k (columns, marble, concierge, time-lock, ATM lobby).
 
+### 7a. House styles
+
+Chosen on New Game (`src/data/houseStyles.ts`); every branch front wears it, whatever the exterior option.
+
+| id | Name | Sign | Lamps | Planters | Door | Flag |
+|---|---|---|---|---|---|---|
+| heritage | Old Exchange | gilt serif on a dark fascia | carriage lanterns | box trees | brand ink, panelled | rectangle |
+| deco | Jazz Age | stepped board, capitals, chevrons | globe lamps | tall urns with spiky plants | glazed with brass bands and a sunburst | swallowtail |
+| modern | Clean Line | lower-case sans with a brand-ink tile | light bars | long trough of grasses | glass with a slim pull | hanging banner |
+| garden | Market Street | rounded painted board, italic | hanging lanterns | pots of flowers in the brand ink | brand ink with a wreath | pennant |
+| civic | Civic Stone | capitals cut into a stone band | sconces (lamp standards on the steps of Classic Columns) | classical urns | dark bronze, panelled | bordered rectangle |
+
 ## 8. Branch campaigns
 
 | id | Name | Levels: label (cost) | Effects per level |

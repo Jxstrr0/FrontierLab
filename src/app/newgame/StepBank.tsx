@@ -1,6 +1,10 @@
-// Wizard step 1: bank name, monogram, brand ink and a live medallion preview.
+// Wizard step 1: bank name, monogram, brand ink and a live medallion preview,
+// then the house style every branch front will share, with a live front.
 import { BRAND_INKS } from '../../data/brandInks';
 import { Medallion } from '../components';
+import { CITIES } from '../../data/cities';
+import { HOUSE_STYLES } from '../../data/houseStyles';
+import { BranchArt } from '../branch/BranchArt';
 import { MONOGRAM_LENGTH, NAME_MAX, monogramFor, type Draft } from './draft';
 
 export function StepBank(p: { draft: Draft; patch: (d: Partial<Draft>) => void }) {
@@ -77,6 +81,39 @@ export function StepBank(p: { draft: Draft; patch: (d: Partial<Draft>) => void }
             </button>
           ))}
         </div>
+      </fieldset>
+
+      <fieldset class="field">
+        <legend class="field-label">House style</legend>
+        <span class="field-hint">
+          How every branch front looks: the sign, lamps, planters and flag.
+        </span>
+        <div class="style-preview">
+          <BranchArt
+            exterior="ext_storefront"
+            bankName={draft.bankName.trim() || 'Your bank'}
+            style={draft.houseStyle}
+            brandInk={draft.brandInk}
+            monogram={draft.monogram || '··'}
+            ink={CITIES[draft.cityId]?.ink}
+          />
+        </div>
+        <div class="style-grid" role="radiogroup" aria-label="House style">
+          {HOUSE_STYLES.map((h) => (
+            <button
+              type="button"
+              role="radio"
+              aria-checked={h.id === draft.houseStyle}
+              class={`style-chip${h.id === draft.houseStyle ? ' is-active' : ''}`}
+              onClick={() => patch({ houseStyle: h.id })}
+            >
+              {h.name}
+            </button>
+          ))}
+        </div>
+        <span class="field-hint">
+          {HOUSE_STYLES.find((h) => h.id === draft.houseStyle)?.description}
+        </span>
       </fieldset>
     </div>
   );

@@ -20,6 +20,7 @@ import { checkMilestones } from '../milestones';
 import { initRivalBench, initRivalFinancials, seedMatureBooks } from '../rivals';
 import { FX_START_INDEX, PAY_REVIEW } from '../../config/balance';
 import { COUNTRIES } from '../../data/countries';
+import { HOUSE_STYLE_IDS } from '../../data/houseStyles';
 import type { CountryId } from '../../data/types';
 import { SCHEMA_VERSION, type BranchGuidance, type ExecSeat, type GameState } from '../state';
 
@@ -337,6 +338,13 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
       if (mem) mem.guidance ??= false;
       for (const c of ex.candidates[seat] ?? []) c.delegations.guidance ??= true;
     }
+    return s;
+  },
+  // v19: the house style of your branch fronts. Older banks get one picked
+  // from their seed, so existing saves still differ from one another.
+  18: (s) => {
+    const state = s as unknown as GameState;
+    state.meta.houseStyle ??= HOUSE_STYLE_IDS[state.meta.seed % HOUSE_STYLE_IDS.length]!;
     return s;
   },
 };

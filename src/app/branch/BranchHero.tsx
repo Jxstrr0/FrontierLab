@@ -3,6 +3,7 @@
 // remembered for the session, so flicking between branches keeps the view.
 import { signal } from '@preact/signals';
 import type { BuildSpec } from '../../data/equipment';
+import type { HouseStyle } from '../../data/types';
 import { BranchArt } from './BranchArt';
 import { BranchInterior, type BranchLive } from './BranchInterior';
 
@@ -12,6 +13,8 @@ export function BranchHero(p: {
   build: BuildSpec;
   brandInk: string;
   monogram: string;
+  bankName: string;
+  style: HouseStyle;
   flagInk?: string;
   ink?: string;
   live?: BranchLive;
@@ -30,6 +33,8 @@ export function BranchHero(p: {
       ) : (
         <BranchArt
           exterior={p.build.exterior}
+          bankName={p.bankName}
+          style={p.style}
           brandInk={p.brandInk}
           monogram={p.monogram}
           flagInk={p.flagInk}

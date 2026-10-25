@@ -1,8 +1,10 @@
 // Shared pieces for the branch exteriors (ART_DIRECTION §3): the bank's seal
 // in its brand ink, glazed panes and round-topped arches, plus the Facade
-// shape each composition in facadesLow.tsx / facadesGrand.tsx fills in.
+// shape each composition in facadesLow.tsx / facadesGrand.tsx fills in
+// (with the anchors the house style dresses, houseStyleArt.tsx).
 import type { JSX } from 'preact';
 import { poly, type Pt } from '../../art/engrave';
+import type { FacadeAnchors } from './houseStyleArt';
 
 export interface Brand {
   ink: string;
@@ -11,6 +13,8 @@ export interface Brand {
 
 export interface Facade {
   draw: (b: Brand) => JSX.Element;
+  /** Where the house style's sign, lamps and planters go. */
+  anchors: FacadeAnchors;
   /** Where the roof flag's pole stands. */
   flag: Pt;
   /** Outer bounds of the building, for the fit-out scaffolding. */

@@ -149,6 +149,38 @@
   font-weight: 600;
 }
 
+/* House style picker */
+.style-preview {
+  margin: var(--space-2) 0;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+.style-preview .vignette {
+  display: block;
+  width: 100%;
+}
+.style-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.style-chip {
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ivory-dim);
+  font: 600 var(--text-14) / 1 var(--font-ui);
+  cursor: pointer;
+}
+.style-chip.is-active {
+  border-color: var(--brass);
+  background: rgb(184 145 61 / 12%);
+  color: var(--ivory);
+}
+
 /* Step 3 */
 .city-card {
   display: block;
