@@ -1,0 +1,193 @@
+/* Engraved interiors (HQ floors, branch inside; ART_DIRECTION §3): shared
+   body tones and the quiet motion that makes a room feel lived in. Motion is
+   small (under a pixel for breathing and typing) and stops entirely with
+   reduced motion, from the system or the in-game setting. */
+.vignette .in-body {
+  stroke: var(--art-ink);
+  stroke-width: 0.7;
+  stroke-linejoin: round;
+}
+.vignette .in-mood-good {
+  fill: var(--jade);
+}
+.vignette .in-mood-warn {
+  fill: var(--brass);
+}
+.vignette .in-mood-bad {
+  fill: var(--oxblood);
+}
+.vignette .in-mood-guest {
+  fill: color-mix(in srgb, var(--art-ink) 22%, var(--ivory));
+}
+.vignette .in-empty {
+  stroke-dasharray: 1.4 1.2;
+  opacity: 0.6;
+}
+.vignette .in-dashed {
+  stroke-dasharray: 1.6 1.4;
+  opacity: 0.55;
+}
+.vignette .in-screen {
+  fill: var(--art-ink);
+  opacity: 0.32;
+}
+.vignette .in-glow {
+  fill: var(--brass);
+  opacity: 0.18;
+}
+.vignette .in-light {
+  fill: var(--brass);
+  opacity: 0.09;
+}
+.vignette .in-brand {
+  stroke: var(--art-ink);
+  stroke-width: 0.7;
+}
+.vignette .in-brand-text {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 7px;
+  fill: var(--ivory);
+}
+.vignette .in-led {
+  fill: var(--jade);
+}
+.vignette .in-caption {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 600;
+  fill: var(--art-ink);
+}
+
+/* ─── Motion ──────────────────────────────────────────────────────────── */
+.in-alive .in-type {
+  animation: in-type 1.9s ease-in-out infinite;
+}
+.in-alive .in-breathe {
+  animation: in-type 3.4s ease-in-out infinite;
+}
+.in-alive .in-screen.is-live {
+  animation: in-flicker 5s steps(1) infinite;
+}
+.in-alive .in-led {
+  animation: in-blink 1.3s steps(1) infinite;
+}
+.in-alive .in-sway {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: in-sway 6s ease-in-out infinite;
+}
+.in-alive .in-hand {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: in-spin 60s linear infinite;
+}
+.in-alive .in-walk {
+  animation: in-walk var(--walk-s, 14s) ease-in-out infinite;
+}
+.in-alive .in-walk .in-step {
+  animation: in-step 0.55s ease-in-out infinite;
+}
+.in-alive .in-arrive {
+  animation: in-arrive var(--walk-s, 9s) ease-in-out infinite;
+}
+
+@keyframes in-type {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-0.45px);
+  }
+}
+@keyframes in-flicker {
+  0% {
+    opacity: 0.32;
+  }
+  37% {
+    opacity: 0.22;
+  }
+  41% {
+    opacity: 0.36;
+  }
+  78% {
+    opacity: 0.28;
+  }
+}
+@keyframes in-blink {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+@keyframes in-sway {
+  0%,
+  100% {
+    transform: rotate(-1.2deg);
+  }
+  50% {
+    transform: rotate(1.2deg);
+  }
+}
+@keyframes in-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes in-step {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-0.7px);
+  }
+}
+/* Walk out along (--dx, --dy), pause, and walk back. */
+@keyframes in-walk {
+  0%,
+  6% {
+    transform: translate(0, 0);
+  }
+  44%,
+  56% {
+    transform: translate(var(--dx), var(--dy));
+  }
+  94%,
+  100% {
+    transform: translate(0, 0);
+  }
+}
+/* Come in from (--dx, --dy), wait, then fade out to make room for the next. */
+@keyframes in-arrive {
+  0% {
+    transform: translate(var(--dx), var(--dy));
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  45%,
+  88% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .in-alive *,
+  .in-alive {
+    animation: none !important;
+  }
+}
+html.reduced-motion .in-alive *,
+html.reduced-motion .in-alive {
+  animation: none !important;
+}

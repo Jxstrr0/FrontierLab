@@ -123,7 +123,7 @@ After the wizard, the map opens with the tutorial (§27).
 ## 4. Build branch
 
 - **Starting pick:** the fit-out you last built with (`company.lastBuild`), so the parts don't need choosing again; before your first build, the mid reference build if cash allows, then basic, then the cheapest parts.
-- **Hero:** the vignette updates live as you change parts.
+- **Hero:** the vignette updates live as you change parts. The same Inside / Outside switch as the branch panel shows the banking hall the lobby, teller line, vault and ATM picks make.
 - **Five tiles:** Exterior, Lobby, Teller line, Vault, ATM. Each shows the current pick's thumbnail and price.
 - **Tap a tile** to open a picker sheet: a carousel of options with name, one-line description, coins (Quality, Productivity, or Security for vaults), extra facts (stations, advisor offices, boxes), price, and Select.
 - **Summary:**
@@ -136,6 +136,7 @@ After the wizard, the map opens with the tutorial (§27).
 
 - **Header:** "{Bank} — {District}" with the address.
 - **Advisor:** the branch manager's portrait with a contextual line (CONTENT Advisor lines).
+- **Hero:** the exterior, with an **Inside / Outside** pill (44 px tall) in the corner that switches to the banking hall (ART_DIRECTION §3) and back; the choice holds for the session. The inside view shows the real staff, morale tint and a queue as long as the wait, with a caption such as "3 of 3 windows open · busy".
 - **Tabs:** Service · Products · Loan Desk · Marketing · Finance.
 
 ### 5.1 Service
@@ -238,7 +239,7 @@ Tabs: Overview · Loans · Credit.
 - **Bottom icon bar** (only departments you have): an icon over a short label for each floor, scrolling sideways when they don't fit. Finance (ledger) · HR (people) · Products (card) · Treasury (vault) · Marketing (megaphone) · IT (screen) · Risk (shield) · Executive (briefcase) · Investment (rising chart) · Add floor (plus).
 
 **Every department floor shows:**
-- **hero:** engraved isometric office interior whose desk count reflects staffing
+- **hero:** engraved isometric office interior whose desk count reflects staffing, furnished per department (ART_DIRECTION §3)
 - **advisor:** a coverage-aware line ("We're short on finance staff — statements are running late.")
 - **Employees:** stepper (`18 / 24`) with an Open positions chip
 - **Annual salary:** stepper with the market hint

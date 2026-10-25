@@ -10,6 +10,24 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-10-25 — Livelier HQ floors and a branch Inside view (v0.10.10)
+- **Owner's ask:** upgrade the office and branch interior art: same style, more alive, higher quality.
+- **HQ floors, redrawn.** Same engraved isometric look, much more in the room:
+  - A plank floor (carpet in the Executive suite), skirting and cornice, wall tops inked like an architect's cut, windows that throw pale daylight across the floor, a clock and a door.
+  - Workers sit at glowing screens with their own hairstyles and desk clutter, still tinted by team mood, with empty desks dashed.
+  - Each department furnishes its own floor. Finance has cabinets and certificates, HR a water cooler and pinboard, Products a whiteboard, Treasury and IT a live ticker (IT adds blinking server racks), Marketing posters and an easel, Risk a safe and a chart, and the Executive suite books, a sofa, a painting and a huddle table.
+  - Busy floors have someone walking the aisle with a folder and two colleagues chatting at the back.
+- **New: a branch Inside view.** An "Inside" pill on the branch picture switches to the banking hall, drawn from what you built:
+  - the teller line's own shape (glazed counter, express counter, pods or concierge desks)
+  - the lobby's floor and its glass advisor offices
+  - the vault door in its style next to a safe-deposit wall
+  - the ATMs, and your monogram over the counter
+  - It fills with your real staff (tellers, then advisors, then a greeter), tinted by morale, and a queue as long as the wait, with someone always walking in. During fit-out there's a ladder and boxes.
+  - The build screen has the same switch, so you can see the hall your parts make before you pay.
+- **Motion is gentle** (breathing, typing, flickering screens, swaying plants, a turning clock hand) and switches off with reduced motion, from the phone or the in-game setting.
+- **How it's built:** a shared isometric kit in `src/app/components/` (`isoKit`, `isoRoom`, `isoPeople`, `isoProps`, `isoWall`, `interior.css`) used by the HQ floor (`hq/OfficeInterior.tsx`, `hq/officeDecor.tsx`) and the branch hall (`branch/BranchInterior.tsx`, `interiorParts.tsx`, `interiorWall.tsx`, `BranchHero.tsx`). Art only: no game state, save or balance change.
+- **Checked** at 390×844 for every department and five branch fit-outs, plus fit-out and the build preview, with no console errors. 731 tests, lint, typecheck and build clean.
+
 ### 2026-10-25 — Branch guidance from the COO, CMO and CPO (v0.10.9)
 - **Owner's ask:** give the other C-suite seats a branch guidance delegation where it fits how they work, so managers stay independent and their skill still matters, but they get helpful steering from above.
 - **COO, Branch guidance: staffing.** Every 4 weeks it looks at staff morale in branches whose manager runs staffing. Below 65 it tells managers to pay up to 6% more and staff up to 15% more; above 82 it lets them trim. The manager's People skill still sets their base wage.

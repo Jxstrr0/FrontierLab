@@ -11,7 +11,7 @@ import { defaultBuild, SLOT_LABEL } from './builds';
 import { PartPicker } from './PartPicker';
 import { SlotIcon } from './SlotIcon';
 import './build.css';
-import { BranchArt } from '../branch/BranchArt';
+import { BranchHero } from '../branch/BranchHero';
 import { CITIES } from '../../data/cities';
 import { ATTENTION } from '../../config/balance';
 import { cashCoverWeeks } from '../../sim/cashCover';
@@ -53,8 +53,8 @@ export function BuildPanel(p: { lotId: string }) {
         subtitle={`${lot.address} · ${districtName(lot)}`}
         onClose={closePanel}
         hero={
-          <BranchArt
-            exterior={build.exterior}
+          <BranchHero
+            build={build}
             brandInk={s.meta.brandInk}
             monogram={s.meta.monogram}
             ink={CITIES[lot.cityId]?.ink}
