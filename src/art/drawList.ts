@@ -6,7 +6,8 @@
 import {
   FLAG_PX,
   LANDMARK_MAX_PX,
-  SIGNATURE_MAX_PX,
+  LANDMARK_SIDE_TILES,
+  SIGNATURE_HEIGHT_PX,
   ROOF_EXTRA_STOREYS,
   SHADOW_TILES_PER_PX,
   STOREY_PX,
@@ -90,17 +91,25 @@ export function tileHeightPx(map: CityMap, index: number): number {
   return (map.floors[index]! + ROOF_EXTRA_STOREYS) * STOREY_PX + flag;
 }
 
+/** How tall a landmark's art reaches above its block, in world px. */
+export function landmarkHeightPx(site: LandmarkSite): number {
+  return site.signature ? SIGNATURE_HEIGHT_PX[site.signature] : LANDMARK_MAX_PX;
+}
+
+/** World bounds of a landmark: its block, its height and (for signatures) a side margin. */
+export function landmarkBounds(tiles: number, site: LandmarkSite): Rect {
+  const b = footprintBounds(tiles, site.x, site.y, site.size, landmarkHeightPx(site));
+  if (!site.signature) return b;
+  const pad = (LANDMARK_SIDE_TILES * TILE_W) / 2;
+  return { x: b.x - pad, y: b.y - pad / 2, w: b.w + 2 * pad, h: b.h + pad };
+}
+
 /** Painter's order key: the footprint's front corner (x + y), then x. */
 export function orderKey(x: number, y: number, size: number, tiles: number): number {
   return (x + y + 2 * size) * (tiles + 1) + x;
 }
 
 /** The tallest anything on this map may draw, for padding chunk queries. */
-/** The tallest a landmark may draw: signatures (towers, masts, pylons) reach higher. */
-export function landmarkHeightPx(site: LandmarkSite): number {
-  return site.id === 'signature' ? SIGNATURE_MAX_PX : LANDMARK_MAX_PX;
-}
-
 export function maxItemHeight(map: CityMap): number {
   let max = 0;
   for (const site of map.landmarks) max = Math.max(max, landmarkHeightPx(site));
@@ -138,7 +147,7 @@ export function itemsInRect(map: CityMap, rect: Rect, maxHeight: number): DrawIt
     }
   }
   for (const site of map.landmarks) {
-    const bounds = footprintBounds(n, site.x, site.y, site.size, landmarkHeightPx(site));
+    const bounds = landmarkBounds(n, site);
     if (rectsOverlap(bounds, rect)) {
       out.push({ type: 'landmark', site, bounds, order: orderKey(site.x, site.y, site.size, n) });
     }

@@ -11,6 +11,7 @@ import {
   RENDER_SLICE_MS,
   ZOOM_STOPS,
 } from '../config/map';
+import { cityLook } from '../data/cityLooks';
 import { context2d, createCanvas, freeCanvas, type AnyCanvas } from './canvasKit';
 import { startChunk, runChunk, type ChunkJob, type PaintContext } from './chunkPainter';
 import {
@@ -57,8 +58,11 @@ const now = () => performance.now();
 
 export const createMapRenderer: CreateMapRenderer = (map, style) => {
   const { width, height } = worldSize(map.tiles);
+  // The city's look (style, signature, tint) comes from its id, not from citygen.
+  const look = cityLook(map.cityId);
   const pc: PaintContext = {
     map,
+    look,
     cityName: style.cityName,
     maxHeight: maxItemHeight(map),
     occupants: {},
@@ -88,7 +92,10 @@ export const createMapRenderer: CreateMapRenderer = (map, style) => {
     grids = new Map(ZOOM_STOPS.map((s) => [s, makeChunkGrid(s, dpr, CHUNK_CSS_PX, width, height)]));
     const probe = context2d(createCanvas(1, 1));
     inks = new Map(
-      ZOOM_STOPS.map((s, k) => [s, makeInkSet(probe, style.ink, style.paper, k, s, dpr)]),
+      ZOOM_STOPS.map((s, k) => [
+        s,
+        makeInkSet(probe, style.ink, style.paper, k, s, dpr, look.tint),
+      ]),
     );
   };
 

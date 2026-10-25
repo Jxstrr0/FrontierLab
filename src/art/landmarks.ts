@@ -4,7 +4,7 @@
 // landmarksOpen.ts. Local coordinates run 0..3 across the block.
 import { STOREY_PX } from '../config/map';
 import type { LandmarkSite } from './citygen';
-import type { Engraver, Vec3 } from './engraver';
+import { Engraver, type Vec3 } from './engraver';
 import { stipple } from './flora';
 import { airport, stadium } from './landmarksOpen';
 import { drawSignature } from './signatures';
@@ -29,6 +29,8 @@ const CLOCK = {
   spire: 26,
   faceR: 0.17,
 } as const;
+/** Line weight multiplier for signature landmarks, by level of detail. */
+const SIGNATURE_LINE = [1.6, 1.35, 1.2] as const;
 /** World px along one tile edge on screen (√(32² + 16²)), for circles on walls. */
 const EDGE_PX = 35.78;
 
@@ -38,8 +40,20 @@ export function drawLandmark(e: Engraver, site: LandmarkSite, seed: number): voi
   if (site.id === 'centralBank') centralBank(e, s);
   else if (site.id === 'clockTower') clockTower(e, s, seed);
   else if (site.id === 'stadium') stadium(e, s, seed);
-  else if (site.id === 'signature') drawSignature(e, site.signature ?? 'none', s, seed);
+  else if (site.id === 'signature') drawSignature(bolder(e), site.signature ?? 'none', s, seed);
   else airport(e, s, seed);
+}
+
+/**
+ * An engraver with heavier lines, so a city's signature landmark stands out
+ * from the fabric around it (most of all at the far zoom).
+ */
+function bolder(e: Engraver): Engraver {
+  const k = SIGNATURE_LINE[e.lod]!;
+  const inks = { ...e.inks, outline: e.inks.outline * k, detail: e.inks.detail * Math.sqrt(k) };
+  const b = new Engraver(inks, e.tiles, e.look).origin(e.ox, e.oy);
+  b.ctx = e.ctx;
+  return b;
 }
 
 function centralBank(e: Engraver, s: number): void {
