@@ -119,7 +119,7 @@ export function convertRivalBranch(
     capacity: 0,
     last: { prospects: 0, captured: 0, served: 0, share: 0 },
     pnl: [],
-    desk: { week: state.clock.week, approved: 0, refused: 0, declined: 0, expired: 0 },
+    desk: { week: state.clock.week, arrived: 0, approved: 0, refused: 0, declined: 0, expired: 0 },
     converting: {
       rivalId: bank.id,
       name: bank.name,

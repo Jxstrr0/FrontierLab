@@ -62,6 +62,7 @@ export function closeWeek(state: GameState): WeeklySnapshot {
     pnl: { ...state.ledger.pnl },
     capitalRatio: cap.capitalRatio,
     tier: cap.tier,
+    appRating: state.company.appRating,
   };
   state.history.weekly.push(snap);
   if (state.history.weekly.length > WEEKLY_HISTORY) {

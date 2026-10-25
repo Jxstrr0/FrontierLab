@@ -37,7 +37,14 @@ describe('loan desk weekly tally', () => {
     const up = migrate(s as Record<string, unknown> & { schemaVersion: number });
     expect(up.schemaVersion).toBe(SCHEMA_VERSION);
     for (const b of Object.values(up.branches as Record<string, Record<string, unknown>>)) {
-      expect(b.desk).toEqual({ week: 0, approved: 0, refused: 0, declined: 0, expired: 0 });
+      expect(b.desk).toEqual({
+        week: 0,
+        arrived: 0,
+        approved: 0,
+        refused: 0,
+        declined: 0,
+        expired: 0,
+      });
     }
   });
 });
