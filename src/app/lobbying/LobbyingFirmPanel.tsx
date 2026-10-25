@@ -128,7 +128,7 @@ export function LobbyingFirmPanel(p: { siteId: string }) {
             <p>
               {asking.title} for {moneyFull(asking.cost, sym)}, paid now. It works{' '}
               {pct(asking.success, 0)} of the time, and there's a {pct(asking.exposure, 0)} chance
-              The Daily Ledger finds out: a fine of {pct(LOBBYING.exposeFine, 0)} of the fee and a
+              The Weekly Ledger finds out: a fine of {pct(LOBBYING.exposeFine, 0)} of the fee and a
               dent in your brand.
             </p>
           }

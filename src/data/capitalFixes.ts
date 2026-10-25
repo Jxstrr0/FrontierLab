@@ -1,6 +1,6 @@
 // How to lift a weak capital ratio (SIMULATION §15), in plain words. Shown as
 // a checklist under the capital meter at Watch or worse, and folded into the
-// Daily Ledger's capital story so the warning says what to do about it.
+// Weekly Ledger's capital story so the warning says what to do about it.
 import type { Tier } from './types';
 
 export type ListingStatus = 'private' | 'public';

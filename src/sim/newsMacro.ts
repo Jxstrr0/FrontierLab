@@ -1,4 +1,4 @@
-// The economy in The Daily Ledger (SIMULATION §24, §4): central bank decisions
+// The economy in The Weekly Ledger (SIMULATION §24, §4): central bank decisions
 // (your home country always, other countries you operate in, then the biggest
 // moves elsewhere), the home economy, house prices for each country you
 // operate in, the weekly market wrap and the year-end Fastest Growing ranking.

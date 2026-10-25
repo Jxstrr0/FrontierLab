@@ -1,4 +1,4 @@
-// The Daily Ledger's templates for central banks, the economy, housing,
+// The Weekly Ledger's templates for central banks, the economy, housing,
 // markets, rankings, sports and politics (CONTENT §23). Tokens in {braces} are
 // filled by src/sim/news*.ts. Every central bank headline carries {rate}.
 // Merged into LEDGER_TEMPLATES by ledgerTemplates.ts.

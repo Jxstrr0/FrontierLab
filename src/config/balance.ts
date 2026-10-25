@@ -17,7 +17,7 @@ export const FEATURES = {
   cityMap: true,
   /** Stage 4: HQ offices, departments and operations depth. */
   hq: true,
-  /** Stage 5: rival AI, macro for every country, The Daily Ledger, incidents. */
+  /** Stage 5: rival AI, macro for every country, The Weekly Ledger, incidents. */
   competition: true,
   /** Stage 6: governance, executives and capital markets. */
   capitalMarkets: true,
@@ -997,7 +997,7 @@ export const RECAP = {
   minPrice: 0.01,
 } as const;
 
-// ─── NEWS: THE DAILY LEDGER (§24) ─────────────────────────────────────────────
+// ─── NEWS: THE WEEKLY LEDGER (§24) ─────────────────────────────────────────────
 /** Articles per weekly issue, the Top tab's size and how many issues the archive keeps. */
 export const NEWS_ARTICLES_MIN = 6;
 export const NEWS_ARTICLES_MAX = 12;
@@ -1180,7 +1180,7 @@ export const HOMES_CFG = {
   /** A refused offer: the seller won't hear another for this many weeks (assumption). */
   refusalWeeks: 4,
   sellFee: 0.05,
-  /** Purchases at or above this make The Daily Ledger. */
+  /** Purchases at or above this make The Weekly Ledger. */
   newsMin: 10_000_000,
 } as const;
 /** Weekly net worth kept for the Personal Wealth screen's weekly change. */
@@ -1751,7 +1751,7 @@ export const REAL_ESTATE = {
   /** Offer stepper on a listing: from this share of asking up to asking, in steps of this share. */
   offerMin: 0.8,
   offerStep: 0.01,
-  /** A purchase or sale at least this large makes The Daily Ledger. */
+  /** A purchase or sale at least this large makes The Weekly Ledger. */
   newsMin: 10_000_000,
 } as const;
 /** §21.3 foreclosed homes: carrying cost per year, Sell all at 90% in 1–4 weeks, Rent yield at 90% occupancy. */

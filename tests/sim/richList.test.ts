@@ -1,6 +1,6 @@
 // The rich list (SIMULATION §22): 50 generated fortunes inside the range,
 // growing 4–8% a year, and your year-end rank by net worth (none below #50),
-// with the RICH_LIST story in The Daily Ledger.
+// with the RICH_LIST story in The Weekly Ledger.
 import { describe, expect, it } from 'vitest';
 import { RICH_LIST } from '../../src/config/balance';
 import { composeNews } from '../../src/sim/news';

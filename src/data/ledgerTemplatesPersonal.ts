@@ -1,4 +1,4 @@
-// The Daily Ledger's templates for Stage 9 personal stories (CONTENT §23): the
+// The Weekly Ledger's templates for Stage 9 personal stories (CONTENT §23): the
 // rich list (entry and rank), insider-trading probes and fines, and big home
 // purchases. Merged into LEDGER_TEMPLATES via ledgerTemplatesEmpire.ts.
 import type { LedgerTemplate } from './ledgerTemplates';

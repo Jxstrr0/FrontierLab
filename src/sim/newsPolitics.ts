@@ -1,4 +1,4 @@
-// Politics for The Daily Ledger (SIMULATION §24): fictional, neutral parties
+// Politics for The Weekly Ledger (SIMULATION §24): fictional, neutral parties
 // table policies now and then and lawmakers vote a few weeks later. A passed
 // capital buffer raises that country's capital tier thresholds by
 // CAPITAL_BUFFER_PP for CAPITAL_BUFFER_WEEKS (capital.ts applies it at home);

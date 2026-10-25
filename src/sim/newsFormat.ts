@@ -1,4 +1,4 @@
-// Pure number formatting for The Daily Ledger's copy (SCREENS §0.4). The sim
+// Pure number formatting for The Weekly Ledger's copy (SCREENS §0.4). The sim
 // can't import the app's formatters, so this mirrors src/app/format/format.ts:
 // compact money ($1.48B, $29.8M, $83.7K, $950), rates with two decimals
 // (3.25%) and plain percentages with one (2.4%). No locale calls, so issues

@@ -1,4 +1,4 @@
-// The Daily Ledger's templates for governance stories (Stage 6, CONTENT §23):
+// The Weekly Ledger's templates for governance stories (Stage 6, CONTENT §23):
 // dividends declared, board votes that went against the founder, and
 // executive hires, departures and firings. Merged into LEDGER_TEMPLATES via
 // ledgerTemplatesCapital.ts. Tokens in {braces} come from src/sim/newsGovernance.ts.

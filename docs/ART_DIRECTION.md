@@ -158,9 +158,9 @@ Every city has its own look (`src/data/cityLooks.ts`), so no two maps read alike
 - **Donut:** segments in a palette derived from the city inks, with fine diagonal engraving lines inside each segment.
 - **Line charts:** 1.5 px strokes, no area fills, and a dotted brass marker for "now".
 
-## 6. The Daily Ledger
+## 6. The Weekly Ledger
 
-- **Paper:** ivory with grain. The masthead "The Daily Ledger" is Bodoni Moda 900, tight tracking, centered, between a double rule with the date at the right.
+- **Paper:** ivory with grain. The masthead "The Weekly Ledger" is Bodoni Moda 900, tight tracking, centered, between a double rule with the date at the right.
 - **Tabs:** text links with a brass underline on the active tab.
 - **Articles:**
   - two columns separated by a hairline

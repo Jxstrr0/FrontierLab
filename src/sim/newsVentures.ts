@@ -1,4 +1,4 @@
-// Ventures stories in The Daily Ledger (Stage 7, SIMULATION §24): convention
+// Ventures stories in The Weekly Ledger (Stage 7, SIMULATION §24): convention
 // announcements (every one, loudest in your cities), big funding rounds and
 // rounds in startups you back, IPOs, acquisitions and failures. Stories about
 // startups you hold lead the Business page; the rest share a small group cap.

@@ -1,5 +1,5 @@
 // Weekly results modal (SCREENS §21): the week's revenue and net income with
-// their change, the cash flow, and that week's issue of The Daily Ledger (as
+// their change, the cash flow, and that week's issue of The Weekly Ledger (as
 // composed by the sim, src/sim/news.ts). When the Finance team is short the
 // figures read "Delayed" (SIMULATION §14.6); the Ledger still runs. Closing
 // resumes the game.

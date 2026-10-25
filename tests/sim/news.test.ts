@@ -1,4 +1,4 @@
-// The Daily Ledger (SIMULATION §24, ROADMAP Stage 5 acceptance): over three
+// The Weekly Ledger (SIMULATION §24, ROADMAP Stage 5 acceptance): over three
 // years every issue carries 6–12 articles, no subject repeats its template in
 // back-to-back weeks, and the numbers match the events and the weekly close.
 import { describe, expect, it } from 'vitest';
@@ -23,7 +23,7 @@ function parseRef(ref: string): [string, number] {
   return [ref.slice(0, at), Number(ref.slice(at + 1))];
 }
 
-describe('The Daily Ledger over three years', () => {
+describe('The Weekly Ledger over three years', () => {
   const issues: LedgerIssue[] = [];
   const cbChecks: { headline: string; rate: string }[] = [];
   const revenueChecks: { body: string; headline: string; revenue: string }[] = [];

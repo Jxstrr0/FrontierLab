@@ -1,4 +1,4 @@
-// The Daily Ledger's templates for Stage 9 stories: your club's season finish
+// The Weekly Ledger's templates for Stage 9 stories: your club's season finish
 // (CONTENT §23 SPORTS), buying and selling a club, kit sponsorship and a big
 // signing. Merged into LEDGER_TEMPLATES via ledgerTemplatesEmpire.ts.
 import type { LedgerTemplate } from './ledgerTemplates';

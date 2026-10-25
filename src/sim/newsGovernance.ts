@@ -1,4 +1,4 @@
-// Governance stories in The Daily Ledger (Stage 6, SIMULATION §24, business
+// Governance stories in The Weekly Ledger (Stage 6, SIMULATION §24, business
 // tab): dividends declared, board votes that went against you (a rejected
 // dividend or CEO pay rise; routine approvals make no news), and executives
 // hired, resigned or fired. Your company's events lead the paper (priority 1).

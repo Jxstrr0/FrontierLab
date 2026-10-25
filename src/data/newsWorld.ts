@@ -1,4 +1,4 @@
-// The world The Daily Ledger reports on beyond banking (SIMULATION §24,
+// The world The Weekly Ledger reports on beyond banking (SIMULATION §24,
 // CONTENT §23): one fictional sports league per country, fictional neutral
 // political parties, the policies they propose, market sectors, each country's
 // share index and the reasons analysts give for house-price moves. Every name

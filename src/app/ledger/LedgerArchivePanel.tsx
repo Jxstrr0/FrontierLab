@@ -1,4 +1,4 @@
-// The Daily Ledger archive (menu → The Ledger, SCREENS §0.3, SIMULATION §24):
+// The Weekly Ledger archive (menu → The Ledger, SCREENS §0.3, SIMULATION §24):
 // the last 52 issues newest first, each with its date and lead headline; tap
 // one to read it with the same tabs as the weekly results.
 import { DAYS_PER_WEEK } from '../../config/balance';
@@ -18,7 +18,7 @@ export function LedgerArchivePanel(p: { week?: number }) {
 
   if (open) {
     return (
-      <Panel title="The Daily Ledger" subtitle={`No. ${open.week}`} onClose={closePanel}>
+      <Panel title="The Weekly Ledger" subtitle={`No. ${open.week}`} onClose={closePanel}>
         <div class="stack">
           <button
             type="button"
@@ -42,7 +42,7 @@ export function LedgerArchivePanel(p: { week?: number }) {
   const newest = [...issues].reverse();
   return (
     <Panel
-      title="The Daily Ledger"
+      title="The Weekly Ledger"
       subtitle={`${issues.length} ${issues.length === 1 ? 'issue' : 'issues'} on file`}
       onClose={closePanel}
     >

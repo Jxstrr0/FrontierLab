@@ -1,4 +1,4 @@
-// The Daily Ledger's templates for markets stories (Stage 6, CONTENT §23):
+// The Weekly Ledger's templates for markets stories (Stage 6, CONTENT §23):
 // your placements, IPO and secondary offerings, big moves in your share price,
 // and listed companies' notable results. The weekly market wrap reuses
 // MARKET_UP / MARKET_DOWN from ledgerTemplatesWorld.ts. Merged into

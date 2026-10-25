@@ -1,4 +1,4 @@
-// The Daily Ledger's Stage 9 personal stories (SIMULATION §24): your place on
+// The Weekly Ledger's Stage 9 personal stories (SIMULATION §24): your place on
 // the year-end rich list, insider-trading probes and their fines, and home
 // purchases of HOMES_CFG.newsMin or more.
 import { HOMES_CFG, NEWS_PRIORITY as P } from '../config/balance';

@@ -92,7 +92,7 @@ export const TUTORIAL_STEPS: Record<number, TutorialStepText> = {
     idle: 'The clock is running: one day a second. The week’s results arrive on day seven.',
     lines: {
       'weekly-continue':
-        'Every week ends with results and The Daily Ledger: revenue, income and cash flow up top. Tap Continue when you’ve read it.',
+        'Every week ends with results and The Weekly Ledger: revenue, income and cash flow up top. Tap Continue when you’ve read it.',
       play: 'We’re ready to open. Tap play to start the clock.',
       'panel-close': 'Close this panel so we can start the clock.',
     },

@@ -1,4 +1,4 @@
-// Your bank's weekly close in The Daily Ledger (SIMULATION §24, §14): the
+// Your bank's weekly close in The Weekly Ledger (SIMULATION §24, §14): the
 // week's revenue and net income (the same figures as the weekly results),
 // quarter results on the first tick of a quarter, and a weak capital tier
 // with what to do about it.

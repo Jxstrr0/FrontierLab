@@ -1,4 +1,4 @@
-// The Daily Ledger's templates for ventures stories (Stage 7, CONTENT §23):
+// The Weekly Ledger's templates for ventures stories (Stage 7, CONTENT §23):
 // convention announcements, funding rounds, IPOs, acquisitions and failures,
 // with louder variants when your bank or you back the startup. Merged into
 // LEDGER_TEMPLATES via ledgerTemplatesInvestments.ts.

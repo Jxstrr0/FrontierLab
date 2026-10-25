@@ -1,4 +1,4 @@
-// The Daily Ledger's templates for rival banks (CONTENT §23): branch moves,
+// The Weekly Ledger's templates for rival banks (CONTENT §23): branch moves,
 // price wars, earnings, dividends, executive exits, failures and the weekly
 // rate watch. Tokens in {braces} are filled by src/sim/newsRivals.ts. Merged
 // into LEDGER_TEMPLATES by ledgerTemplates.ts.

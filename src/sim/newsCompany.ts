@@ -1,4 +1,4 @@
-// Your bank in The Daily Ledger (SIMULATION §24, priority 1): stories from
+// Your bank in The Weekly Ledger (SIMULATION §24, priority 1): stories from
 // your company's events (branches, loans, defaults, the central bank window,
 // fines, incidents, partnerships, launches). The weekly close's stories are
 // in newsWeek.ts.

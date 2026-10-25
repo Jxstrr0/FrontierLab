@@ -944,7 +944,7 @@ A deliberately simple "country up or down" investment (DESIGN §5.12a). Your boo
 - **Branch incidents:** auto-resolved when "Branch troubles" is delegated (§17.1), with a toast. Otherwise they queue and pause the game.
 - Unresolved incidents choose the worst option after 4 weeks.
 
-## 24. News (The Daily Ledger)
+## 24. News (The Weekly Ledger)
 
 - **Each week**, compose 6–12 articles from `events.log`, by priority:
   1. your company's events

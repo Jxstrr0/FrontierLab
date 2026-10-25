@@ -1,4 +1,4 @@
-// Markets stories in The Daily Ledger (Stage 6, SIMULATION §24): your
+// Markets stories in The Weekly Ledger (Stage 6, SIMULATION §24): your
 // placements, IPO and secondary offerings (Business tab, company priority),
 // sharp moves in your share price, notable results from listed companies, and
 // the weekly market wrap when the Ledger Composite moves sharply (it outranks

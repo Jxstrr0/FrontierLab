@@ -1,4 +1,4 @@
-// The Daily Ledger card (ART_DIRECTION §6, SCREENS §21): ivory paper, the
+// The Weekly Ledger card (ART_DIRECTION §6, SCREENS §21): ivory paper, the
 // masthead between double rules, text tabs (Top | Banking | Business | Markets
 // | Politics | Sports) and the article grid of one stored issue. The weekly
 // results and the archive use `LedgerCard`; the game-over screen uses `Masthead`.
@@ -18,11 +18,11 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'sports', label: 'Sports' },
 ];
 
-/** "The Daily Ledger" between a double rule, with edition and date underneath. */
+/** "The Weekly Ledger" between a double rule, with edition and date underneath. */
 export function Masthead(p: { date: string; edition?: string }) {
   return (
     <header class="masthead">
-      <h3 class="masthead-title">The Daily Ledger</h3>
+      <h3 class="masthead-title">The Weekly Ledger</h3>
       <div class="masthead-line">
         <span>{p.edition ?? ''}</span>
         <span>{p.date}</span>
