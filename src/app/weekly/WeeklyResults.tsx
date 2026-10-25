@@ -1,7 +1,10 @@
 // Weekly results modal (SCREENS §21): the week's revenue and net income with
 // their change, the cash flow, and that week's issue of The Daily Ledger (as
-// composed by the sim, src/sim/news.ts). Closing resumes the game.
+// composed by the sim, src/sim/news.ts). When the Finance team is short the
+// figures read "Delayed" (SIMULATION §14.6); the Ledger still runs. Closing
+// resumes the game.
 import { DAYS_PER_WEEK } from '../../config/balance';
+import { statementDelayWeeks } from '../../sim/hq';
 import type { GameState, WeeklySnapshot } from '../../sim/state';
 import { Card, Medallion, Modal, Row, SectionTitle } from '../components';
 import { delta, gameDate, money, moneyFull } from '../format/format';
@@ -25,6 +28,7 @@ export function WeeklyResults(p: { week: number }) {
   const week = snap?.week ?? p.week + 1;
   const date = gameDate(s.meta.startDate, week * DAYS_PER_WEEK);
   const issue = s.news.issues.find((i) => i.week === week);
+  const delay = statementDelayWeeks(s);
 
   return (
     <Modal
@@ -47,7 +51,9 @@ export function WeeklyResults(p: { week: number }) {
         <p class="weekly-date">
           Week {week} · ending {date}
         </p>
-        {snap ? (
+        {snap && delay > 0 ? (
+          <Delayed weeks={delay} />
+        ) : snap ? (
           <>
             <div class="grid-2">
               <Figure label="Revenue" now={snap.revenue} prev={prev?.revenue} sym={sym} />
@@ -88,6 +94,26 @@ function Figure(p: { label: string; now: number; prev: number | undefined; sym: 
         {d ? `${d.text} on last week` : 'First week of trading'}
       </div>
     </Card>
+  );
+}
+
+/** Finance is short-staffed: this week's books aren't closed yet (§14.6). */
+function Delayed(p: { weeks: number }) {
+  return (
+    <div class="stack">
+      <div class="grid-2">
+        {['Revenue', 'Net income'].map((label) => (
+          <Card key={label} class="figure">
+            <div class="figure-label">{label}</div>
+            <div class="figure-value tone-dim">Delayed</div>
+          </Card>
+        ))}
+      </div>
+      <p class="muted weekly-delayed">
+        The finance team is short-staffed, so this week's figures close in {p.weeks}{' '}
+        {p.weeks === 1 ? 'week' : 'weeks'}. Hire finance staff at HQ to catch up.
+      </p>
+    </div>
   );
 }
 

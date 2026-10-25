@@ -1,6 +1,7 @@
 // The part every HQ department floor shares (SCREENS §10): Employees stepper
 // (`18 / 24`) with an Open positions chip, Annual salary with the market hint,
-// Skill and Morale bars, and the coverage meter ("Needs 21 · Coverage 86%").
+// staff figures tinted by mood, Skill and Morale bars, and the coverage meter
+// ("Needs 21 · Coverage 86%").
 import { HQ_COVERAGE } from '../../config/balance';
 import * as cmd from '../../sim/commands';
 import { deptDesks } from '../../sim/hq';
@@ -9,6 +10,7 @@ import { Badge, Card, SectionTitle, StatBar, Stepper } from '../components';
 import { moneyFull } from '../format/format';
 import { act, useGame } from '../store';
 import { coverageView, isHqDept, salaryBounds } from './deptSelectors';
+import { TeamFigures } from './TeamFigures';
 
 export function DeptStaffing(p: { dept: DeptId }) {
   const s = useGame();
@@ -55,6 +57,7 @@ export function DeptStaffing(p: { dept: DeptId }) {
               hint={`Market ${moneyFull(pay.market, sym)}`}
             />
           </div>
+          <TeamFigures staff={d.staff} target={d.target} morale={d.morale} />
           <div>
             <StatBar label="Skill" value={d.skill} />
             <StatBar label="Morale" value={d.morale} />

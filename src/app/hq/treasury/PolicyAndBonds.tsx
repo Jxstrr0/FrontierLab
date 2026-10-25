@@ -1,19 +1,18 @@
 // Treasury policy and government bonds (SCREENS §10, SIMULATION §13.3–13.5):
-// the target liquidity ratio, the bond share of liquid assets above the
+// sliders for the target liquidity ratio and the bond share of liquid assets above the
 // minimum, the auto-funding toggle, and the bond book: market value, book
 // value, unrealised gain or loss, book yield and duration.
 import { BOND_DURATION, BOND_SHARE_MAX, LIQ_MIN, LIQ_TARGET_RANGE } from '../../../config/balance';
 import * as cmd from '../../../sim/commands';
-import { Card, Row, Stepper, Toggle } from '../../components';
-import { delta, money, pct, percentText } from '../../format/format';
+import { Card, Row, Toggle } from '../../components';
+import { delta, money, pct } from '../../format/format';
 import { act, useGame } from '../../store';
+import { PercentSlider } from './PercentSlider';
 import { gainTone } from './treasuryView';
 
-/** Policy steppers move in whole percentage points (target) and 5pp (bond share). */
+/** Policy sliders move in whole percentage points (target) and 5pp (bond share). */
 const TARGET_STEP = 0.01;
 const BOND_STEP = 0.05;
-
-const parsePercent = (t: string) => Number(t.replace('%', '').trim()) / 100;
 
 export function TreasuryPolicyCard() {
   const s = useGame();
@@ -22,30 +21,22 @@ export function TreasuryPolicyCard() {
   return (
     <Card>
       <div class="tr-card-title">Treasury policy</div>
-      <div class="grid-2 tr-policy">
-        <Stepper
+      <div class="tr-policy">
+        <PercentSlider
           label="Target liquidity"
           value={t.liqTarget}
           min={lo}
           max={hi}
           step={TARGET_STEP}
-          format={(v) => pct(v, 0)}
-          editText={percentText}
-          parse={parsePercent}
           onChange={(v) => act(cmd.setTreasuryPolicy, { liqTarget: v })}
-          hint={`${pct(lo, 0)} to ${pct(hi, 0)}`}
         />
-        <Stepper
+        <PercentSlider
           label="Bond share"
           value={t.bondShare}
           min={0}
           max={BOND_SHARE_MAX}
           step={BOND_STEP}
-          format={(v) => pct(v, 0)}
-          editText={percentText}
-          parse={parsePercent}
           onChange={(v) => act(cmd.setTreasuryPolicy, { bondShare: v })}
-          hint={`0% to ${pct(BOND_SHARE_MAX, 0)}`}
         />
       </div>
       <p class="muted small hq-note">

@@ -103,6 +103,40 @@
 .hq-root .stepper-value {
   white-space: nowrap;
 }
+/* Staff figures, tinted by the team's mood band (SCREENS §10). */
+.hq-figures {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 3px;
+  min-height: 18px;
+}
+.hq-fig {
+  width: 12px;
+  height: 18px;
+  stroke-width: 1;
+}
+.hq-fig-good {
+  fill: var(--jade);
+  stroke: var(--jade);
+}
+.hq-fig-warn {
+  fill: var(--brass);
+  stroke: var(--brass);
+}
+.hq-fig-bad {
+  fill: var(--oxblood);
+  stroke: var(--oxblood);
+}
+.hq-fig-open {
+  fill: none;
+  stroke: var(--ivory-dim);
+  stroke-dasharray: 2 1.5;
+}
+.hq-fig-more {
+  margin-left: var(--space-1);
+  font-variant-numeric: tabular-nums;
+}
 .hq-staff-head {
   display: flex;
   align-items: center;
@@ -232,27 +266,6 @@
   display: flex;
   align-items: center;
   gap: var(--space-4);
-}
-
-/* ─── Placeholders ─────────────────────────────────────────────────────── */
-.hq-placeholder {
-  border-style: dashed;
-}
-.hq-placeholder-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: var(--space-2);
-  flex-wrap: wrap;
-}
-.hq-placeholder-title {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: var(--text-16);
-}
-.hq-placeholder-tag {
-  font-size: var(--text-12);
-  color: var(--brass-light);
 }
 
 /* ─── Office card, release and add floor ───────────────────────────────── */

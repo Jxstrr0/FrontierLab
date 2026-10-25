@@ -68,7 +68,7 @@ export function annualPayroll(state: GameState): number {
 
 /** Founder-mode ramp (§16.3): requirements phase in from 3 to 6 branches, or at $250M assets. */
 export function founderRamp(state: GameState): number {
-  // Until the HQ screens ship (FEATURES.hq), no requirements apply.
+  // With the HQ system switched off (FEATURES.hq), no requirements apply.
   if (!FEATURES.hq) return 0;
   const assets = state.history.weekly.at(-1)?.totals.assets ?? 0;
   if (assets >= FOUNDER_MODE_ASSETS) return 1;

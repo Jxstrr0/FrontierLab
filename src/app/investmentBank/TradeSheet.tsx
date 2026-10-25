@@ -1,7 +1,8 @@
 // Trade sheet (SCREENS §12): trade from the company or your private account,
 // buy or sell, a shares slider with a typed field, the cost preview including
 // the 0.1% commission, available cash and the current position with its gain
-// or loss. Your own bank trades from the private account only.
+// or loss. Your own bank trades from the private account only. `account`
+// preselects Company or Private (the Wealth screen opens it on Private).
 import { useState } from 'preact/hooks';
 import { COMMISSION } from '../../config/balance';
 import * as cmd from '../../sim/commands';
@@ -14,11 +15,18 @@ import { sharePrice } from './marketView';
 
 type Side = 'buy' | 'sell';
 
-export function TradeSheet(p: { securityId: string; name: string; onClose: () => void }) {
+export function TradeSheet(p: {
+  securityId: string;
+  name: string;
+  onClose: () => void;
+  account?: TradeAccount;
+}) {
   const s = useGame();
   const sym = s.settings.currency;
   const self = p.securityId === SELF_ID;
-  const [account, setAccount] = useState<TradeAccount>(self ? 'personal' : 'company');
+  const [account, setAccount] = useState<TradeAccount>(
+    self ? 'personal' : (p.account ?? 'company'),
+  );
   const [side, setSide] = useState<Side>('buy');
   const [shares, setShares] = useState(0);
 

@@ -1,12 +1,15 @@
 // Loan Desk tab of the branch panel (SCREENS §5.3, SIMULATION §11): a summary
-// strip, this week's applications and the branch's booked business loans.
+// strip (this week's applications, approved, declined, approval rate, business
+// loan balance, last week's defaults), the applications waiting for a decision
+// and the branch's booked business loans.
 import { useGame } from '../store';
-import { Badge, Card } from '../components';
-import { money, pct } from '../format/format';
+import { Badge, Card, SectionTitle } from '../components';
+import { count, money, pct } from '../format/format';
 import { branchPrice } from '../../sim/branch/pricing';
-import { deskWeek, riskBandVisible } from '../../sim/branch/loanDesk';
+import { riskBandVisible } from '../../sim/branch/loanDesk';
 import { ActiveLoans } from './loandesk/ActiveLoans';
 import { ApplicationCard } from './loandesk/ApplicationCard';
+import { loanDeskStrip } from './selectors';
 import './loandesk/loandesk.css';
 
 export function LoanDeskTab({ branchId }: { branchId: string }) {
@@ -22,12 +25,7 @@ export function LoanDeskTab({ branchId }: { branchId: string }) {
   const loans = Object.values(s.loanDesk.loans).filter(
     (l) => l.branchId === branchId && l.status === 'current',
   );
-  const desk = deskWeek(s, branch);
-  const booked = desk.approved;
-  const decided = desk.approved + desk.refused + desk.declined;
-  const rate = decided > 0 ? booked / decided : undefined;
-  const balance = loans.reduce((sum, l) => sum + l.balance, 0);
-  const defaulted = branch.books.sbl?.last.defaulted ?? 0;
+  const strip = loanDeskStrip(s, branch);
   const delegated = branch.delegation.loans && branch.managerId !== undefined;
   const defaultRate = branchPrice(s, branch, 'sbl');
   const showBand = riskBandVisible(s, branch);
@@ -48,20 +46,28 @@ export function LoanDeskTab({ branchId }: { branchId: string }) {
       )}
 
       <div class="loan-summary">
-        <Stat label="Applications" value={String(apps.length)} />
-        <Stat label="Approved" value={String(booked)} />
-        <Stat label="Declined" value={String(desk.declined)} />
+        <Stat label="Applications this week" value={count(strip.arrived)} />
+        <Stat label="Approved" value={count(strip.approved)} />
+        <Stat label="Declined" value={count(strip.declined)} />
         <Stat
           label="Approval rate"
-          value={rate === undefined ? '–' : `${Math.round(rate * 100)}%`}
+          value={strip.approvalRate === undefined ? '–' : pct(strip.approvalRate, 0)}
         />
-        <Stat label="Loan balance" value={money(balance, sym)} />
-        <Stat label="Defaults" value={defaulted > 0 ? money(defaulted, sym) : 'None'} />
+        <Stat label="Business loans" value={money(strip.balance, sym)} />
+        <Stat
+          label="Defaulted last week"
+          value={
+            strip.defaultedLoans > 0
+              ? `${count(strip.defaultedLoans)} · ${money(strip.defaulted, sym)}`
+              : 'None'
+          }
+        />
       </div>
       <p class="muted small loandesk-foot">
         Each offer starts at {pct(defaultRate)}, your Small Business Loan rate.
       </p>
 
+      <SectionTitle>Waiting for a decision · {count(strip.waiting)}</SectionTitle>
       {apps.length === 0 ? (
         <Card>
           <p class="loandesk-empty">

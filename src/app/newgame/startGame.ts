@@ -5,7 +5,8 @@ import { setSettings, setTutorialStep } from '../../sim/commands';
 import { initialTutorialStep } from '../tutorial/controller';
 import { newGame, type NewGameOptions } from '../../sim/newGame';
 import { loadPrefs, saveToSlot } from '../saves';
-import { screen, setGame, toast } from '../store';
+import { screen, setGame } from '../store';
+import { reportSaveError } from '../saves/saveError';
 
 export function startGame(opts: Omit<NewGameOptions, 'version'>): void {
   const state = newGame({ ...opts, version: __APP_VERSION__ });
@@ -17,5 +18,5 @@ export function startGame(opts: Omit<NewGameOptions, 'version'>): void {
   setGame(state);
   screen.value = 'game';
   const err = saveToSlot('auto', state);
-  if (err) toast(err, 'bad');
+  if (err) reportSaveError(err);
 }

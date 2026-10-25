@@ -1,9 +1,10 @@
 // Read-only views for the M&A tab (SCREENS §12): which rivals are for sale,
-// the price an offer is measured against, their size, and how your last offer
-// to each went.
+// the price an offer is measured against, their market facts (like a Market
+// card) and size, and how your last offer to each went.
 import { CITIES } from '../../data/cities';
-import { requiredPremium } from '../../sim/mergerPricing';
+import { referencePrice, requiredPremium } from '../../sim/mergerPricing';
 import type { GameState, MergerOffer, RivalBank } from '../../sim/state';
+import { rivalSecurity, type SecurityView } from './marketView';
 
 /** Rivals you could bid for: active or on distressed sale, with branches. Distressed first, then biggest. */
 export function mnaRivals(s: GameState): RivalBank[] {
@@ -30,6 +31,31 @@ export function rivalCities(bank: RivalBank): string {
 export function referenceLabel(bank: RivalBank): string {
   if (bank.status === 'distressed') return 'Asking price';
   return bank.listed ? 'Share price' : 'Book value / share';
+}
+
+export interface MnaMarketFacts {
+  /** Market card facts for a listed rival; undefined while it is private. */
+  market?: SecurityView;
+  /** "Ticker · exchange" or "Private". */
+  listing: string;
+  /**
+   * The price an offer is measured against, when the card needs its own row:
+   * a listed, healthy rival's reference is its share price, already on show.
+   */
+  reference?: { label: string; price: number };
+}
+
+/** What an M&A card shows above the deal facts (SCREENS §12: like Market cards). */
+export function mnaMarketFacts(s: GameState, bank: RivalBank): MnaMarketFacts {
+  const market = bank.listed ? rivalSecurity(s, bank) : undefined;
+  const sameAsQuote = !!market && bank.status !== 'distressed';
+  return {
+    market,
+    listing: market ? `${market.ticker} · ${market.exchange}` : 'Private',
+    reference: sameAsQuote
+      ? undefined
+      : { label: referenceLabel(bank), price: referencePrice(bank) },
+  };
 }
 
 /** Weeks left on a distressed sale. */

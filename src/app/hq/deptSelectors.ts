@@ -159,3 +159,18 @@ export function deskPicture(s: GameState, dept: DeptId, maxShown: number) {
   const filled = desks > 0 ? Math.round((Math.min(staff, desks) / desks) * shown) : 0;
   return { desks, staff, shown, filled, mood: moodTone(d?.morale ?? 0) };
 }
+
+/** Most staff figures drawn in a floor's team card; the rest show as "+n". */
+export const MAX_FIGURES = 12;
+
+/**
+ * The team card's figure row (SCREENS §10 "staff figures with mood bubbles"):
+ * people on staff first, then dashed outlines for open positions, capped at
+ * `cap` figures with the remainder counted in `more`.
+ */
+export function staffFigures(staff: number, target: number, cap = MAX_FIGURES) {
+  const open = Math.max(0, target - staff);
+  const filled = Math.min(staff, cap);
+  const openShown = Math.min(open, cap - filled);
+  return { filled, open: openShown, more: staff + open - filled - openShown, staffOpen: open };
+}

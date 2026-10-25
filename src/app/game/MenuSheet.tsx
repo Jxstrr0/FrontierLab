@@ -1,6 +1,6 @@
-// Menu sheet (SCREENS §0.3). Stage 2 has Company, Branches, Settings, Save game
-// and Exit to title; HQ arrives with Stage 4 (FEATURES.hq) and the rest with
-// their stages.
+// Menu sheet (SCREENS §0.3): every screen that isn't on the map, from Company
+// and HQ to Portfolio, Milestones, Settings, Save game and Exit to title.
+// Entries for a system whose FEATURES flag is off are hidden.
 import { FEATURES } from '../../config/balance';
 import { Sheet } from '../components';
 import { stopLoop } from '../loop';
@@ -27,9 +27,13 @@ export function MenuSheet() {
     ...(FEATURES.personalEmpire
       ? [{ label: 'Personal wealth', onClick: () => openPanel({ type: 'wealth' }) }]
       : []),
+    ...(FEATURES.investments
+      ? [{ label: 'Portfolio', onClick: () => openPanel({ type: 'portfolio' }) }]
+      : []),
     ...(FEATURES.competition
       ? [{ label: 'The Ledger', onClick: () => openPanel({ type: 'ledger' }) }]
       : []),
+    { label: 'Milestones', onClick: () => openPanel({ type: 'milestones' }) },
     { label: 'Settings', onClick: () => openPanel({ type: 'settings' }) },
     { label: 'Save game', onClick: () => openPanel({ type: 'saves' }) },
     { label: 'Exit to title', onClick: exit },

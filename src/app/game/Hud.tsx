@@ -9,13 +9,15 @@ import { gameDate, money } from '../format/format';
 import { pause, setSpeed, stepWeek } from '../loop';
 import { CasesChip } from '../incidents/CasesChip';
 import { LayerIcon } from '../map/LayerIcon';
-import { openPanel, sheet, useGame } from '../store';
+import { modal, openPanel, sheet, useGame } from '../store';
 
 const NEXT_SPEED = { 0: 1, 1: 2, 2: 4, 4: 1 } as const;
 
 export function Hud() {
   const s = useGame();
   const paused = s.clock.speed === 0;
+  // A decision popup (weekly results, incident, board…) holds the clock (loop.ts), so the pill reads paused too.
+  const held = paused || modal.value !== null;
   const sym = s.settings.currency;
   const city = CITIES[s.world.currentCityId];
   return (
@@ -35,7 +37,7 @@ export function Hud() {
           </span>
         </button>
         <div class="hud-right">
-          <div class={`hud-chip hud-time${paused ? ' is-paused' : ''}`}>
+          <div class={`hud-chip hud-time${held ? ' is-paused' : ''}`}>
             <button
               type="button"
               class="hud-date"
@@ -43,7 +45,7 @@ export function Hud() {
               onClick={() => setSpeed(paused ? s.settings.defaultSpeed : NEXT_SPEED[s.clock.speed])}
             >
               <span>{gameDate(s.meta.startDate, s.clock.day)}</span>
-              {!paused && <span class="hud-speed">{s.clock.speed}×</span>}
+              {!held && <span class="hud-speed">{s.clock.speed}×</span>}
             </button>
             <button
               type="button"
@@ -53,9 +55,9 @@ export function Hud() {
               onClick={() => (paused ? setSpeed(s.settings.defaultSpeed) : pause())}
             >
               <Icon
-                name={paused ? 'play' : 'pause'}
+                name={held ? 'play' : 'pause'}
                 size={20}
-                class={paused ? 'icon-solid' : undefined}
+                class={held ? 'icon-solid' : undefined}
               />
             </button>
             <button

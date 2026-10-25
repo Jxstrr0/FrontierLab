@@ -457,6 +457,8 @@ export interface Book {
     deltaAccounts: number;
     churned: number;
     defaulted: Money;
+    /** Loans that defaulted this week (business loans only; added in v12). */
+    defaultedLoans?: number;
   };
 }
 

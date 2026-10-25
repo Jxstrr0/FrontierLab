@@ -349,6 +349,7 @@ function runBusinessLoans(
   let count = 0;
   let balance = 0;
   let defaulted = 0;
+  let defaultedLoans = 0;
   for (const loan of loans) {
     if (loan.status !== 'current') continue;
     const hit = rng.chance((loan.pd * cycle * riskPdMult(state)) / WEEKS_PER_YEAR);
@@ -364,6 +365,7 @@ function runBusinessLoans(
       wk.losses += loss;
       state.treasury.reserves += loan.balance - loss;
       defaulted += loan.balance;
+      defaultedLoans += 1;
       if (loan.balance >= LOANDESK.bigDefault) {
         pushEvent(
           state,
@@ -406,6 +408,7 @@ function runBusinessLoans(
     book.accounts = count;
     book.balance = balance;
     book.last.defaulted = defaulted;
+    book.last.defaultedLoans = defaultedLoans;
   }
 }
 

@@ -1,13 +1,16 @@
 // The Personal Wealth screen's holdings (SCREENS §23): Stocks (your founder
-// stake and other shares, with cost basis and gain where known), Real estate
+// stake and other shares, with cost basis and gain where known, and Trade for
+// listed ones, opening the Trade sheet on the Private account), Real estate
 // (buildings with ROI, homes with value and gain; tap to open), and Other
 // assets (cars with Sell, collectibles read-only — the auction house handles
 // them —, the jet, a club you own and private investments).
 import { useState } from 'preact/hooks';
 import { FRANCHISES } from '../../data/franchises';
 import * as cmd from '../../sim/commands';
+import { isListedSecurity, SELF_ID } from '../../sim/securities';
 import { Badge, Card, Confirm, Row, SectionTitle } from '../components';
 import { count, money, pct } from '../format/format';
+import { TradeSheet } from '../investmentBank/TradeSheet';
 import { act, openPanel, toast, useGame } from '../store';
 import {
   carRows,
@@ -26,29 +29,56 @@ export function StocksSection() {
   const s = useGame();
   const sym = s.settings.currency;
   const rows = stockRows(s);
+  const [trading, setTrading] = useState<{ id: string; name: string } | null>(null);
   return (
     <div class="stack">
       <SectionTitle>Stocks</SectionTitle>
-      {rows.length === 0 && <p class="muted small">You hold no shares personally.</p>}
-      {rows.map((r) => (
-        <Card>
-          <div class="pw-card-head">
-            <span class="pw-card-name">{r.name}</span>
-            <span class="muted small">{r.detail}</span>
-          </div>
-          <Row label="Shares" value={count(r.shares)} />
-          <Row
-            label="Cost basis"
-            value={r.cost === undefined ? 'Founder shares' : money(r.cost, sym)}
-            tone="dim"
-          />
-          <Row label="Current value" value={money(r.value, sym)} strong />
-          {r.gain !== undefined && (
-            <Row label="Gain / loss" value={signed(r.gain, sym)} tone={gainTone(r.gain)} />
-          )}
-        </Card>
-      ))}
-      <p class="muted small">Trade shares at an investment bank on the map.</p>
+      {rows.length === 0 && (
+        <p class="muted small">
+          You hold no shares personally. Buy some at an investment bank on the map.
+        </p>
+      )}
+      {rows.map((r) => {
+        // Your own stake trades as SELF_ID once the bank is public; founder shares
+        // of a private bank, and delisted companies, cannot be traded.
+        const id = r.key === 'self' ? SELF_ID : r.key;
+        const tradable = isListedSecurity(s, id);
+        return (
+          <Card>
+            <div class="pw-card-head">
+              <span class="pw-card-name">{r.name}</span>
+              <span class="muted small">{r.detail}</span>
+            </div>
+            <Row label="Shares" value={count(r.shares)} />
+            <Row
+              label="Cost basis"
+              value={r.cost === undefined ? 'Founder shares' : money(r.cost, sym)}
+              tone="dim"
+            />
+            <Row label="Current value" value={money(r.value, sym)} strong />
+            {r.gain !== undefined && (
+              <Row label="Gain / loss" value={signed(r.gain, sym)} tone={gainTone(r.gain)} />
+            )}
+            {tradable && (
+              <button
+                type="button"
+                class="btn btn-secondary btn-block pw-trade"
+                onClick={() => setTrading({ id, name: r.name })}
+              >
+                Trade
+              </button>
+            )}
+          </Card>
+        );
+      })}
+      {trading && (
+        <TradeSheet
+          securityId={trading.id}
+          name={trading.name}
+          account="personal"
+          onClose={() => setTrading(null)}
+        />
+      )}
     </div>
   );
 }

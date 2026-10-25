@@ -10,11 +10,21 @@ import { portfolioRows, SLICES, type HoldingRow } from './investmentView';
 
 export function PortfolioSheet(p: { account: Account; onClose: () => void }) {
   const s = useGame();
-  const sym = s.settings.currency;
-  const rows = portfolioRows(s, p.account);
   const title = p.account === 'company' ? `${s.meta.bankName} portfolio` : 'Private portfolio';
   return (
     <Sheet title={title} onClose={p.onClose}>
+      <PortfolioList account={p.account} />
+    </Sheet>
+  );
+}
+
+/** Every holding of one account, grouped by slice (also the menu's Portfolio panel). */
+export function PortfolioList(p: { account: Account }) {
+  const s = useGame();
+  const sym = s.settings.currency;
+  const rows = portfolioRows(s, p.account);
+  return (
+    <>
       {rows.length === 0 && <p class="muted">Nothing here yet.</p>}
       {SLICES.map((slice) => {
         const group = rows.filter((r) => r.kind === slice.id);
@@ -33,7 +43,7 @@ export function PortfolioSheet(p: { account: Account; onClose: () => void }) {
           </section>
         );
       })}
-    </Sheet>
+    </>
   );
 }
 

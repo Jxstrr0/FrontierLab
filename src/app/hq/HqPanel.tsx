@@ -2,9 +2,9 @@
 // office switcher when you lease more than one, the floor's lead as advisor,
 // the engraved office interior, and bottom tabs for each department you have
 // (in DEPT_ORDER) plus "+ Add floor". Every floor opens with the shared team
-// controls and coverage; Finance, HR and IT have their own content, the other
-// floors hold placeholders until their systems land. Without an office, it
-// explains how to lease one.
+// controls and coverage (the Executive suite hires on the floor itself), then
+// that department's own content. Without an office, it explains how to lease
+// one.
 import { useState } from 'preact/hooks';
 import { CITIES } from '../../data/cities';
 import { DEPARTMENTS } from '../../data/departments';
@@ -19,7 +19,6 @@ import { DeptStaffing } from './DeptStaffing';
 import { FinanceFloor } from './FinanceFloor';
 import { ExecutiveFloor } from '../executive/ExecutiveFloor';
 import { InvestmentFloor } from '../investment/InvestmentFloor';
-import { PLACEHOLDER_FLOORS, PlaceholderFloor } from './FloorPlaceholder';
 import { HrFloor } from './HrFloor';
 import { ItFloor } from './ItFloor';
 import { MarketingFloor } from './MarketingFloor';
@@ -115,7 +114,6 @@ export function HqPanel(p: { officeId?: string; dept?: DeptId }) {
             {dept === 'risk' && <RiskFloor />}
             {dept === 'executive' && <ExecutiveFloor />}
             {dept === 'investment' && <InvestmentFloor />}
-            {PLACEHOLDER_FLOORS[dept] && <PlaceholderFloor dept={dept} />}
           </>
         ) : (
           <Card>

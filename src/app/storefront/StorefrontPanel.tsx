@@ -1,5 +1,5 @@
 // Available branch location (SCREENS §3): what a lot offers (rent, traffic, who lives
-// and works nearby, the competition) and a Build branch button.
+// and works nearby, the competition, an area map) and a Build branch button.
 import { CITIES } from '../../data/cities';
 import { SEGMENTS } from '../../data/types';
 import * as cmd from '../../sim/commands';
@@ -16,6 +16,7 @@ import {
 import { Card, CoinRating, Panel, Row, SectionTitle, StatBar } from '../components';
 import { count, moneyFull, pct } from '../format/format';
 import { closePanel, openPanel, useGame } from '../store';
+import { AreaMiniMap } from './AreaMiniMap';
 import { StorefrontArt } from './StorefrontArt';
 import './storefront.css';
 
@@ -120,6 +121,9 @@ export function StorefrontPanel(p: { lotId: string }) {
             <Row label="Their average rating" value={<CoinRating value={near.ownAverage} />} />
           )}
         </Card>
+
+        <SectionTitle>Area map</SectionTitle>
+        <AreaMiniMap lot={lot} />
       </div>
     </Panel>
   );

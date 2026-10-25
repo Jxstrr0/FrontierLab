@@ -34,9 +34,11 @@ export function LineChart(p: {
   label: string;
   /** Index of the dotted "now" marker; defaults to the latest point. */
   markerIndex?: number;
+  /** Top of the scale (e.g. 5 for a coin rating); defaults to the largest value. */
+  max?: number;
 }) {
   const count = Math.max(0, ...p.series.map((s) => s.values.length));
-  const max = Math.max(0, ...p.series.flatMap((s) => s.values));
+  const max = p.max ?? Math.max(0, ...p.series.flatMap((s) => s.values));
   const nowX =
     p.markerIndex === undefined
       ? W

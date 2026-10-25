@@ -2,14 +2,14 @@
 // liquidity gauge with the funding-freeze banner and cash transfers, the
 // treasury policy, government bonds, the funding inventory, the funding
 // market and the central bank's standing facility (SCREENS §8 puts its
-// Borrow / Repay here). Payroll partnerships arrive with Employers.
+// Borrow / Repay here) and a card per payroll or student partnership.
 import { SectionTitle } from '../components';
 import { CentralBankFacility } from './treasury/CentralBankFacility';
 import { FundingInventory } from './treasury/FundingInventory';
 import { FundingMarket } from './treasury/FundingMarket';
 import { LiquidityCard } from './treasury/LiquidityCard';
+import { PartnershipCards } from './treasury/PartnershipCards';
 import { BondsCard, TreasuryPolicyCard } from './treasury/PolicyAndBonds';
-import { FloorPlaceholder } from './FloorPlaceholder';
 import './treasury/treasury.css';
 
 export function TreasuryFloor() {
@@ -30,11 +30,7 @@ export function TreasuryFloor() {
       <CentralBankFacility />
 
       <SectionTitle>Partnerships</SectionTitle>
-      <FloorPlaceholder
-        title="Payroll partnerships"
-        arrives="Arrives with Employers (Stage 5)"
-        body="Deals with large employers that bring their staff's salary accounts to your bank."
-      />
+      <PartnershipCards />
     </div>
   );
 }

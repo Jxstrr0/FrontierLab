@@ -45,6 +45,9 @@ export type PanelRoute =
   | { type: 'cityList' }
   | { type: 'settings' }
   | { type: 'saves' }
+  // Menu screens added by the audit fixes (SCREENS §0.3).
+  | { type: 'portfolio' }
+  | { type: 'milestones' }
   // Stage 10: the credits, opened from Settings in game (from the title it is a screen).
   | { type: 'credits' };
 
@@ -63,6 +66,8 @@ export interface Toast {
   id: number;
   text: string;
   tone: 'info' | 'good' | 'bad';
+  /** An optional button on the toast, e.g. "Export" when storage is full. */
+  action?: { label: string; run: () => void };
 }
 
 export const screen = signal<Screen>('title');
@@ -100,8 +105,13 @@ export function bump(): void {
 }
 
 let toastId = 0;
-export function toast(text: string, tone: Toast['tone'] = 'info', ms = 3200): void {
-  const t = { id: ++toastId, text, tone };
+export function toast(
+  text: string,
+  tone: Toast['tone'] = 'info',
+  ms = 3200,
+  action?: Toast['action'],
+): void {
+  const t: Toast = { id: ++toastId, text, tone, action };
   toasts.value = [...toasts.value, t].slice(-3);
   setTimeout(() => {
     toasts.value = toasts.value.filter((x) => x.id !== t.id);

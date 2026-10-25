@@ -529,3 +529,16 @@ Advisor-led steps, each highlighting its target with a brass ring:
 7. Approve your first business loan
 
 It's skippable from the advisor bar, and replayable in Settings.
+
+## 28. Milestones (menu → Milestones)
+
+- Subtitle: "n of 11 reached".
+- One row per milestone (data/milestones.ts) in order: a filled brass diamond ◆ when reached with "Reached {date}", an outline ◇ with the goal otherwise.
+- Read-only. Reaching one toasts "Milestone reached: …"; the big ones also make a Ledger story.
+
+## 29. Portfolio (menu → Portfolio)
+
+The same view as the HQ Investment floor's portfolio, reachable from anywhere:
+- Company / Private toggle
+- portfolio value with weekly change and the donut (Stocks, Ventures, Real estate, Venture debt, Currencies)
+- the holdings list; empty states point to investment banks, the Investment floor and conventions

@@ -1,26 +1,28 @@
 // Investment bank M&A tab (SCREENS §12, SIMULATION §19.8): rival bank cards
-// (monogram, name, ticker or Private, reference price, branches, cities,
-// deposits, capital band), distressed sales with their badge and asking price,
-// your offer's status, the Offer sheet, and integrations in progress.
+// like Market cards (sparkline and price, market cap, dividend, 52-week range,
+// P/E, top shareholders; "Private" for unlisted banks) plus branches, cities,
+// deposits and capital band; distressed sales with their badge and asking
+// price, your offer's status, the Offer sheet, and integrations in progress.
 import { useState } from 'preact/hooks';
-import { referencePrice } from '../../sim/mergerPricing';
 import { targetBlocker } from '../../sim/mergerRules';
 import type { GameState, RivalBank } from '../../sim/state';
 import { Badge, Card, Medallion, Row, SectionTitle } from '../components';
 import { capitalRatioText, count, money } from '../format/format';
 import { rivalTier, TIER_LABEL, TIER_TONE } from '../rivals/rivalSelectors';
 import { useGame } from '../store';
+import { sharePrice } from './marketView';
 import {
   lastOffer,
+  mnaMarketFacts,
   mnaRivals,
   offerStatusText,
   offerTone,
-  referenceLabel,
   rivalCities,
   rivalDeposits,
   saleWeeksLeft,
 } from './mnaSelectors';
 import { OfferSheet } from './OfferSheet';
+import { StockHolders, StockQuote, StockStats } from './StockFacts';
 import './mna.css';
 
 export function MnaTab(_p: { bankId: string }) {
@@ -54,26 +56,35 @@ function RivalCard(p: { s: GameState; bank: RivalBank; onOffer: () => void }) {
   const offer = lastOffer(s, bank.id);
   const blocker = targetBlocker(s, bank.id);
   const weeks = saleWeeksLeft(s, bank);
+  const facts = mnaMarketFacts(s, bank);
   return (
     <Card class={`ma-card${distressed ? ' is-distressed' : ''}`}>
       <div class="ma-head">
         <Medallion ink={bank.ink} monogram={bank.monogram} size={40} />
         <div class="ma-title">
           <div class="ma-name">{bank.name}</div>
-          <div class="muted small">{bank.listed ? (bank.ticker ?? 'Listed') : 'Private'}</div>
+          <div class="muted small">{facts.listing}</div>
         </div>
         {distressed && <Badge tone="bad">Distressed sale</Badge>}
       </div>
-      <Row
-        label={referenceLabel(bank)}
-        value={`${sym}${referencePrice(bank).toFixed(2)}`}
-        strong={distressed}
-      />
+      {facts.market && <StockQuote view={facts.market} sym={sym} />}
+      {facts.reference && (
+        <Row
+          label={facts.reference.label}
+          value={sharePrice(facts.reference.price, sym)}
+          strong={distressed}
+        />
+      )}
       {distressed && (
         <p class="ma-sale small">
           Seized by regulators. On sale for {weeks} more week{weeks === 1 ? '' : 's'}, then split
           among other banks.
         </p>
+      )}
+      {facts.market ? (
+        <StockStats view={facts.market} sym={sym} />
+      ) : (
+        <Row label="Market cap, dividend, P/E" value="Private" tone="dim" />
       )}
       <Row label="Branches" value={count(bank.branches.length)} />
       <Row label="Cities" value={rivalCities(bank) || '—'} />
@@ -91,6 +102,7 @@ function RivalCard(p: { s: GameState; bank: RivalBank; onOffer: () => void }) {
           )
         }
       />
+      {facts.market && <StockHolders view={facts.market} />}
       {offer && (
         <p class="ma-status small" role="status">
           <Badge tone={offerTone(offer)}>

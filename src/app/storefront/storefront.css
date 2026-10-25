@@ -27,3 +27,147 @@
   color: var(--ivory);
   text-align: center;
 }
+
+/* Area map (SCREENS §3): the blocks around the lot on map paper, in the city ink
+   (--am-ink) with the city's tint underprint (--am-tint), ART_DIRECTION §2. */
+.area-map {
+  margin: 0;
+}
+.area-map-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  background-color: var(--paper);
+  background-image: var(--paper-grain);
+  border-radius: var(--radius-card);
+}
+.am-water {
+  fill: var(--am-ink);
+  fill-opacity: 0.16;
+}
+.am-wave {
+  fill: none;
+  stroke: var(--am-ink);
+  stroke-width: 0.6;
+  opacity: 0.5;
+}
+.am-park {
+  fill: var(--am-tint);
+  fill-opacity: 0.75;
+}
+.am-block {
+  fill: var(--am-ink);
+}
+/* District tones: taller, denser districts print darker. */
+.am-d-financial {
+  fill-opacity: 0.62;
+}
+.am-d-downtown {
+  fill-opacity: 0.5;
+}
+.am-d-industrial {
+  fill-opacity: 0.42;
+}
+.am-d-midtown {
+  fill-opacity: 0.36;
+}
+.am-d-waterfront {
+  fill-opacity: 0.3;
+}
+.am-d-university {
+  fill-opacity: 0.26;
+}
+.am-d-suburbs {
+  fill-opacity: 0.2;
+}
+.am-landmark {
+  fill: var(--am-ink);
+  fill-opacity: 0.78;
+}
+.am-open {
+  fill: var(--paper);
+  stroke: var(--am-ink);
+  stroke-width: 0.8;
+}
+.am-ring {
+  fill: none;
+  stroke: var(--brass);
+  stroke-width: 1.2;
+  stroke-dasharray: 4 3;
+}
+.am-label {
+  font-family: var(--font-ui);
+  font-size: 9px;
+  font-weight: 600;
+  fill: var(--am-ink);
+  stroke: var(--paper);
+  stroke-width: 2.5px;
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+.am-dot {
+  stroke-width: 1.4;
+}
+.am-dot-own {
+  fill: var(--dot-ink);
+  stroke: var(--ivory);
+}
+.am-dot-rival {
+  fill: var(--ivory);
+  stroke: var(--dot-ink);
+  stroke-width: 2;
+}
+.am-here {
+  fill: var(--brass);
+  stroke: var(--vault-deep);
+  stroke-width: 1;
+}
+.am-here-ring {
+  fill: none;
+  stroke: var(--brass);
+  stroke-width: 1.6;
+}
+.am-frame {
+  fill: none;
+  stroke: var(--brass);
+  stroke-width: 0.8;
+  opacity: 0.7;
+}
+.area-map-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  margin-top: var(--space-2);
+  color: var(--ivory-dim);
+}
+.area-map-key span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.am-key {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.am-key-here {
+  border-radius: 0;
+  transform: rotate(45deg) scale(0.8);
+  background: var(--brass);
+}
+.am-key-own {
+  background: var(--dot-ink);
+  border: 1.5px solid var(--ivory);
+}
+.am-key-rival {
+  background: var(--ivory);
+  border: 2px solid var(--ivory-dim);
+}
+.am-key-ring {
+  width: 14px;
+  height: 0;
+  border-radius: 0;
+  border-top: 2px dashed var(--brass);
+}

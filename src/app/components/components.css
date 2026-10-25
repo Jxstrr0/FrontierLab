@@ -598,6 +598,19 @@
 .toast-bad {
   border-color: var(--oxblood);
 }
+.toast-action {
+  display: block;
+  min-height: 44px;
+  margin-top: var(--space-2);
+  padding: 0 var(--space-4);
+  border: 1px solid var(--brass);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--brass-light);
+  font: inherit;
+  font-weight: 600;
+  pointer-events: auto;
+}
 
 /* ─── Layout helpers ───────────────────────────────────────────────────── */
 .stack {
