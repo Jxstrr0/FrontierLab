@@ -209,7 +209,6 @@ export function newGame(opts: NewGameOptions): GameState {
     fx: emptyFx(),
     auctions: {},
     clubs: {},
-    dealerDeals: {},
     ledger: emptyLedger(),
     events: { log: [], scheduled: [] },
     history: { weekly: [], quarterly: [] },

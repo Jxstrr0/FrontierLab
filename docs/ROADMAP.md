@@ -176,7 +176,7 @@ Eleven stages. Each one ends playable and deployed. A stage usually takes severa
 **Build:**
 - Personal Wealth screen
 - Homes
-- Car dealer, with the dealer financing tab
+- Car dealer (showroom; the dealer financing tab was removed in the 2026-10-25 content trim)
 - Auction houses: bidding, appraisal, counterfeits, consignment
 - Sports franchise, simplified (§SCREENS 20)
 - Rich list, insider-trading risk, milestones

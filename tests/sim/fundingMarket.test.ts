@@ -167,7 +167,7 @@ describe('funding lots', () => {
       rate: 0.05,
       startWeek: 0,
       maturityWeek: s.clock.week,
-      radar: [7, 4, 6, 5, 8],
+      radar: [7, 5, 5, 5, 7],
     });
     homeCountry(s).prevFtpLong = ftpLong(homeCountry(s));
     runTreasury(s);
@@ -180,13 +180,13 @@ describe('funding lots', () => {
     const s = bankWithFloors(['treasury']);
     const lot = (id: string, amount: number, maturityWeek: number): FundingLot => ({
       id,
-      type: 'brokered',
+      type: 'term_interbank',
       counterparty: 'Pinecrest Capital',
       amount,
       rate: 0.05,
       startWeek: 0,
       maturityWeek,
-      radar: [7, 5, 4, 3, 6],
+      radar: [7, 5, 5, 5, 7],
     });
     s.treasury.lots.push(lot('a', 1e6, s.clock.week), lot('b', 2e6, s.clock.week + 1));
     const reserves = s.treasury.reserves;
@@ -199,18 +199,18 @@ describe('funding lots', () => {
     const s = bankWithFloors(['treasury']);
     const base = { counterparty: 'X', rate: 0.05, startWeek: 0, maturityWeek: 999, amount: 1e6 };
     s.treasury.lots.push(
-      { ...base, id: 'ti', type: 'term_interbank', radar: [7, 4, 6, 5, 8] },
-      { ...base, id: 'br', type: 'brokered', radar: [7, 5, 4, 3, 6] },
+      { ...base, id: 'ti', type: 'term_interbank', radar: [7, 5, 5, 5, 7] },
+      { ...base, id: 'cb', type: 'covered_bond', radar: [5, 9, 9, 2, 9] },
     );
     s.treasury.reserves += 2e6;
-    expect(cmd.repayLot(s, 'br')).toEqual({
+    expect(cmd.repayLot(s, 'cb')).toEqual({
       ok: false,
-      reason: "Brokered Deposits can't be repaid early; it runs to maturity.",
+      reason: "Covered Bond can't be repaid early; it runs to maturity.",
     });
     const reserves = s.treasury.reserves;
     expect(cmd.repayLot(s, 'ti')).toEqual({ ok: true });
     expect(s.treasury.reserves).toBeCloseTo(reserves - 1e6);
-    expect(s.treasury.lots.map((l) => l.id)).toEqual(['br']);
+    expect(s.treasury.lots.map((l) => l.id)).toEqual(['cb']);
   });
 
   it('keeps the balance identity through borrowing and maturities', () => {

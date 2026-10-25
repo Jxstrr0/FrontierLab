@@ -1,4 +1,5 @@
 // Wholesale funding types for the Treasury funding market (docs/CONTENT.md §12).
+// Overnight and the central bank window are automatic; the market offers the other two.
 // Radar order: Cost, Term, Stability, Flexibility, Discretion (1–10).
 import type { Pentagon } from './types';
 
@@ -32,49 +33,30 @@ export const FUNDING_TYPES: Record<string, FundingTypeSpec> = {
     weight: 0,
     earlyRepay: true,
   },
+  // Term Interbank took in Brokered Deposits, and Covered Bond took in Senior
+  // Bond (schema 15): two short-to-medium and long-term choices instead of four
+  // near-twins. Each keeps the combined offer weight of the pair it replaced.
   term_interbank: {
     id: 'term_interbank',
     name: 'Term Interbank',
     basis: 'policy',
-    spread: 0.0055,
-    term: [26, 52],
-    size: [5e6, 50e6],
-    radar: [7, 4, 6, 5, 8],
-    weight: 4,
-    earlyRepay: true,
-  },
-  brokered: {
-    id: 'brokered',
-    name: 'Brokered Deposits',
-    basis: 'policy',
-    spread: 0.0045,
+    spread: 0.005,
     term: [26, 104],
-    size: [2e6, 30e6],
-    radar: [7, 5, 4, 3, 6],
-    weight: 4,
-    earlyRepay: false,
+    size: [2e6, 50e6],
+    radar: [7, 5, 5, 5, 7],
+    weight: 8,
+    earlyRepay: true,
   },
   covered_bond: {
     id: 'covered_bond',
     name: 'Covered Bond',
     basis: 'ftpLong',
-    spread: 0.007,
-    term: [260, 260],
-    size: [25e6, 250e6],
-    radar: [6, 9, 9, 2, 9],
-    weight: 2,
-    mortgageCover: 1.25,
-    earlyRepay: false,
-  },
-  senior_bond: {
-    id: 'senior_bond',
-    name: 'Senior Bond',
-    basis: 'ftpLong',
-    spread: 0.012,
+    spread: 0.0085,
     term: [156, 520],
     size: [25e6, 500e6],
-    radar: [4, 9, 8, 2, 9],
-    weight: 2,
+    radar: [5, 9, 9, 2, 9],
+    weight: 4,
+    mortgageCover: 1.25,
     earlyRepay: false,
   },
   cb_window: {

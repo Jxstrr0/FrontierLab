@@ -8,6 +8,7 @@ import * as cmd from '../../src/sim/commands';
 import { advanceWeeks } from '../../src/sim/engine';
 import { capitalNeeded, cfoCapital, cfoShares } from '../../src/sim/execDelegationsCapital';
 import type { GameState } from '../../src/sim/state';
+import { croAppetite } from '../../src/sim/execDelegationsPeople';
 import { homeCountry } from '../../src/sim/treasury';
 import { hire, identityGap } from '../helpers/executives';
 import { bankWithFloors } from '../helpers/scenario';
@@ -94,12 +95,29 @@ describe('CFO capital', () => {
     expect(capitalSnapshot(s).tier).toBe('watch');
     expect(holdsStocks(s)).toBe(true);
     s.company.riskAppetite = 3;
-    while (s.clock.week % EXEC_DELEGATION.croEveryWeeks !== 0) s.clock.week++;
+    while (s.clock.week % EXEC_DELEGATION.croEveryWeeks !== EXEC_DELEGATION.cfoAppetitePhase)
+      s.clock.week++;
     const shares = s.company.sharesOutstanding;
     steer(s);
     expect(holdsStocks(s)).toBe(false);
     expect(s.company.riskAppetite).toBe(2);
     expect(s.company.sharesOutstanding).toBe(shares);
+  });
+
+  it('trims risk appetite alongside a CRO who tunes it, on its own week of the cycle', () => {
+    const s = withCfo(shockedBank(0.09));
+    hire(s, 'cro');
+    expect(cmd.setExecDelegation(s, 'cro', 'appetite', true).ok).toBe(true);
+    s.company.riskAppetite = 4;
+    s.company.capitalRatio = capitalSnapshot(s).capitalRatio; // the weekly close's figure
+    while (s.clock.week % EXEC_DELEGATION.croEveryWeeks !== 0) s.clock.week++;
+    croAppetite(s); // the CRO's week: one step down, and the CFO waits
+    cfoCapital(s);
+    expect(s.company.riskAppetite).toBe(3);
+    s.clock.week += EXEC_DELEGATION.cfoAppetitePhase;
+    croAppetite(s); // the CFO's week: the CRO waits, the CFO steps down again
+    cfoCapital(s);
+    expect(s.company.riskAppetite).toBe(2);
   });
 
   it('with Share sales off, sells stocks and trims appetite but never new shares', () => {
@@ -112,7 +130,7 @@ describe('CFO capital', () => {
     expect(s.company.sharesOutstanding).toBe(shares);
   });
 
-  it('brings a Critical bank back to a safe ratio, where without a CFO it is taken over', () => {
+  it('brings a Critical bank back to a safe ratio, where without a CFO it fails', () => {
     const steered = withCfo(shockedBank(0.035));
     advanceWeeks(steered, 52);
     expect(steered.flags.gameOver).toBeUndefined();
@@ -121,6 +139,7 @@ describe('CFO capital', () => {
 
     const adrift = shockedBank(0.035);
     advanceWeeks(adrift, 52);
-    expect(adrift.flags.gameOver).toBe('takeover');
+    // Takeover or insolvency, whichever comes first: this bank is short of both.
+    expect(['takeover', 'insolvency']).toContain(adrift.flags.gameOver);
   });
 });

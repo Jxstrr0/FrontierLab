@@ -20,15 +20,11 @@ describe('personal pins', () => {
     expect(personalPinInfo(s, site)).toMatchObject({ owned: true, tag: 'Rebuilding' });
   });
 
-  it('seals a dealer while a financing deal runs', () => {
+  it('shows a car dealer as a plain medallion', () => {
     const { s } = openBank();
     const dealer = Object.values(s.world.sites).find(
       (x) => x.kind === 'autoDealer' && x.cityId === 'cal',
     )!;
-    expect(personalPinInfo(s, dealer)?.owned).toBeUndefined();
-    expect(cmd.signDealerDeal(s, dealer.id).ok).toBe(true);
-    expect(personalPinInfo(s, dealer)).toMatchObject({ owned: true });
-    expect(cmd.endDealerDeal(s, dealer.id).ok).toBe(true);
-    expect(personalPinInfo(s, dealer)?.owned).toBeUndefined();
+    expect(personalPinInfo(s, dealer)).toEqual({ visible: true, suffix: ', car dealer' });
   });
 });

@@ -75,7 +75,7 @@ You found a bank with a fresh charter: $2,000,000 of charter capital locked in t
 | Conventions | Fintech and finance conventions | |
 | Real estate: buy, rent per m², occupancy, ROI, for sale | Same | Plus foreclosed homes |
 | Airports, departures board with distances, weekly mileage limit, private jet | Same | |
-| Vacation homes (can rebuild), car dealer | Same | Dealer financing tab added |
+| Vacation homes (can rebuild), car dealer | Same | |
 | Auction house: upcoming auctions, your items, appraisal, counterfeit | Same | |
 | Football franchise: club, uniform, players, transfers, finance | Sports franchise, simplified | Kit sponsorship boosts brand |
 | Personal wealth: salary, total assets donut, stocks, real estate, other assets | Same | Plus rich list |
@@ -319,7 +319,7 @@ Investment banks on the map, with tabs Market / Equity / M&A:
 ### 5.11 Real estate
 - **Buy buildings** as the company or personally. Listings show size, estimated value, market rent, occupancy and asking price.
 - **Run them.** Set rent per m² and occupancy responds. Weekly rent, maintenance and vacancy costs give ROI. List any building for sale.
-- **Foreclosures.** Defaulted mortgages leave foreclosed homes (REO) in each city. Sell them (fast, at a discount), rent them out, or hold.
+- **Foreclosures.** Defaulted mortgages leave foreclosed homes (REO) in each city. Rent them out, or sell them all (fast, at a discount).
 
 ### 5.12 Ventures and conventions
 - **Where startups come from.** The Investment floor surfaces startups that are raising money. Conventions show exclusive ones; they're announced in the Ledger, sit on the map for a week, and must be attended in person.
@@ -565,3 +565,10 @@ Add one dated line per decision. Never delete entries; supersede them.
 - 2026-10-25 (owner's ask): The CFO's new-share sales are their own switch, **Share sales**, apart from **Capital** (stock sales and risk appetite), so you can let the CFO guard the ratio without diluting you. A save's CFO keeps what Capital did (migration 13 → 14); new hires start with both on. The CFO never launches the IPO; that stays your call.
 - 2026-10-25 (owner's ask): The build sheet starts from the fit-out you last built with (`company.lastBuild`, schema v14), and the COO's Expansion builds it too. Only your own builds set it; the COO's don't.
 - 2026-10-25: Sheets and modals render in one overlay layer at the top of #app, not inside the screen that opens them (owner's recording: on iPhone a sheet inside a panel's scrolling content was clipped to it and scrolling broke). The layer stays inside #app so text size still applies.
+- 2026-10-25 (owner's ask, content audit): Foreclosed homes drop **Hold**. It carried the same 6% cost as Rent with no income, so Rent always won; pools now start renting (schema v15 turns held pools into rented ones). Supersedes the Hold option in the Stage 7 entries.
+- 2026-10-25 (owner's ask): Risk appetite stays a single dial on the HQ Products floor, and both executives can move it: the CRO's **Risk appetite** switch tunes it up or down, and the CFO's **Capital** switch steps it down at Watch or worse even with a CRO seated. They act on alternate weeks of the 4-week cycle, so it never moves twice in one week. The dial's card says who is steering it.
+- 2026-10-25 (owner's ask): **Dealer financing is removed** (the car dealer is the showroom only). It was a bank deal inside a personal-spending screen and overlapped Auto Loan pricing and branch campaigns. Running deals end on load; their fees fold into the marketing line. Supersedes the two 2026-10-24 dealer-financing entries.
+- 2026-10-25 (owner's ask): Funding types go from six to four: Brokered Deposits merge into Term Interbank, Senior Bond into Covered Bond (CONTENT §12). Existing lots and offers convert on load.
+- 2026-10-25: Branch campaigns overlapped in pairs, so two were retuned (CONTENT §8): Paperless Pledge lifts Products instead of repeating Free Lobby Coffee's Branch lift, and Community Sponsors reaches businesses with a small Branch lift instead of repeating Direct Mail's families. Still ten campaigns, as in the original.
+- 2026-10-25: Northwind & Pike's two-week package is renamed **Street Team** (was Grand Opening Week) so it isn't mistaken for a new branch's own grand-opening boost. Same price and effect.
+- 2026-10-25: Line of Credit stays as it is. In the content audit it looked like a third unsecured consumer loan, but it is the only revolving credit business customers take, so it isn't a duplicate.

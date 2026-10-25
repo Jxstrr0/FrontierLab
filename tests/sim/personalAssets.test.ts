@@ -1,26 +1,20 @@
-// Homes, cars and dealer financing (SIMULATION §22, SCREENS §19): asking price
-// and the offer ramp, home values following hpi, upkeep, rebuilds and sales;
-// car depreciation (classics gain) and resale; dealer deals billing the bank,
-// lapsing at term, and lifting auto-loan demand in their city.
+// Homes and cars (SIMULATION §22, SCREENS §19): asking price and the offer
+// ramp, home values following hpi, upkeep, rebuilds and sales; car
+// depreciation (classics gain) and resale.
 import { describe, expect, it } from 'vitest';
-import { CARS_CFG, DEALER_FINANCING, HOMES_CFG, WEEKS_PER_YEAR } from '../../src/config/balance';
+import { CARS_CFG, HOMES_CFG, WEEKS_PER_YEAR } from '../../src/config/balance';
 import { CARS } from '../../src/data/cars';
 import { HOMES } from '../../src/data/homes';
-import { balanceSheet } from '../../src/sim/balanceSheet';
-import { campaignEffects } from '../../src/sim/branch/marketing';
-import { runDemand } from '../../src/sim/branch/demand';
 import * as cmd from '../../src/sim/commands';
 import { newGame } from '../../src/sim/newGame';
 import { runPersonalAssets } from '../../src/sim/personalAssets';
 import {
-  dealerBoost,
   homeAsking,
   homeOfferAcceptance,
   homeOfferBounds,
   homeSite,
 } from '../../src/sim/personalValues';
 import type { GameState } from '../../src/sim/state';
-import { openBank } from '../helpers/incidents';
 
 const game = () => {
   const s = newGame({ seed: 42, cityId: 'cal', bankName: 'Wealth Bank' });
@@ -30,10 +24,6 @@ const game = () => {
 const ranchSite = (s: GameState) => homeSite(s, 'bowvalley')!.id;
 const dealerSite = (s: GameState) =>
   Object.values(s.world.sites).find((x) => x.kind === 'autoDealer' && x.cityId === 'cal')!.id;
-const identityGap = (s: GameState) => {
-  const bs = balanceSheet(s);
-  return Math.abs(bs.equity - bs.expectedEquity);
-};
 
 /** Buys the Bow Valley Ranch at asking (always accepted). */
 function buyRanch(s: GameState) {
@@ -168,46 +158,5 @@ describe('cars', () => {
     expect(cmd.buyCar(s, dealerSite(s), 'valkyr').ok).toBe(false);
     s.world.currentCityId = 'sas';
     expect(cmd.buyCar(s, dealerSite(s), 'kestrel').ok).toBe(false);
-  });
-});
-
-describe('dealer financing', () => {
-  it('needs a branch in the city; the bank pays the weekly fee; the deal lapses at term', () => {
-    const { s, b } = openBank();
-    const site = dealerSite(s);
-    b.status = 'fitout';
-    expect(cmd.signDealerDeal(s, site).ok).toBe(false);
-    b.status = 'open';
-    expect(cmd.signDealerDeal(s, site).ok).toBe(true);
-    const cash0 = s.company.cash;
-    const fees0 = s.ledger.pnl.dealerFees;
-    runPersonalAssets(s);
-    const weekly = DEALER_FINANCING.feePerYear / WEEKS_PER_YEAR;
-    expect(s.company.cash).toBeCloseTo(cash0 - weekly, 6);
-    expect(s.ledger.pnl.dealerFees - fees0).toBeCloseTo(weekly, 6);
-    expect(identityGap(s)).toBeLessThan(1);
-    s.clock.week += DEALER_FINANCING.termWeeks;
-    runPersonalAssets(s);
-    expect(s.dealerDeals[site]).toBeUndefined();
-    expect(s.events.log.at(-1)).toMatchObject({ type: 'DEALER_ENDED' });
-  });
-
-  it('lifts auto-loan demand at branches in that city by demandBoost', () => {
-    const { s, b } = openBank();
-    cmd.setOffered(s, b.id, 'auto_loan', true);
-    const signed = structuredClone(s);
-    expect(cmd.signDealerDeal(signed, dealerSite(signed)).ok).toBe(true);
-    expect(dealerBoost(signed, 'cal', 'auto_loan')).toBe(1 + DEALER_FINANCING.demandBoost);
-    expect(dealerBoost(signed, 'cal', 'mortgage')).toBe(1);
-    expect(dealerBoost(signed, 'sas', 'auto_loan')).toBe(1);
-    const base = runDemand(s, b, campaignEffects(b)).byProduct.auto_loan!;
-    const sb = signed.branches[b.id]!;
-    const boosted = runDemand(signed, sb, campaignEffects(sb)).byProduct.auto_loan!;
-    expect(base.newAccounts).toBeGreaterThan(0);
-    expect(boosted.newAccounts / base.newAccounts).toBeCloseTo(1 + DEALER_FINANCING.demandBoost, 6);
-    // Other products are untouched.
-    const m0 = runDemand(s, b, campaignEffects(b)).byProduct.chequing?.newAccounts;
-    const m1 = runDemand(signed, sb, campaignEffects(sb)).byProduct.chequing?.newAccounts;
-    expect(m1).toBeCloseTo(m0!, 6);
   });
 });

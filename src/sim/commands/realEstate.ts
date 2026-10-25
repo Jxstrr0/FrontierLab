@@ -1,6 +1,6 @@
 // Real estate commands (SIMULATION §21, SCREENS §16): offer on a listed
 // building as the company or privately, set an owned building's rent, put it
-// up for sale or take it off, and choose Hold / Rent / Sell all for a city's
+// up for sale or take it off, and choose Rent / Sell all for a city's
 // foreclosed homes. A company purchase pays investing cash and books the
 // building at its estimated value; the difference is a property gain or loss.
 import { REAL_ESTATE, REO } from '../../config/balance';
@@ -120,8 +120,8 @@ export function setPropertyForSale(state: GameState, siteId: string, on: boolean
 }
 
 /**
- * Hold, Rent or Sell all for a city's foreclosed homes (§21.3). Sell all
- * settles in 1–4 weeks and can't be called off once started.
+ * Rent or Sell all for a city's foreclosed homes (§21.3). Sell all settles in
+ * 1–4 weeks and can't be called off once started.
  */
 export function setReoMode(state: GameState, cityId: string, mode: ReoPool['mode']): CommandResult {
   const pool = state.reo[cityId];

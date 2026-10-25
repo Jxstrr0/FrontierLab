@@ -51,9 +51,9 @@ export type * from './competitionTypes';
 export type * from './marketsTypes';
 export type * from './investmentsTypes';
 export type * from './personalTypes';
-import type { AuctionHouseState, ClubState, DealerDeal } from './personalTypes';
+import type { AuctionHouseState, ClubState } from './personalTypes';
 
-export const SCHEMA_VERSION = 14;
+export const SCHEMA_VERSION = 15;
 
 export interface GameState {
   schemaVersion: number;
@@ -119,8 +119,6 @@ export interface GameState {
   auctions: Record<Id, AuctionHouseState>;
   /** Every sports club by club id, yours or not (SCREENS §20). */
   clubs: Record<Id, ClubState>;
-  /** Car-dealer financing deals by dealer site id (SCREENS §19). */
-  dealerDeals: Record<Id, DealerDeal>;
   /** Accumulates P&L lines and cash movements since the last weekly close. */
   ledger: Ledger;
   events: { log: GameEvent[]; scheduled: ScheduledEvent[] };
@@ -825,8 +823,8 @@ export interface RivalBranch {
 export interface ReoPool {
   units: number;
   value: Money;
-  /** Hold (carry the cost), Rent (yield income) or Selling (settles at sellWeek), §21.3. */
-  mode: 'hold' | 'rent' | 'selling';
+  /** Rent (carry the cost, earn rent) or Selling (settles at sellWeek), §21.3. */
+  mode: 'rent' | 'selling';
   sellWeek?: Week;
   /** House price index the value was last marked at (value tracks hpi). */
   hpiRef: number;
@@ -877,7 +875,6 @@ export type PnlLine =
   | 'travel'
   | 'franchiseRevenue'
   | 'franchiseCosts'
-  | 'dealerFees'
   | 'loanLosses'
   | 'depreciation'
   | 'tax';

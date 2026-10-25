@@ -95,7 +95,7 @@ Spend the boldness on the map and the illustrations, the way a banknote's engrav
   - **Medallion**: places. A round coin filled with the type's own ink (`--type-*` tokens in tokens.css: oxblood, vermilion, teal, cobalt, plum, magenta, forest …) with an ivory glyph. Every glyph and caption on its ink reaches 4.5:1 (tested).
   - **Price tag**: things you rent or buy. A pointed tag with a punched hole: offices in light brass with dark ink, buildings and vacation homes in their type ink. Compact (just the glyph) until close zoom, where it adds its words ("For lease").
   - **Seal**: landmarks (central bank, airport, stadium). 32 px, scalloped.
-  - **Yours, one colour:** every place you own (branches, HQ, property, vacation homes, clubs) is a crest in your brand ink. Branches carry your monogram; the rest carry their type glyph, so each reads apart. Partners (employers, universities, car dealers) keep their type medallion with a small brand-ink tick.
+  - **Yours, one colour:** every place you own (branches, HQ, property, vacation homes, clubs) is a crest in your brand ink. Branches carry your monogram; the rest carry their type glyph, so each reads apart. Partners (employers, universities) keep their type medallion with a small brand-ink tick.
   - **One footprint:** crests (26 × 30), medallions (28), tags (22 high) and seals (32) are all about the same size, so no kind of pin shouts over the others.
   - **Words at close zoom only:** captions, notes ("Sale wk 4", "For sale", "Converting") and tag words appear from close zoom (PIN_CAPTION_FROM_ZOOM); the normal view is symbols only.
   - The same per-type ink marks that type everywhere it appears: map pins, the Layers legend and panel headers.

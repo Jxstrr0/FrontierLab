@@ -5,6 +5,7 @@ import { initPersonalEmpire } from '../personalInit';
 import { generatePersonalSites } from '../personalSites';
 import { START_CASH } from '../../config/balance';
 import { CITIES } from '../../data/cities';
+import { FUNDING_TYPES } from '../../data/fundingTypes';
 import { cityGeometry } from '../cityGeo';
 import { isFrontage, nearestFrontage } from '../cityLayout';
 import { fullCoverage } from '../hq';
@@ -175,7 +176,8 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     for (const w of state.history.weekly) addLines(w.pnl);
     for (const [cityId, pool] of Object.entries(state.reo)) {
       const country = CITIES[cityId]?.country;
-      pool.mode = 'hold';
+      // Hold existed until schema 15, which turns every held pool into Rent.
+      (pool as { mode: string }).mode = 'hold';
       pool.hpiRef = (country && state.world.countries[country]?.hpi) || 100;
     }
     for (const cityId of Object.keys(state.world.cities).sort()) {
@@ -209,10 +211,12 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
   // clubs and rich list start fresh.
   9: (s) => {
     const state = s as unknown as GameState;
-    for (const line of STAGE9_PNL_LINES) {
-      state.ledger.pnl[line] ??= 0;
-      for (const w of state.history.weekly) w.pnl[line] ??= 0;
-    }
+    // Typed loosely: dealerFees was one of these lines until schema 15 removed it.
+    const pnls = [state.ledger.pnl, ...state.history.weekly.map((w) => w.pnl)] as Record<
+      string,
+      number
+    >[];
+    for (const line of STAGE9_PNL_LINES) for (const pnl of pnls) pnl[line] ??= 0;
     for (const cityId of Object.keys(state.world.cities).sort()) {
       generatePersonalSites(state, cityId);
     }
@@ -270,6 +274,46 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     if (newest && !state.company.lastBuild) state.company.lastBuild = { ...newest.build };
     return s;
   },
+
+  // 14 → 15: content trim (DESIGN decision log 2026-10-25). Foreclosed homes
+  // lose Hold (Rent always beat it), so held pools start renting. Dealer
+  // financing is gone: running deals end, and the dealerFees P&L line folds
+  // into marketing (what the referral fee was). Brokered deposits and senior
+  // bonds merge into term interbank and covered bonds, lots and offers alike.
+  // The agency's Grand Opening Week package is now Street Team.
+  14: (s) => {
+    const state = s as unknown as GameState;
+    for (const pool of Object.values(state.reo)) {
+      if ((pool.mode as string) === 'hold') pool.mode = 'rent';
+    }
+    const raw = s as Record<string, unknown>;
+    delete raw.dealerDeals;
+    const pnls = [state.ledger.pnl, ...state.history.weekly.map((w) => w.pnl)] as Record<
+      string,
+      number
+    >[];
+    for (const pnl of pnls) {
+      pnl.marketing = (pnl.marketing ?? 0) + (pnl.dealerFees ?? 0);
+      delete pnl.dealerFees;
+    }
+    state.events.log = state.events.log.filter((e) => !e.type.startsWith('DEALER_'));
+    for (const item of [...state.treasury.lots, ...state.treasury.offers]) {
+      const to = MERGED_FUNDING[item.type];
+      if (!to) continue;
+      item.type = to;
+      item.radar = [...FUNDING_TYPES[to]!.radar];
+    }
+    for (const run of state.marketing.packages) {
+      if (run.packageId === 'grand_opening') run.packageId = 'street_team';
+    }
+    return s;
+  },
+};
+
+/** Funding types merged away in schema 15, and the type each became. */
+const MERGED_FUNDING: Record<string, string> = {
+  brokered: 'term_interbank',
+  senior_bond: 'covered_bond',
 };
 
 const STAGE9_PNL_LINES = ['franchiseRevenue', 'franchiseCosts', 'dealerFees'] as const;

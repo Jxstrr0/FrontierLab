@@ -1234,15 +1234,6 @@ export const AUCTIONS = {
   bidMaxFactor: 3,
 } as const;
 /**
- * Dealer financing (SCREENS §19): a car dealer refers auto-loan customers to
- * your branches in its city for a yearly fee. Auto-loan demand there × (1 + boost).
- */
-export const DEALER_FINANCING = {
-  feePerYear: 120_000,
-  termWeeks: 156,
-  demandBoost: 0.25,
-} as const;
-/**
  * Sports franchise (DESIGN §5.16, SCREENS §20; numbers are our assumption).
  * Revenue a year ≈ revenueYield × value, split across tickets/broadcast/merch/
  * sponsorship; operations cost opsShare of revenue; payroll from the squad.
@@ -1434,8 +1425,14 @@ export const EXEC_DELEGATION = {
   croRaiseCr: 0.14,
   croRaiseLoss: 0.009,
   croMaxAppetite: 4,
-  /** CFO Capital (§17.2): acts at Watch or worse, raises equity at Restricted or worse, aims for 12%. */
+  /**
+   * CFO Capital (§17.2): acts at Watch or worse, raises equity at Restricted or
+   * worse, aims for 12%. Its risk-appetite step comes every croEveryWeeks too,
+   * cfoAppetitePhase weeks after the CRO's, so with both seated the dial can
+   * move every 2 weeks in a capital squeeze but never twice in one week.
+   */
   cfoTargetCr: 0.12,
+  cfoAppetitePhase: 2,
   cfoRaiseStep: 0.01,
   /**
    * COO Expansion (§17.2): one branch at most every expansionEveryWeeks, only in
