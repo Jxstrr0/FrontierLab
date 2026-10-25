@@ -20,6 +20,27 @@
   --paper: #e3e9df;
   --ledger-ink: #22252b;
 
+  /* Place-type inks (ART_DIRECTION §2 Pins): every kind of place on the map has
+     its own banknote ink, used wherever that place's type marker appears (map
+     pins, the Layers legend, panel headers). All but the office brass take
+     ivory glyphs and text at ≥ 4.5:1 and stand out on --paper; shape and glyph
+     carry the meaning too, so colour is never the only cue. */
+  --type-central-bank: #1b2847;
+  --type-airport: #2a62a3;
+  --type-sports: #3b7428;
+  --type-investment-bank: #263f8f;
+  --type-bureau: #0f6b6b;
+  --type-agency: #b23a22;
+  --type-lobby: #6a2c70;
+  --type-convention: #9b2f6d;
+  --type-employer: #22633e;
+  --type-university: #4c3a94;
+  --type-car-dealer: #474f5a;
+  --type-auction: #8c1c34;
+  --type-office: #d9be7a; /* light brass: takes --vault-deep glyphs and text */
+  --type-real-estate: #a04f10;
+  --type-vacation-home: #176f8e;
+
   /* Hairlines are brass at 40% (§1.3) */
   --hairline: rgb(184 145 61 / 40%);
 

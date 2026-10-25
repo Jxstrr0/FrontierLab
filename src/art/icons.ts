@@ -2,22 +2,39 @@
 // with a 1.5 px stroke and rounded caps and joins, in brass on navy or ink on
 // ivory. Map layers, Ledger articles, pins and panel chrome all draw from
 // here (src/app/components/Icon.tsx renders them).
+//
+// The place glyphs are drawn to read at 18–24 px inside a map medallion, and
+// each has its own silhouette: a credit score dial for bureaus, a megaphone for
+// agencies, a podium and microphone for lobbying firms, a name badge on a lanyard
+// for conventions, a gavel on its block for auction houses, a palm on its
+// island for vacation homes. Closely related ideas never share an outline.
 
 export const ICON_PATHS = {
   // Buildings and places
   branch: 'M3 9.5 12 4l9 5.5M4 20h16M5 18h14M6.5 11v6M10 11v6M14 11v6M17.5 11v6M4 9.5h16',
-  office: 'M6 21V4h12v17M4 21h16M9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2M11 21v-3h2v3',
-  realEstate: 'M3.5 11 12 4l8.5 7M6 9.5V20h12V9.5M10 20v-5h4v5',
-  bureau: 'M5 3.5h9l3 3V12M5 3.5V20h6M8 8h6M8 11h4M15.5 18.5a3 3 0 1 0 0-.01M17.6 20.6 20 23',
-  bank: 'M5 21V8h14v13M3 21h18M12 8V3l4 1.5L12 6M8 11v7M12 11v7M16 11v7',
-  investmentBank: 'M3 20h18M4 16l5-5 4 3 7-8M16 6h4v4',
-  agency: 'M4 10v4h3l8 4V6l-8 4H4M7 14l1.5 5h2L9.5 15M18 9.5a3 3 0 0 1 0 5',
-  convention: 'M3 10 12 4l9 6M5 10v10M19 10v10M3 20h18M5 10l2.3 2 2.3-2 2.4 2 2.3-2 2.4 2 2.3-2',
-  lobby: 'M5 12a7 5 0 0 1 14 0M12 4v3M4 12h16M6 12v7M10 12v7M14 12v7M18 12v7M3 20h18',
+  office:
+    'M6 21V3.5h12V21M4 21h16M9 6.5h2M13 6.5h2M9 10h2M13 10h2M9 13.5h2M13 13.5h2M10.5 21v-3.5h3V21',
+  realEstate: 'M3.5 11.5 12 4.5l8.5 7M6 10v10h12V10M10 20v-5h4v5M15.5 7.4V4.5h2v4.5',
+  // A palm tree on its island, waves lapping (vacation homes).
+  villa:
+    'M11 21c.3-4-.2-7.5-1.5-10.5M9.5 10.5C8 8.5 5.5 8 3.5 9.2M9.5 10.5C9.2 8 10.8 6 13.5 5.5M9.5 10.5c2.3-1.3 5-1 7 .8M9.5 10.5c-2.2.2-4 1.6-4.8 3.8M9.5 10.5c1.8.6 3.2 2 3.8 4M4 21h11M15 18.5c1-.7 2-.7 3 0s2 .7 3 0',
+  // A credit score dial: needle swinging across a graduated arc.
+  bureau:
+    'M3.5 17a8.5 8.5 0 0 1 17 0M12 8.5v2M6 11l1.4 1.4M18 11l-1.4 1.4M12 17l4-4.6M13.1 17a1.1 1.1 0 1 1-2.2 0 1.1 1.1 0 0 1 2.2 0M4 20.5h16',
+  bank: 'M5 21V9h14v12M3 21h18M4 9h16M12 9V3l4 1.5L12 6M8 12v6M12 12v6M16 12v6',
+  investmentBank: 'M3 20.5h18M4 16.5l5-5 4 3 7-8M15.5 6.5H20V11M6 20.5v-2M10 20.5v-4M14 20.5v-3',
+  agency: 'M4 10v4h3l8 4V6l-8 4H4M7 14l1.5 5h2L9.5 15M18 9.5a3 3 0 0 1 0 5M20.5 7.5a6 6 0 0 1 0 9',
+  // A name badge on its lanyard (conventions).
+  convention:
+    'M8 3l4 5 4-5M6 8h12v13H6zM12 10.5a1.9 1.9 0 1 0 .01 0M8.8 18.5c.6-1.8 1.8-2.7 3.2-2.7s2.6.9 3.2 2.7',
+  // A speaker's podium with its microphone (lobbying firms: making the case).
+  lobby:
+    'M5.5 10h13l-1.2 2.6H6.7zM8 12.6l.8 7.4h6.4l.8-7.4M6 20.5h12M12 10V6.2M12 2.6a1.8 1.8 0 1 0 .01 0M10.6 15.6h2.8',
   stadium:
     'M3 9c0-2 4-3.5 9-3.5S21 7 21 9v7c0 2-4 3.5-9 3.5S3 18 3 16zM3 9c0 2 4 3.5 9 3.5S21 11 21 9M6 4v3M18 4v3M12 12.5v7',
-  car: 'M3 16v-3l2-4h10l3 4h2v3zM6.5 18.5a1.5 1.5 0 1 0 0-.01M16.5 18.5a1.5 1.5 0 1 0 0-.01M7 9l1 4M3 13h17',
-  gavel: 'M5 9l5-5 3 3-5 5zM11.5 10.5 19 18M4 21h9M5.5 21v-2h6v2',
+  car: 'M3 16.5v-3c0-.6.4-1 1-1.1l2.4-.5 2.3-3.3c.3-.4.8-.6 1.3-.6h4.4c.5 0 1 .3 1.3.7l2.1 3.2 2.2.5c.6.1 1 .6 1 1.1v3M9.4 17h5.2M3 16.5h2.6M18.4 16.5H21M7.5 15.2a1.8 1.8 0 1 0 .01 0M16.5 15.2a1.8 1.8 0 1 0 .01 0M8.6 11.8h7',
+  // A gavel striking its block (auction houses; law and rulings in the Ledger).
+  gavel: 'M5.5 9.5l5-5 3.5 3.5-5 5zM8 7l3.5 3.5M12.2 11.2 19.5 18.5M3.5 21h10M5 21v-2.5h7V21',
   university: 'M2.5 9 12 5l9.5 4L12 13zM6.5 11v4.5c3 2 8 2 11 0V11M21.5 9v5',
   employer: 'M4 8h16v11H4zM9 8V5.5h6V8M4 12.5h16M11 12v2h2v-2',
   airport: 'M4 20h16M6 20v-8h12v8M9 12V8h6v4M12 8V4M10 4h4M8.5 15.5h2M13.5 15.5h2',

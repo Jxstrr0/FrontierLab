@@ -1,6 +1,5 @@
-/* The city map (SCREENS §2, ART_DIRECTION §2): full-bleed canvas with DOM pins.
-   Pin sizes come from config/mapView.ts as --pin-size, --pin-hit and --pin-lift
-   (set by PinLayer); a pin's (0, 0) is its roof anchor. */
+/* The city map (SCREENS §2, ART_DIRECTION §2): full-bleed canvas with DOM pins
+   (styled in pins.css) and the Layers sheet with its key to the pin shapes. */
 .game-map {
   position: absolute;
   inset: 0;
@@ -34,272 +33,6 @@
   contain: layout style;
 }
 
-/* ─── Pins ──────────────────────────────────────────────────────────────── */
-.map-pin {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: var(--pin-hit);
-  height: var(--pin-hit);
-  margin-left: calc(var(--pin-hit) / -2);
-  margin-top: calc(-1 * var(--pin-lift) - var(--pin-hit) / 2);
-  padding: 0;
-  border: 0;
-  background: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: auto;
-  touch-action: none;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-/* A short brass stem from the medallion down to the roof. */
-.map-pin::after {
-  content: '';
-  position: absolute;
-  left: calc(50% - 0.75px);
-  top: calc(50% + var(--pin-size) / 2 - 1px);
-  width: 1.5px;
-  height: calc(var(--pin-lift) - var(--pin-size) / 2 + 1px);
-  background: var(--brass);
-  pointer-events: none;
-}
-.map-pin:focus-visible {
-  outline: none;
-}
-.map-pin:focus-visible > :first-child {
-  outline: 2px solid var(--brass-light);
-  outline-offset: 2px;
-  border-radius: 50%;
-}
-.pin-body {
-  display: block;
-  border-radius: 50%;
-  transition: transform var(--dur-press) var(--ease-out);
-}
-.map-pin:active .pin-body,
-.map-pin:active .pin-tag,
-.map-pin:active .pin-count {
-  transform: scale(0.92);
-}
-
-/* Your HQ: a branch-style medallion with an extra brass ring around it. */
-.pin-hq .pin-body {
-  outline: 1.5px solid var(--brass-light);
-  outline-offset: 1.5px;
-}
-
-/* Rival head office: the banks medallion ringed in the rival's ink with a small
-   swallowtail pennant, unlike rival branches (ringed monograms) and "$" lots. */
-.pin-rivalHq .pin-body {
-  position: relative;
-  outline: 2.5px solid var(--pin-ink, var(--brass));
-  outline-offset: 0;
-}
-.pin-rivalHq .pin-body::after {
-  content: '';
-  position: absolute;
-  right: -6px;
-  top: -4px;
-  width: 11px;
-  height: 8px;
-  background: var(--pin-ink, var(--brass));
-  clip-path: polygon(0 0, 100% 0, 72% 50%, 100% 100%, 0 100%);
-}
-/* A failed (distressed) rival's head office: faded, dashed ring. */
-.pin-rivalHq.is-muted .pin-body {
-  opacity: 0.55;
-  outline-style: dashed;
-}
-/* The central bank: its own navy, columned-dome medallion, a touch larger (a landmark). */
-.pin-centralBank .pin-body {
-  transform: scale(1.12);
-}
-.map-pin.pin-centralBank:active .pin-body {
-  transform: scale(1.02);
-}
-
-/* The airport (Stage 8): its own navy plane medallion, landmark-sized like the central bank. */
-.pin-airport .pin-body {
-  transform: scale(1.12);
-}
-.map-pin.pin-airport:active .pin-body {
-  transform: scale(1.02);
-}
-
-/* Open branch location: a smaller blank "$" medallion, quieter than branches. */
-.pin-lot .pin-body {
-  transform: scale(0.8);
-}
-.map-pin.pin-lot:active .pin-body {
-  transform: scale(0.72);
-}
-.pin-lot::after {
-  top: calc(50% + var(--pin-size) * 0.4 - 1px);
-  height: calc(var(--pin-lift) - var(--pin-size) * 0.4 + 1px);
-}
-/* Far zoom: open locations shrink to small "$" coins. */
-.pin-layer.is-far .pin-lot .pin-body {
-  transform: scale(0.5);
-}
-
-/* For lease (office buildings you can rent): an ivory tag with a brass outline. */
-.pin-office {
-  width: 92px;
-  margin-left: -46px;
-}
-.pin-tag {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  padding: 2px 6px;
-  border: 1.5px solid var(--brass);
-  border-radius: 3px;
-  background: var(--ivory);
-  color: var(--ledger-ink);
-  font-size: 11px;
-  font-weight: 700;
-  line-height: 14px;
-  white-space: nowrap;
-  transition: transform var(--dur-press) var(--ease-out);
-}
-.pin-tag .layer-icon {
-  flex: none;
-}
-.pin-office::after {
-  top: calc(50% + 9px);
-  height: calc(var(--pin-lift) - 9px);
-}
-/* Far zoom: the tag shrinks to a small brass tag dot. */
-.pin-layer.is-far .pin-office {
-  width: var(--pin-hit);
-  margin-left: calc(var(--pin-hit) / -2);
-}
-.pin-layer.is-far .pin-tag {
-  display: block;
-  width: 10px;
-  height: 10px;
-  padding: 0;
-  border-radius: 2px;
-  background: var(--brass-light);
-  border-color: var(--brass);
-  font-size: 0;
-  transform: rotate(45deg);
-}
-.pin-layer.is-far .pin-tag .layer-icon {
-  display: none;
-}
-.pin-layer.is-far .map-pin::after {
-  display: none;
-}
-.pin-layer.is-far .map-pin {
-  margin-top: calc(var(--pin-hit) / -2 - 6px);
-}
-
-/* Cluster: a count medallion; brand ink when it holds one of yours. */
-.pin-count {
-  --size: calc(var(--pin-size) + 4px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--size);
-  height: var(--size);
-  border-radius: 50%;
-  background: var(--vault-deep);
-  border: 1.5px solid var(--brass);
-  box-shadow:
-    inset 0 0 0 2.5px var(--vault-deep),
-    inset 0 0 0 3.2px var(--brass-light);
-  color: var(--ivory);
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 13px;
-  transition: transform var(--dur-press) var(--ease-out);
-}
-.pin-cluster.has-mine .pin-count {
-  background: var(--pin-ink);
-  box-shadow:
-    inset 0 0 0 2.5px var(--pin-ink),
-    inset 0 0 0 3.2px var(--brass-light);
-}
-.pin-cluster::after {
-  display: none;
-}
-
-/* Brass dot: loan applications waiting (SCREENS §0.2). */
-.pin-badge {
-  position: absolute;
-  top: calc(50% - var(--pin-size) / 2 - 2px);
-  left: calc(50% + var(--pin-size) / 2 - 8px);
-  width: 11px;
-  height: 11px;
-  border-radius: 50%;
-  background: var(--brass-light);
-  border: 2px solid var(--vault-deep);
-  pointer-events: none;
-}
-/* Employer or university you partner with: a brand-ink seal, lower right of the medallion. */
-.pin-partner {
-  position: absolute;
-  top: calc(50% + var(--pin-size) / 2 - 12px);
-  left: calc(50% + var(--pin-size) / 2 - 10px);
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--pin-ink);
-  border: 1px solid var(--ivory);
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-}
-.pin-partner svg {
-  display: block;
-}
-
-/* Acquired branch converting to your brand (§19.8): progress ring and a small label under it. */
-.pin-ring {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-}
-.pin-converting {
-  position: absolute;
-  top: calc(50% + var(--pin-size) / 2 + 2px);
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 0 5px;
-  border-radius: var(--radius-pill);
-  background: var(--vault-deep);
-  color: var(--brass-light);
-  font: 600 9px/14px var(--font-ui);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  pointer-events: none;
-  z-index: 1;
-}
-.pin-layer.is-far .pin-converting {
-  display: none;
-}
-
-/* Oxblood dot: an unresolved incident (SCREENS §0.2), opposite the brass dot. */
-.pin-alert {
-  position: absolute;
-  top: calc(50% - var(--pin-size) / 2 - 2px);
-  left: calc(50% - var(--pin-size) / 2 - 3px);
-  width: 11px;
-  height: 11px;
-  border-radius: 50%;
-  background: var(--oxblood);
-  border: 2px solid var(--ivory);
-  pointer-events: none;
-}
-
 /* ─── Layers sheet ─────────────────────────────────────────────────────── */
 .layers {
   display: flex;
@@ -314,15 +47,49 @@
 .layer-row > .toggle {
   flex: 1;
 }
+/* Each row shows the pins it toggles, right-aligned against the label. */
 .layer-icon-slot {
   flex: none;
-  width: 28px;
+  width: 76px;
   display: flex;
-  justify-content: center;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 3px;
   color: var(--brass-light);
+}
+.layer-pins .medallion {
+  flex: none;
 }
 .layer-sub {
   padding-left: var(--space-5);
+}
+
+/* Key to the map's shapes, above the toggles. */
+.map-key {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-2);
+  margin: 0 0 var(--space-3);
+  padding: var(--space-3) var(--space-2);
+  list-style: none;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-card);
+}
+.map-key li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-12);
+  line-height: 1.2;
+  text-align: center;
+  color: var(--ivory-dim);
+}
+.map-key-mark {
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .layers-list-btn {
   margin-top: var(--space-4);

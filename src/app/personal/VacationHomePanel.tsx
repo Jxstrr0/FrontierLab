@@ -40,7 +40,7 @@ export function VacationHomePanel(p: { siteId: string }) {
     <Panel
       title={spec.name}
       subtitle={`${site.address} · ${CITIES[spec.cityId]?.name ?? ''}`}
-      icon={<LayerMedallion id="realEstate" size={32} />}
+      icon={<LayerMedallion id="vacationHomes" size={32} />}
       onClose={closePanel}
       advisor={{ text: 'A place to get away from it all — bought with your own money.' }}
       hero={<VacationHomeArt rebuilt={(home?.rebuilds ?? 0) > 0} />}
