@@ -18,6 +18,7 @@ import {
   type CampaignRow,
 } from './lobbyingView';
 import './lobbying.css';
+import { LobbyingArt } from './LobbyingArt';
 
 const weeksText = (n: number) => (n === 1 ? '1 week' : `${n} weeks`);
 
@@ -55,6 +56,7 @@ export function LobbyingFirmPanel(p: { siteId: string }) {
       advisor={{
         text: 'We know the right people. Results take a few weeks, and discretion is never guaranteed.',
       }}
+      hero={<LobbyingArt />}
     >
       <div class="stack">
         <SectionTitle>Campaigns</SectionTitle>

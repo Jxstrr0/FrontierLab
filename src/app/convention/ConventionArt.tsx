@@ -1,16 +1,16 @@
 // Exhibition hall vignette for conventions (ART_DIRECTION §3, "Other
-// buildings"): a vaulted glass hall with a banner, stands and visitors, in
-// engraved line art on the vault ground, like the other site vignettes.
-import '../sites/sites.css';
-import '../storefront/storefront.css';
+// buildings"): a vaulted glass hall with a banner, stands and visitors,
+// engraved in the city ink on ivory with hatched stands.
+import { rect } from '../../art/engrave';
+import { Face, Hatch, Vignette } from '../components';
 
 const STANDS = [36, 96, 156, 216];
 
 export function ConventionArt() {
   return (
-    <svg class="site-art" viewBox="0 0 320 150" role="img" aria-label="A vaulted exhibition hall">
-      <rect x="0" y="0" width="320" height="150" class="art-ground" />
+    <Vignette label="A vaulted exhibition hall">
       <path d="M0 132h320" class="art-line" />
+      <path d="M20 132V70c0-34 280-34 280 0v62z" class="art-tint" />
       {/* The vaulted roof and its ribs. */}
       <path d="M20 132V70c0-34 280-34 280 0v62" class="art-line" />
       <path
@@ -19,11 +19,14 @@ export function ConventionArt() {
       />
       <path d="M20 70h280" class="art-line art-fine" />
       {/* Banner. */}
-      <path d="M110 56h100v16H110zM118 64h84" class="art-line" />
+      <Face pts={rect(110, 56, 100, 16)} density="light" angle={0} />
+      <path d="M118 64h84" class="art-line" />
       {/* Stands with counters and screens. */}
       {STANDS.map((x) => (
         <g>
-          <path d={`M${x} 132v-22h48v22M${x - 2} 110h52`} class="art-line" />
+          <Face pts={rect(x, 110, 48, 22)} density="medium" angle={90} />
+          <Hatch pts={rect(x + 40, 110, 8, 22)} density="dense" />
+          <path d={`M${x - 2} 110h52`} class="art-line" />
           <path d={`M${x + 10} 106v-14h28v14M${x + 6} 122h36`} class="art-line art-fine" />
         </g>
       ))}
@@ -34,6 +37,6 @@ export function ConventionArt() {
           class="art-line art-fine"
         />
       ))}
-    </svg>
+    </Vignette>
   );
 }

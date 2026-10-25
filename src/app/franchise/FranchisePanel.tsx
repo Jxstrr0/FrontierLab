@@ -12,6 +12,7 @@ import { ClubTab, KitTab } from './ClubTabs';
 import { clubView, windowStatus } from './franchiseView';
 import { SquadTab, TransfersTab } from './SquadTabs';
 import './franchise.css';
+import { StadiumArt } from './StadiumArt';
 
 type ClubTabId = 'club' | 'kit' | 'squad' | 'transfers' | 'finance';
 
@@ -46,6 +47,13 @@ export function FranchisePanel(p: { clubId?: string }) {
           ? 'Winning fills the stadium and lifts the club’s value. Your bank on the shirt spreads the brand.'
           : 'Fans, a stadium, and a lot of payroll. Interested?',
       }}
+      hero={
+        <StadiumArt
+          sport={spec.sport}
+          primary={view.club.kit.primary}
+          secondary={view.club.kit.secondary}
+        />
+      }
       tabs={owned ? tabs : undefined}
       tab={owned ? tab : undefined}
       onTab={setTab}

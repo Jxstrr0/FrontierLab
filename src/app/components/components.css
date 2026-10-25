@@ -1,44 +1,49 @@
 /* Shared component styles (SCREENS §0.5, ART_DIRECTION §1, §5). */
 
 /* ─── Card ─────────────────────────────────────────────────────────────── */
+/* Certificate card (ART_DIRECTION §1.3): a brass hairline at 40%, a second
+   hairline 3 px inside, small engraved rosettes on the inner corners, radius
+   6 and a 1 px top highlight. No drop shadows. */
+:root {
+  --card-rosette: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cg fill='%2322304A' stroke='%23B8913D' stroke-width='.7'%3E%3Ccircle cx='6' cy='6' r='4.4'/%3E%3Cpath d='M6 1.8C7.4 4 7.4 8 6 10.2 4.6 8 4.6 4 6 1.8zM1.8 6C4 4.6 8 4.6 10.2 6 8 7.4 4 7.4 1.8 6z'/%3E%3Ccircle cx='6' cy='6' r='1.1'/%3E%3C/g%3E%3C/svg%3E");
+}
 .card {
   position: relative;
   display: block;
   width: 100%;
   text-align: left;
-  background: var(--vault-raised);
+  background-color: var(--vault-raised);
   border: 1px solid var(--hairline);
   border-radius: var(--radius-card);
   padding: var(--space-4);
-  box-shadow: inset 0 1px 0 rgb(238 231 211 / 6%);
+  box-shadow: inset 0 1px 0 rgb(238 231 211 / 7%);
   color: inherit;
 }
 .card::before {
   content: '';
   position: absolute;
   inset: 3px;
-  border: 1px solid rgb(184 145 61 / 22%);
+  border: 1px solid rgb(184 145 61 / 24%);
   border-radius: 4px;
   pointer-events: none;
 }
 .card::after {
-  content: '◆';
+  content: '';
   position: absolute;
-  top: -7px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 9px;
-  color: var(--brass);
-  background: var(--vault);
-  padding: 0 4px;
-  line-height: 12px;
+  inset: -1px;
+  pointer-events: none;
+  background:
+    var(--card-rosette) left top / 10px no-repeat,
+    var(--card-rosette) right top / 10px no-repeat,
+    var(--card-rosette) left bottom / 10px no-repeat,
+    var(--card-rosette) right bottom / 10px no-repeat;
 }
 .card-tap {
   cursor: pointer;
   font: inherit;
 }
 .card-tap:active {
-  background: #283857;
+  background-color: #283857;
 }
 .card + .card {
   margin-top: var(--space-4);
@@ -50,7 +55,10 @@
   gap: var(--space-2);
   color: var(--brass);
   margin: var(--space-5) 0;
-  font-size: 10px;
+}
+.rule svg {
+  display: block;
+  flex: none;
 }
 .rule::before,
 .rule::after {
@@ -270,146 +278,6 @@
 .segmented-opt.is-active {
   background: var(--brass);
   color: var(--vault-deep);
-}
-
-/* ─── Visuals ──────────────────────────────────────────────────────────── */
-.coins {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-.coin-empty {
-  fill: none;
-  stroke: rgb(184 145 61 / 35%);
-  stroke-width: 1.2;
-}
-.coin-full {
-  fill: var(--brass);
-  stroke: var(--brass-light);
-  stroke-width: 0.8;
-}
-.coin-star {
-  fill: var(--brass-light);
-  opacity: 0.8;
-}
-.coins-num {
-  font-weight: 600;
-  font-size: var(--text-14);
-}
-
-.statbar {
-  display: grid;
-  grid-template-columns: 7.5em 1fr 2.5em;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: var(--text-14);
-  padding: 4px 0;
-}
-.statbar-label {
-  color: var(--ivory-dim);
-}
-.statbar-track {
-  height: 6px;
-  border-radius: 3px;
-  background: var(--vault-deep);
-  overflow: hidden;
-}
-.statbar-fill {
-  display: block;
-  height: 100%;
-  background: var(--brass);
-  border-radius: 3px;
-}
-.statbar-value {
-  text-align: right;
-  font-weight: 600;
-}
-
-.ring {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-1);
-}
-.ring-track {
-  fill: none;
-  stroke: var(--vault-deep);
-  stroke-width: 6;
-}
-.ring-fill {
-  fill: none;
-  stroke: var(--brass);
-  stroke-width: 6;
-  stroke-linecap: round;
-}
-.ring-text {
-  font-family: var(--font-display);
-  font-size: 18px;
-  font-weight: 700;
-  fill: var(--ivory);
-}
-.ring-caption {
-  font-size: var(--text-12);
-  color: var(--ivory-dim);
-}
-
-.barchart svg {
-  width: 100%;
-  height: 140px;
-  display: block;
-}
-.barchart-axis {
-  stroke: var(--hairline);
-  stroke-width: 0.4;
-  vector-effect: non-scaling-stroke;
-}
-.bar-rev {
-  fill: var(--ivory);
-}
-.bar-inc {
-  fill: var(--brass-light);
-}
-.bar-loss {
-  fill: var(--oxblood);
-}
-.barchart-labels {
-  display: flex;
-  justify-content: space-around;
-  font-size: var(--text-12);
-  color: var(--ivory-dim);
-}
-.barchart-legend {
-  display: flex;
-  gap: var(--space-4);
-  justify-content: center;
-  font-size: var(--text-12);
-  margin-top: var(--space-2);
-  color: var(--ivory-dim);
-}
-.barchart-legend span::before {
-  content: '';
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  margin-right: 6px;
-  vertical-align: -1px;
-  border-radius: 2px;
-}
-.lg-rev::before {
-  background: var(--ivory);
-}
-.lg-inc::before {
-  background: var(--brass-light);
-}
-
-.medallion {
-  flex: none;
-  display: block;
-}
-.medallion-text {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 11px;
 }
 
 /* ─── Panel, sheet, modal ──────────────────────────────────────────────── */
@@ -789,71 +657,4 @@
 .art-small {
   font-size: 7px;
   fill: var(--ivory-dim);
-}
-
-/* ─── Line chart (ART_DIRECTION §5: 1.5 px strokes, dotted "now") ─────── */
-.linechart svg {
-  width: 100%;
-  height: 140px;
-  display: block;
-  overflow: visible;
-}
-.linechart-axis {
-  stroke: var(--hairline);
-  stroke-width: 1;
-  vector-effect: non-scaling-stroke;
-}
-.linechart-now {
-  stroke: var(--brass);
-  stroke-width: 1;
-  stroke-dasharray: 2 3;
-  vector-effect: non-scaling-stroke;
-}
-.linechart-line {
-  fill: none;
-  stroke-width: 1.5;
-  stroke-linejoin: round;
-  stroke-linecap: round;
-  vector-effect: non-scaling-stroke;
-}
-.linechart-ivory {
-  stroke: var(--ivory);
-}
-.linechart-brass {
-  stroke: var(--brass-light);
-}
-.linechart-jade {
-  stroke: var(--jade);
-}
-.linechart-labels {
-  display: flex;
-  justify-content: space-between;
-  font-size: var(--text-12);
-  color: var(--ivory-dim);
-  margin-top: var(--space-1);
-}
-.linechart-legend {
-  display: flex;
-  gap: var(--space-4);
-  justify-content: center;
-  font-size: var(--text-12);
-  margin-top: var(--space-2);
-  color: var(--ivory-dim);
-}
-.lg-line::before {
-  content: '';
-  display: inline-block;
-  width: 14px;
-  height: 2px;
-  margin-right: 6px;
-  vertical-align: 3px;
-}
-.lg-line-ivory::before {
-  background: var(--ivory);
-}
-.lg-line-brass::before {
-  background: var(--brass-light);
-}
-.lg-line-jade::before {
-  background: var(--jade);
 }

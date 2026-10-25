@@ -11,6 +11,8 @@ import { defaultBuild, SLOT_LABEL } from './builds';
 import { PartPicker } from './PartPicker';
 import { SlotIcon } from './SlotIcon';
 import './build.css';
+import { BranchArt } from '../branch/BranchArt';
+import { CITIES } from '../../data/cities';
 
 export function BuildPanel(p: { lotId: string }) {
   const s = useGame();
@@ -44,6 +46,14 @@ export function BuildPanel(p: { lotId: string }) {
         title="Build branch"
         subtitle={`${lot.address} · ${districtName(lot)}`}
         onClose={closePanel}
+        hero={
+          <BranchArt
+            exterior={build.exterior}
+            brandInk={s.meta.brandInk}
+            monogram={s.meta.monogram}
+            ink={CITIES[lot.cityId]?.ink}
+          />
+        }
         footer={
           <div class="stack">
             {blocker && <p class="build-blocker small">{blocker}</p>}

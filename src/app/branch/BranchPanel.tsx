@@ -2,6 +2,7 @@
 // line and the five tabs; an acquired branch shows a converting banner. The active tab lives in the panel route so it
 // survives re-renders and reopening.
 import { MERGERS } from '../../config/balance';
+import { CITIES } from '../../data/cities';
 import { DISTRICT_SPECS } from '../../data/districts';
 import { managerOf } from '../../sim/branch/staff';
 import { Medallion, Panel, type Tab } from '../components';
@@ -11,6 +12,7 @@ import { FinanceTab } from './FinanceTab';
 import { LoanDeskTab } from './LoanDeskTab';
 import { MarketingTab } from './MarketingTab';
 import { ProductsTab } from './ProductsTab';
+import { BranchArt } from './BranchArt';
 import { advisorLines, businessLoans, openingDay } from './selectors';
 import { ServiceTab } from './ServiceTab';
 import './branch.css';
@@ -49,7 +51,20 @@ export function BranchPanel(p: { branchId: string; tab: BranchTab }) {
         />
       }
       onClose={closePanel}
-      advisor={{ name: mgr?.name ?? 'Branch advisor', text: advisorLines(s, branch, opening) }}
+      advisor={{
+        name: mgr?.name ?? 'Branch advisor',
+        text: advisorLines(s, branch, opening),
+        avatar: mgr?.portrait,
+      }}
+      hero={
+        <BranchArt
+          exterior={branch.build.exterior}
+          brandInk={conv?.ink ?? s.meta.brandInk}
+          monogram={conv?.monogram ?? s.meta.monogram}
+          fitout={branch.status === 'fitout'}
+          ink={CITIES[branch.cityId]?.ink}
+        />
+      }
       tabs={tabs}
       tab={p.tab}
       onTab={setTab}

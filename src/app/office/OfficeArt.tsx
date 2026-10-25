@@ -1,8 +1,10 @@
 // Office building vignette (ART_DIRECTION §3): an engraved front elevation
 // with one window row per leasable floor, a glazed lobby, a stepped crown and,
-// while it's vacant, a "To let" banner. Line art only, like StorefrontArt.
+// while it's vacant, a "To let" banner, in the city ink on ivory.
+import { rect } from '../../art/engrave';
+import { Face, Hatch, Vignette } from '../components';
+
 const W = 320;
-const H = 150;
 /** Building geometry in SVG units. */
 const B = { x: 104, w: 112, ground: 136, lobby: 16, crown: 10, maxStorey: 11 } as const;
 
@@ -28,13 +30,7 @@ export function OfficeArt(p: { floors: number; desksPerFloor: number; vacant: bo
     return `M${B.x} ${y.toFixed(1)}H${x1}`;
   }).join('');
   return (
-    <svg
-      class="office-art"
-      viewBox={`0 0 ${W} ${H}`}
-      role="img"
-      aria-label={`An office building with ${p.floors} floors${p.vacant ? ', to let' : ''}`}
-    >
-      <rect x="0" y="0" width={W} height={H} class="art-ground" />
+    <Vignette label={`An office building with ${p.floors} floors${p.vacant ? ', to let' : ''}`}>
       <path d={`M0 ${B.ground}h${W}`} class="art-line" />
       {/* Neighbours, kept faint so the office reads first. */}
       <path
@@ -46,8 +42,24 @@ export function OfficeArt(p: { floors: number; desksPerFloor: number; vacant: bo
         d={`M${B.x + 14} ${shaftTop - B.crown}h${B.w - 28}v${B.crown}M${B.x - 4} ${shaftTop}h${B.w + 8}M${B.x + 30} ${shaftTop - B.crown}v-8h${B.w - 60}v8M${B.x + B.w / 2} ${shaftTop - B.crown - 8}v-8`}
         class="art-line"
       />
-      <path d={`M${B.x} ${B.ground}V${shaftTop}H${x1}V${B.ground}`} class="art-line" />
+      <Face
+        pts={[
+          [x1, shaftTop],
+          [x1 + 10, shaftTop - 6],
+          [x1 + 10, B.ground],
+          [x1, B.ground],
+        ]}
+        density="medium"
+      />
+      <Face pts={rect(B.x, shaftTop, B.w, B.ground - shaftTop)} />
+      <path d={windows.join('')} class="art-tint" />
+      <Hatch
+        pts={rect(B.x, shaftTop, B.w, B.ground - B.lobby - shaftTop)}
+        density="light"
+        angle={-60}
+      />
       <path d={floorLines} class="art-line art-fine" />
+      <path d={windows.join('')} class="art-paper" style={{ opacity: 0.55 }} />
       <path d={windows.join('')} class="art-line art-fine" />
       {/* Lobby: glass bays and a revolving door. */}
       <path
@@ -56,18 +68,19 @@ export function OfficeArt(p: { floors: number; desksPerFloor: number; vacant: bo
       />
       {p.vacant && (
         <g>
+          <Face pts={rect(x1 + 14, shaftTop + 6, 34, 40)} />
           <path
-            d={`M${x1 + 6} ${shaftTop + 6}h34v40h-34zM${x1} ${shaftTop + 10}h6M${x1} ${shaftTop + 40}h6`}
-            class="art-line"
+            d={`M${x1 + 17} ${shaftTop + 9}h28v34h-28zM${x1 + 10} ${shaftTop + 10}h4M${x1 + 10} ${shaftTop + 40}h4`}
+            class="art-line art-fine"
           />
-          <text x={x1 + 23} y={shaftTop + 24} text-anchor="middle" class="art-text">
+          <text x={x1 + 31} y={shaftTop + 24} text-anchor="middle" class="art-text">
             To let
           </text>
-          <text x={x1 + 23} y={shaftTop + 36} text-anchor="middle" class="art-text art-small">
+          <text x={x1 + 31} y={shaftTop + 36} text-anchor="middle" class="art-small">
             {p.floors} floors
           </text>
         </g>
       )}
-    </svg>
+    </Vignette>
   );
 }

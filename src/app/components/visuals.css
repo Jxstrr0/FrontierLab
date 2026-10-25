@@ -1,0 +1,265 @@
+/* Data visuals (SCREENS §0.5, ART_DIRECTION §5): coins, stat bars, the ring
+   gauge, bar and line charts and the medallion. The rosette, donut and icons
+   are in radial.css. */
+
+/* ─── Visuals ──────────────────────────────────────────────────────────── */
+.coins {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.coin-empty {
+  fill: none;
+  stroke: rgb(184 145 61 / 35%);
+  stroke-width: 1.2;
+}
+.coin-full {
+  fill: var(--brass);
+  stroke: var(--brass-light);
+  stroke-width: 0.8;
+}
+.coin-rim {
+  fill: none;
+  stroke: var(--vault-deep);
+  stroke-width: 0.5;
+  stroke-dasharray: 0.8 0.9;
+  opacity: 0.55;
+}
+.coin-star {
+  fill: var(--brass-light);
+  stroke: var(--vault-deep);
+  stroke-width: 0.35;
+  stroke-opacity: 0.4;
+}
+.coin-clip {
+  transition: width 420ms var(--ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  .coin-clip {
+    transition: none;
+  }
+}
+.coins-num {
+  font-weight: 600;
+  font-size: var(--text-14);
+}
+
+.statbar {
+  display: grid;
+  grid-template-columns: 7.5em 1fr 2.5em;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-14);
+  padding: 4px 0;
+}
+.statbar-label {
+  color: var(--ivory-dim);
+}
+.statbar-track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--vault-deep);
+  overflow: hidden;
+}
+.statbar-fill {
+  display: block;
+  height: 100%;
+  background: var(--brass);
+  border-radius: 3px;
+}
+.statbar-value {
+  text-align: right;
+  font-weight: 600;
+}
+
+.ring {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+/* RingGauge (ART_DIRECTION §5): a 6 px brass ring on a 6 px raised track; on a
+   raised card the track drops to vault-deep so it still shows. */
+.ring-track {
+  fill: none;
+  stroke: var(--vault-raised);
+  stroke-width: 6;
+}
+.card .ring-track {
+  stroke: var(--vault-deep);
+}
+.ring-fill {
+  fill: none;
+  stroke: var(--brass);
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+.ring-text {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  fill: var(--ivory);
+}
+.ring-caption {
+  font-size: var(--text-12);
+  color: var(--ivory-dim);
+}
+
+.barchart svg {
+  width: 100%;
+  height: auto;
+  max-height: 180px;
+  display: block;
+}
+.barchart-axis {
+  stroke: var(--hairline);
+  stroke-width: 1;
+}
+.bar-pair {
+  cursor: pointer;
+  outline: none;
+  transition: opacity var(--dur-panel) var(--ease-out);
+}
+.bar-pair.is-dim {
+  opacity: 0.4;
+}
+.bar-pair:focus-visible .bar-hit {
+  stroke: var(--brass);
+  stroke-width: 1;
+}
+.bar-hit {
+  fill: transparent;
+}
+.bar-value {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.bar-value-rev {
+  fill: var(--ivory);
+}
+.bar-value-inc {
+  fill: var(--brass-light);
+}
+.barchart-hint {
+  color: var(--ivory-dim);
+}
+.barchart-legend .barchart-hint::before {
+  display: none;
+}
+.bar-rev {
+  fill: var(--ivory);
+}
+.bar-inc {
+  fill: var(--brass-light);
+}
+.bar-loss {
+  fill: var(--oxblood);
+}
+.barchart-labels {
+  display: flex;
+  justify-content: space-around;
+  font-size: var(--text-12);
+  color: var(--ivory-dim);
+}
+.barchart-legend {
+  display: flex;
+  gap: var(--space-4);
+  justify-content: center;
+  font-size: var(--text-12);
+  margin-top: var(--space-2);
+  color: var(--ivory-dim);
+}
+.barchart-legend span::before {
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 6px;
+  vertical-align: -1px;
+  border-radius: 2px;
+}
+.lg-rev::before {
+  background: var(--ivory);
+}
+.lg-inc::before {
+  background: var(--brass-light);
+}
+
+.medallion {
+  flex: none;
+  display: block;
+}
+.medallion-text {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 11px;
+}
+
+/* ─── Line chart (ART_DIRECTION §5: 1.5 px strokes, dotted "now") ─────── */
+.linechart svg {
+  width: 100%;
+  height: 140px;
+  display: block;
+  overflow: visible;
+}
+.linechart-axis {
+  stroke: var(--hairline);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.linechart-now {
+  stroke: var(--brass);
+  stroke-width: 1;
+  stroke-dasharray: 2 3;
+  vector-effect: non-scaling-stroke;
+}
+.linechart-line {
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+.linechart-ivory {
+  stroke: var(--ivory);
+}
+.linechart-brass {
+  stroke: var(--brass-light);
+}
+.linechart-jade {
+  stroke: var(--jade);
+}
+.linechart-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--text-12);
+  color: var(--ivory-dim);
+  margin-top: var(--space-1);
+}
+.linechart-legend {
+  display: flex;
+  gap: var(--space-4);
+  justify-content: center;
+  font-size: var(--text-12);
+  margin-top: var(--space-2);
+  color: var(--ivory-dim);
+}
+.lg-line::before {
+  content: '';
+  display: inline-block;
+  width: 14px;
+  height: 2px;
+  margin-right: 6px;
+  vertical-align: 3px;
+}
+.lg-line-ivory::before {
+  background: var(--ivory);
+}
+.lg-line-brass::before {
+  background: var(--brass-light);
+}
+.lg-line-jade::before {
+  background: var(--jade);
+}

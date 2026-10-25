@@ -2,9 +2,8 @@
 // into an advanced disclosure.
 import { START_DATE } from '../../config/balance';
 import { CITIES } from '../../data/cities';
-import { Card, Medallion, Row } from '../components';
+import { Card, Medallion, Row, Portrait } from '../components';
 import { gameDate } from '../format/format';
-import { FounderPortrait } from './AvatarPicker';
 import { CURRENCY_NAME, DIFFICULTY_LABEL, cashLabel } from './choices';
 import { randomSeed, type Draft } from './draft';
 
@@ -20,7 +19,7 @@ export function StepConfirm(p: { draft: Draft; patch: (d: Partial<Draft>) => voi
             <div class="summary-name">{draft.bankName.trim()}</div>
             <div class="small muted">Founded by {draft.founderName.trim()}</div>
           </div>
-          <FounderPortrait avatar={draft.avatar} size={48} />
+          <Portrait avatar={draft.avatar} size={48} />
         </div>
         <Row label="Start city" value={city.name} />
         <Row label="Rival banks" value={draft.competitors} />

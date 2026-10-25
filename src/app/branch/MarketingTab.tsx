@@ -6,6 +6,7 @@ import { campaignEffects } from '../../sim/branch/marketing';
 import * as cmd from '../../sim/commands';
 import type { Branch } from '../../sim/state';
 import { Card, Row } from '../components';
+import { SpotArt } from '../components/SpotArt';
 import { money } from '../format/format';
 import { act, useGame } from '../store';
 import { campaignCostText } from './selectors';
@@ -50,7 +51,10 @@ function CampaignCard({ branch, spec }: { branch: Branch; spec: CampaignSpec }) 
   const options = ['Off', ...spec.levels.map((l) => l.label)];
   return (
     <Card class={`br-campaign${active ? ' is-on' : ''}`}>
-      <div class="br-campaign-name">{spec.name}</div>
+      <div class="br-campaign-head">
+        <SpotArt group="campaign" id={spec.id} size={40} />
+        <div class="br-campaign-name">{spec.name}</div>
+      </div>
       <div class="br-levels" role="radiogroup" aria-label={`${spec.name} level`}>
         {options.map((label, i) => (
           <button

@@ -22,6 +22,7 @@ import { money, moneyFull, pct } from '../format/format';
 import { LayerMedallion } from '../map/LayerIcon';
 import { act, closePanel, toast, useGame } from '../store';
 import './personal.css';
+import { VacationHomeArt } from './VacationHomeArt';
 
 export function VacationHomePanel(p: { siteId: string }) {
   const s = useGame();
@@ -42,6 +43,7 @@ export function VacationHomePanel(p: { siteId: string }) {
       icon={<LayerMedallion id="realEstate" size={32} />}
       onClose={closePanel}
       advisor={{ text: 'A place to get away from it all — bought with your own money.' }}
+      hero={<VacationHomeArt rebuilt={(home?.rebuilds ?? 0) > 0} />}
     >
       <div class="stack">
         <Card>

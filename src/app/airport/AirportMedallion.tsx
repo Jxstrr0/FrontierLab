@@ -2,11 +2,11 @@
 // a navy coin with a brass rim, a dotted flight arc and an engraved plane, so
 // the landmark reads apart from the central bank's dome and the ivory type
 // medallions. The plane glyph (24 px grid, 1.5 px stroke) also flies in the
-// flight overlay and marks the Travel sheet.
+// flight overlay and marks the Travel sheet; it lives in the shared icon set.
+import { ICON_PATHS } from '../../art/icons';
 
 /** Plane seen from above, nose to the right (rotate it to its heading). */
-export const PLANE_PATH =
-  'M21 12c0-.8-.7-1.3-1.5-1.3H14.6L10.4 4H8.6l2.2 6.7H6.1L4.4 8.6H3l1 3.4-1 3.4h1.4l1.7-2.1h4.7L8.6 20h1.8l4.2-6.7h4.9c.8 0 1.5-.5 1.5-1.3z';
+export const PLANE_PATH = ICON_PATHS.plane;
 
 export function PlaneIcon(p: { size?: number; filled?: boolean }) {
   const size = p.size ?? 24;

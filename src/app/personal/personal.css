@@ -1,10 +1,10 @@
 /* Personal empire screens (SCREENS §19, §23): Personal Wealth, vacation homes
-   and car dealers. Donut layout comes from investment/investment.css. */
+   and car dealers. Donut layout comes from components/visuals.css. */
 .inv-slice-cash {
-  --slice: var(--jade);
+  --slice: var(--donut-teal);
 }
 .inv-slice-others {
-  --slice: #7b93b8;
+  --slice: var(--donut-blue);
 }
 
 .pw-profile {

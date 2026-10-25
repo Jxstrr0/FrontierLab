@@ -1,8 +1,11 @@
 // HQ floor hero (ART_DIRECTION §3, "HQ floors"): an engraved isometric
-// cut-away office. Desks and people reflect actual staffing, so an
-// understaffed floor shows empty desks at a glance; people are tinted by the
-// team's mood (jade / brass / oxblood). Line art on the vault background.
+// cut-away office in the city ink on ivory. Desks and people reflect actual
+// staffing, so an understaffed floor shows empty desks (dashed, chair pushed
+// in) at a glance; people are tinted by the team's mood (jade / brass /
+// oxblood). Walls and floor are hatched like the other vignettes.
+import { shade } from '../../art/engrave';
 import type { DeptId } from '../../sim/state';
+import { Vignette } from '../components';
 import { useGame } from '../store';
 import { deskPicture } from './deptSelectors';
 
@@ -65,27 +68,36 @@ export function OfficeInterior(p: { dept: DeptId }) {
       : `Office floor: ${pic.staff} of ${pic.desks} desks filled${pic.desks > pic.shown ? ' (drawn to scale)' : ''}`;
 
   return (
-    <svg class="hq-interior" viewBox={`0 0 ${G.w} ${G.h}`} role="img" aria-label={label}>
-      <rect x="0" y="0" width={G.w} height={G.h} class="art-ground" />
+    <Vignette label={label} bare class="hq-interior">
       {/* Cut-away room: floor and the two back walls with windows. */}
       <path d={path(floor)} class="hq-floor" />
+      <path d={shade(floor, 'light', -26.6)} class="art-hatch" />
       <path d={path([back, rightBack, up(rightBack), up(back)])} class="hq-wall" />
-      <path d={path([back, leftFront, up(leftFront), up(back)])} class="hq-wall hq-wall-shade" />
+      <path d={path([back, leftFront, up(leftFront), up(back)])} class="hq-wall" />
+      <path d={shade([back, leftFront, up(leftFront), up(back)], 'medium', 90)} class="art-hatch" />
       {windows(back, rightBack, Math.max(3, cols - 2)).map((d) => (
-        <path d={d} class="art-line" />
+        <g>
+          <path d={d} class="art-paper" />
+          <path d={d} class="art-tint" />
+          <path d={d} class="art-line" />
+        </g>
       ))}
       {windows(back, leftFront, Math.max(2, rows)).map((d) => (
-        <path d={d} class="art-line" />
+        <g>
+          <path d={d} class="art-paper" />
+          <path d={d} class="art-tint" />
+          <path d={d} class="art-line" />
+        </g>
       ))}
       {desks.map(({ i, j, k }) => (
         <Desk at={c(i, j)} taken={k < pic.filled} mood={pic.mood} />
       ))}
       {pic.desks > 0 && (
-        <text x="10" y={G.h - 8} class="hq-interior-caption">
+        <text x="12" y={G.h - 8} class="hq-interior-caption">
           {pic.staff} of {pic.desks} desks filled
         </text>
       )}
-    </svg>
+    </Vignette>
   );
 }
 
@@ -101,11 +113,13 @@ function Desk(p: { at: Pt; taken: boolean; mood: 'good' | 'warn' | 'bad' }) {
   ] as Pt[];
   return (
     <g class={p.taken ? 'hq-desk is-taken' : 'hq-desk'}>
-      {p.taken && (
+      {p.taken ? (
         <g class={`hq-person hq-mood-${p.mood}`}>
-          <circle cx={x - 1} cy={y - 17} r="2.6" />
+          <circle cx={x - 1} cy={y - 17} r="2.6" class="hq-head" />
           <path d={`M${x - 5} ${y - 6}c0-5 1.5-8 4-8s4 3 4 8z`} />
         </g>
+      ) : (
+        <path d={`M${x - 6} ${y - 6}v-6l3-1.5v6`} class="hq-chair" />
       )}
       <path d={path(top)} class="hq-desk-top" />
       <path

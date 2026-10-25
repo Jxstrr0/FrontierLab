@@ -1,10 +1,18 @@
 // Shared UI components (SCREENS §0.5).
 import './components.css';
+import './visuals.css';
+import './radial.css';
 export { Badge, Card, Row, Rule, SectionTitle } from './Card';
 export { Carousel } from './Carousel';
 export { Chips } from './Chips';
+export { Donut, type DonutSlice } from './Donut';
+export { Icon } from './Icon';
+export { Portrait } from './Portrait';
+export { Face, Hatch, Vignette, cityInk } from './Vignette';
 export { Segmented, Stepper, Toggle } from './Controls';
 export { AdvisorBar, Confirm, Modal, Panel, Sheet, type Tab } from './Panel';
 export { LineChart, type LineSeries } from './LineChart';
+export { RadarRosette, type RosetteAxes } from './RadarRosette';
 export { ToastHost } from './Toasts';
 export { BarChart, CoinRating, Medallion, RingGauge, StatBar } from './Visuals';
+export { SpotArt } from './SpotArt';

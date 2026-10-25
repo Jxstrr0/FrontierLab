@@ -1,6 +1,11 @@
-// Startup vignettes (ART_DIRECTION §3, small spot illustrations): one engraved
-// line drawing per sector on an 80 × 80 plate with a double guilloche ring,
-// like the HR benefit art. Used on venture cards and the startup panel.
+// Startup art (ART_DIRECTION §3): one engraved line drawing per sector on an
+// 80 × 80 plate with a double guilloche ring, like the HR benefit art (venture
+// cards and the startup panel), and the panel hero: a converted warehouse loft
+// with the sector's plate hung as its sign.
+import { memo } from 'preact/compat';
+import { rect } from '../../art/engrave';
+import { Face, Hatch, Vignette } from '../components';
+import { SpotArt } from '../components/SpotArt';
 import './startup.css';
 
 const ART: Record<string, string> = {
@@ -54,12 +59,57 @@ const ART: Record<string, string> = {
 };
 
 export function StartupArt(p: { sector: string; size?: number }) {
-  const size = p.size ?? 64;
-  return (
-    <svg class="st-art" width={size} height={size} viewBox="0 0 80 80" aria-hidden="true">
-      <circle cx="40" cy="40" r="38" class="st-art-ring" />
-      <circle cx="40" cy="40" r="34.5" class="st-art-ring st-art-ring-fine" />
-      <path d={ART[p.sector] ?? ART.fintech} class="st-art-line" />
-    </svg>
-  );
+  return <SpotArt d={ART[p.sector] ?? ART.fintech} size={p.size ?? 64} class="st-art" />;
 }
+
+const PANES = Array.from({ length: 4 }, (_, i) => 92 + i * 34);
+
+/** The startup panel hero: a warehouse loft with big steel windows and the sector sign. */
+export const StartupLoftArt = memo(function StartupLoftArt(p: { sector: string }) {
+  return (
+    <Vignette label="A converted warehouse loft">
+      <path d="M0 132h320" class="art-line" />
+      <Face
+        pts={[
+          [236, 40],
+          [248, 34],
+          [248, 132],
+          [236, 132],
+        ]}
+        density="dense"
+      />
+      <Face pts={rect(84, 40, 152, 92)} />
+      <Hatch pts={rect(84, 40, 152, 92)} density="light" angle={0} />
+      <Face
+        pts={[
+          [80, 40],
+          [160, 22],
+          [240, 40],
+        ]}
+        density="medium"
+        angle={-30}
+      />
+      {PANES.map((x) => (
+        <g>
+          <path d={`M${x} 52h26v32h-26z`} class="art-paper" />
+          <path d={`M${x} 52h26v32h-26z`} class="art-tint" />
+          <path
+            d={`M${x} 52h26v32h-26zM${x + 13} 52v32M${x} 62.7h26M${x} 73.3h26`}
+            class="art-line art-fine"
+          />
+        </g>
+      ))}
+      <Face pts={rect(92, 96, 60, 36)} density="dense" angle={90} />
+      <path d="M92 104h60M92 112h60M92 120h60" class="art-line art-fine" />
+      <Face pts={rect(186, 100, 22, 32)} />
+      <path d="M190 104h14v14h-14z" class="art-tint" />
+      {/* The sector's plate as a hanging sign. */}
+      <path d="M236 70h22M254 70v4" class="art-line" />
+      <g transform="translate(240 74) scale(0.36)">
+        <circle cx="40" cy="40" r="38" class="art-paper" />
+        <circle cx="40" cy="40" r="38" class="art-line" style={{ strokeWidth: 3 }} />
+        <path d={ART[p.sector] ?? ART.fintech} class="art-line" style={{ strokeWidth: 3 }} />
+      </g>
+    </Vignette>
+  );
+});

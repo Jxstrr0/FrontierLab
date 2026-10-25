@@ -1,17 +1,17 @@
-/* The Daily Ledger archive (menu → The Ledger): back issues on ivory paper,
-   one tappable row per issue (ART_DIRECTION §6). */
+/* The Daily Ledger archive (menu → The Ledger): back issues on ivory paper
+   under the masthead, one tappable row per issue (ART_DIRECTION §6). */
 
 .ledger-archive {
   list-style: none;
-  margin: 0;
-  padding: 0 var(--space-4);
+  margin: var(--space-2) 0 0;
+  padding: 0;
 }
 .ledger-archive li + li {
   border-top: 1px solid var(--ink-line);
 }
 .archive-row {
   display: grid;
-  grid-template-columns: 24px 1fr;
+  grid-template-columns: 30px 1fr;
   gap: var(--space-3);
   align-items: start;
   width: 100%;
