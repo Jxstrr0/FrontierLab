@@ -16,6 +16,7 @@ import { homeCountry } from '../sim/treasury';
 import { CAPITAL_BUFFER_POLICY } from '../data/newsWorld';
 import { saveToSlot } from './saves';
 import { play } from './sound/sound';
+import { autosave } from './saves/autosave';
 import { bump, modal, peekGame, toast } from './store';
 import { MNA_BAD_EVENTS, MNA_EVENT_TEXT } from './investmentBank/mnaToasts';
 import { VENTURE_BAD_EVENTS, VENTURE_EVENT_TEXT } from './startup/ventureToasts';
@@ -120,8 +121,7 @@ function afterWeek(s: GameState): void {
     modal.value = { type: 'gameover' };
     return;
   }
-  const err = saveToSlot('auto', s);
-  if (err) toast(err, 'bad');
+  autosave(s, (err) => toast(err, 'bad'));
 
   if (s.settings.autoPauseApplications && expiringApplications(s) > 0) {
     pause('Loan applications expire this week');

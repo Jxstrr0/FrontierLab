@@ -2,7 +2,8 @@
 // content and an optional bottom tab bar. Full screen on phones, a right drawer
 // at ≥ 900px. Also the bottom Sheet and centred Modal shells.
 import type { ComponentChildren } from 'preact';
-import { useEffect, useState } from 'preact/hooks';
+import { useRef, useState } from 'preact/hooks';
+import { useDialog } from './dialog';
 
 export interface Tab<T extends string> {
   id: T;
@@ -23,9 +24,10 @@ export function Panel<T extends string>(p: {
   footer?: ComponentChildren;
   children: ComponentChildren;
 }) {
-  useEscape(p.onClose);
+  const ref = useRef<HTMLElement>(null);
+  useDialog(ref, p.onClose);
   return (
-    <section class="panel" role="dialog" aria-label={p.title}>
+    <section class="panel" role="dialog" aria-label={p.title} tabIndex={-1} ref={ref}>
       <header class="panel-header">
         {p.icon && <span class="panel-icon">{p.icon}</span>}
         <div class="panel-titles">
@@ -43,7 +45,7 @@ export function Panel<T extends string>(p: {
         </button>
       </header>
       {p.advisor && <AdvisorBar text={p.advisor.text} name={p.advisor.name} />}
-      <div class="panel-content">
+      <div class="panel-content" tabIndex={0}>
         {p.hero && <div class="panel-hero">{p.hero}</div>}
         {p.children}
       </div>
@@ -111,10 +113,18 @@ export function AdvisorBar(p: { text: string | string[]; name?: string }) {
 
 /** Bottom sheet over everything; tap the scrim to close. */
 export function Sheet(p: { title?: string; onClose: () => void; children: ComponentChildren }) {
-  useEscape(p.onClose);
+  const ref = useRef<HTMLDivElement>(null);
+  useDialog(ref, p.onClose, true);
   return (
     <div class="scrim" onClick={(e) => e.target === e.currentTarget && p.onClose()}>
-      <div class="sheet" role="dialog" aria-label={p.title}>
+      <div
+        class="sheet"
+        role="dialog"
+        aria-modal="true"
+        aria-label={p.title}
+        tabIndex={-1}
+        ref={ref}
+      >
         <div class="sheet-grip" aria-hidden="true" />
         {p.title && (
           <header class="sheet-header">
@@ -139,10 +149,18 @@ export function Modal(p: {
   footer?: ComponentChildren;
   class?: string;
 }) {
-  useEscape(p.onClose);
+  const ref = useRef<HTMLDivElement>(null);
+  useDialog(ref, p.onClose, true);
   return (
     <div class="scrim scrim-modal">
-      <div class={`modal${p.class ? ` ${p.class}` : ''}`} role="dialog" aria-label={p.title}>
+      <div
+        class={`modal${p.class ? ` ${p.class}` : ''}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label={p.title}
+        tabIndex={-1}
+        ref={ref}
+      >
         <header class="modal-header">
           {p.icon}
           <h2 class="modal-title">{p.title}</h2>
@@ -185,13 +203,4 @@ export function Confirm(p: {
       </div>
     </Sheet>
   );
-}
-
-function useEscape(fn?: () => void) {
-  useEffect(() => {
-    if (!fn) return;
-    const h = (e: KeyboardEvent) => e.key === 'Escape' && fn();
-    window.addEventListener('keydown', h);
-    return () => window.removeEventListener('keydown', h);
-  }, [fn]);
 }

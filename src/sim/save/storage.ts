@@ -44,9 +44,12 @@ function store(): Storage | null {
 
 /** Writes a game to a slot. Returns an error message, or null on success. */
 export function saveToSlot(slot: SlotId, state: GameState): string | null {
-  const ls = store();
-  if (!ls) return 'Saving is unavailable in this browser.';
-  const meta: SaveMeta = {
+  return writeSlot(slot, compressToUTF16(serialize(state)), slotMetaFor(slot, state));
+}
+
+/** The slot card record for a game as it is now. */
+export function slotMetaFor(slot: SlotId, state: GameState): SaveMeta {
+  return {
     slot,
     bankName: state.meta.bankName,
     monogram: state.meta.monogram,
@@ -56,8 +59,18 @@ export function saveToSlot(slot: SlotId, state: GameState): string | null {
     cash: state.company.cash,
     savedAt: Date.now(),
   };
+}
+
+/**
+ * Stores an already compressed save (compressToUTF16 of serialize(state)) and
+ * its card. The weekly autosave compresses off the main thread and then calls
+ * this (src/app/saves/autosave.ts). Returns an error message, or null.
+ */
+export function writeSlot(slot: SlotId, compressed: string, meta: SaveMeta): string | null {
+  const ls = store();
+  if (!ls) return 'Saving is unavailable in this browser.';
   try {
-    ls.setItem(dataKey(slot), compressToUTF16(serialize(state)));
+    ls.setItem(dataKey(slot), compressed);
     ls.setItem(metaKey(slot), JSON.stringify(meta));
     return null;
   } catch {
