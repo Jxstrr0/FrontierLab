@@ -10,6 +10,13 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-10-25 — Quarterly pay reviews (v0.10.8)
+- **Owner's ask:** the COO's Pay reviews should run every quarter, not once a year.
+- **What changed.** `PAY_REVIEW.everyWeeks` is now 13 (was 52). With the switch on, every executive and branch manager is reset to market pay plus your premium four times a year, so pay tracks the market more closely and rarely drifts into the "underpaid" poaching zone. It still also runs at once when you switch it on or change the premium. The wording on the COO card, the pay policy note and the manager card now says "once a quarter".
+- **Existing saves:** no shape change, so no migration; the next review comes 13 weeks after the last one.
+- **Balance:** the 10-year steady run stays inside every target. Determinism snapshot unchanged (the scripted run doesn't use Pay reviews).
+- **Tests:** 726 pass. Lint, typecheck and build clean.
+
 ### 2026-10-25 — Pay to reroll manager and executive candidates (v0.10.7)
 - **Owner's ask:** a paid reroll for branch manager and C-suite applications.
 - **How it works.** Both hire sheets end with a "New candidates · $fee" button. A recruiter deals a fresh list for 10% of the role's market pay (about $7,100 for a Calgary manager, about $17,600 for a first executive). Each further reroll before the free refresh doubles the fee. The free list every 4 weeks still comes on time and resets the fee. Executive rerolls only touch the seat you're hiring for.

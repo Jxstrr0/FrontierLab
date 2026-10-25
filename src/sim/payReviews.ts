@@ -2,7 +2,7 @@
 // a market pay that rises with their years at the bank, and a rival may poach
 // one each week, more often when they're underpaid and less when well paid.
 // The COO's Pay reviews delegation sets every executive and branch manager to
-// market × (1 + your pay premium) once a year, so pay keeps up with the market.
+// market × (1 + your pay premium) once a quarter, so pay keeps up with the market.
 import {
   EXEC_PAY,
   MANAGER_BASE_SALARY,

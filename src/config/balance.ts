@@ -1489,7 +1489,7 @@ export const GUIDANCE = {
  * premiumRange in premiumStep steps, so pay rises with the market.
  */
 export const PAY_REVIEW = {
-  everyWeeks: 52,
+  everyWeeks: 13,
   premiumRange: [-0.1, 0.3] as [number, number],
   premiumStep: 0.05,
   defaultPremium: 0.05,

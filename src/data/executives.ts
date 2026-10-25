@@ -57,7 +57,7 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
         id: 'payReviews',
         label: 'Pay reviews',
         description:
-          'Once a year sets every executive and branch manager to market pay plus your pay premium, so pay keeps rising with the market and rivals struggle to poach them.',
+          'Once a quarter sets every executive and branch manager to market pay plus your pay premium, so pay keeps rising with the market and rivals struggle to poach them.',
       },
     ],
   },
