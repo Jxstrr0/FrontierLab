@@ -21,7 +21,7 @@ import { initRivalBench, initRivalFinancials, seedMatureBooks } from '../rivals'
 import { FX_START_INDEX, PAY_REVIEW } from '../../config/balance';
 import { COUNTRIES } from '../../data/countries';
 import type { CountryId } from '../../data/types';
-import { SCHEMA_VERSION, type ExecSeat, type GameState } from '../state';
+import { SCHEMA_VERSION, type BranchGuidance, type ExecSeat, type GameState } from '../state';
 
 type RawSave = Record<string, unknown> & { schemaVersion: number };
 
@@ -281,7 +281,7 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
   // default for hires.
   14: (s) => {
     const state = s as unknown as GameState;
-    state.company.guidance ??= { deposits: 0, loans: 0 };
+    state.company.guidance ??= { deposits: 0, loans: 0 } as BranchGuidance;
     const ex = state.executives;
     ex.payPremium ??= PAY_REVIEW.defaultPremium;
     ex.lastPayReviewWeek ??= -1;
@@ -318,6 +318,25 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     const state = s as unknown as GameState;
     state.people.rerolls ??= {};
     state.executives.rerolls ??= {};
+    return s;
+  },
+  // v18: branch guidance from the COO (staffing), CMO (marketing) and CPO
+  // (products). Like v15, seated executives start with the switches off and
+  // waiting candidates with them on.
+  17: (s) => {
+    const state = s as unknown as GameState;
+    const g = (state.company.guidance ??= { deposits: 0, loans: 0 } as BranchGuidance);
+    g.staffing ??= 0;
+    g.marketing ??= 0;
+    g.products ??= 0;
+    const ex = state.executives;
+    for (const seat of ['coo', 'cmo', 'cpo'] as ExecSeat[]) {
+      const exec = ex.seats[seat];
+      if (exec) exec.delegations.guidance ??= false;
+      const mem = ex.remembered[seat];
+      if (mem) mem.guidance ??= false;
+      for (const c of ex.candidates[seat] ?? []) c.delegations.guidance ??= true;
+    }
     return s;
   },
 };

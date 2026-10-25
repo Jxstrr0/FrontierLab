@@ -53,7 +53,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState, DealerDeal } from './personalTypes';
 
-export const SCHEMA_VERSION = 17;
+export const SCHEMA_VERSION = 18;
 
 export interface GameState {
   schemaVersion: number;
@@ -365,16 +365,24 @@ export interface Company {
   /** The fit-out you last built with (schema v14): the build sheet and the COO start from it. */
   lastBuild?: BuildSpec;
   /**
-   * Branch guidance from the CFO and CRO (schema v15, §17.2): whole steps that
-   * move delegated managers' deposit and loan pricing and Loan Desk approvals.
+   * Branch guidance from the C-suite (schema v15, §17.2): whole steps that move
+   * delegated managers' pricing, Loan Desk approvals, wages, marketing and
+   * lineup. Staffing, marketing and products joined in schema v18.
    */
   guidance: BranchGuidance;
 }
 
-/** Positive deposits pays savers more; positive loans charges borrowers more and approves less. */
+/**
+ * Positive deposits pays savers more; positive loans charges borrowers more and
+ * approves less; positive staffing pays and staffs more; positive marketing
+ * spends more on campaigns; positive products offers more and charges less.
+ */
 export interface BranchGuidance {
   deposits: number;
   loans: number;
+  staffing: number;
+  marketing: number;
+  products: number;
 }
 
 export interface FixedAsset {

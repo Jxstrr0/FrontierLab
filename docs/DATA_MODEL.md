@@ -325,7 +325,7 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 | Personal | `offerHome`, `rebuildHome`, `sellHome`, `buyCar`, `sellCar`, `placeBid`, `clearBid`, `appraiseCollectible`, `consignCollectible`, `withdrawConsignment`, `buyJet`, `sellJet`, `buyClub`, `sellClub`, `setKit`, `setKitSponsor`, `signPlayer`, `releasePlayer` |
 | Settings and saves | `setSettings`, `setFounderAvatar`; saves are not commands: `saveToSlot`, `loadFromSlot` (`src/sim/save/storage.ts`), `exportCode`, `importCode` (`serialize.ts`) |
 
-## 12. Implemented so far (schema v17)
+## 12. Implemented so far (schema v18)
 
 `src/sim/state.ts` is the source of truth; this section records how it differs from the guide above. Later stages add the rest with a schema bump and a migration.
 
@@ -343,6 +343,7 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 - **Schema v15 adds:** `company.guidance` (`{ deposits, loans }`, whole steps of the CFO and CRO's branch guidance), `executives.payPremium` (the COO's pay premium over market, default 0.05) and `executives.lastPayReviewWeek` (−1 before the first), plus the delegations `cfo.guidance`, `cro.guidance` and `coo.payReviews`. Migration 14 → 15 fills the fields and adds the new switches off for seated executives and remembered toggles (so nothing changes until you flip one) and on for waiting candidates. The RNG gains a `managerPoach` stream when first used.
 - **Schema v16 adds** Russia (`RU`) and its cities Moscow and St Petersburg. `world.countries.RU` and `fx.level.RU`/`fx.history.RU` join the per-country records; Russia draws its cycle and currency from its own `macro:RU` and `fx:RU` streams (`CountrySpec.ownStream`). `CitySpec.density` (optional, data only) scales a city's foot traffic and customer pool. Migration 15 → 16 initialises Russia's economy (`initCountries`) and starts the ruble at the index start.
 - **Schema v17 adds** `people.rerolls` (city id → paid manager rerolls since that pool's free refresh) and `executives.rerolls` (seat → paid rerolls since the pools' free refresh). Migration 16 → 17 starts both empty.
+- **Schema v18 adds** `company.guidance.staffing`, `.marketing` and `.products` (the COO's, CMO's and CPO's branch guidance steps) and a `guidance` delegation on those three seats. Migration 17 → 18 starts the steps at 0 and the switches off for seated executives and remembered toggles (on for waiting candidates).
 - **Not yet present:** nothing from the v1 plan.
 - **Added fields:**
   - `ledger`: P&L lines and cash movements since the last weekly close, so commands between ticks land in the right week.

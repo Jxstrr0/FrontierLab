@@ -299,6 +299,7 @@ Tabs: Overview · Loans · Credit.
 - delegation toggles for the role
 - COO only: **Pay premium over market** stepper (−10% to +30%, "Market" at 0) for the Pay reviews delegation, with when the last review ran
 - CFO and CRO: **Branch guidance now**: the deposit and loan rate offsets and how much stricter or looser approvals are, noting which switch is off
+- COO, CMO and CPO: **Branch guidance now**: the COO's wage and headcount change, the CMO's campaign push, or the CPO's fee change and whether the lineup is wider or narrower, noting when the switch is off
 - COO only: **Growth cities**: every city you have visited, home first, each with a switch (may the Expansion delegation build here) and an **Open now** button that has the COO build their usual pick at once; the hint under each city shows the next storefront and its cost, or why nothing can be built there
 - annual salary stepper
 - grants list: type, shares, strike, vesting progress

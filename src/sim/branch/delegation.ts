@@ -26,7 +26,12 @@ import { managerOf, marketWage, staffNeeded } from './staff';
 import { difficultyOf } from '../difficulty';
 import { dpow } from '../detmath';
 import { allProducts, baseId } from '../products';
-import { guidanceRateOffset } from '../branchGuidance';
+import {
+  guidanceMarketingMult,
+  guidanceProducts,
+  guidanceRateOffset,
+  guidanceStaffing,
+} from '../branchGuidance';
 
 /** Campaigns a delegated manager weighs by awareness return. */
 const AWARENESS_CAMPAIGNS = [
@@ -43,10 +48,15 @@ export function runDelegation(state: GameState, branch: Branch): void {
   if (!mgr) return;
   if (branch.delegation.staffing) {
     const [lo, hi] = DELEGATE.staffWait;
-    branch.staff.target = Math.ceil(staffNeeded(branch) * clamp(branch.waitIndex, lo, hi));
+    // §17.2 branch guidance: the COO's step lifts (or trims) wages and headcount.
+    const coo = guidanceStaffing(state);
+    branch.staff.target = Math.ceil(
+      staffNeeded(branch) * clamp(branch.waitIndex, lo, hi) * coo.staff,
+    );
     branch.staff.wage = roundToStep(
       marketWage(branch.cityId) *
-        (DELEGATE.wageBase + (DELEGATE.wageSlope * mgr.skills.people) / 100),
+        (DELEGATE.wageBase + (DELEGATE.wageSlope * mgr.skills.people) / 100) *
+        coo.wage,
       WAGE_STEP,
     );
   }
@@ -72,7 +82,8 @@ export function delegatedPrice(
   const offset = DELEGATE.rateOffsetComp * RATE_COMP_STEP;
   let price: number;
   if (spec.priceType !== 'rate') {
-    price = m * DELEGATE.feeDiscount;
+    // §17.2 branch guidance: the CPO's step cuts (or raises) fees.
+    price = m * DELEGATE.feeDiscount * guidanceProducts(state).fee;
   } else {
     const ftp = ftpFor(spec, c);
     const def = defaultPrice(spec, c);
@@ -100,9 +111,11 @@ export function delegatedPrice(
 function delegatePricing(state: GameState, branch: Branch, productSkill: number): void {
   const offices = EQUIPMENT[branch.build.lobby]?.advisorOffices ?? 0;
   const boxes = EQUIPMENT[branch.build.vault]?.boxes ?? 0;
+  // §17.2 branch guidance: the CPO's step lowers (or raises) the bar for a product.
+  const bar = DELEGATE.minAffinity * guidanceProducts(state).affinity;
   for (const spec of allProducts(state)) {
     const slot = (branch.offered[spec.id] ??= { on: false, price: 0 });
-    let on = spec.kind === 'sbl' || lotAffinity(state, branch, spec.id) >= DELEGATE.minAffinity;
+    let on = spec.kind === 'sbl' || lotAffinity(state, branch, spec.id) >= bar;
     if (spec.kind === 'wealth' && offices === 0) on = false;
     if (spec.kind === 'safebox' && boxes === 0) on = false;
     slot.on = on;
@@ -137,6 +150,8 @@ function delegateMarketing(state: GameState, branch: Branch): void {
     cityRoom(state, branch.cityId);
   const share = branch.last.share;
   const H = DELEGATE.marketingHorizon;
+  // §17.2 branch guidance: the CMO's step makes awareness worth more (or less).
+  const cmo = guidanceMarketingMult(state);
   const steady = (g: number) => (g * mult) / (AWARENESS_DECAY + g * mult);
 
   let chosenGain = 0;
@@ -150,7 +165,7 @@ function delegateMarketing(state: GameState, branch: Branch): void {
       const da = steady(chosenGain + (level.awareness ?? 0)) - steady(chosenGain);
       const extraCustomersPerWeek = prospectsPerAwareness * da * share;
       // A customer won mid-horizon earns for half of it on average.
-      const value = extraCustomersPerWeek * perCustomer * H * (H / 2);
+      const value = extraCustomersPerWeek * perCustomer * H * (H / 2) * cmo;
       const net = value - level.cost.amount * H;
       if (net > bestNet) {
         bestNet = net;

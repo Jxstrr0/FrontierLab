@@ -4,11 +4,23 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 **Current stage:** 10 — Art pass, onboarding, polish, launch (built and live; awaiting the owner's iPhone check). All ten roadmap stages are built. Still open: the owner's testing and tuning pass, an Add to Home Screen test on a real iPhone, and the Vault Street card on Kelbo.Website (in a separate session in that repo).
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `06e4a3cf5f24d3` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `03b9402390e27e` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-25 — Branch guidance from the COO, CMO and CPO (v0.10.9)
+- **Owner's ask:** give the other C-suite seats a branch guidance delegation where it fits how they work, so managers stay independent and their skill still matters, but they get helpful steering from above.
+- **COO, Branch guidance: staffing.** Every 4 weeks it looks at staff morale in branches whose manager runs staffing. Below 65 it tells managers to pay up to 6% more and staff up to 15% more; above 82 it lets them trim. The manager's People skill still sets their base wage.
+- **CMO, Branch guidance: marketing.** It watches brand awareness in the cities where managers run marketing. Under 40% it pushes them to value campaigns up to 60% more, so they buy more of them; above 60% they ease off. Managers still pick which campaigns pay.
+- **CPO, Branch guidance: lineup.** It watches the products rating where managers run products. Under 3★ it has them cut fees (up to 9%) and carry more products; at 4★ or better they charge a little more. Product skill still decides how close each manager prices.
+- **The CTO gets none.** Digital projects are HQ work with no branch decision to steer.
+- **Each profile shows what its executive is telling managers right now**, like the CFO's and CRO's note already did.
+- **Tried in a live game:** a year with one delegated branch, switches on vs off. Morale ended at 40 vs 33, revenue about 3% higher, and the balance sheet stayed balanced throughout.
+- **Existing saves:** schema v18 (migration 17 → 18). Executives already in a seat start with the new switch off, so nothing changes until you turn it on. New hires come with it on.
+- **Balance:** the 10-year runs (steady, aggressive and turtle) stay inside every target; those scripted runs don't hire executives. The determinism snapshot moved `06e4a3cf5f24d3` → `03b9402390e27e` only because the save gained the new fields; with them removed the hash matches the old one exactly.
+- **Tests:** 731 (each new part moving up and down with its reading and changing the manager's wages, prices or campaign value; switching off; no reading with no delegated branch; migration 17 → 18).
 
 ### 2026-10-25 — Quarterly pay reviews (v0.10.8)
 - **Owner's ask:** the COO's Pay reviews should run every quarter, not once a year.
