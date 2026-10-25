@@ -10,6 +10,41 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-10-25 — Clearer map icons and a look of its own for every city
+- **Stage / step:** post-launch polish (owner request: "unique icon visual clarity, easier to determine what's what" and "each city more unique and detailed", plus "maybe adding some unique colour to the icons")
+- **Done:**
+  - **Map pins have a shape language.** A shield (crest) is a bank: yours filled with your colour, rivals in theirs, head offices with a small crown. A small "$" coin is an open branch location. A round medallion is a place you deal with. A price tag is something to rent or buy. A larger scalloped seal is a landmark (central bank, airport, stadium).
+  - **Every type of place has its own colour.** For example, credit bureaus are teal, marketing agencies vermilion, lobbying firms plum and auction houses red, and so on for all 15 types. The same colour marks that type on the map, in the Layers sheet and in panel headers. Contrast is tested.
+  - **Bolder, distinct icons.** Look-alike glyphs were redrawn: the credit bureau is a score dial, the lobbying firm a podium, the convention a lanyard badge, and vacation homes a palm on an island.
+  - **Clusters say what's inside.** At the far zoom only similar things group together. A group shows a small stack of the real pins with a count, and open locations shrink to a quiet "$ ×3". The old carpet of identical navy number circles is gone.
+  - **Captions and a legend.** Zoom in close and places are labelled ("Credit bureau"), with rival branches showing the bank's name. The Layers sheet opens with a key to the five shapes, and each row shows the pins it toggles.
+  - **Every city has its own geography:**
+    - **Water:** rivers with arched bridges (London, Paris, Calgary, Saskatoon, Montréal, Frankfurt), New York between two rivers, lakes (Toronto, Chicago, Zürich), harbours (Vancouver, Sydney, Hong Kong), bays (San Francisco, Singapore), Amsterdam's canal rings and Tokyo's islands. Boats and piers sit on open water.
+    - **Layout:** each city arranges its districts differently, and New York and Montréal get a big central park.
+    - **Streets:** tree-lined avenues and plazas with fountains.
+  - **Every city has its own architecture:**
+    - **14 local styles,** for example London's brick terraces with chimney stacks, Paris's mansard blocks with dormers, Amsterdam's gabled canal houses, Frankfurt's half-timbered rows and Tokyo's dense small houses and pencil towers. Each style comes with its own suburban houses, towers and trees.
+    - **18 signature landmarks,** all generic shapes with no real names: a giant wheel, an iron lattice tower, a tall broadcast tower, a shell-roofed harbour hall, suspension-bridge towers, a red-and-white lattice mast, and more.
+    - **A pale second ink per city,** like a banknote's underprint, on roofs, lawns and trees. Parks get paths with a fountain, pond, bandstand or statue.
+  - **Your saves are safe.** Cities you've already played keep their exact map, so no branch moves (save format version 11). New games, and cities you first fly to from now on, use the new looks.
+- **How it was built:** three engineers in parallel (pins, geography, architecture), merged and checked together.
+- **Checks:**
+  - tsc, eslint, prettier, 641 tests and the build all pass.
+  - Screenshots at 390×844 of all 18 cities and the 3 regional sites show no console errors.
+  - **Determinism:** the snapshot changed on purpose, from `18c44acb4c1d33` to `078a7f43a079dc`, because lots sit on the new layouts. Layout-1 maps are checked against fingerprints recorded before the change, and a real v10 save migrates with its cities unchanged.
+  - **Balance:** turtle, aggressive and stress pass all targets, and the 20-city median passes every first-branch target. Steady seed 42 passes everything except week-260 first-branch revenue: $151.0k against a $150k ceiling, a slightly lucky single city. Per the earlier decision, the 20-city median is the judge, so no numbers changed.
+- **Performance:**
+  - Pin updates per frame are unchanged (under 1 ms on average).
+  - The richer buildings take about 20–30% longer to paint for New York and London, and about 40% longer for Tokyo's dense houses. Painting is still spread across frames within the 6 ms budget, so panning stays smooth, but a fresh view fills in a little more slowly.
+- **Dependencies:** none added.
+- **Known issues:**
+  - Amsterdam's narrow canals, and Saskatoon's and Frankfurt's rivers, are subtle at the start zoom.
+  - The three "glass" cities (Vancouver, Toronto, Hong Kong) share building fabric; only the skyline, water and landmark tell them apart.
+  - The Chicago twin-mast tower is the least distinctive landmark at the far zoom, and the Amsterdam station can read as a church.
+  - Two neighbouring "For lease" tags can still overlap at zoom 1.
+  - Steady seed 42 is $1k over one ceiling (see Balance).
+  - Add to Home Screen still needs a test on a real iPhone.
+
 ### 2026-10-25 — Stage 10 known issues fixed
 - **Stage / step:** 10 — polish after launch
 - **Done:**

@@ -71,7 +71,7 @@ Spend the boldness on the map and the illustrations, the way a banknote's engrav
 - **Linework:**
   - every building outline in the city ink, 1.25 px at zoom 1
   - faces shaded with 45° hatching at three densities: light for faces toward the light, medium, and dense
-  - no flat fills except the paper and the water tint
+  - no flat fills except the paper, the water tint and the city's tint underprint (§2.1)
 - **Procedural buildings** (`src/art/buildings.ts`), by district:
 
   | District | Buildings |
@@ -89,18 +89,34 @@ Spend the boldness on the map and the illustrations, the way a banknote's engrav
 - **Parks:** stipple dots plus lollipop trees drawn with spiral strokes.
 - **Streets:** paper-coloured, with dashed centrelines in the ink at 30%.
 - **Your branches** add a small brand-ink flag on the roof.
-- **Pins** (DOM): 30 px medallions with a brass rim and an engraved inner ring.
-  - Inside: a type icon (24 px grid).
-  - Yours: filled with your brand ink plus your monogram.
-  - Rivals: an ivory fill with their ink ring and monogram.
-  - Open branch locations: a blank ivory medallion with a plain "$" in ink, drawn at 80% so branches stand out (half size at the far zoom).
-  - For lease (buildings you rent, such as office buildings): a rectangular ivory tag with a brass outline, the building's type icon and "For lease".
+- **Pins** (DOM; SCREENS §2). Silhouette first, then colour, then glyph, so a pin reads at a glance and without relying on hue:
+  - **Crest** (shield): banks. Yours filled with your brand ink and monogram; rivals ivory with their ink ring and monogram; head offices add a brass crown.
+  - **Coin**: open branch locations. A small ivory "$" coin with a milled edge (half size at the far zoom).
+  - **Medallion**: places. A round coin filled with the type's own ink (`--type-*` tokens in tokens.css: oxblood, vermilion, teal, cobalt, plum, magenta, forest …) with an ivory glyph. Every glyph and caption on its ink reaches 4.5:1 (tested).
+  - **Price tag**: things you rent or buy. A pointed tag with a punched hole: offices in light brass with dark ink ("For lease"), buildings and vacation homes in their type ink.
+  - **Seal**: landmarks (central bank, airport, stadium). 40 px, scalloped.
+  - The same per-type ink marks that type everywhere it appears: map pins, the Layers legend and panel headers.
+  - Stacking, bottom to top: coins, tags, places and rivals, landmarks, yours.
 - **Performance:**
   - Split the map into square screen-space chunks, 256 CSS px at each zoom stop, rendered once to an offscreen canvas at stop × devicePixelRatio. Each chunk draws every tile whose art touches it, back to front, so buildings overlap correctly across chunk edges.
   - In-between zooms scale the nearest stop's chunks; missing chunks show a scaled copy from another stop (or paper) and are painted about 6 ms per frame, nearest the centre first.
   - Keep at most 40 M px of chunks (least recently used goes first) to stay inside iOS Safari's canvas memory. A building change repaints only the chunks it touches.
   - Cull off-screen chunks.
   - Pins use `transform: translate3d`.
+
+### 2.1 City looks
+
+Every city has its own look (`src/data/cityLooks.ts`), so no two maps read alike:
+
+- **Water** (`water`): none, coast, river, twin rivers, bay, lake, harbour, canals or islands. The shape is defined once and turned and mirrored with the city's district arrangement, so the waterfront always hugs the shore. Narrow water crossed by a street gets an arched **bridge** (deck, railings, piers); wide water gets piers and boats.
+- **District arrangement** (`arrange`): the default district centres turned 0–3 quarter turns and optionally mirrored, then fitted to the land (waterfront 4 tiles in from the shore).
+- **Big park** (`bigPark`): New York and Montréal get a park of 2×2 or 2×3 blocks between the financial district and the university.
+- **Skyline** (`skyline`): scales the storeys of financial and downtown filler buildings.
+- **Local style** (`style`): one of 14 vernaculars (prairie, glass, brick, painted, coastal, terrace, mansard, timber, canal, alpine, dense, colonial, tropical, outback). It changes rooflines (gables, mansards, stepped and bell gables, flat roofs with tanks), proportions, facade marks (chimney stacks, bay windows, fire escapes, shutters, verandahs, half-timbering, arcades), suburban houses, towers, industry and trees. Rows on neighbouring tiles join into continuous terraces around a court.
+- **Signature landmark** (`signature`): one engraved one-of-a-kind building per city, described generically (a giant observation wheel, an iron lattice tower, a tall broadcast tower, a shell-roofed harbour hall …), never by a real name. Drawn with heavier lines so it reads at zoom 0.5. Water's-edge kinds sit on the block with the most open water beside them. Heights per kind are `SIGNATURE_HEIGHT_PX`.
+- **Tint underprint** (`tint`): a pale second ink, like a banknote's underprint. Roof slopes get hatching over tinted paper, flat roofs a tinted fill, and lawns, yards and tree crowns a see-through wash. It stays restrained (about a third of the way from paper to tint) so the map still reads as an engraving.
+- **Street life:** tree-lined avenues, plazas with fountains, and park furniture (paths, a fountain, pond, bandstand or statue in the middle of each park block).
+- **Old saves:** cities generated before this change keep their original map (layout 1, see DATA_MODEL `CityState.layout`); new games and cities first visited later use these looks (layout 2).
 
 ## 3. Vignettes (panel hero art)
 
@@ -150,7 +166,8 @@ Spend the boldness on the map and the illustrations, the way a banknote's engrav
 
 ## 7. Icons
 
-- **Style:** custom set on a 24 px grid, 1.5 px stroke, rounded caps and joins. Drawn in brass on navy and ink on ivory.
+- **Style:** custom set on a 24 px grid, 1.5 px stroke, rounded caps and joins. Drawn in brass on navy and ink on ivory, and ivory on the type inks in map pins (§2).
+- **Distinct at a glance:** no two glyphs share a silhouette at 20 px (credit bureau = score dial, lobbying firm = podium with microphone, convention = lanyard badge, vacation home = palm on an island).
 - **Starter list:** branch, office, real estate, bureau, bank, investment bank, agency, convention, lobby, stadium, car, gavel, university, employer, airport, plane, coin, vault, ATM, teller, chart, shield, warning, person, people, settings, save, menu, layers, close, pause, play, fast, trade, handshake, key, leaf.
 
 ## 8. Sound (optional, Stage 10)
