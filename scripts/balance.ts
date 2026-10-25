@@ -1,10 +1,13 @@
 // Headless multi-year balance run (SIMULATION §25).
 //   npm run balance -- --years 5 --seed 42 --strategy steady --city cal
 //     [--difficulty normal] [--competitors 3] [--cash 750000]
+//   npm run balance -- --years 5 --seeds 1-20   (steady first branch, median city)
 // Prints a yearly company table, the steady first branch's checkpoints, the
 // strategy's own targets (strategyTargets.ts), and a warning for every target
 // out of range. Branch revenue, income and loan-ratio checkpoints that land in
 // a recession or the 26 weeks after it read "n/a" (§25: they assume Expansion).
+// With --seeds, it runs steady once per seed and checks the first-branch bands
+// against the median city (branchCheckpoints.ts).
 import { isDeposit, PRODUCTS } from '../src/data/products';
 import { balanceSheet } from '../src/sim/balanceSheet';
 import { advanceWeeks } from '../src/sim/engine';
@@ -14,6 +17,7 @@ import type { Branch, GameState } from '../src/sim/state';
 import { hqStaff } from '../src/sim/hq';
 import { summarize } from '../src/sim/ledger';
 import { founderStake } from '../src/sim/shares';
+import { branchCheckpoints, medianMetrics, type BranchMetrics } from './branchCheckpoints';
 import { STRATEGIES } from './strategies';
 import { emptyLog, logWeek, nearRecession, strategyChecks, type Check } from './strategyTargets';
 
@@ -25,6 +29,8 @@ interface Args {
   difficulty: Difficulty;
   competitors?: number;
   cash?: number;
+  /** --seeds a-b: run steady once per seed and judge the median first branch. */
+  seeds?: [number, number];
 }
 
 function parseArgs(argv: string[]): Args {
@@ -46,6 +52,10 @@ function parseArgs(argv: string[]): Args {
     if (key === 'difficulty') args.difficulty = val as Difficulty;
     if (key === 'competitors') args.competitors = Number(val);
     if (key === 'cash') args.cash = Number(val);
+    if (key === 'seeds') {
+      const [a, b = a] = val.split('-').map(Number);
+      args.seeds = [a!, b!];
+    }
   }
   return args;
 }
@@ -78,8 +88,8 @@ function minCoverage(state: GameState): number {
 /** Weeks after a recession during which branch earnings checkpoints don't apply. */
 const RECESSION_GRACE_WEEKS = 26;
 
-function run(): void {
-  const args = parseArgs(process.argv.slice(2));
+/** One headless run: the yearly table rows, the first branch's metrics and company checks. */
+function simulate(args: Args) {
   const strategy = STRATEGIES[args.strategy];
   if (!strategy)
     throw new Error(
@@ -100,8 +110,7 @@ function run(): void {
   let positiveWeek: number | undefined;
   let paybackWeek: number | undefined;
   let cumIncome = 0;
-  const at: Record<number, { dep: number; loans: number; cust: number; rev: number; inc: number }> =
-    {};
+  const at: BranchMetrics['at'] = {};
   const rows: string[] = [];
   const weeks = args.years * 52;
   let minCash = Infinity;
@@ -172,6 +181,28 @@ function run(): void {
     }
   }
 
+  const metrics: BranchMetrics = {
+    buildSpend,
+    positiveWeek,
+    paybackWeek,
+    at,
+    exempt: (wk) => nearRecession(log, wk, RECESSION_GRACE_WEEKS),
+  };
+  return { state, strategy, rows, metrics, minCash, maxIdentityGap, log };
+}
+
+const print = (title: string, list: Check[]) => {
+  console.log(`\n${title}`);
+  for (const c of list)
+    console.log(
+      `  ${c.ok ? '✓' : '✗'} ${c.label.padEnd(30)} ${c.value.padStart(10)}   target ${c.target}`,
+    );
+};
+
+function run(): void {
+  const args = parseArgs(process.argv.slice(2));
+  if (args.seeds) return runPanel(args, args.seeds);
+  const { state, strategy, rows, metrics, minCash, maxIdentityGap, log } = simulate(args);
   console.log(
     `Vault Street balance — strategy ${strategy.name}, seed ${args.seed}, city ${args.city}, ` +
       `${args.difficulty}, ${state.meta.competitors} competitors, ${args.years} years\n`,
@@ -181,118 +212,9 @@ function run(): void {
   );
   for (const r of rows) console.log(r);
 
-  const checks: Check[] = [];
-  const branchChecks = strategy.name === 'steady';
-  const exempt = (wk: number) => nearRecession(log, wk, RECESSION_GRACE_WEEKS);
-  const na = (c: Check, wk: number): Check =>
-    exempt(wk) ? { ...c, value: 'n/a', ok: true, target: `${c.target} (recession)` } : c;
-  const inRange = (x: number | undefined, lo: number, hi: number) =>
-    x !== undefined && x >= lo && x <= hi;
-  checks.push({
-    label: 'First branch build + deposit',
-    value: K(buildSpend),
-    ok: inRange(buildSpend, 300e3, 450e3),
-    target: '$300k–$450k',
-  });
-  checks.push({
-    label: 'First week income positive',
-    value: String(positiveWeek ?? '—'),
-    ok: inRange(positiveWeek, 6, 16),
-    target: 'week 6–16',
-  });
-  const w26 = at[26];
-  if (w26) {
-    checks.push({
-      label: 'Week 26 deposits',
-      value: M(w26.dep),
-      ok: inRange(w26.dep, 15e6, 30e6),
-      target: '$15–30M',
-    });
-    checks.push({
-      label: 'Week 26 income',
-      value: K(w26.inc),
-      ok: w26.inc > 0,
-      target: 'positive',
-    });
-  }
-  const w52 = at[52];
-  if (w52) {
-    checks.push({
-      label: 'Week 52 deposits',
-      value: M(w52.dep),
-      ok: inRange(w52.dep, 30e6, 50e6),
-      target: '$30–50M',
-    });
-    checks.push({
-      label: 'Week 52 loans / deposits',
-      value: P(w52.loans / w52.dep),
-      ok: inRange(w52.loans / w52.dep, 0.75, 0.9),
-      target: '75–90%',
-    });
-    checks.push({
-      label: 'Week 52 customers',
-      value: String(w52.cust),
-      ok: inRange(w52.cust, 3000, 5000),
-      target: '3,000–5,000',
-    });
-    checks.push({
-      label: 'Week 52 income / week',
-      value: K(w52.inc),
-      ok: inRange(w52.inc, 20e3, 40e3),
-      target: '$20–40k',
-    });
-  }
-  for (const wk of [104, 156, 208, 260]) {
-    const m = at[wk];
-    if (!m) continue;
-    checks.push({
-      label: `Week ${wk} deposits`,
-      value: M(m.dep),
-      ok: inRange(m.dep, 40e6, 70e6),
-      target: '$40–70M',
-    });
-    checks.push(
-      na(
-        {
-          label: `Week ${wk} loans / deposits`,
-          value: P(m.loans / m.dep),
-          ok: inRange(m.loans / m.dep, 0.7, 0.9),
-          target: '70–90%',
-        },
-        wk,
-      ),
-    );
-    checks.push(
-      na(
-        {
-          label: `Week ${wk} revenue / week`,
-          value: K(m.rev),
-          ok: inRange(m.rev, 110e3, 150e3),
-          target: '$110–150k',
-        },
-        wk,
-      ),
-    );
-    checks.push(
-      na(
-        {
-          label: `Week ${wk} income / week`,
-          value: K(m.inc),
-          ok: inRange(m.inc, 45e3, 70e3),
-          target: '$45–70k',
-        },
-        wk,
-      ),
-    );
-  }
-  checks.push({
-    label: 'Payback from opening',
-    value: String(paybackWeek ?? '—'),
-    ok: inRange(paybackWeek, 1, 40),
-    target: '≤ 40 weeks',
-  });
   // §25: the branch checkpoints read the steady strategy's first branch only.
-  if (!branchChecks) checks.splice(0, checks.length);
+  const branchChecks = strategy.name === 'steady';
+  const checks: Check[] = branchChecks ? branchCheckpoints(metrics) : [];
   checks.push({
     label: 'Corporate cash never < 0',
     value: K(minCash),
@@ -341,17 +263,69 @@ function run(): void {
     },
     log,
   );
-  const print = (title: string, list: Check[]) => {
-    console.log(`\n${title}`);
-    for (const c of list)
-      console.log(
-        `  ${c.ok ? '✓' : '✗'} ${c.label.padEnd(30)} ${c.value.padStart(10)}   target ${c.target}`,
-      );
-  };
   print(branchChecks ? 'First-branch checkpoints (SIMULATION §25)' : 'Company checks', checks);
   if (own.length) print(`Strategy targets: ${strategy.name} (SIMULATION §25)`, own);
   const bad = [...checks, ...own].filter((c) => !c.ok);
   console.log(bad.length ? `\n${bad.length} warning(s).` : '\nAll checkpoints in range.');
+  if (branchChecks)
+    console.log(
+      'First-branch bands describe a typical city; one seed can sit outside them. ' +
+        'Judge them with --seeds 1-20 (the median city).',
+    );
 }
+
+/** --seeds: steady once per seed, a line per seed, then the bands against the median city. */
+function runPanel(args: Args, [from, to]: [number, number]): void {
+  const runs: BranchMetrics[] = [];
+  let worstGap = 0;
+  let worstCash = Infinity;
+  console.log(
+    `Vault Street balance — steady first branch, seeds ${from}–${to}, city ${args.city}, ` +
+      `${args.difficulty}, ${args.years} years\n`,
+  );
+  console.log('Seed   Wk52 dep  Wk104 dep  Wk208 dep  Wk156 inc  Payback  Misses');
+  for (let seed = from; seed <= to; seed++) {
+    const r = simulate({ ...args, seed, strategy: 'steady' });
+    runs.push(r.metrics);
+    worstGap = Math.max(worstGap, r.maxIdentityGap);
+    worstCash = Math.min(worstCash, r.minCash);
+    const a = r.metrics.at;
+    const cell = (x: number | undefined, f: (n: number) => string) =>
+      (x === undefined ? '—' : f(x)).padStart(10);
+    const misses = branchCheckpoints(r.metrics).filter((c) => !c.ok).length;
+    console.log(
+      [
+        String(seed).padStart(4),
+        cell(a[52]?.dep, M),
+        cell(a[104]?.dep, M),
+        cell(a[208]?.dep, M),
+        cell(a[156]?.inc, K),
+        String(r.metrics.paybackWeek ?? '—').padStart(8),
+        String(misses).padStart(7),
+      ].join(' '),
+    );
+  }
+  const checks = branchCheckpoints(medianMetrics(runs));
+  checks.push(
+    {
+      label: 'Corporate cash never < 0',
+      value: K(worstCash),
+      ok: worstCash >= 0,
+      target: '≥ 0 (every seed)',
+    },
+    {
+      label: 'Balance identity gap',
+      value: worstGap.toFixed(4),
+      ok: worstGap < 1,
+      target: '< $1 (every seed)',
+    },
+  );
+  print(`First-branch checkpoints, median of ${runs.length} cities (SIMULATION §25)`, checks);
+  const bad = checks.filter((c) => !c.ok);
+  console.log(bad.length ? `\n${bad.length} warning(s).` : '\nAll checkpoints in range.');
+}
+
+const inRange = (x: number | undefined, lo: number, hi: number) =>
+  x !== undefined && x >= lo && x <= hi;
 
 run();

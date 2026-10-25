@@ -10,9 +10,10 @@
  * - Fetch: answer the site's own GET requests from that cache first (page loads
  *   get the cached index.html); anything missing is fetched and added.
  * - Updates: a new deploy has a new version, so its worker installs alongside
- *   the old one and waits. It takes over on the next launch, once every tab of
- *   the old version is closed, and then deletes the old caches. No page is ever
- *   switched to new files halfway through a session.
+ *   the old one and waits. The page asks it to take over (a 'skipWaiting'
+ *   message) only while no game is loaded, then reloads (src/app/pwa/register.ts);
+ *   otherwise it takes over on the next launch. Either way it then deletes the
+ *   old caches. No game is ever switched to new files halfway through.
  *
  * Only the site's own files are ever requested; there are no other network calls.
  */
@@ -30,6 +31,10 @@ self.addEventListener('install', (event) => {
       // `reload` skips the HTTP cache so a new version never stores stale files.
       .then((cache) => cache.addAll(PRECACHE.map((p) => new Request(p, { cache: 'reload' })))),
   );
+});
+
+self.addEventListener('message', (event) => {
+  if (event.data === 'skipWaiting') self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {

@@ -39,6 +39,8 @@
   --radius-card: 6px;
   --radius-pill: 999px;
   --tap-min: 44px;
+  /* Width of a panel when it opens as a side drawer (900 px and wider). */
+  --drawer-w: max(400px, min(480px, 40vw));
 
   /* Spacing */
   --space-1: 4px;

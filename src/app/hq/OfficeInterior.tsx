@@ -2,7 +2,8 @@
 // cut-away office in the city ink on ivory. Desks and people reflect actual
 // staffing, so an understaffed floor shows empty desks (dashed, chair pushed
 // in) at a glance; people are tinted by the team's mood (jade / brass /
-// oxblood). Walls and floor are hatched like the other vignettes.
+// oxblood). Walls and floor are hatched like the other vignettes. With no
+// department yet (a new HQ) it draws the bare room, waiting for a team.
 import { shade } from '../../art/engrave';
 import type { DeptId } from '../../sim/state';
 import { Vignette } from '../components';
@@ -24,11 +25,16 @@ function at(i: number, j: number, ox: number, oy: number, step: number): Pt {
 const path = (pts: Pt[], close = true) =>
   `M${pts.map(([x, y]) => `${x.toFixed(1)} ${y.toFixed(1)}`).join('L')}${close ? 'Z' : ''}`;
 
-export function OfficeInterior(p: { dept: DeptId }) {
+/** A floor with nobody on it yet: the bare room, this many desk rows deep. */
+const BARE_ROOM_ROWS = 4;
+const BARE_ROOM = { shown: 0, desks: 0, staff: 0, filled: 0, mood: 'good' } as const;
+
+export function OfficeInterior(p: { dept?: DeptId }) {
   const s = useGame();
-  const pic = deskPicture(s, p.dept, MAX_DESKS);
+  const pic = p.dept ? deskPicture(s, p.dept, MAX_DESKS) : BARE_ROOM;
   const cols = pic.shown > 24 ? 8 : 6;
-  const rows = Math.max(1, Math.ceil(pic.shown / cols));
+  // The bare room is drawn at a typical floor's depth rather than as a sliver.
+  const rows = pic.shown > 0 ? Math.ceil(pic.shown / cols) : BARE_ROOM_ROWS;
   // Size the cells so the room (walls included) fits, then centre it.
   const step = Math.min(G.maxStep, ((G.bottom - G.top - G.wall) * 2) / (cols + rows + 2));
   const ox = G.cx - ((cols - rows) * step) / 2;
@@ -92,11 +98,9 @@ export function OfficeInterior(p: { dept: DeptId }) {
       {desks.map(({ i, j, k }) => (
         <Desk at={c(i, j)} taken={k < pic.filled} mood={pic.mood} />
       ))}
-      {pic.desks > 0 && (
-        <text x="12" y={G.h - 8} class="hq-interior-caption">
-          {pic.staff} of {pic.desks} desks filled
-        </text>
-      )}
+      <text x="12" y={G.h - 8} class="hq-interior-caption">
+        {pic.desks > 0 ? `${pic.staff} of ${pic.desks} desks filled` : 'Empty floor'}
+      </text>
     </Vignette>
   );
 }

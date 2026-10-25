@@ -308,8 +308,7 @@
 @media (min-width: 900px) {
   .panel {
     left: auto;
-    width: min(480px, 40vw);
-    min-width: 400px;
+    width: var(--drawer-w);
     border-left: 1px solid var(--hairline);
     animation-name: drawer-in;
   }

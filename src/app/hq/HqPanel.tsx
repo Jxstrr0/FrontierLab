@@ -78,7 +78,7 @@ export function HqPanel(p: { officeId?: string; dept?: DeptId }) {
             }
           : { text: 'An empty building, ready for its first team.' }
       }
-      hero={dept ? <OfficeInterior dept={dept} /> : undefined}
+      hero={<OfficeInterior dept={dept} />}
       tabs={dept ? tabs : undefined}
       tab={dept}
       onTab={onTab}

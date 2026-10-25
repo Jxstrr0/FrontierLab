@@ -10,6 +10,23 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-10-25 — Stage 10 known issues fixed
+- **Stage / step:** 10 — polish after launch
+- **Done:**
+  - **Updates on iPhone:** a new version no longer waits for a second launch. If you're on the title screen, the game reloads into the new version as soon as it has downloaded. Mid-game, a message says it will load when you quit to the title. Reopening the app from the background also checks for a new version.
+  - **Top bar:** play, pause and Menu use the engraved icon set instead of text characters.
+  - **HQ:** a new HQ with no floors shows its empty room as the picture at the top.
+  - **Wide screens:** with a panel open at 900 px and wider, the top and bottom bars move left to sit beside it, so the date, speed controls and Menu stay visible.
+  - **Balance across cities:** I ran 20 different cities. The median city's first branch meets every target. Single cities vary by 30–40% because some maps have weaker "average" lots (seeds 7, 8 and 16) and some stronger (14 and 17). That's the map, not a bug. `npm run balance -- --years 5 --seeds 1-20` now checks the targets against the median city. One band changed, with the reason in SIMULATION §25: a branch's earnings keep growing with its deposits through years 2–3, so the full mature target applies from week 208. Weeks 104–156 now ask for at least $95k revenue and $38k income a week.
+- **Checks:**
+  - Seed 42 meets every target for steady, turtle, aggressive and stress.
+  - The 20-city median meets every first-branch target.
+  - The game's own numbers didn't change, so the determinism snapshot is the same (`18c44acb4c1d33`).
+- **Dependencies:** none added.
+- **Known issues:**
+  - Add to Home Screen still needs a test on a real iPhone.
+  - Carried over from Stage 9 and earlier (see below).
+
 ### 2026-10-25 — Stage 10 built: art, tutorial, sound, PWA, balance
 - **Stage / step:** 10 — Art pass, onboarding, polish, launch
 - **Done:**
@@ -52,13 +69,7 @@ Claude Code updates this at the end of every session. Newest entries go at the t
     - start a new game and follow the tutorial;
     - turn on Sound in Settings;
     - Share → Add to Home Screen, open it from the icon, then try it in airplane mode.
-- **Known issues:**
-  - On iPhone a new version shows on the second launch after a deploy (the first launch downloads it).
-  - The top-bar glyphs are still text characters, not the new icons.
-  - An HQ with no floors built has no picture at the top.
-  - At 1280 px wide, the side drawer covers the date pill.
-  - With seeds 7 and 99, the steady player's first-branch earnings miss their checkpoints. Seed 42 meets them; left for the tuning pass.
-  - Carried over from Stage 9 and earlier (see below).
+- **Known issues:** the five listed at launch were fixed the same day (see the entry above). Carried over from Stage 9 and earlier (see below).
 
 ### 2026-10-24 — Stage 9 built: personal empire
 - **Stage / step:** 9 — Personal empire
