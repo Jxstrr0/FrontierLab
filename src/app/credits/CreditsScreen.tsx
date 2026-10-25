@@ -3,6 +3,7 @@
 // and from Settings (on the title, or in game where it opens as a panel).
 import { Card, Panel, Rule, SectionTitle } from '../components';
 import { openPanel, screen } from '../store';
+import { creditsReturn } from './openCredits';
 import '../settings/standalone.css';
 import './credits.css';
 
@@ -18,17 +19,10 @@ const TYPEFACES = [
   { name: 'Public Sans', use: 'everything else' },
 ];
 
-/** Where the credits were opened from, so Back returns there. */
-let returnTo: 'title' | 'settings' = 'title';
-
-/** Opens the full-screen credits from the title screen or the title's Settings. */
-export function openCredits(from: 'title' | 'settings'): void {
-  returnTo = from;
-  screen.value = 'credits';
-}
-
 export function CreditsScreen(p: { inGame?: boolean }) {
-  const back = p.inGame ? () => openPanel({ type: 'settings' }) : () => (screen.value = returnTo);
+  const back = p.inGame
+    ? () => openPanel({ type: 'settings' })
+    : () => (screen.value = creditsReturn());
   return (
     <div class={p.inGame ? undefined : 'standalone'}>
       <Panel title="Credits" onClose={back}>

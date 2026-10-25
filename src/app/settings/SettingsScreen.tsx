@@ -16,7 +16,7 @@ import type { Settings } from '../../sim/state';
 import { Panel, Row, SectionTitle, Segmented, Sheet, Toggle } from '../components';
 import { AvatarPicker } from '../newgame/AvatarPicker';
 import { loadPrefs, savePrefs } from '../saves';
-import { openCredits } from '../credits/CreditsScreen';
+import { openCredits } from '../credits/openCredits';
 import { play, unlockAudio } from '../sound/sound';
 import { act, bump, closePanel, openPanel, peekGame, rev, screen } from '../store';
 import { TutorialSetting } from './TutorialSetting';
@@ -111,7 +111,7 @@ export function SettingsScreen(p: { inGame?: boolean }) {
           />
           <Toggle
             label="Pause for incidents"
-            hint="Stops time when something goes wrong. Incidents arrive in a later stage."
+            hint="Stops time when something goes wrong."
             checked={s.autoPauseIncidents}
             onChange={(autoPauseIncidents) => change({ autoPauseIncidents })}
           />

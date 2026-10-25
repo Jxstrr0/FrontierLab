@@ -3,7 +3,7 @@ import { CornerRosette } from './CornerRosette';
 import { latestSlot, loadFromSlot } from '../saves';
 import { screen, setGame, toast } from '../store';
 import { ToastHost } from '../components';
-import { openCredits } from '../credits/CreditsScreen';
+import { openCredits } from '../credits/openCredits';
 import { Rosette } from './Rosette';
 import './title.css';
 

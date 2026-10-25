@@ -284,10 +284,10 @@ export interface AvatarSpec { head: number; hair: number; facial: number; glasse
 
 ## 10. Saves
 
-- **localStorage keys:**
-  - `vaultstreet:auto` (written each weekly tick)
-  - `vaultstreet:slot1`, `vaultstreet:slot2`, `vaultstreet:slot3`
-  - `vaultstreet:settings` (settings also live inside each save; this key holds title-screen prefs)
+- **localStorage keys** (all written by `src/sim/save/storage.ts`; the names are fixed so existing saves keep loading):
+  - `vaultstreet.save.{slot}` and `vaultstreet.meta.{slot}` for slots `auto` (written each weekly tick), `1`, `2`, `3`: the compressed game and its slot card
+  - `vaultstreet.prefs` (settings also live inside each save; this key holds title-screen prefs)
+  - `vaultstreet.tutorialSeen`
 - **Format:** `JSON.stringify(state)`, compressed with lz-string `compressToUTF16` for localStorage.
 - **Export code:** `"VS" + schemaVersion + ":" + compressToEncodedURIComponent(json)`. Offer copy-to-clipboard and `navigator.share` when available.
 - **Import:**
@@ -299,33 +299,33 @@ export interface AvatarSpec { head: number; hair: number; facial: number; glasse
 - **Size budget:** keep a late-game save under 2 MB uncompressed by:
   - trimming histories (weekly snapshots 260, Ledger issues 52, review cards 8, pnl 52)
   - not storing generated lots for unvisited cities
-- **Quota errors:** catch them and show "Storage full — export your save" in the UI.
-- **Quick check:** a save checksum (simple hash) stored alongside helps detect corruption.
+- **Quota errors:** caught; the UI says "Storage full — export your save" and the toast carries an Export save button that opens the Save game panel. If the card can't be written after the data was, the old data is put back.
+- **Checksum:** each slot card stores `checksum` (cyrb53 of the compressed data). Loading refuses a slot whose data doesn't match ("That save is damaged…"). Cards written before v12 have none and load as before.
 
 ## 11. Commands (player actions)
 One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { ok: false, reason: string }`. The UI shows `reason` verbatim.
 
 | Area | Commands |
 |---|---|
-| Game | `newGame`, `setSpeed`, `travelTo` |
-| Branches | `leaseStorefront`, `buildBranch`, `renameBranch`, `closeBranch` |
+| Game | `newGame`, `travelTo` (speed is UI clock state, `setSpeed` in `src/app/loop.ts`) |
+| Branches | `buildBranch` (leases and builds in one step), `renameBranch`, `closeBranch` |
 | Products and pricing | `setOffered`, `setPrice`, `setApplyRatesToAll`, `setCompanyPrice` |
 | Branch staff and marketing | `setStaffTarget`, `setWage`, `hireManager`, `fireManager`, `setManagerSalary`, `setDelegation`, `setCampaignLevel` |
 | Loan Desk | `decideApplication(id, 'approve', rate)`, `declineApplication` |
 | Offices and departments | `leaseOffice`, `addFloor`, `releaseFloor`, `setDeptTarget`, `setDeptSalary`, `setBenefit` |
 | Products floor | `startDevelopment`, `cancelDevelopment`, `deleteProduct`, `setRiskAppetite`, `buyBureauModel`, `commissionBureauModel`, `saveCustomModel`, `activateModel` |
 | Treasury | `setTreasuryPolicy`, `borrowOffer`, `repayLot`, `transferToTreasury`, `borrowWindow`, `repayWindow` |
-| Partnerships and partners | `signPartnership`, `renewPartnership`, `releasePartnership`, `signDealerFinancing`, `signUniversityProgram` |
+| Partnerships and partners | `signPartnership` (payroll or student), `renewPartnership`, `releasePartnership`, `startGradProgram`, `endGradProgram`, `signDealerDeal`, `endDealerDeal` |
 | Marketing and lobbying | `startBrandCampaign`, `buyAgencyPackage`, `startLobbying` (was `lobby`) |
-| Corporate borrowing | `takeCorporateLoan`, `repayCorporateLoan`, `drawCredit`, `repayCredit` |
+| Corporate borrowing | `acceptCorporateLoan`, `repayCorporateLoan`, `drawCredit`, `repayCredit` |
 | Capital markets | `trade(account, securityId, shares)`, `privatePlacement(bankId, pct)`, `launchIpo(bankId, floatPct)`, `secondaryOffering(bankId, pct)`, `offerMerger(rivalId, pricePerShare)` |
 | Investments and property | `buyStartupLot` (was `investInRound`), `offerVentureDebt`, `offerProperty` (was `buyProperty`), `setPropertyRent`, `setPropertyForSale`, `setReoMode`, `tradeFx` |
 | Governance and executives | `holdBoardMeeting(dividendPerShare, ceoSalary)`, `hireExec(seat, candidateId)`, `fireExec`, `setExecSalary`, `setExecDelegation`, `addGrant(seat, type, shares, strike)` |
 | Incidents | `resolveIncident(id, optionId)` |
-| Personal | `buyHome`, `rebuildHome`, `buyCar`, `placeBid`, `appraise`, `consign`, `buyJet`, `sellJet`, `buyFranchise`, `setKit`, `signPlayer`, `releasePlayer` |
-| Settings and saves | `updateSettings`, `saveToSlot`, `loadSlot`, `exportCode`, `importCode` |
+| Personal | `offerHome`, `rebuildHome`, `sellHome`, `buyCar`, `sellCar`, `placeBid`, `clearBid`, `appraiseCollectible`, `consignCollectible`, `withdrawConsignment`, `buyJet`, `sellJet`, `buyClub`, `sellClub`, `setKit`, `setKitSponsor`, `signPlayer`, `releasePlayer` |
+| Settings and saves | `setSettings`, `setFounderAvatar`; saves are not commands: `saveToSlot`, `loadFromSlot` (`src/sim/save/storage.ts`), `exportCode`, `importCode` (`serialize.ts`) |
 
-## 12. Implemented so far (schema v11)
+## 12. Implemented so far (schema v12)
 
 `src/sim/state.ts` is the source of truth; this section records how it differs from the guide above. Later stages add the rest with a schema bump and a migration.
 
@@ -337,6 +337,7 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 - **Stage 8 (schema v9) adds:** `meta.homeCityId` (the start city: home central bank, tax, exchange), `world.travel` (`kmThisWeek`, `totalKm`, `flights`, `faresPaid`), `personal.jet?` (`model`, `value`, `price`, `boughtWeek`), the `travel` P&L line (opex: fares the bank paid), and `company.companyPrices` keyed by country (`{ CA: { savings: 0.031, … } }`). `CitySpec` gains `airport` and, for regional sites, `regional.employers`. Cities other than the start city are generated on first visit (`worldGen.generateCity`). Migration 8 → 9 records the home city (first branch's city, else the current city), starts travel fresh, adds the line and moves the old HQ price list under the home country.
 - **Stage 9 (schema v10) adds** (types in `src/sim/personalTypes.ts`): `personal.empire` (`homes`: OwnedHome with price, value, `hpiRef`, `rebuildDoneWeek`; `cars`; `collectibles`: OwnedCollectible with house, price, value, hidden `genuine`, `appraised`, `appraisalWeek`, `consignedTo`; `richList` fortunes and rank; `insider.pending` cases), `auctions` (per house: `nextWeek`, `lots` with hidden authenticity and your max bid, `history`), `clubs` (every sports club: owner outside/company/personal, value, stars, otherPayroll, transfer `market`, `record`, `lastFinish`, `fanMood`, `kit`, `season` finances) and `dealerDeals` (by dealer site). `SiteKind` adds `autoDealer`, `auctionHouse` and `vacationHome` (stream `sites9:{cityId}`). New P&L lines: `franchiseRevenue` (fee & other income), `franchiseCosts` and `dealerFees` (opex). The balance sheet adds a company-owned club (`franchise`, risk weight 2.5), marked through investment gains. `netWorth(state)` sums the founder's cash, own stake, holdings and other assets. Migration 9 → 10 adds the lines, seeds every visited city's new buildings and starts the rest fresh.
 - **Schema v11 adds** `CityState.layout` (1 | 2): which map layout a city uses. Layout 1 is the original shared street grid and bottom-edge shoreline; layout 2 is the city's own geography from `data/cityLooks.ts` (water form, district arrangement, big park). Migration 10 → 11 sets layout 1 on every city already generated, so their lots, offices, sites and picture never move; `worldGen.generateCity` sets layout 2. The derived geometry (water, street, bridge, park and frontage masks, fitted district centres) lives in `src/sim/cityGeo.ts`, cached per city and layout, and is never saved.
+- **Schema v12 adds** (audit follow-up): `DeskWeek.arrived` (applications that arrived this week), `RivalBank.execs` (the CFO/COO/CRO bench: `{ title, name }[]`), `WeeklySnapshot.appRating` (for the IT floor's trend) and, optional, `Book.last.defaultedLoans` (business loans that defaulted in the week). `milestones` now fills (id → week reached). Migration 11 → 12 draws every rival's bench from the `rivalBench` stream, adds `arrived: 0` to every desk tally and records milestones already reached without news.
 - **Not yet present:** nothing from the v1 plan.
 - **Added fields:**
   - `ledger`: P&L lines and cash movements since the last weekly close, so commands between ticks land in the right week.
@@ -344,7 +345,7 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
   - `meta.difficulty` (`'easy' | 'normal' | 'hard' | 'expert'`), `meta.competitors` (1–5) and `meta.startCash` (schema v2; migration 1 → 2 fills Normal, the city's usual rival count and $750k).
   - Schema v4 changes no shape: migration 3 → 4 moves lots onto tiles facing the Stage 3 street grid (lots already on frontage stay put).
   - The drawable city (streets, water, parks, landmarks, building heights) is not saved: `src/art/citygen.ts` regenerates it from the save seed, the city and its lots.
-  - `Branch.desk` (`DeskWeek`: `week`, `approved`, `refused`, `declined`, `expired`): this week's Loan Desk outcomes, reset when the week turns (schema v3; migration 2 → 3 adds an empty tally).
+  - `Branch.desk` (`DeskWeek`: `week`, `arrived` (v12), `approved`, `refused`, `declined`, `expired`): this week's Loan Desk outcomes, reset when the week turns (schema v3; migration 2 → 3 adds an empty tally).
   - `company.negativeCashWeeks`, `company.lowCapitalWeeks`: counters for the game-over checks (schema v2).
   - `company.retainedEarnings`, `company.leaseDeposits` (an asset). `company.liquidityRatio` is `null` while there are no deposits.
   - `CountryState`: `hpiHistory`, `prevFtpShort`/`prevFtpLong` (to detect moves), `cardAnchor`, `startPolicy`, `feeIndex`, `marketReturn`, `forceRecessionAtWeek`.
@@ -360,5 +361,5 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
   - Optional, absent until first used: `products.digitalDone` (completed digital templates), `company.companyOffered` (HQ lineup), `UnderwritingModel.hostedBy` (bureau-hosted custom models; ids `model_N`).
   - `UnderwritingState.switching = { fromId, weeksLeft }` (the old model blending out) instead of `switchingTo`; `activeModelId` is the new model from the moment you switch.
   - Commands: `startDevelopment`, `cancelDevelopment`, `deleteProduct` (`commands/development.ts`); `buyBureauModel`, `commissionBureauModel`, `saveCustomModel`, `activateModel` (`commands/underwriting.ts`); `setApplyRatesToAll`, `setCompanyPrice`, `setCompanyOffered` (`commands/products.ts`).
-- **Saves:** `src/sim/save/serialize.ts` has `serialize`, `deserialize` (with migrations and a required-keys check), `checksum` (cyrb53) and `exportCode`/`importCode`. localStorage slots arrive with the Stage 2 UI.
+- **Saves:** `src/sim/save/serialize.ts` has `serialize`, `deserialize` (with migrations and a required-keys check), `checksum` (cyrb53) and `exportCode`/`importCode`. localStorage slots live in `src/sim/save/storage.ts` (§10).
 

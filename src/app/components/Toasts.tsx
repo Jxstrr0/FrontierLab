@@ -7,6 +7,11 @@ export function ToastHost() {
       {toasts.value.map((t) => (
         <div key={t.id} class={`toast toast-${t.tone}`}>
           {t.text}
+          {t.action && (
+            <button type="button" class="toast-action" onClick={t.action.run}>
+              {t.action.label}
+            </button>
+          )}
         </div>
       ))}
     </div>

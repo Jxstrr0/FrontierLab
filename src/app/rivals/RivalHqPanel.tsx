@@ -4,6 +4,7 @@
 // loans and line of credit they offer your company (SIMULATION §19.9).
 import { CITIES } from '../../data/cities';
 import { DISTRICT_SPECS } from '../../data/districts';
+import { RIVAL_BENCH_LABEL } from '../../data/rivals';
 import { previousQuarter } from '../../sim/calendar';
 import { rivalSharePrice } from '../../sim/rivalQuarter';
 import type { GameState, RivalBank } from '../../sim/state';
@@ -120,6 +121,9 @@ function Overview(p: { s: GameState; bank: RivalBank }) {
           }
         />
         <Row label="Chief executive" value={bank.ceo || '—'} />
+        {bank.execs.map((e) => (
+          <Row key={e.title} label={RIVAL_BENCH_LABEL[e.title] ?? e.title} value={e.name || '—'} />
+        ))}
       </Card>
       {recent.length > 0 && (
         <section>

@@ -16,6 +16,7 @@ import {
 import type { CampaignCost } from '../../data/campaigns';
 import { CITIES } from '../../data/cities';
 import { isDeposit, isLoan, type ProductSpec } from '../../data/products';
+import { deskWeek } from '../../sim/branch/loanDesk';
 import { marketWage, staffNeeded } from '../../sim/branch/staff';
 import type { Book, Branch, BranchPnl, BranchPnlLine, GameState } from '../../sim/state';
 import { delta, money, pct, percentText } from '../format/format';
@@ -270,6 +271,39 @@ export function businessLoans(state: GameState, branchId: string) {
     (a) => a.branchId === branchId,
   ).length;
   return { balance, count, pending };
+}
+
+export interface LoanDeskStrip {
+  /** Applications that arrived this week (DeskWeek.arrived). */
+  arrived: number;
+  approved: number;
+  declined: number;
+  /** Approved ÷ decided (approved, refused by the business, declined); undefined before any. */
+  approvalRate?: number;
+  /** Balance of the branch's current business loans. */
+  balance: number;
+  /** Business loans that defaulted in the last weekly close, and their balance. */
+  defaultedLoans: number;
+  defaulted: number;
+  /** Applications waiting for a decision now. */
+  waiting: number;
+}
+
+/** The Loan Desk summary strip (SCREENS §5.3). */
+export function loanDeskStrip(state: GameState, branch: Branch): LoanDeskStrip {
+  const desk = deskWeek(state, branch);
+  const decided = desk.approved + desk.refused + desk.declined;
+  const loans = businessLoans(state, branch.id);
+  return {
+    arrived: desk.arrived,
+    approved: desk.approved,
+    declined: desk.declined,
+    approvalRate: decided > 0 ? desk.approved / decided : undefined,
+    balance: loans.balance,
+    defaultedLoans: branch.books.sbl?.last.defaultedLoans ?? 0,
+    defaulted: branch.books.sbl?.last.defaulted ?? 0,
+    waiting: loans.pending,
+  };
 }
 
 export type Period = 'week' | 'quarter' | 'year';

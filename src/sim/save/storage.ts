@@ -1,13 +1,15 @@
 // Save slots in localStorage (SCREENS §26): one autosave plus three manual
 // slots. Each slot keeps the serialized game (lz-string compressed) and a small
 // metadata record for the slot cards. Storage can be missing or full (private
-// windows, quotas), so every access is guarded and reports failure.
+// windows, quotas), so every access is guarded and reports failure. Each card
+// also carries a checksum of the stored save so a damaged slot is caught on load
+// instead of half-loading. Key names never change, so old saves keep loading.
 // This is the only module allowed to touch browser storage (CLAUDE.md); the
 // simulation itself never calls it.
 import { compressToUTF16, decompressFromUTF16 } from 'lz-string';
 import { dateOf } from '../calendar';
 import type { GameState, Settings } from '../state';
-import { deserialize, serialize } from './serialize';
+import { checksum, deserialize, serialize } from './serialize';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const gameDate = (startDate: string, day: number) => {
@@ -27,7 +29,13 @@ export interface SaveMeta {
   day: number;
   cash: number;
   savedAt: number;
+  /** checksum() of the compressed save; missing on slots written before v12. */
+  checksum?: string;
 }
+
+export const STORAGE_FULL =
+  'Storage full — export your save as a code, then delete a slot and try again.';
+export const SAVE_DAMAGED = 'That save is damaged and cannot be loaded.';
 
 const PREFIX = 'vaultstreet.';
 const dataKey = (slot: SlotId) => `${PREFIX}save.${slot}`;
@@ -69,12 +77,25 @@ export function slotMetaFor(slot: SlotId, state: GameState): SaveMeta {
 export function writeSlot(slot: SlotId, compressed: string, meta: SaveMeta): string | null {
   const ls = store();
   if (!ls) return 'Saving is unavailable in this browser.';
+  let previous: string | null;
   try {
+    previous = ls.getItem(dataKey(slot));
     ls.setItem(dataKey(slot), compressed);
-    ls.setItem(metaKey(slot), JSON.stringify(meta));
+  } catch {
+    return STORAGE_FULL;
+  }
+  try {
+    ls.setItem(metaKey(slot), JSON.stringify({ ...meta, checksum: checksum(compressed) }));
     return null;
   } catch {
-    return 'Not enough storage space to save. Delete a slot and try again.';
+    // Put the old save back so the slot's card and checksum still match it.
+    try {
+      if (previous === null) ls.removeItem(dataKey(slot));
+      else ls.setItem(dataKey(slot), previous);
+    } catch {
+      // Nothing more to do; the load-time checksum will flag the slot.
+    }
+    return STORAGE_FULL;
   }
 }
 
@@ -83,8 +104,10 @@ export function loadFromSlot(slot: SlotId): GameState {
   const ls = store();
   const raw = ls?.getItem(dataKey(slot));
   if (!raw) throw new Error('That save slot is empty.');
+  const expected = slotMeta(slot)?.checksum;
+  if (expected !== undefined && checksum(raw) !== expected) throw new Error(SAVE_DAMAGED);
   const json = decompressFromUTF16(raw);
-  if (!json) throw new Error('That save is damaged and cannot be loaded.');
+  if (!json) throw new Error(SAVE_DAMAGED);
   return deserialize(json);
 }
 

@@ -1,5 +1,7 @@
-// Branch Products tab (SCREENS §5.2): the house underwriting model, a category
-// switch and one card per product. Cards stack vertically rather than in a
+// Branch Products tab (SCREENS §5.2): the house underwriting model (its radar,
+// cost per application and Manage models, which opens the HQ Products floor
+// or, without one, points to the credit bureaus), a category switch and one
+// card per product. Cards stack vertically rather than in a
 // carousel so every product's toggle and price stay visible on a phone.
 import { useState } from 'preact/hooks';
 import { CITIES } from '../../data/cities';
@@ -9,7 +11,9 @@ import { allProducts } from '../../sim/products';
 import { activeModel } from '../../sim/underwriting';
 import type { Branch, GameState } from '../../sim/state';
 import { Card, Segmented } from '../components';
-import { useGame } from '../store';
+import { openPanel, useGame } from '../store';
+import { hqDepts } from '../hq/officeSelectors';
+import { ModelRosette } from '../hq/products/ModelRosette';
 import { priceCountries } from '../hq/products/productSelectors';
 import { ProductCard } from './ProductCard';
 
@@ -24,24 +28,33 @@ export function ProductsTab(p: { branch: Branch; onLoanDesk: () => void }) {
   const [cat, setCat] = useState<CategoryId>('deposits');
   const model = activeModel(s);
   const specs = allProducts(s).filter((x) => x.category === cat);
+  const hasProductsFloor = hqDepts(s).includes('products');
   return (
     <div class="stack">
       <Card>
         <div class="br-model">
-          <Rosette />
-          <div class="br-model-text">
-            <div class="muted small">House model</div>
-            <div class="br-model-name">{model.name}</div>
-            <div class="small">
-              {s.settings.currency}
-              {model.costPerApp.toFixed(2)} per application
-            </div>
+          <div class="muted small">House model</div>
+          <div class="br-model-name">{model.name}</div>
+          <div class="small">
+            {s.settings.currency}
+            {model.costPerApp.toFixed(2)} per application
           </div>
         </div>
-        <p class="muted small br-model-hint">
-          Manage models: open an HQ with a Products floor to build your own, or visit a credit
-          bureau for a better package.
-        </p>
+        <ModelRosette radar={model.radar} label="House model" />
+        {hasProductsFloor ? (
+          <button
+            type="button"
+            class="btn btn-secondary btn-block br-model-btn"
+            onClick={() => openPanel({ type: 'hq', dept: 'products' })}
+          >
+            Manage models
+          </button>
+        ) : (
+          <p class="muted small br-model-hint">
+            Visit a credit bureau on the map for a better model, or add a Products floor at HQ to
+            build your own.
+          </p>
+        )}
       </Card>
       <div data-tutorial="product-category">
         <Segmented label="Product category" options={CATEGORIES} value={cat} onChange={setCat} />
@@ -64,18 +77,4 @@ function hqPriceNotice(s: GameState, branch: Branch): string {
   return country
     ? `Prices follow HQ's list for ${theCountryName(country)}.`
     : 'Prices are set at HQ.';
-}
-
-/** Small engraved rosette standing in for the model's radar until the HQ floor exists. */
-function Rosette() {
-  const petals = Array.from({ length: 10 }, (_, i) => i * 36);
-  return (
-    <svg class="br-rosette" viewBox="0 0 40 40" aria-hidden="true">
-      <circle cx="20" cy="20" r="18" />
-      {petals.map((a) => (
-        <ellipse cx="20" cy="11" rx="3.2" ry="8" transform={`rotate(${a} 20 20)`} />
-      ))}
-      <circle cx="20" cy="20" r="4" />
-    </svg>
-  );
 }

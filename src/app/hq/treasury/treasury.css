@@ -110,8 +110,10 @@
 }
 
 /* ─── Policy ───────────────────────────────────────────────────────────── */
-.tr-policy .stepper-value {
-  white-space: nowrap;
+.tr-policy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
 }
 
 /* ─── Funding lot and offer cards ──────────────────────────────────────── */
@@ -155,6 +157,18 @@
 }
 .tr-fund-card .badge {
   align-self: flex-start;
+}
+
+/* ─── Partnership cards ────────────────────────────────────────────────── */
+.tr-partner-term {
+  white-space: nowrap;
+}
+.tr-partner .badge {
+  flex: none;
+}
+.tr-partner-link {
+  align-self: flex-end;
+  color: var(--brass-light);
 }
 
 /* ─── Amount slider ────────────────────────────────────────────────────── */

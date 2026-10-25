@@ -23,7 +23,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  /* Top-aligned so values line up across a row when a label wraps. */
+  justify-content: flex-start;
   gap: 2px;
   padding: var(--space-3) var(--space-2);
   text-align: center;

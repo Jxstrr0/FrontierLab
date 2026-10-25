@@ -279,10 +279,17 @@ export const STRATEGY_PROFILES: Record<Strategy, StrategyProfile> = {
   },
 };
 
-/** Total rival branches at start by city size (CONTENT §15). Disruptors get 1–2 each. */
 /** Senior seats below the CEO on every rival's team (SIMULATION §18.1). */
 export const RIVAL_BENCH_TITLES = ['CFO', 'COO', 'CRO'] as const;
 
+/** How each bench seat reads on the rival's HQ panel. */
+export const RIVAL_BENCH_LABEL: Record<string, string> = {
+  CFO: 'Chief financial officer',
+  COO: 'Chief operating officer',
+  CRO: 'Chief risk officer',
+};
+
+/** Total rival branches at start by city size (CONTENT §15). Disruptors get 1–2 each. */
 export const RIVAL_BRANCHES_BY_SIZE: Record<'S' | 'M' | 'L' | 'XL', [number, number]> = {
   S: [3, 5],
   M: [6, 10],

@@ -33,9 +33,8 @@ export function floorFitout(cityId: string): number {
 }
 
 /**
- * Whether a department's floor can be added: the Stage 4 departments, and the
- * Executive suite with Stage 6. Investment arrives with its system (Stage 7).
- * The UI also hides floors whose FEATURES flag is off.
+ * Whether a department's floor can be added: the core departments always, the
+ * Executive suite and Investment floor with their FEATURES flags.
  */
 export function deptAvailable(id: DeptId): boolean {
   if (id === 'executive') return FEATURES.capitalMarkets;

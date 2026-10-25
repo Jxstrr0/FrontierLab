@@ -1,14 +1,14 @@
 // Market tab view model (SCREENS §12): one card's worth of facts for every
 // security in a sector, read from the simulation. Banking lists the listed
 // rival banks and, once you are public, your own bank (tradable personally).
-import { QUARTERS_PER_YEAR } from '../../config/balance';
+import { QUARTERS_PER_YEAR, STOCK_MARKET } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { EXCHANGES, type SectorId } from '../../data/stocks';
 import { topHolders, type HolderRow } from '../../sim/marketHolders';
 import { priceEarnings } from '../../sim/marketStocks';
 import { rivalNetIncomeTtm } from '../../sim/marketRivals';
 import { SELF_ID } from '../../sim/securities';
-import type { GameState } from '../../sim/state';
+import type { GameState, RivalBank } from '../../sim/state';
 import { netIncomeTtm } from '../../sim/valuation';
 
 export interface SecurityView {
@@ -77,26 +77,7 @@ function bankingSecurities(state: GameState): SecurityView[] {
   const out: SecurityView[] = [];
   for (const r of Object.values(state.rivals)) {
     if (!r.listed || (r.status !== 'active' && r.status !== 'distressed')) continue;
-    const dividend = (r.dps ?? 0) * QUARTERS_PER_YEAR;
-    const eps = rivalNetIncomeTtm(r) / Math.max(1, r.shares);
-    out.push({
-      id: r.id,
-      name: r.name,
-      ticker: r.ticker ?? monogramOf(r.name.toUpperCase()),
-      exchange: EXCHANGES[CITIES[r.cities[0] ?? '']?.country ?? 'CA'],
-      monogram: r.monogram,
-      ink: r.ink,
-      price: r.price,
-      history: r.history,
-      marketCap: r.price * r.shares,
-      dividend,
-      yield: r.price > 0 ? dividend / r.price : 0,
-      high52: r.high52,
-      low52: r.low52,
-      pe: priceEarnings(r.price, eps),
-      holders: topHolders(state, r.id),
-      self: false,
-    });
+    out.push(rivalSecurity(state, r));
   }
   const st = state.stock;
   if (st.status === 'public') {
@@ -122,6 +103,49 @@ function bankingSecurities(state: GameState): SecurityView[] {
     });
   }
   return out.sort((a, b) => b.marketCap - a.marketCap);
+}
+
+/**
+ * One rival bank's market facts (Market and M&A cards). Only meaningful for a
+ * listed rival; a private one has no share price or history.
+ */
+export function rivalSecurity(state: GameState, r: RivalBank): SecurityView {
+  const dividend = (r.dps ?? 0) * QUARTERS_PER_YEAR;
+  const eps = rivalNetIncomeTtm(r) / Math.max(1, r.shares);
+  return {
+    id: r.id,
+    name: r.name,
+    ticker: r.ticker ?? monogramOf(r.name.toUpperCase()),
+    exchange: EXCHANGES[CITIES[r.cities[0] ?? '']?.country ?? 'CA'],
+    monogram: r.monogram,
+    ink: r.ink,
+    price: r.price,
+    history: r.history,
+    marketCap: r.price * r.shares,
+    dividend,
+    yield: r.price > 0 ? dividend / r.price : 0,
+    high52: r.high52,
+    low52: r.low52,
+    pe: priceEarnings(r.price, eps),
+    holders: topHolders(state, r.id),
+    self: false,
+  };
+}
+
+/**
+ * The price move a card shows: over the last year of weekly closes, or over
+ * as many weeks as there are ("in 12 wk"), with the wording for it.
+ */
+export function priceChange(
+  history: readonly number[],
+  price: number,
+): { change: number; since: string } {
+  const recent = history.slice(-(STOCK_MARKET.rangeWeeks + 1));
+  const first = recent[0] ?? price;
+  const span = recent.length - 1;
+  const since =
+    span >= STOCK_MARKET.rangeWeeks ? 'in a year' : span > 0 ? `in ${span} wk` : 'this week';
+  return { change: first > 0 ? price / first - 1 : 0, since };
 }
 
 /** A share price for cards: "$12.34" (prices stay exact to the cent). */

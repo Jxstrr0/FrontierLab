@@ -6,6 +6,8 @@ import { FranchisePanel } from '../franchise/FranchisePanel';
 import { CarDealerPanel } from '../personal/CarDealerPanel';
 import { VacationHomePanel } from '../personal/VacationHomePanel';
 import { WealthPanel } from '../personal/WealthPanel';
+import { PortfolioPanel } from '../investment/PortfolioPanel';
+import { MilestonesPanel } from '../milestones/MilestonesPanel';
 import { AirportPanel } from '../airport/AirportPanel';
 import { FlightOverlay } from '../airport/FlightOverlay';
 import { TravelSheet } from '../airport/TravelSheet';
@@ -163,6 +165,10 @@ function PanelHost() {
       return <SettingsScreen inGame />;
     case 'saves':
       return <SavesScreen inGame />;
+    case 'portfolio':
+      return FEATURES.investments ? <PortfolioPanel /> : null;
+    case 'milestones':
+      return <MilestonesPanel />;
     case 'credits':
       return <CreditsScreen inGame />;
   }

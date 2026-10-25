@@ -27,8 +27,6 @@ export const FEATURES = {
   multiCity: true,
   /** Stage 9: personal wealth, homes, cars, auctions, franchise. */
   personalEmpire: true,
-  /** Stage 10: art pass, tutorial, sound, PWA. */
-  polish: false,
 } as const;
 
 export type FeatureId = keyof typeof FEATURES;

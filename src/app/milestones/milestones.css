@@ -1,0 +1,51 @@
+/* Milestones screen: a quiet list; reached rows carry a brass diamond and date. */
+.ms-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ms-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  min-height: var(--tap-min);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.ms-row:last-child {
+  border-bottom: none;
+}
+
+.ms-mark {
+  flex: none;
+  width: 20px;
+  color: var(--ivory-dim);
+  font-size: var(--text-16);
+  line-height: var(--line-body);
+}
+
+.ms-row.is-reached .ms-mark {
+  color: var(--brass-light);
+}
+
+.ms-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ms-title {
+  font-weight: 600;
+  color: var(--ivory-dim);
+}
+
+.ms-row.is-reached .ms-title {
+  color: var(--ivory);
+}
+
+.ms-detail {
+  font-size: var(--text-14);
+  color: var(--ivory-dim);
+}

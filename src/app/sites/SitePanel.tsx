@@ -14,21 +14,11 @@ import './sites.css';
 
 type HqSiteKind = 'bureau' | 'agency';
 
-const COPY: Record<HqSiteKind, { advisor: string; title: string; arrives: string; body: string }> =
-  {
-    bureau: {
-      advisor: 'Better data, fewer defaults. What can we score for you?',
-      title: 'Scoring models',
-      arrives: 'Arrives with the Products update',
-      body: 'Packaged underwriting models to use as your house model, and custom models the bureau can build and host for you.',
-    },
-    agency: {
-      advisor: "Let's put your name on every billboard in town.",
-      title: 'Campaign packages',
-      arrives: 'Arrives with the Marketing update',
-      body: 'One-off packages that lift your brand across the city for a few weeks.',
-    },
-  };
+/** The advisor's line for each building. */
+const ADVISOR: Record<HqSiteKind, string> = {
+  bureau: 'Better data, fewer defaults. What can we score for you?',
+  agency: "Let's put your name on every billboard in town.",
+};
 
 export function SitePanel(p: { siteId: string; kind: HqSiteKind }) {
   const s = useGame();
@@ -41,7 +31,6 @@ export function SitePanel(p: { siteId: string; kind: HqSiteKind }) {
       </Panel>
     );
   }
-  const copy = COPY[p.kind];
   const district = DISTRICT_SPECS[site.district]?.name;
   return (
     <Panel
@@ -54,7 +43,7 @@ export function SitePanel(p: { siteId: string; kind: HqSiteKind }) {
         />
       }
       onClose={closePanel}
-      advisor={{ text: copy.advisor }}
+      advisor={{ text: ADVISOR[p.kind] }}
       hero={<SiteArt kind={site.kind} />}
     >
       <div class="stack">

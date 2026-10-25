@@ -4,11 +4,56 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 **Current stage:** 10 — Art pass, onboarding, polish, launch (built and live; awaiting the owner's iPhone check). All ten roadmap stages are built. Still open: the owner's testing and tuning pass, an Add to Home Screen test on a real iPhone, and the Vault Street card on Kelbo.Website (in a separate session in that repo).
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `1bef8d65d74559` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `0d4e27c63a2b9f` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-25 — Audit: everything built, gaps closed
+- **Stage / step:** post-launch audit (owner: "make sure everything is built and nothing has been missed … report issues to me before fixing"). Every system in DESIGN §3.1 was already in the game except milestones. The audit found a handful of rule gaps and loose ends, reported them, and the owner chose yes or no on each in popups.
+- **Weekly recap holds time:** time already stopped while the recap was open. The HUD now shows that too: the play icon, with no speed, until you tap Continue.
+- **Sim fixes (owner said yes):**
+  - **Milestones:** 11 goals, from first branch to top of the rich list, on a new Milestones screen in the menu. Each one toasts when you reach it, and the big ones make a Ledger story. Older saves fill in milestones already reached, without news.
+  - **Loan Desk rules:**
+    - Managers deciding loans by delegation now respect the Critical capital tier and the funding freeze. Before, only the player was stopped.
+    - At the Restricted tier, half as many applications arrive.
+    - A staffed Risk floor makes every branch's risk estimate sharper.
+    - A deciding manager's Ethics shifts their approval line: below 60 they take riskier loans, above it they're stricter.
+  - **Insolvency:** the game isn't lost while an undrawn credit line could cover the cash hole.
+  - **Rivals:** each rival now has a CFO, COO and CRO under the CEO (shown on their HQ panel). Resignation news can name any of them.
+  - **Regional employers:** split into oil sands, iron mine and shale field.
+  - **Stadium naming rights:** now makes a Ledger story.
+- **Screens (owner said yes):**
+  - **Weekly recap:** Revenue and Net income read "Delayed" while the Finance floor is short.
+  - **Menu:** Portfolio and Milestones entries.
+  - **Wealth:** stock cards have a Trade button.
+  - **Storefront:** an area mini-map showing streets, water, parks, rival and own branches, and the competition radius.
+  - **M&A:** cards show the same market stats as the Market tab.
+  - **Loan Desk strip:** applications this week, approved, declined, approval rate, balance, and loans defaulted last week (count and amount).
+  - **Treasury floor:** partnership cards and sliders for the two policies.
+  - **IT floor:** a 26-week app-rating trend, yearly breach odds, and a warning when the CTO seat is empty.
+  - **HQ:** staff figures on every floor coloured by morale, with outlines for open seats.
+  - **Branch Products tab:** the real house-model rosette and a Manage models button.
+- **Saves:**
+  - Each slot now stores a checksum, so a damaged slot is refused instead of half-loading.
+  - When browser storage is full, the message says "Storage full — export your save" and has an Export save button.
+  - Key names are unchanged, so every existing save still loads.
+- **Clean-up:**
+  - Removed stale "later stage" text, the unused placeholder floor and placeholder renderer, and the unused `polish` flag (Stage 10 needs no flag).
+  - Fixed the one build warning by splitting the credits link out of the credits screen.
+- **Kept as is (owner said no), logged in DESIGN §7:** HUD long-press and plane icon, convention networking as flavour. Also logged: save key names, the 50 ms clock timer, the one-column Ledger on phones, and no credit-bureau tier.
+- **Saves:** schema **v12**. Migration 11 → 12 adds desk arrivals, rival benches and the milestone catch-up. See DATA_MODEL §12.
+- **Determinism snapshot:** `1bef8d65d74559` → `0d4e27c63a2b9f`. This is an intended change: new rival bench draws, Loan Desk rules, milestones and the snapshot's app rating.
+- **Balance:**
+  - The 20-seed median panel (`--years 5 --seeds 1-20 --strategy steady`) is all in range. For example, week 52 income is $27.1k/week (target $20–40k) and week 260 income is $40.0k (target $38–70k).
+  - Seed 42 over 10 years meets every steady target: 153 branches and $10.2B assets in year 10.
+  - Seed 42's single week-52 income reading is $1.6k. It was already below the band before this session ($11.5k), because one city and one week is noisy (a default lands that week). The median is the judge.
+- **Checks:**
+  - tsc, ESLint, Prettier and all tests pass. New tests: save slots (checksum, damaged slot, storage full), milestones, HQ floor extras, Loan Desk strip, M&A cards and the storefront area map.
+  - The build has no warnings.
+  - Checked at 390×844: the clock holds on day 7 while the recap is open and the HUD reads paused. Also checked the Milestones and Portfolio panels, the rival bench, and a save and load with checksum. No console errors.
+- **Dependencies:** none added.
 
 ### 2026-10-25 — Start in any city
 - **Stage / step:** post-launch feature (owner: "I'd also like to be able to start in any city").
