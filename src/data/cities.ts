@@ -445,7 +445,8 @@ export const CITIES: Record<string, CitySpec> = {
   }),
 };
 
-export const START_CITIES = ['sas', 'cal', 'tor', 'nyc'] as const;
+/** Cities a new game can start in: every city with storefronts. */
+export const START_CITIES: string[] = Object.keys(CITIES).filter((id) => !CITIES[id]!.regional);
 
 /** Every place with an airport: the v1 cities, then the regional sites. */
 export const DESTINATIONS = Object.keys(CITIES);

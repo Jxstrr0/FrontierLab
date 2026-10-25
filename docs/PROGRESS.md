@@ -10,6 +10,20 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-10-25 — Start in any city
+- **Stage / step:** post-launch feature (owner: "I'd also like to be able to start in any city").
+- **Done:**
+  - New Game's city step lists all 18 cities with storefronts (the three regional sites stay travel-only). Region tabs (Canada / U.S. / Europe / Asia-Pacific) keep the list short on a phone; it opens on the chosen city's region.
+  - Each card now shows the country (Paris, Frankfurt and Amsterdam say France, Germany and the Netherlands rather than "Eurozone"), and each new city has its own one-line flavour.
+  - The intro explains that the start city's country becomes the bank's home: the central bank you borrow from, the taxes you pay and the exchange you list on.
+  - Fixed a style clash: the city list's header class (`city-head`) was also styling the New Game city cards and stacking their titles. The city list now uses `citylist-head`.
+- **Checks:**
+  - New `tests/app/startCities.test.ts` covers every start city: its region tab, flavour line and country name, and that a new game starts at home there.
+  - A 10-year steady run from each of the 18 cities finishes without errors. Results differ by city, as they already did between Saskatoon and New York; the balance bands still use Calgary.
+  - Checked at 390×844: the region tabs, the London card and a London start with the tutorial, with no console errors.
+- **Saves:** no change. `meta.homeCityId` already records the start city.
+- **Dependencies:** none added.
+
 ### 2026-10-25 — Fewer storefronts, scaled to the competition
 - **Stage / step:** post-launch balance (owner: "quality vs quantity: better branches or more of them are two distinct expansion plans, so locations should feel slightly scarce and scale with the number of competitors").
 - **Done:**
