@@ -159,7 +159,13 @@ export function newGame(opts: NewGameOptions): GameState {
     offices: {},
     departments: {},
     hq: { ramp: 0, coverage: fullCoverage() },
-    people: { managers: {}, managerCandidates: {}, candidatesRefreshWeek: {}, benefits: {} },
+    people: {
+      managers: {},
+      managerCandidates: {},
+      candidatesRefreshWeek: {},
+      rerolls: {},
+      benefits: {},
+    },
     products: { catalog: {}, developments: [] },
     underwriting: { activeModelId: model.id, models: { [model.id]: model }, loansBooked: 0 },
     treasury: {

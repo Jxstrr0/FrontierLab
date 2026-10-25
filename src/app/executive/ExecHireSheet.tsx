@@ -1,14 +1,14 @@
 // Hire sheet for an empty executive seat (SCREENS §10): the seat's candidates
 // with portrait, Leadership / Expertise / Loyalty bars, asking salary and Hire.
-// The pool refreshes every few weeks.
+// The pool refreshes every few weeks, or sooner by paying a recruiter.
 import { EXECUTIVES } from '../../config/balance';
 import { DEPARTMENTS } from '../../data/departments';
 import * as cmd from '../../sim/commands';
 import type { ExecSeat } from '../../sim/state';
-import { Card, Sheet, StatBar, Portrait } from '../components';
+import { Card, Portrait, RerollButton, Sheet, StatBar } from '../components';
 import { moneyFull } from '../format/format';
 import { act, toast, useGame } from '../store';
-import { seatSpec } from './execSelectors';
+import { execRerollFee, seatSpec } from './execSelectors';
 
 export function ExecHireSheet(p: { seat: ExecSeat; onClose: () => void }) {
   const s = useGame();
@@ -23,7 +23,7 @@ export function ExecHireSheet(p: { seat: ExecSeat; onClose: () => void }) {
     <Sheet title={`Hire a ${spec.short}`} onClose={p.onClose}>
       <div class="stack">
         <p class="muted small exec-sheet-intro">
-          {spec.title}. {depts} New candidates in {weeks} week{weeks === 1 ? '' : 's'}.
+          {spec.title}. {depts}
         </p>
         {pool.length === 0 && <p class="muted">No candidates right now.</p>}
         {pool.map((c) => (
@@ -56,6 +56,12 @@ export function ExecHireSheet(p: { seat: ExecSeat; onClose: () => void }) {
             </div>
           </Card>
         ))}
+        <RerollButton
+          fee={execRerollFee(s, p.seat)}
+          sym={sym}
+          weeks={weeks}
+          onClick={() => act(cmd.rerollExecCandidates, p.seat)}
+        />
       </div>
     </Sheet>
   );

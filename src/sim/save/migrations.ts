@@ -313,6 +313,13 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     }
     return s;
   },
+  // v17: paid candidate rerolls. Counts start at zero for every pool.
+  16: (s) => {
+    const state = s as unknown as GameState;
+    state.people.rerolls ??= {};
+    state.executives.rerolls ??= {};
+    return s;
+  },
 };
 
 const STAGE9_PNL_LINES = ['franchiseRevenue', 'franchiseCosts', 'dealerFees'] as const;

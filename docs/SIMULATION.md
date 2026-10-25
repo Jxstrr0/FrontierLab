@@ -174,7 +174,7 @@ These are read by other systems:
 - `served = captured × clamp((C − visitRate × customers) / captured, 0, 1)`
 
 ### 6.5 Branch managers
-- **Hiring.** Hire from 3 candidates; the pool refreshes every 4 weeks, and also whenever the hire sheet is closed without hiring (`rerollManagerCandidates`, drawn from the `people` stream). Until your first manager is hired, the first candidate (the tutorial guide) is kept.
+- **Hiring.** Hire from 3 candidates; the pool refreshes free every 4 weeks. **Paid reroll** (`rerollManagerCandidates`, drawn from the `people` stream): a recruiter deals 3 new candidates for CANDIDATE_REROLL.feeShare (10%) × the city's manager market pay (MANAGER_BASE_SALARY × wageIndex), rounded to $100; each further reroll before the free refresh multiplies the fee by CANDIDATE_REROLL.growth (2). The free refresh resets the count; a paid reroll doesn't move its date. The fee is posted to `managers`. Until your first manager is hired, the first candidate (the tutorial guide) is kept.
   - Skills: People, Product, Marketing and Ethics, each drawn from normal(60, 15) and clamped to 25–98.
   - Salary ask: `MANAGER_BASE_SALARY (72,000) × city.wageIndex × (0.7 + 0.6 × avgSkill/100)`.
 - **People** lifts morale and skill (§6.2, §6.3) and the Service rating (§8).
@@ -711,7 +711,7 @@ Levels 1–5 (Very conservative to Very aggressive):
 
 **Resignation:** weekly probability `0.002 × (1.5 − loyalty/100) × (pay/market < 0.9 ? 2 : pay/market ≥ 1.1 ? 0.5 : 1) × (unvested grants ? 0.5 : 1)`. Triggers the `EXEC_POACHED` incident.
 
-**Candidate pools** refresh every 4 weeks. A University Graduate Program adds +10 to candidate skills. Candidates come with every delegation on; a seat remembers the toggles its last holder left, and the next hire for that seat starts with those (schema v13), so a resignation never silently changes how the bank is run.
+**Candidate pools** refresh every 4 weeks. A seat's pool can be rerolled sooner for a recruiter's fee (`rerollExecCandidates`): CANDIDATE_REROLL.feeShare × the executive market salary, doubling with each reroll of that seat until the free refresh; posted to `execPay`. A University Graduate Program adds +10 to candidate skills. Candidates come with every delegation on; a seat remembers the toggles its last holder left, and the next hire for that seat starts with those (schema v13), so a resignation never silently changes how the bank is run.
 
 **Growth cities and "Open now":** `setGrowthCity` marks a city the COO may build in (only cities you have visited, not regional sites); hiring a COO with Expansion on, or switching it on, with none marked seeds the list with the cities you already have branches in. `cooOpenBranch(cityId)` has a seated COO build their usual pick at once, needing only the cash for the build (no reserve, no cadence); it works from any city, because the COO travels for you.
 

@@ -4,6 +4,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   APP_RATING,
+  CANDIDATE_REROLL,
   EXEC_PAY,
   EXECUTIVES,
   GRAD_PROGRAM,
@@ -15,7 +16,8 @@ import { ctoTerm } from '../../src/sim/company';
 import { advanceWeeks, weeklyTick } from '../../src/sim/engine';
 import { refreshExecCandidates } from '../../src/sim/execCandidates';
 import { runGrants, VEST_WEEKS } from '../../src/sim/execGrants';
-import { execMult, execMultOf, resignChance } from '../../src/sim/execSeats';
+import { execMarketSalary, execMult, execMultOf, resignChance } from '../../src/sim/execSeats';
+import { execRerollFee } from '../../src/sim/candidateRerolls';
 import { staffEff, statementDelayWeeks } from '../../src/sim/hq';
 import { incidentChance, raiseIncident } from '../../src/sim/incidents';
 import { sharesHeld } from '../../src/sim/shares';
@@ -54,6 +56,48 @@ describe('candidate pools', () => {
     expect(Math.min(...all.map((c) => c!.expertise))).toBeGreaterThanOrEqual(
       EXECUTIVES.skillRange[0] + GRAD_PROGRAM.skillBonus,
     );
+  });
+
+  it("pays a recruiter for a seat's new candidates, doubling until the free refresh", () => {
+    const s = execGame();
+    const old = s.executives.candidates.cfo!.map((c) => c.id);
+    const others = s.executives.candidates.cmo!.map((c) => c.id);
+    const fee = execRerollFee(s, 'cfo');
+    expect(fee).toBe(Math.round((execMarketSalary(s) * CANDIDATE_REROLL.feeShare) / 100) * 100);
+    const cash = s.company.cash;
+    const r = cmd.rerollExecCandidates(s, 'cfo');
+    expect(r.ok && r.fee).toBe(fee);
+    expect(s.company.cash).toBeCloseTo(cash - fee);
+    const fresh = s.executives.candidates.cfo!;
+    expect(fresh).toHaveLength(EXECUTIVES.candidatesPerSeat);
+    expect(fresh.some((c) => old.includes(c.id))).toBe(false);
+    expect(s.executives.candidates.cmo!.map((c) => c.id)).toEqual(others);
+    expect(Math.abs(execRerollFee(s, 'cfo') - fee * CANDIDATE_REROLL.growth)).toBeLessThanOrEqual(
+      100,
+    );
+    expect(execRerollFee(s, 'cmo')).toBe(fee);
+    refreshExecCandidates(s, true);
+    expect(execRerollFee(s, 'cfo')).toBe(fee);
+    s.company.cash = fee - 1;
+    expect(cmd.rerollExecCandidates(s, 'cfo').ok).toBe(false);
+    s.company.cash = fee * 10;
+    hire(s, 'cfo');
+    expect(cmd.rerollExecCandidates(s, 'cfo').ok).toBe(false);
+  });
+
+  it('adds reroll counts to v16 saves', () => {
+    const s = execGame();
+    const raw = JSON.parse(JSON.stringify(s)) as Record<string, unknown> & {
+      schemaVersion: number;
+    };
+    delete (raw.people as Partial<GameState['people']>).rerolls;
+    delete (raw.executives as Partial<GameState['executives']>).rerolls;
+    raw.schemaVersion = 16;
+    const up = migrate(raw) as unknown as GameState;
+    expect(up.schemaVersion).toBe(SCHEMA_VERSION);
+    expect(up.people.rerolls).toEqual({});
+    expect(up.executives.rerolls).toEqual({});
+    expect(cmd.rerollExecCandidates(up, 'cfo').ok).toBe(true);
   });
 
   it('refuses to hire without an Executive floor', () => {

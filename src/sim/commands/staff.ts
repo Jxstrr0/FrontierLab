@@ -10,6 +10,8 @@ import {
 import { CAMPAIGNS } from '../../data/campaigns';
 import { CITIES } from '../../data/cities';
 import { marketWage, staffNeeded } from '../branch/staff';
+import { managerRerollFee } from '../candidateRerolls';
+import { spend } from '../ledger';
 import { roundToStep } from '../math';
 import { generateManager } from '../people';
 import type { Delegation, GameState } from '../state';
@@ -79,13 +81,19 @@ export function hireManager(
 }
 
 /**
- * Deals a fresh set of manager candidates for a city (the hire sheet calls this
- * when it closes, so reopening it shows new faces). Before your first manager
- * is hired, the first candidate is the tutorial guide ("I'm on the list too")
- * and stays on the list.
+ * Pays a recruiter for a fresh set of manager candidates in a city (SIMULATION
+ * §6.5). The fee doubles with each reroll until the pool's free refresh. Before
+ * your first manager is hired, the first candidate is the tutorial guide ("I'm
+ * on the list too") and stays on the list.
  */
-export function rerollManagerCandidates(state: GameState, cityId: string): CommandResult {
+export function rerollManagerCandidates(
+  state: GameState,
+  cityId: string,
+): CommandResult<{ fee: number }> {
   if (!CITIES[cityId]) return fail('Unknown city.');
+  const fee = managerRerollFee(state, cityId);
+  if (state.company.cash < fee) return fail(`Not enough cash: new candidates cost ${money(fee)}.`);
+  spend(state, 'managers', fee);
   const old = state.people.managerCandidates[cityId] ?? [];
   const keepGuide =
     cityId === state.world.currentCityId &&
@@ -94,8 +102,8 @@ export function rerollManagerCandidates(state: GameState, cityId: string): Comma
   const pool = keepGuide ? [old[0]!] : [];
   while (pool.length < MANAGER_POOL_SIZE) pool.push(generateManager(state, cityId));
   state.people.managerCandidates[cityId] = pool;
-  state.people.candidatesRefreshWeek[cityId] = state.clock.week;
-  return ok();
+  state.people.rerolls[cityId] = (state.people.rerolls[cityId] ?? 0) + 1;
+  return ok({ fee });
 }
 
 export function fireManager(state: GameState, branchId: string): CommandResult {

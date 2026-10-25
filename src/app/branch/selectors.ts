@@ -17,6 +17,7 @@ import { isDeposit, isLoan, type ProductSpec } from '../../data/products';
 import { deskWeek } from '../../sim/branch/loanDesk';
 import { marketWage, staffNeeded } from '../../sim/branch/staff';
 import { managerMarketSalary, managerSalaryBounds } from '../../sim/payReviews';
+export { managerRerollFee } from '../../sim/candidateRerolls';
 import type { Book, Branch, BranchPnl, BranchPnlLine, GameState, Manager } from '../../sim/state';
 import {
   delta,

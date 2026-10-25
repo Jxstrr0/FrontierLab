@@ -17,3 +17,4 @@ export { RadarRosette, type RosetteAxes } from './RadarRosette';
 export { ToastHost } from './Toasts';
 export { BarChart, CoinRating, Medallion, RingGauge, StatBar } from './Visuals';
 export { SpotArt } from './SpotArt';
+export { RerollButton } from './RerollButton';

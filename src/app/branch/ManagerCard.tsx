@@ -1,7 +1,8 @@
 // Branch manager card (SCREENS §5.1): skills, salary against market pay (rivals
 // poach the underpaid, §17.1), the five delegation toggles and Fire; with no manager, a Hire button that opens the candidate sheet.
-// Closing the sheet without hiring deals new candidates for next time.
+// The sheet can pay a recruiter for new candidates (the fee doubles each time until the free refresh).
 import { useState } from 'preact/hooks';
+import { MANAGER_POOL_REFRESH_WEEKS } from '../../config/balance';
 import { managerOf } from '../../sim/branch/staff';
 import * as cmd from '../../sim/commands';
 import type { Branch, Delegation, Manager } from '../../sim/state';
@@ -9,6 +10,7 @@ import {
   Card,
   Confirm,
   Portrait,
+  RerollButton,
   SectionTitle,
   Sheet,
   StatBar,
@@ -17,7 +19,13 @@ import {
 } from '../components';
 import { gameDate, moneyFull, moneyStepper } from '../format/format';
 import { act, toast, useGame } from '../store';
-import { dayOfWeek, managerPayView, salaryBounds, SALARY_STEP } from './selectors';
+import {
+  dayOfWeek,
+  managerPayView,
+  managerRerollFee,
+  salaryBounds,
+  SALARY_STEP,
+} from './selectors';
 
 const STANDING: Record<string, string> = {
   underpaid: 'Underpaid: rivals are more likely to poach them.',
@@ -57,15 +65,7 @@ export function ManagerCard({ branch }: { branch: Branch }) {
             Hire a manager
           </button>
         </Card>
-        {hiring && (
-          <HireSheet
-            branch={branch}
-            onClose={(hired) => {
-              setHiring(false);
-              if (!hired) act(cmd.rerollManagerCandidates, branch.cityId);
-            }}
-          />
-        )}
+        {hiring && <HireSheet branch={branch} onClose={() => setHiring(false)} />}
       </section>
     );
   }
@@ -145,12 +145,15 @@ function Skills({ mgr }: { mgr: Manager }) {
   );
 }
 
-function HireSheet({ branch, onClose }: { branch: Branch; onClose: (hired: boolean) => void }) {
+function HireSheet({ branch, onClose }: { branch: Branch; onClose: () => void }) {
   const s = useGame();
   const pool = s.people.managerCandidates[branch.cityId] ?? [];
   const sym = s.settings.currency;
+  const fee = managerRerollFee(s, branch.cityId);
+  const since = s.people.candidatesRefreshWeek[branch.cityId] ?? s.clock.week;
+  const weeks = Math.max(1, since + MANAGER_POOL_REFRESH_WEEKS - s.clock.week);
   return (
-    <Sheet title="Hire a manager" onClose={() => onClose(false)}>
+    <Sheet title="Hire a manager" onClose={onClose}>
       <div class="stack">
         {pool.length === 0 && <p class="muted">No candidates right now.</p>}
         {pool.map((m) => (
@@ -171,7 +174,7 @@ function HireSheet({ branch, onClose }: { branch: Branch; onClose: (hired: boole
                 onClick={() => {
                   if (act(cmd.hireManager, branch.id, m.id).ok) {
                     toast(`${m.name} now runs ${branch.name}.`, 'good');
-                    onClose(true);
+                    onClose();
                   }
                 }}
               >
@@ -180,9 +183,12 @@ function HireSheet({ branch, onClose }: { branch: Branch; onClose: (hired: boole
             </div>
           </Card>
         ))}
-        <p class="muted small">
-          Not keen on anyone? Close this and reopen it to see new candidates.
-        </p>
+        <RerollButton
+          fee={fee}
+          sym={sym}
+          weeks={weeks}
+          onClick={() => act(cmd.rerollManagerCandidates, branch.cityId)}
+        />
       </div>
     </Sheet>
   );

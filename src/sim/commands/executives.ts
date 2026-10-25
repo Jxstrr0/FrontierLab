@@ -5,6 +5,8 @@
 import { EXEC_PAY, EXECUTIVES, PAY_REVIEW, WEEKS_PER_YEAR } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { EXEC_SEATS } from '../../data/executives';
+import { execRerollFee } from '../candidateRerolls';
+import { generateExecutive } from '../execCandidates';
 import { canGrowIn, expansionPlan, seedGrowthCities } from '../execDelegationsGrowth';
 import { grantFairValue } from '../execGrants';
 import { seatExecutive, vacateSeat } from '../execSeatChanges';
@@ -13,7 +15,7 @@ import { newId } from '../ids';
 import { payReviewsOn, runPayReview } from '../payReviews';
 import { spend } from '../ledger';
 import { roundToStep } from '../math';
-import type { EquityGrant, ExecSeat, GameState } from '../state';
+import type { EquityGrant, ExecSeat, Executive, GameState } from '../state';
 import { buildBranch } from './branches';
 import { fail, money, ok, type CommandResult } from './result';
 
@@ -46,6 +48,27 @@ export function hireExec(state: GameState, seat: ExecSeat, candidateId: string):
   seatExecutive(state, exec);
   seedGrowthCities(state);
   return ok();
+}
+
+/**
+ * Pays a recruiter for a fresh set of candidates for an empty seat (SIMULATION
+ * §17.2). The fee doubles with each reroll until the pools' free refresh.
+ */
+export function rerollExecCandidates(
+  state: GameState,
+  seat: ExecSeat,
+): CommandResult<{ fee: number }> {
+  if (!hasExecFloor(state)) return fail(NO_FLOOR);
+  if (!isSeat(seat)) return fail('Unknown seat.');
+  if (state.executives.seats[seat]) return fail(`You already have a ${EXEC_SEATS[seat].short}.`);
+  const fee = execRerollFee(state, seat);
+  if (state.company.cash < fee) return fail(`Not enough cash: new candidates cost ${money(fee)}.`);
+  spend(state, 'execPay', fee);
+  const pool: Executive[] = [];
+  for (let i = 0; i < EXECUTIVES.candidatesPerSeat; i++) pool.push(generateExecutive(state, seat));
+  state.executives.candidates[seat] = pool;
+  state.executives.rerolls[seat] = (state.executives.rerolls[seat] ?? 0) + 1;
+  return ok({ fee });
 }
 
 export function fireExec(state: GameState, seat: ExecSeat): CommandResult<{ severance: number }> {

@@ -4,11 +4,20 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 **Current stage:** 10 — Art pass, onboarding, polish, launch (built and live; awaiting the owner's iPhone check). All ten roadmap stages are built. Still open: the owner's testing and tuning pass, an Add to Home Screen test on a real iPhone, and the Vault Street card on Kelbo.Website (in a separate session in that repo).
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `18e729fd965135` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `06e4a3cf5f24d3` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-25 — Pay to reroll manager and executive candidates (v0.10.7)
+- **Owner's ask:** a paid reroll for branch manager and C-suite applications.
+- **How it works.** Both hire sheets end with a "New candidates · $fee" button. A recruiter deals a fresh list for 10% of the role's market pay (about $7,100 for a Calgary manager, about $17,600 for a first executive). Each further reroll before the free refresh doubles the fee. The free list every 4 weeks still comes on time and resets the fee. Executive rerolls only touch the seat you're hiring for.
+- **What changed.** Closing the manager sheet no longer deals a free new list, since that would make the paid button pointless. The tutorial guide still stays on the list until your first manager.
+- **Where the money goes.** Manager fees count as manager pay and executive fees as executive pay on the income statement.
+- **Existing saves:** schema v17 (migration 16 → 17) adds the reroll counts, starting at zero.
+- **Balance:** no change. The determinism snapshot moved `18e729fd965135` → `06e4a3cf5f24d3` only because two empty fields joined the save; with them removed the hash matches the old one exactly.
+- **Tests:** 726 (paid manager reroll with the guide kept, doubling, reset and not-enough-cash; executive reroll touching one seat only; migration 16 → 17). Lint, typecheck and build clean. Clicked both sheets at 390×844 with no console errors.
 
 ### 2026-10-25 — Moscow and St Petersburg (v0.10.6)
 - **Owner's ask:** add Moscow as a start city and a city in general, with a huge, high-density urban presence; add St Petersburg too.
