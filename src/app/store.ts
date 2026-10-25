@@ -134,6 +134,15 @@ export function act<A extends unknown[], R extends CommandResult>(
   return result;
 }
 
+/**
+ * Time passes only on the map (DESIGN §5.1): any open panel, sheet or modal
+ * holds the clock, so the weekly results and other popups never land on top of
+ * a screen you are reading.
+ */
+export function clockHeld(): boolean {
+  return panel.value !== null || sheet.value !== null || modal.value !== null;
+}
+
 export function openPanel(route: PanelRoute): void {
   sheet.value = null;
   panel.value = route;
