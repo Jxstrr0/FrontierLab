@@ -12,7 +12,7 @@ Every building panel uses the same five parts, mirroring the original's structur
 2. **Advisor bar:** an oval engraved portrait and a one-line speech. Tap to cycle contextual hints. Lines are in CONTENT.
 3. **Hero vignette:** a procedural engraving of the building, about 16:9. Small corner buttons where needed (e.g. "details").
 4. **Content:** scrolls.
-5. **Bottom tab bar:** when the panel has tabs. It scrolls horizontally if there are more than 5 tabs.
+5. **Bottom tab bar:** when the panel has tabs. The current tab sits in a brass pill and is scrolled to the middle whenever it changes. When the tabs don't all fit, the bar scrolls sideways and a side with hidden tabs fades under a chevron (tap to page that way). The five branch tabs fit at 390 px.
 
 **Phone vs desktop:** on phones, panels slide up full-screen. On screens ≥ 900 px wide, they open as a right drawer, `min(480px, 40vw)` wide, over the map. Modals are centered cards; on phones they become bottom sheets.
 

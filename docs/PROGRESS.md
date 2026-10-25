@@ -10,6 +10,16 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-10-25 — Bottom tabs easier to use and read
+- **Done (owner's ask):** the bottom tab bars on panels (HQ floors, branch, investment bank and the rest) were hard to read and use. On the HQ, the floor you were on could sit off screen with nothing showing the bar scrolled.
+  - The current tab now sits in a brass pill with bold brass text, instead of only a thin line above it.
+  - The bar scrolls the current tab to the middle whenever you change tab, so it is never hidden.
+  - When some tabs are hidden, that side fades out under a chevron (‹ or ›). Tap the chevron to page that way, or swipe as before.
+  - Bigger labels and icons (HQ labels 12 → 13 px, icons 22 → 24 px) and taller tabs (56–62 px).
+  - The five branch tabs still fit on one screen at 390 px. With Large text, branch labels wrap onto two lines as before.
+- **Code:** the bar is now its own component, `src/app/components/PanelTabs.tsx`, used by every Panel. Added `chevronLeft` and `chevronRight` icons.
+- **Checked** at 390×844: the HQ on its first, middle and last floors, chevron paging, the branch panel, and Large text. No console errors; all 672 tests pass, lint and types clean.
+
 ### 2026-10-25 — HQ and map symbols clean-up
 - **Owner's picks (popups):** an icon floor bar and an Office sheet for the HQ; one pin size, words only at close zoom, compact office tags and quieter open-spot dots for the map. Not picked, so not done: tidier executive cards, a shorter HQ illustration, smaller rival crests.
 - **HQ:**

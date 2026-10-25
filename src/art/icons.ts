@@ -76,6 +76,8 @@ export const ICON_PATHS = {
   layers: 'M12 4 3 9l9 5 9-5zM3 13.5l9 5 9-5',
   close: 'M6 6l12 12M18 6 6 18',
   plus: 'M12 5v14M5 12h14',
+  chevronLeft: 'M15 5l-7 7 7 7',
+  chevronRight: 'M9 5l7 7-7 7',
   pause: 'M8.5 5v14M15.5 5v14',
   play: 'M7 5l12 7-12 7z',
   fast: 'M4 6l8 6-8 6zM12 6l8 6-8 6z',

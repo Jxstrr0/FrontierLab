@@ -367,49 +367,113 @@
   border-top: 1px solid var(--hairline);
   background: var(--vault-deep);
 }
+/* Bottom tab bar (PanelTabs.tsx): the current tab in a brass pill; extra tabs
+   scroll sideways, the hidden side fading out under a chevron. */
 .panel-tabs {
-  display: flex;
-  overflow-x: auto;
+  position: relative;
   background: var(--vault-deep);
   border-top: 1px solid var(--hairline);
   padding-bottom: var(--safe-bottom);
+}
+.panel-tabs-track {
+  display: flex;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
   scrollbar-width: none;
+}
+.panel-tabs-track::-webkit-scrollbar {
+  display: none;
 }
 .panel-tab {
   flex: 1 0 auto;
-  min-height: 52px;
-  padding: 0 var(--space-1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 56px;
+  padding: 0 2px;
   border: 0;
   background: transparent;
   color: var(--ivory-dim);
+  font: inherit;
   font-size: var(--text-14);
   font-weight: 600;
   cursor: pointer;
   position: relative;
-  border-top: 2px solid transparent;
+}
+.panel-tab-pill {
+  flex: 1 1 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  /* Stretches to its tab, so five branch tabs still fit at 390px. */
+  padding: 0 5px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  line-height: 1.15;
 }
 .panel-tab.is-active {
   color: var(--brass-light);
-  border-top-color: var(--brass);
 }
-/* Icon bar (HQ floors): an icon over a short label, scrolling sideways when
-   there are more tabs than fit. */
+.panel-tab.is-active .panel-tab-pill {
+  background: rgb(184 145 61 / 18%);
+  border-color: rgb(184 145 61 / 55%);
+}
+.panel-tab:active .panel-tab-pill {
+  background: rgb(184 145 61 / 12%);
+}
+/* Icon bar (HQ floors): the pill holds the icon, the label sits under it. */
 .panel-tabs.has-icons .panel-tab {
-  flex: 1 0 64px;
-  min-height: 56px;
-  display: flex;
+  flex: 1 0 72px;
+  min-height: 62px;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-  padding: var(--space-1) var(--space-1) 0;
+  gap: 2px;
+  padding: 6px 6px 4px;
+}
+.panel-tabs.has-icons .panel-tab-pill {
+  flex: none;
+  min-height: 30px;
+  width: 52px;
+  padding: 0;
 }
 .panel-tab-label {
-  font-size: var(--text-12);
-  line-height: 1.1;
+  font-size: 13px;
+  line-height: 1.15;
   white-space: nowrap;
 }
+.panel-tab.is-active .panel-tab-label {
+  font-weight: 700;
+}
 .panel-tabs.has-icons .dot {
+  position: absolute;
+  top: 5px;
+  right: calc(50% - 26px);
+  margin: 0;
+}
+/* Fades and chevrons over a side with hidden tabs (tap to page that way). */
+.panel-tabs-more {
+  position: absolute;
+  top: 0;
+  bottom: var(--safe-bottom);
+  width: var(--tap-min);
+  display: flex;
+  align-items: center;
+  border: 0;
+  padding: 0 4px;
+  color: var(--brass-light);
+  cursor: pointer;
+}
+.panel-tabs-more.is-left {
+  left: 0;
+  justify-content: flex-start;
+  background: linear-gradient(to right, var(--vault-deep) 55%, transparent);
+}
+.panel-tabs-more.is-right {
+  right: 0;
+  justify-content: flex-end;
+  background: linear-gradient(to left, var(--vault-deep) 55%, transparent);
+}
+.dot {
   position: absolute;
   top: 6px;
   right: calc(50% - 18px);
