@@ -7,10 +7,10 @@ import { dpow } from '../detmath';
 import { clamp } from '../math';
 import type { GameState } from '../state';
 
-/** Customers your bank can win in this city (CITY_MARKET by city size). */
+/** Customers your bank can win in this city (CITY_MARKET by city size × density). */
 export function cityMarket(cityId: string): number {
   const city = CITIES[cityId];
-  return city ? CITY_MARKET[city.size] : 0;
+  return city ? CITY_MARKET[city.size] * (city.density ?? 1) : 0;
 }
 
 /** Your customers across every branch in the city. */
@@ -36,5 +36,5 @@ export function cityRoom(state: GameState, cityId: string): number {
 /** About how many branches a city supports (advice, CITY_BRANCH_GUIDE). */
 export function cityBranchGuide(cityId: string): number {
   const city = CITIES[cityId];
-  return city ? CITY_BRANCH_GUIDE[city.size] : 0;
+  return city ? Math.round(CITY_BRANCH_GUIDE[city.size] * (city.density ?? 1)) : 0;
 }

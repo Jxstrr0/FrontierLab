@@ -19,6 +19,7 @@ export const LOBBY_FIRMS: Record<string, LobbyFirmSpec> = {
     name: 'Harbourline Policy Group',
     countries: ['AU', 'SG', 'HK', 'JP'],
   },
+  graniteQuay: { id: 'graniteQuay', name: 'Granite Quay Advisors', countries: ['RU'] },
 };
 
 export const lobbyFirmFor = (country: CountryId): LobbyFirmSpec | undefined =>

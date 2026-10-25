@@ -13,7 +13,7 @@ import { newGame } from '../../src/sim/newGame';
 
 describe('start cities', () => {
   it('offers every non-regional city and no regional site', () => {
-    expect(START_CITIES.length).toBe(18);
+    expect(START_CITIES.length).toBe(20);
     for (const id of START_CITIES) expect(CITIES[id]!.regional).toBeUndefined();
   });
 

@@ -18,6 +18,7 @@ Starting values are fictional. Meeting weeks are weeks of the year.
 | AU | Australia | Reserve Bank of Australia | 3.60% | 3.00% | 2.5% | 30% | 7, 13, 20, 27, 33, 40, 46, 50 | |
 | SG | Singapore | Monetary Authority of Singapore | 3.00% | 2.50% | 2.0% | 17% | 4, 17, 30, 43 | |
 | HK | Hong Kong | Hong Kong Monetary Authority | — | — | — | 16.5% | follows US | `peggedTo: US`, spread +0.25% |
+| RU | Russia | Bank of Russia | 6.00% | 5.00% | 2.0% | 25% | 6, 12, 17, 24, 30, 38, 43, 51 | Moscow, St Petersburg. A high-rate economy. `ownStream`: its cycle and currency use their own RNG streams (`macro:RU`, `fx:RU`), so adding it left existing worlds unchanged |
 
 ## 2. Cities (v1)
 
@@ -41,6 +42,10 @@ Starting values are fictional. Meeting weeks are weeks of the year.
 | syd | Sydney | AU | L | 64 | −33.87, 151.21 | 1.25 | 1.10 | 1.20 | 1.15 | 0.40 | 4 | Coral | |
 | sin | Singapore | SG | L | 60 | 1.35, 103.82 | 1.40 | 1.05 | 1.30 | 1.20 | 0.42 | 4 | Orchid | |
 | hkg | Hong Kong | HK | L | 60 | 22.32, 114.17 | 1.60 | 1.00 | 1.25 | 1.25 | 0.45 | 4 | Jade Harbour | |
+| mos | Moscow | RU | XL | 84 | 55.76, 37.62 | 1.05 | 0.70 | 0.85 | 0.80 | 0.50 | 5 | Brick Crimson | density 1.35 |
+| spb | St Petersburg | RU | L | 64 | 59.94, 30.31 | 0.85 | 0.65 | 0.90 | 0.75 | 0.42 | 4 | Neva Blue | density 1.15 |
+
+**Density** (optional, default 1): how crowded a city is. It multiplies every lot's foot traffic and the city-wide customer pool (`CITY_MARKET`, SIMULATION §9.2) and the branch guide, so each branch's catchment holds more people. Rent still follows `rentIndex`.
 
 ### Regional sites
 Each site is a small map with an airport and 1–2 employers. There are no storefronts.
@@ -69,8 +74,8 @@ Each city's generator mixes these districts in proportions set by city size.
 **How many storefronts** (2026-10-25): `round(LOTS_BASE[size] + LOTS_PER_RIVAL[size] × rival banks in the city)`, with `LOTS_BASE = { S: 12, M: 18, L: 24, XL: 32 }` and `LOTS_PER_RIVAL = { S: 4, M: 4.5, L: 5, XL: 6 }`. With the usual rival count that is about 20 / 32 / 44 / 62 storefronts (it was 36 / 56 / 80 / 110), so good corners feel slightly scarce and a city with more competitors has more of them. At the start about three times the advised branch count (SIMULATION §9.2) is free; rivals take more as they grow. Cities already on the map in a save (layout 1) keep their original count.
 
 How a lot's values are derived:
-- **Traffic:** district value ×U(0.65, 1.35).
-- **Rent:** base × city.rentIndex × (traffic / district traffic)^0.6 × U(0.9, 1.1).
+- **Traffic:** district value × city density (default 1) × U(0.65, 1.35).
+- **Rent:** base × city.rentIndex × (traffic / (district traffic × density))^0.6 × U(0.9, 1.1).
 - **Deposit:** 6 × rent.
 - **incomeIndex:** district income × city.incomeIndex × U(0.9, 1.1).
 - **Position:** a point drawn around the district centre (balance `CITYGEN.layout`), snapped to the nearest free tile facing a street. Streets run every 4th row and column (`CITY_LAYOUT.block`); water cities have a wavy shoreline near the far edge (`CITY_LAYOUT.shore`).
@@ -373,6 +378,11 @@ Counterparty names: Harbor Clearing Bank · Meridian Treasury · Atlas Money Mar
 | lionport | Lionport Bank | Incumbent | SG | #9C2F2F | yes (LPB) |
 | jadeharbour | Jade Harbour Bank | Incumbent | HK | #2F7A6A | yes (JHB) |
 | peak | Peak Private | Premium | HK, SG | #3A3A4A | no |
+| volgastate | Volga State Bank | Incumbent | RU | #7A2430 | yes (VSB) |
+| birchcrest | Birchcrest Bank | Incumbent | RU | #3A5A40 | yes (BCB) |
+| komet | Komet | Disruptor | RU | #E0663A | no |
+| ambermark | Ambermark Private | Premium | RU | #4A3A5A | no |
+| nevasavings | Neva Savings Union | Community | RU | #4A7A9A | no |
 
 **Strategy offsets and quality profiles:**
 
@@ -398,9 +408,9 @@ Branch counts at start, by city size: S 3–5, M 6–10, L 10–16, XL 16–24 i
   | Sakura Bridge Securities | Tokyo, Singapore, Hong Kong | 4.40% | 0–10% | |
   | Southern Gate Advisory | Sydney, Vancouver | 4.70% | 0–12% | |
 
-  Cities not listed borrow the nearest house: Saskatoon and Montréal → Ashgrove Capital, Seattle → Whitlock & Rowe, Frankfurt and Amsterdam → Meridian Partners. Implemented in `src/data/investmentBanks.ts`.
+  Cities not listed borrow the nearest house: Saskatoon and Montréal → Ashgrove Capital, Seattle → Whitlock & Rowe, Frankfurt, Amsterdam, Moscow and St Petersburg → Meridian Partners. Implemented in `src/data/investmentBanks.ts`.
 - **Marketing agencies:** Brightwell Creative, Northwind & Pike, Studio Halcyon. Present in L and XL cities; M cities get one.
-- **Lobbying firms:** Capitol Bridge Advisors (US), Parliament Row Partners (CA, UK), Rue Royale Affairs (EA, and CH by borrowing), Harbourline Policy Group (AU, SG, HK, and JP by borrowing). Campaigns are in SIMULATION §21.6.
+- **Lobbying firms:** Capitol Bridge Advisors (US), Parliament Row Partners (CA, UK), Rue Royale Affairs (EA, and CH by borrowing), Harbourline Policy Group (AU, SG, HK, and JP by borrowing), Granite Quay Advisors (RU). Campaigns are in SIMULATION §21.6.
 - **Universities:**
   - Named: Prairie State University (Saskatoon), Kingsley University (Toronto), Bow River University (Calgary), Pacific Crest University (Vancouver), Hudson Polytechnic (New York).
   - Elsewhere, generate as "University of {City}" or "{City} Institute of Technology".
@@ -408,9 +418,10 @@ Branch counts at start, by city size: S 3–5, M 6–10, L 10–16, XL 16–24 i
   - Marlowe & Finch (London, New York): 4% counterfeit odds
   - Harrowgate Auctions (Toronto, Chicago): 8%
   - Kanazawa Auctions (Tokyo, Hong Kong): 6%
+  - Sokolov & Lind (Moscow, St Petersburg): 9%
 - **Convention centre:** one per L and XL city, plus every city that hosts a convention (Saskatoon, Calgary). Venue names are in `src/data/conventions.ts`; other cities use "{City} Convention Centre".
 - **Property buildings:** 4 / 6 / 8 / 10 per S / M / L / XL city, in any district (SIMULATION §21.5).
-- **Airports** (code, name): SAS Saskatoon Regional · CAL Calgary International · VAN Vancouver International · TOR Toronto Pearson-style "Lakeshore International" · MTL Montréal-Mercier · NYC Liberty International · CHI O'Hare-style "Lakefront International" · SFO Bayview International · SEA Sound International · LON Thameshaven · PAR Charles-Lumière · FRA Rhein-Main · AMS Polder International · ZUR Kloten-Alpen · TYO Haneda-Bay · SYD Harbour Kingsford · SIN Changi-Garden · HKG Lantau Harbour. Regional sites: FMM Athabasca Field · PHE Port Hedland Strip · MAF Permian Regional. All fictional names; use the city name in UI where clearer.
+- **Airports** (code, name): SAS Saskatoon Regional · CAL Calgary International · VAN Vancouver International · TOR Toronto Pearson-style "Lakeshore International" · MTL Montréal-Mercier · NYC Liberty International · CHI O'Hare-style "Lakefront International" · SFO Bayview International · SEA Sound International · LON Thameshaven · PAR Charles-Lumière · FRA Rhein-Main · AMS Polder International · ZUR Kloten-Alpen · TYO Haneda-Bay · SYD Harbour Kingsford · SIN Changi-Garden · HKG Lantau Harbour · MOW Vnukovo Fields · LED Pulkovo-Neva. Regional sites: FMM Athabasca Field · PHE Port Hedland Strip · MAF Permian Regional. All fictional names; use the city name in UI where clearer.
 
 ## 17. Stock market (non-bank listed companies)
 
@@ -435,7 +446,7 @@ Branch counts at start, by city size: S 3–5, M 6–10, L 10–16, XL 16–24 i
 
 The Banking sector lists the rivals marked "Listed" in §15, and your bank once it lists.
 
-Implemented in `src/data/stocks.ts`, with a home exchange per company and beta by sector (Technology 1.3, Auto 1.2, Banking 1.1, Energy 0.9, Retail 0.8, Real estate 0.7). **Exchanges** (fictional, one per country): CA Maple Exchange · US Union Exchange · UK Thames Exchange · EA Rhine Bourse · CH Alpine Exchange · JP Sakura Exchange · AU Coral Exchange · SG Lion City Exchange · HK Pearl Exchange. **Index:** the Ledger Composite.
+Implemented in `src/data/stocks.ts`, with a home exchange per company and beta by sector (Technology 1.3, Auto 1.2, Banking 1.1, Energy 0.9, Retail 0.8, Real estate 0.7). **Exchanges** (fictional, one per country): CA Maple Exchange · US Union Exchange · UK Thames Exchange · EA Rhine Bourse · CH Alpine Exchange · JP Sakura Exchange · AU Coral Exchange · SG Lion City Exchange · HK Pearl Exchange · RU Neva Exchange. **Index:** the Ledger Composite.
 
 **Sector μ by phase** (annual, Expansion / Slowdown / Recession / Recovery):
 
@@ -506,6 +517,7 @@ Announced in the Ledger 2 weeks before. Active for 1 week. Calgary's fair is our
 | AU | AUD | Australian dollar | 0.9% | |
 | SG | SGD | Singapore dollar | 0.4% | |
 | HK | HKD | Hong Kong dollar | 0.5% | pegged to USD |
+| RU | RUB | Russian ruble | 1.2% | the most volatile |
 
 ## 20. Personal purchases
 

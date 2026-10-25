@@ -12,7 +12,7 @@ export type Stars = number;
 export type Score = number;
 /** 0–1 */
 export type Pct = number;
-export type CountryId = 'CA' | 'US' | 'UK' | 'EA' | 'CH' | 'JP' | 'AU' | 'SG' | 'HK';
+export type CountryId = 'CA' | 'US' | 'UK' | 'EA' | 'CH' | 'JP' | 'AU' | 'SG' | 'HK' | 'RU';
 export type SegmentId = 'STU' | 'YP' | 'FAM' | 'RET' | 'BIZ';
 export type SegmentMix = Record<SegmentId, number>;
 export type CategoryId = 'deposits' | 'lending' | 'cards';
