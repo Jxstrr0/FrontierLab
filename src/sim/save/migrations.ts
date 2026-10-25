@@ -256,6 +256,20 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     }
     return s;
   },
+  // v14: the CFO's share sales split out of Capital (each keeps what Capital
+  // did, so nothing changes until you flip one), and the last fit-out you built.
+  13: (s) => {
+    const state = s as unknown as GameState;
+    const ex = state.executives;
+    const cfo = ex.seats.cfo;
+    if (cfo) cfo.delegations.shares ??= !!cfo.delegations.capital;
+    const mem = ex.remembered.cfo;
+    if (mem) mem.shares ??= !!mem.capital;
+    for (const c of ex.candidates.cfo ?? []) c.delegations.shares ??= true;
+    const newest = Object.values(state.branches).sort((a, b) => b.builtDay - a.builtDay)[0];
+    if (newest && !state.company.lastBuild) state.company.lastBuild = { ...newest.build };
+    return s;
+  },
 };
 
 const STAGE9_PNL_LINES = ['franchiseRevenue', 'franchiseCosts', 'dealerFees'] as const;

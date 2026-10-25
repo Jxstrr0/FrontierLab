@@ -1,13 +1,15 @@
-// The CFO's Capital delegation (SIMULATION §17.2, §15): a weekly routine that
-// steers a weak capital ratio back to a safe level using the player's own
-// commands, in the order a careful finance chief would:
+// The CFO's Capital and Share sales delegations (SIMULATION §17.2, §15): weekly
+// routines that steer a weak capital ratio back to a safe level using the
+// player's own commands, in the order a careful finance chief would.
+// Capital:
 //   1. at Watch or worse, sell the company's stock holdings (risk weight 2.5×)
 //   2. at Watch or worse, step risk appetite down every few weeks (unless a CRO
 //      already runs appetite) so new lending carries less risk
-//   3. at Restricted or Critical, or under the charter floor, sell new shares
-//      through the cheapest investment bank: a private placement while private
-//      (rounds and spacing permitting), a secondary offering once listed, sized
-//      to reach the target ratio (12%, plus any regulator buffer in force)
+// Share sales (its own switch, so you can keep your stake from being diluted):
+//   3. at Restricted or Critical, sell new shares through the cheapest
+//      investment bank: a private placement while private (rounds and spacing
+//      permitting), a secondary offering once listed, sized to reach the target
+//      ratio (12%, plus any regulator buffer in force). Never launches an IPO.
 import { CHARTER_MIN_EQUITY, EXEC_DELEGATION as X, PLACEMENT, SECONDARY } from '../config/balance';
 import { INVESTMENT_BANKS } from '../data/investmentBanks';
 import { capitalBufferPp, capitalSnapshot } from './capital';
@@ -67,7 +69,7 @@ function raiseCapital(state: GameState): void {
 const WEAK = new Set(['watch', 'restricted', 'critical']);
 const RAISE = new Set(['restricted', 'critical']);
 
-/** Capital: brings a tier under Adequate back to the target ratio. */
+/** Capital: at Watch or worse, sells company stocks and trims risk appetite. */
 export function cfoCapital(state: GameState): void {
   if (!WEAK.has(capitalSnapshot(state).tier)) return;
   sellCompanyStocks(state);
@@ -78,5 +80,9 @@ export function cfoCapital(state: GameState): void {
     !delegationOn(state, 'cro', 'appetite')
   )
     setRiskAppetite(state, level - 1);
+}
+
+/** Share sales: at Restricted or Critical, sells new shares sized to the target ratio. */
+export function cfoShares(state: GameState): void {
   if (RAISE.has(capitalSnapshot(state).tier)) raiseCapital(state);
 }

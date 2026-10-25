@@ -83,11 +83,12 @@ export function bestLot(state: GameState, cityId: string): Lot | undefined {
   return best;
 }
 
-/** Your usual fit-out: the newest branch's build, then the reference builds, affordable first. */
+/** Your usual fit-out: the last build you chose (else the newest branch's), then the reference builds. */
 export function usualBuilds(state: GameState): BuildSpec[] {
   const newest = Object.values(state.branches).sort((a, b) => b.builtDay - a.builtDay)[0];
+  const usual = state.company.lastBuild ?? newest?.build;
   const list: BuildSpec[] = [];
-  if (newest) list.push({ ...newest.build });
+  if (usual) list.push({ ...usual });
   list.push({ ...REFERENCE_BUILDS.mid }, { ...REFERENCE_BUILDS.basic });
   return list;
 }

@@ -325,7 +325,7 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 | Personal | `offerHome`, `rebuildHome`, `sellHome`, `buyCar`, `sellCar`, `placeBid`, `clearBid`, `appraiseCollectible`, `consignCollectible`, `withdrawConsignment`, `buyJet`, `sellJet`, `buyClub`, `sellClub`, `setKit`, `setKitSponsor`, `signPlayer`, `releasePlayer` |
 | Settings and saves | `setSettings`, `setFounderAvatar`; saves are not commands: `saveToSlot`, `loadFromSlot` (`src/sim/save/storage.ts`), `exportCode`, `importCode` (`serialize.ts`) |
 
-## 12. Implemented so far (schema v13)
+## 12. Implemented so far (schema v14)
 
 `src/sim/state.ts` is the source of truth; this section records how it differs from the guide above. Later stages add the rest with a schema bump and a migration.
 
@@ -339,6 +339,7 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 - **Schema v11 adds** `CityState.layout` (1 | 2): which map layout a city uses. Layout 1 is the original shared street grid and bottom-edge shoreline; layout 2 is the city's own geography from `data/cityLooks.ts` (water form, district arrangement, big park). Migration 10 → 11 sets layout 1 on every city already generated, so their lots, offices, sites and picture never move; `worldGen.generateCity` sets layout 2. The derived geometry (water, street, bridge, park and frontage masks, fitted district centres) lives in `src/sim/cityGeo.ts`, cached per city and layout, and is never saved.
 - **Schema v12 adds** (audit follow-up): `DeskWeek.arrived` (applications that arrived this week), `RivalBank.execs` (the CFO/COO/CRO bench: `{ title, name }[]`), `WeeklySnapshot.appRating` (for the IT floor's trend) and, optional, `Book.last.defaultedLoans` (business loans that defaulted in the week). `milestones` now fills (id → week reached). Migration 11 → 12 draws every rival's bench from the `rivalBench` stream, adds `arrived: 0` to every desk tally and records milestones already reached without news.
 - **Schema v13 adds** (hands-off play): `executives.remembered` (per seat, the delegation toggles its last holder left; applied to the next hire), `executives.growthCities` (city id → true: where the COO's Expansion may build) and `executives.lastExpansionWeek` (-1 before the first COO build). `IncidentSpec.yours` and `NEW_BRANCH.by` ('coo') are data, not state. Migration 12 → 13 adds the three fields and switches every waiting candidate's delegations on (the new default).
+- **Schema v14 adds:** `company.lastBuild` (optional `BuildSpec`: the fit-out of your last own build; the build sheet and the COO's Expansion start from it) and the CFO's `shares` delegation (Share sales, split out of Capital). Migration 13 → 14 sets a seated CFO's and the remembered CFO toggles' `shares` to their `capital`, switches it on for waiting CFO candidates, and fills `lastBuild` from the newest branch.
 - **Not yet present:** nothing from the v1 plan.
 - **Added fields:**
   - `ledger`: P&L lines and cash movements since the last weekly close, so commands between ticks land in the right week.

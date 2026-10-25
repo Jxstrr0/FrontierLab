@@ -121,6 +121,7 @@ After the wizard, the map opens with the tutorial (§27).
 
 ## 4. Build branch
 
+- **Starting pick:** the fit-out you last built with (`company.lastBuild`), so the parts don't need choosing again; before your first build, the mid reference build if cash allows, then basic, then the cheapest parts.
 - **Hero:** the vignette updates live as you change parts.
 - **Five tiles:** Exterior, Lobby, Teller line, Vault, ATM. Each shows the current pick's thumbnail and price.
 - **Tap a tile** to open a picker sheet: a carousel of options with name, one-line description, coins (Quality, Productivity, or Security for vaults), extra facts (stations, advisor offices, boxes), price, and Select.

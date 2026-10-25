@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { REFERENCE_BUILDS } from '../../src/data/equipment';
 import * as cmd from '../../src/sim/commands';
 import { newGame } from '../../src/sim/newGame';
+import { defaultBuild } from '../../src/app/build/builds';
+import { usualBuilds } from '../../src/sim/execDelegationsGrowth';
 import { freeLot } from '../helpers/scenario';
 
 describe('commands', () => {
@@ -16,6 +18,19 @@ describe('commands', () => {
     expect(s.company.leaseDeposits).toBe(lot.deposit);
     expect(lot.occupant?.type).toBe('player');
     expect(s.events.scheduled).toHaveLength(1);
+  });
+
+  it('remembers the fit-out you built with; the build sheet and the COO start from it', () => {
+    const s = newGame({ seed: 42, cityId: 'cal' });
+    s.company.cash = 5_000_000;
+    expect(defaultBuild(s, freeLot(s).id)).toEqual(REFERENCE_BUILDS.mid);
+    const mine = { ...REFERENCE_BUILDS.basic, vault: REFERENCE_BUILDS.mid.vault };
+    expect(cmd.buildBranch(s, { lotId: freeLot(s, 'midtown').id, build: mine }).ok).toBe(true);
+    expect(s.company.lastBuild).toEqual(mine);
+    const next = defaultBuild(s, freeLot(s).id);
+    expect(next).toEqual(mine);
+    expect(next).not.toBe(s.company.lastBuild); // a copy, so editing the sheet can't change it
+    expect(usualBuilds(s)[0]).toEqual(mine);
   });
 
   it('explains why a build is refused', () => {

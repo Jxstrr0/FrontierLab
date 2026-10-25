@@ -71,7 +71,13 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
         id: 'capital',
         label: 'Capital',
         description:
-          'Keeps the capital ratio safe: below 10.5% sells company stocks and trims risk appetite; below 8% sells new shares to get back to 12%.',
+          'Keeps the capital ratio safe without selling shares: below 10.5% sells company stocks and trims risk appetite.',
+      },
+      {
+        id: 'shares',
+        label: 'Share sales',
+        description:
+          'Below 8%, sells new shares to get back to 12%: a private placement while private, a secondary offering once listed. Never launches your IPO.',
       },
       {
         id: 'dividends',

@@ -6,7 +6,7 @@ import { EXEC_DELEGATION, PLACEMENT } from '../../src/config/balance';
 import { capitalSnapshot } from '../../src/sim/capital';
 import * as cmd from '../../src/sim/commands';
 import { advanceWeeks } from '../../src/sim/engine';
-import { capitalNeeded, cfoCapital } from '../../src/sim/execDelegationsCapital';
+import { capitalNeeded, cfoCapital, cfoShares } from '../../src/sim/execDelegationsCapital';
 import type { GameState } from '../../src/sim/state';
 import { homeCountry } from '../../src/sim/treasury';
 import { hire, identityGap } from '../helpers/executives';
@@ -41,7 +41,14 @@ const holdsStocks = (s: GameState) =>
 const withCfo = (s: GameState) => {
   hire(s, 'cfo');
   expect(cmd.setExecDelegation(s, 'cfo', 'capital', true).ok).toBe(true);
+  expect(cmd.setExecDelegation(s, 'cfo', 'shares', true).ok).toBe(true);
   return s;
+};
+
+/** One week of both CFO capital routines, in their tick order. */
+const steer = (s: GameState) => {
+  cfoCapital(s);
+  cfoShares(s);
 };
 
 describe('CFO capital', () => {
@@ -49,7 +56,7 @@ describe('CFO capital', () => {
     const s = withCfo(bankWithFloors(['executive'], { weeks: 156 }));
     expect(['adequate', 'strong']).toContain(capitalSnapshot(s).tier);
     const shares = s.company.sharesOutstanding;
-    cfoCapital(s);
+    steer(s);
     expect(s.company.sharesOutstanding).toBe(shares);
   });
 
@@ -61,7 +68,7 @@ describe('CFO capital', () => {
     expect(capitalSnapshot(s).tier).toBe('restricted');
     const target = EXEC_DELEGATION.cfoTargetCr + 0.05;
     const shares = s.company.sharesOutstanding;
-    cfoCapital(s);
+    steer(s);
     expect(s.stock.placements).toHaveLength(1);
     expect(s.company.sharesOutstanding - shares).toBeLessThan(shares * PLACEMENT.maxPct);
     const cr = capitalSnapshot(s).capitalRatio;
@@ -75,10 +82,10 @@ describe('CFO capital', () => {
     const s = withCfo(shockedBank(0.035));
     const shares = s.company.sharesOutstanding;
     const before = capitalSnapshot(s).capitalRatio;
-    cfoCapital(s);
+    steer(s);
     expect(s.company.sharesOutstanding - shares).toBe(Math.round(shares * PLACEMENT.maxPct));
     expect(capitalSnapshot(s).capitalRatio).toBeGreaterThan(before);
-    cfoCapital(s); // the next round waits for the 26-week gap
+    steer(s); // the next round waits for the 26-week gap
     expect(s.stock.placements).toHaveLength(1);
   });
 
@@ -89,9 +96,19 @@ describe('CFO capital', () => {
     s.company.riskAppetite = 3;
     while (s.clock.week % EXEC_DELEGATION.croEveryWeeks !== 0) s.clock.week++;
     const shares = s.company.sharesOutstanding;
-    cfoCapital(s);
+    steer(s);
     expect(holdsStocks(s)).toBe(false);
     expect(s.company.riskAppetite).toBe(2);
+    expect(s.company.sharesOutstanding).toBe(shares);
+  });
+
+  it('with Share sales off, sells stocks and trims appetite but never new shares', () => {
+    const s = withCfo(shockedBank(0.035, 1_000_000));
+    expect(cmd.setExecDelegation(s, 'cfo', 'shares', false).ok).toBe(true);
+    const shares = s.company.sharesOutstanding;
+    advanceWeeks(s, 8);
+    expect(holdsStocks(s)).toBe(false);
+    expect(s.stock.placements).toHaveLength(0);
     expect(s.company.sharesOutstanding).toBe(shares);
   });
 
