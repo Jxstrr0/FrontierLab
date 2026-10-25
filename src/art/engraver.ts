@@ -2,8 +2,11 @@
 // weights, level of detail) plus tile-local path helpers. Building and ground
 // painters draw through it in tile space — (a, b) across a footprint and z in
 // world px up — so every shape lands on the 2:1 isometric grid (ART_DIRECTION §2).
+// It also carries the city's look (data/cityLooks.ts): the local building style
+// and the pale "tint" underprint ink used on roofs, lawns and tree crowns.
 import { STOREY_PX } from '../config/map';
-import { makeHatch, rgba, type Ctx2D } from './canvasKit';
+import { cityLook, type CityLook, type Vernacular } from '../data/cityLooks';
+import { makeHatch, mix, rgba, type Ctx2D } from './canvasKit';
 import { isoPoint } from './iso';
 import { paperPattern, waterPattern } from './printPatterns';
 
@@ -20,12 +23,43 @@ const LOOK = {
   shadowAlpha: 0.45,
 } as const;
 
-export type Fill = 'paper' | 'light' | 'medium' | 'dense' | 'shadow' | 'none' | (string & {});
+/**
+ * The tint underprint (ART_DIRECTION §2.1): banknotes print a pale second ink
+ * under the engraving. Roofs take the tint mixed into the paper (under their
+ * hatching), lawns a see-through wash and tree crowns a slightly stronger mix.
+ * Kept low so the map still reads as ink lines on paper.
+ */
+const TINT = {
+  roof: 0.34,
+  crown: 0.5,
+  lawnAlpha: 0.3,
+} as const;
+
+export type Fill =
+  | 'paper'
+  | 'light'
+  | 'medium'
+  | 'dense'
+  | 'shadow'
+  | 'roof'
+  | 'roofLight'
+  | 'roofMedium'
+  | 'roofDense'
+  | 'lawn'
+  | 'crown'
+  | 'water'
+  | 'none'
+  | (string & {});
 export type Vec3 = readonly [number, number, number];
 type Hatch = 'light' | 'medium' | 'dense' | 'shadow';
+type RoofHatch = 'roofLight' | 'roofMedium' | 'roofDense';
 
 function isHatch(f: Fill): f is Hatch {
   return f === 'light' || f === 'medium' || f === 'dense' || f === 'shadow';
+}
+
+function isRoofHatch(f: Fill): f is RoofHatch {
+  return f === 'roofLight' || f === 'roofMedium' || f === 'roofDense';
 }
 
 export interface InkSet {
@@ -35,6 +69,13 @@ export interface InkSet {
   lod: number;
   stop: number;
   patterns: Record<Hatch, CanvasPattern>;
+  /** Hatches over tinted paper, for roof slopes (the underprint). */
+  roofPatterns: Record<RoofHatch, CanvasPattern>;
+  /** The city's tint ink, and opaque/see-through colours made from it. */
+  tint: string;
+  roof: string;
+  crown: string;
+  lawn: string;
   /** Paper with the guilloche mesh, and tinted water with waves (opaque). */
   paperPrint: CanvasPattern;
   waterPrint: CanvasPattern;
@@ -52,12 +93,14 @@ export function makeInkSet(
   stopIndex: number,
   stop: number,
   dpr: number,
+  tint: string = paper,
 ): InkSet {
   const i = stopIndex;
   const w = LOOK.hatchWeight[i]!;
   const scale = stop * dpr;
-  const hatch = (spacing: number, dir: 1 | -1, alpha: number, opaque: boolean) =>
-    makeHatch(ctx, { spacing, weight: w, alpha, dir, opaque }, ink, paper, dpr, scale);
+  const roof = mix(paper, tint, TINT.roof);
+  const hatch = (spacing: number, dir: 1 | -1, alpha: number, opaque: boolean, bg = paper) =>
+    makeHatch(ctx, { spacing, weight: w, alpha, dir, opaque }, ink, bg, dpr, scale);
   const cache = new Map<number, string>();
   return {
     ink,
@@ -70,6 +113,15 @@ export function makeInkSet(
       dense: hatch(LOOK.dense[i]!, 1, LOOK.hatchAlpha, true),
       shadow: hatch(LOOK.shadow[i]!, 1, LOOK.shadowAlpha, false),
     },
+    roofPatterns: {
+      roofLight: hatch(LOOK.light[i]!, -1, LOOK.hatchAlpha, true, roof),
+      roofMedium: hatch(LOOK.medium[i]!, 1, LOOK.hatchAlpha, true, roof),
+      roofDense: hatch(LOOK.dense[i]!, 1, LOOK.hatchAlpha, true, roof),
+    },
+    tint,
+    roof,
+    crown: mix(paper, tint, TINT.crown),
+    lawn: rgba(tint, TINT.lawnAlpha),
     paperPrint: paperPattern(ctx, ink, paper, i, stop, dpr),
     waterPrint: waterPattern(ctx, ink, paper, i, stop, dpr),
     outline: LOOK.outline[i]! / stop,
@@ -86,14 +138,25 @@ export class Engraver {
   ctx!: Ctx2D;
   ox = 0;
   oy = 0;
+  /** While batching, segments() collects strokes by width and alpha instead of drawing. */
+  private batch: Map<string, { width: number; alpha: number; segs: [Vec3, Vec3][] }> | null = null;
+  /** While batching polygons too, poly() collects shapes by fill and outline. */
+  private polyBatch: Map<string, { fill: Fill; stroke: number | null; list: Vec3[][] }> | null =
+    null;
 
   constructor(
     readonly inks: InkSet,
     readonly tiles: number,
+    readonly look: CityLook = cityLook(''),
   ) {}
 
   get lod(): number {
     return this.inks.lod;
+  }
+
+  /** The city's local building style. */
+  get style(): Vernacular {
+    return this.look.style;
   }
 
   /** Sets the tile whose top corner is local (0, 0). */
@@ -129,12 +192,24 @@ export class Engraver {
     if (fill === 'none') return false;
     if (fill === 'paper') c.fillStyle = this.inks.paper;
     else if (isHatch(fill)) c.fillStyle = this.inks.patterns[fill];
+    else if (fill === 'roof') c.fillStyle = this.inks.roof;
+    else if (fill === 'lawn') c.fillStyle = this.inks.lawn;
+    else if (fill === 'crown') c.fillStyle = this.inks.crown;
+    else if (fill === 'water') c.fillStyle = this.inks.waterPrint;
+    else if (isRoofHatch(fill)) c.fillStyle = this.inks.roofPatterns[fill];
     else c.fillStyle = fill;
     return true;
   }
 
   /** A closed polygon in local coords, filled then outlined. */
   poly(pts: readonly Vec3[], fill: Fill, stroke: number | null = this.inks.outline): void {
+    if (this.polyBatch) {
+      const key = `${fill}|${stroke}`;
+      let v = this.polyBatch.get(key);
+      if (!v) this.polyBatch.set(key, (v = { fill, stroke, list: [] }));
+      v.list.push([...pts]);
+      return;
+    }
     const c = this.ctx;
     c.beginPath();
     pts.forEach(([a, b, z], k) => (k === 0 ? this.m(a, b, z) : this.l(a, b, z)));
@@ -147,9 +222,57 @@ export class Engraver {
     }
   }
 
+  /** Several closed polygons sharing one fill and outline, in one path (fewer paint calls). */
+  polys(
+    list: readonly (readonly Vec3[])[],
+    fill: Fill,
+    stroke: number | null = this.inks.outline,
+  ): void {
+    if (list.length === 0) return;
+    const c = this.ctx;
+    c.beginPath();
+    for (const pts of list) {
+      pts.forEach(([a, b, z], k) => (k === 0 ? this.m(a, b, z) : this.l(a, b, z)));
+      c.closePath();
+    }
+    if (this.setFill(fill)) c.fill();
+    if (stroke !== null) {
+      c.lineWidth = stroke;
+      c.strokeStyle = this.inks.ink;
+      c.stroke();
+    }
+  }
+
+  /**
+   * Starts collecting line marks (and, with `polys`, flat shapes) so a whole
+   * row of houses paints them in a few paths (endBatch draws them). Only for
+   * marks that do not overlap one another or anything drawn later.
+   */
+  beginBatch(polys = false): void {
+    this.batch = new Map();
+    if (polys) this.polyBatch = new Map();
+  }
+
+  /** Draws what was collected: shapes first (by fill), then the line marks. */
+  endBatch(): void {
+    const b = this.batch;
+    const p = this.polyBatch;
+    this.batch = null;
+    this.polyBatch = null;
+    if (p) for (const v of p.values()) this.polys(v.list, v.fill, v.stroke);
+    if (b) for (const v of b.values()) this.segments(v.segs, v.width, v.alpha);
+  }
+
   /** Strokes a batch of local-space segments in one path. */
   segments(segs: readonly (readonly [Vec3, Vec3])[], width: number, alpha = 1): void {
     if (segs.length === 0) return;
+    if (this.batch) {
+      const key = `${width}|${alpha}`;
+      let v = this.batch.get(key);
+      if (!v) this.batch.set(key, (v = { width, alpha, segs: [] }));
+      for (const [p, q] of segs) v.segs.push([p, q]);
+      return;
+    }
     const c = this.ctx;
     c.beginPath();
     for (const [p, q] of segs) {

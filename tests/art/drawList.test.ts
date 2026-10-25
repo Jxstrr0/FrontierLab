@@ -4,6 +4,7 @@ import { generateCityMap, tileAt } from '../../src/art/citygen';
 import {
   footprintBounds,
   itemsInRect,
+  landmarkBounds,
   maxItemHeight,
   orderKey,
   tileBounds,
@@ -35,7 +36,7 @@ function allItems(map: ReturnType<typeof mapFor>) {
   for (const s of map.landmarks) {
     out.push({
       key: `l${s.id}`,
-      bounds: footprintBounds(map.tiles, s.x, s.y, s.size, LANDMARK_MAX_PX),
+      bounds: landmarkBounds(map.tiles, s),
     });
   }
   return out;
