@@ -1,12 +1,14 @@
 // Paints one chunk of the map into its own canvas, a step at a time so the
 // renderer can spread the work over several frames (ART_DIRECTION §2,
-// Performance). Steps are the ground layers followed by every raised item that
-// reaches into the chunk, back to front.
+// Performance). Steps are the ground layers (with the tint underprint after the
+// stipple) followed by every raised item that reaches into the chunk, back to
+// front. The city's look (data/cityLooks.ts) rides along on the engraver.
 import { drawBuilding } from './buildings';
 import { drawOffice, drawSite } from './buildingsOffice';
 import type { ChunkGrid, Rect } from './chunkGrid';
 import { chunkRect } from './chunkGrid';
 import { context2d, createCanvas, type AnyCanvas, type Ctx2D } from './canvasKit';
+import type { CityLook } from '../data/cityLooks';
 import { tileAt, type CityMap } from './citygen';
 import { itemsInRect, type DrawItem } from './drawList';
 import { Engraver, type InkSet } from './engraver';
@@ -15,8 +17,9 @@ import { drawGround, GROUND_STEPS, type GroundStep } from './ground';
 import { drawLandmark } from './landmarks';
 import type { LotOccupant } from './mapRenderer';
 import { mixSeed } from './prng';
+import { isParkMiddle, tintLayer } from './tintLayer';
 
-type Step = { ground: GroundStep } | { item: DrawItem };
+type Step = { ground: GroundStep } | { tint: true } | { item: DrawItem };
 
 export interface ChunkJob {
   canvas: AnyCanvas;
@@ -28,6 +31,7 @@ export interface ChunkJob {
 
 export interface PaintContext {
   map: CityMap;
+  look: CityLook;
   cityName: string;
   maxHeight: number;
   occupants: Record<string, LotOccupant>;
@@ -59,6 +63,8 @@ export function startChunk(
   ctx.lineJoin = 'round';
   ctx.lineCap = 'round';
   const steps: Step[] = GROUND_STEPS.map((g) => ({ ground: g }));
+  // The tint goes over the street and stipple layer, under the water.
+  steps.splice(Math.max(0, GROUND_STEPS.indexOf('tiles')) + 1, 0, { tint: true });
   for (const item of itemsInRect(pc.map, rect, pc.maxHeight)) steps.push({ item });
   return { canvas: c, ctx, rect, steps, cursor: 0 };
 }
@@ -79,13 +85,14 @@ export function runChunk(
   deadline: number,
   now: () => number,
 ): boolean {
-  const e = new Engraver(inks, pc.map.tiles);
+  const e = new Engraver(inks, pc.map.tiles, pc.look);
   e.ctx = job.ctx;
   const start = now();
   const budget = deadline - start;
   do {
     const step = job.steps[job.cursor++]!;
     if ('ground' in step) drawGround(e, pc.map, job.rect, step.ground, pc.cityName);
+    else if ('tint' in step) tintLayer(e, pc.map, job.rect);
     else drawItem(e, pc, step.item);
   } while (job.cursor < job.steps.length && (now() - start) * (1 + pc.rasterRatio) < budget);
   const recorded = now() - start;
@@ -103,8 +110,8 @@ function drawItem(e: Engraver, pc: PaintContext, item: DrawItem): void {
     return;
   }
   const t = tileAt(pc.map, item.x, item.y)!;
-  if (t.kind === 'park') parkTrees(e, t.x, t.y, t.seed);
+  if (t.kind === 'park') parkTrees(e, t.x, t.y, t.seed, isParkMiddle(pc.map, t.x, t.y));
   else if (t.kind === 'office') drawOffice(e, t, t.officeId ? pc.occupants[t.officeId] : undefined);
   else if (t.kind === 'site') drawSite(e, t);
-  else drawBuilding(e, t, t.lotId ? pc.occupants[t.lotId] : undefined);
+  else drawBuilding(e, t, t.lotId ? pc.occupants[t.lotId] : undefined, pc.map);
 }

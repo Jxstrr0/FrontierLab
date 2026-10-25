@@ -1,12 +1,21 @@
 // Dev-only map lab (maplab.html): renders one city full-window with the
 // engraved renderer, drag-to-pan, wheel zoom and an fps / ms readout, for
 // visual iteration and scripted screenshots. Params: ?city=sas&zoom=1&seed=42
-// &cx=20&cy=20 (tile to centre on) &hud=0 (hide readout). Never shipped.
+// &cx=20&cy=20 (tile to centre on) &hud=0 (hide readout) &sig=latticeTower
+// (draw that signature landmark instead of the city's own) &focus=signature
+// (centre on the signature landmark). Never shipped.
 import '@fontsource/public-sans/600.css';
-import { ZOOM_MAX, ZOOM_MIN } from '../../config/map';
+import { SIGNATURE_HEIGHT_PX, ZOOM_MAX, ZOOM_MIN } from '../../config/map';
 import { CITIES } from '../../data/cities';
+import type { Signature } from '../../data/cityLooks';
 import { newGame } from '../../sim/newGame';
+import { cityLook } from '../../data/cityLooks';
+import { context2d, createCanvas } from '../canvasKit';
+import { chunksInRect, makeChunkGrid } from '../chunkGrid';
+import { runChunk, startChunk, type PaintContext } from '../chunkPainter';
 import { generateCityMap } from '../citygen';
+import { maxItemHeight } from '../drawList';
+import { makeInkSet } from '../engraver';
 import { tileCenter } from '../iso';
 import { createMapRenderer } from '../isoRenderer';
 import type { Camera, LotOccupant } from '../mapRenderer';
@@ -25,6 +34,12 @@ const lots = Object.values(state.world.lots).filter((l) => l.cityId === city.id)
 const offices = Object.values(state.world.officeListings).filter((o) => o.cityId === city.id);
 const sites = Object.values(state.world.sites).filter((x) => x.cityId === city.id);
 const map = generateCityMap(city, seed, lots, { offices, sites });
+const sigSite = map.landmarks.find((l) => l.id === 'signature') ?? map.landmarks[0];
+const sigParam = params.get('sig') as Signature | null;
+if (sigParam && sigSite) {
+  sigSite.id = 'signature';
+  sigSite.signature = sigParam;
+}
 
 // Rivals keep their lots; the player takes the free lots nearest the centre.
 const occupants: Record<string, LotOccupant> = {};
@@ -54,11 +69,15 @@ if (params.get('hud') === '0') hud.style.display = 'none';
 const ctx = canvas.getContext('2d')!;
 
 const cam: Camera = { x: 0, y: 0, zoom: Number(params.get('zoom') ?? 1) };
-const focus = tileCenter(
-  map.tiles,
-  Number(params.get('cx') ?? city.tiles / 2),
-  Number(params.get('cy') ?? city.tiles / 2),
-);
+const onSig = params.get('focus') === 'signature' && sigSite;
+const focus = onSig
+  ? tileCenter(map.tiles, sigSite.x + sigSite.size / 2, sigSite.y + sigSite.size / 2)
+  : tileCenter(
+      map.tiles,
+      Number(params.get('cx') ?? city.tiles / 2),
+      Number(params.get('cy') ?? city.tiles / 2),
+    );
+if (onSig) focus.y -= SIGNATURE_HEIGHT_PX[sigSite.signature ?? 'none'] * 0.45;
 cam.x = focus.x - innerWidth / 2 / cam.zoom;
 cam.y = focus.y - innerHeight / 2 / cam.zoom;
 
@@ -143,6 +162,46 @@ function zoomAt(z: number, sx: number, sy: number) {
   dirty = true;
 }
 
+/**
+ * Paints every chunk under a 390×844 view at the map centre for one zoom stop
+ * from scratch, forcing each to rasterise, and returns the best of `runs`
+ * total times in ms: a steadier paint-cost number than frame timings.
+ */
+function bench(stopIndex: number, runs = 3, dpr = 2): number {
+  const stops = [0.5, 1, 2];
+  const stop = stops[stopIndex]!;
+  const w = renderer.width;
+  const h = renderer.height;
+  const grid = makeChunkGrid(stop, dpr, 256, w, h);
+  const vw = 390 / stop;
+  const vh = 844 / stop;
+  const range = chunksInRect(grid, { x: w / 2 - vw / 2, y: h / 2 - vh / 2, w: vw, h: vh })!;
+  const probe = context2d(createCanvas(1, 1));
+  const look = cityLook(city.id);
+  const inks = makeInkSet(probe, city.ink, PAPER, stopIndex, stop, dpr, look.tint);
+  let best = Infinity;
+  for (let r = 0; r < runs; r++) {
+    const pc: PaintContext = {
+      map,
+      look,
+      cityName: city.name,
+      maxHeight: maxItemHeight(map),
+      occupants,
+      rasterRatio: 1,
+      flushTarget: context2d(createCanvas(1, 1)),
+    };
+    const t0 = performance.now();
+    for (let j = range.j0; j <= range.j1; j++) {
+      for (let i = range.i0; i <= range.i1; i++) {
+        const job = startChunk(grid, i, j, pc);
+        while (!runChunk(job, pc, inks, Infinity, () => performance.now()));
+      }
+    }
+    best = Math.min(best, performance.now() - t0);
+  }
+  return best;
+}
+
 // Hooks for scripted runs (Playwright).
 Object.assign(window, {
   lab: {
@@ -164,5 +223,7 @@ Object.assign(window, {
       dirty = true;
     },
     world: () => ({ width: renderer.width, height: renderer.height }),
+    landmarks: () => map.landmarks.map((l) => ({ ...l })),
+    bench,
   },
 });

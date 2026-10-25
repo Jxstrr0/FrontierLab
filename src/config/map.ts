@@ -1,5 +1,6 @@
 // Map art constants (ART_DIRECTION §2). These shape how the city is drawn, not
 // how the simulation behaves, so they live apart from balance.ts.
+import type { Signature } from '../data/cityLooks';
 import type { DistrictId } from '../data/types';
 
 /** 2:1 isometric tile footprint at zoom 1, in world pixels. */
@@ -95,5 +96,33 @@ export const ROOF_EXTRA_STOREYS = 4;
 export const FLAG_PX = 14;
 /** Tallest a landmark may draw above its block, in world px. */
 export const LANDMARK_MAX_PX = 150;
+/**
+ * How tall each signature landmark draws above its block, in world px
+ * (src/art/signatures*.ts), so chunk queries reach high enough and nothing
+ * clips. Keep the tallest below MAP_MARGIN.top so it never leaves the map.
+ */
+export const SIGNATURE_HEIGHT_PX: Record<Signature, number> = {
+  chateauHotel: 110,
+  needleTower: 196,
+  sailCanopy: 64,
+  broadcastTower: 258,
+  domedBasilica: 136,
+  decoSpire: 256,
+  twinAntenna: 258,
+  suspensionBridge: 132,
+  saucerTower: 180,
+  observationWheel: 128,
+  latticeTower: 260,
+  steppedGables: 80,
+  grandStation: 112,
+  twinSpires: 158,
+  latticeMast: 258,
+  shellHall: 80,
+  skyDeck: 206,
+  prismTower: 252,
+  none: LANDMARK_MAX_PX,
+};
+/** Signature art may reach this many tiles past its block's sides (the bridge deck). */
+export const LANDMARK_SIDE_TILES = 0.7;
 /** Cast shadows run along +x for this many tiles per world px of height. */
 export const SHADOW_TILES_PER_PX = 0.006;
