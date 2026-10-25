@@ -40,10 +40,12 @@ html.text-large #app .hud-top {
 html.text-large #app .hud-right {
   margin-left: auto;
 }
-html.text-large #app .panel-tab {
+html.text-large #app .panel-tabs:not(.has-icons) .panel-tab {
   flex: 1 1 auto;
   padding: 0 2px;
-  line-height: 1.2;
+}
+html.text-large #app .panel-tabs:not(.has-icons) .panel-tab-pill {
+  padding: 2px var(--space-2);
 }
 @media (max-width: 599px) {
   html.text-large #app .hud-layers > span {

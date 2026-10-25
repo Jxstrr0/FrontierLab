@@ -4,19 +4,13 @@
 import type { ComponentChildren } from 'preact';
 import { useRef, useState } from 'preact/hooks';
 import { avatarFromSeed } from '../../art/portraits';
-import type { IconName } from '../../art/icons';
 import type { AvatarSpec } from '../../sim/state';
 import { useDialog } from './dialog';
 import { Icon } from './Icon';
+import { PanelTabs, type Tab } from './PanelTabs';
 import { Portrait } from './Portrait';
 
-export interface Tab<T extends string> {
-  id: T;
-  label: string;
-  badge?: boolean;
-  /** Drawn over the label; when any tab has one the bar becomes an icon bar. */
-  icon?: IconName;
-}
+export type { Tab };
 
 export function Panel<T extends string>(p: {
   title: string;
@@ -62,26 +56,7 @@ export function Panel<T extends string>(p: {
         {p.children}
       </div>
       {p.footer && <div class="panel-footer">{p.footer}</div>}
-      {p.tabs && p.tab && (
-        <nav
-          class={`panel-tabs${p.tabs.some((t) => t.icon) ? ' has-icons' : ''}`}
-          aria-label="Sections"
-        >
-          {p.tabs.map((t) => (
-            <button
-              type="button"
-              class={`panel-tab${t.id === p.tab ? ' is-active' : ''}`}
-              aria-current={t.id === p.tab}
-              onClick={() => p.onTab?.(t.id)}
-              data-tutorial={`tab-${t.id}`}
-            >
-              {t.icon && <Icon name={t.icon} size={22} class="panel-tab-icon" />}
-              {t.icon ? <span class="panel-tab-label">{t.label}</span> : t.label}
-              {t.badge && <span class="dot" aria-label="needs attention" />}
-            </button>
-          ))}
-        </nav>
-      )}
+      {p.tabs && p.tab && <PanelTabs tabs={p.tabs} tab={p.tab} onTab={p.onTab} />}
     </section>
   );
 }
