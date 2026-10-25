@@ -137,6 +137,26 @@
   letter-spacing: 0.02em;
 }
 
+.title-update {
+  min-height: var(--tap-min);
+  padding: 0 var(--space-4);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--brass-light);
+  font: inherit;
+  font-size: var(--text-14);
+  font-weight: 600;
+  cursor: pointer;
+}
+.title-update:active {
+  background: rgb(184 145 61 / 15%);
+}
+.title-update:disabled {
+  color: var(--ivory-dim);
+  cursor: default;
+}
+
 @media (min-width: 900px) {
   .title-wordmark {
     font-size: 56px;

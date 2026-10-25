@@ -10,6 +10,12 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-10-25 — Check for updates button
+- **Done (owner's ask):** the title screen has a **Check for updates** button under the version number. It asks the site for a newer version. If there is one, it downloads it and the game reloads into it. If not, a message says "You have the latest version". With no connection it says so.
+- **Why:** the home-screen app on iPhone is often resumed rather than reopened, so a new version could wait until you swiped the app away. Now you can pull it in with one tap. It's only on the title screen, where no game is loaded, so nothing can be lost.
+- **Code:** `checkForUpdate()` in `src/app/pwa/register.ts`; the button in `src/app/title/TitleScreen.tsx`.
+- **Checked** at 390×844: the button fits (44 px tall) with Continue showing, and the page doesn't scroll. With no new version it shows the "latest" message. After a simulated new deploy, it reloaded once into the new version. No console errors; tests and lint pass.
+
 ### 2026-10-25 — Version number 0.9.1
 - **Done:** bumped to **v0.9.1** (`package.json`) so the title screen shows a new number for the HQ clean-up, calmer map symbols and the new bottom tabs, which had shipped under 0.9.0. Patch bumps (0.9.x) mark polish builds before 1.0.0.
 
