@@ -196,7 +196,8 @@ describe('payroll partnerships', () => {
 
   it('releases on request and moves to another branch when the host closes', () => {
     const { s, branchId, employer, university } = setup();
-    const other = openScriptedBranch(s, 'downtown');
+    // Any free lot: rivals often hold every downtown corner.
+    const other = openScriptedBranch(s);
     advanceWeeks(s, 2);
     const p = sign(s, employer, branchId);
     const q = sign(s, university, branchId, 'student');

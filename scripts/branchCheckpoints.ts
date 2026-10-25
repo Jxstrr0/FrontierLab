@@ -94,8 +94,9 @@ export function branchCheckpoints(m: BranchMetrics): Check[] {
   for (const wk of [104, 156, 208, 260]) {
     const s = m.at[wk];
     if (!s) continue;
-    // §25: one mature band; the city-wide pool (§9.2) levels the first branch off once home fills up.
-    const [revLo, incLo] = [95e3, 38e3];
+    // §25: one mature band from week 156; the city-wide pool (§9.2) levels the first branch off
+    // once home fills up. Week 104 sits lower: in a tighter city rivals stand closer (CONTENT §3).
+    const [revLo, incLo] = wk < 156 ? [85e3, 33e3] : [95e3, 38e3];
     checks.push({
       label: `Week ${wk} deposits`,
       value: M(s.dep),

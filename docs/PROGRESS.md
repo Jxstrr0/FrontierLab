@@ -4,11 +4,36 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 **Current stage:** 10 — Art pass, onboarding, polish, launch (built and live; awaiting the owner's iPhone check). All ten roadmap stages are built. Still open: the owner's testing and tuning pass, an Add to Home Screen test on a real iPhone, and the Vault Street card on Kelbo.Website (in a separate session in that repo).
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `1d8a4c9537a73c` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `1bef8d65d74559` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-25 — Fewer storefronts, scaled to the competition
+- **Stage / step:** post-launch balance (owner: "quality vs quantity: better branches or more of them are two distinct expansion plans, so locations should feel slightly scarce and scale with the number of competitors").
+- **Done:**
+  - **Lots per city** = a base for the city size plus room for each rival bank (CONTENT §3). With the usual rivals: Saskatoon 20 (was 36), Calgary 32 (was 56), Toronto 44 (was 80), New York 62 (was 110). Fewer rivals means fewer lots, and more rivals means more: Calgary has 23 with 1 rival and 40 with 5.
+  - At the start about three times the advised branch count is free, and rivals take more as they grow. Downtown corners often go to rivals first.
+  - **Both expansion plans work** (5 years, 3 seeds, after build costs):
+    - Calgary: 7 premium branches net $71M; 10 basic net $73M.
+    - Toronto: 7 premium net $70M; 10 basic net $74M.
+    - Saskatoon: 5 premium net $36M; 10 basic net $40M.
+    - Mid builds sit a little ahead as the middle path.
+  - The map is cleaner, with fewer open-lot coins.
+- **Checks:**
+  - tsc, eslint, prettier, 643 tests and the build all pass.
+  - Two tests assumed lots that rivals now often hold, so they were adjusted:
+    - A partnership test builds on any free lot instead of downtown.
+    - A rate test allows 5%, since new deposits that week also earn the hike.
+  - **Determinism:** the snapshot changed on purpose, from `1d8a4c9537a73c` to `1bef8d65d74559`.
+  - **Balance:**
+    - The 20-seed panel is in range, and every strategy passes.
+    - Steady seed 42's first branch misses week 52 ($11.5k) and week 260 ($17k) income. That's one city's average lot; the median panel is the judge.
+  - **Target change** (SIMULATION §25): week 104 for the first branch is now $85k+ revenue and $33k+ income (was $95k / $38k), because in a tighter city rivals stand closer and year 2 ramps a little slower. From week 156 the band is unchanged.
+- **Saves:** cities already on the map keep their lots. Cities you visit for the first time get the new counts.
+- **Dependencies:** none added.
+
 
 ### 2026-10-25 — A city tops out at 5–12 branches
 - **Stage / step:** post-launch balance (owner request: "most banks don't have 30 branches per city, they have 5–12 or so, depending on city size"). Also logged the owner's call that branch equipment stays fixed after the build.

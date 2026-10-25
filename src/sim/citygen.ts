@@ -6,12 +6,15 @@ import {
   CITYGEN,
   LEASE_DEPOSIT_WEEKS,
   LOT_COUNT_BY_SIZE,
+  LOTS_BASE,
+  LOTS_PER_RIVAL,
   LOT_INCOME_NOISE,
   LOT_RENT_NOISE,
   LOT_TRAFFIC_NOISE,
   RENT_TRAFFIC_EXP,
 } from '../config/balance';
-import { CITIES } from '../data/cities';
+import type { LayoutVersion } from '../config/cityGeo';
+import { CITIES, type CitySpec } from '../data/cities';
 import { DISTRICT_SPECS } from '../data/districts';
 import { STREET_KINDS, STREET_NAMES } from '../data/names';
 import type { DistrictId } from '../data/types';
@@ -20,13 +23,22 @@ import { stream } from './rng';
 import type { GameState, Lot } from './state';
 import { dhypot, dpow } from './detmath';
 
-export function generateLots(state: GameState, cityId: string): Lot[] {
+/**
+ * How many storefronts a city gets: layout 1 keeps the original count; later
+ * layouts give a base plus room for each rival bank (LOTS_BASE, LOTS_PER_RIVAL).
+ */
+export function lotCount(city: CitySpec, layout: LayoutVersion, rivals: number): number {
+  if (layout === 1) return LOT_COUNT_BY_SIZE[city.size];
+  return Math.round(LOTS_BASE[city.size] + LOTS_PER_RIVAL[city.size] * rivals);
+}
+
+/** `total`: how many storefronts to place (lotCount). */
+export function generateLots(state: GameState, cityId: string, total: number): Lot[] {
   const city = CITIES[cityId];
   if (!city) throw new Error(`Unknown city ${cityId}`);
   const rng = stream(state, `citygen:${cityId}`);
   const geo = geometryFor(state, cityId);
   const shares = CITYGEN.districtShares[city.size];
-  const total = LOT_COUNT_BY_SIZE[city.size];
   const used = new Set<string>();
   const lots: Lot[] = [];
   let index = 0;
