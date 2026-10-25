@@ -10,6 +10,9 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-10-25 — Recap no longer see-through when it opens
+- **Done:** when the week ended with a panel open, the weekly recap faded in over it and both showed through each other for a moment (the owner's screen recording). The backdrop's fade was fading the recap too. Now only the dark backdrop fades, and every bottom sheet and pop-up slides up as a solid card. Checked at 390×844: no see-through frames, no console errors, all 672 tests pass.
+
 ### 2026-10-25 — Version number 0.9.0
 - **Done:** the title screen read v0.0.1, left over from Stage 0. It now reads **v0.9.0** (set in `package.json`; the title screen and new saves read it from there). All ten stages are built, so this is the pre-launch build; **1.0.0** is for launch, once the owner's iPhone check and tuning pass are done.
 - **Next:** bump the version with each release from here (`npm version <x.y.z> --no-git-tag-version`).
