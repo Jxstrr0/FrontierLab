@@ -217,3 +217,35 @@
   padding-top: var(--space-2);
   border-top: 1px solid var(--hairline);
 }
+
+/* ─── How to fix a weak capital ratio ──────────────────────────────────── */
+.cap-fixes {
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--hairline);
+  border-left: 3px solid var(--brass-light);
+  border-radius: var(--radius-card);
+}
+.cap-fixes.is-restricted,
+.cap-fixes.is-critical {
+  border-left-color: #e07a7a;
+}
+.cap-fixes-title {
+  color: var(--ivory);
+  font-weight: 600;
+  margin-bottom: var(--space-2);
+}
+.cap-fixes-list {
+  margin: 0;
+  padding-left: 1.25em;
+  display: grid;
+  gap: var(--space-2);
+  font-size: 0.9375rem;
+  line-height: 1.4;
+}
+.cap-fixes-warn {
+  margin: var(--space-3) 0 0;
+  color: #e07a7a;
+  font-size: 0.875rem;
+  font-weight: 600;
+}

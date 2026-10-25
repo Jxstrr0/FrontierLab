@@ -7,6 +7,7 @@ import { capitalSnapshot } from '../../sim/capital';
 import { statementDelayWeeks } from '../../sim/hq';
 import { Badge, BarChart, Card, Row, SectionTitle } from '../components';
 import { dayOfWeek } from '../branch/selectors';
+import { CapitalFixes } from '../company/CapitalFixes';
 import { CapitalMeter, TIER_LABEL, TIER_TONE } from '../company/CapitalMeter';
 import { Statements } from '../company/Statements';
 import { capitalRatioText, delta, money, pct, shortDate } from '../format/format';
@@ -70,6 +71,7 @@ export function FinanceFloor() {
           <Badge tone={TIER_TONE[cap.tier]}>{TIER_LABEL[cap.tier]}</Badge>
         </div>
         <CapitalMeter ratio={cap.capitalRatio} tier={cap.tier} />
+        <CapitalFixes tier={cap.tier} listing={s.stock.status} />
       </Card>
       <Card>
         <Row

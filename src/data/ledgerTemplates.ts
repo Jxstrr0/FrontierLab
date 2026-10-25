@@ -282,11 +282,11 @@ const BANK_TEMPLATES = {
   CAPITAL_WEAK: [
     {
       h: 'Regulator puts {bank} on watch',
-      b: 'With a capital ratio of {cr}, the bank shows {tier}. Deposits fund loans; capital limits growth.',
+      b: 'With a capital ratio of {cr}, the bank shows {tier}. To recover, it can {fix}.',
     },
     {
       h: 'Thin cushion at {bank}',
-      b: 'A capital ratio of {cr} leaves {tier}. Analysts expect a capital raise or slower lending.',
+      b: 'A capital ratio of {cr} leaves {tier}. Analysts say the bank should {fix}.',
     },
   ],
   INCIDENT_ROBBERY: [

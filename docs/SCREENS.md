@@ -248,7 +248,7 @@ Tabs: Overview · Loans · Credit.
   - total revenue and net income with weekly change
   - bar chart
   - Statements: Income / Balance sheet / Cash flow, each Week | Quarter | Year
-  - capital ratio (tier badge + meter with thresholds) and liquidity ratio
+  - capital ratio (tier badge + meter with thresholds) and liquidity ratio; at Watch or worse, a "How to fix this" checklist under the meter (as §24)
   - "Delayed" placeholders when short-staffed
 - **HR:**
   - Employee benefits carousel (vignette, name, description, control stepper, estimated weekly cost, effect badge like "+3 morale")
@@ -491,6 +491,7 @@ Tabs: Overview · Loans · Credit.
 ## 24. Company summary (menu → Company)
 
 - capital ratio with tier badge and a meter with thresholds
+- at Watch, Restricted or Critical, a "How to fix this" checklist under the meter (`src/data/capitalFixes.ts`): sell new shares at an investment bank (Private placement, or Secondary offering once listed), sell company stocks and startup stakes, turn risk appetite down, hold off on growth and dividends; at Critical, a line on the emergency rescue
 - liquidity ratio
 - totals: assets, deposits, loans, equity
 - share price or private valuation, with the 52-week range, market cap, your stake and top shareholders
