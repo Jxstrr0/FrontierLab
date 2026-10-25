@@ -107,7 +107,8 @@ describe("Stage 8 acceptance: each country's policy rate drives its own branches
     const dDeposit = margin(hike, branches.nyc).deposit - margin(base, branches.nyc).deposit;
     const dCharge = margin(hike, branches.nyc).charge - margin(base, branches.nyc).charge;
     // +2pp on every deposit dollar for a week, and loans cost 2pp more to fund.
-    expect(dDeposit).toBeCloseTo((deposits(nyc) * 0.02) / WEEKS_PER_YEAR, -2);
+    // Within 5%: the week's new deposits earn the hike too.
+    expect(dDeposit / ((deposits(nyc) * 0.02) / WEEKS_PER_YEAR)).toBeCloseTo(1, 1);
     expect(dCharge).toBeGreaterThan((loans(nyc) * 0.015) / WEEKS_PER_YEAR);
     expect(identityGap(hike)).toBeLessThan(1);
   });

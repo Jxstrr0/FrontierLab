@@ -612,7 +612,15 @@ export const WEEKLY_HISTORY = 260;
 export const EVENT_LOG_WEEKS = 8;
 
 // ─── CITYGEN (Stage 1 lot list; CONTENT §3) ───────────────────────────────────
+/** Storefronts per city on layout 1 (maps from saves before 2026-10-25 keep them). */
 export const LOT_COUNT_BY_SIZE = { S: 36, M: 56, L: 80, XL: 110 } as const;
+/**
+ * Storefronts per city on layout 2+ (CONTENT §3): room for your bank plus room
+ * for each rival bank in the city, so good corners feel slightly scarce and a
+ * crowded city has more of them. With the usual rival count: S 20, M 32, L 44, XL 62.
+ */
+export const LOTS_BASE = { S: 12, M: 18, L: 24, XL: 32 } as const;
+export const LOTS_PER_RIVAL = { S: 4, M: 4.5, L: 5, XL: 6 } as const;
 export const LOT_TRAFFIC_NOISE: [number, number] = [0.65, 1.35];
 export const LOT_RENT_NOISE: [number, number] = [0.9, 1.1];
 export const LOT_INCOME_NOISE: [number, number] = [0.9, 1.1];

@@ -66,6 +66,8 @@ Each city's generator mixes these districts in proportions set by city size.
 | Industrial | 3,000 | 500 | .03 | .20 | .25 | .07 | .45 | 0.90 | .50 | 180 |
 | Waterfront | 10,000 | 1,800 | .05 | .35 | .20 | .30 | .10 | 1.50 | .60 | 700 |
 
+**How many storefronts** (2026-10-25): `round(LOTS_BASE[size] + LOTS_PER_RIVAL[size] × rival banks in the city)`, with `LOTS_BASE = { S: 12, M: 18, L: 24, XL: 32 }` and `LOTS_PER_RIVAL = { S: 4, M: 4.5, L: 5, XL: 6 }`. With the usual rival count that is about 20 / 32 / 44 / 62 storefronts (it was 36 / 56 / 80 / 110), so good corners feel slightly scarce and a city with more competitors has more of them. At the start about three times the advised branch count (SIMULATION §9.2) is free; rivals take more as they grow. Cities already on the map in a save (layout 1) keep their original count.
+
 How a lot's values are derived:
 - **Traffic:** district value ×U(0.65, 1.35).
 - **Rent:** base × city.rentIndex × (traffic / district traffic)^0.6 × U(0.9, 1.1).

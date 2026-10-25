@@ -6,7 +6,7 @@
 import { LATEST_LAYOUT, type LayoutVersion } from '../config/cityGeo';
 import { CITIES } from '../data/cities';
 import { generateCapitalMarketSites } from './capitalSites';
-import { generateLots } from './citygen';
+import { generateLots, lotCount } from './citygen';
 import { generateCompetitionSites } from './competitionSites';
 import { generateSites } from './hqSites';
 import { generateInvestmentSites } from './investmentSites';
@@ -14,7 +14,7 @@ import { generatePersonalSites } from './personalSites';
 import { refreshManagerPool } from './people';
 import { refreshListings } from './propertyListings';
 import { updateMarketRefs } from './rates';
-import { seedRivals } from './rivals';
+import { competitorsFor, seedRivals } from './rivals';
 import type { GameState } from './state';
 
 /** Whether a city has been generated in this save. */
@@ -47,7 +47,8 @@ export function generateCity(
     updateMarketRefs(state);
     return;
   }
-  const lots = generateLots(state, cityId);
+  const layout = state.world.cities[cityId]!.layout;
+  const lots = generateLots(state, cityId, lotCount(city, layout, competitorsFor(state, cityId)));
   seedRivals(state, cityId, lots);
   for (const lot of lots) state.world.lots[lot.id] = lot;
   generateSites(state, cityId);
