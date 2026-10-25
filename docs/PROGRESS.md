@@ -10,6 +10,9 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-10-25 — Version number 0.9.1
+- **Done:** bumped to **v0.9.1** (`package.json`) so the title screen shows a new number for the HQ clean-up, calmer map symbols and the new bottom tabs, which had shipped under 0.9.0. Patch bumps (0.9.x) mark polish builds before 1.0.0.
+
 ### 2026-10-25 — Bottom tabs easier to use and read
 - **Done (owner's ask):** the bottom tab bars on panels (HQ floors, branch, investment bank and the rest) were hard to read and use. On the HQ, the floor you were on could sit off screen with nothing showing the bar scrolled.
   - The current tab now sits in a brass pill with bold brass text, instead of only a thin line above it.
