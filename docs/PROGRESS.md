@@ -10,6 +10,12 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-10-25 — Fresh manager candidates on reopen (v0.9.4)
+- **Done (owner's ask):** closing the "Hire a manager" sheet without hiring now deals a new set of candidates, so reopening it shows new people. The sheet's footer now says "Not keen on anyone? Close this and reopen it to see new candidates." instead of a countdown.
+- **The tutorial guide stays:** until you hire your first manager, the first candidate is your guide (the tutorial says "I'm on the list too"), so they stay on the list and only the other two change.
+- **Code:** new command `rerollManagerCandidates` in `src/sim/commands/staff.ts` (deterministic, from the `people` stream). The hire sheet calls it when it closes without a hire.
+- **Checked** at 390×844: opened and closed the sheet three times and got new names each time, with the guide kept. Added a test; all 674 tests pass and the determinism snapshot is unchanged.
+
 ### 2026-10-25 — Your places in your brand colour (v0.9.3)
 - **Done (owner's ask):** everything you own on the map is now drawn in your brand colour, each with its own icon:
   - branches: your crest with your monogram (as before);

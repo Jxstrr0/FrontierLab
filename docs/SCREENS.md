@@ -153,7 +153,7 @@ After the wizard, the map opens with the tutorial (§27).
   - Annual salary stepper
   - Delegation toggles: Staffing & wages · Products & rates · Branch marketing · Branch troubles · Loan approvals
   - Fire manager (confirm)
-  - **With no manager:** "Hire a manager" opens a sheet of 3 candidate cards (skills, salary ask, Hire).
+  - **With no manager:** "Hire a manager" opens a sheet of 3 candidate cards (skills, salary ask, Hire). Closing the sheet without hiring deals 3 new candidates for next time; before your first hire, the tutorial guide stays as the first card.
 
 ### 5.2 Products
 - **House model card:** name, rosette, cost per application, "Manage models" (opens the HQ Products floor if it exists, otherwise a tip pointing to credit bureaus).

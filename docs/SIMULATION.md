@@ -174,7 +174,7 @@ These are read by other systems:
 - `served = captured × clamp((C − visitRate × customers) / captured, 0, 1)`
 
 ### 6.5 Branch managers
-- **Hiring.** Hire from 3 candidates; the pool refreshes every 4 weeks.
+- **Hiring.** Hire from 3 candidates; the pool refreshes every 4 weeks, and also whenever the hire sheet is closed without hiring (`rerollManagerCandidates`, drawn from the `people` stream). Until your first manager is hired, the first candidate (the tutorial guide) is kept.
   - Skills: People, Product, Marketing and Ethics, each drawn from normal(60, 15) and clamped to 25–98.
   - Salary ask: `MANAGER_BASE_SALARY (72,000) × city.wageIndex × (0.7 + 0.6 × avgSkill/100)`.
 - **People** lifts morale and skill (§6.2, §6.3) and the Service rating (§8).

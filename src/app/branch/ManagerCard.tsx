@@ -1,7 +1,7 @@
 // Branch manager card (SCREENS §5.1): skills, salary, the five delegation
 // toggles and Fire; with no manager, a Hire button that opens the candidate sheet.
+// Closing the sheet without hiring deals new candidates for next time.
 import { useState } from 'preact/hooks';
-import { MANAGER_POOL_REFRESH_WEEKS } from '../../config/balance';
 import { managerOf } from '../../sim/branch/staff';
 import * as cmd from '../../sim/commands';
 import type { Branch, Delegation, Manager } from '../../sim/state';
@@ -51,7 +51,15 @@ export function ManagerCard({ branch }: { branch: Branch }) {
             Hire a manager
           </button>
         </Card>
-        {hiring && <HireSheet branch={branch} onClose={() => setHiring(false)} />}
+        {hiring && (
+          <HireSheet
+            branch={branch}
+            onClose={(hired) => {
+              setHiring(false);
+              if (!hired) act(cmd.rerollManagerCandidates, branch.cityId);
+            }}
+          />
+        )}
       </section>
     );
   }
@@ -125,14 +133,12 @@ function Skills({ mgr }: { mgr: Manager }) {
   );
 }
 
-function HireSheet({ branch, onClose }: { branch: Branch; onClose: () => void }) {
+function HireSheet({ branch, onClose }: { branch: Branch; onClose: (hired: boolean) => void }) {
   const s = useGame();
   const pool = s.people.managerCandidates[branch.cityId] ?? [];
   const sym = s.settings.currency;
-  const since = s.people.candidatesRefreshWeek[branch.cityId] ?? s.clock.week;
-  const weeks = Math.max(1, since + MANAGER_POOL_REFRESH_WEEKS - s.clock.week);
   return (
-    <Sheet title="Hire a manager" onClose={onClose}>
+    <Sheet title="Hire a manager" onClose={() => onClose(false)}>
       <div class="stack">
         {pool.length === 0 && <p class="muted">No candidates right now.</p>}
         {pool.map((m) => (
@@ -153,7 +159,7 @@ function HireSheet({ branch, onClose }: { branch: Branch; onClose: () => void })
                 onClick={() => {
                   if (act(cmd.hireManager, branch.id, m.id).ok) {
                     toast(`${m.name} now runs ${branch.name}.`, 'good');
-                    onClose();
+                    onClose(true);
                   }
                 }}
               >
@@ -163,7 +169,7 @@ function HireSheet({ branch, onClose }: { branch: Branch; onClose: () => void })
           </Card>
         ))}
         <p class="muted small">
-          New candidates in {weeks} {weeks === 1 ? 'week' : 'weeks'}.
+          Not keen on anyone? Close this and reopen it to see new candidates.
         </p>
       </div>
     </Sheet>

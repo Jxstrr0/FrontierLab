@@ -59,4 +59,21 @@ describe('commands', () => {
     expect(cmd.setDelegation(s, r.branchId, 'loans', true).ok).toBe(true);
     expect(s.people.managerCandidates.cal).toHaveLength(2);
   });
+
+  it('deals new manager candidates on demand, keeping the guide until a first hire', () => {
+    const s = newGame({ seed: 42, cityId: 'cal' });
+    const r = cmd.buildBranch(s, { lotId: freeLot(s).id, build: REFERENCE_BUILDS.basic });
+    if (!r.ok) throw new Error(r.reason);
+    const ids = () => s.people.managerCandidates.cal!.map((m) => m.id);
+    const before = ids();
+    expect(cmd.rerollManagerCandidates(s, 'cal').ok).toBe(true);
+    const after = ids();
+    expect(after).toHaveLength(3);
+    expect(after[0]).toBe(before[0]); // the tutorial guide stays on the list
+    expect(after.slice(1).some((id) => before.includes(id))).toBe(false);
+    expect(cmd.hireManager(s, r.branchId, after[1]!).ok).toBe(true);
+    cmd.rerollManagerCandidates(s, 'cal');
+    expect(ids().some((id) => after.includes(id))).toBe(false);
+    expect(cmd.rerollManagerCandidates(s, 'nowhere').ok).toBe(false);
+  });
 });
