@@ -73,7 +73,15 @@ export function emptyGovernance(): Governance {
 }
 
 export function emptyExecutives(): ExecutivesState {
-  return { seats: {}, candidates: {}, candidatesRefreshWeek: -1, hadCto: false };
+  return {
+    seats: {},
+    candidates: {},
+    candidatesRefreshWeek: -1,
+    hadCto: false,
+    remembered: {},
+    growthCities: {},
+    lastExpansionWeek: -1,
+  };
 }
 
 export function emptyMergers(): MergersState {

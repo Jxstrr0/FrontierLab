@@ -15,7 +15,8 @@ export interface IncidentOptionSpec {
   line?: 'incidents' | 'fines' | 'capex';
   /**
    * A delegated manager values this option's non-cash effects at this many weeks
-   * of the branch's revenue (§17.1, expected value).
+   * of the branch's revenue (§17.1, expected value); for company and city cases
+   * the COO uses weeks of the company's revenue (§17.2).
    */
   penaltyWeeks?: number;
   /** A delegated manager never picks it (firing themselves, say). */
@@ -31,6 +32,8 @@ export interface IncidentSpec {
   trigger: 'rolled' | 'triggered';
   /** Information only: one OK option, nothing to decide. */
   info?: boolean;
+  /** Always lands on your desk: a COO trusted with Company troubles never settles it (§17.2). */
+  yours?: boolean;
   baseP?: number;
   /** Weeks before the same type can fire again for the same scope. */
   cooldownWeeks?: number;
@@ -110,12 +113,14 @@ export const INCIDENT_SPECS: Record<string, IncidentSpec> = {
         id: 'notify',
         label: 'Notify and monitor',
         effect: 'Credit monitoring for everyone affected. Overall rating −0.1 for 4 weeks.',
+        penaltyWeeks: 0.5,
       },
       {
         id: 'quiet',
         label: 'Quiet fix',
         effect:
           '40% chance it comes out: a fine of 2% of yearly revenue and Overall −0.4 for 12 weeks.',
+        penaltyWeeks: 2,
       },
       {
         id: 'forensic',
@@ -197,6 +202,7 @@ export const INCIDENT_SPECS: Record<string, IncidentSpec> = {
     title: 'Executive poached',
     scope: 'company',
     trigger: 'triggered',
+    yours: true,
     stage: 6,
     text: '{rival} is trying to hire our {title}, {name}.',
     options: [
@@ -223,6 +229,7 @@ export const INCIDENT_SPECS: Record<string, IncidentSpec> = {
     title: 'Bank run',
     scope: 'company',
     trigger: 'triggered',
+    yours: true,
     text: 'Rumours about our health are spreading, and depositors are queueing to take their money out.',
     money: ['window'],
     pct: ['odds'],
@@ -259,6 +266,7 @@ export const INCIDENT_SPECS: Record<string, IncidentSpec> = {
         id: 'freeze',
         label: 'Freeze cards for a week',
         effect: 'No losses, but card take-up −50% for 4 weeks.',
+        penaltyWeeks: 1,
       },
       {
         id: 'bureau',
@@ -311,8 +319,14 @@ export const INCIDENT_SPECS: Record<string, IncidentSpec> = {
         id: 'match',
         label: 'Match it',
         effect: 'Savings +0.15% at every branch in {city} for 26 weeks.',
+        penaltyWeeks: 1,
       },
-      { id: 'hold', label: 'Hold our rates', effect: 'Keep our margin and risk some outflows.' },
+      {
+        id: 'hold',
+        label: 'Hold our rates',
+        effect: 'Keep our margin and risk some outflows.',
+        penaltyWeeks: 1.5,
+      },
     ],
     worst: 'hold',
   },
@@ -365,6 +379,7 @@ export const INCIDENT_SPECS: Record<string, IncidentSpec> = {
     title: 'Emergency recapitalisation',
     scope: 'company',
     trigger: 'triggered',
+    yours: true,
     cooldownWeeks: 0,
     text: 'Our capital ratio has been under {floor} for {weeks} weeks. The regulator will let us carry on if new shareholders put in {amount}, buying shares at {price} each, half our book value. Refusing means a takeover.',
     money: ['amount'],

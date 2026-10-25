@@ -1,11 +1,13 @@
-// Incidents (SIMULATION §23, CONTENT §22): weekly rolls, cooldowns, delegation,
-// deadlines and the timed effects choices leave behind, plus the bank-run clock
+// Incidents (SIMULATION §23, CONTENT §22): weekly rolls, cooldowns, delegation
+// (branch cases to a trusted manager, company and city cases to a COO trusted
+// with Company troubles), deadlines and the timed effects choices leave behind, plus the bank-run clock
 // (§13.8) and the regulator's letter (§15). Other systems raise incidents
 // through `raiseIncident`; the player answers through commands/incidents.ts.
 // Per-type rules live in src/sim/incident/, numbers in src/data/incidents.ts.
-import { BANK_RUN, FEATURES, INCIDENTS, type FeatureId } from '../config/balance';
+import { BANK_RUN, EXEC_DELEGATION, FEATURES, INCIDENTS, type FeatureId } from '../config/balance';
 import { INCIDENT_SPECS, type IncidentSpec } from '../data/incidents';
 import { pushEvent } from './events';
+import { delegationOn } from './execSeats';
 import { newId } from './ids';
 import { postCash, spend } from './ledger';
 import { stream } from './rng';
@@ -101,6 +103,8 @@ export function raiseIncident(
   );
   if (scopeKind === 'branch' && troublesDelegated(state, scope)) {
     resolveWith(state, inc, managerChoice(state, inc), 'manager');
+  } else if (troublesDelegatedToCoo(state, spec)) {
+    resolveWith(state, inc, executiveChoice(state, inc), 'executive');
   }
   return inc;
 }
@@ -117,6 +121,15 @@ export function forceIncident(state: GameState, type: string, scope: string): In
 export function troublesDelegated(state: GameState, branchId: string): boolean {
   const b = state.branches[branchId];
   return !!b?.managerId && b.delegation.troubles;
+}
+
+/**
+ * True when a seated COO trusted with "Company troubles" settles this kind of
+ * case (§17.2): company and city scope, never one marked `yours`.
+ */
+export function troublesDelegatedToCoo(state: GameState, spec: IncidentSpec): boolean {
+  if (spec.yours || (spec.scope !== 'company' && spec.scope !== 'city')) return false;
+  return delegationOn(state, 'coo', 'troubles');
 }
 
 /** Why an option can't be chosen now: the rule's own reason, or the cash it needs. */
@@ -142,7 +155,7 @@ export function resolveWith(
   state: GameState,
   inc: Incident,
   optionId: string,
-  by: 'you' | 'manager' | 'deadline',
+  by: 'you' | 'manager' | 'executive' | 'deadline',
 ): string | undefined {
   const spec = INCIDENT_SPECS[inc.type]!;
   const rule = RULES[inc.type]!;
@@ -178,13 +191,30 @@ export function resolveWith(
  * revenue, each scaled by 1 + normal(0, error × (1 − (People + Ethics)/200)).
  */
 export function managerChoice(state: GameState, inc: Incident): string {
-  const spec = INCIDENT_SPECS[inc.type]!;
-  const rule = RULES[inc.type]!;
   const b = state.branches[inc.scope];
   const mgr = b?.managerId ? state.people.managers[b.managerId] : undefined;
   const weekly = Math.max(INCIDENTS.minWeeklyValue, b?.pnl.at(-1)?.revenue ?? 0);
   const skill = mgr ? (mgr.skills.people + mgr.skills.ethics) / 200 : 0;
-  const sd = INCIDENTS.managerError * (1 - skill);
+  return bestOption(state, inc, weekly, INCIDENTS.managerError * (1 - skill));
+}
+
+/**
+ * §17.2: the COO settles a company or city case the same way, valuing non-cash
+ * effects in weeks of the company's revenue, with error shrinking with their
+ * expertise.
+ */
+export function executiveChoice(state: GameState, inc: Incident): string {
+  const coo = state.executives.seats.coo;
+  const last = state.history.weekly.at(-1);
+  const weekly = Math.max(INCIDENTS.minWeeklyValue, last?.revenue ?? 0);
+  const skill = coo ? coo.expertise / 100 : 0;
+  return bestOption(state, inc, weekly, EXEC_DELEGATION.troublesError * (1 - skill));
+}
+
+/** The option with the lowest noisy expected cost (shared by managers and the COO). */
+function bestOption(state: GameState, inc: Incident, weekly: number, sd: number): string {
+  const spec = INCIDENT_SPECS[inc.type]!;
+  const rule = RULES[inc.type]!;
   const rng = stream(state, 'incidents');
   let best: string | undefined;
   let bestScore = Infinity;

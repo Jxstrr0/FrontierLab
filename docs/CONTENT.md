@@ -593,7 +593,7 @@ Pentagon order: Management, Track record, Market, Competitiveness, Financial hea
 ## 22. Incidents
 Implemented in `src/data/incidents.ts` (texts and options) and `src/data/incidentParams.ts` (numbers).
 
-Default cooldown: 8 weeks per scope.
+Default cooldown: 8 weeks per scope. Branch cases go to a manager trusted with Branch troubles; company and city cases to a COO trusted with Company troubles (§17.2), except those marked **yours** below (EXEC_POACHED, BANK_RUN, RECAP_OFFER), which always reach you. `penaltyWeeks` on an option is how a delegated decider values its non-cash effects, in weeks of revenue.
 
 | id | Scope | Weekly base p | Condition / multiplier | Options (cost → effect) |
 |---|---|---|---|---|

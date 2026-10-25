@@ -249,3 +249,61 @@
   font-size: 0.875rem;
   font-weight: 600;
 }
+
+/* "Where to look" (SCREENS §24): ranked items, each a tap to its screen. */
+.attn-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.attn-list > li + li {
+  border-top: 1px solid var(--hairline);
+}
+.attn-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  min-height: 44px;
+  padding: var(--space-2) 0;
+  text-align: left;
+}
+.attn-tap {
+  position: relative;
+  padding-right: var(--space-5);
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.attn-tap:active {
+  opacity: 0.7;
+}
+.attn-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.attn-title {
+  font-weight: 700;
+}
+.attn-arrow {
+  position: absolute;
+  right: var(--space-1);
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: var(--text-20, 20px);
+  color: var(--ivory-dim);
+}
+.attn-clear {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+}
+.attn-more {
+  margin: var(--space-2) 0 0;
+}

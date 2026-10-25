@@ -8,6 +8,7 @@
 // stepWeek() runs the rest of the current week at once and leaves the game
 // paused, for week-by-week play.
 import { CAPITAL_BUFFER_PP, DAY_MS, DAYS_PER_WEEK, FEATURES } from '../config/balance';
+import { CITIES } from '../data/cities';
 import { INCIDENT_SPECS } from '../data/incidents';
 import { isQuarterStart } from '../sim/calendar';
 import { advanceDay } from '../sim/engine';
@@ -172,6 +173,10 @@ const EVENT_TEXT: Record<string, (p: Record<string, unknown>) => string> = {
   ...VENTURE_EVENT_TEXT,
   ...AUCTION_EVENT_TEXT,
   BRANCH_OPENED: (p) => `${String(p.name)} is open for business.`,
+  NEW_BRANCH: (p) =>
+    p.by === 'coo'
+      ? `Your COO leased ${String(p.address)} in ${CITIES[String(p.city)]?.name ?? String(p.city)}. The branch opens after fit-out.`
+      : '',
   CB_DECISION: (p) => {
     const change = Number(p.change);
     const verb = change > 0 ? 'raised' : change < 0 ? 'cut' : 'held';
@@ -189,6 +194,10 @@ const EVENT_TEXT: Record<string, (p: Record<string, unknown>) => string> = {
       return spec?.info
         ? `${String(p.scopeName)}: ${title}. Your manager has it in hand.`
         : `${String(p.scopeName)}: your manager handled the ${title} (${String(p.option)}).`;
+    if (p.by === 'executive')
+      return spec?.info
+        ? `${spec.title}: your COO has it in hand.`
+        : `Your COO handled the ${title} (${String(p.option)}).`;
     if (p.by === 'deadline' && !spec?.info)
       return `No decision on the ${title}, so we went with “${String(p.option)}”.`;
     return '';

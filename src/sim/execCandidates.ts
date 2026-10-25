@@ -32,7 +32,7 @@ export function askingSalary(
   );
 }
 
-/** One candidate for a seat, delegations all off. */
+/** One candidate for a seat, every delegation on (the seat's remembered toggles win on hire). */
 export function generateExecutive(state: GameState, seat: ExecSeat): Executive {
   const rng = stream(state, 'execs');
   const bonus = gradSkillBonus(state);
@@ -40,7 +40,7 @@ export function generateExecutive(state: GameState, seat: ExecSeat): Executive {
   const expertise = rollSkill(rng, bonus);
   const loyalty = rollSkill(rng, bonus);
   const delegations: Record<string, boolean> = {};
-  for (const d of EXEC_SEATS[seat].delegations) delegations[d.id] = false;
+  for (const d of EXEC_SEATS[seat].delegations) delegations[d.id] = true;
   return {
     id: newId(state, 'exec'),
     seat,

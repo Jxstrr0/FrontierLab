@@ -210,3 +210,33 @@ button.exec-seat:active {
   flex-direction: column;
   gap: var(--space-1);
 }
+
+/* Growth cities on the COO's profile (SCREENS §10.1). */
+.growth {
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--hairline);
+}
+.growth-title {
+  margin: 0 0 var(--space-1);
+  font-family: var(--font-display);
+  font-size: var(--text-16);
+}
+.growth-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.growth-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.growth-row > .toggle {
+  flex: 1;
+  min-width: 0;
+}
+.growth-open {
+  flex: 0 0 auto;
+  min-height: 44px;
+}

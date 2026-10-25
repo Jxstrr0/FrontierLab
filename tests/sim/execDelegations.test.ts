@@ -5,6 +5,8 @@ import { DEV_MIN_WEEKLY, EXEC_DELEGATION } from '../../src/config/balance';
 import { DEV_TEMPLATES, isDigital } from '../../src/data/devTemplates';
 import * as cmd from '../../src/sim/commands';
 import { cfoTreasury, cpoDevelopments, ctoDigital } from '../../src/sim/execDelegationsFinance';
+import { bestLot, cooExpansion, expansionPlan } from '../../src/sim/execDelegationsGrowth';
+import { tileDistance } from '../../src/sim/citygen';
 import {
   averageMorale,
   cmoBrand,
@@ -136,5 +138,90 @@ describe('CRO appetite', () => {
     hire(s, 'cro');
     expect(cmd.setExecDelegation(s, 'cro', 'appetite', true).ok).toBe(true);
     expect(cmd.setExecDelegation(s, 'cro', 'nope', true).ok).toBe(false);
+  });
+});
+
+describe('COO Expansion (§17.2)', () => {
+  const setup = () => {
+    const s = execGame();
+    openFirst(s);
+    hire(s, 'coo');
+    return s;
+  };
+
+  it('builds in a growth city when the spare cash allows, once per cadence', () => {
+    const s = setup();
+    cmd.setGrowthCity(s, 'cal', true);
+    const before = Object.keys(s.branches).length;
+    cooExpansion(s);
+    expect(Object.keys(s.branches)).toHaveLength(before + 1);
+    expect(s.executives.lastExpansionWeek).toBe(s.clock.week);
+    const built = Object.values(s.branches).find((b) => b.status === 'fitout')!;
+    expect(built.cityId).toBe('cal');
+    expect(
+      s.events.log.find((e) => e.type === 'NEW_BRANCH' && e.payload.by === 'coo'),
+    ).toBeDefined();
+    cooExpansion(s);
+    expect(Object.keys(s.branches)).toHaveLength(before + 1);
+    s.clock.week += EXEC_DELEGATION.expansionEveryWeeks;
+    cooExpansion(s);
+    expect(Object.keys(s.branches)).toHaveLength(before + 2);
+    expect(identityGap(s)).toBeLessThan(1);
+  });
+
+  it('keeps the cash reserve and does nothing without growth cities', () => {
+    const s = setup();
+    s.executives.growthCities = {};
+    const before = Object.keys(s.branches).length;
+    cooExpansion(s);
+    expect(Object.keys(s.branches)).toHaveLength(before);
+    cmd.setGrowthCity(s, 'cal', true);
+    // Weekly costs so high that 8 weeks of them exceed the cash on hand.
+    withRevenue(s, s.company.cash);
+    s.history.weekly.at(-1)!.netIncome = 0;
+    expect(expansionPlan(s, 'cal').blocker).toMatch(/reserve/);
+    cooExpansion(s);
+    expect(Object.keys(s.branches)).toHaveLength(before);
+    // Your own ask ignores the reserve.
+    expect(expansionPlan(s, 'cal', false).blocker).toBeUndefined();
+  });
+
+  it('picks the busiest free storefront away from your branches', () => {
+    const s = setup();
+    const lot = bestLot(s, 'cal')!;
+    expect(lot.occupant).toBeUndefined();
+    const mine = Object.values(s.world.lots).filter((l) => l.occupant?.type === 'player');
+    const score = (l: typeof lot) =>
+      l.footTraffic *
+      Math.min(
+        1,
+        Math.min(...mine.map((m) => tileDistance(l, m))) / EXEC_DELEGATION.expansionSpacing,
+      );
+    const best = Math.max(
+      ...Object.values(s.world.lots)
+        .filter((l) => l.cityId === 'cal' && !l.occupant)
+        .map(score),
+    );
+    expect(score(lot)).toBe(best);
+  });
+
+  it('Open now needs a COO, works from another city, and growth cities must be visited', () => {
+    const s = execGame();
+    expect(cmd.cooOpenBranch(s, 'cal').ok).toBe(false);
+    expect(cmd.setGrowthCity(s, 'tor', true).ok).toBe(false);
+    hire(s, 'coo');
+    s.world.currentCityId = 'tor';
+    const r = cmd.cooOpenBranch(s, 'cal');
+    expect(r.ok).toBe(true);
+    expect(identityGap(s)).toBeLessThan(1);
+  });
+
+  it('hiring with Expansion on, or switching it on, seeds the growth cities from where you are', () => {
+    const s = setup();
+    expect(s.executives.growthCities).toEqual({ cal: true });
+    cmd.setExecDelegation(s, 'coo', 'expansion', false);
+    s.executives.growthCities = {};
+    cmd.setExecDelegation(s, 'coo', 'expansion', true);
+    expect(s.executives.growthCities).toEqual({ cal: true });
   });
 });

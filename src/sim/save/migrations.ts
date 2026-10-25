@@ -239,6 +239,23 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     checkMilestones(state, true);
     return s;
   },
+
+  // 12 → 13: hands-off play. Executive seats remember their last holder's
+  // delegation toggles, the COO gets a list of growth cities and an expansion
+  // clock, and candidates waiting in the pools now come with every delegation
+  // on (the new default for hires).
+  12: (s) => {
+    const state = s as unknown as GameState;
+    const ex = state.executives;
+    ex.remembered ??= {};
+    ex.growthCities ??= {};
+    ex.lastExpansionWeek ??= -1;
+    for (const pool of Object.values(ex.candidates)) {
+      for (const c of pool ?? [])
+        for (const id of Object.keys(c.delegations)) c.delegations[id] = true;
+    }
+    return s;
+  },
 };
 
 const STAGE9_PNL_LINES = ['franchiseRevenue', 'franchiseCosts', 'dealerFees'] as const;

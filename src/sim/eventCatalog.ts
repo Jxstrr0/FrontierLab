@@ -8,7 +8,7 @@ import type { Id, Money, Rate } from '../data/types';
 export interface EventPayloads {
   // ─── Your bank ────────────────────────────────────────────────────────────
   /** You started a build (commands/branches.ts). */
-  NEW_BRANCH: { branchId: Id; city: Id; district: string; address: string };
+  NEW_BRANCH: { branchId: Id; city: Id; district: string; address: string; by?: 'coo' };
   /** Fit-out finished; the branch opened (engine.ts). */
   BRANCH_OPENED: { branchId: Id; name: string };
   BRANCH_CLOSED: { branchId: Id; name: string; movedTo?: string };
@@ -76,7 +76,7 @@ export interface EventPayloads {
     scope: Id;
     scopeName: string;
     option: string;
-    by: 'you' | 'manager' | 'deadline';
+    by: 'you' | 'manager' | 'executive' | 'deadline';
     cost: Money;
   };
   REG_FINE: { bank: string; amount: Money; reason: string };

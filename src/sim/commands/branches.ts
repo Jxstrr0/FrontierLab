@@ -43,16 +43,25 @@ export function buildQuote(state: GameState, lotId: string, build: BuildSpec) {
   return { parts, deposit, rent, total: parts + deposit + rent };
 }
 
-/** Why a branch can't be built here right now, or undefined if it can. */
+/**
+ * Why a branch can't be built here right now, or undefined if it can. `via`
+ * 'coo' is a build the COO makes for you (Expansion, §17.2): it may be in a
+ * city you are not in, because they are.
+ */
 export function buildBlocker(
   state: GameState,
   lotId: string,
   build: BuildSpec,
+  via?: 'coo',
 ): string | undefined {
   const lot = state.world.lots[lotId];
   if (!lot) return 'That storefront no longer exists.';
   if (lot.occupant) return 'This storefront is already taken.';
-  if (lot.cityId !== state.world.currentCityId) return "You can only build in the city you're in.";
+  if (via === 'coo') {
+    if (!state.executives.seats.coo) return 'You need a COO to open branches for you.';
+  } else if (lot.cityId !== state.world.currentCityId) {
+    return "You can only build in the city you're in.";
+  }
   for (const slot of BUILD_SLOTS) {
     const item = EQUIPMENT[build[slot]];
     if (!item || item.slot !== slot) return `Pick a valid ${slot} option.`;
@@ -80,9 +89,9 @@ export function defaultName(state: GameState, district: string, cityId?: string)
 /** Leases the storefront and builds a branch; it opens after a one-week fit-out (DESIGN §5.3). */
 export function buildBranch(
   state: GameState,
-  args: { lotId: string; build: BuildSpec; name?: string },
+  args: { lotId: string; build: BuildSpec; name?: string; via?: 'coo' },
 ): CommandResult<{ branchId: string }> {
-  const blocker = buildBlocker(state, args.lotId, args.build);
+  const blocker = buildBlocker(state, args.lotId, args.build, args.via);
   if (blocker) return fail(blocker);
   const lot = state.world.lots[args.lotId]!;
   const quote = buildQuote(state, args.lotId, args.build);
@@ -189,7 +198,13 @@ export function buildBranch(
   pushEvent(
     state,
     'NEW_BRANCH',
-    { branchId: id, city: lot.cityId, district: lot.district, address: lot.address },
+    {
+      branchId: id,
+      city: lot.cityId,
+      district: lot.district,
+      address: lot.address,
+      ...(args.via ? { by: args.via } : {}),
+    },
     1,
     id,
   );

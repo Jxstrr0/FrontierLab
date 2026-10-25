@@ -19,7 +19,8 @@ import { execMult, execMultOf, resignChance } from '../../src/sim/execSeats';
 import { staffEff, statementDelayWeeks } from '../../src/sim/hq';
 import { incidentChance, raiseIncident } from '../../src/sim/incidents';
 import { sharesHeld } from '../../src/sim/shares';
-import type { Executive, GameState } from '../../src/sim/state';
+import { migrate } from '../../src/sim/save/migrations';
+import { SCHEMA_VERSION, type Executive, type GameState } from '../../src/sim/state';
 import { execGame, hire, holderTotal, identityGap } from '../helpers/executives';
 
 /** Advances exactly one week of ticks without the rest of the engine's randomness mattering. */
@@ -281,5 +282,55 @@ describe('releasing the Executive suite', () => {
     expect(s.executives.seats.cto).toBeUndefined();
     expect(s.events.log.filter((e) => e.type === 'EXEC_FIRED')).toHaveLength(2);
     expect(identityGap(s)).toBeLessThan(1);
+  });
+});
+
+describe('delegation defaults and seat memory (schema v13)', () => {
+  it('a new hire starts with every delegation on', () => {
+    const s = execGame();
+    const coo = hire(s, 'coo');
+    expect(Object.values(coo.delegations).every(Boolean)).toBe(true);
+  });
+
+  it('a seat remembers its last holder’s toggles for the next hire', () => {
+    const s = execGame();
+    hire(s, 'cfo');
+    cmd.setExecDelegation(s, 'cfo', 'dividends', false);
+    cmd.setExecDelegation(s, 'cfo', 'capital', false);
+    cmd.fireExec(s, 'cfo');
+    expect(s.executives.remembered.cfo).toMatchObject({
+      treasury: true,
+      capital: false,
+      dividends: false,
+    });
+    refreshExecCandidates(s, true);
+    const next = hire(s, 'cfo');
+    expect(next.delegations).toMatchObject({ treasury: true, capital: false, dividends: false });
+  });
+});
+
+describe('migration 12 → 13', () => {
+  it('adds the new executive fields and switches waiting candidates on', () => {
+    const s = execGame();
+    refreshExecCandidates(s, true);
+    const raw = JSON.parse(JSON.stringify(s)) as Record<string, unknown> & {
+      schemaVersion: number;
+    };
+    const ex = raw.executives as Record<string, unknown>;
+    delete ex.remembered;
+    delete ex.growthCities;
+    delete ex.lastExpansionWeek;
+    for (const pool of Object.values(ex.candidates as Record<string, Executive[]>))
+      for (const c of pool) for (const id of Object.keys(c.delegations)) c.delegations[id] = false;
+    raw.schemaVersion = 12;
+    const up = migrate(raw) as unknown as GameState;
+    expect(up.schemaVersion).toBe(SCHEMA_VERSION);
+    expect(up.executives).toMatchObject({
+      remembered: {},
+      growthCities: {},
+      lastExpansionWeek: -1,
+    });
+    const first = up.executives.candidates.coo![0]!;
+    expect(Object.values(first.delegations).every(Boolean)).toBe(true);
   });
 });

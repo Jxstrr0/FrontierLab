@@ -4,11 +4,22 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 **Current stage:** 10 — Art pass, onboarding, polish, launch (built and live; awaiting the owner's iPhone check). All ten roadmap stages are built. Still open: the owner's testing and tuning pass, an Add to Home Screen test on a real iPhone, and the Vault Street card on Kelbo.Website (in a separate session in that repo).
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `0d4e27c63a2b9f` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `0c95376ab09fe5` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-25 — Run the top of the bank (v0.10.0)
+- **Done (owner's ask):** four changes so you can run the top of the bank and leave the branches to hired staff.
+  1. **COO Expansion.** A new switch on the COO's profile. Each week they may open one branch for you in a city you have marked for growth: the growth city with the most room, the busiest free storefront that isn't on top of one of yours, your usual fit-out (your newest branch's build, else the mid or basic reference build), at most one every 4 weeks, and only while 8 weeks of running costs stay in cash. **Growth cities** sit under the switch: every city you have visited, each with a toggle and an **Open now** button that has the COO build there at once (needing only the cash for the build). Switching Expansion on with nothing marked starts with the cities you already have branches in. You still cannot build where you are not; the COO can, because they travel for you.
+  2. **Seats remember their toggles, and hires start with everything on.** No automatic rehiring (owner's call). But every candidate now comes with all delegations on, and when an executive leaves, the seat keeps their toggles for the next hire, so a poaching never silently switches the bank back to manual.
+  3. **COO Company troubles.** With it on, the COO settles company and city cases (data breach, card fraud, regulator audit, price war, information notices) the way a trusted branch manager settles branch cases: lowest expected cost, judged in weeks of company revenue, with a little error that shrinks with their Expertise. Bank runs, the emergency rescue and poached executives are marked `yours` and always reach you. The toast says what the COO decided.
+  4. **Where to look.** A new card at the top of Menu → Company listing the three things that most need you, worst first (Urgent / Watch / Note), each a tap to the right screen: capital tier, open cases, liquidity under target, expiring loan applications, branches losing money for 4 weeks, ratings under 2.5, understaffing, loan losses over the 1.2% ceiling, morale under 50, branches without a manager, empty executive seats, switched-off delegations, and cities where few people know you. "All clear" when nothing qualifies.
+- **Not done (owner's call):** no faster speed or "play to quarter end", and no automatic replacement of poached executives.
+- **Code:** `src/sim/execDelegationsGrowth.ts` (expansion plan and routine), `src/sim/attention.ts` (the ranking), `commands/executives.ts` gains `setGrowthCity` and `cooOpenBranch`, `buildBranch` takes `via: 'coo'` for a build away from where you are, `incidents.ts` gains `executiveChoice` and `troublesDelegatedToCoo`. New constants under `EXEC_DELEGATION` (expansion*, troublesError) and `ATTENTION` in balance.ts. UI: `src/app/company/WhereToLook.tsx`, `src/app/executive/GrowthCities.tsx`.
+- **Saves:** schema v13 (`executives.remembered`, `growthCities`, `lastExpansionWeek`); migration 12 → 13 adds them and switches waiting candidates' delegations on.
+- **Determinism snapshot** updated to `0c95376ab09fe5`: the scripted run never hires an executive, and with the new fields and the schema number removed from the serialized state the old hash `0d4e27c63a2b9f` comes back exactly, so the sim's behaviour is unchanged. Tests: 8 new (seat memory, migration, expansion routine and commands, company troubles, attention ranking).
 
 ### 2026-10-25 — The Weekly Ledger (v0.9.8)
 - **Done (owner's ask):** the newspaper is now called **The Weekly Ledger**. It already came out once a week (one issue per weekly close, numbered by week, shown in the weekly results and kept under Menu → The Ledger); only the name said Daily. Nothing about its timing changed.

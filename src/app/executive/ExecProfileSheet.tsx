@@ -2,6 +2,8 @@
 // Leadership, Expertise and Loyalty bars; the seat's delegation toggles with
 // what each does; the salary stepper with the market hint; the grants list
 // with vesting progress, Add grant, and Fire with a confirm showing severance.
+// The COO's sheet adds the growth cities their Expansion delegation may build
+// in, each with an "Open a branch now" button (GrowthCities.tsx).
 import { useState } from 'preact/hooks';
 import * as cmd from '../../sim/commands';
 import type { ExecSeat } from '../../sim/state';
@@ -18,6 +20,7 @@ import {
 import { count, gameDate, moneyFull } from '../format/format';
 import { act, toast, useGame } from '../store';
 import { ExecGrantForm } from './ExecGrantForm';
+import { GrowthCities } from './GrowthCities';
 import { dayOf, execSalaryStepper, seatSpec, vestProgress } from './execSelectors';
 
 export function ExecProfileSheet(p: { seat: ExecSeat; onClose: () => void }) {
@@ -60,6 +63,7 @@ export function ExecProfileSheet(p: { seat: ExecSeat; onClose: () => void }) {
                   onChange={(v) => act(cmd.setExecDelegation, p.seat, d.id, v)}
                 />
               ))}
+              {p.seat === 'coo' && <GrowthCities s={s} />}
               {p.seat === 'cfo' && (
                 <p class="muted small exec-note">
                   Statement delays are halved while a CFO is seated.
