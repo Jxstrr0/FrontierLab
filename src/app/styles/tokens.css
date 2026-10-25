@@ -13,6 +13,10 @@
   --brass-light: #d9be7a;
   --jade: #3e8a73;
   --oxblood: #9e3d3d;
+  /* Jade and oxblood are fills; as text on navy they miss WCAG AA (3.8:1, 2.4:1).
+     These lighter tints are for text (7.5:1, 5.4:1 on --vault; Stage 10 a11y). */
+  --jade-text: #6cc3a6;
+  --oxblood-text: #e07a7a;
   --paper: #e3e9df;
   --ledger-ink: #22252b;
 

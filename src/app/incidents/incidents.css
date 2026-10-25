@@ -123,8 +123,7 @@
   opacity: 0.5;
 }
 .inc-option:disabled .inc-option-effect {
-  color: var(--oxblood);
-  filter: brightness(1.5);
+  color: var(--oxblood-text);
 }
 .inc-option-head {
   display: flex;

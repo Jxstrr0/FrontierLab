@@ -49,7 +49,7 @@ function Reviews({ branch }: { branch: Branch }) {
         </div>
       </Card>
       {cards.length > 0 ? (
-        <div class="carousel br-review-carousel">
+        <div class="carousel br-review-carousel" role="group" aria-label="Reviews" tabIndex={0}>
           {cards.map((c) => (
             <ReviewCardView card={c} />
           ))}
@@ -152,7 +152,7 @@ function StaffFigures(p: { count: number; target: number; mood: 'good' | 'warn' 
     ...Array.from({ length: open }, () => 'br-fig br-fig-open'),
   ];
   return (
-    <div class="br-figures" aria-label={`${p.count} staff, ${open} open positions`}>
+    <div class="br-figures" role="img" aria-label={`${p.count} staff, ${open} open positions`}>
       {figures.map((cls) => (
         <svg class={cls} viewBox="0 0 12 18" aria-hidden="true">
           <circle cx="6" cy="4" r="3" />

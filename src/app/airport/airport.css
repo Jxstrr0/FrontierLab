@@ -122,8 +122,9 @@
   flex: none;
   padding: 1px 5px;
   border-radius: 3px;
-  background: var(--jade);
-  color: var(--ivory);
+  /* Light jade with dark ink: ivory on jade is only 3.3:1 (WCAG AA needs 4.5). */
+  background: var(--jade-text);
+  color: var(--vault-deep);
   font-family: var(--font-ui);
   font-size: 10px;
   letter-spacing: 0.06em;
@@ -154,7 +155,7 @@
 }
 .dep-fare.is-free,
 .dep-fare.is-jet {
-  color: var(--jade);
+  color: var(--jade-text);
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }

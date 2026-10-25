@@ -13,6 +13,7 @@ import {
 } from '../../config/mapView';
 import { CITIES, DESTINATIONS } from '../../data/cities';
 import { landPath } from '../../art/worldOutline';
+import { useDialog } from '../components/dialog';
 import { money } from '../format/format';
 import { useGame } from '../store';
 import { PLANE_PATH, PlaneIcon } from './AirportMedallion';
@@ -84,6 +85,9 @@ function FlightScene({ f }: { f: Flight }) {
   }, []);
 
   const skip = () => run.current.flown && run.current.finish();
+  // Focus moves onto the overlay; Escape skips like a tap (Stage 10 accessibility).
+  const dialog = useRef<HTMLDivElement>(null);
+  useDialog(dialog, skip, true);
   // User units per CSS px: strokes and labels stay the same size whatever the zoom.
   const px = box.w / (typeof window === 'undefined' ? 390 : window.innerWidth);
   const plane = pointAt(pts, easeInOut(t));
@@ -102,7 +106,10 @@ function FlightScene({ f }: { f: Flight }) {
     <div
       class={`flight${fading ? ' is-fading' : ''}${reduced ? ' is-still' : ''}`}
       role="dialog"
+      aria-modal="true"
       aria-label={`Flying from ${from.name} to ${to.name}`}
+      tabIndex={-1}
+      ref={dialog}
       style={{ '--flight-fade': `${FLIGHT_FADE_MS}ms` }}
       onClick={skip}
     >
