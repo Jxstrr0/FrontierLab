@@ -1,6 +1,7 @@
 // GameState types (docs/DATA_MODEL.md). Everything here is plain JSON so it
 // serializes directly. Stage 1 holds the founder-phase systems; later stages add
 // fields with a schemaVersion bump and a migration (src/sim/save/migrations.ts).
+import type { LayoutVersion } from '../config/cityGeo';
 import type { BuildSpec } from '../data/equipment';
 import type {
   CountryId,
@@ -52,7 +53,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState, DealerDeal } from './personalTypes';
 
-export const SCHEMA_VERSION = 10;
+export const SCHEMA_VERSION = 11;
 
 export interface GameState {
   schemaVersion: number;
@@ -297,6 +298,11 @@ export interface CountryState {
 export interface CityState {
   id: Id;
   generated: boolean;
+  /**
+   * Which street layout the city was generated on (cityGeo.ts): 1 is the
+   * original shared grid (cities from saves before v11), 2 its own geography.
+   */
+  layout: LayoutVersion;
   /** City brand awareness b (SIMULATION §7). */
   brandAwareness: Pct;
   /** Market reference price m(p, city) per product (§5). */

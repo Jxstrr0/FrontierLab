@@ -6,7 +6,7 @@ import { generateCityMap, type CityMap, type MapPlaces } from '../../art/citygen
 import { tileCenter } from '../../art/iso';
 import { createMapRenderer } from '../../art/isoRenderer';
 import type { MapRenderer } from '../../art/mapRenderer';
-import { CITYGEN, FEATURES } from '../../config/balance';
+import { FEATURES } from '../../config/balance';
 import { BRANCH_ZOOM, OVERVIEW_ZOOM } from '../../config/mapView';
 import type { CitySpec } from '../../data/cities';
 import type { GameState, Lot } from '../../sim/state';
@@ -33,10 +33,12 @@ function paperColour(): string {
   return v || PAPER_FALLBACK;
 }
 
-/** Office buildings and sites to draw in a city (Stage 4, behind FEATURES.hq). */
+/** The city's layout version, plus office buildings and sites (Stage 4, behind FEATURES.hq). */
 export function mapPlaces(s: GameState, cityId: string): MapPlaces {
-  if (!FEATURES.hq) return {};
+  const layout = s.world.cities[cityId]?.layout;
+  if (!FEATURES.hq) return { layout };
   return {
+    layout,
     offices: Object.values(s.world.officeListings).filter((o) => o.cityId === cityId),
     sites: Object.values(s.world.sites).filter((x) => x.cityId === cityId && siteEnabled(x.kind)),
   };
@@ -47,7 +49,7 @@ export function mapPlaces(s: GameState, cityId: string): MapPlaces {
  * build (they never move; who leases them is drawn from the occupants).
  */
 export function sceneFor(city: CitySpec, seed: number, lots: Lot[], places: MapPlaces = {}): Scene {
-  const key = `${city.id}:${seed}`;
+  const key = `${city.id}:${seed}:${places.layout ?? ''}`;
   if (cached?.key === key) return cached;
   const map = generateCityMap(city, seed, lots, places);
   cached = {
@@ -68,7 +70,8 @@ export function rememberCamera(key: string, cam: ViewCamera): void {
  * Where the camera starts: where you last looked in this city; else on your
  * first branch here at BRANCH_ZOOM; at a regional site (Stage 8), between its
  * airport and employers, so both are on screen when you land; else over the
- * financial district at OVERVIEW_ZOOM, which shows a good chunk of the city.
+ * financial district (nudged toward the water, cityGeo.ts) at OVERVIEW_ZOOM,
+ * which shows a good chunk of the city.
  */
 export function initialCamera(s: GameState, scene: Scene): ViewCamera {
   const saved = cameras.get(scene.key);
@@ -94,7 +97,7 @@ export function initialCamera(s: GameState, scene: Scene): ViewCamera {
       return { cx, cy, zoom: OVERVIEW_ZOOM };
     }
   }
-  const f = CITYGEN.layout.financial;
-  const c = tileCenter(tiles, f.cx * tiles, f.cy * tiles);
+  const f = scene.map.geo.focus;
+  const c = tileCenter(tiles, f.x, f.y);
   return { cx: c.x, cy: c.y, zoom: OVERVIEW_ZOOM };
 }

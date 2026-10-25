@@ -15,6 +15,7 @@ import { drawGround, GROUND_STEPS, type GroundStep } from './ground';
 import { drawLandmark } from './landmarks';
 import type { LotOccupant } from './mapRenderer';
 import { mixSeed } from './prng';
+import { drawStreetLife } from './streetLife';
 
 type Step = { ground: GroundStep } | { item: DrawItem };
 
@@ -102,6 +103,7 @@ function drawItem(e: Engraver, pc: PaintContext, item: DrawItem): void {
     drawLandmark(e, site, mixSeed(pc.map.seed[site.y * pc.map.tiles + site.x]!, site.size));
     return;
   }
+  if (drawStreetLife(e, pc.map, item.x, item.y)) return;
   const t = tileAt(pc.map, item.x, item.y)!;
   if (t.kind === 'park') parkTrees(e, t.x, t.y, t.seed);
   else if (t.kind === 'office') drawOffice(e, t, t.officeId ? pc.occupants[t.officeId] : undefined);

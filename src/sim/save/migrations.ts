@@ -5,6 +5,7 @@ import { initPersonalEmpire } from '../personalInit';
 import { generatePersonalSites } from '../personalSites';
 import { START_CASH } from '../../config/balance';
 import { CITIES } from '../../data/cities';
+import { cityGeometry } from '../cityGeo';
 import { isFrontage, nearestFrontage } from '../cityLayout';
 import { fullCoverage } from '../hq';
 import { generateSites } from '../hqSites';
@@ -53,13 +54,14 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     const misplaced: typeof lots = [];
     for (const lot of lots) {
       const city = CITIES[lot.cityId];
-      if (city && isFrontage(city, lot.tile.x, lot.tile.y)) {
+      if (city && isFrontage(cityGeometry(city, 1), lot.tile.x, lot.tile.y)) {
         usedIn(lot.cityId).add(`${lot.tile.x},${lot.tile.y}`);
       } else misplaced.push(lot);
     }
     for (const lot of misplaced) {
       const city = CITIES[lot.cityId];
-      const spot = city && nearestFrontage(city, lot.tile.x, lot.tile.y, usedIn(lot.cityId));
+      const spot =
+        city && nearestFrontage(cityGeometry(city, 1), lot.tile.x, lot.tile.y, usedIn(lot.cityId));
       if (!spot) continue;
       lot.tile = spot;
       usedIn(lot.cityId).add(`${spot.x},${spot.y}`);
@@ -214,6 +216,15 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
       generatePersonalSites(state, cityId);
     }
     initPersonalEmpire(state);
+    return s;
+  },
+
+  // 10 → 11: per-city geography (layout versions). Every city already generated
+  // keeps the original shared grid (layout 1), so its lots, buildings and map
+  // never move; cities visited from now on get their own geography (layout 2).
+  10: (s) => {
+    const state = s as unknown as GameState;
+    for (const city of Object.values(state.world.cities)) city.layout = 1;
     return s;
   },
 };
