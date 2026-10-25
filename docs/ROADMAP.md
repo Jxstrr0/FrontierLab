@@ -12,7 +12,7 @@ Eleven stages. Each one ends playable and deployed. A stage usually takes severa
 **Every session after that:**
 > Read CLAUDE.md and docs/PROGRESS.md. Continue the current stage in docs/ROADMAP.md. Work in small steps, keep CI green, stop at a stable point, deploy, and update docs/PROGRESS.md with what changed, what's next and any decisions (also logged in docs/DESIGN.md §7).
 
-**Testing a stage on the phone:** open the live URL in Safari. Add it to the Home Screen once Stage 10's PWA work lands.
+**Testing a stage on the phone:** open the live URL in Safari, or add it to the Home Screen (Share → Add to Home Screen) to play full screen and offline.
 
 ---
 

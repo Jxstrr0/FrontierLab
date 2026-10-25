@@ -73,11 +73,12 @@ jobs:
 - The live URL loads on iPhone Safari with no console errors.
 - A hard refresh still works.
 
-## Later (Stage 10)
-- **PWA:**
-  - manifest with `start_url: "./"` and `scope: "./"`
-  - icons at 192, 512 and maskable
-  - a service worker that caches the build
-  - test "Add to Home Screen" on iOS
+## PWA (built in Stage 10)
+- `public/manifest.webmanifest` with `start_url: "./"` and `scope: "./"`, so it works under `/VaultStreet/`. Icons at 192, 512 and maskable are drawn by `scripts/icons.ts`.
+- A service worker (`src/app/pwa/sw.js`) is written to `dist/sw.js` at build time by `src/app/pwa/swPlugin.ts`. It precaches every file of that build under a build-versioned cache name. A new deploy is picked up on the next launch after it has downloaded, so on iPhone an update shows on the second launch.
+- Add `?nosw` to the URL to run without the service worker (and unregister an old one) when testing.
+- Still to test on a real iPhone: Share → Add to Home Screen, then launch offline.
+
+## Later
 - **Hub:** add a Vault Street card in the Longlight hub repo (`Jxstrr0/Kelbo.Website`) in a separate session.
 - **Custom domain (optional):** add a CNAME in Pages settings.

@@ -2,13 +2,63 @@
 
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
-**Current stage:** 9 — Personal empire (built and live; awaiting the owner's iPhone check). The Stage 2–8 checks are still open too; the owner will do major testing and tuning later. Next: Stage 10 — Art pass, onboarding, polish, launch (waiting for the owner's go).
+**Current stage:** 10 — Art pass, onboarding, polish, launch (built and live; awaiting the owner's iPhone check). All ten roadmap stages are built. Still open: the owner's testing and tuning pass, an Add to Home Screen test on a real iPhone, and the Vault Street card on Kelbo.Website (in a separate session in that repo).
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
 **Determinism snapshot:** `18c44acb4c1d33` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-25 — Stage 10 built: art, tutorial, sound, PWA, balance
+- **Stage / step:** 10 — Art pass, onboarding, polish, launch
+- **Done:**
+  - **Tutorial:** seven short steps led by your first branch manager: tap a storefront, build a branch, set the savings rate, hire, read the first weekly results, turn on Personal Loans, approve a business loan. A brass ring shows where to tap. You can skip it from the advisor bar and replay it from Settings.
+  - **Art pass:**
+    - an engraved picture at the top of every building panel;
+    - banknote-style portraits for every person;
+    - small pictures for products and campaigns;
+    - one matching icon set;
+    - certificate-style cards with corner rosettes;
+    - restyled charts (tap a bar to see its value);
+    - a restyled Daily Ledger;
+    - weekly results that slide in and land with a "press".
+  - **Sound** (off by default; Settings → Sound): coin, paper, stamp and latch sounds.
+  - **Credits** screen, opened from the title screen and from Settings.
+  - **Install and offline:**
+    - you can add the game to your Home Screen, and it opens full screen with its own icon;
+    - after the first visit it works offline;
+    - updates arrive on the next launch.
+  - **Speed:** the title screen loads first and the other screens load in the background. The weekly autosave no longer causes a short freeze.
+  - **Accessibility:**
+    - better contrast and larger tap targets;
+    - labels for screen readers;
+    - keyboard focus moves into and out of panels;
+    - reduced motion swaps movement for fades;
+    - layout fixes at large text sizes.
+  - **Balance:** the balance report now checks every scripted strategy (steady, turtle, aggressive, stress) against its own targets. Seed 42 meets all of them.
+- **How it was built:** I did the balance pass while three helper agents built the tutorial/sound/credits, the install/offline/speed/accessibility work, and the art pass in parallel. I merged them, fixed the overlaps (the panel header and the loop both changed in two branches), and played it at phone size.
+- **Acceptance:**
+  - Lighthouse mobile scores on the final build: performance 98, accessibility 100, best practices 100, SEO 100. The target was at least 90.
+  - The tutorial took a scripted new player under 5 minutes, reading every line at a slow 180 words a minute (36 taps, no console errors). The target was under 10 minutes.
+  - Balance targets are met for all four strategies.
+  - 581 tests pass.
+- **Determinism snapshot:** unchanged (`18c44acb4c1d33`). The tutorial only adds an optional flag, so saves stay at version 10 and older saves load as they are.
+- **Dependencies:** none added. Lighthouse and axe were run with `npx` only and are not in package.json.
+- **Next:**
+  - The owner's testing and tuning pass.
+  - Add the Vault Street card to Kelbo.Website in a separate session in that repo.
+  - On iPhone:
+    - start a new game and follow the tutorial;
+    - turn on Sound in Settings;
+    - Share → Add to Home Screen, open it from the icon, then try it in airplane mode.
+- **Known issues:**
+  - On iPhone a new version shows on the second launch after a deploy (the first launch downloads it).
+  - The top-bar glyphs are still text characters, not the new icons.
+  - An HQ with no floors built has no picture at the top.
+  - At 1280 px wide, the side drawer covers the date pill.
+  - With seeds 7 and 99, the steady player's first-branch earnings miss their checkpoints. Seed 42 meets them; left for the tuning pass.
+  - Carried over from Stage 9 and earlier (see below).
 
 ### 2026-10-24 — Stage 9 built: personal empire
 - **Stage / step:** 9 — Personal empire
