@@ -10,6 +10,17 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-10-25 — A CFO who steers capital back to safety (v0.9.6)
+- **Done (owner's ask):** the CFO has a new **Capital** switch on their profile (Executive floor → tap the CFO). With it on, they watch the capital ratio every week and act when it slips:
+  - **Watch or worse (under 10.5%):** sells the stocks the company holds and turns risk appetite down a step every 4 weeks (unless your CRO already runs risk appetite).
+  - **Restricted or Critical (under 8%), or equity under $2M:** sells new shares through the cheapest investment bank, just enough to get back to 12% (more if the regulator has added a buffer). While private this is a private placement, so the usual limits apply: 3 rounds, 26 weeks apart, up to 25% each. Once listed it's a secondary offering.
+  - Above 10.5% the CFO leaves your capital alone.
+- **Checked that it works:** a bank knocked down to 3.5% with the CFO on climbs back to Adequate (about 11%) in roughly 28 weeks and reaches Strong within a year. The same bank without a CFO stalls at 4.6% and is taken over by the regulator. Both are now tests (`tests/sim/cfoCapital.test.ts`).
+- **Worth knowing:** a bank in deep trouble is valued low, so one share sale may not be enough on its own. The CFO raises as much as allowed and lets profits and the next round do the rest.
+- The "How to fix this" checklist now ends with a tip to seat a CFO and switch on Capital.
+- **Code:** `src/sim/execDelegationsCapital.ts` (new), the `capital` delegation in `src/data/executives.ts`, and `cfoTargetCr`/`cfoRaiseStep` in `EXEC_DELEGATION`. Older saves need no migration: existing CFOs simply have the new switch off.
+- 681 tests pass and the determinism snapshot is unchanged. Checked the CFO profile at 390×844 with no console errors.
+
 ### 2026-10-25 — The capital warning says how to fix it (v0.9.5)
 - **Done (owner's ask):** when your capital ratio is low, the game now tells you what to do about it.
   - **The Daily Ledger story** ("Thin cushion at …", "Regulator puts … on watch") now ends with the fixes: sell new shares through an investment bank, sell the stocks the bank holds, or turn risk appetite down.

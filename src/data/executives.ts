@@ -56,6 +56,12 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
           'Runs auto-funding, the bond share and funding offers to hold liquidity near target.',
       },
       {
+        id: 'capital',
+        label: 'Capital',
+        description:
+          'Keeps the capital ratio safe: below 10.5% sells company stocks and trims risk appetite; below 8% sells new shares to get back to 12%.',
+      },
+      {
         id: 'dividends',
         label: 'Dividends',
         description: 'Proposes a dividend at each board meeting.',
