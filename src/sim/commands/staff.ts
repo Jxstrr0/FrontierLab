@@ -1,6 +1,7 @@
 // Branch staff, manager, delegation and marketing commands.
 import {
   MANAGER_BASE_SALARY,
+  MANAGER_POOL_SIZE,
   MANAGER_SALARY_RANGE,
   MAX_STAFF_MULT,
   WAGE_RANGE,
@@ -10,6 +11,7 @@ import { CAMPAIGNS } from '../../data/campaigns';
 import { CITIES } from '../../data/cities';
 import { marketWage, staffNeeded } from '../branch/staff';
 import { roundToStep } from '../math';
+import { generateManager } from '../people';
 import type { Delegation, GameState } from '../state';
 import { fail, money, ok, type CommandResult } from './result';
 
@@ -72,6 +74,26 @@ export function hireManager(
   mgr.sinceWeek = state.clock.week;
   state.people.managers[mgr.id] = mgr;
   branch.managerId = mgr.id;
+  return ok();
+}
+
+/**
+ * Deals a fresh set of manager candidates for a city (the hire sheet calls this
+ * when it closes, so reopening it shows new faces). Before your first manager
+ * is hired, the first candidate is the tutorial guide ("I'm on the list too")
+ * and stays on the list.
+ */
+export function rerollManagerCandidates(state: GameState, cityId: string): CommandResult {
+  if (!CITIES[cityId]) return fail('Unknown city.');
+  const old = state.people.managerCandidates[cityId] ?? [];
+  const keepGuide =
+    cityId === state.world.currentCityId &&
+    Object.keys(state.people.managers).length === 0 &&
+    old.length > 0;
+  const pool = keepGuide ? [old[0]!] : [];
+  while (pool.length < MANAGER_POOL_SIZE) pool.push(generateManager(state, cityId));
+  state.people.managerCandidates[cityId] = pool;
+  state.people.candidatesRefreshWeek[cityId] = state.clock.week;
   return ok();
 }
 
