@@ -31,7 +31,14 @@ export function GameOverModal() {
     <Modal
       title="Game over"
       class="weekly-modal gameover-modal"
-      icon={<Medallion ink={s.meta.brandInk} monogram={s.meta.monogram} shape={s.meta.logoShape} size={30} />}
+      icon={
+        <Medallion
+          ink={s.meta.brandInk}
+          monogram={s.meta.monogram}
+          shape={s.meta.logoShape}
+          size={30}
+        />
+      }
       footer={
         <div class="btn-row">
           <button type="button" class="btn btn-secondary" onClick={() => leave('title')}>

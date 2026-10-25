@@ -299,8 +299,10 @@ Tabs: Overview · Loans · Credit.
 ### 10.1 Executive profile (sheet)
 - portrait, name, title, hired date
 - Leadership, Expertise and Loyalty bars
-- delegation toggles for the role
-- COO only: **Pay premium over market** stepper (−10% to +30%, "Market" at 0) for the Pay reviews delegation, with when the last review ran
+- delegation toggles for the role; three carry a **dial** (a stepped slider with named 44 px stops and a tagline estimating the company impact of the chosen stop, SIMULATION §17.2 "Delegation dials") nested under the switch:
+  - COO · HR benefits: **Morale target** 70 / 80 / 90, tagline "Benefits +$1.2K/wk (3.4% of payroll, budget 8%) · morale 68 → about 80" (", as far as the budget reaches" when the budget stops short; "Needs an HR floor at HQ." without one)
+  - COO · Pay reviews: **Review cadence** Quarterly | Annual, tagline "4 reviews a year · pay lags the market by up to 0.8% between reviews · next review +$22.6K/yr for 6 people", followed by the **Pay premium over market** stepper (−10% to +30%, "Market" at 0) with when the last review ran
+  - CMO · Brand campaigns: **Awareness target** 40% / 50% / 60% / 70%, tagline "Campaigns +$25.0K/wk (2.1% of revenue, budget 3%) · pushes 3 of 6 cities · +9% new customers" ("· held back by the budget" when a city can't be afforded; "Needs a Marketing floor at HQ." without one)
 - CFO and CRO: **Branch guidance now**: the deposit and loan rate offsets and how much stricter or looser approvals are, noting which switch is off
 - COO, CMO and CPO: **Branch guidance now**: the COO's wage and headcount change, the CMO's campaign push, or the CPO's fee change and whether the lineup is wider or narrower, noting when the switch is off
 - COO only: **Growth cities**: every city you have visited, home first, each with a switch (may the Expansion delegation build here) and an **Open now** button that has the COO build their usual pick at once; the hint under each city shows the next storefront and its cost, or why nothing can be built there

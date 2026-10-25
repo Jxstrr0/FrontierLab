@@ -1,8 +1,15 @@
 // Executive commands (SIMULATION §17.2, SCREENS §10.1): hire from a seat's
 // candidate pool, fire (severance in weeks of salary, P&L execPay), set salary,
 // switch delegations and add stock option or RSU grants. All need an Executive
-// floor at HQ. Also the COO's growth cities and "Open a branch now" (§17.2).
-import { EXEC_PAY, EXECUTIVES, PAY_REVIEW, WEEKS_PER_YEAR } from '../../config/balance';
+// floor at HQ. Also the COO's growth cities and "Open a branch now" (§17.2),
+// and the delegation dials: pay review cadence, morale target, brand target.
+import {
+  EXEC_DELEGATION,
+  EXEC_PAY,
+  EXECUTIVES,
+  PAY_REVIEW,
+  WEEKS_PER_YEAR,
+} from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { EXEC_SEATS } from '../../data/executives';
 import { execRerollFee } from '../candidateRerolls';
@@ -16,6 +23,7 @@ import { payReviewsOn, runPayReview } from '../payReviews';
 import { spend } from '../ledger';
 import { roundToStep } from '../math';
 import type { EquityGrant, ExecSeat, Executive, GameState } from '../state';
+import type { PayReviewCadence } from '../marketsTypes';
 import { buildBranch } from './branches';
 import { fail, money, ok, type CommandResult } from './result';
 
@@ -120,6 +128,33 @@ export function setPayPremium(state: GameState, premium: number): CommandResult 
     return fail(`Pick a premium from ${Math.round(lo * 100)}% to +${Math.round(hi * 100)}%.`);
   state.executives.payPremium = Number(p.toFixed(2));
   if (payReviewsOn(state)) runPayReview(state);
+  return ok();
+}
+
+/** How often the COO's Pay reviews run: quarterly or annual (PAY_REVIEW.cadences). */
+export function setPayReviewCadence(state: GameState, cadence: PayReviewCadence): CommandResult {
+  if (!(cadence in PAY_REVIEW.cadences)) return fail('Pick quarterly or annual reviews.');
+  state.executives.payReviewCadence = cadence;
+  return ok();
+}
+
+/** The average morale the COO's HR benefits holds (one of EXEC_DELEGATION.moraleTargets). */
+export function setMoraleTarget(state: GameState, target: number): CommandResult {
+  if (!EXEC_DELEGATION.moraleTargets.includes(target))
+    return fail(`Pick a morale target of ${EXEC_DELEGATION.moraleTargets.join(', ')}.`);
+  state.executives.moraleTarget = target;
+  return ok();
+}
+
+/** The city awareness the CMO's Brand campaigns hold (one of EXEC_DELEGATION.brandTargets). */
+export function setBrandTarget(state: GameState, target: number): CommandResult {
+  const stops = EXEC_DELEGATION.brandTargets;
+  const match = stops.find((t) => Math.abs(t - target) < 1e-9);
+  if (match === undefined)
+    return fail(
+      `Pick an awareness target of ${stops.map((t) => `${Math.round(t * 100)}%`).join(', ')}.`,
+    );
+  state.executives.brandTarget = match;
   return ok();
 }
 

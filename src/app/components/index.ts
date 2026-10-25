@@ -10,7 +10,7 @@ export { Donut, type DonutSlice } from './Donut';
 export { Icon } from './Icon';
 export { Portrait } from './Portrait';
 export { Face, Hatch, Vignette, cityInk } from './Vignette';
-export { Segmented, Stepper, Toggle } from './Controls';
+export { Segmented, StepSlider, Stepper, Toggle } from './Controls';
 export { AdvisorBar, Confirm, Modal, Panel, Sheet, type Tab } from './Panel';
 export { LineChart, type LineSeries } from './LineChart';
 export { RadarRosette, type RosetteAxes } from './RadarRosette';

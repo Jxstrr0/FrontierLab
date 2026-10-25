@@ -4,11 +4,24 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 **Current stage:** 10 — Art pass, onboarding, polish, launch (built and live; awaiting the owner's iPhone check). All ten roadmap stages are built. Still open: the owner's testing and tuning pass, an Add to Home Screen test on a real iPhone, and the Vault Street card on Kelbo.Website (in a separate session in that repo).
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `0c8122394b4893` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `1ca6909f9fa30a` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-25 — Delegation dials (v0.10.13)
+- **Owner's ask:** keep simple delegations as yes/no switches, and give the ones with a target a stepped slider (HR benefits morale 70 / 80 / 90, pay reviews quarterly or annual, brand campaigns' awareness 50 / 60…) with a small tagline under it showing the company impact ("+6% cost, 5 morale").
+- **Dials.** A new stepped-slider control (`StepSlider`: a rail with a few named stops, each a 44 px tap target, the chosen one lit in brass) sits under three switches on the executive profiles:
+  - COO · **HR benefits → Morale target** 70 / 80 / 90. Tagline: the extra weekly benefits cost, its share of payroll against the 8% budget, and the morale it should reach ("Benefits +$1.2K/wk (3.4% of payroll, budget 8%) · morale 68 → about 80"), noting when the budget stops short.
+  - COO · **Pay reviews → Review cadence** Quarterly | Annual, with the pay premium stepper moved under it. Tagline: reviews a year, how far pay can lag the market between reviews (0.8% quarterly, 3% annual, from the 3%-a-year market drift), and what the next review would add to annual pay across executives and managers.
+  - CMO · **Brand campaigns → Awareness target** 40 / 50 / 60 / 70%. Tagline: the change in weekly campaign spend and its share of revenue against the 3% budget, how many branch cities get pushed, and the change in new-customer flow once awareness sits at the target.
+- **Honest estimates.** The taglines come from `src/sim/execPolicy.ts`, which walks the delegations' own rules (the same benefit-step scoring, the same campaign budget check) on a copy of the state, so what they show is what the switch will do. The benefits routine was refactored to share that step logic without mutating state; its behaviour is unchanged (verified below).
+- **State and saves.** `executives.moraleTarget`, `executives.brandTarget` and `executives.payReviewCadence` (schema v21; migration 20 → 21 sets 70, 50% and quarterly, exactly what the switches always did). Three new commands set them, accepting only the dial's stops. The CMO's branch guidance band now sits around the dialled target too. `PAY_REVIEW.everyWeeks` became `PAY_REVIEW.cadences` (13 / 52 weeks) with `defaultCadence`.
+- **Copy.** The HR benefits, Pay reviews, Brand campaigns and CMO guidance descriptions now refer to "your target" and "as often as you choose"; the manager card's "Your COO reviews this pay once a quarter" follows the cadence.
+- **Housekeeping.** Prettier reflowed nine one-line `shape=` props from the logo-shape commit that had slipped past the formatter; no code change.
+- **Determinism:** the snapshot moved `0c8122394b4893` → `1ca6909f9fa30a` for the three new state fields only; stripping them from the final state reproduces the old hash, so the benefits refactor changed nothing.
+- **Checked** the COO and CMO sheets at 390×844: stops are 44×62 px, taps change the stored targets, taglines update per stop, no console errors. New tests: dial commands accept only the stops, defaults, the routines read the dials (benefits, brand, 13- vs 52-week reviews), estimates are pure and move the right way, migration 20 → 21.
 
 ### 2026-10-25 — Logo shapes on the start page (v0.10.12)
 - **Owner's ask:** different logo shapes for the bank on the start page.

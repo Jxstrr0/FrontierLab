@@ -69,7 +69,15 @@ export interface ExecutivesState {
   payPremium: number;
   /** Week of the last pay review; -1 before the first. */
   lastPayReviewWeek: Week;
+  /** How often Pay reviews run (schema v21): a key of PAY_REVIEW.cadences. */
+  payReviewCadence: PayReviewCadence;
+  /** Average morale the COO's HR benefits holds (schema v21), one of EXEC_DELEGATION.moraleTargets. */
+  moraleTarget: number;
+  /** City brand awareness the CMO's Brand campaigns hold (schema v21), one of EXEC_DELEGATION.brandTargets. */
+  brandTarget: number;
 }
+
+export type PayReviewCadence = 'quarterly' | 'annual';
 
 // ─── Board and dividends (DESIGN §5.13, SCREENS §10.2) ────────────────────────
 

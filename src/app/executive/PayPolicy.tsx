@@ -1,6 +1,6 @@
-// Pay policy on the COO's profile (SCREENS §10.1): the pay premium over market
-// that the Pay reviews delegation sets every executive and branch manager to,
-// and when the last review ran.
+// Pay policy on the COO's profile (SCREENS §10.1), under the Pay reviews dial:
+// the pay premium over market that the delegation sets every executive and
+// branch manager to, and when the last review ran.
 import { PAY_REVIEW } from '../../config/balance';
 import * as cmd from '../../sim/commands';
 import type { GameState } from '../../sim/state';
@@ -33,8 +33,8 @@ export function PayPolicy(p: { s: GameState }) {
       />
       <p class="muted small exec-note">
         {on
-          ? `Pay reviews set every executive and branch manager to market ${ex.payPremium === 0 ? '' : signedPct(ex.payPremium, 0) + ' '}once a quarter, and at once when you change the premium. ${last}`
-          : 'Switch on Pay reviews to have the COO apply this every year.'}
+          ? `Pay reviews set every executive and branch manager to market ${ex.payPremium === 0 ? '' : signedPct(ex.payPremium, 0) + ' '}${ex.payReviewCadence === 'annual' ? 'once a year' : 'once a quarter'}, and at once when you change the premium. ${last}`
+          : 'Switch on Pay reviews to have the COO apply this.'}
       </p>
     </div>
   );

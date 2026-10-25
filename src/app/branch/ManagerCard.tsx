@@ -100,7 +100,9 @@ export function ManagerCard({ branch }: { branch: Branch }) {
           />
           <p class={`small ${pay.standing === 'underpaid' ? 'tone-bad' : 'muted'}`}>
             {STANDING[pay.standing]}
-            {reviews ? ' Your COO reviews this pay once a quarter.' : ''}
+            {reviews
+              ? ` Your COO reviews this pay ${s.executives.payReviewCadence === 'annual' ? 'once a year' : 'once a quarter'}.`
+              : ''}
           </p>
           <div>
             <div class="muted small">Let your manager handle</div>

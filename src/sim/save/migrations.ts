@@ -18,7 +18,7 @@ import { emptyCorporateDebt } from '../corporateDebt';
 import { initCountries } from '../macro';
 import { checkMilestones } from '../milestones';
 import { initRivalBench, initRivalFinancials, seedMatureBooks } from '../rivals';
-import { FX_START_INDEX, PAY_REVIEW } from '../../config/balance';
+import { EXEC_DELEGATION, FX_START_INDEX, PAY_REVIEW } from '../../config/balance';
 import { COUNTRIES } from '../../data/countries';
 import { HOUSE_STYLE_IDS } from '../../data/houseStyles';
 import { DEFAULT_LOGO_SHAPE } from '../../data/logoShapes';
@@ -353,6 +353,16 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
   19: (s) => {
     const state = s as unknown as GameState;
     state.meta.logoShape ??= DEFAULT_LOGO_SHAPE;
+    return s;
+  },
+  // v21: the delegation dials. Older banks keep what the switches always did:
+  // morale held at 70, awareness at 50%, pay reviewed once a quarter.
+  20: (s) => {
+    const state = s as unknown as GameState;
+    const ex = state.executives;
+    ex.payReviewCadence ??= PAY_REVIEW.defaultCadence;
+    ex.moraleTarget ??= EXEC_DELEGATION.moraleTarget;
+    ex.brandTarget ??= EXEC_DELEGATION.brandTarget;
     return s;
   },
 };
