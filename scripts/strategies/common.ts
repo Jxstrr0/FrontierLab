@@ -115,8 +115,25 @@ export function handleIncidents(state: GameState): void {
   }
 }
 
+/**
+ * Replaces managers rivals poached (§17.1): the best candidate, with staffing
+ * and marketing delegated, and loans too where the branch lends to businesses.
+ */
+export function rehireManagers(state: GameState): void {
+  for (const b of Object.values(state.branches)) {
+    if (b.status !== 'open' || b.managerId) continue;
+    const pool = state.people.managerCandidates[b.cityId] ?? [];
+    const best = [...pool].sort((x, y) => avgSkill(y) - avgSkill(x))[0];
+    if (!best || !cmd.hireManager(state, b.id, best.id).ok) continue;
+    cmd.setDelegation(state, b.id, 'staffing', true);
+    cmd.setDelegation(state, b.id, 'marketing', true);
+    cmd.setDelegation(state, b.id, 'loans', b.offered.sbl?.on === true);
+  }
+}
+
 export function followDefaults(state: GameState, depositOffset = 0, loanOffset = 0): void {
   handleIncidents(state);
+  rehireManagers(state);
   for (const b of Object.values(state.branches)) {
     if (b.delegation.products) continue;
     const c = countryOfCity(state, b.cityId);

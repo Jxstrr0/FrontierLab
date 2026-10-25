@@ -14,6 +14,7 @@ import { roundToStep } from '../math';
 import { generateManager } from '../people';
 import type { Delegation, GameState } from '../state';
 import { fail, money, ok, type CommandResult } from './result';
+import { clearManager } from '../payReviews';
 
 export function setStaffTarget(state: GameState, branchId: string, target: number): CommandResult {
   const branch = state.branches[branchId];
@@ -101,15 +102,7 @@ export function fireManager(state: GameState, branchId: string): CommandResult {
   const branch = state.branches[branchId];
   if (!branch) return fail('That branch no longer exists.');
   if (!branch.managerId) return fail('This branch has no manager.');
-  delete state.people.managers[branch.managerId];
-  delete branch.managerId;
-  branch.delegation = {
-    staffing: false,
-    products: false,
-    marketing: false,
-    troubles: false,
-    loans: false,
-  };
+  clearManager(state, branch);
   return ok();
 }
 

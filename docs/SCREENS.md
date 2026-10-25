@@ -153,7 +153,7 @@ After the wizard, the map opens with the tutorial (§27).
   - portrait and name
   - Manager skills bars: People, Product, Marketing, Ethics
   - "Manager since {date}"
-  - Annual salary stepper
+  - Annual salary stepper, its hint showing market pay (SIMULATION §6.5) and the range, and a line under it: "Underpaid: rivals are more likely to poach them" (oxblood), "Paid about market" or "Well paid…", plus "Your COO reviews this pay once a year" while the COO's Pay reviews is on
   - Delegation toggles: Staffing & wages · Products & rates · Branch marketing · Branch troubles · Loan approvals
   - Fire manager (confirm)
   - **With no manager:** "Hire a manager" opens a sheet of 3 candidate cards (skills, salary ask, Hire). Closing the sheet without hiring deals 3 new candidates for next time; before your first hire, the tutorial guide stays as the first card.
@@ -297,6 +297,8 @@ Tabs: Overview · Loans · Credit.
 - portrait, name, title, hired date
 - Leadership, Expertise and Loyalty bars
 - delegation toggles for the role
+- COO only: **Pay premium over market** stepper (−10% to +30%, "Market" at 0) for the Pay reviews delegation, with when the last review ran
+- CFO and CRO: **Branch guidance now**: the deposit and loan rate offsets and how much stricter or looser approvals are, noting which switch is off
 - COO only: **Growth cities**: every city you have visited, home first, each with a switch (may the Expansion delegation build here) and an **Open now** button that has the COO build their usual pick at once; the hint under each city shows the next storefront and its cost, or why nothing can be built there
 - annual salary stepper
 - grants list: type, shares, strike, vesting progress

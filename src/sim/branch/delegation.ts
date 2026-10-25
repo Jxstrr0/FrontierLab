@@ -26,6 +26,7 @@ import { managerOf, marketWage, staffNeeded } from './staff';
 import { difficultyOf } from '../difficulty';
 import { dpow } from '../detmath';
 import { allProducts, baseId } from '../products';
+import { guidanceRateOffset } from '../branchGuidance';
 
 /** Campaigns a delegated manager weighs by awareness return. */
 const AWARENESS_CAMPAIGNS = [
@@ -76,15 +77,20 @@ export function delegatedPrice(
     const ftp = ftpFor(spec, c);
     const def = defaultPrice(spec, c);
     const error = rng.normal(0, DELEGATE.priceErrorSd * (1 - productSkill / 100));
+    // §17.2 branch guidance: the CFO and CRO move deposit and loan rates by whole steps.
     if (spec.category === 'deposits') {
       price = m + offset;
       const spread = ftp - def;
       if (spread > 0) price = Math.min(price, ftp - DELEGATE.minMarginShare * spread);
+      price += guidanceRateOffset(state, 'deposits');
+      if (spread > 0) price = Math.min(price, ftp);
     } else {
       price = m - offset;
       const spread = def - ftp;
       if (spread > 0 && baseId(spec) !== 'credit_card')
         price = Math.max(price, ftp + DELEGATE.minMarginShare * spread);
+      price += guidanceRateOffset(state, 'loans');
+      if (spread > 0) price = Math.max(price, ftp);
     }
     price += error;
   }

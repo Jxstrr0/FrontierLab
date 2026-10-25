@@ -153,6 +153,7 @@ export function newGame(opts: NewGameOptions): GameState {
       riskAppetite: DEFAULT_RISK_APPETITE,
       applyRatesToAll: false,
       companyPrices: {},
+      guidance: { deposits: 0, loans: 0 },
     },
     branches: {},
     offices: {},

@@ -18,7 +18,8 @@ import { emptyCorporateDebt } from '../corporateDebt';
 import { initCountries } from '../macro';
 import { checkMilestones } from '../milestones';
 import { initRivalBench, initRivalFinancials, seedMatureBooks } from '../rivals';
-import { SCHEMA_VERSION, type GameState } from '../state';
+import { PAY_REVIEW } from '../../config/balance';
+import { SCHEMA_VERSION, type ExecSeat, type GameState } from '../state';
 
 type RawSave = Record<string, unknown> & { schemaVersion: number };
 
@@ -270,6 +271,30 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     for (const c of ex.candidates.cfo ?? []) c.delegations.shares ??= true;
     const newest = Object.values(state.branches).sort((a, b) => b.builtDay - a.builtDay)[0];
     if (newest && !state.company.lastBuild) state.company.lastBuild = { ...newest.build };
+    return s;
+  },
+  // v15: CFO + CRO branch guidance and the COO's pay reviews. Seated executives
+  // (and the toggles a seat remembers) start with the new switches off, so
+  // nothing changes until you flip one; waiting candidates get them on, the
+  // default for hires.
+  14: (s) => {
+    const state = s as unknown as GameState;
+    state.company.guidance ??= { deposits: 0, loans: 0 };
+    const ex = state.executives;
+    ex.payPremium ??= PAY_REVIEW.defaultPremium;
+    ex.lastPayReviewWeek ??= -1;
+    const added: [ExecSeat, string][] = [
+      ['cfo', 'guidance'],
+      ['cro', 'guidance'],
+      ['coo', 'payReviews'],
+    ];
+    for (const [seat, id] of added) {
+      const exec = ex.seats[seat];
+      if (exec) exec.delegations[id] ??= false;
+      const mem = ex.remembered[seat];
+      if (mem) mem[id] ??= false;
+      for (const c of ex.candidates[seat] ?? []) c.delegations[id] ??= true;
+    }
     return s;
   },
 };

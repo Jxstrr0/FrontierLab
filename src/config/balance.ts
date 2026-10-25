@@ -1353,6 +1353,9 @@ export const EXECUTIVES = {
   resignLoyalty: 1.5,
   underpaidRatio: 0.9,
   underpaidMult: 2,
+  /** Paid at least wellPaidRatio × market: resignation chance × wellPaidMult. */
+  wellPaidRatio: 1.1,
+  wellPaidMult: 0.5,
   grantMult: 0.5,
   salaryBase: 180_000,
   salaryPerBillion: 60_000,
@@ -1452,6 +1455,55 @@ export const EXEC_DELEGATION = {
   expansionSpacing: 12,
   /** COO Company troubles: option error shrinks with the COO's expertise like a manager's skills. */
   troublesError: 0.5,
+} as const;
+
+/**
+ * Branch guidance (§17.2), the CFO and CRO steering delegated managers together.
+ * Each half is a whole step in [min, max], moved one step every everyWeeks:
+ * the CFO's deposit step up while liquidity is below liqTarget − liqLow and down
+ * above liqTarget + liqHigh; the CRO's loan step up (tighter) when capital or
+ * losses miss the croMinCr / croMaxLoss marks and down at croRaiseCr /
+ * croRaiseLoss. A step moves delegated rate prices by rateStep and the
+ * delegated Loan Desk PD threshold by × (1 − thresholdStep × loan step).
+ * A switched-off half returns to 0.
+ */
+export const GUIDANCE = {
+  everyWeeks: 4,
+  min: -1,
+  max: 3,
+  rateStep: 0.001,
+  thresholdStep: 0.12,
+  liqLow: 0.01,
+  liqHigh: 0.05,
+} as const;
+
+/**
+ * Pay reviews (COO, §17.2): every everyWeeks the COO sets each executive's and
+ * branch manager's pay to market × (1 + the pay premium you choose), within
+ * premiumRange in premiumStep steps, so pay rises with the market.
+ */
+export const PAY_REVIEW = {
+  everyWeeks: 52,
+  premiumRange: [-0.1, 0.3] as [number, number],
+  premiumStep: 0.05,
+  defaultPremium: 0.05,
+} as const;
+
+/**
+ * Branch manager pay market and poaching (§17.1). Market pay is the hiring ask
+ * (MANAGER_BASE_SALARY × wageIndex × the skill spread) × (1 + tenureGrowth ×
+ * years at the bank): rivals pay more for experience. Weekly poaching chance:
+ * poachBase × underpaidMult below underpaidRatio × market, × wellPaidMult at
+ * wellPaidRatio × market or more. Salaries move in salaryStep.
+ */
+export const MANAGER_PAY = {
+  tenureGrowth: 0.03,
+  poachBase: 0.0006,
+  underpaidRatio: 0.9,
+  underpaidMult: 3,
+  wellPaidRatio: 1.1,
+  wellPaidMult: 0.5,
+  salaryStep: 1_000,
 } as const;
 
 /**

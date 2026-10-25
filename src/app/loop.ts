@@ -203,6 +203,14 @@ const EVENT_TEXT: Record<string, (p: Record<string, unknown>) => string> = {
     return '';
   },
   MILESTONE: (p) => `Milestone reached: ${String(p.title)}.`,
+  MANAGER_POACHED: (p) =>
+    `${String(p.rival)} poached ${String(p.name)}, the manager of ${String(p.branch)}. Its delegations are back with you.`,
+  PAY_REVIEW: (p) => {
+    const changed = Number(p.raised) + Number(p.cut);
+    return changed > 0
+      ? `Your COO's pay review moved ${changed} ${changed === 1 ? 'salary' : 'salaries'} to market${Number(p.premium) ? ` ${Number(p.premium) > 0 ? '+' : '−'}${Math.round(Math.abs(Number(p.premium)) * 100)}%` : ''}.`
+      : '';
+  },
   BANK_RUN: () => 'Depositors are queueing to withdraw: a bank run has started.',
   BANK_RUN_ENDED: () => 'The bank run is over.',
 };
@@ -211,6 +219,7 @@ const EVENT_TEXT: Record<string, (p: Record<string, unknown>) => string> = {
 const HOME_ONLY = new Set(['CB_DECISION', 'POLICY_PASSED']);
 const BAD_EVENTS = new Set([
   'WINDOW_USE',
+  'MANAGER_POACHED',
   'BANK_RUN',
   ...MNA_BAD_EVENTS,
   ...VENTURE_BAD_EVENTS,

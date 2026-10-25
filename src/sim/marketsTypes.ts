@@ -63,6 +63,10 @@ export interface ExecutivesState {
   growthCities: Record<Id, boolean>;
   /** Week of the COO's last branch build (Expansion cadence); -1 before the first. */
   lastExpansionWeek: Week;
+  /** Pay premium over market the COO's Pay reviews aim for (schema v15), e.g. 0.05 = +5%. */
+  payPremium: number;
+  /** Week of the last pay review; -1 before the first. */
+  lastPayReviewWeek: Week;
 }
 
 // ─── Board and dividends (DESIGN §5.13, SCREENS §10.2) ────────────────────────
