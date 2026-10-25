@@ -7,6 +7,7 @@ import type { LandmarkSite } from './citygen';
 import type { Engraver, Vec3 } from './engraver';
 import { stipple } from './flora';
 import { airport, stadium } from './landmarksOpen';
+import { drawSignature } from './signatures';
 import { artRng } from './prng';
 import { bands, box, castShadow, cylinder, dome, gable, ribs } from './solids';
 
@@ -37,6 +38,7 @@ export function drawLandmark(e: Engraver, site: LandmarkSite, seed: number): voi
   if (site.id === 'centralBank') centralBank(e, s);
   else if (site.id === 'clockTower') clockTower(e, s, seed);
   else if (site.id === 'stadium') stadium(e, s, seed);
+  else if (site.id === 'signature') drawSignature(e, site.signature ?? 'none', s, seed);
   else airport(e, s, seed);
 }
 

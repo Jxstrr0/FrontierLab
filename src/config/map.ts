@@ -62,6 +62,8 @@ export const LANDMARKS = [
   { id: 'clockTower', district: 'university' },
   { id: 'stadium', district: 'suburbs' },
   { id: 'airport', district: 'industrial' },
+  // The city's one-of-a-kind landmark (data/cityLooks.ts); cities without one skip it.
+  { id: 'signature', district: 'downtown' },
 ] as const satisfies readonly { id: string; district: DistrictId }[];
 export type LandmarkId = (typeof LANDMARKS)[number]['id'];
 /** Regional sites (CONTENT §2) are small towns: only the airport landmark. */

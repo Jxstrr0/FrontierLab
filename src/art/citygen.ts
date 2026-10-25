@@ -18,6 +18,7 @@ import {
   type LandmarkId,
 } from '../config/map';
 import type { CitySpec } from '../data/cities';
+import { cityLook, type Signature } from '../data/cityLooks';
 import { DISTRICTS, type DistrictId } from '../data/types';
 import { isStreet, isWater } from '../sim/cityLayout';
 import type { Lot, OfficeListing, Site, SiteKind } from '../sim/state';
@@ -41,6 +42,8 @@ export interface LandmarkSite {
   x: number;
   y: number;
   size: number;
+  /** For the 'signature' landmark: which one-of-a-kind building stands here. */
+  signature?: Signature;
 }
 
 export interface CityMap {
@@ -198,9 +201,10 @@ export function generateCityMap(
 
   // Whole land blocks without lots can hold a landmark or a park.
   const free = freeBlocks(map);
-  const landmarks = regional
-    ? LANDMARKS.filter((l) => REGIONAL_LANDMARKS.includes(l.id))
-    : LANDMARKS;
+  const signature = cityLook(city.id).signature;
+  const landmarks = (
+    regional ? LANDMARKS.filter((l) => REGIONAL_LANDMARKS.includes(l.id)) : LANDMARKS
+  ).filter((l) => l.id !== 'signature' || signature !== 'none');
   for (const lm of landmarks) {
     const centre = CITYGEN.layout[lm.district];
     let best = -1;
@@ -216,7 +220,9 @@ export function generateCityMap(
     });
     if (best < 0) continue;
     const b = free.splice(best, 1)[0]!;
-    map.landmarks.push({ id: lm.id, x: b.x, y: b.y, size: CITY_LAYOUT.block - 1 });
+    const site: LandmarkSite = { id: lm.id, x: b.x, y: b.y, size: CITY_LAYOUT.block - 1 };
+    if (lm.id === 'signature') site.signature = signature;
+    map.landmarks.push(site);
     fillBlock(map, b, KIND.landmark);
   }
   for (const b of free) {
