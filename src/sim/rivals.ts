@@ -14,6 +14,7 @@ import {
 } from '../config/balance';
 import { FIRST_NAMES, LAST_NAMES } from '../data/names';
 import { CITIES } from '../data/cities';
+import { RIVAL_BENCH_TITLES } from '../data/rivals';
 import { PRODUCTS } from '../data/products';
 import { difficultyOf } from './difficulty';
 import {
@@ -161,6 +162,16 @@ export function initRivalFinancials(state: GameState, bank: RivalBank): void {
   bank.equity = loans * RIVAL_LOAN_RISK_WEIGHT * cr;
   bank.ceo = `${rng.pick(FIRST_NAMES)} ${rng.pick(LAST_NAMES)}`;
   initRivalShares(bank);
+  initRivalBench(state, bank);
+}
+
+/** Names the rest of a rival's senior team, from its own stream so earlier draws never shift. */
+export function initRivalBench(state: GameState, bank: RivalBank): void {
+  const rng = stream(state, 'rivalBench');
+  bank.execs = RIVAL_BENCH_TITLES.map((title) => ({
+    title,
+    name: `${rng.pick(FIRST_NAMES)} ${rng.pick(LAST_NAMES)}`,
+  }));
 }
 
 function ensureRival(state: GameState, spec: RivalSpec, c: CountryState): RivalBank {
@@ -187,6 +198,7 @@ function ensureRival(state: GameState, spec: RivalSpec, c: CountryState): RivalB
     capitalRatio: 0,
     listed: spec.ticker !== undefined,
     ceo: '',
+    execs: [],
     qtd: { revenue: 0, netIncome: 0 },
     quarters: [],
     priceWar: {},

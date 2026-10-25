@@ -2,6 +2,7 @@
 // pentagon profile and a hidden PD. The player (or a delegated manager) approves
 // at a rate or declines; booked loans amortize and default one by one.
 import {
+  CAPITAL_GATE,
   HQ_EFFECTS,
   AWARENESS_FLOOR,
   LOANDESK,
@@ -16,7 +17,7 @@ import { BUSINESS_PREFIXES, LOAN_SECTORS } from '../../data/loanSectors';
 import { PRODUCTS } from '../../data/products';
 import type { Pentagon } from '../../data/types';
 import { pushEvent } from '../events';
-import { riskPdMult, shortfall } from '../hq';
+import { deptDesks, riskPdMult, shortfall } from '../hq';
 import { recordLoss } from '../riskFloor';
 import { appCost } from '../underwriting';
 import { delegationOn } from '../execSeats';
@@ -46,14 +47,26 @@ export function pdFromScore(avg: number, collateral: Collateral): number {
   return SBL_BASE_PD * dexp(-LOANDESK.pdSlope * (avg - 5)) * LOANDESK.collateralPd[collateral];
 }
 
-/** Estimator skill: the manager's Product skill (a Risk floor adds 40 + 50 × coverage in Stage 4). */
+/** §11: estimatorSkill = max(manager Product, 40 + 50 × riskCoverage′) once a Risk floor exists. */
 export function estimatorSkill(state: GameState, branch: Branch): number {
-  return managerOf(state, branch)?.skills.product ?? 0;
+  const product = managerOf(state, branch)?.skills.product ?? 0;
+  if (deptDesks(state, 'risk') <= 0) return product;
+  const k = Math.min(1, state.hq.coverage.risk?.kPrime ?? 0);
+  return Math.max(product, LOANDESK.estimatorBase + LOANDESK.estimatorSlope * k);
 }
 
-/** Whether the player sees a risk band on this branch's applications (§11). */
+/** Whether the player sees a risk band on this branch's applications: a Risk floor, or a manager with Product ≥ 60 (§11). */
 export function riskBandVisible(state: GameState, branch: Branch): boolean {
-  return estimatorSkill(state, branch) >= LOANDESK.riskBandVisibleProduct;
+  return (
+    deptDesks(state, 'risk') > 0 || estimatorSkill(state, branch) >= LOANDESK.riskBandVisibleProduct
+  );
+}
+
+/** No new business lending during a funding freeze or at the Critical tier (§13.5, §15). */
+export function lendingBlocked(state: GameState): string | undefined {
+  if (state.treasury.freeze) return 'Lending is frozen until liquidity recovers.';
+  if (state.company.tier === 'critical') return 'No new lending at the Critical capital tier.';
+  return undefined;
 }
 
 export function riskBand(estPd: number): 'low' | 'medium' | 'high' {
@@ -71,7 +84,14 @@ export function recordDesk(
   const branch = state.branches[branchId];
   if (!branch) return;
   if (branch.desk.week !== state.clock.week) {
-    branch.desk = { week: state.clock.week, approved: 0, refused: 0, declined: 0, expired: 0 };
+    branch.desk = {
+      week: state.clock.week,
+      arrived: 0,
+      approved: 0,
+      refused: 0,
+      declined: 0,
+      expired: 0,
+    };
   }
   branch.desk[what] += 1;
 }
@@ -80,7 +100,18 @@ export function recordDesk(
 export function deskWeek(state: GameState, branch: Branch): DeskWeek {
   return branch.desk.week === state.clock.week
     ? branch.desk
-    : { week: state.clock.week, approved: 0, refused: 0, declined: 0, expired: 0 };
+    : { week: state.clock.week, arrived: 0, approved: 0, refused: 0, declined: 0, expired: 0 };
+}
+
+/**
+ * DESIGN §5.4.3: a delegated manager's Ethics bends the approval threshold.
+ * Below the reference a manager chases volume and takes riskier loans; above
+ * it they are stricter. The CRO's policy (no manager deciding) is neutral.
+ */
+function ethicsStretch(state: GameState, branch: Branch): number {
+  const manager = branch.delegation.loans ? managerOf(state, branch) : undefined;
+  if (!manager) return 1;
+  return 1 + ((LOANDESK.ethicsRef - manager.skills.ethics) / 100) * LOANDESK.ethicsSlope;
 }
 
 /**
@@ -128,11 +159,14 @@ export function runLoanDesk(
         (lot.footTraffic / LOANDESK.trafficRef) *
         (AWARENESS_FLOOR + (1 - AWARENESS_FLOOR) * effectiveAwareness(state, branch)) *
         loanDemand(country) *
-        fx.loanDesk;
+        fx.loanDesk *
+        // §15: Restricted halves new lending, Critical stops it.
+        CAPITAL_GATE[state.company.tier];
     const n = rng.poisson(lambda);
     for (let i = 0; i < n; i++) {
       const app = generateApplication(state, branch, rng);
       state.loanDesk.applications[app.id] = app;
+      recordDesk(state, branch.id, 'arrived');
     }
     wk.underwriting += n * appCost(state);
   }
@@ -279,7 +313,11 @@ function decideDelegated(
   branch: Branch,
   app: LoanApplication,
 ): BusinessLoan | undefined {
-  const threshold = LOANDESK.delegatedThresholds[state.company.riskAppetite - 1] ?? 0;
+  // Waiting applications sit untouched while lending is blocked; they may expire.
+  if (lendingBlocked(state)) return undefined;
+  const threshold =
+    (LOANDESK.delegatedThresholds[state.company.riskAppetite - 1] ?? 0) *
+    ethicsStretch(state, branch);
   if (app.estPd > threshold) {
     delete state.loanDesk.applications[app.id];
     recordDesk(state, branch.id, 'declined');

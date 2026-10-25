@@ -17,7 +17,7 @@ import { initInvestments } from '../investmentsInit';
 import { initCapitalMarkets, initRivalShares } from '../marketInit';
 import { emptyCorporateDebt } from '../corporateDebt';
 import { initCountries } from '../macro';
-import { initRivalFinancials, seedMatureBooks } from '../rivals';
+import { initRivalBench, initRivalFinancials, seedMatureBooks } from '../rivals';
 import { SCHEMA_VERSION, type GameState } from '../state';
 
 type RawSave = Record<string, unknown> & { schemaVersion: number };
@@ -225,6 +225,15 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
   10: (s) => {
     const state = s as unknown as GameState;
     for (const city of Object.values(state.world.cities)) city.layout = 1;
+    return s;
+  },
+
+  // 11 → 12: audit fixes. Rivals get a senior team below the CEO, and each
+  // branch's Loan Desk tally counts this week's arrivals (unknown, so 0).
+  11: (s) => {
+    const state = s as unknown as GameState;
+    for (const id of Object.keys(state.rivals).sort()) initRivalBench(state, state.rivals[id]!);
+    for (const b of Object.values(state.branches)) b.desk.arrived ??= 0;
     return s;
   },
 };

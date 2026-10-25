@@ -53,7 +53,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState, DealerDeal } from './personalTypes';
 
-export const SCHEMA_VERSION = 11;
+export const SCHEMA_VERSION = 12;
 
 export interface GameState {
   schemaVersion: number;
@@ -436,6 +436,8 @@ export interface Ratings {
 /** Loan Desk outcomes in one week; reset when the week changes. */
 export interface DeskWeek {
   week: Week;
+  /** Applications that arrived this week. */
+  arrived: number;
   approved: number;
   /** Offers the business turned down. */
   refused: number;
@@ -773,6 +775,8 @@ export interface RivalBank {
   listed: boolean;
   ticker?: string;
   ceo: string;
+  /** The rest of the senior team (§18.1), shown on the rival HQ panel. */
+  execs: { title: string; name: string }[];
   /** Revenue and net income since the quarter began. */
   qtd: { revenue: Money; netIncome: Money };
   /** Reported quarters, oldest first (last 8). */
@@ -913,6 +917,8 @@ export interface WeeklySnapshot {
   pnl: Record<PnlLine, Money>;
   capitalRatio: number;
   tier: Tier;
+  /** Mobile app rating at the week's close (IT floor trend). Missing in older saves. */
+  appRating?: Stars;
 }
 
 export interface QuarterReport {

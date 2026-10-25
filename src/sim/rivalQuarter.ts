@@ -44,7 +44,9 @@ export function runRivalQuarter(state: GameState): void {
     if (bank.status !== 'active') continue;
     report(state, bank, quarter);
     payDividend(state, bank, quarter);
-    if (rng.chance(RIVAL_EXEC_RESIGN_CHANCE)) changeCeo(state, bank, rng);
+    // One roll per seat's worth of risk, so a fuller team makes the news a little more often.
+    if (rng.chance(RIVAL_EXEC_RESIGN_CHANCE * (1 + bank.execs.length)))
+      changeExec(state, bank, rng);
     failureCheck(state, bank, rng);
   }
 }
@@ -115,14 +117,24 @@ function payDividend(state: GameState, bank: RivalBank, quarter: string): void {
   );
 }
 
-function changeCeo(state: GameState, bank: RivalBank, rng: Rng): void {
-  const leaving = bank.ceo;
-  bank.ceo = `${rng.pick(FIRST_NAMES)} ${rng.pick(LAST_NAMES)}`;
+/** One of the CEO or the bench steps down and is replaced (§18.1). */
+function changeExec(state: GameState, bank: RivalBank, rng: Rng): void {
+  const seat = rng.int(0, bank.execs.length);
+  const name = `${rng.pick(FIRST_NAMES)} ${rng.pick(LAST_NAMES)}`;
+  let title = 'CEO';
+  let leaving = bank.ceo;
+  if (seat === 0) bank.ceo = name;
+  else {
+    const exec = bank.execs[seat - 1]!;
+    title = exec.title;
+    leaving = exec.name;
+    exec.name = name;
+  }
   pushEvent(
     state,
     'RIVAL_EXEC_RESIGN',
-    { rivalId: bank.id, company: bank.name, title: 'CEO', name: leaving },
-    2,
+    { rivalId: bank.id, company: bank.name, title, name: leaving },
+    seat === 0 ? 2 : 1,
   );
 }
 

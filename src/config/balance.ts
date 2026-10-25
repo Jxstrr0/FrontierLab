@@ -341,6 +341,9 @@ export const LOANDESK = {
   riskBands: { low: 0.02, high: 0.045 },
   delegatedThresholds: [0.02, 0.03, 0.045, 0.06, 0.08],
   delegatedMargin: 0.025,
+  /** Delegated threshold × (1 + (ethicsRef − Ethics)/100 × ethicsSlope): Ethics 30 → ×1.3, 90 → ×0.7. */
+  ethicsRef: 60,
+  ethicsSlope: 1,
   bigDefault: 500_000,
   /** Balances below this count as repaid. */
   dustBalance: 0.005,
