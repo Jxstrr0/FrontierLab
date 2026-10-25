@@ -25,6 +25,7 @@ import { personalPinInfo } from '../personal/personalPins';
 import type { SitePinInfo } from './sitePinInfo';
 import type { CountryId } from '../../data/types';
 import { LEASE_ONLY_KEY, layerOn, type MapLayerId } from '../../data/mapLayers';
+import { rivalShortName } from './markers';
 import type { GameState, Lot, OfficeListing, Site } from '../../sim/state';
 
 export type PinKind =
@@ -80,6 +81,8 @@ export interface PinSpec {
   clubId?: string;
   /** A short note under the medallion on Stage 7 sites ("For sale", "Open now"). */
   tag?: string;
+  /** Caption under the pin at close zoom when not the type's own (a rival's short name). */
+  caption?: string;
 }
 
 /** Clustering seeds and stacking: yours first, then rivals, then other buildings, open locations last. */
@@ -105,9 +108,6 @@ const KIND_ORDER: Record<PinKind, number> = {
   stadium: 18,
   lot: 19,
 };
-
-/** Pins drawn in your brand ink, lifted above the rest. */
-export const isYours = (p: { kind: PinKind }): boolean => p.kind === 'mine' || p.kind === 'hq';
 
 export function pendingByBranch(s: GameState): Record<string, number> {
   const out: Record<string, number> = {};
@@ -162,6 +162,7 @@ function lotPin(s: GameState, map: CityMap, lot: Lot, pending: Record<string, nu
       ink: bank?.ink ?? '#5a5a5a',
       monogram: bank?.monogram ?? '?',
       badge: false,
+      caption: rivalShortName(bank?.name ?? 'Rival bank'),
     };
   }
   return {
@@ -287,6 +288,7 @@ function sitePin(s: GameState, map: CityMap, site: Site, info?: SitePinInfo): Pi
     badge: false,
     icon: SITE_ICON[site.kind],
     ...(rival && rival.status !== 'active' ? { muted: true } : {}),
+    ...(rival ? { caption: `${rivalShortName(rival.name)} HQ` } : {}),
   };
   if (partner) pin.partner = true;
   if (info?.tag) pin.tag = info.tag;
@@ -363,7 +365,7 @@ export function pinsKey(pins: PinSpec[]): string {
   return pins
     .map(
       (p) =>
-        `${p.id}|${p.kind}|${p.ink}|${p.monogram}|${p.label}|${p.muted ? 1 : 0}|${p.converting?.weeksLeft ?? ''}|${p.tag ?? ''}|${p.partner ? 1 : 0}`,
+        `${p.id}|${p.kind}|${p.ink}|${p.monogram}|${p.label}|${p.muted ? 1 : 0}|${p.converting?.weeksLeft ?? ''}|${p.tag ?? ''}|${p.partner ? 1 : 0}|${p.caption ?? ''}`,
     )
     .join(';');
 }

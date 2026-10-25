@@ -1,28 +1,36 @@
-// DOM pins over the map canvas (ART_DIRECTION §2): medallions for branches
-// and your HQ, plain "$" medallions for open branch locations, type
-// medallions for credit bureaus and agencies, the central bank's and airport's
-// own landmark medallions (employers and universities you
-// partner with add a brand-ink seal; acquired branches still converting wear
-// the old bank's ink with a progress ring), brass "For lease" tags for
-// office buildings you can rent, and count medallions for clusters at the far
-// zoom. Plain DOM managed imperatively: elements are created when the
-// pin set changes and only their transforms are touched per frame, so a pan
-// never re-renders Preact. Each pin is a real <button> (tap, keyboard, label).
-import { h, render } from 'preact';
+// DOM pins over the map canvas (ART_DIRECTION §2; the shape language is in
+// markers.ts): bank crests for your branches and rivals', small "$" coins for
+// open branch locations, medallions in each place type's own ink, price tags
+// for buildings you rent or buy and larger seals for landmarks. At the far zoom
+// nearby pins of the same group merge into clusters that show what they hold;
+// at close zoom places add a short caption. Plain DOM managed imperatively:
+// elements are created when the pin set changes (pinElements.tsx) and only
+// their transforms are touched per frame, so a pan never re-renders Preact.
+// Each pin is a real <button> (tap, keyboard, label).
 import {
   FAR_ZOOM_BELOW,
+  PIN_CAPTION_FROM_ZOOM,
+  PIN_COIN_LIFT_PX,
+  PIN_COIN_PX,
+  PIN_CREST_CROWN_PX,
+  PIN_CREST_LIFT_PX,
+  PIN_CREST_PX,
   PIN_CULL_MARGIN_PX,
+  PIN_FAR_SCALE,
   PIN_HIT_PX,
+  PIN_LANDMARK_LIFT_PX,
+  PIN_LANDMARK_PX,
   PIN_LIFT_PX,
   PIN_MEDALLION_PX,
+  PIN_TAG_LIFT_PX,
+  PIN_TAG_PX,
 } from '../../config/mapView';
-import { AirportMedallion } from '../airport/AirportMedallion';
-import { CentralBankMedallion } from '../centralbank/CentralBankMedallion';
-import { Medallion } from '../components';
-import { LayerIcon, LayerMedallion } from './LayerIcon';
 import { worldToScreen, type Size, type ViewCamera } from './camera';
 import { clusterLevel, clusterPins, clusterRadius, type Cluster } from './cluster';
-import { isYours, type PinSpec } from './pins';
+import { clusterGroup, stackTier } from './markers';
+import { makeClusterElement, makePinElement } from './pinElements';
+import type { PinSpec } from './pins';
+import './pins.css';
 
 export interface PinTargets {
   onPin(pin: PinSpec): void;
@@ -40,7 +48,32 @@ interface Placed {
 }
 
 const pinKey = (p: PinSpec) =>
-  `${p.kind}|${p.ink}|${p.monogram}|${p.label}|${p.badge}|${p.alert ?? false}|${p.x}|${p.y}|${p.converting?.progress ?? ''}`;
+  `${p.kind}|${p.ink}|${p.monogram}|${p.label}|${p.badge}|${p.alert ?? false}|${p.x}|${p.y}|` +
+  `${p.converting?.progress ?? ''}|${p.tag ?? ''}|${p.partner ?? false}|${p.muted ?? false}|${p.caption ?? ''}`;
+
+/** Pin geometry from config/mapView.ts, as CSS custom properties on the pin layer (map.css). */
+const GEOMETRY: Record<string, number> = {
+  '--pin-size': PIN_MEDALLION_PX,
+  '--pin-hit': PIN_HIT_PX,
+  '--pin-lift': PIN_LIFT_PX,
+  '--crest-h': PIN_CREST_PX.h,
+  '--crest-lift': PIN_CREST_LIFT_PX,
+  '--crest-crown': PIN_CREST_CROWN_PX,
+  '--seal-size': PIN_LANDMARK_PX,
+  '--seal-lift': PIN_LANDMARK_LIFT_PX,
+  '--coin-size': PIN_COIN_PX,
+  '--coin-lift': PIN_COIN_LIFT_PX,
+  '--tag-h': PIN_TAG_PX,
+  '--tag-lift': PIN_TAG_LIFT_PX,
+};
+const FAR_SCALES: Record<string, number> = {
+  '--far-crest': PIN_FAR_SCALE.crest,
+  '--far-mine': PIN_FAR_SCALE.mine,
+  '--far-medallion': PIN_FAR_SCALE.medallion,
+  '--far-seal': PIN_FAR_SCALE.landmark,
+  '--far-coin': PIN_FAR_SCALE.coin,
+  '--far-tag': PIN_FAR_SCALE.tag,
+};
 
 export class PinLayer {
   private pins: PinSpec[] = [];
@@ -51,6 +84,7 @@ export class PinLayer {
   private clusterEls = new Map<string, Placed>();
   private hidden = new Set<string>();
   private far = false;
+  private close = false;
   /** Milliseconds spent in the last update (for the debug hook). */
   lastUpdateMs = 0;
 
@@ -59,9 +93,8 @@ export class PinLayer {
     private targets: PinTargets,
   ) {
     host.addEventListener('click', this.onClick);
-    host.style.setProperty('--pin-size', `${PIN_MEDALLION_PX}px`);
-    host.style.setProperty('--pin-hit', `${PIN_HIT_PX}px`);
-    host.style.setProperty('--pin-lift', `${PIN_LIFT_PX}px`);
+    for (const [k, v] of Object.entries(GEOMETRY)) host.style.setProperty(k, `${v}px`);
+    for (const [k, v] of Object.entries(FAR_SCALES)) host.style.setProperty(k, String(v));
   }
 
   /** Replaces the pin set; pins whose look didn't change keep their element. */
@@ -80,8 +113,8 @@ export class PinLayer {
       if (old && old.key === key) continue;
       old?.el.remove();
       const el = makePinElement(p);
-      // Your branches and HQ always on top; otherwise lower on the map draws in front.
-      el.style.zIndex = String(stackOrder(p.y, isYours(p)));
+      // Yours always on top, open locations at the bottom; otherwise lower on the map in front.
+      el.style.zIndex = String(stackOrder(p.y, stackTier(p.kind)));
       this.host.appendChild(el);
       this.els.set(p.id, { el, x: p.x, y: p.y, shown: '', key });
     }
@@ -99,6 +132,11 @@ export class PinLayer {
     if (far !== this.far) {
       this.far = far;
       this.host.classList.toggle('is-far', far);
+    }
+    const close = cam.zoom >= PIN_CAPTION_FROM_ZOOM;
+    if (close !== this.close) {
+      this.close = close;
+      this.host.classList.toggle('is-close', close);
     }
     const hidden = this.hidden;
     hidden.clear();
@@ -130,7 +168,7 @@ export class PinLayer {
   private place(p: Placed, cam: ViewCamera, vp: Size): void {
     const s = worldToScreen(cam, vp, p.x, p.y);
     const m = PIN_CULL_MARGIN_PX;
-    if (s.x < -m || s.y < -m || s.x > vp.width + m || s.y > vp.height + m + PIN_MEDALLION_PX) {
+    if (s.x < -m || s.y < -m || s.x > vp.width + m || s.y > vp.height + m + PIN_LANDMARK_PX) {
       hide(p);
       return;
     }
@@ -144,13 +182,14 @@ export class PinLayer {
 
   private recluster(level: number, zoom: number): void {
     this.clusterAt = level;
-    this.clusters = clusterPins(this.pins, clusterRadius(zoom));
+    // Only like with like: your branches, rival branches, open locations, places, tags.
+    this.clusters = clusterPins(this.pins, clusterRadius(zoom), clusterGroup);
     for (const placed of this.clusterEls.values()) placed.el.remove();
     this.clusterEls.clear();
     for (const c of this.clusters) {
       if (c.members.length === 1) continue;
       const el = makeClusterElement(c);
-      el.style.zIndex = String(stackOrder(c.y, c.members.some(isYours)));
+      el.style.zIndex = String(stackOrder(c.y, stackTier(c.members[0]!.kind)));
       this.host.appendChild(el);
       this.clusterEls.set(c.key, { el, x: c.x, y: c.y, shown: '', key: c.key });
     }
@@ -170,137 +209,12 @@ export class PinLayer {
   };
 }
 
-/** z-index from world y (always ≥ 0 for map points); yours lifted above every other pin. */
-const MINE_LIFT = 1_000_000;
-const stackOrder = (y: number, mine: boolean) => Math.round(y) + (mine ? MINE_LIFT : 0);
+/** z-index from world y (always ≥ 0 for map points), lifted by stacking tier (markers.ts). */
+const TIER_LIFT = 1_000_000;
+const stackOrder = (y: number, tier: number) => Math.round(y) + tier * TIER_LIFT;
 
 function hide(p: Placed): void {
   if (p.shown === '') return;
   p.el.style.display = 'none';
   p.shown = '';
-}
-
-const LEASE_TAG_ICON_PX = 13;
-
-/** Open branch location: a blank ivory medallion with a plain "$" (ART_DIRECTION §2). */
-const LOT_MEDALLION_SVG =
-  `<svg class="medallion" width="${PIN_MEDALLION_PX}" height="${PIN_MEDALLION_PX}" viewBox="0 0 30 30">` +
-  '<circle cx="15" cy="15" r="14" fill="var(--ivory)" stroke="var(--brass)" stroke-width="1.5"/>' +
-  '<circle cx="15" cy="15" r="11.5" fill="none" stroke="var(--brass)" stroke-width="0.6" stroke-dasharray="1 1.2"/>' +
-  '<text x="15" y="15.5" text-anchor="middle" dominant-baseline="central" class="medallion-text" fill="var(--ledger-ink)">$</text>' +
-  '</svg>';
-
-function makePinElement(p: PinSpec): HTMLButtonElement {
-  const el = document.createElement('button');
-  el.type = 'button';
-  el.className = `map-pin pin-${p.kind}${p.muted ? ' is-muted' : ''}`;
-  el.dataset.lotId = p.id;
-  // The tutorial's brass ring finds storefronts and your branches by these (SCREENS §27).
-  if (p.kind === 'lot' || p.kind === 'mine')
-    el.dataset.tutorial = p.kind === 'lot' ? 'open-lot' : 'my-branch';
-  // Rival head offices wear the bank's ink as a ring and pennant (map.css).
-  if (p.kind === 'rivalHq' && p.ink) el.style.setProperty('--pin-ink', p.ink);
-  el.setAttribute('aria-label', p.label);
-  el.style.display = 'none';
-  if (p.kind === 'office') {
-    // Rentable building: the For lease tag with the building type's icon.
-    const tag = document.createElement('span');
-    tag.className = 'pin-tag';
-    tag.setAttribute('aria-hidden', 'true');
-    if (p.icon) render(h(LayerIcon, { id: p.icon, size: LEASE_TAG_ICON_PX }), tag);
-    tag.insertAdjacentText('beforeend', 'For lease');
-    el.appendChild(tag);
-  } else if (p.kind === 'lot') {
-    el.innerHTML = `<span class="pin-body" aria-hidden="true">${LOT_MEDALLION_SVG}</span>`;
-  } else {
-    const body = document.createElement('span');
-    body.className = 'pin-body';
-    render(
-      p.kind === 'centralBank'
-        ? h(CentralBankMedallion, { size: PIN_MEDALLION_PX })
-        : p.kind === 'airport'
-          ? h(AirportMedallion, { size: PIN_MEDALLION_PX })
-          : p.icon
-            ? h(LayerMedallion, { id: p.icon, size: PIN_MEDALLION_PX })
-            : h(Medallion, {
-                ink: p.ink,
-                monogram: p.monogram,
-                size: PIN_MEDALLION_PX,
-                ring: p.kind === 'rival',
-              }),
-      body,
-    );
-    el.appendChild(body);
-  }
-  if (p.converting) {
-    // Acquired branch converting to your brand: a brass progress ring and a small label.
-    el.classList.add('is-converting');
-    el.insertAdjacentHTML('beforeend', convertingRing(p.converting.progress));
-    el.insertAdjacentHTML(
-      'beforeend',
-      '<span class="pin-converting" aria-hidden="true">Converting</span>',
-    );
-  }
-  if (p.tag) {
-    // Stage 7 sites: a short note under the medallion ("For sale", "Open now").
-    const note = document.createElement('span');
-    note.className = 'pin-converting pin-note';
-    note.setAttribute('aria-hidden', 'true');
-    note.textContent = p.tag;
-    el.appendChild(note);
-  }
-  if (p.partner) {
-    // Your employer or university partner: a small brand-ink seal with an ivory tick.
-    const seal = document.createElement('span');
-    seal.className = 'pin-partner';
-    seal.setAttribute('aria-hidden', 'true');
-    seal.style.setProperty('--pin-ink', p.ink);
-    seal.innerHTML = PARTNER_SEAL_SVG;
-    el.appendChild(seal);
-  }
-  if (p.badge)
-    el.insertAdjacentHTML('beforeend', '<span class="pin-badge" aria-hidden="true"></span>');
-  if (p.alert)
-    el.insertAdjacentHTML('beforeend', '<span class="pin-alert" aria-hidden="true"></span>');
-  return el;
-}
-
-/** A ring around the medallion filled clockwise from the top by conversion progress (0–1). */
-function convertingRing(progress: number): string {
-  const size = PIN_MEDALLION_PX + 8;
-  const r = size / 2 - 1.5;
-  const c = 2 * Math.PI * r;
-  const half = size / 2;
-  return (
-    `<svg class="pin-ring" aria-hidden="true" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">` +
-    `<circle cx="${half}" cy="${half}" r="${r}" fill="none" stroke="var(--vault-deep)" stroke-width="3"/>` +
-    `<circle cx="${half}" cy="${half}" r="${r}" fill="none" stroke="var(--brass-light)" stroke-width="3" ` +
-    `stroke-dasharray="${(c * progress).toFixed(2)} ${c.toFixed(2)}" transform="rotate(-90 ${half} ${half})"/>` +
-    '</svg>'
-  );
-}
-
-const PARTNER_SEAL_SVG =
-  '<svg viewBox="0 0 14 14" width="14" height="14"><path d="M3.8 7.2l2.1 2.1 4.3-4.6" ' +
-  'fill="none" stroke="var(--ivory)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-
-function makeClusterElement(c: Cluster<PinSpec>): HTMLButtonElement {
-  const el = document.createElement('button');
-  el.type = 'button';
-  const mine = c.members.filter(isYours);
-  el.className = `map-pin pin-cluster${mine.length ? ' has-mine' : ''}`;
-  if (mine[0]) el.style.setProperty('--pin-ink', mine[0].ink);
-  el.dataset.cluster = c.key;
-  const n = c.members.length;
-  el.setAttribute(
-    'aria-label',
-    `${n} places${mine.length ? `, ${mine.length} of them yours` : ''}. Zoom in`,
-  );
-  el.style.display = 'none';
-  el.innerHTML = `<span class="pin-count" aria-hidden="true">${n > 99 ? '99+' : n}</span>`;
-  if (c.members.some((m) => m.badge))
-    el.insertAdjacentHTML('beforeend', '<span class="pin-badge" aria-hidden="true"></span>');
-  if (c.members.some((m) => m.alert))
-    el.insertAdjacentHTML('beforeend', '<span class="pin-alert" aria-hidden="true"></span>');
-  return el;
 }

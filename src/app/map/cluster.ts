@@ -1,7 +1,9 @@
 // Pin clustering for the far zoom (SCREENS §2): nearby pins merge into one
-// medallion with a count. Pure and camera-independent: it works in world
-// pixels and walks pins in a fixed order, so clusters don't reshuffle while
-// panning, only when the cluster zoom level changes.
+// mark with a count, but only like with like (an optional group key, e.g. your
+// branches, rival branches, open locations, places, tags), so a cluster can
+// show what it holds. Pure and camera-independent: it works in world pixels and
+// walks pins in a fixed order, so clusters don't reshuffle while panning, only
+// when the cluster zoom level changes.
 import { CLUSTER_LEVELS_PER_OCTAVE, CLUSTER_RADIUS_PX } from '../../config/mapView';
 
 export interface ClusterInput {
@@ -22,11 +24,17 @@ export interface Cluster<T extends ClusterInput> {
 
 /**
  * Greedy clustering: pins are taken in their given order; each pin not yet
- * claimed seeds a cluster and claims every unclaimed pin within `radius` of it.
- * A spatial grid keeps it near-linear for a few hundred pins.
+ * claimed seeds a cluster and claims every unclaimed pin of the same group
+ * (`groupOf`, all one group if omitted) within `radius` of it. A spatial grid
+ * keeps it near-linear for a few hundred pins.
  */
-export function clusterPins<T extends ClusterInput>(pins: T[], radius: number): Cluster<T>[] {
+export function clusterPins<T extends ClusterInput>(
+  pins: T[],
+  radius: number,
+  groupOf?: (p: T) => string,
+): Cluster<T>[] {
   if (!(radius > 0)) return pins.map((p) => ({ key: p.id, x: p.x, y: p.y, members: [p] }));
+  const groups = groupOf ? pins.map(groupOf) : undefined;
   const cell = (v: number) => Math.floor(v / radius);
   const grid = new Map<string, number[]>();
   pins.forEach((p, i) => {
@@ -49,6 +57,7 @@ export function clusterPins<T extends ClusterInput>(pins: T[], radius: number): 
       for (let dx = -1; dx <= 1; dx++) {
         for (const j of grid.get(`${gx + dx},${gy + dy}`) ?? []) {
           if (claimed[j]) continue;
+          if (groups && groups[j] !== groups[i]) continue;
           const p = pins[j]!;
           const ox = p.x - seed.x;
           const oy = p.y - seed.y;

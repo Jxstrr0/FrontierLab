@@ -55,6 +55,53 @@ export const PIN_MEDALLION_PX = 30;
 export const PIN_HIT_PX = 44;
 /** The medallion floats this far above the roof anchor (centre to anchor). */
 export const PIN_LIFT_PX = 20;
+/** Bank crests (your branches and rivals'): width and height; a head office adds a crown on top. */
+export const PIN_CREST_PX = { w: 30, h: 34 } as const;
+export const PIN_CREST_CROWN_PX = 6;
+export const PIN_CREST_LIFT_PX = 22;
+/** Landmark seals (central bank, airport, stadium): larger than medallions. */
+export const PIN_LANDMARK_PX = 40;
+export const PIN_LANDMARK_LIFT_PX = 27;
+/** Open branch locations: a small "$" coin. */
+export const PIN_COIN_PX = 22;
+export const PIN_COIN_LIFT_PX = 15;
+/** Price tags (rent or buy): height and lift. */
+export const PIN_TAG_PX = 22;
+export const PIN_TAG_LIFT_PX = 19;
+/** Far zoom (below FAR_ZOOM_BELOW): each shape shrinks by this factor. */
+export const PIN_FAR_SCALE = {
+  crest: 0.82,
+  mine: 0.92,
+  medallion: 0.8,
+  landmark: 0.78,
+  coin: 0.5,
+  tag: 0.8,
+} as const;
+/** Far-zoom cluster marks: crest width, medallion and coin size (px). */
+export const CLUSTER_MARK_PX = { crest: 26, medallion: 25, coin: 14 } as const;
+/** At most this many distinct marks fan out in a cluster stack. */
+export const CLUSTER_STACK_MAX = 3;
+/** From this zoom up, places show a short caption under the pin ("Credit bureau"). */
+export const PIN_CAPTION_FROM_ZOOM = 1.5;
+/** Words dropped from a rival bank's name for the caption under its crest. */
+export const RIVAL_CAPTION_GENERIC_WORDS = [
+  'Bank',
+  'Banque',
+  'Financial',
+  'Mutual',
+  'Private',
+  'Privatbank',
+  'Federal',
+  'Trust',
+  '&',
+  'Co',
+  'Building',
+  'Society',
+  'Cantonal',
+  'Savings',
+  'Money',
+  'Pay',
+] as const;
 /** Pins this far outside the viewport (CSS px) are still placed, so edges don't pop. */
 export const PIN_CULL_MARGIN_PX = 48;
 
