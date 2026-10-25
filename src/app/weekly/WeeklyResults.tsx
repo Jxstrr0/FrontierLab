@@ -35,7 +35,14 @@ export function WeeklyResults(p: { week: number }) {
       title="Weekly results"
       class="weekly-modal"
       onClose={close}
-      icon={<Medallion ink={s.meta.brandInk} monogram={s.meta.monogram} shape={s.meta.logoShape} size={30} />}
+      icon={
+        <Medallion
+          ink={s.meta.brandInk}
+          monogram={s.meta.monogram}
+          shape={s.meta.logoShape}
+          size={30}
+        />
+      }
       footer={
         <button
           type="button"

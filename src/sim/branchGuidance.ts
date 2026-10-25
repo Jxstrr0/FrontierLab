@@ -106,8 +106,8 @@ export function runBranchGuidance(state: GameState): void {
     g.marketing = nudge(
       g.marketing,
       aware,
-      X.brandTarget - GUIDANCE.brandBand,
-      X.brandTarget + GUIDANCE.brandBand,
+      state.executives.brandTarget - GUIDANCE.brandBand,
+      state.executives.brandTarget + GUIDANCE.brandBand,
     );
   }
   if (cpo) {

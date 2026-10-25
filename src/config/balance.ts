@@ -1424,7 +1424,9 @@ export const EXEC_PAY = {
  */
 export const EXEC_DELEGATION = {
   cooDelegation: { staffing: true, products: true, marketing: true, troubles: true, loans: true },
+  /** HR benefits: the morale floor the COO holds (a dial on their profile), default and stops. */
   moraleTarget: 70,
+  moraleTargets: [70, 80, 90] as readonly number[],
   moraleSlack: 5,
   benefitsEveryWeeks: 4,
   benefitsBudgetShare: 0.08,
@@ -1436,7 +1438,9 @@ export const EXEC_DELEGATION = {
   devTier: 'medium',
   devBudgetShare: 0.01,
   revenueWeeks: 13,
+  /** Brand campaigns: the awareness the CMO holds in each city (a dial on their profile), default and stops. */
   brandTarget: 0.5,
+  brandTargets: [0.4, 0.5, 0.6, 0.7] as readonly number[],
   brandSlack: 0.05,
   brandBudgetShare: 0.03,
   croEveryWeeks: 4,
@@ -1504,12 +1508,14 @@ export const GUIDANCE = {
 } as const;
 
 /**
- * Pay reviews (COO, §17.2): every everyWeeks the COO sets each executive's and
- * branch manager's pay to market × (1 + the pay premium you choose), within
- * premiumRange in premiumStep steps, so pay rises with the market.
+ * Pay reviews (COO, §17.2): on the cadence you choose (quarterly or annual,
+ * in weeks) the COO sets each executive's and branch manager's pay to market
+ * × (1 + the pay premium you choose), within premiumRange in premiumStep
+ * steps, so pay rises with the market.
  */
 export const PAY_REVIEW = {
-  everyWeeks: 13,
+  cadences: { quarterly: 13, annual: 52 } as const,
+  defaultCadence: 'quarterly' as const,
   premiumRange: [-0.1, 0.3] as [number, number],
   premiumStep: 0.05,
   defaultPremium: 0.05,

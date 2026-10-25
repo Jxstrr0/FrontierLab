@@ -33,7 +33,12 @@ export function SlotCard(p: {
     <Card class="slot">
       <div class="slot-head">
         {meta ? (
-          <Medallion ink={meta.brandInk} monogram={meta.monogram} shape={meta.logoShape} size={44} />
+          <Medallion
+            ink={meta.brandInk}
+            monogram={meta.monogram}
+            shape={meta.logoShape}
+            size={44}
+          />
         ) : (
           <span class="slot-empty-mark" aria-hidden="true" />
         )}

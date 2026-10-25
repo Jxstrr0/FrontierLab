@@ -2,7 +2,8 @@
 // a market pay that rises with their years at the bank, and a rival may poach
 // one each week, more often when they're underpaid and less when well paid.
 // The COO's Pay reviews delegation sets every executive and branch manager to
-// market × (1 + your pay premium) once a quarter, so pay keeps up with the market.
+// market × (1 + your pay premium) once a quarter or once a year, as you choose,
+// so pay keeps up with the market.
 import {
   EXEC_PAY,
   MANAGER_BASE_SALARY,
@@ -136,11 +137,33 @@ export function runPayReview(state: GameState): { raised: number; cut: number } 
   return { raised, cut };
 }
 
-/** COO Pay reviews (delegation): a review once every PAY_REVIEW.everyWeeks. */
+/** Weeks between reviews on the cadence you chose (PAY_REVIEW.cadences). */
+export function payReviewEveryWeeks(state: GameState): number {
+  return PAY_REVIEW.cadences[state.executives.payReviewCadence] ?? PAY_REVIEW.cadences.quarterly;
+}
+
+/** COO Pay reviews (delegation): a review once every payReviewEveryWeeks. */
 export function cooPayReviews(state: GameState): void {
   const last = state.executives.lastPayReviewWeek;
-  if (last >= 0 && state.clock.week - last < PAY_REVIEW.everyWeeks) return;
+  if (last >= 0 && state.clock.week - last < payReviewEveryWeeks(state)) return;
   runPayReview(state);
+}
+
+/** What the next review would add to annual pay across executives and managers (negative when it cuts). */
+export function nextReviewDelta(state: GameState): { delta: number; people: number } {
+  let delta = 0;
+  let people = 0;
+  const execPay = reviewedExecSalary(state);
+  for (const e of seatedExecs(state)) {
+    delta += execPay - e.salary;
+    people += 1;
+  }
+  for (const m of Object.values(state.people.managers)) {
+    if (!m.branchId) continue;
+    delta += reviewedManagerSalary(state, m) - m.salary;
+    people += 1;
+  }
+  return { delta, people };
 }
 
 /** True when the COO is seated with Pay reviews on. */

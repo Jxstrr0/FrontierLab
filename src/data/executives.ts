@@ -1,6 +1,7 @@
 // Executive seats (SIMULATION §17.2, SCREENS §10): titles, the HQ departments
 // each executive lifts with execMult, and the delegation toggles on their
-// profile. The CEO seat is you and isn't listed. Numbers live in balance.ts.
+// profile (some with a dial under them: DelegationDials.tsx). The CEO seat is
+// you and isn't listed. Numbers live in balance.ts.
 import type { ExecSeat } from '../sim/marketsTypes';
 import type { HqDeptId } from './types';
 
@@ -46,7 +47,7 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
       {
         id: 'hrBenefits',
         label: 'HR benefits',
-        description: 'Keeps average morale at 70 or better at the least cost.',
+        description: 'Keeps average morale at your target or better at the least cost.',
       },
       {
         id: 'hrDivision',
@@ -57,7 +58,7 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
         id: 'payReviews',
         label: 'Pay reviews',
         description:
-          'Once a quarter sets every executive and branch manager to market pay plus your pay premium, so pay keeps rising with the market and rivals struggle to poach them.',
+          'Sets every executive and branch manager to market pay plus your pay premium, as often as you choose, so pay keeps rising with the market and rivals struggle to poach them.',
       },
       {
         id: 'guidance',
@@ -142,13 +143,14 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
       {
         id: 'brand',
         label: 'Brand campaigns',
-        description: 'Runs brand campaigns to hold awareness near 50% within 3% of revenue.',
+        description:
+          'Runs brand campaigns to hold awareness in every branch city near your target, within 3% of revenue.',
       },
       {
         id: 'guidance',
         label: 'Branch guidance: marketing',
         description:
-          'Steers managers who run marketing: every 4 weeks pushes them to spend more on campaigns while brand awareness in their cities is under 40%, and less above 60%.',
+          'Steers managers who run marketing: every 4 weeks pushes them to spend more on campaigns while brand awareness in their cities is 10 points under your target, and less when 10 points over.',
       },
     ],
   },
