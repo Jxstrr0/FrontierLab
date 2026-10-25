@@ -13,6 +13,8 @@ import {
   rivalShortName,
   shapeOf,
   stackTier,
+  ownedGlyph,
+  pinShape,
   type MarkerId,
 } from '../../src/app/map/markers';
 import { clusterLabel } from '../../src/app/map/pinElements';
@@ -216,6 +218,20 @@ describe('clustering like with like', () => {
     const places = [pin('a', 'bureau', 0), pin('b', 'employer', 0, { alert: true })];
     expect(clusterLabel('medallion', places)).toBe(
       '2 places: Credit bureau, Employer, open incident. Zoom in',
+    );
+  });
+});
+
+describe('places you own', () => {
+  it('wear your crest with their own glyph, on top and in your cluster', () => {
+    expect(pinShape({ kind: 'property', owned: true })).toBe('crest');
+    expect(pinShape({ kind: 'property' })).toBe('tag');
+    expect(
+      ['hq', 'property', 'vacationHome', 'stadium'].map((k) => ownedGlyph(k as PinKind)),
+    ).toEqual(['office', 'realEstate', 'villa', 'trophy']);
+    expect(stackTier('vacationHome', true)).toBe(stackTier('mine'));
+    expect(clusterGroup({ id: 'a', kind: 'property', owned: true })).toBe(
+      clusterGroup({ id: 'b', kind: 'mine' }),
     );
   });
 });

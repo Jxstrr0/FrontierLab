@@ -10,6 +10,18 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-10-25 — Your places in your brand colour (v0.9.3)
+- **Done (owner's ask):** everything you own on the map is now drawn in your brand colour, each with its own icon:
+  - branches: your crest with your monogram (as before);
+  - HQ: your crest with an office icon and the small crown;
+  - property you own: your crest with a building icon (was a teal "Owned" tag);
+  - vacation homes: your crest with a villa icon (was an "Owned" tag);
+  - clubs you own: your crest with a trophy (was the stadium seal with a tick).
+  - "Selling" and "Rebuilding" show as a note under the crest. Your places sit on top of other pins and group with your branches at the far zoom.
+- **Not changed:** partners (employers, universities, car dealers) keep their own colour with the small brand tick, because you partner with them rather than own them.
+- **Code:** `owned` on map pins (`src/app/map/pins.ts`), `pinShape` and `ownedGlyph` in `markers.ts`, and an `icon` option on `Crest`.
+- **Checked** at 390×844 with a branch, HQ, property, vacation home and partner in Calgary. No console errors; tests pass.
+
 ### 2026-10-25 — Version number 0.9.2
 - **Done:** bumped to **v0.9.2** (`package.json`) for the new Check for updates button on the title screen.
 

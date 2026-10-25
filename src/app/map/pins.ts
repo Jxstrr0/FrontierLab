@@ -71,8 +71,10 @@ export interface PinSpec {
   icon?: MapLayerId;
   /** The central bank pin's country. */
   countryId?: CountryId;
-  /** Employer or university you partner with: a brand-ink seal on the medallion (ink = brand ink). */
+  /** Employer, university or car dealer you partner with: a brand-ink seal on the medallion (ink = brand ink). */
   partner?: boolean;
+  /** A place you own (HQ, property, vacation home, club): a brand-ink crest with the type's glyph. */
+  owned?: boolean;
   /** A failed rival's head office (distressed): drawn faded with a dashed ring. */
   muted?: boolean;
   /** Your acquired branch still converting (§19.8): old ink and monogram, with a progress ring. */
@@ -186,6 +188,7 @@ function officePin(s: GameState, map: CityMap, o: OfficeListing): PinSpec {
       ink: s.meta.brandInk,
       monogram: s.meta.monogram,
       officeId: o.officeId,
+      owned: true,
     };
   }
   return {
@@ -263,7 +266,9 @@ function stage7Info(s: GameState, site: Site): SitePinInfo | undefined {
 
 function sitePin(s: GameState, map: CityMap, site: Site, info?: SitePinInfo): PinSpec {
   const at = anchor(map, site.tile);
-  const partner = isPartnerSite(s, site) || !!info?.owned;
+  // Property and homes you own become your crests; a car dealer deal is a partnership.
+  const owned = !!info?.owned && (site.kind === 'property' || site.kind === 'vacationHome');
+  const partner = isPartnerSite(s, site) || (!!info?.owned && !owned);
   const suffix =
     (info
       ? info.suffix
@@ -283,7 +288,7 @@ function sitePin(s: GameState, map: CityMap, site: Site, info?: SitePinInfo): Pi
     x: at.x,
     y: at.y,
     label: `${siteName(s, site)}${suffix}, ${site.address}`,
-    ink: rival?.ink ?? (partner ? s.meta.brandInk : ''),
+    ink: rival?.ink ?? (partner || owned ? s.meta.brandInk : ''),
     monogram: rival?.monogram ?? '',
     badge: false,
     icon: SITE_ICON[site.kind],
@@ -291,6 +296,7 @@ function sitePin(s: GameState, map: CityMap, site: Site, info?: SitePinInfo): Pi
     ...(rival ? { caption: `${rivalShortName(rival.name)} HQ` } : {}),
   };
   if (partner) pin.partner = true;
+  if (owned) pin.owned = true;
   if (info?.tag) pin.tag = info.tag;
   return pin;
 }
@@ -365,7 +371,7 @@ export function pinsKey(pins: PinSpec[]): string {
   return pins
     .map(
       (p) =>
-        `${p.id}|${p.kind}|${p.ink}|${p.monogram}|${p.label}|${p.muted ? 1 : 0}|${p.converting?.weeksLeft ?? ''}|${p.tag ?? ''}|${p.partner ? 1 : 0}|${p.caption ?? ''}`,
+        `${p.id}|${p.kind}|${p.ink}|${p.monogram}|${p.label}|${p.muted ? 1 : 0}|${p.converting?.weeksLeft ?? ''}|${p.tag ?? ''}|${p.partner ? 1 : 0}|${p.owned ? 1 : 0}|${p.caption ?? ''}`,
     )
     .join(';');
 }

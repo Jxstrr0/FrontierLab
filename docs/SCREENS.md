@@ -94,10 +94,10 @@ After the wizard, the map opens with the tutorial (§27).
 
 - **Canvas map:** isometric engraved city with pinch zoom (3 levels plus continuous), pan, and inertia.
 - **Pins** are DOM marks positioned over the canvas. The shape says the category, the colour and glyph say the type (ART_DIRECTION §2 Pins):
-  - **crest** (shield) = a bank. Yours: filled with your brand ink and monogram. Rivals: ivory with their ink ring and monogram. Head offices (your HQ, rival HQs) wear a small brass crown.
+  - **crest** (shield) = a bank. Yours: filled with your brand ink and monogram. Rivals: ivory with their ink ring and monogram. Head offices (your HQ, rival HQs) wear a small brass crown. **Everything you own** is a brand-ink crest too, with its own ivory glyph in place of the monogram: office (HQ, crowned), building (property), villa (vacation home), trophy (club). They stack on top and cluster with your branches.
   - **coin** = an open branch location: a small ivory "$" coin, quieter than everything else.
   - **medallion** = a place you deal with (bureau, investment bank, agency, convention, lobbying firm, employer, university, car dealer, auction house): filled with the type's own ink, ivory glyph.
-  - **price tag** = something to rent or buy: offices ("For lease"), buildings ("For sale", "Selling", "Owned"), vacation homes.
+  - **price tag** = something to rent or buy: offices ("For lease"), buildings and vacation homes ("For sale"). Once yours they become crests; "Selling" and "Rebuilding" show as a note under the crest.
   - **seal** = a landmark (central bank, airport, stadium): larger, scalloped.
 - **Captions** from zoom 1.5: places show their type ("Credit bureau") in the type's ink; rival branches show the bank's short name. Captions follow the Text size setting.
 - At the far zoom, nearby pins cluster, but only like with like (yours, rivals, open locations, places, tags; landmarks never cluster). A cluster shows a fanned stack of up to three member marks with a count chip; open locations collapse into a quiet brass dot "×N". Its label names what's inside.

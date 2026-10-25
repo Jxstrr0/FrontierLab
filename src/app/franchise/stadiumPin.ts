@@ -1,7 +1,7 @@
 // The stadium pins (SCREENS §20): one per club on the city's stadium landmark
 // (Sports Teams layer), anchored like landmarkPins.ts. A city with two clubs
 // (Toronto) spreads them a little either side of the landmark. Unowned clubs
-// carry a "For sale" note; yours wear the brand-ink seal.
+// carry a "For sale" note; yours are brand-ink crests with the trophy.
 import type { CityMap } from '../../art/citygen';
 import { franchisesIn } from '../../data/franchises';
 import type { GameState } from '../../sim/state';
@@ -31,7 +31,7 @@ export function stadiumPins(s: GameState, map: CityMap): PinSpec[] {
       icon: 'sportsTeams',
       clubId: spec.id,
     };
-    if (owned) pin.partner = true;
+    if (owned) pin.owned = true;
     else pin.tag = 'For sale';
     return pin;
   });
