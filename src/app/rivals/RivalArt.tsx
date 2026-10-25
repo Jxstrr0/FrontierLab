@@ -1,44 +1,70 @@
 // Vignettes for rival buildings (ART_DIRECTION §3, "Other buildings"): a rival
 // branch front with its monogram on a banner in the bank's ink, and a columned
-// head office tower flying its flag. Line art only, like StorefrontArt.
+// head office tower flying its flag, engraved in the city ink on ivory.
+import { rect } from '../../art/engrave';
 import type { RivalBank } from '../../sim/state';
+import { Face, Hatch, Vignette } from '../components';
 
 export function RivalBranchArt(p: { bank: RivalBank }) {
   return (
-    <svg class="site-art" viewBox="0 0 320 150" role="img" aria-label={`${p.bank.name} branch`}>
-      <rect x="0" y="0" width="320" height="150" class="art-ground" />
+    <Vignette label={`${p.bank.name} branch`}>
       <path d="M0 132h320" class="art-line" />
       {/* Building, cornice and steps */}
-      <path d="M66 132V44h188v88M58 44h204M66 44l8-10h172l8 10" class="art-line" />
+      <Face
+        pts={[
+          [254, 44],
+          [264, 38],
+          [264, 132],
+          [254, 132],
+        ]}
+        density="medium"
+      />
+      <Face pts={rect(66, 44, 188, 88)} />
+      <Hatch pts={rect(76, 62, 168, 62)} density="dense" angle={90} />
+      <Face
+        pts={[
+          [58, 44],
+          [262, 44],
+          [254, 34],
+          [74, 34],
+        ]}
+        density="light"
+        angle={0}
+      />
       <path d="M120 132v-4h80v4M126 128v-4h68v4" class="art-line art-fine" />
       {/* Columns */}
       {[86, 112, 208, 234].map((x) => (
-        <path d={`M${x} 124V62M${x - 5} 62h10M${x - 5} 124h10`} class="art-line" />
+        <g>
+          <Face pts={rect(x - 4, 62, 8, 62)} outline="fine" />
+          <path d={`M${x - 5} 62h10M${x - 5} 124h10`} class="art-line" />
+        </g>
       ))}
       {/* Door and windows */}
-      <path d="M140 124V82h40v42M160 82v42M136 82h48" class="art-line" />
+      <Face pts={rect(140, 82, 40, 42)} />
+      <path d="M160 82v42M136 82h48" class="art-line" />
       <path d="M128 66h64" class="art-line art-fine" />
       {/* Banner in the bank's ink */}
       <path d="M124 48h72v12h-72z" style={{ fill: p.bank.ink }} class="art-line" />
-      <text x="160" y="57.5" text-anchor="middle" class="art-text rv-art-mono">
+      <text x="160" y="57.5" text-anchor="middle" class="art-brand-text">
         {p.bank.monogram}
       </text>
-    </svg>
+    </Vignette>
   );
 }
 
 export function RivalHqArt(p: { bank: RivalBank }) {
   return (
-    <svg
-      class="site-art"
-      viewBox="0 0 320 150"
-      role="img"
-      aria-label={`${p.bank.name} head office`}
-    >
-      <rect x="0" y="0" width="320" height="150" class="art-ground" />
+    <Vignette label={`${p.bank.name} head office`}>
       <path d="M0 132h320" class="art-line" />
+      {/* Side wings */}
+      <Face pts={rect(40, 80, 70, 52)} />
+      <Face pts={rect(210, 80, 70, 52)} />
+      <Hatch pts={rect(262, 80, 18, 52)} density="medium" />
       {/* Tower with set-backs */}
-      <path d="M110 132V40h100v92M122 40V26h76v14M136 26V16h48v10" class="art-line" />
+      <Face pts={rect(110, 40, 100, 92)} />
+      <Hatch pts={rect(192, 40, 18, 68)} density="medium" />
+      <Face pts={rect(122, 26, 76, 14)} density="light" angle={0} />
+      <Face pts={rect(136, 16, 48, 10)} density="medium" angle={0} />
       {[52, 64, 76, 88, 100].map((y) => (
         <path d={`M118 ${y}h84`} class="art-line art-fine" />
       ))}
@@ -54,11 +80,9 @@ export function RivalHqArt(p: { bank: RivalBank }) {
       {/* Flag in the bank's ink */}
       <path d="M160 16V2" class="art-line" />
       <path d="M160 3h22l-5 5 5 5h-22z" style={{ fill: p.bank.ink }} class="art-line" />
-      {/* Side wings */}
-      <path d="M40 132V80h70M210 80h70v52" class="art-line" />
       {[56, 76, 96, 226, 246, 266].map((x) => (
         <path d={`M${x - 6} 92h12v16h-12z`} class="art-line art-fine" />
       ))}
-    </svg>
+    </Vignette>
   );
 }

@@ -1,47 +1,11 @@
-// Founder avatar picker: a placeholder oval portrait plus one row per part.
-// The engraved portrait generator (ART_DIRECTION §4) doesn't exist yet, so the
-// oval reflects skin tone and head shape and the part names are listed beneath.
-// Used by the New Game wizard and by Settings.
+// Founder avatar picker: the engraved portrait (ART_DIRECTION §4) updating
+// live, plus one row per part and the six skin-tone swatches. Used by the New
+// Game wizard and by Settings.
+import { SKIN_TONES } from '../../art/portraits';
 import { AVATAR_PARTS, type AvatarPart } from '../../data/avatarParts';
+import { Portrait } from '../components';
 import type { AvatarSpec } from '../../sim/state';
 import './avatar.css';
-
-/** Head shape → width of the oval, as a share of its height. */
-const HEAD_WIDTH = [0.5, 0.58, 0.54, 0.44];
-
-export function FounderPortrait(p: { avatar: AvatarSpec; size?: number }) {
-  const w = p.size ?? 120;
-  const h = Math.round(w * 1.25);
-  const head = HEAD_WIDTH[p.avatar.head] ?? HEAD_WIDTH[0]!;
-  return (
-    <svg
-      class="founder-portrait"
-      width={w}
-      height={h}
-      viewBox="0 0 120 150"
-      role="img"
-      aria-label="Founder portrait placeholder"
-    >
-      <ellipse cx="60" cy="75" rx="56" ry="71" class="portrait-frame" />
-      <ellipse cx="60" cy="75" rx="51" ry="66" class="portrait-frame-inner" />
-      <clipPath id="portrait-clip">
-        <ellipse cx="60" cy="75" rx="50" ry="65" />
-      </clipPath>
-      <g clip-path="url(#portrait-clip)">
-        <rect x="0" y="0" width="120" height="150" class="portrait-ground" />
-        <path d="M10 150c4-30 24-44 50-44s46 14 50 44z" class="portrait-shoulders" />
-        <ellipse
-          cx="60"
-          cy="64"
-          rx={head * 68}
-          ry="34"
-          style={{ fill: `var(--tone-${p.avatar.tone})` }}
-          class="portrait-head"
-        />
-      </g>
-    </svg>
-  );
-}
 
 function optionName(part: AvatarPart, spec: AvatarSpec): string {
   const names = AVATAR_PARTS.find((x) => x.part === part)!.names;
@@ -67,7 +31,7 @@ export function AvatarPicker(p: {
   return (
     <div class="avatar-picker">
       <div class="avatar-stage">
-        <FounderPortrait avatar={p.value} />
+        <Portrait avatar={p.value} size={120} label="Your portrait" />
         <p class="avatar-summary small muted">{avatarSummary(p.value)}</p>
       </div>
       <div class="part-list">
@@ -132,7 +96,7 @@ function ToneRow(p: { value: number; count: number; onPick: (index: number) => v
             aria-checked={i === p.value}
             aria-label={`Tone ${i + 1}`}
             class={`tone-swatch${i === p.value ? ' is-active' : ''}`}
-            style={{ '--swatch': `var(--tone-${i})` }}
+            style={{ '--swatch': SKIN_TONES[i] }}
             onClick={() => p.onPick(i)}
           />
         ))}

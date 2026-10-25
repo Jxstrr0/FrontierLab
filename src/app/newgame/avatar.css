@@ -1,14 +1,4 @@
-/* Founder avatar picker: the placeholder portrait, part rows and tone swatches. */
-:root {
-  /* Six skin tones, tinted from the UI inks so no new colours enter the palette. */
-  --tone-0: color-mix(in srgb, var(--ivory) 88%, var(--brass-light));
-  --tone-1: color-mix(in srgb, var(--brass-light) 80%, var(--ivory));
-  --tone-2: var(--brass-light);
-  --tone-3: color-mix(in srgb, var(--brass) 75%, var(--oxblood));
-  --tone-4: color-mix(in srgb, var(--oxblood) 60%, var(--brass));
-  --tone-5: color-mix(in srgb, var(--vault-raised) 55%, var(--oxblood));
-}
-
+/* Founder avatar picker: the portrait stage, part rows and tone swatches. */
 .avatar-picker {
   display: flex;
   flex-direction: column;
@@ -24,34 +14,6 @@
   margin: 0;
   max-width: 28em;
   text-align: center;
-}
-
-.founder-portrait {
-  flex: none;
-  display: block;
-}
-.portrait-frame {
-  fill: none;
-  stroke: var(--brass);
-  stroke-width: 1.5;
-}
-.portrait-frame-inner {
-  fill: none;
-  stroke: var(--hairline);
-  stroke-width: 1;
-  stroke-dasharray: 1.5 2.5;
-}
-.portrait-ground {
-  fill: var(--vault-raised);
-}
-.portrait-shoulders {
-  fill: var(--vault-deep);
-  stroke: var(--brass-light);
-  stroke-width: 1;
-}
-.portrait-head {
-  stroke: var(--brass-light);
-  stroke-width: 1;
 }
 
 .part-list {

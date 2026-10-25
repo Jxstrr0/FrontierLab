@@ -4,9 +4,8 @@
 // empty seats open the hire sheet, filled ones the executive's profile.
 import { useState } from 'preact/hooks';
 import type { ExecSeat } from '../../sim/state';
-import { Badge, Card, Row, SectionTitle } from '../components';
+import { Badge, Card, Row, SectionTitle, Portrait } from '../components';
 import { money, moneyFull } from '../format/format';
-import { FounderPortrait } from '../newgame/AvatarPicker';
 import { modal, useGame } from '../store';
 import { ExecHireSheet } from './ExecHireSheet';
 import { ExecProfileSheet } from './ExecProfileSheet';
@@ -79,7 +78,7 @@ function SeatGrid(p: { onHire: (seat: ExecSeat) => void; onOpen: (seat: ExecSeat
     <ul class="exec-grid" aria-label="Executive seats">
       <li>
         <div class="exec-seat is-ceo">
-          <FounderPortrait avatar={s.meta.founderAvatar} size={56} />
+          <Portrait avatar={s.meta.founderAvatar} size={56} />
           <span class="exec-seat-name">{s.meta.founderName}</span>
           <span class="exec-seat-title">Chief Executive · You</span>
         </div>
@@ -114,7 +113,7 @@ function SeatGrid(p: { onHire: (seat: ExecSeat) => void; onOpen: (seat: ExecSeat
               aria-label={`${exec.name}, ${spec.title}`}
               onClick={() => p.onOpen(seat)}
             >
-              <FounderPortrait avatar={exec.portrait} size={56} />
+              <Portrait avatar={exec.portrait} size={56} />
               <span class="exec-seat-name">{exec.name}</span>
               <span class="exec-seat-title">{spec.short}</span>
               <span class="exec-seat-meta muted">

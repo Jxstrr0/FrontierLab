@@ -15,6 +15,7 @@ import { act, closePanel, toast, useGame } from '../store';
 import { OwnedProperty } from './OwnedProperty';
 import { offerBounds, propertyView } from './realEstateView';
 import './realEstate.css';
+import { PropertyArt } from './PropertyArt';
 
 export function PropertyPanel(p: { siteId: string }) {
   const s = useGame();
@@ -41,6 +42,14 @@ export function PropertyPanel(p: { siteId: string }) {
             ? 'Price the rent right: too high and tenants leave, too low and you leave money on the table.'
             : 'Buildings pay rent every week and their value moves with the property market.',
       }}
+      hero={
+        <PropertyArt
+          sqm={site.property?.sqm ?? 0}
+          status={view.kind}
+          ink={s.meta.brandInk}
+          monogram={s.meta.monogram}
+        />
+      }
     >
       {view.kind === 'owned' && <OwnedProperty property={view.property} site={site} />}
       {view.kind === 'listed' && (

@@ -21,6 +21,7 @@ import { LayerMedallion } from '../map/LayerIcon';
 import { act, closePanel, toast, useGame } from '../store';
 import { CarArt } from './CarArt';
 import './personal.css';
+import { ShowroomArt } from './ShowroomArt';
 
 type DealerTab = 'showroom' | 'financing';
 
@@ -43,6 +44,7 @@ export function CarDealerPanel(p: { siteId: string; tab?: DealerTab }) {
       icon={<LayerMedallion id="autoDealers" size={32} />}
       onClose={closePanel}
       advisor={{ text: 'Our finest machines. Something for the weekend?' }}
+      hero={<ShowroomArt />}
       tabs={[
         { id: 'showroom', label: 'Showroom' },
         { id: 'financing', label: 'Dealer financing' },

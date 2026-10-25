@@ -1,8 +1,10 @@
 // Hero vignettes for employers and universities (ART_DIRECTION §3, "Other
-// buildings"): engraved line art on the vault ground, one drawing per employer
-// type (civic hall, hospital, auto plant, tech campus, port, mine) and the
-// university's clock tower. Line art only, like SiteArt.
+// buildings"): one engraving per employer type (civic hall, hospital, auto
+// plant, tech campus, port, mine) and the university's clock tower, in the
+// city ink on ivory with hatched shadows.
 import type { JSX } from 'preact';
+import { rect } from '../../art/engrave';
+import { Face, Hatch, Vignette } from '../components';
 
 const ART: Record<string, { label: string; draw: () => JSX.Element }> = {
   cityHall: { label: 'A domed civic hall with columns', draw: CityHall },
@@ -17,11 +19,10 @@ const ART: Record<string, { label: string; draw: () => JSX.Element }> = {
 export function PartnerArt(p: { type: string }) {
   const art = ART[p.type] ?? ART.cityHall!;
   return (
-    <svg class="site-art" viewBox="0 0 320 150" role="img" aria-label={art.label}>
-      <rect x="0" y="0" width="320" height="150" class="art-ground" />
+    <Vignette label={art.label}>
       <path d="M0 132h320" class="art-line" />
       {art.draw()}
-    </svg>
+    </Vignette>
   );
 }
 
@@ -38,11 +39,35 @@ function CityHall() {
   const cols = [104, 124, 144, 164, 184, 204];
   return (
     <g>
-      <path d="M90 132V84h140v48M84 84h152l-76-22z" class="art-line" />
-      <path d="M130 62a30 30 0 0 1 60 0M160 32v-10M156 22h8" class="art-line" />
+      <Face pts={rect(90, 84, 140, 48)} />
+      <Hatch pts={rect(96, 90, 128, 38)} density="dense" angle={90} />
+      <Face
+        pts={[
+          [84, 84],
+          [236, 84],
+          [160, 62],
+        ]}
+        density="light"
+      />
+      <Face
+        pts={Array.from({ length: 13 }, (_, i) => {
+          const t = Math.PI + (i / 12) * Math.PI;
+          return [160 + 30 * Math.cos(t), 62 + 30 * Math.sin(t)] as [number, number];
+        })}
+      />
+      <Hatch
+        pts={[
+          [166, 33],
+          [190, 62],
+          [168, 62],
+        ]}
+        density="medium"
+        angle={90}
+      />
+      <path d="M160 32v-10M156 22h8" class="art-line" />
       <path d="M126 62h68" class="art-line art-fine" />
       {cols.map((x) => (
-        <path d={`M${x} 90v38M${x + 8} 90v38`} class="art-line art-fine" />
+        <Face pts={rect(x, 90, 8, 38)} outline="fine" />
       ))}
       <path d="M80 132v-4h160v4M150 132v-22h20v22" class="art-line" />
     </g>
@@ -52,11 +77,22 @@ function CityHall() {
 function Hospital() {
   return (
     <g>
-      <path d="M60 132V50h200v82M140 50V30h40v20" class="art-line" />
+      <Face
+        pts={[
+          [260, 50],
+          [270, 44],
+          [270, 132],
+          [260, 132],
+        ]}
+        density="medium"
+      />
+      <Face pts={rect(60, 50, 200, 82)} />
+      <Face pts={rect(140, 30, 40, 20)} density="light" angle={0} />
       <path d="M154 34h12v6h6v12h-6v6h-12v-6h-6V40h6z" class="art-line" />
       {windows(72, 62, 4, 4)}
       {windows(194, 62, 4, 4)}
-      <path d="M144 132v-28h32v28M140 104h40" class="art-line" />
+      <Face pts={rect(144, 104, 32, 28)} density="dense" angle={90} />
+      <Face pts={rect(140, 100, 40, 4)} />
     </g>
   );
 }
@@ -66,11 +102,33 @@ function AutoPlant() {
   return (
     <g>
       <path d="M40 132V76M240 132V76" class="art-line" />
+      <Face pts={rect(40, 76, 200, 56)} />
       {teeth.map((x) => (
-        <path d={`M${x} 76l40-24v24`} class="art-line" />
+        <g>
+          <Face
+            pts={[
+              [x, 76],
+              [x + 40, 52],
+              [x + 40, 76],
+            ]}
+            density="light"
+            angle={0}
+          />
+          <Hatch
+            pts={[
+              [x + 36, 55],
+              [x + 40, 52],
+              [x + 40, 76],
+              [x + 36, 76],
+            ]}
+            density="dense"
+          />
+        </g>
       ))}
       <path d="M40 76h200" class="art-line art-fine" />
-      <path d="M262 132V36h14v96M258 36h22" class="art-line" />
+      <Face pts={rect(262, 36, 14, 96)} />
+      <Hatch pts={rect(270, 36, 6, 96)} density="medium" />
+      <path d="M258 36h22" class="art-line" />
       <path d="M270 28c6-8 16-6 20-14M274 22c8-2 12-8 22-6" class="art-line art-fine" />
       <path d="M70 132v-30h40v30M150 132v-30h40v30" class="art-line" />
       <path d="M70 110h40M70 118h40M150 110h40M150 118h40" class="art-line art-fine" />
@@ -81,7 +139,12 @@ function AutoPlant() {
 function TechCampus() {
   return (
     <g>
-      <path d="M50 132V60h60v72M130 132V36h56v96M206 132V74h64v58" class="art-line" />
+      <Face pts={rect(50, 60, 60, 72)} />
+      <Hatch pts={rect(92, 60, 18, 72)} density="medium" />
+      <Face pts={rect(130, 36, 56, 96)} />
+      <Hatch pts={rect(170, 36, 16, 96)} density="medium" />
+      <Face pts={rect(206, 74, 64, 58)} />
+      <Hatch pts={rect(252, 74, 18, 58)} density="medium" />
       <path d="M130 36l28-12 28 12" class="art-line art-fine" />
       {windows(58, 70, 3, 4, 10, 8, 8)}
       {windows(138, 46, 3, 5, 10, 10, 6)}
@@ -97,7 +160,9 @@ function Port() {
       <path d="M60 120V40l60 0M60 40l-20 0M60 56l40-16M100 40v40M96 80h8" class="art-line" />
       <path d="M180 120V48h56M180 48h-16M180 62l36-14M216 48v34M212 82h8" class="art-line" />
       <path d="M40 120h240" class="art-line" />
-      <path d="M100 104h60v16h-60zM110 104v-12h40v12" class="art-line art-fine" />
+      <Face pts={rect(100, 104, 60, 16)} density="medium" angle={90} outline="fine" />
+      <Face pts={rect(110, 92, 40, 12)} density="light" angle={90} outline="fine" />
+      <Hatch pts={rect(0, 122, 320, 26)} density="light" angle={0} />
       <path d="M20 140c10-4 20-4 30 0s20 4 30 0 20-4 30 0 20 4 30 0" class="art-line art-fine" />
       <path d="M160 144c10-4 20-4 30 0s20 4 30 0 20-4 30 0 20 4 30 0" class="art-line art-fine" />
     </g>
@@ -113,7 +178,26 @@ function Mine() {
       />
       <path d="M116 40v-8M110 32h12" class="art-line" />
       <circle cx="116" cy="46" r="6" class="art-line art-fine" />
-      <path d="M160 132l90-60h30v60M250 72v60" class="art-line" />
+      <Face
+        pts={[
+          [160, 132],
+          [250, 72],
+          [280, 72],
+          [280, 132],
+        ]}
+        density="light"
+        angle={0}
+      />
+      <Hatch
+        pts={[
+          [250, 72],
+          [280, 72],
+          [280, 132],
+          [250, 132],
+        ]}
+        density="medium"
+      />
+      <path d="M250 72v60" class="art-line" />
       <path d="M200 132l40-26 40 26" class="art-line art-fine" />
     </g>
   );
@@ -122,8 +206,40 @@ function Mine() {
 function University() {
   return (
     <g>
-      <path d="M40 132V82h90v50M190 132V82h90v50" class="art-line" />
-      <path d="M130 132V44h60v88M124 44h72l-36-24z" class="art-line" />
+      <Face pts={rect(40, 82, 90, 50)} />
+      <Face pts={rect(190, 82, 90, 50)} />
+      <Face pts={rect(130, 44, 60, 88)} />
+      <Hatch pts={rect(172, 44, 18, 88)} density="medium" />
+      <Face
+        pts={[
+          [124, 44],
+          [196, 44],
+          [160, 20],
+        ]}
+        density="dense"
+        angle={-45}
+      />
+      <Face
+        pts={[
+          [36, 82],
+          [134, 82],
+          [128, 74],
+          [42, 74],
+        ]}
+        density="light"
+        angle={0}
+      />
+      <Face
+        pts={[
+          [186, 82],
+          [284, 82],
+          [278, 74],
+          [192, 74],
+        ]}
+        density="light"
+        angle={0}
+      />
+      <circle cx="160" cy="62" r="12" class="art-paper" />
       <circle cx="160" cy="62" r="12" class="art-line" />
       <path d="M160 62v-8M160 62l6 4" class="art-line art-fine" />
       {windows(50, 92, 5, 2, 8, 12, 8)}

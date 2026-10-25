@@ -7,12 +7,11 @@ import { DAYS_PER_WEEK } from '../../config/balance';
 import type { Startup } from '../../sim/state';
 import { sectorOf } from '../../sim/ventureModel';
 import { PentagonRosette, type RosetteAxes } from '../branch/loandesk/PentagonRosette';
-import { Card, Panel, Row, SectionTitle, Segmented } from '../components';
+import { Card, Panel, Row, SectionTitle, Segmented, Portrait } from '../components';
 import { gameDate, money, pct } from '../format/format';
-import { FounderPortrait } from '../newgame/AvatarPicker';
 import { closePanel, useGame } from '../store';
 import { QuarterBars } from './QuarterBars';
-import { StartupArt } from './StartupArt';
+import { StartupArt, StartupLoftArt } from './StartupArt';
 import { StartupFunding } from './StartupFunding';
 import { advisorLine, preMoney, quarterBars, topShareholders } from './startupView';
 
@@ -39,7 +38,8 @@ export function StartupPanel(p: { startupId: string }) {
       title={st.name}
       subtitle={sectorOf(st.sector).label}
       icon={<StartupArt sector={st.sector} size={32} />}
-      advisor={{ text: advisorLine(s, st) }}
+      advisor={{ text: advisorLine(s, st), name: st.ceo.name, avatar: st.ceo.portrait }}
+      hero={<StartupLoftArt sector={st.sector} />}
       onClose={closePanel}
     >
       <div class="stack">
@@ -64,7 +64,7 @@ function Profile(p: { startup: Startup }) {
     <Card>
       <p class="st-desc">{st.description}</p>
       <div class="st-ceo">
-        <FounderPortrait avatar={st.ceo.portrait} size={56} />
+        <Portrait avatar={st.ceo.portrait} size={56} />
         <div>
           <div class="st-ceo-name">{st.ceo.name}</div>
           <div class="muted small">Chief executive</div>
