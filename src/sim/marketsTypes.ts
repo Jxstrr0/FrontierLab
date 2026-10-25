@@ -51,6 +51,8 @@ export interface ExecutivesState {
   /** Candidates per seat; the pool refreshes every few weeks (§17.2). */
   candidates: Partial<Record<ExecSeat, Executive[]>>;
   candidatesRefreshWeek: Week;
+  /** Paid rerolls per seat since the pools last refreshed for free (schema v17). */
+  rerolls: Partial<Record<ExecSeat, number>>;
   /** True once a CTO has been hired: an empty CTO seat then drags the app rating (§16.9). */
   hadCto: boolean;
   /**

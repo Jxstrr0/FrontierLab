@@ -78,6 +78,7 @@ export function emptyExecutives(): ExecutivesState {
     seats: {},
     candidates: {},
     candidatesRefreshWeek: -1,
+    rerolls: {},
     hadCto: false,
     remembered: {},
     growthCities: {},

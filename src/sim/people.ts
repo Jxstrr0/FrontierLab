@@ -83,4 +83,5 @@ export function refreshManagerPool(state: GameState, cityId: string, force = fal
   for (let i = 0; i < MANAGER_POOL_SIZE; i++) pool.push(generateManager(state, cityId));
   state.people.managerCandidates[cityId] = pool;
   state.people.candidatesRefreshWeek[cityId] = state.clock.week;
+  delete state.people.rerolls[cityId];
 }

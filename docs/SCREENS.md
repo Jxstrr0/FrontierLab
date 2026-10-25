@@ -156,7 +156,7 @@ After the wizard, the map opens with the tutorial (§27).
   - Annual salary stepper, its hint showing market pay (SIMULATION §6.5) and the range, and a line under it: "Underpaid: rivals are more likely to poach them" (oxblood), "Paid about market" or "Well paid…", plus "Your COO reviews this pay once a year" while the COO's Pay reviews is on
   - Delegation toggles: Staffing & wages · Products & rates · Branch marketing · Branch troubles · Loan approvals
   - Fire manager (confirm)
-  - **With no manager:** "Hire a manager" opens a sheet of 3 candidate cards (skills, salary ask, Hire). Closing the sheet without hiring deals 3 new candidates for next time; before your first hire, the tutorial guide stays as the first card.
+  - **With no manager:** "Hire a manager" opens a sheet of 3 candidate cards (skills, salary ask, Hire). Below the cards, "New candidates · $fee" pays a recruiter for 3 new ones (the fee doubles each time until the free refresh, which the note under it counts down); before your first hire, the tutorial guide stays as the first card.
 
 ### 5.2 Products
 - **House model card:** name, rosette, cost per application, "Manage models" (opens the HQ Products floor if it exists, otherwise a tip pointing to credit bureaus).
@@ -287,7 +287,7 @@ Tabs: Overview · Loans · Credit.
   - regulator status and last review result
 - **Executive:**
   - Board meeting card: explanation, last meeting date, Hold meeting (enabled once per quarter)
-  - Senior executives grid: seven seats (CEO, COO, CFO, CPO, CMO, CTO, CRO) with portrait, name and title; empty seats show Hire
+  - Senior executives grid: seven seats (CEO, COO, CFO, CPO, CMO, CTO, CRO) with portrait, name and title; empty seats show Hire, which opens a sheet of the seat's candidates with a paid "New candidates · $fee" button at the bottom (as for branch managers)
 - **Investment:**
   - portfolio value with weekly change, a donut (Stocks, Ventures, Real estate, Venture debt, Currencies) and List portfolio
   - Ventures carousel (vignette, name, sector, short description, founded, Details)

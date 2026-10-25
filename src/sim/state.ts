@@ -53,7 +53,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState, DealerDeal } from './personalTypes';
 
-export const SCHEMA_VERSION = 16;
+export const SCHEMA_VERSION = 17;
 
 export interface GameState {
   schemaVersion: number;
@@ -617,6 +617,8 @@ export interface People {
   /** Candidate pool per city; refreshes every 4 weeks (SIMULATION §6.5). */
   managerCandidates: Record<Id, Manager[]>;
   candidatesRefreshWeek: Record<Id, Week>;
+  /** Paid rerolls per city since its pool last refreshed for free (schema v17). */
+  rerolls: Record<Id, number>;
   /** HR benefit control values by benefit id (§16.5). */
   benefits: Record<string, number>;
 }
