@@ -531,3 +531,4 @@ Add one dated line per decision. Never delete entries; supersede them.
 - 2026-10-25: Every city gets its own look (data/cityLooks.ts, ART_DIRECTION §2.1): water form, district arrangement, local building style, a signature landmark described generically, a tint underprint and a skyline scale. The tint deliberately extends the "no flat fills" rule with a pale second ink, as banknotes do.
 - 2026-10-25: Old saves keep their maps. `CityState.layout` records the map layout per city (schema 11); cities already generated stay on layout 1, and new games and cities first visited later use layout 2. The seed-42 determinism snapshot changed to `078a7f43a079dc` because lots sit on the new layouts.
 
+- 2026-10-25: Branch equipment is a final choice (owner's call): the five parts picked in Build branch can't be upgraded or swapped later. The only exception is the robbery incident's half-price vault upgrade. To change a building, close the branch and build again.
