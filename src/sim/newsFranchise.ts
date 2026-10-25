@@ -69,6 +69,15 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
           price: newsMoney(num(p.price), ctx.sym),
         },
       };
+    case 'NAMING_RIGHTS':
+      return {
+        key: 'NAMING_RIGHTS',
+        subject: clubId,
+        tab: 'sports',
+        icon: 'trophy',
+        priority: P.sports + CLUB_BOOST.kit,
+        tokens: { ...base, bank: ctx.bank, stadium: spec?.stadium ?? 'the stadium' },
+      };
     case 'KIT_SPONSOR': {
       if (p.on !== true) return undefined;
       const country = CITIES[spec?.cityId ?? '']?.country;

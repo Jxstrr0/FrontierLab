@@ -190,6 +190,7 @@ const EVENT_TEXT: Record<string, (p: Record<string, unknown>) => string> = {
       return `No decision on the ${title}, so we went with “${String(p.option)}”.`;
     return '';
   },
+  MILESTONE: (p) => `Milestone reached: ${String(p.title)}.`,
   BANK_RUN: () => 'Depositors are queueing to withdraw: a bank run has started.',
   BANK_RUN_ENDED: () => 'The bank run is over.',
 };

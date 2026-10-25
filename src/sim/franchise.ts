@@ -70,6 +70,11 @@ export function ownsClubIn(state: GameState, cityId: string): boolean {
   return yourClubs(state).some((c) => FRANCHISES[c.clubId]?.cityId === cityId);
 }
 
+/** The first club you own in this city, by id (the arena that carries your name). */
+export function clubIn(state: GameState, cityId: string): string | undefined {
+  return yourClubs(state).find((c) => FRANCHISES[c.clubId]?.cityId === cityId)?.clubId;
+}
+
 /** Weekly (tick step 11): games, transfer market, value; for yours finances and kit awareness. */
 export function runFranchises(state: GameState): void {
   if (!state.clubs) return;

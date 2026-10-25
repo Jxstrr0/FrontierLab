@@ -6,6 +6,7 @@ import { NEWS_PRIORITY as P } from '../config/balance';
 import { COUNTRIES } from '../data/countries';
 import { LEDGER_TEMPLATES, type TemplateKey } from '../data/ledgerTemplates';
 import { LOAN_SECTORS } from '../data/loanSectors';
+import { MILESTONES } from '../data/milestones';
 import { PARTNERSHIP_END_COPY } from '../data/newsWorld';
 import { grouped, newsMoney, newsRate } from './newsFormat';
 import { cityName, districtName, num, str, type NewsContext, type Story } from './newsStory';
@@ -82,6 +83,17 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
           sector: sector ?? 'local',
           amount: m(p.amount),
         },
+      });
+    }
+    case 'MILESTONE': {
+      const spec = MILESTONES.find((m) => m.id === str(p.id));
+      if (!spec?.news) return undefined;
+      return business({
+        key: 'MILESTONE',
+        subject: spec.id,
+        icon: 'spark',
+        priority: P.companyRoutine,
+        tokens: { bank, title: spec.title.toLowerCase(), line: spec.line.replace('{bank}', bank) },
       });
     }
     case 'WINDOW_USE':

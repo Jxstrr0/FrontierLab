@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { CHARTER_CAPITAL } from '../../src/config/balance';
 import { advanceWeeks } from '../../src/sim/engine';
 import { totalDeposits } from '../../src/sim/balanceSheet';
+import { creditAvailable, lendersNearYou } from '../../src/sim/corporateDebt';
 import { newGame, type NewGameOptions } from '../../src/sim/newGame';
 import { migrate } from '../../src/sim/save/migrations';
 import { openScriptedBranch } from '../helpers/scenario';
@@ -69,5 +70,20 @@ describe('game over', () => {
     const day = s.clock.day;
     advanceWeeks(s, 1);
     expect(s.clock.day).toBe(day);
+  });
+
+  it('stays open while an undrawn credit line could cover the hole', () => {
+    const s = newGame(base);
+    openScriptedBranch(s, 'midtown');
+    expect(lendersNearYou(s).length).toBeGreaterThan(0);
+    const keepNegative = () => {
+      s.company.cash = -Math.min(50_000, creditAvailable(s) / 2);
+      advanceWeeks(s, 1);
+    };
+    for (let i = 0; i < 6; i++) keepNegative();
+    expect(s.flags.gameOver).toBeUndefined();
+    s.company.cash = -(creditAvailable(s) + 1_000_000);
+    advanceWeeks(s, 1);
+    expect(s.flags.gameOver).toBe('insolvency');
   });
 });

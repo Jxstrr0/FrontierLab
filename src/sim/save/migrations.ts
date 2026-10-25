@@ -17,6 +17,7 @@ import { initInvestments } from '../investmentsInit';
 import { initCapitalMarkets, initRivalShares } from '../marketInit';
 import { emptyCorporateDebt } from '../corporateDebt';
 import { initCountries } from '../macro';
+import { checkMilestones } from '../milestones';
 import { initRivalBench, initRivalFinancials, seedMatureBooks } from '../rivals';
 import { SCHEMA_VERSION, type GameState } from '../state';
 
@@ -234,6 +235,8 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     const state = s as unknown as GameState;
     for (const id of Object.keys(state.rivals).sort()) initRivalBench(state, state.rivals[id]!);
     for (const b of Object.values(state.branches)) b.desk.arrived ??= 0;
+    // Milestones already reached are recorded now, quietly (no toasts or stories).
+    checkMilestones(state, true);
     return s;
   },
 };

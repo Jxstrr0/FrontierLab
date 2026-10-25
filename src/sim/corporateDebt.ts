@@ -26,6 +26,15 @@ export function creditLimit(state: GameState): number {
   return CORPORATE_LENDING.lineEquityShare * equityNow(state);
 }
 
+/** Undrawn credit you could draw today across every lender near you (DESIGN §5.18). */
+export function creditAvailable(state: GameState): number {
+  const limit = creditLimit(state);
+  return lendersNearYou(state).reduce(
+    (sum, r) => sum + Math.max(0, limit - (state.corporateDebt.lines[r.id]?.drawn ?? 0)),
+    0,
+  );
+}
+
 /** Line of credit rate: home policy + 4% (§19.9). */
 export function lineRate(state: GameState): number {
   return homeCountry(state).policyRate + CORPORATE_LENDING.lineSpread;
