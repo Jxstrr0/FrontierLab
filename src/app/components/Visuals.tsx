@@ -1,6 +1,9 @@
 // Data visuals (ART_DIRECTION §5): CoinRating, StatBar, RingGauge, BarChart
 // (values on tap) and the bank Medallion.
 import { useId, useState } from 'preact/hooks';
+import { logoPath, logoTextShift } from '../../art/logoShapes';
+import { DEFAULT_LOGO_SHAPE } from '../../data/logoShapes';
+import type { LogoShape } from '../../data/types';
 
 /**
  * Five 18 px brass coins (ART_DIRECTION §5) with a milled rim and a tiny
@@ -213,31 +216,39 @@ export function BarChart(p: {
   );
 }
 
-/** Round bank medallion: brass rim, brand ink fill and a monogram. */
-export function Medallion(p: { ink: string; monogram: string; size?: number; ring?: boolean }) {
+/**
+ * The bank's medallion: brass rim, brand ink fill and a monogram, in the logo
+ * shape chosen at New Game (CONTENT §7b; round when none is given).
+ */
+export function Medallion(p: {
+  ink: string;
+  monogram: string;
+  size?: number;
+  ring?: boolean;
+  shape?: LogoShape;
+}) {
   const size = p.size ?? 30;
+  const shape = p.shape ?? DEFAULT_LOGO_SHAPE;
   return (
     <svg class="medallion" width={size} height={size} viewBox="0 0 30 30" aria-hidden="true">
-      <circle
-        cx="15"
-        cy="15"
-        r="14"
+      <path
+        d={logoPath(shape, 15, 15, 14)}
         fill={p.ring ? 'var(--ivory)' : p.ink}
         stroke="var(--brass)"
         stroke-width="1.5"
+        stroke-linejoin="round"
       />
-      <circle
-        cx="15"
-        cy="15"
-        r="11"
+      <path
+        d={logoPath(shape, 15, 15, 11)}
         fill="none"
         stroke={p.ring ? p.ink : 'var(--brass-light)'}
         stroke-width={p.ring ? 2 : 0.6}
+        stroke-linejoin="round"
         stroke-dasharray={p.ring ? undefined : '1 1.2'}
       />
       <text
         x="15"
-        y="15.5"
+        y={15.5 + logoTextShift(shape, 14)}
         text-anchor="middle"
         dominant-baseline="central"
         class="medallion-text"

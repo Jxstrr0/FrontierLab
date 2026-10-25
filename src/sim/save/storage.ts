@@ -7,6 +7,7 @@
 // This is the only module allowed to touch browser storage (CLAUDE.md); the
 // simulation itself never calls it.
 import { compressToUTF16, decompressFromUTF16 } from 'lz-string';
+import type { LogoShape } from '../../data/types';
 import { dateOf } from '../calendar';
 import type { GameState, Settings } from '../state';
 import { checksum, deserialize, serialize } from './serialize';
@@ -25,6 +26,8 @@ export interface SaveMeta {
   bankName: string;
   monogram: string;
   brandInk: string;
+  /** The mark's outline; missing on slots written before v20 (drawn round). */
+  logoShape?: LogoShape;
   date: string;
   day: number;
   cash: number;
@@ -62,6 +65,7 @@ export function slotMetaFor(slot: SlotId, state: GameState): SaveMeta {
     bankName: state.meta.bankName,
     monogram: state.meta.monogram,
     brandInk: state.meta.brandInk,
+    logoShape: state.meta.logoShape,
     date: gameDate(state.meta.startDate, state.clock.day),
     day: state.clock.day,
     cash: state.company.cash,

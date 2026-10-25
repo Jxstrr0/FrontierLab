@@ -9,6 +9,8 @@
 import { memo } from 'preact/compat';
 import { WAIT_LABELS } from '../../config/balance';
 import { EQUIPMENT, type BuildSpec } from '../../data/equipment';
+import { DEFAULT_LOGO_SHAPE } from '../../data/logoShapes';
+import type { LogoShape } from '../../data/types';
 import { Vignette } from '../components/Vignette';
 import { isoPt, placeAt, type Iso } from '../components/isoKit';
 import { SeatedFront, Standing, StandingBack, type Mood } from '../components/isoPeople';
@@ -57,6 +59,7 @@ export const BranchInterior = memo(function BranchInterior(p: {
   build: BuildSpec;
   brandInk: string;
   monogram: string;
+  logoShape?: LogoShape;
   ink?: string;
   live?: BranchLive;
 }) {
@@ -138,6 +141,7 @@ export const BranchInterior = memo(function BranchInterior(p: {
               r={0.42 * s}
               ink={p.brandInk}
               monogram={p.monogram}
+              shape={p.logoShape ?? DEFAULT_LOGO_SHAPE}
             />
             <WallClock x={(boxesI + Math.max(0.4, boxesW / 2)) * s} y={-2.25 * s} />
             <DepositBoxes x={boxesI * s} s={s} boxes={boxes} />

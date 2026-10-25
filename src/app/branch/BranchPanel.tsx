@@ -4,6 +4,7 @@
 import { MERGERS } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { DISTRICT_SPECS } from '../../data/districts';
+import { DEFAULT_LOGO_SHAPE } from '../../data/logoShapes';
 import { managerOf } from '../../sim/branch/staff';
 import { Medallion, Panel, type Tab } from '../components';
 import { gameDate } from '../format/format';
@@ -47,6 +48,7 @@ export function BranchPanel(p: { branchId: string; tab: BranchTab }) {
         <Medallion
           ink={conv?.ink ?? s.meta.brandInk}
           monogram={conv?.monogram ?? s.meta.monogram}
+          shape={conv ? DEFAULT_LOGO_SHAPE : s.meta.logoShape}
           size={32}
         />
       }
@@ -63,6 +65,7 @@ export function BranchPanel(p: { branchId: string; tab: BranchTab }) {
           style={s.meta.houseStyle}
           brandInk={conv?.ink ?? s.meta.brandInk}
           monogram={conv?.monogram ?? s.meta.monogram}
+          logoShape={conv ? DEFAULT_LOGO_SHAPE : s.meta.logoShape}
           ink={CITIES[branch.cityId]?.ink}
           live={{
             status: branch.status,

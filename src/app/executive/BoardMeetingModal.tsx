@@ -25,7 +25,7 @@ export function BoardMeetingModal() {
   const [before, setBefore] = useState(s.governance.ceoSalary);
   const close = () => (modal.value = null);
   const sym = s.settings.currency;
-  const icon = <Medallion ink={s.meta.brandInk} monogram={s.meta.monogram} size={30} />;
+  const icon = <Medallion ink={s.meta.brandInk} monogram={s.meta.monogram} shape={s.meta.logoShape} size={30} />;
   const b = boardCard(s);
 
   if (asking) {

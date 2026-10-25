@@ -59,6 +59,7 @@ export function BuildPanel(p: { lotId: string }) {
             style={s.meta.houseStyle}
             brandInk={s.meta.brandInk}
             monogram={s.meta.monogram}
+            logoShape={s.meta.logoShape}
             ink={CITIES[lot.cityId]?.ink}
           />
         }

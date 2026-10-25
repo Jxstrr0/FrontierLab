@@ -63,7 +63,7 @@ export function CompanyPanel() {
     <Panel
       title="Company"
       subtitle={s.meta.bankName}
-      icon={<Medallion ink={s.meta.brandInk} monogram={s.meta.monogram} size={30} />}
+      icon={<Medallion ink={s.meta.brandInk} monogram={s.meta.monogram} shape={s.meta.logoShape} size={30} />}
       onClose={closePanel}
       advisor={{ text: 'Deposits fund loans; capital limits growth.' }}
     >

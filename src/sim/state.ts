@@ -14,6 +14,7 @@ import type {
   Pentagon,
   HqDeptId,
   HouseStyle,
+  LogoShape,
   Phase,
   Rate,
   RatingCategory,
@@ -54,7 +55,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState, DealerDeal } from './personalTypes';
 
-export const SCHEMA_VERSION = 19;
+export const SCHEMA_VERSION = 20;
 
 export interface GameState {
   schemaVersion: number;
@@ -156,6 +157,8 @@ export interface Meta {
   homeCityId: Id;
   /** The look every branch front shares (schema v19), chosen at New Game. */
   houseStyle: HouseStyle;
+  /** The outline of the bank's mark (schema v20), chosen at New Game. */
+  logoShape: LogoShape;
 }
 
 export interface Clock {

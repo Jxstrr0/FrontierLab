@@ -4,11 +4,14 @@
 // (with the anchors the house style dresses, houseStyleArt.tsx).
 import type { JSX } from 'preact';
 import { poly, type Pt } from '../../art/engrave';
+import { logoPath, logoTextShift } from '../../art/logoShapes';
+import type { LogoShape } from '../../data/types';
 import type { FacadeAnchors } from './houseStyleArt';
 
 export interface Brand {
   ink: string;
   monogram: string;
+  shape: LogoShape;
 }
 
 export interface Facade {
@@ -21,21 +24,20 @@ export interface Facade {
   box: [number, number, number, number];
 }
 
-/** The bank's round seal in its brand ink with the monogram. */
+/** The bank's seal in its brand ink and logo shape, with the monogram. */
 export function Seal(p: { x: number; y: number; r: number; brand: Brand }) {
+  const { shape } = p.brand;
   return (
     <g>
-      <circle cx={p.x} cy={p.y} r={p.r} style={{ fill: p.brand.ink }} class="art-brand" />
-      <circle
-        cx={p.x}
-        cy={p.y}
-        r={p.r - 1.6}
+      <path d={logoPath(shape, p.x, p.y, p.r)} style={{ fill: p.brand.ink }} class="art-brand" />
+      <path
+        d={logoPath(shape, p.x, p.y, p.r - 1.6)}
         class="art-line art-fine"
         style={{ stroke: 'var(--ivory)' }}
       />
       <text
         x={p.x}
-        y={p.y + p.r * 0.32}
+        y={p.y + p.r * 0.32 + logoTextShift(shape, p.r)}
         text-anchor="middle"
         class="art-brand-text"
         style={{ fontSize: `${p.r * 0.85}px` }}

@@ -21,6 +21,7 @@ import { initRivalBench, initRivalFinancials, seedMatureBooks } from '../rivals'
 import { FX_START_INDEX, PAY_REVIEW } from '../../config/balance';
 import { COUNTRIES } from '../../data/countries';
 import { HOUSE_STYLE_IDS } from '../../data/houseStyles';
+import { DEFAULT_LOGO_SHAPE } from '../../data/logoShapes';
 import type { CountryId } from '../../data/types';
 import { SCHEMA_VERSION, type BranchGuidance, type ExecSeat, type GameState } from '../state';
 
@@ -345,6 +346,13 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
   18: (s) => {
     const state = s as unknown as GameState;
     state.meta.houseStyle ??= HOUSE_STYLE_IDS[state.meta.seed % HOUSE_STYLE_IDS.length]!;
+    return s;
+  },
+  // v20: the outline of the bank's mark. Older banks keep the round medallion
+  // they have always worn.
+  19: (s) => {
+    const state = s as unknown as GameState;
+    state.meta.logoShape ??= DEFAULT_LOGO_SHAPE;
     return s;
   },
 };
