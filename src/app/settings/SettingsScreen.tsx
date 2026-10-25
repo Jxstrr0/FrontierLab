@@ -10,15 +10,17 @@ import {
   TEXT_SCALES,
   WEEKLY_RESULTS_MODES,
 } from '../../data/settingsOptions';
-import { setFounderAvatar, setSettings } from '../../sim/commands';
+import { DEV_PAYMENT } from '../../config/balance';
+import { devPayment, setFounderAvatar, setSettings } from '../../sim/commands';
 import { DEFAULT_SETTINGS } from '../../sim/newGame';
 import type { Settings } from '../../sim/state';
 import { Panel, Row, SectionTitle, Segmented, Sheet, Toggle } from '../components';
 import { AvatarPicker } from '../newgame/AvatarPicker';
-import { loadPrefs, savePrefs } from '../saves';
+import { money } from '../format/format';
+import { loadDevTools, loadPrefs, saveDevTools, savePrefs } from '../saves';
 import { openCredits } from '../credits/openCredits';
 import { play, unlockAudio } from '../sound/sound';
-import { act, bump, closePanel, openPanel, peekGame, rev, screen } from '../store';
+import { act, bump, closePanel, openPanel, peekGame, rev, screen, toast } from '../store';
 import { TutorialSetting } from './TutorialSetting';
 import './settings.css';
 import './standalone.css';
@@ -34,6 +36,7 @@ export function SettingsScreen(p: { inGame?: boolean }) {
   const game = p.inGame ? peekGame() : null;
   const s: Settings = game ? game.settings : { ...DEFAULT_SETTINGS, ...loadPrefs() };
   const [editingAvatar, setEditingAvatar] = useState(false);
+  const [devTools, setDevTools] = useState(loadDevTools);
 
   const change = (patch: Partial<Settings>) => {
     if (game) act(setSettings, patch);
@@ -150,6 +153,35 @@ export function SettingsScreen(p: { inGame?: boolean }) {
               Settings.
             </p>
           )}
+
+          <SectionTitle>Developer</SectionTitle>
+          <Toggle
+            label="Developer tools"
+            hint="Testing shortcuts. Saved on this device only."
+            checked={devTools}
+            onChange={(on) => {
+              saveDevTools(on);
+              setDevTools(on);
+            }}
+          />
+          {devTools &&
+            (game ? (
+              <button
+                type="button"
+                class="btn btn-secondary btn-block"
+                onClick={() => {
+                  if (act(devPayment).ok) {
+                    toast(`${money(DEV_PAYMENT, s.currency)} added to company cash.`, 'good');
+                  }
+                }}
+              >
+                Add {money(DEV_PAYMENT, s.currency)} to company cash
+              </button>
+            ) : (
+              <p class="muted small">
+                Open Settings from inside a game to use the developer tools.
+              </p>
+            ))}
 
           <SectionTitle>About</SectionTitle>
           <button

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { START_CASH } from '../../src/config/balance';
 import { REFERENCE_BUILDS } from '../../src/data/equipment';
 import * as cmd from '../../src/sim/commands';
 import { newGame } from '../../src/sim/newGame';
@@ -14,7 +15,7 @@ describe('commands', () => {
     expect(quote.parts).toBe(332_000);
     const r = cmd.buildBranch(s, { lotId: lot.id, build: REFERENCE_BUILDS.mid });
     expect(r.ok).toBe(true);
-    expect(s.company.cash).toBeCloseTo(750_000 - quote.total);
+    expect(s.company.cash).toBeCloseTo(START_CASH - quote.total);
     expect(s.company.leaseDeposits).toBe(lot.deposit);
     expect(lot.occupant?.type).toBe('player');
     expect(s.events.scheduled).toHaveLength(1);
@@ -60,7 +61,7 @@ describe('commands', () => {
     const reserves = s.treasury.reserves;
     expect(cmd.transferToTreasury(s, 50_000).ok).toBe(true);
     expect(s.treasury.reserves).toBe(reserves + 50_000);
-    expect(s.company.cash).toBe(700_000);
+    expect(s.company.cash).toBe(START_CASH - 50_000);
     expect(cmd.transferToTreasury(s, 10_000_000).ok).toBe(false);
   });
 

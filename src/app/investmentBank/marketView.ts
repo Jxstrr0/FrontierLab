@@ -10,6 +10,7 @@ import { rivalNetIncomeTtm } from '../../sim/marketRivals';
 import { SELF_ID } from '../../sim/securities';
 import type { GameState, RivalBank } from '../../sim/state';
 import { netIncomeTtm } from '../../sim/valuation';
+import { exactMoney } from '../format/format';
 
 export interface SecurityView {
   id: string;
@@ -150,5 +151,5 @@ export function priceChange(
 
 /** A share price for cards: "$12.34" (prices stay exact to the cent). */
 export function sharePrice(x: number, sym: string): string {
-  return `${sym}${x.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  return exactMoney(x, sym);
 }

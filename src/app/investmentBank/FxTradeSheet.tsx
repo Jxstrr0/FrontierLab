@@ -8,7 +8,7 @@ import type { CountryId } from '../../data/types';
 import * as cmd from '../../sim/commands';
 import { accountCash, fxPositionValue, type TradeAccount } from '../../sim/commands';
 import { Row, Segmented, Sheet } from '../components';
-import { money, pct } from '../format/format';
+import { fromCurrency, money, pct, toCurrency } from '../format/format';
 import { act, toast, useGame } from '../store';
 
 type Side = 'buy' | 'sell';
@@ -78,11 +78,10 @@ export function FxTradeSheet(p: { country: CountryId; onClose: () => void }) {
               id="fx-amount-input"
               class="ib-shares-input"
               inputMode="numeric"
-              value={String(n)}
+              value={String(Math.round(toCurrency(n, sym)))}
               onInput={(e) => {
-                const v = Math.floor(
-                  Number((e.target as HTMLInputElement).value.replace(/\D/g, '')),
-                );
+                const typed = Number((e.target as HTMLInputElement).value.replace(/\D/g, ''));
+                const v = Math.floor(fromCurrency(typed, sym));
                 setAmount(Number.isFinite(v) ? Math.max(0, Math.min(max, v)) : 0);
               }}
             />

@@ -19,7 +19,15 @@ import { isDeposit, isLoan, type ProductSpec } from '../../data/products';
 import { deskWeek } from '../../sim/branch/loanDesk';
 import { marketWage, staffNeeded } from '../../sim/branch/staff';
 import type { Book, Branch, BranchPnl, BranchPnlLine, GameState } from '../../sim/state';
-import { delta, money, pct, percentText } from '../format/format';
+import {
+  delta,
+  exactMoney,
+  fromCurrency,
+  money,
+  pct,
+  percentText,
+  toCurrency,
+} from '../format/format';
 
 /** UI-only thresholds for the advisor's contextual line (not simulation tuning). */
 const ADVISOR = {
@@ -132,9 +140,9 @@ export function priceText(spec: ProductSpec, v: number, sym: string): string {
     case 'pctFee':
       return pct(v);
     case 'feeMonthly':
-      return `${sym}${Math.round(v)}/mo`;
+      return `${sym}${Math.round(toCurrency(v, sym)).toLocaleString('en-US')}/mo`;
     case 'feeAnnual':
-      return `${sym}${Math.round(v)}/yr`;
+      return `${sym}${Math.round(toCurrency(v, sym)).toLocaleString('en-US')}/yr`;
   }
 }
 
@@ -143,7 +151,8 @@ export function rangeText(spec: ProductSpec, sym: string): string {
   if (spec.priceType === 'rate' || spec.priceType === 'pctFee') {
     return `${(spec.min * 100).toFixed(2)}–${pct(spec.max)}`;
   }
-  return `${sym}${spec.min}–${sym}${spec.max}`;
+  const whole = (v: number) => Math.round(toCurrency(v, sym)).toLocaleString('en-US');
+  return `${sym}${whole(spec.min)}–${sym}${whole(spec.max)}`;
 }
 
 /**
@@ -151,16 +160,17 @@ export function rangeText(spec: ProductSpec, sym: string): string {
  * a value already inside the product's range (e.g. 0.0325) is taken as is.
  */
 /** Reads a typed price: rates and % fees are typed as percents ("3.25"), fees as whole money. */
-export function parsePrice(spec: ProductSpec, s: string): number {
-  const n = Number(s.replace(/[%$\s,]|\/mo|\/yr/g, ''));
-  if (spec.priceType === 'feeMonthly' || spec.priceType === 'feeAnnual') return n;
+export function parsePrice(spec: ProductSpec, s: string, sym = '$'): number {
+  const n = Number(s.replace(/[^0-9.]/g, ''));
+  if (spec.priceType === 'feeMonthly' || spec.priceType === 'feeAnnual')
+    return fromCurrency(n, sym);
   return n / 100;
 }
 
 /** The editable text for a price, in the units parsePrice expects. */
-export function editPrice(spec: ProductSpec, v: number): string {
+export function editPrice(spec: ProductSpec, v: number, sym = '$'): string {
   if (spec.priceType === 'feeMonthly' || spec.priceType === 'feeAnnual')
-    return String(Math.round(v));
+    return String(Math.round(toCurrency(v, sym)));
   return percentText(v);
 }
 
@@ -215,7 +225,7 @@ export function unitView(
       margin: ratio(keep, rev),
       caption: `Spread ${signed(ftp - pay)}`,
       costLabel: 'Unit cost',
-      costText: `${sym}${(perYear / MONTHS_PER_YEAR).toFixed(2)}/mo`,
+      costText: `${exactMoney(perYear / MONTHS_PER_YEAR, sym)}/mo`,
     };
   }
   if (spec.kind === 'wealth') {
@@ -224,7 +234,7 @@ export function unitView(
       margin: ratio(rev - perYear, rev),
       caption: `Fee ${pct(price)} of assets`,
       costLabel: 'Unit cost',
-      costText: `${sym}${(perYear / MONTHS_PER_YEAR).toFixed(2)}/mo`,
+      costText: `${exactMoney(perYear / MONTHS_PER_YEAR, sym)}/mo`,
     };
   }
   if (spec.kind === 'fx') {
@@ -235,7 +245,7 @@ export function unitView(
     margin: ratio(rev - perYear, rev),
     caption: `Fee ${priceText(spec, price, sym)}`,
     costLabel: 'Unit cost',
-    costText: `${sym}${perYear.toFixed(2)}/yr`,
+    costText: `${exactMoney(perYear, sym)}/yr`,
   };
 }
 
@@ -355,7 +365,7 @@ export function campaignCostText(cost: CampaignCost, costIndex: number, sym: str
   if (cost.type === 'perNewDepositAccount') {
     return `${money(cost.amount, sym)} per new deposit account`;
   }
-  return `${sym}${cost.amount.toFixed(2)} per account a week`;
+  return `${exactMoney(cost.amount, sym)} per account a week`;
 }
 
 /** Game day at the close of a sim week, for dates on week-indexed records. */

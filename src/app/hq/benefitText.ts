@@ -5,7 +5,7 @@
 import { REMOTE_FRIDAY_STAFF } from '../../config/balance';
 import { BENEFIT_RULES, type BenefitSpec } from '../../data/benefits';
 import { scaledEffect } from '../../sim/hq';
-import { moneyFull } from '../format/format';
+import { fromCurrency, moneyFull, toCurrency } from '../format/format';
 
 /** The value as the card's stepper shows it. */
 export function benefitValueText(spec: BenefitSpec, value: number, sym = '$'): string {
@@ -40,14 +40,16 @@ export function benefitUnit(spec: BenefitSpec): string {
 }
 
 /** Typed text for the stepper's tap-to-type (percent controls take percent). */
-export const benefitEditText = (spec: BenefitSpec, v: number): string =>
+export const benefitEditText = (spec: BenefitSpec, v: number, sym = '$'): string =>
   spec.control === 'pctSalary' || spec.control === 'discount'
     ? String(Number((v * 100).toFixed(3)))
-    : String(v);
+    : String(Number(toCurrency(v, sym).toFixed(2)));
 
-export const benefitParse = (spec: BenefitSpec, text: string): number => {
+export const benefitParse = (spec: BenefitSpec, text: string, sym = '$'): number => {
   const n = Number(text.replace(/[^0-9.-]/g, ''));
-  return spec.control === 'pctSalary' || spec.control === 'discount' ? n / 100 : n;
+  return spec.control === 'pctSalary' || spec.control === 'discount'
+    ? n / 100
+    : fromCurrency(n, sym);
 };
 
 const signed = (n: number, digits = 0) => `+${Number(n.toFixed(digits))}`;

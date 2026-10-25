@@ -975,7 +975,7 @@ Run `npm run balance` with seed 42 and the start city Calgary, unless noted. Bra
 
 | Checkpoint | Target |
 |---|---|
-| First branch build + lease deposit (mid build, average lot) | $300k–$450k, leaving room for at most one more basic branch from the $750k start |
+| First branch build + lease deposit (mid build, average lot) | $300k–$450k, leaving room for at most one more basic branch from the $900k start |
 | First branch weekly income turns positive | week 6–16 |
 | Branch at week 26 | deposits $15–30M; income positive |
 | Branch at week 52 | deposits $30–50M; loans 75–90% of deposits; customers 3,000–5,000; income +$20k–$40k/week [was $15k–$30k] |
@@ -1015,8 +1015,8 @@ Group the constants like this, with the defaults shown above:
   - `DAY_MS = 1000`, `SPEEDS = [0, 1, 2, 4]`
   - `START_DATE = '2027-01-04'`, `QUARTER_ENDS`
 - **START:**
-  - `START_CASH = 750_000`, `CHARTER_CAPITAL = 2_000_000` (in reserves), `START_SHARES = 10_000_000`
-  - `START_CASH_OPTIONS = [500_000, 750_000, 1_000_000, 1_250_000]`; `COMPETITORS = { min: 1, max: 5 }`
+  - `START_CASH = 900_000`, `CHARTER_CAPITAL = 2_000_000` (in reserves), `START_SHARES = 10_000_000`
+  - `START_CASH_OPTIONS = [600_000, 900_000, 1_200_000, 1_500_000]`; `DEV_PAYMENT = 10_000_000` (Settings developer tools); `COMPETITORS = { min: 1, max: 5 }`
   - `DIFFICULTY` per level (`demandMult` on prospects §9.2, `rivalQuality` coins added at rival seeding, `rivalRateEdge` pp toward customers on rival rates §18.2, `lossMult` on new-loan and business-loan PDs §10.3, §11):
 
     | Level | demandMult | rivalQuality | rivalRateEdge | lossMult |

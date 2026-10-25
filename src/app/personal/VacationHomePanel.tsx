@@ -18,7 +18,7 @@ import {
 } from '../../sim/personalValues';
 import type { OwnedHome, Site } from '../../sim/state';
 import { Card, Confirm, Panel, Row, SectionTitle, Stepper } from '../components';
-import { money, moneyFull, pct } from '../format/format';
+import { money, moneyFull, moneyStepper, pct } from '../format/format';
 import { LayerMedallion } from '../map/LayerIcon';
 import { act, closePanel, toast, useGame } from '../store';
 import './personal.css';
@@ -97,7 +97,7 @@ function ForSale(p: { site: Site; spec: HomeSpec }) {
             max={bounds.max}
             step={bounds.step}
             onChange={setOffer}
-            format={(v) => moneyFull(v, sym)}
+            {...moneyStepper(sym)}
             hint={`${pct(offer / asking, 0)} of asking`}
           />
           <button

@@ -5,7 +5,7 @@
 import { useState } from 'preact/hooks';
 import type { ExecSeat } from '../../sim/state';
 import { Badge, Card, Row, SectionTitle, Portrait } from '../components';
-import { money, moneyFull } from '../format/format';
+import { exactMoney, money, moneyFull } from '../format/format';
 import { modal, useGame } from '../store';
 import { ExecHireSheet } from './ExecHireSheet';
 import { ExecProfileSheet } from './ExecProfileSheet';
@@ -44,7 +44,7 @@ function BoardCard() {
           </p>
           <div>
             <Row label="Last meeting" value={b.lastMeeting ?? 'Not yet held'} />
-            <Row label="Dividend per share" value={`${sym}${b.dps.toFixed(2)} a quarter`} />
+            <Row label="Dividend per share" value={`${exactMoney(b.dps, sym)} a quarter`} />
             <Row label="Your salary" value={`${moneyFull(b.ceoSalary, sym)} a year`} />
             {b.pending && (
               <Row

@@ -2,7 +2,9 @@
 // can't import the app's formatters, so this mirrors src/app/format/format.ts:
 // compact money ($1.48B, $29.8M, $83.7K, $950), rates with two decimals
 // (3.25%) and plain percentages with one (2.4%). No locale calls, so issues
-// read the same on every device.
+// read the same on every device. Money converts to the chosen currency at the
+// fixed CURRENCY_RATES, as on screen.
+import { CURRENCY_DECIMALS, toCurrency, type CurrencySymbol } from '../data/settingsOptions';
 
 /** Thousands separators without toLocaleString: 12500 → "12,500". */
 export function grouped(x: number): string {
@@ -22,11 +24,19 @@ function trim(v: number): string {
 /** Compact money for headlines, the same rule as the app's `money`. */
 export function newsMoney(x: number, symbol: string): string {
   const sign = x < 0 ? '−' : '';
-  const a = Math.abs(x);
+  const a = Math.abs(toCurrency(x, symbol));
   if (a >= 1e9) return `${sign}${symbol}${trim(a / 1e9)}B`;
   if (a >= 1e6) return `${sign}${symbol}${trim(a / 1e6)}M`;
   if (a >= 1e4) return `${sign}${symbol}${trim(a / 1e3)}K`;
   return `${sign}${symbol}${grouped(a)}`;
+}
+
+/** An exact price, like the app's `exactMoney`: "$12.34", "¥1,851". */
+export function newsExact(x: number, symbol: string): string {
+  const digits = CURRENCY_DECIMALS[symbol as CurrencySymbol] ?? 2;
+  const v = toCurrency(x, symbol);
+  if (digits === 0) return `${v < 0 ? '−' : ''}${symbol}${grouped(v)}`;
+  return `${v < 0 ? '−' : ''}${symbol}${v.toFixed(digits)}`;
 }
 
 /** A decimal rate as a percentage: 0.0325 → "3.25%". */

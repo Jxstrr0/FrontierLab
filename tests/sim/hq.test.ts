@@ -16,7 +16,7 @@ import type { GameState } from '../../src/sim/state';
 import { openScriptedBranch } from '../helpers/scenario';
 
 function withOffice(depts: Parameters<typeof cmd.leaseOffice>[2] = ['finance', 'hr']) {
-  const s = newGame({ seed: 7, cityId: 'cal', startCash: 1_250_000 });
+  const s = newGame({ seed: 7, cityId: 'cal', startCash: 1_500_000 });
   const listing = Object.values(s.world.officeListings).sort((a, b) =>
     a.id.localeCompare(b.id),
   )[0]!;
@@ -108,7 +108,7 @@ describe('office commands', () => {
   });
 
   it('rejects too many floors, later-stage floors and short cash', () => {
-    const s = newGame({ seed: 7, cityId: 'cal', startCash: 500_000 });
+    const s = newGame({ seed: 7, cityId: 'cal', startCash: 600_000 });
     const l = Object.values(s.world.officeListings)[0]!;
     // Every floor is available once Stage 7 enables the Investment floor; unknown ones still fail.
     expect(cmd.leaseOffice(s, l.id, ['vault' as never]).ok).toBe(false);

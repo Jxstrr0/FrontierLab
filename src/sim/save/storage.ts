@@ -180,3 +180,24 @@ export function saveTutorialSeen(seen: boolean): void {
     // A convenience only; ignore storage failures.
   }
 }
+
+const DEV_TOOLS_KEY = `${PREFIX}devTools`;
+
+/** Whether this browser shows the developer tools in Settings (SCREENS §26). */
+export function loadDevTools(): boolean {
+  try {
+    return store()?.getItem(DEV_TOOLS_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+/** Switches the developer tools on or off for this browser. */
+export function saveDevTools(on: boolean): void {
+  try {
+    if (on) store()?.setItem(DEV_TOOLS_KEY, '1');
+    else store()?.removeItem(DEV_TOOLS_KEY);
+  } catch {
+    // A convenience only; ignore storage failures.
+  }
+}

@@ -5,7 +5,7 @@
 // and replaces the routine wrap, which shares its key and subject).
 import { NEWS_PRIORITY as P, STOCK_MARKET } from '../config/balance';
 import { MARKET_INDEX_NAME, SECTORS, type SectorId } from '../data/stocks';
-import { grouped, newsAbsPct, newsMoney } from './newsFormat';
+import { grouped, newsAbsPct, newsExact, newsMoney } from './newsFormat';
 import { num, str, type NewsContext, type Story } from './newsStory';
 import type { GameEvent, GameState } from './state';
 
@@ -13,7 +13,7 @@ const business = (s: Omit<Story, 'tab'>): Story => ({ ...s, tab: 'business' });
 const markets = (s: Omit<Story, 'tab'>): Story => ({ ...s, tab: 'markets' });
 
 /** A share price for copy: "$12.34". */
-const sharePrice = (x: number, sym: string) => `${sym}${x.toFixed(2)}`;
+const sharePrice = (x: number, sym: string) => newsExact(x, sym);
 
 /** How the wrap names a sector. */
 const SECTOR_WORD: Record<SectorId, string> = {

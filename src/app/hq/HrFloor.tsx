@@ -74,8 +74,8 @@ function BenefitCard({ spec }: { spec: BenefitSpec }) {
           max={spec.max}
           step={spec.step}
           format={(v) => benefitValueText(spec, v, sym)}
-          editText={(v) => benefitEditText(spec, v)}
-          parse={(t) => benefitParse(spec, t)}
+          editText={(v) => benefitEditText(spec, v, sym)}
+          parse={(t) => benefitParse(spec, t, sym)}
           onChange={set}
           hint={locked ? 'Once listed' : undefined}
           disabled={locked}

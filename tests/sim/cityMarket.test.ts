@@ -22,7 +22,7 @@ describe('city market', () => {
   });
 
   it('sums customers across your branches and shrinks room as reach grows', () => {
-    const s = newGame({ seed: 11, cityId: 'cal', startCash: 1_250_000 });
+    const s = newGame({ seed: 11, cityId: 'cal', startCash: 1_500_000 });
     expect(cityRoom(s, 'cal')).toBe(1);
     const a = openScriptedBranch(s, 'midtown');
     const b = openScriptedBranch(s, 'downtown');

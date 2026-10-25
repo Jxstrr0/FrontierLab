@@ -4,6 +4,7 @@
 import { CITIES, START_CITIES, type CitySize } from '../../data/cities';
 import { COUNTRIES } from '../../data/countries';
 import type { CountryId, Difficulty } from '../../data/types';
+import { toCurrency } from '../format/format';
 
 export type StartRegion = 'ca' | 'us' | 'eu' | 'ap';
 
@@ -97,9 +98,12 @@ export const DIFFICULTY_LABEL: Record<Difficulty, string> = {
   expert: 'Expert',
 };
 
-/** "$500K", "$1M", "$1.25M" for the starting cash choices. */
+/** "$600K", "$1.2M", "¥135M" for the starting cash choices, in the chosen currency. */
 export function cashLabel(amount: number, sym = '$'): string {
-  return amount >= 1_000_000 ? `${sym}${amount / 1_000_000}M` : `${sym}${amount / 1_000}K`;
+  const v = toCurrency(amount, sym);
+  const short = (x: number) => String(Number(x.toFixed(2)));
+  if (v >= 1e9) return `${sym}${short(v / 1e9)}B`;
+  return v >= 1e6 ? `${sym}${short(v / 1e6)}M` : `${sym}${short(v / 1e3)}K`;
 }
 
 /** How the currency choice reads under its control. */
