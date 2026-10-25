@@ -59,6 +59,12 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
         description:
           'Once a quarter sets every executive and branch manager to market pay plus your pay premium, so pay keeps rising with the market and rivals struggle to poach them.',
       },
+      {
+        id: 'guidance',
+        label: 'Branch guidance: staffing',
+        description:
+          'Steers managers who run staffing: every 4 weeks raises their wages and headcount while staff morale is low and trims them when it is high.',
+      },
     ],
   },
   cfo: {
@@ -119,6 +125,12 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
         label: 'Models',
         description: 'Switches to the bureau package that saves the most defaults per dollar.',
       },
+      {
+        id: 'guidance',
+        label: 'Branch guidance: lineup',
+        description:
+          'Steers managers who run products: every 4 weeks cuts their fees and widens their lineup while product ratings are weak, and charges a little more when they are strong.',
+      },
     ],
   },
   cmo: {
@@ -131,6 +143,12 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
         id: 'brand',
         label: 'Brand campaigns',
         description: 'Runs brand campaigns to hold awareness near 50% within 3% of revenue.',
+      },
+      {
+        id: 'guidance',
+        label: 'Branch guidance: marketing',
+        description:
+          'Steers managers who run marketing: every 4 weeks pushes them to spend more on campaigns while brand awareness in their cities is under 40%, and less above 60%.',
       },
     ],
   },

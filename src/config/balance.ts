@@ -1471,7 +1471,17 @@ export const EXEC_DELEGATION = {
  * losses miss the croMinCr / croMaxLoss marks and down at croRaiseCr /
  * croRaiseLoss. A step moves delegated rate prices by rateStep and the
  * delegated Loan Desk PD threshold by × (1 − thresholdStep × loan step).
- * A switched-off half returns to 0.
+ * The COO, CMO and CPO steer the rest the same way (schema v18):
+ * - COO staffing: up while delegated-staffing branches average morale below
+ *   moraleLow, down above moraleHigh; a step adds wageStep to their wages and
+ *   staffStep to their staff target.
+ * - CMO marketing: up while average brand awareness in your branch cities is
+ *   below EXEC_DELEGATION.brandTarget − brandBand, down above target + brandBand;
+ *   a step adds marketingStep to the value managers put on awareness.
+ * - CPO products: up while delegated-products branches average a products
+ *   rating below productsLow, down at productsHigh or better; a step cuts
+ *   delegated fees by feeStep and lowers the lineup's affinity bar by affinityStep.
+ * A switched-off part returns to 0.
  */
 export const GUIDANCE = {
   everyWeeks: 4,
@@ -1481,6 +1491,16 @@ export const GUIDANCE = {
   thresholdStep: 0.12,
   liqLow: 0.01,
   liqHigh: 0.05,
+  moraleLow: 65,
+  moraleHigh: 82,
+  wageStep: 0.02,
+  staffStep: 0.05,
+  brandBand: 0.1,
+  marketingStep: 0.2,
+  productsLow: 3,
+  productsHigh: 4,
+  feeStep: 0.03,
+  affinityStep: 0.25,
 } as const;
 
 /**

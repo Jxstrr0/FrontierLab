@@ -23,7 +23,7 @@ import { count, exactMoney, gameDate, moneyFull, moneyStepper } from '../format/
 import { act, toast, useGame } from '../store';
 import { ExecGrantForm } from './ExecGrantForm';
 import { GrowthCities } from './GrowthCities';
-import { GuidanceNote } from './GuidanceNote';
+import { GUIDANCE_SEATS, GuidanceNote } from './GuidanceNote';
 import { PayPolicy } from './PayPolicy';
 import { dayOf, execSalaryStepper, seatSpec, vestProgress } from './execSelectors';
 
@@ -69,7 +69,7 @@ export function ExecProfileSheet(p: { seat: ExecSeat; onClose: () => void }) {
               ))}
               {p.seat === 'coo' && <PayPolicy s={s} />}
               {p.seat === 'coo' && <GrowthCities s={s} />}
-              {(p.seat === 'cfo' || p.seat === 'cro') && <GuidanceNote s={s} />}
+              {GUIDANCE_SEATS.includes(p.seat) && <GuidanceNote s={s} seat={p.seat} />}
               {p.seat === 'cfo' && (
                 <p class="muted small exec-note">
                   Statement delays are halved while a CFO is seated.
