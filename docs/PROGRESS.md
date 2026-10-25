@@ -10,6 +10,9 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-10-25 — Version number 0.9.2
+- **Done:** bumped to **v0.9.2** (`package.json`) for the new Check for updates button on the title screen.
+
 ### 2026-10-25 — Check for updates button
 - **Done (owner's ask):** the title screen has a **Check for updates** button under the version number. It asks the site for a newer version. If there is one, it downloads it and the game reloads into it. If not, a message says "You have the latest version". With no connection it says so.
 - **Why:** the home-screen app on iPhone is often resumed rather than reopened, so a new version could wait until you swiped the app away. Now you can pull it in with one tap. It's only on the title screen, where no game is loaded, so nothing can be lost.
