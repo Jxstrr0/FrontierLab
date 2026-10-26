@@ -135,6 +135,15 @@ Every city has its own look (`src/data/cityLooks.ts`), so no two maps read alike
 - **Street life:** tree-lined avenues, plazas with fountains, and park furniture (paths, a fountain, pond, bandstand or statue in the middle of each park block).
 - **Old saves:** cities generated before this change keep their original map (layout 1, see DATA_MODEL `CityState.layout`); new games and cities first visited later use these looks (layout 2).
 
+### 2.2 The cover
+
+The title screen leads with the map, the game's boldest art ("Living skyline", docs/COVER_SCREEN.md, SCREENS §1):
+
+- **What it shows:** a strip of a real city printed by the map renderer, untouched: its ink, tint underprint, water, vernacular and signature landmark. A returning player sees the city they're in with their own roof flags (the usual `LotOccupant` flags, no new art); a new player sees a different city each launch.
+- **Framing:** the panel is flat map paper on navy with no shadow or gradient, a 1 px outer rule and a hairline inner rule in the city ink, and the city name as all-caps microprint between them (the microprint and the logotype are the only all-caps text on the screen).
+- **Motion:** a slow sideways drift of the printed strip (CSS only, nothing redraws). It's ambient motion, not a second signature moment; the Ledger press keeps that title. Reduced motion holds the strip still.
+- **Before it prints:** paper, the rules and a faint guilloche in the city ink, then a 400 ms crossfade to the city.
+
 ## 3. Vignettes (panel hero art)
 
 - **Format:** procedural SVG scenes at 16:9 in the city ink on ivory, with the same hatching rules.
