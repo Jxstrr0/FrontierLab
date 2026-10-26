@@ -221,7 +221,7 @@ export interface RivalBank {
   campaigns?: Record<Id /*city*/, { boost: number; weeksLeft: number }>;   // rival ads (v37)
 }
 export interface RivalBranch {
-  id: Id; lotId: Id; openedWeek: Week; quality: [Stars, Stars, Stars, Stars]; // rates, products, service, branch
+  id: Id; lotId: Id; size: number /* C2b: 0–3 like Branch.size */; openedWeek: Week; quality: [Stars, Stars, Stars, Stars]; // rates, products, service, branch
   prices: Record<string, number>; deposits: Money; loans: Money; reviewCount: number; negativeWeeks: number;
 }
 export interface MarketState {
@@ -342,6 +342,8 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 `src/sim/state.ts` is the source of truth; this section records how it differs from the guide above. Later stages add the rest with a schema bump and a migration.
 
 **Frontier Lab renumbering (stage C0, 2026-10-26):** the state below is Vault Street's final shape (its schema v38), renumbered as Frontier Lab schema 1. Vault Street's 37 migration steps were dropped, so the schema numbers and migrations mentioned in the entries below are history only.
+
+**Frontier Lab schema 3 (stage C2b, rival sales offices):** `RivalBranch.size` (0–3). Migration 2 → 3 folds each rival's branches in a city into one office of the nearest size (`foldRivalCity`: books added, quality blended, the other lots freed). Events `RIVAL_OFFICE_GROWN` and `RIVAL_OFFICE_SHRUNK { rivalId, bank, city, size }`.
 
 **Frontier Lab schema 2 (stage C2a, sales offices):** `Branch.size` (0–3: Starter, Standard, Large, Flagship; SIMULATION §6.4). Migration 1 → 2 sets `size = 0` on every branch. A save from before C2a may hold several branches in one city; they keep running, and the one-per-city rule only stops new builds. Event `OFFICE_GROWN { branchId, city, size }`.
 

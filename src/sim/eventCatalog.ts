@@ -49,6 +49,9 @@ export interface EventPayloads {
     address: string;
   };
   RIVAL_BRANCH_CLOSED: { rivalId: Id; bank: string; city: Id; district: string; address: string };
+  /** A rival grows or shrinks its office in a city a size (C2b); `size` is the new size's name. */
+  RIVAL_OFFICE_GROWN: { rivalId: Id; bank: string; city: Id; size: string };
+  RIVAL_OFFICE_SHRUNK: { rivalId: Id; bank: string; city: Id; size: string };
   /** A rival opens its first branch in a new city (§18.4); `cities` is its count afterwards. */
   RIVAL_CITY_ENTRY: {
     rivalId: Id;

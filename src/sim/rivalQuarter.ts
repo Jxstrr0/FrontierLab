@@ -22,6 +22,7 @@ import { rivalBvps, rollDistressedAsk } from './mergerPricing';
 import { stream, type Rng } from './rng';
 import { rivalCapitalRatio, rivalLoans } from './rivalBooks';
 import type { GameState, RivalBank } from './state';
+import { giveRivalOffice, rivalUnits } from './rivalOffices';
 
 const QUARTERS_KEPT = 8;
 const QUARTERS_PER_YEAR = 4;
@@ -197,11 +198,11 @@ export function splitDistressed(state: GameState): void {
         .filter(
           (r) => r.status === 'active' && r.id !== bank.id && r.cities.includes(branch.cityId),
         )
-        .sort((a, b) => a.branches.length - b.branches.length || (a.id < b.id ? -1 : 1));
+        .sort((a, b) => rivalUnits(a) - rivalUnits(b) || (a.id < b.id ? -1 : 1));
       const taker = others[0];
       if (taker && lot) {
-        taker.branches.push({ ...branch, negativeWeeks: 0 });
-        lot.occupant = { type: 'rival', id: taker.id };
+        // It joins the taker's office in the city, or becomes it (C2b).
+        giveRivalOffice(state, taker, branch);
         taker.capitalRatio = rivalCapitalRatio(taker);
         takers.add(taker.name);
       } else if (lot?.occupant?.id === bank.id) {

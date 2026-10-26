@@ -9,6 +9,8 @@ import { newGame } from '../../src/sim/newGame';
 import { entryCity, runExpansion } from '../../src/sim/rivalExpansion';
 import { learn, rivalsLearn } from '../../src/sim/rivalLearning';
 import { generateCity } from '../../src/sim/worldGen';
+import { MAX_OFFICE_SIZE } from '../../src/sim/branch/officeSize';
+import { rivalUnits } from '../../src/sim/rivalOffices';
 import type { GameState, RivalBank } from '../../src/sim/state';
 import { openScriptedBranch } from '../helpers/scenario';
 
@@ -17,9 +19,9 @@ function primed(s: GameState, bank: RivalBank): void {
   bank.quarters = [1, 2, 3, 4].map(() => ({ revenue: 1e6, netIncome: 5e5 }));
   bank.capitalRatio = 0.2;
   bank.equity = 1e9;
-  while (bank.branches.length < RIVAL_EXPANSION.entryMinBranches) {
-    bank.branches.push({ ...bank.branches[0]!, id: `${bank.id}_x${bank.branches.length}` });
-  }
+  // A Flagship office stands for more than entryMinUnits branches (C2b).
+  bank.branches[0]!.size = MAX_OFFICE_SIZE;
+  expect(rivalUnits(bank)).toBeGreaterThanOrEqual(RIVAL_EXPANSION.entryMinUnits);
 }
 
 describe('rival city entry', () => {

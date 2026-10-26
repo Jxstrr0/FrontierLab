@@ -66,6 +66,23 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
         },
       };
     }
+    case 'RIVAL_OFFICE_GROWN':
+    case 'RIVAL_OFFICE_SHRUNK': {
+      const here = ctx.yourCities.has(str(p.city));
+      return {
+        key: e.type,
+        subject: rivalId,
+        tab: 'banking',
+        icon: 'facade',
+        priority: here ? P.rivalLocal : P.rivalAbroad,
+        group: 'rivalBranch',
+        tokens: {
+          bank: str(p.bank, 'A rival'),
+          city: cityName(str(p.city)),
+          size: str(p.size, 'bigger').toLowerCase(),
+        },
+      };
+    }
     case 'RIVAL_CITY_ENTRY': {
       const here = ctx.yourCities.has(str(p.city));
       return {

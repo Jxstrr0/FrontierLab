@@ -55,7 +55,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState } from './personalTypes';
 
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 
 export interface GameState {
   schemaVersion: number;
@@ -867,10 +867,13 @@ export interface RivalBank {
   dps?: Money;
 }
 
+/** A rival lab's sales office: one per city (C2b), sized like yours. */
 export interface RivalBranch {
   id: Id;
   cityId: Id;
   lotId: Id;
+  /** Office size (0 = Starter … 3 = Flagship, OFFICE_SIZES). */
+  size: number;
   openedWeek: Week;
   /** Rates, Products, Service, Branch. */
   quality: [Stars, Stars, Stars, Stars];

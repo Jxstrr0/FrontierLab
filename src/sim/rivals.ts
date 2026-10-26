@@ -33,6 +33,7 @@ import { nominalIndex } from './nominal';
 import { stream, type Rng } from './rng';
 import type { CountryState, GameState, Lot, RivalBank, RivalBranch } from './state';
 import { dpow } from './detmath';
+import { foldRivalCity, rivalMult } from './rivalOffices';
 
 const STRATEGY_ORDER: Strategy[] = ['incumbent', 'community', 'disruptor', 'premium'];
 
@@ -105,7 +106,7 @@ export function seedRivals(state: GameState, cityId: string, lots: Lot[]): void 
     if (!bank.cities.includes(cityId)) bank.cities.push(cityId);
     for (let k = 0; k < (counts[i] ?? 0); k++) {
       const lot = bestLot(lots, spec.strategy, bank, rng);
-      if (!lot) return;
+      if (!lot) break;
       lot.occupant = { type: 'rival', id: bank.id };
       const profile = STRATEGY_PROFILES[spec.strategy].quality;
       const quality = profile.map((q) =>
@@ -115,6 +116,7 @@ export function seedRivals(state: GameState, cityId: string, lots: Lot[]): void 
         id: seedBranchId(bank),
         cityId,
         lotId: lot.id,
+        size: 0,
         openedWeek: 0,
         quality,
         overall: overallOf(quality),
@@ -124,9 +126,11 @@ export function seedRivals(state: GameState, cityId: string, lots: Lot[]): void 
         contribution: 0,
         negativeWeeks: 0,
       };
-      seedMatureBooks(state, branch);
       bank.branches.push(branch);
     }
+    // One office per city (C2b): the branches drawn fold into one sized for them.
+    const office = foldRivalCity(state, bank, cityId);
+    if (office) seedMatureBooks(state, office);
   });
   for (const spec of chosen) {
     const bank = state.rivals[spec.id];
@@ -145,14 +149,18 @@ function seedBranchId(bank: RivalBank): string {
   return `rb_${bank.id}_${n}`;
 }
 
-/** A rival branch's mature deposit size (§18.1): city size × quality × the nominal index (§4.6). */
+/**
+ * A rival office's mature deposit size (§18.1): city size × quality × the
+ * nominal index (§4.6) × its size multiplier (C2b).
+ */
 export function matureDeposits(
   state: GameState,
-  branch: Pick<RivalBranch, 'cityId' | 'overall'>,
+  branch: Pick<RivalBranch, 'cityId' | 'overall' | 'size'>,
 ): number {
   const income = CITIES[branch.cityId]?.incomeIndex ?? 1;
   return (
     RIVAL_MATURE_DEPOSITS *
+    rivalMult(branch) *
     income *
     (branch.overall / RIVAL_QUALITY_REF) *
     nominalIndex(state, branch.cityId)

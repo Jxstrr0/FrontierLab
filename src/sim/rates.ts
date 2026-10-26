@@ -7,6 +7,7 @@ import { clamp } from './math';
 import { baseId, productSpec } from './products';
 import { rivalPriceIn } from './rivalPrices';
 import type { CountryState, GameState } from './state';
+import { rivalUnitsIn } from './rivalOffices';
 
 export function ftpShort(c: CountryState): number {
   return c.policyRate;
@@ -59,7 +60,7 @@ export function updateMarketRefs(state: GameState): void {
       let count = 0;
       for (const rival of Object.values(state.rivals)) {
         if (rival.status !== 'active') continue;
-        const n = rival.branches.filter((b) => b.cityId === city.id).length;
+        const n = rivalUnitsIn(rival, city.id);
         const price = rivalPriceIn(state, rival, spec.id, c.id);
         if (n > 0 && price !== undefined) {
           weighted += price * n;

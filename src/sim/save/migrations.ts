@@ -4,9 +4,23 @@
 // Frontier Lab's chain starts at schema 1 (stage C0, DESIGN decision A6).
 // Vault Street's 37 steps were dropped: its saves live in a separate store
 // and its export codes are turned away, so none can reach this chain.
-import { SCHEMA_VERSION } from '../state';
+import { foldRivalCity } from '../rivalOffices';
+import { SCHEMA_VERSION, type GameState } from '../state';
 
 type RawSave = Record<string, unknown> & { schemaVersion: number };
+
+/** 2 → 3: a rival's branches in one city fold into one office sized for them. */
+function foldRivalCities(s: RawSave): RawSave {
+  // Schema 2 rivals have GameState's shape less `size`, which counts as Starter.
+  const state = s as unknown as GameState;
+  for (const bank of Object.values(state.rivals ?? {})) {
+    for (const b of bank.branches) b.size ??= 0;
+    for (const cityId of new Set(bank.branches.map((b) => b.cityId))) {
+      foldRivalCity(state, bank, cityId);
+    }
+  }
+  return s;
+}
 
 export const migrations: Record<number, (s: RawSave) => RawSave> = {
   // 1 → 2 (stage C2a): branches become sales offices with a size; every
@@ -16,6 +30,8 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     for (const b of Object.values(branches)) if (b.size === undefined) b.size = 0;
     return s;
   },
+  // 2 → 3 (stage C2b): rival labs hold one sales office per city, with a size.
+  2: foldRivalCities,
 };
 
 /** Upgrades a raw save to the current schema, or throws if it can't. */
