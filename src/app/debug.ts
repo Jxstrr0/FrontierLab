@@ -78,10 +78,10 @@ export function installDebug(): void {
       activeMap()?.flyTo(tileCenter(city.tiles, lot.tile.x, lot.tile.y), zoom);
       return true;
     },
-    /** Saves the game to a slot; returns an error message or null. */
+    /** Saves the game to a slot; resolves to an error message or null. */
     save(slot: SlotId = '1') {
       const s = peekGame();
-      return s ? saveToSlot(slot, s) : 'No game';
+      return s ? saveToSlot(slot, s) : Promise.resolve('No game');
     },
     /** Opens a save code (an exported save, e.g. a tests/fixtures file) in the game screen. */
     importSave(code: string) {
@@ -89,8 +89,8 @@ export function installDebug(): void {
       screen.value = 'game';
     },
     /** Loads a slot into the game screen. */
-    load(slot: SlotId = '1') {
-      setGame(loadFromSlot(slot));
+    async load(slot: SlotId = '1') {
+      setGame(await loadFromSlot(slot));
       screen.value = 'game';
     },
     /**

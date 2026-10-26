@@ -45,9 +45,9 @@ function Export(p: { sources: Source[] }) {
     return <p class="muted small">Nothing to export yet. Save a game first.</p>;
   }
 
-  const make = () => {
+  const make = async () => {
     try {
-      const state = chosen === 'current' ? peekGame() : loadFromSlot(chosen);
+      const state = chosen === 'current' ? peekGame() : await loadFromSlot(chosen);
       if (!state) throw new Error('There is no game to export.');
       setCode(exportCode(state));
     } catch (e) {

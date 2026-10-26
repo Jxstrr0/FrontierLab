@@ -1,6 +1,7 @@
-// Save slots in localStorage (SCREENS §26): one autosave plus three manual
-// slots. Each slot keeps the serialized game (lz-string compressed) and a small
-// metadata record for the slot cards. Storage can be missing or full (private
+// Save slots (SCREENS §26): one autosave plus three manual slots. Each slot
+// keeps the serialized game (lz-string compressed) in IndexedDB (slotData.ts)
+// and a small metadata record for the slot cards in localStorage, so menus can
+// list the slots without waiting. Storage can be missing or full (private
 // windows, quotas), so every access is guarded and reports failure. Each card
 // also carries a checksum of the stored save so a damaged slot is caught on load
 // instead of half-loading. Key names never change, so old saves keep loading.
@@ -12,6 +13,7 @@ import { dateOf } from '../calendar';
 import { coverMetaFor, type CoverMeta } from '../coverMeta';
 import type { GameState, Settings } from '../state';
 import { checksum, deserialize, serialize } from './serialize';
+import { localStore, withSlotStore } from './slotData';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const gameDate = (startDate: string, day: number) => {
@@ -44,20 +46,15 @@ export const STORAGE_FULL =
 export const SAVE_DAMAGED = 'That save is damaged and cannot be loaded.';
 
 const PREFIX = 'vaultstreet.';
-const dataKey = (slot: SlotId) => `${PREFIX}save.${slot}`;
 const metaKey = (slot: SlotId) => `${PREFIX}meta.${slot}`;
 const PREFS_KEY = `${PREFIX}prefs`;
+const store = localStore;
 
-function store(): Storage | null {
-  try {
-    return window.localStorage;
-  } catch {
-    return null;
-  }
-}
-
-/** Writes a game to a slot. Returns an error message, or null on success. */
-export function saveToSlot(slot: SlotId, state: GameState): string | null {
+/**
+ * Writes a game to a slot. The game is captured at once, so it can keep
+ * running while the write finishes. Resolves to an error message, or null.
+ */
+export function saveToSlot(slot: SlotId, state: GameState): Promise<string | null> {
   return writeSlot(slot, compressToUTF16(serialize(state)), slotMetaFor(slot, state));
 }
 
@@ -80,39 +77,52 @@ export function slotMetaFor(slot: SlotId, state: GameState): SaveMeta {
 /**
  * Stores an already compressed save (compressToUTF16 of serialize(state)) and
  * its card. The weekly autosave compresses off the main thread and then calls
- * this (src/app/saves/autosave.ts). Returns an error message, or null.
+ * this (src/app/saves/autosave.ts). `skipIf` sees the slot's card just before
+ * the write, after every earlier save has landed, and can cancel it. The data
+ * goes in first and the card last, so a card's checksum always describes data
+ * that is really there. Resolves to an error message, or null.
  */
-export function writeSlot(slot: SlotId, compressed: string, meta: SaveMeta): string | null {
-  const ls = store();
-  if (!ls) return 'Saving is unavailable in this browser.';
-  let previous: string | null;
-  try {
-    previous = ls.getItem(dataKey(slot));
-    ls.setItem(dataKey(slot), compressed);
-  } catch {
-    return STORAGE_FULL;
-  }
-  try {
-    ls.setItem(metaKey(slot), JSON.stringify({ ...meta, checksum: checksum(compressed) }));
-    return null;
-  } catch {
-    // Put the old save back so the slot's card and checksum still match it.
+export function writeSlot(
+  slot: SlotId,
+  compressed: string,
+  meta: SaveMeta,
+  skipIf?: (stored: SaveMeta | null) => boolean,
+): Promise<string | null> {
+  return withSlotStore(SLOTS, async (data) => {
+    const ls = store();
+    if (!data || !ls) return 'Saving is unavailable in this browser.';
+    if (skipIf?.(slotMeta(slot))) return null;
+    let previous: string | null;
     try {
-      if (previous === null) ls.removeItem(dataKey(slot));
-      else ls.setItem(dataKey(slot), previous);
+      previous = await data.get(slot);
+      await data.put(slot, compressed);
     } catch {
-      // Nothing more to do; the load-time checksum will flag the slot.
+      return STORAGE_FULL;
     }
-    return STORAGE_FULL;
-  }
+    try {
+      ls.setItem(metaKey(slot), JSON.stringify({ ...meta, checksum: checksum(compressed) }));
+      return null;
+    } catch {
+      // Put the old save back so the slot's card and checksum still match it.
+      try {
+        if (previous === null) await data.remove(slot);
+        else await data.put(slot, previous);
+      } catch {
+        // Nothing more to do; the load-time checksum will flag the slot.
+      }
+      return STORAGE_FULL;
+    }
+  });
 }
 
-/** Loads a slot. Throws with a readable message if it's missing or broken. */
-export function loadFromSlot(slot: SlotId): GameState {
-  const ls = store();
-  const raw = ls?.getItem(dataKey(slot));
+/** Loads a slot. Rejects with a readable message if it's missing or broken. */
+export async function loadFromSlot(slot: SlotId): Promise<GameState> {
+  // Read the card inside the queue too, so it matches the data after any save in flight.
+  const { raw, expected } = await withSlotStore(SLOTS, async (data) => ({
+    raw: data ? await data.get(slot).catch(() => null) : null,
+    expected: slotMeta(slot)?.checksum,
+  }));
   if (!raw) throw new Error('That save slot is empty.');
-  const expected = slotMeta(slot)?.checksum;
   if (expected !== undefined && checksum(raw) !== expected) throw new Error(SAVE_DAMAGED);
   const json = decompressFromUTF16(raw);
   if (!json) throw new Error(SAVE_DAMAGED);
@@ -132,13 +142,16 @@ export function allSlotMeta(): Record<SlotId, SaveMeta | null> {
   return { auto: slotMeta('auto'), '1': slotMeta('1'), '2': slotMeta('2'), '3': slotMeta('3') };
 }
 
-export function deleteSlot(slot: SlotId): void {
+/** Empties a slot. Its card goes at once; the data follows. */
+export function deleteSlot(slot: SlotId): Promise<void> {
   try {
-    store()?.removeItem(dataKey(slot));
     store()?.removeItem(metaKey(slot));
   } catch {
     // Nothing to do: storage is unavailable.
   }
+  return withSlotStore(SLOTS, async (data) => {
+    await data?.remove(slot).catch(() => undefined);
+  });
 }
 
 /** The most recently written slot, for Continue. */
