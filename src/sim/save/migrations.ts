@@ -20,7 +20,7 @@ import { initCountries } from '../macro';
 import { checkMilestones } from '../milestones';
 import { faceDetail, type BaseAvatar } from '../people';
 import { initRivalBench, initRivalFinancials, seedMatureBooks } from '../rivals';
-import { EXEC_DELEGATION, FX_START_INDEX, PAY_REVIEW } from '../../config/balance';
+import { EXEC_DELEGATION, FX_START_INDEX, OFFICE_LISTINGS, PAY_REVIEW } from '../../config/balance';
 import { COUNTRIES } from '../../data/countries';
 import { SEEDED_HOUSE_STYLE_IDS } from '../../data/houseStyles';
 import { DEFAULT_LOGO_SHAPE } from '../../data/logoShapes';
@@ -437,6 +437,29 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     }
     for (const run of state.marketing.packages) {
       if (run.packageId === 'grand_opening') run.packageId = 'street_team';
+    }
+    return s;
+  },
+  // v27: fewer office listings, more property buildings (DESIGN decision log
+  // 2026-10-26). Each generated city keeps the offices you lease and only as
+  // many unleased ones as the new count allows (lowest numbers first), then
+  // gains property buildings up to the new count from its `sites7` stream.
+  26: (s) => {
+    const state = s as unknown as GameState;
+    for (const cityId of Object.keys(state.world.cities).sort()) {
+      const size = CITIES[cityId]?.size;
+      if (!size) continue;
+      let room = OFFICE_LISTINGS.countBySize[size];
+      const listings = Object.values(state.world.officeListings)
+        .filter((o) => o.cityId === cityId)
+        .sort((a, b) => a.id.localeCompare(b.id));
+      for (const o of listings) if (o.officeId) room -= 1;
+      for (const o of listings) {
+        if (o.officeId) continue;
+        if (room > 0) room -= 1;
+        else delete state.world.officeListings[o.id];
+      }
+      generateInvestmentSites(state, cityId);
     }
     return s;
   },
