@@ -270,7 +270,9 @@ Follows the brief's map structure (1–2 main offices worldwide, one sales offic
   - Save migration: existing branches get size Starter. A second branch in a city from an old save keeps running; only new builds are refused.
 - **C2b — Rival sales offices: done (v0.1.6, schema 3).** Each rival lab holds one office per city with a size (see SIMULATION §18.4). Expansion = enter a city or grow an office; closures, charters and rival mergers fold the same way. Map pins show one office per lab per city.
 - **C2c — Data centers: done (v0.1.7, schema 4).** A second building kind, on a free lot or a regional energy site, with GPU hall, power and cooling slots and an 8–16 week fit-out. In C2 it adds a Service (latency) lift to its city and nearby cities and counts toward milestones; its compute joins the pool in C4.
-- **C2d — Main offices and the screens:** HQ as the first main office, a second in another country adding floors; company-wide prices and marketing at HQ with per-city overrides; "branch" → "sales office" on screen; map layers Sales Offices / Data Centers / Energy Sites.
+- **C2d — Main offices and the screens**, in two parts:
+  - **C2d1 — Screens: done (v0.1.8, no schema change).** "Branch" → "sales office" in every player-facing string (UI, news, incidents, tutorial, lessons, command errors; ids, CSS classes and save keys keep `branch`). Map layers Sales Offices (id `branches`), Data Centers and Energy Sites (16 layers).
+  - **C2d2 — Main offices and company-wide settings:** HQ as the first main office, at most a second in another country adding floors; company-wide prices and marketing at HQ with per-city overrides.
 - **Moved to C5:** the customer account screen (it needs the businesses and contracts built there).
 - **Accept (C2 as a whole):** a steady run opens several cities with one office each and grows them in size; the balance script stays inside the new targets.
 

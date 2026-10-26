@@ -96,7 +96,7 @@ function PackageCard(p: {
       <Row label="Spread over" value={`${pointsText(pkg.boost / pkg.weeks)} /week`} tone="dim" />
       {pkg.branchBonus && (
         <Row
-          label="Branch rating"
+          label="Sales office rating"
           value={`+${pkg.branchBonus.bonus.toFixed(2)} for ${pkg.branchBonus.weeks} weeks`}
           tone="good"
         />
@@ -114,7 +114,7 @@ function PackageCard(p: {
           ? `You can buy from this agency once you're in ${p.city}.`
           : branches
             ? `Corporate cash ${money(s.company.cash, sym)}`
-            : `Corporate cash ${money(s.company.cash, sym)}. No branch in ${p.city} yet; the awareness will help your first one.`}
+            : `Corporate cash ${money(s.company.cash, sym)}. No sales office in ${p.city} yet; the awareness will help your first one.`}
       </p>
     </Card>
   );

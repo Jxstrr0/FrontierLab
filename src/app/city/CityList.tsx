@@ -174,7 +174,7 @@ function LotRow(p: {
         />
         <span class="lot-main">
           <span class="lot-address">{lot.address}</span>
-          <span class="lot-occupant">{branch?.name ?? 'Your branch'}</span>
+          <span class="lot-occupant">{branch?.name ?? 'Your sales office'}</span>
           <span class="muted small">{facts}</span>
         </span>
         <span class="lot-tag">

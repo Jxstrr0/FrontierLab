@@ -3,13 +3,28 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C2c done (v0.1.7, save schema 4): data centers, on a storefront or at a regional energy site. C2b (v0.1.6): rival labs also hold one sizable sales office per city. C2a (v0.1.5): one sales office per city, grown in place through four sizes. Before that, C1 (v0.1.4): floors, executives, segments, campaigns, benefits, conferences, incidents, stock sector, map layers, rival labs, "the lab" wording and the newspaper. Next is C2d (main offices and the screens), waiting on the owner's go-ahead. The owner's decisions are in the design brief and CONVERSION_PLAN §5.
+**Current stage:** C2d1 done (v0.1.8, save schema 4): "sales office" everywhere on screen, and Sales Offices / Data Centers / Energy Sites map layers. C2c (v0.1.7): data centers, on a storefront or at a regional energy site. C2b (v0.1.6): rival labs also hold one sizable sales office per city. C2a (v0.1.5): one sales office per city, grown in place through four sizes. Before that, C1 (v0.1.4): floors, executives, segments, campaigns, benefits, conferences, incidents, stock sector, map layers, rival labs, "the lab" wording and the newspaper. Next is C2d2 (main offices, company-wide prices with per-office overrides). The owner's decisions are in the design brief and CONVERSION_PLAN §5.
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
 **Determinism snapshot:** `0024151388b688` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-26 — Stage C2d1: "sales office" on screen, new map layers (v0.1.8)
+
+**What you asked for:** "go for next pls", stage C2d. I split it in two so each part is small enough to check: this is part 1 (the words and the map). Part 2 (main offices, company-wide prices) comes next.
+
+**What changed.**
+- **Words:** everywhere the game said "branch" it now says **sales office** (and "office manager" for the person who runs one). That's about 230 bits of text: panels, news stories, incidents, the tutorial, the advisor tips and error messages. The code underneath still calls them branches, so your saves are untouched.
+- **Map layers:** the Layers sheet now has 16 toggles. **Sales Offices** is the old Branches toggle. **Data Centers** is new, so you can hide or show your data centers on their own. **Energy Sites** is new: the remote regional sites (like Athabasca Sands Camp) now have an amber lightning-bolt pin of their own instead of looking like ordinary employers.
+- The map key's first row now says "Labs" instead of "Banks", and the takeover screen lists "Labs" for sale.
+
+**Checked in the browser** at iPhone size: the Layers sheet and the map with a data center, no console errors.
+
+**Checks.** `npm run lint`, all tests and `npm run build` pass. No save change, and the determinism snapshot didn't move.
+
+**Next:** C2d2: at most two main offices (the second in another country), and company-wide prices set at HQ with per-office overrides.
 
 ### 2026-10-26 — Stage C2c: data centers (v0.1.7)
 

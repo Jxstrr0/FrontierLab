@@ -49,7 +49,7 @@ export const RIVAL_TEMPLATES = {
     },
     {
       h: 'New name on {city} high streets: {bank}',
-      b: '{bank} opened its first {city} branch at {address} this week.',
+      b: '{bank} opened its first {city} sales office at {address} this week.',
     },
   ],
   RIVAL_CHARTERED: [
@@ -109,7 +109,7 @@ export const RIVAL_TEMPLATES = {
     },
     {
       h: 'New corners for {city} banks',
-      b: 'With {lots} storefronts newly open to lease, {city} has room for more branches.',
+      b: 'With {lots} storefronts newly open to lease, {city} has room for more sales offices.',
     },
   ],
   RIVAL_BRANCH_CLOSED: [
@@ -181,15 +181,18 @@ export const RIVAL_TEMPLATES = {
     },
   ],
   BANK_FAILURE: [
-    { h: 'Regulators seize {bank}', b: "{bank}'s {n} branches will be offered to buyers." },
+    { h: 'Regulators seize {bank}', b: "{bank}'s {n} sales offices will be offered to buyers." },
     {
       h: '{bank} collapses',
-      b: 'Supervisors stepped in over the weekend. Its {n} branches are up for sale.',
+      b: 'Supervisors stepped in over the weekend. Its {n} sales offices are up for sale.',
     },
   ],
   RIVAL_NETWORK_SPLIT: [
-    { h: "{bank}'s branches find new owners", b: 'The {n} branches go to {takers}.' },
-    { h: 'Carve-up of {bank} complete', b: "{takers} take over the failed bank's {n} branches." },
+    { h: "{bank}'s sales offices find new owners", b: 'The {n} sales offices go to {takers}.' },
+    {
+      h: 'Carve-up of {bank} complete',
+      b: "{takers} take over the failed bank's {n} sales offices.",
+    },
   ],
   RATE_WATCH: [
     {

@@ -80,7 +80,7 @@ export function balanceSheetLines(s: GameState): StatementLine[] {
     ...optional('Compute credits', b.ventureDebt),
     ...optional('Real estate', b.realEstate),
     ...optional('Currencies', b.currencies),
-    { label: 'Branches and equipment', value: b.fixedAssets, kind: 'sub' },
+    { label: 'Sales offices and equipment', value: b.fixedAssets, kind: 'sub' },
     { label: 'Lease deposits', value: b.leaseDeposits, kind: 'sub' },
     ...optional('Partnership fees', b.intangibles),
     ...optional('Goodwill', b.goodwill),

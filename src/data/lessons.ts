@@ -69,10 +69,10 @@ export const CHAPTERS: Record<ChapterId, ChapterText> = {
     title: 'Headquarters',
     steps: [
       {
-        idle: 'From the third branch we need a head office. Offices for lease are tags on the map: open Layers and switch on Offices if you can’t see them.',
+        idle: 'From the third sales office we need a head office. Offices for lease are tags on the map: open Layers and switch on Offices if you can’t see them.',
         lines: {
           'pin-office':
-            'From the third branch the lab needs a head office: Finance, HR and the teams behind the branches. Tap an office for lease.',
+            'From the third sales office the lab needs a head office: Finance, HR and the teams behind the sales offices. Tap an office for lease.',
           'panel-close': CLOSE_FIRST,
         },
       },
@@ -160,7 +160,7 @@ export const CHAPTERS: Record<ChapterId, ChapterText> = {
       },
       {
         idle: 'Tap the city name at the top, then Go to the airport.',
-        here: 'Each week’s flights are free up to a mileage allowance; the board shows what’s left. We open branches only where you are, but the ones we have keep running, and the Branches list reaches them from anywhere. Fly somewhere new, or close this to stay.',
+        here: 'Each week’s flights are free up to a mileage allowance; the board shows what’s left. We open sales offices only where you are, but the ones we have keep running, and the Sales offices list reaches them from anywhere. Fly somewhere new, or close this to stay.',
         lines: {},
       },
     ],
@@ -214,7 +214,7 @@ export const FLOOR_TIPS: Record<DeptId, TipText> = {
   },
   products: {
     title: 'Products floor',
-    line: 'Set rates for every branch at once, tune the house underwriting model, and develop new products. A better model lifts every branch’s Products rating.',
+    line: 'Set rates for every sales office at once, tune the house underwriting model, and develop new products. A better model lifts every sales office’s Products rating.',
   },
   treasury: {
     title: 'Treasury floor',
@@ -222,11 +222,11 @@ export const FLOOR_TIPS: Record<DeptId, TipText> = {
   },
   marketing: {
     title: 'Marketing floor',
-    line: 'Brand campaigns lift awareness across a whole city or country, not just one branch. More awareness means more people walk in.',
+    line: 'Brand campaigns lift awareness across a whole city or country, not just one sales office. More awareness means more people walk in.',
   },
   it: {
     title: 'Platform & Security floor',
-    line: 'Our app rating lifts the Products rating and takes pressure off the branches. A short-staffed platform team makes breaches and outages more likely.',
+    line: 'Our app rating lifts the Products rating and takes pressure off the sales offices. A short-staffed platform team makes breaches and outages more likely.',
   },
   risk: {
     title: 'Safety & Alignment floor',
@@ -245,7 +245,7 @@ export const FLOOR_TIPS: Record<DeptId, TipText> = {
 /** First look at each map place or menu screen, by panel type. */
 export const PLACE_TIPS: Record<string, TipText> = {
   rivalBranch: {
-    title: 'Rival branch',
+    title: 'Rival sales office',
     line: 'Rivals publish their rates and reviews. Beat their rates or their service and customers drift our way.',
   },
   rivalHq: {
@@ -262,11 +262,11 @@ export const PLACE_TIPS: Record<string, TipText> = {
   },
   agency: {
     title: 'Marketing agency',
-    line: 'Agencies sell city-wide campaign packages: awareness for every branch in the city at once.',
+    line: 'Agencies sell city-wide campaign packages: awareness for every sales office in the city at once.',
   },
   employer: {
     title: 'Employer',
-    line: 'A payroll partnership pays this firm’s staff through one of our branches: a steady stream of deposits for years. Renew it before it lapses.',
+    line: 'A payroll partnership pays this firm’s staff through one of our sales offices: a steady stream of deposits for years. Renew it before it lapses.',
   },
   university: {
     title: 'University',
@@ -325,12 +325,12 @@ export const PLACE_TIPS: Record<string, TipText> = {
 /** Other first looks: a branch tab, an investment bank tab, the decision popups. */
 export const OTHER_TIPS = {
   'branch-finance': {
-    title: 'Branch finance',
-    line: 'Each branch’s own income statement. Deposits earn the branch a funding credit and loans pay a funding charge, so you can see which branches gather cheap money and lend it well.',
+    title: 'Sales office finance',
+    line: 'Each sales office’s own income statement. Deposits earn the sales office a funding credit and loans pay a funding charge, so you can see which sales offices gather cheap money and lend it well.',
   },
   'ib-mna': {
     title: 'Mergers & acquisitions',
-    line: 'Make an offer for a rival lab. A higher premium is likelier to be accepted, and the regulator checks our capital afterwards. Their branches take our name over eight weeks.',
+    line: 'Make an offer for a rival lab. A higher premium is likelier to be accepted, and the regulator checks our capital afterwards. Their sales offices take our name over eight weeks.',
   },
   'modal-board': {
     title: 'Board meeting',
@@ -338,7 +338,7 @@ export const OTHER_TIPS = {
   },
   'modal-incident': {
     title: 'Incidents',
-    line: 'Something has gone wrong. Each choice has a cost and a consequence; pick one. A branch manager can handle branch troubles for you.',
+    line: 'Something has gone wrong. Each choice has a cost and a consequence; pick one. A office manager can handle sales office troubles for you.',
   },
 } satisfies Record<string, TipText>;
 

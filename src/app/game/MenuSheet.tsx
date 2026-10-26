@@ -24,7 +24,7 @@ export function MenuSheet() {
     { label: 'Company', onClick: () => openPanel({ type: 'company' }) },
     // Opens your HQ, or explains how to lease an office when you have none.
     ...(FEATURES.hq ? [{ label: 'HQ', onClick: () => openPanel({ type: 'hq' }) }] : []),
-    { label: 'Branches', onClick: () => openPanel({ type: 'branches' }) },
+    { label: 'Sales offices', onClick: () => openPanel({ type: 'branches' }) },
     ...(FEATURES.personalEmpire
       ? [{ label: 'Personal wealth', onClick: () => openPanel({ type: 'wealth' }) }]
       : []),

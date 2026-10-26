@@ -130,7 +130,12 @@ export const BranchInterior = memo(function BranchInterior(p: {
         : `${tellers} of ${stations} windows open · ${wait > WAIT_LABELS.long ? 'long wait' : busy ? 'busy' : 'short wait'}`;
 
   return (
-    <Vignette label={`Inside the branch: ${caption}`} bare ink={p.ink} class="br-interior in-alive">
+    <Vignette
+      label={`Inside the sales office: ${caption}`}
+      bare
+      ink={p.ink}
+      class="br-interior in-alive"
+    >
       <IsoRoom
         r={room}
         back={

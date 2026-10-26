@@ -45,8 +45,13 @@ export function FinanceTab({ branch }: { branch: Branch }) {
     <div class="stack">
       {last ? (
         <div class="grid-2 br-headlines">
-          <Headline label="Branch revenue" now={last.revenue} prev={prev?.revenue} sym={sym} />
-          <Headline label="Branch income" now={last.income} prev={prev?.income} sym={sym} />
+          <Headline
+            label="Sales office revenue"
+            now={last.revenue}
+            prev={prev?.revenue}
+            sym={sym}
+          />
+          <Headline label="Sales office income" now={last.income} prev={prev?.income} sym={sym} />
         </div>
       ) : (
         <p class="muted">No results yet. The first week closes after the doors open.</p>
@@ -73,7 +78,7 @@ export function FinanceTab({ branch }: { branch: Branch }) {
 
       <div class="grid-2 br-footer">
         <button type="button" class="btn btn-secondary btn-block" onClick={() => setRenaming(true)}>
-          Rename branch
+          Rename sales office
         </button>
         <CloseBranch branch={branch} />
       </div>
@@ -121,7 +126,7 @@ function Statement({ branch, period, sym }: { branch: Branch; period: Period; sy
       ))}
       <Row label="Total expenses" value={figure(t.expenses, sym)} strong />
       <Row
-        label="Branch income"
+        label="Sales office income"
         value={figure(t.income, sym)}
         tone={t.income < 0 ? 'bad' : undefined}
         strong
@@ -136,7 +141,7 @@ function RenameSheet({ branch, onClose }: { branch: Branch; onClose: () => void 
     if (act(cmd.renameBranch, branch.id, name).ok) onClose();
   };
   return (
-    <Sheet title="Rename branch" onClose={onClose}>
+    <Sheet title="Rename sales office" onClose={onClose}>
       <form
         class="stack"
         onSubmit={(e) => {
@@ -145,7 +150,7 @@ function RenameSheet({ branch, onClose }: { branch: Branch; onClose: () => void 
         }}
       >
         <label class="br-field">
-          <span class="muted small">Branch name</span>
+          <span class="muted small">Sales office name</span>
           <input
             class="br-input"
             value={name}

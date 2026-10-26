@@ -87,7 +87,7 @@ export function bumpMorale(branch: Branch, delta: number): void {
 
 /** Branch name, city name or the bank's name for an incident's scope. */
 export function scopeName(state: GameState, inc: Pick<Incident, 'scopeKind' | 'scope'>): string {
-  if (inc.scopeKind === 'branch') return state.branches[inc.scope]?.name ?? 'A branch';
+  if (inc.scopeKind === 'branch') return state.branches[inc.scope]?.name ?? 'A sales office';
   if (inc.scopeKind === 'city') return CITIES[inc.scope]?.name ?? inc.scope;
   if (inc.scopeKind === 'personal') return state.meta.founderName;
   return state.meta.bankName;

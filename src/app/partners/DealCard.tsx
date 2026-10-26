@@ -45,8 +45,8 @@ function Deal(p: { site: Site; kind: PartnershipKind; people: number }) {
   const blocker =
     hosts.length === 0
       ? regional
-        ? `You need an open branch in ${COUNTRIES[regional].name} to host the accounts.`
-        : 'You need an open branch in this city to host the accounts.'
+        ? `You need an open sales office in ${COUNTRIES[regional].name} to host the accounts.`
+        : 'You need an open sales office in this city to host the accounts.'
       : cmd.signBlocker(s, site.id, hostId ?? '', pkg ?? '', kind);
   // Hosts in other cities (a regional site's) carry their city's name.
   const hostLabel = (b: Branch) =>
@@ -80,7 +80,7 @@ function Deal(p: { site: Site; kind: PartnershipKind; people: number }) {
       {hosts.length > 0 && (
         <>
           <Picker
-            label="Host branch"
+            label="Host sales office"
             value={hostId}
             options={hosts.map((b) => ({ value: b.id, label: hostLabel(b) }))}
             onChange={(v) => {
@@ -96,7 +96,7 @@ function Deal(p: { site: Site; kind: PartnershipKind; people: number }) {
               onChange={setPkg}
             />
           ) : (
-            <p class="small tone-bad">This branch offers no deposit accounts to package.</p>
+            <p class="small tone-bad">This sales office offers no deposit accounts to package.</p>
           )}
         </>
       )}

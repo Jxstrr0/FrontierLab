@@ -20,7 +20,10 @@ export type MarkShape = 'crest' | 'coin' | 'medallion' | 'tag' | 'landmark';
 
 /** A type marker: a place layer, plus vacation homes and the two landmarks. */
 export type MarkerId =
-  Exclude<MapLayerId, 'branches' | 'banks'> | 'vacationHomes' | 'centralBank' | 'airport';
+  | Exclude<MapLayerId, 'branches' | 'banks' | 'dataCenters'>
+  | 'vacationHomes'
+  | 'centralBank'
+  | 'airport';
 
 export interface MarkerStyle {
   icon: IconName;
@@ -108,6 +111,12 @@ export const MARKERS: Record<MarkerId, MarkerStyle> = {
     caption: 'Employer',
     shape: 'medallion',
   },
+  energySites: {
+    icon: 'bolt',
+    ink: 'var(--type-energy)',
+    caption: 'Energy site',
+    shape: 'medallion',
+  },
   sportsTeams: { icon: 'trophy', ink: 'var(--type-sports)', caption: 'Stadium', shape: 'landmark' },
   centralBank: {
     icon: 'dome',
@@ -132,6 +141,7 @@ const KIND_MARKER: Partial<Record<PinKind, MarkerId>> = {
   auctionHouse: 'auctionHouses',
   university: 'universities',
   employer: 'employers',
+  energySite: 'energySites',
   stadium: 'sportsTeams',
   centralBank: 'centralBank',
   airport: 'airport',

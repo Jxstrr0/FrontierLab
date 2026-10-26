@@ -33,12 +33,12 @@ export function MnaTab(_p: { bankId: string }) {
   return (
     <>
       <p class="muted small">
-        Buy a rival lab for cash. Its branches convert to your brand over eight weeks. The regulator
-        checks your capital and local market share first.
+        Buy a rival lab for cash. Its sales offices convert to your brand over eight weeks. The
+        regulator checks your capital and local market share first.
       </p>
       <Integrations s={s} />
-      <SectionTitle>Banks</SectionTitle>
-      {rivals.length === 0 && <p class="muted small">No banks are for sale right now.</p>}
+      <SectionTitle>Labs</SectionTitle>
+      {rivals.length === 0 && <p class="muted small">No labs are for sale right now.</p>}
       {rivals.map((bank) => (
         <RivalCard s={s} bank={bank} onOffer={() => setTarget(bank.id)} />
       ))}
@@ -86,7 +86,7 @@ function RivalCard(p: { s: GameState; bank: RivalBank; onOffer: () => void }) {
       ) : (
         <Row label="Market cap, dividend, P/E" value="Private" tone="dim" />
       )}
-      <Row label="Branches" value={count(bank.branches.length)} />
+      <Row label="Sales offices" value={count(bank.branches.length)} />
       <Row label="Cities" value={rivalCities(bank) || '—'} />
       <Row label="Deposits" value={money(rivalDeposits(bank), sym)} />
       <Row
@@ -137,7 +137,7 @@ function Integrations(p: { s: GameState }) {
               value={`${i.weeksLeft} week${i.weeksLeft === 1 ? '' : 's'} left`}
               strong
             />
-            <Row label="Branches converting" value={count(branches)} />
+            <Row label="Sales offices converting" value={count(branches)} />
           </Card>
         );
       })}
@@ -156,7 +156,7 @@ function Deals(p: { s: GameState }) {
         {[...deals].reverse().map((d) => (
           <Row
             label={`${d.name}${d.distressed ? ' (distressed)' : ''}`}
-            value={`${money(d.price, sym)} · ${d.branches} branch${d.branches === 1 ? '' : 'es'}`}
+            value={`${money(d.price, sym)} · ${d.branches} sales office${d.branches === 1 ? '' : 's'}`}
           />
         ))}
       </Card>

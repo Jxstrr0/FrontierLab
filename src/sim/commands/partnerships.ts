@@ -53,11 +53,11 @@ export function signBlocker(
   // A regional site has no storefronts: any open branch in its country can host (hostCandidates).
   if (!host || !hostCandidates(state, site.cityId).some((b) => b.id === host.id))
     return CITIES[site.cityId]?.regional
-      ? `Pick an open branch of yours in ${COUNTRIES[CITIES[site.cityId]!.country].name} to host the accounts.`
-      : 'Pick an open branch of yours in this city to host the accounts.';
+      ? `Pick an open sales office of yours in ${COUNTRIES[CITIES[site.cityId]!.country].name} to host the accounts.`
+      : 'Pick an open sales office of yours in this city to host the accounts.';
   const spec = productSpec(state, productId);
   if (!spec || !isDeposit(spec) || !isOffered(host, productId))
-    return 'Pick a deposit account the host branch offers as the package.';
+    return 'Pick a deposit account the host sales office offers as the package.';
   const fee = signingFee(state, site, kind);
   if (state.company.cash < fee) return `Not enough cash: you need ${money(fee)}.`;
   return undefined;

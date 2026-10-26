@@ -27,7 +27,7 @@ export function setOffered(
 ): CommandResult {
   const branch = state.branches[branchId];
   const spec = productSpec(state, productId);
-  if (!branch) return fail('That branch no longer exists.');
+  if (!branch) return fail('That sales office no longer exists.');
   if (!spec) return fail('Unknown product.');
   if (state.company.applyRatesToAll) return fail('Set at HQ.');
   if (branch.delegation.products)
@@ -44,7 +44,7 @@ export function setPrice(
 ): CommandResult<{ price: number }> {
   const branch = state.branches[branchId];
   const spec = productSpec(state, productId);
-  if (!branch) return fail('That branch no longer exists.');
+  if (!branch) return fail('That sales office no longer exists.');
   if (!spec) return fail('Unknown product.');
   if (state.company.applyRatesToAll) return fail('Set at HQ.');
   if (branch.delegation.products)
@@ -116,7 +116,7 @@ export function setCompanyPrice(
   const spec = productSpec(state, productId);
   if (!spec) return fail('Unknown product.');
   if (!state.company.applyRatesToAll)
-    return fail('Turn on "Apply rates to all branches" to set HQ prices.');
+    return fail('Turn on "Apply rates to all sales offices" to set HQ prices.');
   if (!state.world.countries[country]) return fail('Unknown country.');
   if (!Number.isFinite(price)) return fail('Enter a number.');
   const p = clamp(roundToStep(price, spec.step), spec.min, spec.max);

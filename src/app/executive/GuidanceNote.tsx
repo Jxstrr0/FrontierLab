@@ -28,15 +28,15 @@ function line(s: GameState, seat: ExecSeat): string {
   const needs = (x: ExecSeat, short: string) => (on(x) ? '' : ` (needs the ${short}’s switch)`);
   switch (seat) {
     case 'coo':
-      return `Branch guidance now: wages ${pct(g.staffing, GUIDANCE.wageStep)}, headcount ${pct(g.staffing, GUIDANCE.staffStep)}${needs('coo', 'COO')}. It applies to managers you let handle staffing.`;
+      return `Sales office guidance now: wages ${pct(g.staffing, GUIDANCE.wageStep)}, headcount ${pct(g.staffing, GUIDANCE.staffStep)}${needs('coo', 'COO')}. It applies to managers you let handle staffing.`;
     case 'cmo':
-      return `Branch guidance now: campaign push ${pct(g.marketing, GUIDANCE.marketingStep)}${needs('cmo', 'CMO')}. It applies to managers you let handle marketing.`;
+      return `Sales office guidance now: campaign push ${pct(g.marketing, GUIDANCE.marketingStep)}${needs('cmo', 'CMO')}. It applies to managers you let handle marketing.`;
     case 'cpo':
-      return `Branch guidance now: fees ${pct(-g.products, GUIDANCE.feeStep)}, lineup ${g.products > 0 ? 'wider' : g.products < 0 ? 'narrower' : 'no change'}${needs('cpo', 'CPO')}. It applies to managers you let handle products, and to company pricing.`;
+      return `Sales office guidance now: fees ${pct(-g.products, GUIDANCE.feeStep)}, lineup ${g.products > 0 ? 'wider' : g.products < 0 ? 'narrower' : 'no change'}${needs('cpo', 'CPO')}. It applies to managers you let handle products, and to company pricing.`;
     default: {
       const approvals = Math.round(Math.abs(g.loans) * GUIDANCE.thresholdStep * 100);
       return (
-        `Branch guidance now: deposit rates ${pp(g.deposits)}${needs('cfo', 'CFO')}; ` +
+        `Sales office guidance now: deposit rates ${pp(g.deposits)}${needs('cfo', 'CFO')}; ` +
         `loan rates ${pp(g.loans)}` +
         (g.loans !== 0 ? `, approvals ${approvals}% ${g.loans > 0 ? 'stricter' : 'looser'}` : '') +
         `${needs('cro', 'CSO')}. It applies to managers you let handle products or loan approvals, and to the CPO’s company pricing.`

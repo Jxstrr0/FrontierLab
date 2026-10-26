@@ -22,7 +22,7 @@ import './company.css';
 const EXPLAINERS: { title: string; body: string }[] = [
   {
     title: 'Deposits fund loans',
-    body: 'Every deposit your branches take in becomes money Treasury can lend or hold. More deposits mean more room to lend.',
+    body: 'Every deposit your sales offices take in becomes money Treasury can lend or hold. More deposits mean more room to lend.',
   },
   {
     title: 'Capital limits growth',
@@ -34,7 +34,7 @@ const EXPLAINERS: { title: string; body: string }[] = [
   },
   {
     title: 'Cash cover',
-    body: 'Corporate cash pays the wages, rent and salaries. Cash cover is how many weeks of those running costs it would last. A new branch loses money for its first couple of months, so build with cover to spare.',
+    body: 'Corporate cash pays the wages, rent and salaries. Cash cover is how many weeks of those running costs it would last. A new sales office loses money for its first couple of months, so build with cover to spare.',
   },
 ];
 
@@ -116,7 +116,7 @@ export function CompanyPanel() {
           />
           <p class="muted small cap-note">
             How long cash would pay the wages, rent and salaries at the last few weeks' pace. A new
-            branch loses money for its first couple of months, so keep about{' '}
+            sales office loses money for its first couple of months, so keep about{' '}
             {ATTENTION.cashCoverWeeks} weeks in hand before you build.
           </p>
         </Card>

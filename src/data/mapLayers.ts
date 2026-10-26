@@ -1,10 +1,11 @@
-// Map layers (DESIGN §3.1 "Map layers", SCREENS §2): the 14 pin types the
+// Map layers (DESIGN §3.1 "Map layers", SCREENS §2): the 16 pin types the
 // Layers sheet can show or hide. A layer is listed once the FEATURES flag of
 // the stage that builds its system is on; toggles persist in settings.layers.
 import { FEATURES, type FeatureId } from '../config/balance';
 
 export const MAP_LAYER_IDS = [
   'branches',
+  'dataCenters',
   'offices',
   'realEstate',
   'creditBureaus',
@@ -18,6 +19,7 @@ export const MAP_LAYER_IDS = [
   'auctionHouses',
   'universities',
   'employers',
+  'energySites',
 ] as const;
 export type MapLayerId = (typeof MAP_LAYER_IDS)[number];
 
@@ -29,8 +31,10 @@ export interface MapLayerSpec {
 }
 
 export const MAP_LAYERS: readonly MapLayerSpec[] = [
-  // Your branches, rival branches and open branch locations ($ pins).
-  { id: 'branches', label: 'Branches', feature: 'cityMap' },
+  // Your sales offices, rival offices and open storefronts ($ pins). Id kept for saved toggles.
+  { id: 'branches', label: 'Sales Offices', feature: 'cityMap' },
+  // Stage C2d: your data centers on storefront lots, and the regional energy sites.
+  { id: 'dataCenters', label: 'Data Centers', feature: 'cityMap' },
   { id: 'offices', label: 'Offices', feature: 'hq' },
   { id: 'realEstate', label: 'Real Estate', feature: 'investments' },
   { id: 'creditBureaus', label: 'Credit Bureaus', feature: 'hq' },
@@ -44,9 +48,10 @@ export const MAP_LAYERS: readonly MapLayerSpec[] = [
   { id: 'auctionHouses', label: 'Auction Houses', feature: 'personalEmpire' },
   { id: 'universities', label: 'Universities', feature: 'competition' },
   { id: 'employers', label: 'Employers', feature: 'competition' },
+  { id: 'energySites', label: 'Energy Sites', feature: 'multiCity' },
 ];
 
-/** Settings key for the Branches layer's "Available only" sub-filter (off by default). */
+/** Settings key for the Sales Offices layer's "Available only" sub-filter (off by default). */
 export const LEASE_ONLY_KEY = 'branches.leaseOnly';
 
 /** Layers whose systems exist in this build. */

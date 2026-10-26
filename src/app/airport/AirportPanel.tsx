@@ -54,7 +54,7 @@ export function AirportPanel(p: { jet?: boolean }) {
         usedUp
           ? "You've used this week's free mileage. Tickets come from your personal cash, and the lab covers any shortfall."
           : 'Flights within your weekly mileage are free. Past it, a one-way ticket comes from your personal cash.',
-        'Opening branches and buying buildings means being in that city. Your branches run everywhere at once.',
+        'Opening sales offices and buying buildings means being in that city. Your sales offices run everywhere at once.',
       ];
 
   // Re-quote at confirm time so the sheet shows today's split.

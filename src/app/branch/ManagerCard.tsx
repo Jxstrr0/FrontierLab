@@ -36,8 +36,8 @@ const STANDING: Record<string, string> = {
 const DELEGATIONS: [keyof Delegation, string][] = [
   ['staffing', 'Staffing & wages'],
   ['products', 'Products & rates'],
-  ['marketing', 'Branch marketing'],
-  ['troubles', 'Branch troubles'],
+  ['marketing', 'Sales office marketing'],
+  ['troubles', 'Sales office troubles'],
   ['loans', 'Loan approvals'],
 ];
 
@@ -51,7 +51,7 @@ export function ManagerCard({ branch }: { branch: Branch }) {
   if (!mgr) {
     return (
       <section>
-        <SectionTitle>Branch manager</SectionTitle>
+        <SectionTitle>Office manager</SectionTitle>
         <Card>
           <p class="br-mgr-empty muted">
             No manager. Service and morale suffer a little, and nothing can be delegated.
@@ -75,7 +75,7 @@ export function ManagerCard({ branch }: { branch: Branch }) {
   const reviews = !!s.executives.seats.coo?.delegations.payReviews;
   return (
     <section>
-      <SectionTitle>Branch manager</SectionTitle>
+      <SectionTitle>Office manager</SectionTitle>
       <Card>
         <div class="stack">
           <div class="br-mgr-head">
@@ -128,7 +128,7 @@ export function ManagerCard({ branch }: { branch: Branch }) {
           onCancel={() => setFiring(false)}
           onConfirm={() => {
             setFiring(false);
-            if (act(cmd.fireManager, branch.id).ok) toast(`${mgr.name} has left the branch.`);
+            if (act(cmd.fireManager, branch.id).ok) toast(`${mgr.name} has left the sales office.`);
           }}
         />
       )}

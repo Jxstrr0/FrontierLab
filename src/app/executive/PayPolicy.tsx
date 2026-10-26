@@ -33,7 +33,7 @@ export function PayPolicy(p: { s: GameState }) {
       />
       <p class="muted small exec-note">
         {on
-          ? `Pay reviews set every executive and branch manager to market ${ex.payPremium === 0 ? '' : signedPct(ex.payPremium, 0) + ' '}${ex.payReviewCadence === 'annual' ? 'once a year' : 'once a quarter'}, and at once when you change the premium. ${last}`
+          ? `Pay reviews set every executive and office manager to market ${ex.payPremium === 0 ? '' : signedPct(ex.payPremium, 0) + ' '}${ex.payReviewCadence === 'annual' ? 'once a year' : 'once a quarter'}, and at once when you change the premium. ${last}`
           : 'Switch on Pay reviews to have the COO apply this.'}
       </p>
     </div>

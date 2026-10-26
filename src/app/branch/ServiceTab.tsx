@@ -13,7 +13,7 @@ const CATEGORY_LABELS = {
   rates: 'Rates',
   products: 'Products',
   service: 'Service',
-  branch: 'Branch',
+  branch: 'Sales office',
 };
 
 export function ServiceTab(p: { branch: Branch }) {

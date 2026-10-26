@@ -49,7 +49,7 @@ export function LayersSheet() {
             <span class="layer-icon-slot" aria-hidden="true" />
             <Toggle
               label="Available only"
-              hint="Hide branches and show only open branch locations ($)."
+              hint="Hide sales offices and show only open locations ($)."
               checked={layers[LEASE_ONLY_KEY] === true}
               disabled={!layerOn(layers, 'branches')}
               onChange={(on) => set({ [LEASE_ONLY_KEY]: on })}
@@ -81,7 +81,7 @@ function MapKey(p: { brand: Brand }) {
         <span class="map-key-mark" aria-hidden="true">
           <Crest ink={p.brand.ink} monogram={p.brand.monogram} width={KEY_PX.crest} />
         </span>
-        Banks
+        Labs
       </li>
       <li>
         <span class="map-key-mark" aria-hidden="true">
@@ -122,6 +122,8 @@ function LayerPins(p: { id: MapLayerId; brand: Brand }) {
           <LotCoin size={KEY_PX.coin} />
         </>
       );
+    case 'dataCenters':
+      return <Crest ink={p.brand.ink} monogram={p.brand.monogram} width={KEY_PX.crest} />;
     case 'banks':
       return (
         <>

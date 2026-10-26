@@ -81,7 +81,7 @@ export function benefitEffects(spec: BenefitSpec, value: number): string[] {
   if (e.morale) out.push(`${signed(at(e.morale), 1)} morale${spec.hqOnly ? ' at HQ' : ''}`);
   if (e.retention) out.push(`${signed(at(e.retention) * 100)}% retention`);
   if (e.attraction) out.push(`${signed(at(e.attraction), 1)} hiring appeal`);
-  if (e.reputation) out.push(`${signed(at(e.reputation), 2)} branch rating`);
+  if (e.reputation) out.push(`${signed(at(e.reputation), 2)} sales office rating`);
   if (spec.id === 'remote_fri')
     out.push(`${Math.round(REMOTE_FRIDAY_STAFF * 100)}% less HQ output`);
   return out;
