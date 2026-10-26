@@ -41,6 +41,19 @@
   fill-opacity: 0.3;
   stroke: none;
 }
+.portrait .pt-grey {
+  fill-opacity: 0.1;
+}
+.portrait .pt-white {
+  fill: var(--ivory);
+  stroke: none;
+}
+.portrait .pt-iris {
+  fill: var(--portrait-ink);
+  fill-opacity: 0.35;
+  stroke: var(--portrait-ink);
+  stroke-width: 0.35;
+}
 .portrait .pt-line {
   fill: none;
   stroke: var(--portrait-ink);
@@ -52,7 +65,40 @@
   stroke-width: 0.48;
 }
 .portrait .pt-brow {
-  stroke-width: 0.9;
+  stroke-width: 0.7;
+}
+.portrait .pt-brow-hair {
+  fill: none;
+  stroke: var(--portrait-ink);
+  stroke-width: 0.4;
+  stroke-linecap: round;
+  opacity: 0.85;
+}
+.portrait .pt-lid {
+  stroke-width: 0.7;
+}
+/* Soft marks: lip bow, lids, folds, seams. */
+.portrait .pt-soft {
+  fill: none;
+  stroke: var(--portrait-ink);
+  stroke-width: 0.38;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.6;
+}
+.portrait .pt-wrinkle {
+  fill: none;
+  stroke: var(--portrait-ink);
+  stroke-width: 0.36;
+  stroke-linecap: round;
+  opacity: 0.5;
+}
+.portrait .pt-strand {
+  fill: none;
+  stroke: var(--portrait-ink);
+  stroke-width: 0.5;
+  stroke-linecap: round;
+  opacity: 0.45;
 }
 .portrait .pt-glass {
   stroke-width: 0.65;

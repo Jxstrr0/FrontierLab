@@ -93,6 +93,10 @@ const DEFAULT_AVATAR: AvatarSpec = {
   attire: 0,
   tone: 0,
   shade: 1,
+  eyes: 0,
+  brows: 0,
+  mouth: 0,
+  age: 0,
 };
 
 export function newGame(opts: NewGameOptions): GameState {

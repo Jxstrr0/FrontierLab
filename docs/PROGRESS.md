@@ -4,12 +4,30 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 **Current stage:** 10 — Art pass, onboarding, polish, launch (built and live; awaiting the owner's iPhone check). All ten roadmap stages are built. Still open: the owner's testing and tuning pass, an Add to Home Screen test on a real iPhone, and the Vault Street card on Kelbo.Website (in a separate session in that repo).
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `12dd4c303e05ab` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `000acf5c010cae` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
 
+### 2026-10-26 — More detailed faces and a grouped portrait creator (v0.10.18)
+- **Owner's ask:** update the profile picture creator and the faces: same art style, more detail.
+- **Faces, redrawn.** Every portrait in the game (founder, managers, candidates, executives, startup and venture CEOs, advisors, review cards) is still an engraved banknote plate, with much more in it:
+  - **Eyes** have whites, an inked iris with a pupil and a tiny catchlight, a heavier upper lid with a lash flick, a faint lower lid, and a shadow under the brow on the dark side.
+  - **Brows** are little strips of hair strokes, tapering outward.
+  - **Nose** has a shaded bridge, wings and nostrils. **Lips** have a cupid's bow, a shaded lower lip and a chin shadow.
+  - **Hair** keeps its hatching and gains sparser strand lines over it. **Ears** show the inner curve.
+  - The head has extra shade under the jaw and at the temple, the neck a tendon line, and the whole plate sits on ruled lines that get denser toward the frame, like a real banknote vignette.
+  - **Attire:** the suit has a knotted, cross-hatched tie, a shaded lapel, buttons, a pocket square and sleeve seams; the blouse soft folds and a pendant; the sweater a cross-knit texture with a shirt collar; the turtleneck fold lines.
+  - Tiny plates (the advisor bar, review cards) keep the stronger shapes and drop the fine marks so they stay readable at 28–40 px.
+- **Four new parts in the creator**, so you can shape the face itself:
+  - **Eyes:** Almond, Round, Hooded, Upturned. **Brows:** Soft arch, Straight, Bold. **Mouth:** Smile, Composed, Grin (teeth showing). **Age:** Fresh, Seasoned (smile lines, a forehead line, faint crow's feet), Veteran (deeper lines, pouches, hollow cheeks, neck lines and silver hair).
+  - **Glasses** gains a fourth option, Half-rim.
+- **The creator itself** is split into **Face** (head shape, eyes, brows, mouth, age, skin tone) and **Style** (hair, facial hair, glasses, attire), each row shows where you are (e.g. 3/4), the preview is bigger, and a **Shuffle** button deals a random face to start from. Same picker in Settings → Edit founder avatar.
+- **How everyone else got a face.** New people don't draw the four new parts from the people RNG: they hash them from the parts they already have (`faceDetail` in `src/sim/people.ts`). That way the candidate pools and everything downstream for every seed are exactly as before, verified by stripping the new fields from the 260-week run and recovering the old hash. The determinism snapshot still moves, `12dd4c303e05ab` → `000acf5c010cae`, only for the new fields, the schema number and the fourth glasses option.
+- **Existing saves:** schema v23 (migration 22 → 23) walks the save and gives every face the same hashed detail a new game would; your founder gets the defaults (almond eyes, soft arch, smile, fresh), which is exactly how they drew before.
+- **Files:** the face lives in `src/art/portraitFace.ts` (eyes, brows, nose, mouth, age lines) and `src/art/portraitTrim.ts` (ears, glasses); `portraits.ts` assembles, `portraitAttire.ts` dresses.
+- **Checked** the Founder step at 390×844 (top, after Shuffle, scrolled to Style) with no console errors, plus 24 seeded faces and every part option rendered at 120 px and 36 px.  757 tests (new: every generated person has detail in range, detail derives from the other parts and varies, migration 20 → 21 keeps the founder and gives everyone else their face; settings command accepts the new parts and still refuses `shade`), lint, typecheck and build clean.
 ### 2026-10-26 — Colour on the branch fronts (v0.10.17)
 - **Owner's ask:** make the exterior of the branches incorporate a little more colour.
 - **Material washes.** Every branch front (the hero on the branch panel, the Build branch preview and the New Game style picker) now has a pale second printing under its hatching, the way the map's tint underprint works: terracotta on the Heritage Brick walls, warm limestone on the Classic Columns, the Deco tower and the stone dressings, a cool wash on all the glazing, slate on roof slabs, fascias and the Modern Glass spandrels, verdigris on the Deco setbacks, and leaf green on the planting in every house style's planters. The brand ink joins in on the building itself: the awning stripes of the Plain Storefront, the pediment of the Classic Columns, the canopy of the Modern Glass front and the spandrels and crown of the Deco tower. The Deco sunburst over the door is brass now.

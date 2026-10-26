@@ -23,6 +23,10 @@ const FALLBACK_AVATAR: AvatarSpec = {
   attire: 1,
   tone: 2,
   shade: 1,
+  eyes: 0,
+  brows: 0,
+  mouth: 0,
+  age: 1,
 };
 
 export function TutorialOverlay() {

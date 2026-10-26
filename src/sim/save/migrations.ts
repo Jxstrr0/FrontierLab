@@ -17,6 +17,7 @@ import { initCapitalMarkets, initRivalShares } from '../marketInit';
 import { emptyCorporateDebt } from '../corporateDebt';
 import { initCountries } from '../macro';
 import { checkMilestones } from '../milestones';
+import { faceDetail, type BaseAvatar } from '../people';
 import { initRivalBench, initRivalFinancials, seedMatureBooks } from '../rivals';
 import { EXEC_DELEGATION, FX_START_INDEX, PAY_REVIEW } from '../../config/balance';
 import { COUNTRIES } from '../../data/countries';
@@ -371,7 +372,45 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     state.settings.hqTabOrder ??= [];
     return s;
   },
+  // v23: portraits gained eyes, brows, mouth and age. Every face in the save
+  // (founder, managers, candidates, executives, startup and venture CEOs) gets
+  // them. The founder keeps the look they chose; everyone else gets the face
+  // a new game would give the same parts (people.ts faceDetail).
+  22: (s) => {
+    const meta = s.meta as { founderAvatar?: Record<string, unknown> };
+    if (meta.founderAvatar) {
+      Object.assign(meta.founderAvatar, { eyes: 0, brows: 0, mouth: 0, age: 0 });
+    }
+    addFaceDetail(s);
+    return s;
+  },
 };
+
+/** The v22 portrait fields; an object with all of them and no `eyes` is a face. */
+const V22_FACE_KEYS = ['head', 'hair', 'facial', 'glasses', 'attire', 'tone', 'shade'] as const;
+
+function addFaceDetail(node: unknown): void {
+  if (!node || typeof node !== 'object') return;
+  if (Array.isArray(node)) {
+    for (const item of node) addFaceDetail(item);
+    return;
+  }
+  const o = node as Record<string, unknown>;
+  for (const key of Object.keys(o)) {
+    const v = o[key];
+    if (!v || typeof v !== 'object') continue;
+    if (Array.isArray(v)) {
+      addFaceDetail(v);
+      continue;
+    }
+    const face = v as Record<string, unknown>;
+    if (V22_FACE_KEYS.every((k) => typeof face[k] === 'number') && face.eyes === undefined) {
+      Object.assign(face, faceDetail(face as unknown as BaseAvatar));
+      continue;
+    }
+    addFaceDetail(v);
+  }
+}
 
 const STAGE9_PNL_LINES = ['franchiseRevenue', 'franchiseCosts', 'dealerFees'] as const;
 

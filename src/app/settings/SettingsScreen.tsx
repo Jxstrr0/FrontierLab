@@ -197,7 +197,7 @@ export function SettingsScreen(p: { inGame?: boolean }) {
         <Sheet title="Founder avatar" onClose={() => setEditingAvatar(false)}>
           <AvatarPicker
             value={game.meta.founderAvatar}
-            onChange={(part, index) => act(setFounderAvatar, { [part]: index })}
+            onChange={(parts) => act(setFounderAvatar, parts)}
           />
           <button
             type="button"
