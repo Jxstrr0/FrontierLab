@@ -19,11 +19,11 @@ import {
   oddsRows,
   openInputs,
   productSubtitle,
-  riskHint,
   templateBlocker,
   tierHint,
   trendSeries,
 } from '../../src/app/hq/products/productSelectors';
+import { riskHint } from '../../src/app/hq/finance/riskSelectors';
 import { DEV_TEMPLATES } from '../../src/data/devTemplates';
 import { PRODUCTS } from '../../src/data/products';
 import * as cmd from '../../src/sim/commands';
@@ -95,13 +95,15 @@ describe('mix slider maths', () => {
   });
 });
 
-describe('Products floor wording', () => {
+describe('Finance floor risk appetite wording', () => {
   it('describes risk appetite from the balance table', () => {
     expect(riskHint(3)).toBe('Standard loan volumes and default rates.');
     expect(riskHint(1)).toBe('About 30% fewer loans, with defaults 30% lower.');
     expect(riskHint(5)).toBe('About 30% more loans, with defaults 45% higher.');
   });
+});
 
+describe('Products floor wording', () => {
   it('describes the price tier for rate and fee products', () => {
     expect(tierHint(DEV_TEMPLATES.senior_saver, 'low')).toBe('Default rate −0.10pp');
     expect(tierHint(DEV_TEMPLATES.senior_saver, 'medium')).toBe('Standard rate');

@@ -258,6 +258,7 @@ Tabs: Overview · Loans · Credit.
   - bar chart
   - Statements: Income / Balance sheet / Cash flow, each Week | Quarter | Year
   - capital ratio (tier badge + meter with thresholds) and liquidity ratio; at Watch or worse, a "How to fix this" checklist under the meter (as §24)
+  - risk appetite Segmented (1–5), with the level's name, its effect on loan volume and defaults, and a line naming who else steers it when a CRO (Risk appetite switch) or CFO (Capital switch) is seated
   - "Delayed" placeholders when short-staffed
 - **HR:**
   - **Branch managers** card: a "Hire managers for empty branches" toggle (on by default; hint "Each week, the strongest candidate in the city"; SIMULATION §16.11), a "Branches without a manager" count, and, when the COO's Branch operations is on, a note that the COO hires first and also turns on the branch's delegation
@@ -265,7 +266,6 @@ Tabs: Overview · Loans · Credit.
   - "Close HR floor" (release the floor)
 - **Products:**
   - house model (rosette, cost/app, model name) and Manage models (sliders for each data input that sum to 100%, with a live rosette and cost)
-  - risk appetite Segmented (1–5), with a line naming who else steers it when a CRO (Risk appetite switch) or CFO (Capital switch) is seated
   - company deposits and loans line chart with week-over-week changes
   - **Product lineup** (category Segmented + product cards like §5.2, at company level) and the "Apply rates to all branches" toggle
   - Product developments list (progress bar, weeks left) and New product
@@ -506,7 +506,7 @@ Tabs: Overview · Loans · Credit.
 
 - **Where to look** at the top: the three things that most need you, worst first (Urgent / Watch / Note), each a tap to the right screen: capital tier, corporate cash below zero or under `ATTENTION.cashCoverWeeks` of running costs, open cases, a lending freeze or liquidity under the minimum (or under target with auto-funding off), expiring loan applications, branches losing money for 4 weeks, ratings under 2.5, understaffing, loan losses over the CRO ceiling, morale under 50, branches without a manager, empty executive seats, switched-off delegations, low awareness. "All clear" when nothing qualifies. Ranking in `src/sim/attention.ts`, thresholds in `ATTENTION`.
 - capital ratio with tier badge and a meter with thresholds
-- at Watch, Restricted or Critical, a "How to fix this" checklist under the meter (`src/data/capitalFixes.ts`): sell new shares at an investment bank (Private placement, or Secondary offering once listed), sell company stocks and startup stakes, turn risk appetite down, hold off on growth and dividends; at Critical, a line on the emergency rescue
+- at Watch, Restricted or Critical, a "How to fix this" checklist under the meter (`src/data/capitalFixes.ts`): sell new shares at an investment bank (Private placement, or Secondary offering once listed), sell company stocks and startup stakes, turn risk appetite down (Finance floor), hold off on growth and dividends; at Critical, a line on the emergency rescue
 - **Cash** card: corporate cash, running costs a week and **cash cover** (weeks of running costs; red under `ATTENTION.cashCoverWeeks`)
 - liquidity ratio with the Treasury gauge's status badge, the target, overnight borrowing when any, and a line saying whether auto-funding is holding the target
 - totals: assets, deposits, loans, equity

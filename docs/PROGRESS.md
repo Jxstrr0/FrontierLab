@@ -10,6 +10,15 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-10-26 — Risk appetite moves to the Finance floor (v0.11.3)
+- **Owner's ask:** move risk appetite to the Finance floor.
+- **What changes.** The risk appetite card (the 1–5 dial, its effect on loans and defaults, and the line saying when your CRO or CFO is steering it) now sits on the HQ **Finance** floor, under the capital ratio and liquidity cards, because it is mostly a capital lever. The Products floor no longer shows it. The "How to fix this" capital checklist and the Finance and Products floors' first-look tips now point to the Finance floor.
+- **Heads-up:** you now need a Finance floor at HQ to change the dial by hand (before, you needed a Products floor). Your current level carries over, and a seated CRO or CFO keeps steering it either way.
+- **Saves:** no change. It's the same setting in a different place.
+- **Code:** the card and its wording moved to `src/app/hq/finance/` (`RiskAppetite.tsx`, `riskSelectors.ts`, `finance.css`).
+- **Checked:** lint, full test suite and build clean. Determinism snapshot unchanged (UI only).
+- **Docs:** SCREENS §10 and §24, DATA_MODEL command table, DESIGN decision log.
+
 ### 2026-10-26 — Content trim merged (v0.11.2)
 - **Owner's ask:** update pull request #2 (the 2026-10-25 content trim, v0.10.4, entry below) and merge it.
 - **Brought up to date.** `main` had moved 29 commits and ten save versions since the trim was written. I merged `main` into the branch and kept both sides. The trim's save migration was written as 14 → 15, but `main` already uses 15–25 for other features, so it now runs last as **25 → 26** (schema v26), with the same steps: dealer deals removed, their fees folded into marketing, held foreclosed homes turned to renting, merged funding types retyped, and the Grand Opening Week package renamed Street Team. The old migration test still walks a v14 save all the way up.
