@@ -203,7 +203,8 @@ After the wizard, the map opens with the tutorial (§27).
 - **Chart:** paired bars for the last 5 weeks.
 - **Branch income statement** (Week | Quarter | Year), with the line groups from SIMULATION §12.
 - **Balances box:** Deposits, Loans, Customers.
-- **Footer:** Rename branch, Close branch (confirm, showing what you get back).
+- **Office size card (C2a):** the size (Starter, Standard, Large or Flagship), the cost to grow to the next one and its new weekly rent, and a **Grow office** button (confirm, showing fit-out, extra lease deposit, total and new rent; the reason shows under the button when it can't). At Flagship the card says it is the largest size.
+- **Footer:** Rename branch, Close branch (confirm, showing what you get back; with one office per city, accounts go to the office in the nearest city).
 
 ## 6. Rival branch
 
@@ -311,7 +312,7 @@ Tabs: Overview · Loans · Credit.
 - CFO and CRO: **Branch guidance now**: the deposit and loan rate offsets and how much stricter or looser approvals are, noting which switch is off
 - COO, CMO and CPO: **Branch guidance now**: the COO's wage and headcount change, the CMO's campaign push, or the CPO's fee change and whether the lineup is wider or narrower, noting when the switch is off
 - CIO (Chief Infrastructure Officer, seat id `creo`): four switches. **Rents: the bank's buildings** and **Rents: your own buildings**, each with an **Occupancy** dial under it (80% / 85% / 90% / 95% / 100%; tagline: "Rent +5% per m² · net rent $2.53M/yr, $177K less than at 100%", "As full as tenants allow · net rent $1.15M/yr across 2 buildings", or with no buildings "No buildings yet: …"); then **Buying: the bank's buildings** and **Buying: your own buildings**. Then a note: "Managing 3 buildings of the bank's and 1 of yours: tenants pay up to 8% over market, and rents are reviewed every 4 weeks (next in 2 weeks)." (or, with both off, how many buildings wait on the switches), and for each Buying switch that is on: "For the bank: next, 803 Copper Lane in Calgary for $3.27M (13.8% a year), in 3 weeks." or what holds it back ("Waiting for spare cash: …", "The bank's buildings would pass 5% of its assets.", "The capital ratio would fall under 12%.", the regulator at a restricted tier, "No building for sale earns its keep right now.")
-- COO only: **Growth cities**: every city you have visited, home first, each with a switch (may the Expansion delegation build here) and an **Open now** button that has the COO build their usual pick at once; the hint under each city shows how many branches you already have there (open or being built), then the next storefront and its cost, or why nothing can be built there
+- COO only: **Growth cities**: every city you have visited, home first, each with a switch (may the Expansion delegation build here) and an **Open now** button that has the COO build their usual pick at once (C2a: **Grow now** where you already have an office, which grows it a size); the hint under each city shows "No office yet" or the office's size, then the next storefront or size and its cost, or why nothing can be done there
 - annual salary stepper
 - grants list: type, shares, strike, vesting progress
 - **Add grant:**

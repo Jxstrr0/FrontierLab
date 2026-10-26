@@ -213,9 +213,11 @@ describe('news and names across cities', () => {
     expect(s.branches[branches.nyc]!.name).toBe('New York Midtown');
     expect(s.branches[branches.lon]!.name).toBe('London Midtown');
     expect(s.branches[branches.cal]!.name).toBe('Midtown');
-    // The rate watch covers your busiest city: a second New York branch makes it New York.
-    fly(s, 'nyc');
-    openScriptedBranch(s, 'downtown');
+    // The rate watch covers your busiest city: growing the New York office makes it New York.
+    addCapital(s, 5_000_000);
+    advanceWeeks(s, 8);
+    expect(cmd.upgradeBlocker(s, branches.nyc!)).toBeUndefined();
+    cmd.upgradeOffice(s, branches.nyc!);
     advanceWeeks(s, 2);
     expect(rateWatchStory(newsContext(s, []))?.tokens.city).toBe(CITIES.nyc!.name);
   });

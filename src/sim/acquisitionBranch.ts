@@ -85,6 +85,7 @@ export function convertRivalBranch(
     openedWeek: state.clock.week,
     status: 'open',
     build: { ...ACQUIRED_BUILDS[bank.strategy] },
+    size: 0,
     lease: { weeklyRent: lot.weeklyRent, deposit: lot.deposit },
     staff: {
       count: 0,

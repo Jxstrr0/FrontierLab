@@ -15,8 +15,8 @@ export interface MilestoneSpec {
 export const MILESTONES: MilestoneSpec[] = [
   {
     id: 'first_branch',
-    title: 'First branch',
-    goal: 'Open your first branch.',
+    title: 'First sales office',
+    goal: 'Open your first sales office.',
     line: 'The doors are open and the first deposits are in.',
     news: false,
   },
@@ -36,9 +36,9 @@ export const MILESTONES: MilestoneSpec[] = [
   },
   {
     id: 'ten_branches',
-    title: '10 branches',
-    goal: 'Run 10 open branches.',
-    line: '{bank} now runs ten branches.',
+    title: 'First Flagship',
+    goal: 'Grow a sales office to Flagship size.',
+    line: '{bank} now runs a Flagship sales office.',
     news: true,
   },
   {
@@ -64,16 +64,16 @@ export const MILESTONES: MilestoneSpec[] = [
   },
   {
     id: 'hundred_branches',
-    title: '100 branches',
-    goal: 'Run 100 open branches.',
-    line: '{bank} now runs a hundred branches.',
+    title: 'Five Flagships',
+    goal: 'Run five Flagship sales offices.',
+    line: '{bank} now runs five Flagship sales offices.',
     news: true,
   },
   {
     id: 'ten_cities',
     title: 'Ten cities',
-    goal: 'Run branches in ten cities.',
-    line: '{bank} now has branches in ten cities.',
+    goal: 'Run sales offices in ten cities.',
+    line: '{bank} now has sales offices in ten cities.',
     news: true,
   },
   {
@@ -86,7 +86,7 @@ export const MILESTONES: MilestoneSpec[] = [
   {
     id: 'five_countries',
     title: 'Five countries',
-    goal: 'Run branches in five countries.',
+    goal: 'Run sales offices in five countries.',
     line: '{bank} now banks customers in five countries.',
     news: true,
   },
@@ -114,14 +114,14 @@ export const MILESTONES: MilestoneSpec[] = [
   {
     id: 'twenty_cities',
     title: 'Twenty cities',
-    goal: 'Run branches in twenty cities.',
-    line: '{bank} now has branches in twenty cities.',
+    goal: 'Run sales offices in twenty cities.',
+    line: '{bank} now has sales offices in twenty cities.',
     news: true,
   },
   {
     id: 'ten_countries',
     title: 'Ten countries',
-    goal: 'Run branches in ten countries.',
+    goal: 'Run sales offices in ten countries.',
     line: '{bank} now banks customers in ten countries.',
     news: true,
   },

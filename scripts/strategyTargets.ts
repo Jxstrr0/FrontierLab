@@ -100,11 +100,11 @@ export function strategyChecks(name: string, opts: NewGameOptions, log: RunLog):
     if (weeks >= 104) {
       const n = log.branches[104]!;
       checks.push({
-        label: 'Year 2 branches',
+        label: 'Year 2 sales offices',
         value: String(n),
-        // 3–8 since the nominal index (§4.6): a balance sheet that grows with the economy binds capital a little sooner.
-        ok: n >= 3 && n <= 8,
-        target: '3–8',
+        // C2a: one office per city, grown in place, so year 2 holds the home office and a city or so more.
+        ok: n >= 1 && n <= 4,
+        target: '1–4',
       });
     }
     if (weeks >= 520) {
@@ -112,10 +112,10 @@ export function strategyChecks(name: string, opts: NewGameOptions, log: RunLog):
       // §25 bands are in start-of-game money: deflate by the nominal index.
       const a = log.assets[520]! / log.nominal[520]!;
       checks.push({
-        label: 'Year 10 branches',
+        label: 'Year 10 cities with an office',
         value: String(n),
-        ok: n >= 60 && n <= 250,
-        target: '60–250',
+        ok: n >= 10 && n <= 25,
+        target: '10–25',
       });
       checks.push({
         label: 'Year 10 total assets (real)',

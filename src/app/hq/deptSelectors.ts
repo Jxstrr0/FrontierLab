@@ -13,7 +13,7 @@ import { seatedExecs } from '../../sim/execSeats';
 /** UI-only thresholds for the advisor line (not simulation tuning). */
 const ADVISOR = { lowMorale: 40 } as const;
 
-/** Branch count at which requirements start (founder mode, SIMULATION §16.3). */
+/** Office units (a Starter is 1) at which requirements start (founder mode, SIMULATION §16.3). */
 export const FOUNDER_FROM_BRANCHES = FOUNDER_RAMP.fromBranches + 1;
 
 export const isHqDept = (d: DeptId): d is HqDeptId => (HQ_DEPTS as readonly string[]).includes(d);
@@ -45,7 +45,7 @@ export function coverageView(s: GameState, dept: HqDeptId): CoverageView {
       ramp,
       status: 'founder',
       text: `Not required yet · Coverage ${pctText}`,
-      note: `Founder mode: nothing is required until you run ${FOUNDER_FROM_BRANCHES} branches.${needs > 0 ? ` At today's size this floor would need ${needs}.` : ''}`,
+      note: `Founder mode: nothing is required until your sales offices add up to ${FOUNDER_FROM_BRANCHES} Starters (a Standard counts 2).${needs > 0 ? ` At today's size this floor would need ${needs}.` : ''}`,
     };
   }
   const short = (c?.kPrime ?? 1) < 1;

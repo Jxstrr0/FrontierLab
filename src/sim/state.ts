@@ -55,7 +55,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState } from './personalTypes';
 
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 export interface GameState {
   schemaVersion: number;
@@ -434,6 +434,8 @@ export interface Branch {
   openedWeek?: Week;
   status: 'fitout' | 'open' | 'closed';
   build: BuildSpec;
+  /** Sales office size level, an index into OFFICE_SIZES (schema 2, stage C2a). */
+  size: number;
   lease: { weeklyRent: Money; deposit: Money };
   staff: BranchStaff;
   managerId?: Id;

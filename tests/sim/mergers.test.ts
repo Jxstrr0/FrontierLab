@@ -221,24 +221,24 @@ describe('closing', () => {
     expect(identityGap(s)).toBeLessThan(1);
   });
 
-  it('runs years after a deal with converted branches like any other', () => {
+  it('runs years after a deal with the rival folded into your office (C2a)', () => {
     const s = capitalisedBank();
+    const home = Object.keys(s.branches)[0]!;
+    const before = s.branches[home]!.customers;
     buy(s);
-    const acquired = Object.values(s.branches).filter((b) => b.converting);
-    expect(acquired.length).toBeGreaterThan(0);
+    // The Calgary rival's branches join your Calgary office: one office, more customers.
+    expect(Object.values(s.branches).filter((b) => b.cityId === 'cal')).toHaveLength(1);
+    expect(s.branches[home]!.customers).toBeGreaterThan(before);
+    cmd.travelTo(s, 'sas');
+    openScriptedBranch(s);
     for (let w = 0; w < 156; w++) {
       advanceWeeks(s, 1);
       expect(identityGap(s)).toBeLessThan(1);
     }
     expect(JSON.stringify(s)).not.toMatch(/NaN|null/);
-    for (const b of acquired) {
-      const now = s.branches[b.id]!;
-      expect(now.converting).toBeUndefined();
-      expect(now.pnl.length).toBeGreaterThanOrEqual(52);
-      expect(now.customers).toBeGreaterThan(0);
-    }
-    // Closing an acquired branch works like any other.
-    const r = closeBranch(s, acquired[0]!.id);
+    expect(s.branches[home]!.customers).toBeGreaterThan(0);
+    // Closing the merged office works like any other.
+    const r = closeBranch(s, home);
     expect(r.ok).toBe(true);
     expect(identityGap(s)).toBeLessThan(1);
     advanceWeeks(s, 4);

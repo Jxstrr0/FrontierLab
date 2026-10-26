@@ -27,6 +27,17 @@ export interface BranchMetrics {
 /** Weeks with deposit, customer and earnings checkpoints. */
 export const CHECK_WEEKS = [26, 52, 104, 156, 208, 260] as const;
 
+/** §25 home-office bands from year 2 (C2a): [low, high] deposits, revenue and income a week. */
+const OFFICE_BANDS: Record<
+  number,
+  { dep: [number, number]; rev: [number, number]; inc: [number, number] }
+> = {
+  104: { dep: [70e6, 180e6], rev: [160e3, 380e3], inc: [55e3, 140e3] },
+  156: { dep: [110e6, 260e6], rev: [250e3, 520e3], inc: [85e3, 190e3] },
+  208: { dep: [140e6, 340e6], rev: [320e3, 700e3], inc: [110e3, 260e3] },
+  260: { dep: [140e6, 360e6], rev: [320e3, 720e3], inc: [110e3, 260e3] },
+};
+
 const M = (x: number) => `${(x / 1e6).toFixed(1)}M`;
 const K = (x: number) => `${(x / 1e3).toFixed(1)}k`;
 const P = (x: number) => `${(x * 100).toFixed(1)}%`;
@@ -68,52 +79,49 @@ export function branchCheckpoints(m: BranchMetrics): Check[] {
       {
         label: 'Week 52 deposits',
         value: M(w52.dep),
-        ok: inRange(w52.dep, 30e6, 50e6),
-        target: '$30–50M',
+        ok: inRange(w52.dep, 35e6, 80e6),
+        target: '$35–80M',
       },
       {
         label: 'Week 52 loans / deposits',
         value: P(w52.loans / w52.dep),
-        ok: inRange(w52.loans / w52.dep, 0.75, 0.9),
-        target: '75–90%',
+        ok: inRange(w52.loans / w52.dep, 0.65, 0.9),
+        target: '65–90%',
       },
       {
         label: 'Week 52 customers',
         value: String(Math.round(w52.cust)),
-        ok: inRange(w52.cust, 3000, 5000),
-        target: '3,000–5,000',
+        ok: inRange(w52.cust, 3500, 8000),
+        target: '3,500–8,000',
       },
       {
         label: 'Week 52 income / week',
         value: K(w52.inc),
-        ok: inRange(w52.inc, 20e3, 40e3),
-        target: '$20–40k',
+        ok: inRange(w52.inc, 25e3, 60e3),
+        target: '$25–60k',
       },
     );
   }
   for (const wk of [104, 156, 208, 260]) {
     const s = m.at[wk];
     if (!s) continue;
-    // §25: one mature band from week 156; the city-wide pool (§9.2) levels the first branch off
-    // once home fills up. Week 104 sits lower: in a tighter city rivals stand closer (CONTENT §3).
-    // Since rivals learn (§18.3) a first branch that never upgrades gives up a little share a year.
-    // The 20-city median reads $84k revenue at week 104 (2026-10-26), so year 2 starts at $80k.
-    // Rivals that replace lost banks, advertise and keep their branches (§18.7–18.9) take a
-    // little more of a never-upgraded first branch's income: $31k at week 104, $32k after.
-    const [revLo, incLo] = wk < 156 ? [80e3, 31e3] : [85e3, 32e3];
+    // §25 (C2a): the home office grows a size at a time once HQ is up, so its
+    // bands climb to week 208 and then level off as the city fills (§9.2).
+    // Set from the 20-city median on 2026-10-26.
+    const band = OFFICE_BANDS[wk]!;
     checks.push({
       label: `Week ${wk} deposits`,
       value: M(s.dep),
-      ok: inRange(s.dep, 38e6, 70e6),
-      target: '$38–70M',
+      ok: inRange(s.dep, band.dep[0], band.dep[1]),
+      target: `$${band.dep[0] / 1e6}–${band.dep[1] / 1e6}M`,
     });
     checks.push(
       na(
         {
           label: `Week ${wk} loans / deposits`,
           value: P(s.loans / s.dep),
-          ok: inRange(s.loans / s.dep, 0.7, 0.9),
-          target: '70–90%',
+          ok: inRange(s.loans / s.dep, 0.65, 0.9),
+          target: '65–90%',
         },
         wk,
       ),
@@ -121,8 +129,8 @@ export function branchCheckpoints(m: BranchMetrics): Check[] {
         {
           label: `Week ${wk} revenue / week`,
           value: K(s.rev),
-          ok: inRange(s.rev, revLo, 150e3),
-          target: `$${revLo / 1e3}–150k`,
+          ok: inRange(s.rev, band.rev[0], band.rev[1]),
+          target: `$${band.rev[0] / 1e3}–${band.rev[1] / 1e3}k`,
         },
         wk,
       ),
@@ -130,8 +138,8 @@ export function branchCheckpoints(m: BranchMetrics): Check[] {
         {
           label: `Week ${wk} income / week`,
           value: K(s.inc),
-          ok: inRange(s.inc, incLo, 70e3),
-          target: `$${incLo / 1e3}–70k`,
+          ok: inRange(s.inc, band.inc[0], band.inc[1]),
+          target: `$${band.inc[0] / 1e3}–${band.inc[1] / 1e3}k`,
         },
         wk,
       ),

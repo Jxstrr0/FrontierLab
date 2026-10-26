@@ -1,7 +1,7 @@
 // Expanding across cities for scripted strategies (DESIGN §5.2 "one global
-// enterprise", ROADMAP Stage 8): build in the city you're in while it has a
-// good free lot and room for another branch (CITY_BRANCH_GUIDE); once it runs
-// out, fly to the next city in a fixed order (the home country's other cities
+// enterprise", ROADMAP Stage 8): one sales office per city (C2a), grown a size
+// when it gets busy (growableOffice); a city without one gets one, the next
+// city in a fixed order (the home country's other cities
 // nearest first, then every other city by distance from home; regional sites
 // never) and carry on there. Deterministic: the order
 // depends only on the home city, and the choice only on the map.
@@ -9,7 +9,9 @@ import { CITIES } from '../../src/data/cities';
 import * as cmd from '../../src/sim/commands';
 import { cityDistanceKm } from '../../src/sim/geo';
 import type { GameState, Lot } from '../../src/sim/state';
-import { cityBranchGuide } from '../../src/sim/branch/cityMarket';
+import { cityRoom } from '../../src/sim/branch/cityMarket';
+import { nextSizeAddsReach, officeInCity } from '../../src/sim/branch/officeSize';
+import type { Branch } from '../../src/sim/state';
 import { isGenerated } from '../../src/sim/worldGen';
 import { bestLot, goodLots } from './common';
 
@@ -24,16 +26,26 @@ export function expansionOrder(home: string): string[] {
   return [home, ...domestic, ...abroad];
 }
 
-/**
- * A city still worth building in: not yet visited (so unknown), or with a good
- * free lot and fewer of our branches than the city supports (CITY_BRANCH_GUIDE).
- */
+/** A city still worth an office: not yet visited (so unknown), or without one and with a good free lot. */
 export function hasRoom(state: GameState, cityId: string): boolean {
   if (!isGenerated(state, cityId)) return true;
-  const ours = Object.values(state.branches).filter(
-    (b) => b.cityId === cityId && b.status !== 'closed',
-  ).length;
-  return ours < cityBranchGuide(cityId) && goodLots(state, cityId).length > 0;
+  return !officeInCity(state, cityId) && goodLots(state, cityId).length > 0;
+}
+
+/** City room a scripted lab needs before it grows an office there. */
+const GROW_MIN_ROOM = 0.2;
+
+/** The office that should grow a size now (busiest first), if any. */
+export function growableOffice(state: GameState): Branch | undefined {
+  return Object.values(state.branches)
+    .filter(
+      (b) =>
+        b.status === 'open' &&
+        !b.converting &&
+        nextSizeAddsReach(b) &&
+        cityRoom(state, b.cityId) >= GROW_MIN_ROOM,
+    )
+    .sort((a, b) => b.waitIndex - a.waitIndex || (a.id < b.id ? -1 : 1))[0];
 }
 
 /**

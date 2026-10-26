@@ -3,6 +3,7 @@
 // currency, home country, the countries and cities you operate in) and small
 // name lookups. Stories carry a template key, a subject and raw tokens; news.ts
 // picks the variant and renders the text.
+import { sizeMult } from './branch/officeSize';
 import { CITIES } from '../data/cities';
 import { COUNTRIES } from '../data/countries';
 import { DISTRICT_SPECS } from '../data/districts';
@@ -91,7 +92,7 @@ export const districtName = (id: string): string =>
   DISTRICT_SPECS[id as DistrictId]?.name ?? 'the district';
 
 /**
- * The city with most of your open branches (first opened wins a tie), limited
+ * The city with most of your office space (sizes weighed, first opened wins a tie), limited
  * to one country when given; undefined if you have none there.
  */
 export function busiestCity(state: GameState, country?: CountryId): string | undefined {
@@ -99,7 +100,7 @@ export function busiestCity(state: GameState, country?: CountryId): string | und
   for (const b of Object.values(state.branches)) {
     if (b.status === 'closed') continue;
     if (country && CITIES[b.cityId]?.country !== country) continue;
-    counts.set(b.cityId, (counts.get(b.cityId) ?? 0) + 1);
+    counts.set(b.cityId, (counts.get(b.cityId) ?? 0) + sizeMult(b));
   }
   let best: string | undefined;
   for (const [id, n] of counts) if (best === undefined || n > counts.get(best)!) best = id;

@@ -11,6 +11,7 @@
 import { MERGERS } from '../config/balance';
 import type { DealPlan } from './acquisitionPlan';
 import { convertRivalBranch } from './acquisitionBranch';
+import { foldIntoOffice } from './branch/officeMerge';
 import { pushEvent } from './events';
 import { issueDealShares } from './shareDeals';
 import { postCash, postPnl } from './ledger';
@@ -54,9 +55,27 @@ export function closeAcquisition(
   state.treasury.reserves += plan.reserves;
   state.company.leaseDeposits += plan.leaseDeposits;
 
-  const branchIds = bank.branches.map((rb) =>
+  const converted = bank.branches.map((rb) =>
     convertRivalBranch(state, bank, rb, plan.loanFactor, rng),
   );
+  // One office per city (C2a): in each city the acquired branches join your
+  // office there, or the biggest of them becomes your office.
+  const byCity = new Map<string, string[]>();
+  for (const id of converted) {
+    const cityId = state.branches[id]!.cityId;
+    byCity.set(cityId, [...(byCity.get(cityId) ?? []), id]);
+  }
+  for (const [cityId, ids] of byCity) {
+    const own = Object.values(state.branches).find(
+      (b) => b.cityId === cityId && b.status !== 'closed' && !converted.includes(b.id),
+    );
+    const ranked = ids
+      .map((id) => state.branches[id]!)
+      .sort((a, b) => b.customers - a.customers || (a.id < b.id ? -1 : 1));
+    const keeper = own ?? ranked[0]!;
+    for (const b of ranked) if (b !== keeper) foldIntoOffice(state, keeper, b);
+  }
+  const branchIds = converted.filter((id) => state.branches[id]);
 
   for (const site of Object.values(state.world.sites)) {
     if (site.employer?.partnerRivalId === bank.id) delete site.employer.partnerRivalId;

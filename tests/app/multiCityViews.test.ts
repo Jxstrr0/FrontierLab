@@ -54,15 +54,16 @@ describe('campaign cities', () => {
 describe('Branches list across countries', () => {
   it('orders chips home first, groups rows by country in the order you entered', () => {
     const { s } = worldBank();
-    fly(s, 'cal');
-    openScriptedBranch(s, 'downtown');
+    fly(s, 'sas');
+    openScriptedBranch(s);
     const rows = branchRows(s);
-    expect(filterCities(s, rows)).toEqual(['cal', 'nyc', 'lon']);
+    expect(filterCities(s, rows)).toEqual(['cal', 'sas', 'nyc', 'lon']);
     const order = countryOrder(s, rows);
     expect(order).toEqual(['CA', 'US', 'UK']);
     const groups = groupByCountry(order, sortRows(rows, 'name', false));
+    const sasName = rows.find((r) => r.cityId === 'sas')!.name;
     expect(groups.map((g) => [g.country, g.rows.map((r) => r.name)])).toEqual([
-      ['CA', ['Downtown', 'Midtown']],
+      ['CA', ['Midtown', sasName]],
       ['US', ['New York Midtown']],
       ['UK', ['London Midtown']],
     ]);
