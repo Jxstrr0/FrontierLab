@@ -1,13 +1,12 @@
 // Real estate commands (SIMULATION §21, SCREENS §16): offer on a listed
 // building as the company or privately, set an owned building's rent, put it
 // up for sale or take it off, and choose Rent / Sell all for a city's
-// foreclosed homes. A company purchase pays investing cash and books the
-// building at its estimated value; the difference is a property gain or loss.
+// foreclosed homes. Accepted offers complete in propertyBuy.ts.
 import { REAL_ESTATE, REO } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { pushEvent } from '../events';
-import { postCash, postPnl } from '../ledger';
-import { marketRentNow, offerAcceptance, rentBounds } from '../propertyMath';
+import { completePurchase } from '../propertyBuy';
+import { offerAcceptance, rentBounds } from '../propertyMath';
 import { stream } from '../rng';
 import type { GameState, ReoPool } from '../state';
 import { fail, money, ok, type CommandResult } from './result';
@@ -56,36 +55,7 @@ export function offerProperty(
     return ok({ accepted: false });
   }
 
-  const marketRent = marketRentNow(state, site);
-  const value = listing.estimate;
-  if (account === 'company') {
-    postCash(state, -offer, 'investing');
-    // The building enters the books at its estimated value; paying more or less is a gain or loss.
-    postPnl(state, 'propertyGains', value - offer);
-  } else {
-    state.personal.cash -= offer;
-  }
-  state.realEstate.properties[siteId] = {
-    id: siteId,
-    cityId: site.cityId,
-    owner: account,
-    sqm: site.property.sqm,
-    purchasePrice: offer,
-    boughtWeek: state.clock.week,
-    value,
-    rent: marketRent,
-    marketRent,
-    occupancy: listing.occupancy,
-    forSale: false,
-  };
-  delete state.realEstate.listings[siteId];
-  pushEvent(
-    state,
-    'PROPERTY_BOUGHT',
-    { siteId, address: site.address, price: offer, account, cityId: site.cityId },
-    account === 'company' ? 3 : 5,
-    siteId,
-  );
+  completePurchase(state, siteId, offer, account);
   return ok({ accepted: true });
 }
 

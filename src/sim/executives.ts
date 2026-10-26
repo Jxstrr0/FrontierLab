@@ -12,6 +12,7 @@ import { refreshExecCandidates } from './execCandidates';
 import { cfoCapital, cfoShares } from './execDelegationsCapital';
 import { cooExpansion } from './execDelegationsGrowth';
 import { creoBankRents, creoPrivateRents } from './execDelegationsProperty';
+import { creoBankBuys, creoPrivateBuys } from './execBuying';
 import {
   cfoTreasury,
   cpoDevelopments,
@@ -53,6 +54,8 @@ const DELEGATIONS: [ExecSeat, string, (s: GameState) => void][] = [
   ['cro', 'appetite', croAppetite],
   ['creo', 'bankRents', creoBankRents],
   ['creo', 'privateRents', creoPrivateRents],
+  ['creo', 'bankBuys', creoBankBuys],
+  ['creo', 'privateBuys', creoPrivateBuys],
 ];
 
 /** Weekly cost of every seated executive's salary. */

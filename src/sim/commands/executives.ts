@@ -114,7 +114,8 @@ export function setExecDelegation(
   seedGrowthCities(state);
   // Switching Pay reviews on runs the first review at once; so does a Rents switch.
   if (seat === 'coo' && id === 'payReviews' && on) runPayReview(state);
-  if (seat === 'creo' && on) reviewRents(state, id === 'bankRents' ? 'company' : 'personal');
+  if (seat === 'creo' && on && (id === 'bankRents' || id === 'privateRents'))
+    reviewRents(state, id === 'bankRents' ? 'company' : 'personal');
   return ok();
 }
 
@@ -157,6 +158,21 @@ export function setBrandTarget(state: GameState, target: number): CommandResult 
       `Pick an awareness target of ${stops.map((t) => `${Math.round(t * 100)}%`).join(', ')}.`,
     );
   state.executives.brandTarget = match;
+  return ok();
+}
+
+/** The occupancy the CREO's Rents price for, per owner (one of EXEC_DELEGATION.occTargets); a managed owner is repriced now. */
+export function setOccupancyTarget(
+  state: GameState,
+  owner: 'company' | 'personal',
+  target: number,
+): CommandResult {
+  const stops = EXEC_DELEGATION.occTargets;
+  const match = stops.find((t) => Math.abs(t - target) < 1e-9);
+  if (match === undefined || (owner !== 'company' && owner !== 'personal'))
+    return fail(`Pick an occupancy of ${stops.map((t) => `${Math.round(t * 100)}%`).join(', ')}.`);
+  state.executives.occTargets[owner] = match;
+  reviewRents(state, owner);
   return ok();
 }
 

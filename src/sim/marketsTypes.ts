@@ -75,6 +75,8 @@ export interface ExecutivesState {
   moraleTarget: number;
   /** City brand awareness the CMO's Brand campaigns hold (schema v21), one of EXEC_DELEGATION.brandTargets. */
   brandTarget: number;
+  /** Occupancy the CREO's Rents price for, per owner (schema v30), each one of EXEC_DELEGATION.occTargets. */
+  occTargets: { company: number; personal: number };
 }
 
 export type PayReviewCadence = 'quarterly' | 'annual';
