@@ -134,7 +134,7 @@ export interface IncidentsState {
 
 // ─── The Weekly Ledger (SIMULATION §24) ────────────────────────────────────────
 
-export type LedgerTab = 'banking' | 'business' | 'markets' | 'politics' | 'sports';
+export type LedgerTab = 'world' | 'banking' | 'business' | 'markets' | 'politics' | 'sports';
 
 export interface LedgerArticle {
   id: string;
@@ -184,6 +184,10 @@ export interface NewsDesk {
   polls: Partial<Record<CountryId, number[]>>;
   /** Total assets per bank ('you' for yours) when the ranking year began. */
   assetMarks: Record<Id, Money>;
+  /** World desk (§24.1): week each `${beat}:${country}` last ran, for its cooldown. */
+  worldRecent: Record<string, Week>;
+  /** Elections (§24 Politics): each country's governing party (index in PARTIES) and next vote. */
+  elections: Partial<Record<CountryId, { governing: number; nextWeek: Week }>>;
 }
 
 // ─── Competition tracker ──────────────────────────────────────────────────────

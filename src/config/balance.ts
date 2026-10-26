@@ -1045,7 +1045,7 @@ export const RECAP = {
 // ─── NEWS: THE WEEKLY LEDGER (§24) ─────────────────────────────────────────────
 /** Articles per weekly issue, the Top tab's size and how many issues the archive keeps. */
 export const NEWS_ARTICLES_MIN = 6;
-export const NEWS_ARTICLES_MAX = 12;
+export const NEWS_ARTICLES_MAX = 14;
 export const NEWS_TOP_N = 6;
 export const NEWS_ARCHIVE_ISSUES = 52;
 /** Central bank stories from countries where you don't operate, per issue (moves first). */
@@ -1060,6 +1060,14 @@ export const NEWS_GROUP_CAPS: Record<string, number> = {
   economy: 1,
   incident: 2,
   ventures: 2,
+  /** Your routine stories (weekly figures, loans, a watch-tier capital note, rate watch). */
+  youRoutine: 2,
+  auctions: 1,
+  world: 4,
+  movers: 2,
+  corporate: 1,
+  sportsAbroad: 1,
+  elections: 2,
 };
 /**
  * Story priority (higher leads; Top = the six highest). SIMULATION §24 order:
@@ -1089,7 +1097,64 @@ export const NEWS_PRIORITY = {
   rateWatch: 20,
   poll: 18,
   filler: 12,
+  /** World desk stories (§24.1): home country, then everywhere else. */
+  worldHome: 40,
+  world: 36,
+  /** A listed company's big weekly share move, and corporate news. */
+  mover: 44,
+  corporate: 28,
+  column: 32,
+  sportsAbroad: 22,
+  electionLocal: 60,
+  electionAbroad: 42,
 };
+/**
+ * The world desk (§24.1): stories drawn from every country each week, chosen by
+ * its economy and season; a beat won't repeat in the same country for
+ * `cooldownWeeks`.
+ */
+export const NEWS_WORLD = {
+  perIssue: 4,
+  /** World stories every issue keeps, however busy the week. */
+  minPerIssue: 2,
+  /** Chance the home country is the one picked for a slot (otherwise any other country). */
+  homeShare: 0.25,
+  cooldownWeeks: 26,
+  /** Inflation (%) above which price stories appear; unemployment (%) below which hiring booms do. */
+  highInflation: 3.5,
+  lowUnemployment: 4.5,
+  /** House prices up more than this over a year (decimal) bring rent stories. */
+  housingHot: 0.04,
+};
+/** Company desk (§24.2): share moves of at least moverMin (%) get a story; weekly chance of corporate news per issue. */
+export const NEWS_COMPANY_DESK = {
+  moverMin: 6,
+  /** …and at least this many of the company's own weekly standard deviations. */
+  moverSigma: 2.2,
+  corporateChance: 0.35,
+  /** Jobs at a company's new site. */
+  siteJobs: [150, 1200] as [number, number],
+};
+/** The Money Column (§24.3) runs every n weeks; a rate move within rateWindowWeeks sets its topic. */
+export const NEWS_COLUMN = { everyWeeks: 2, rateWindowWeeks: 13 };
+/**
+ * Elections (§24 Politics): every country votes every termWeeks, staggered by
+ * staggerWeeks per country; campaign news runs from campaignWeeks before.
+ * The poll leader wins with leaderWinP, otherwise the runner-up.
+ */
+export const NEWS_ELECTIONS = {
+  termWeeks: 208,
+  staggerWeeks: 21,
+  campaignWeeks: 6,
+  leaderWinP: 0.7,
+  /** Poll points the winner gains on the night, renormalised (a honeymoon that fades with drift). */
+  winnerBounce: 8,
+};
+/** Weekly figures still print every n weeks when nothing notable happened; so does a Watch-tier capital note. */
+export const NEWS_ROUTINE_EVERY_WEEKS = 4;
+/** Weeks of history before a best-ever week counts as a record, and how far (decimal) it must top the old best. */
+export const NEWS_RECORD_MIN_WEEKS = 12;
+export const NEWS_RECORD_MARGIN = 0.1;
 /** Housing story every n weeks per country you operate in, once a year of prices exists. */
 export const NEWS_HOUSING_EVERY_WEEKS = 4;
 /** A poll story every n weeks in your home country. Weekly poll drift (points, σ). */

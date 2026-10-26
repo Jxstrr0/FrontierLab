@@ -563,6 +563,16 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     return s;
   },
   33: (s) => {
+    // The World desk and elections (§24.1, §24 Politics) start fresh: no beat on
+    // cooldown, and each country's first vote is scheduled on the next issue.
+    const desk = (s as unknown as GameState).news.desk;
+    if (desk) {
+      desk.worldRecent ??= {};
+      desk.elections ??= {};
+    }
+    return s;
+  },
+  34: (s) => {
     // Price lists (§4.6) start at 1: catalogue prices and rents step to the
     // nominal index at the next year end, so a long save catches up then.
     for (const c of Object.values((s as unknown as GameState).world.countries)) {

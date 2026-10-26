@@ -663,7 +663,7 @@ Default cooldown: 8 weeks per scope. Branch cases go to a manager trusted with B
 | RECAP_OFFER | company | §15 | — | Accept recapitalisation · Decline (takeover risk) |
 
 ## 23. Ledger headline templates
-Tokens are in {braces}. Write 2–4 variants per type in code. The full set lives in `src/data/ledgerTemplates.ts`, `ledgerTemplatesRivals.ts` and `ledgerTemplatesWorld.ts` (about 50 story types); the fictional leagues, parties and policies are in `src/data/newsWorld.ts`.
+Tokens are in {braces}. Write 2–4 variants per type in code. The full set lives in `src/data/ledgerTemplates.ts`, `ledgerTemplatesRivals.ts`, `ledgerTemplatesWorld.ts`, `ledgerTemplatesGlobe.ts` (§23.1 World desk: 35 beats) and `ledgerTemplatesDesk.ts` (§23.2 company desk, §23.3 Money Column, §23.4 elections); the fictional leagues, parties and policies are in `src/data/newsWorld.ts`, and the World desk's beat rules (country, months, phase, condition, number ranges), share-move reasons by sector and launch products in `src/data/newsWorldBeats.ts`. Every place, person and company in them is invented or a game city.
 
 | Type | Headline | Body |
 |---|---|---|
