@@ -12,7 +12,7 @@ import { newGame } from '../../src/sim/newGame';
 import { propertySites, refreshListings } from '../../src/sim/propertyListings';
 import {
   estimateValue,
-  marketRentFor,
+  baseRentFor,
   occupancyTarget,
   offerAcceptance,
   propertyRoi,
@@ -89,7 +89,7 @@ describe('listings', () => {
     const cre = s.world.countries.CA!.cre;
     for (const l of listed) {
       const site = s.world.sites[l.siteId]!;
-      expect(l.estimate).toBeCloseTo(estimateValue(site.property!.sqm, marketRentFor(site), cre));
+      expect(l.estimate).toBeCloseTo(estimateValue(site.property!.sqm, baseRentFor(site), cre));
       expect(l.asking / l.estimate).toBeGreaterThanOrEqual(REAL_ESTATE.askRange[0]);
       expect(l.asking / l.estimate).toBeLessThanOrEqual(REAL_ESTATE.askRange[1]);
       expect(l.occupancy).toBeGreaterThanOrEqual(REAL_ESTATE.startOcc[0]);
@@ -191,8 +191,9 @@ describe('buying and running a building', () => {
     expect(cmd.setPropertyRent(s, l.siteId, p.marketRent * 1.1).ok).toBe(true);
     expect(cmd.setPropertyRent(s, l.siteId, p.marketRent * 5).ok).toBe(false);
     const occ0 = p.occupancy;
-    const target = occupancyTarget(p.rent, p.marketRent);
     advanceWeeks(s, 1);
+    // The tick eases market rent toward today's first (§21.2), then occupancy.
+    const target = occupancyTarget(p.rent, p.marketRent);
     const occ1 = occ0 + REAL_ESTATE.occEma * (target - occ0);
     expect(p.occupancy).toBeCloseTo(occ1, 9);
     const wk = propertyWeek(p);

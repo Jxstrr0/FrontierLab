@@ -380,7 +380,7 @@ export function newDepartment(state: GameState, id: DeptId): Department {
   return {
     id,
     staff: 0,
-    // The Executive suite's desks are you and the six executives, not hired staff.
+    // The Executive suite's desks are you and the seven executives, not hired staff.
     target:
       id === 'executive' ? 0 : Math.min(desks, Math.max(1, Math.ceil(required / DEPT_DEFAULT_EFF))),
     salary: Math.round(deptMarketSalary(state, id) / 1000) * 1000,

@@ -70,7 +70,7 @@ You found a bank with a fresh charter: $2,000,000 of charter capital locked in t
 | Competitor store: reviews, menu prices | Rival branch: reviews, rate sheet | |
 | Weekly results with cash flow and newspaper (Top, Retail, Business, Market, Politics, Sports) | Weekly results with The Weekly Ledger (Top, Banking, Business, Markets, Politics, Sports) | |
 | Company incidents ("case 1 of 1") | Incidents | Bank-specific cases |
-| Executive floor: board meeting, dividends, CEO pay, six seats (CEO, COO, CFO, CPO, CMO, CTO), delegation, option/RSU grants | Same six, plus a Chief Risk Officer as a seventh seat | Regulator can cap dividends |
+| Executive floor: board meeting, dividends, CEO pay, six seats (CEO, COO, CFO, CPO, CMO, CTO), delegation, option/RSU grants | Same six, plus a Chief Risk Officer as a seventh seat and a Chief Real Estate Officer as an eighth | Regulator can cap dividends |
 | Investment floor: ventures, benchmark pentagon, funding rounds, company/private toggle | Same | Plus venture debt |
 | Conventions | Fintech and finance conventions | |
 | Real estate: buy, rent per m², occupancy, ROI, for sale | Same | Plus foreclosed homes |
@@ -227,7 +227,7 @@ Shown to the player in one place, the Company summary:
 - **On the map.** The central bank building shows the country dashboard and offers an emergency lending facility, which carries stigma.
 
 ### 5.8 HQ and offices
-- **Offices.** Lease office buildings (floors, area, weekly rent, deposit). Each floor holds one department. Desks per floor depend on the building (24 or 32, as in the original); Investment floors have 32 and the Executive suite 7. Departments can span floors and offices.
+- **Offices.** Lease office buildings (floors, area, weekly rent, deposit). Each floor holds one department. Desks per floor depend on the building (24 or 32, as in the original); Investment floors have 32 and the Executive suite 8. Departments can span floors and offices.
 - **Each department shows:**
   - employees (n / desks) and open positions
   - annual salary
@@ -277,7 +277,7 @@ Brand awareness by city, brand campaigns (TV, billboards, podcasts, creators, ar
 
 #### 5.8.8 Executive
 - Quarterly board meeting.
-- Senior executives: COO, CFO, CPO, CMO and CTO, as in the original, plus a Chief Risk Officer as a seventh seat.
+- Senior executives: COO, CFO, CPO, CMO and CTO, as in the original, plus a Chief Risk Officer as a seventh seat and a Chief Real Estate Officer (CREO) as an eighth, who manages the rents on the bank's buildings and on yours.
 - Each profile has skills (Leadership, Expertise, Loyalty), delegation toggles, salary, stock option and RSU grants with vesting, and a fire button. Delegations are on from the day of hire, and a seat remembers its last holder's toggles.
 - The COO can run expansion (branches in the cities you mark for growth) and settle company-level troubles, so a player who wants to run only the top of the bank can.
 
@@ -598,4 +598,5 @@ Add one dated line per decision. Never delete entries; supersede them.
 - 2026-10-26 (owner's ask): The risk appetite dial moves from the HQ Products floor to the **Finance floor**, next to the capital ratio it protects. Same dial, same CRO and CFO steering; the capital fixes checklist and first-look tips point there. Supersedes the floor named in the 2026-10-25 entry above.
 - 2026-10-26 (owner's ask): **Fewer offices, more buildings.** A bank only ever needs a handful of offices, so each city lists 2/2/3/4 (S/M/L/XL) instead of 3/5/7/9, split across districts by largest remainder. Property buildings go the other way: 6/9/12/15 per city instead of 4/6/8/10, sized by city (up to 16,000 m² in XL cities, 5,000 m² in S), with towers only in the financial, downtown and waterfront districts, so the high-value buildings are in the major cities. Existing saves (schema v27) keep every office they lease, drop spare listings down to the new count, and gain buildings from the city's own `sites7` stream, so nothing already on the map moves. Supersedes the office and building counts in the two 2026-10-24 entries above.
 - 2026-10-26 (owner's ask): **Monthly results.** The results setting gains Monthly (weekly / monthly / quarterly / off). A monthly or quarterly report rolls its weeks up: revenue, net income and cash flow summed, the change against the previous month or quarter, the latest Ledger plus the lead headline of each earlier issue in the period. Snapshot weeks belong to the month their last day falls in (4 or 5 weeks a month). So that a monthly reader never misses a convention, conventions are now announced four weeks ahead and open for four weeks (CONVENTIONS; was two and one), and existing saves' upcoming runs stretch to match (schema v28). Loan applications expiring and incidents still auto-pause on their own; auctions already show the next sale date on their tab.
+- 2026-10-26 (owner's ask): **Market rents follow the property cycle, and a Chief Real Estate Officer.** An owned building's market rent used to be fixed at purchase, so a rent set once was right for good and a boom only moved the value. Now market rent eases toward base × cre/100 (5% a week, half-life about 14 weeks): values move first, rents catch up months later, and a rent left alone drifts off market. The eighth executive seat, the CREO, manages that: two Rents switches (the bank's buildings, your own buildings, so private ones can stay yours to price) set each covered building to the highest rent that still fills it, at once when switched on and every 4 weeks after. Their Expertise is pricing power: tenants of a managed building pay up to 10% × expertise/100 over market with no loss of occupancy, the seat's version of execMult. Chosen over a maintenance saving so the effect shows on the rent stepper, and without manager-style noise since expertise already acts through pricing power. The bank pays the chief even for your private buildings. Foreclosed homes and buying stay yours. Existing saves (schema v29) get the seat's candidates at once if they have an Executive suite; their buildings' market rents start drifting from where they are, no jump.
 - 2026-10-25: Line of Credit stays as it is. In the content audit it looked like a third unsecured consumer loan, but it is the only revolving credit business customers take, so it isn't a duplicate.

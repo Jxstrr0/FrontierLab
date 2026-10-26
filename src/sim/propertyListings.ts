@@ -4,7 +4,7 @@
 // cre, an asking price around it and the building's occupancy. Listings that
 // aren't picked again disappear. Draws come from the `realEstate` stream.
 import { REAL_ESTATE } from '../config/balance';
-import { cityCre, estimateValue, marketRentFor } from './propertyMath';
+import { cityCre, estimateValue, baseRentFor } from './propertyMath';
 import { stream } from './rng';
 import type { GameState, Site } from './state';
 
@@ -37,7 +37,7 @@ export function refreshListings(state: GameState, cityId: string): void {
   for (const site of pool.slice(0, n)) {
     const b = site.property!;
     b.occupancy ??= rng.range(occLo, occHi);
-    const estimate = estimateValue(b.sqm, marketRentFor(site), cre);
+    const estimate = estimateValue(b.sqm, baseRentFor(site), cre);
     re.listings[site.id] = {
       siteId: site.id,
       estimate,
@@ -53,7 +53,7 @@ export function markListings(state: GameState): void {
   for (const l of Object.values(state.realEstate.listings)) {
     const site = state.world.sites[l.siteId];
     if (!site?.property) continue;
-    l.estimate = estimateValue(site.property.sqm, marketRentFor(site), cityCre(state, site.cityId));
+    l.estimate = estimateValue(site.property.sqm, baseRentFor(site), cityCre(state, site.cityId));
   }
 }
 

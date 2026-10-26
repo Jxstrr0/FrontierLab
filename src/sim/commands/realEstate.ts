@@ -7,7 +7,7 @@ import { REAL_ESTATE, REO } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { pushEvent } from '../events';
 import { postCash, postPnl } from '../ledger';
-import { marketRentFor, offerAcceptance, rentBounds } from '../propertyMath';
+import { marketRentNow, offerAcceptance, rentBounds } from '../propertyMath';
 import { stream } from '../rng';
 import type { GameState, ReoPool } from '../state';
 import { fail, money, ok, type CommandResult } from './result';
@@ -56,7 +56,7 @@ export function offerProperty(
     return ok({ accepted: false });
   }
 
-  const marketRent = marketRentFor(site);
+  const marketRent = marketRentNow(state, site);
   const value = listing.estimate;
   if (account === 'company') {
     postCash(state, -offer, 'investing');

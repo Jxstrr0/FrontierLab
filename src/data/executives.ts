@@ -1,7 +1,8 @@
 // Executive seats (SIMULATION §17.2, SCREENS §10): titles, the HQ departments
 // each executive lifts with execMult, and the delegation toggles on their
 // profile (some with a dial under them: DelegationDials.tsx). The CEO seat is
-// you and isn't listed. Numbers live in balance.ts.
+// you and isn't listed. The CREO lifts no department: its expertise is pricing
+// power on the buildings it manages (§21.2). Numbers live in balance.ts.
 import type { ExecSeat } from '../sim/marketsTypes';
 import type { HqDeptId } from './types';
 
@@ -192,7 +193,35 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
       },
     ],
   },
+  creo: {
+    seat: 'creo',
+    title: 'Chief Real Estate Officer',
+    short: 'CREO',
+    depts: [],
+    delegations: [
+      {
+        id: 'bankRents',
+        label: "Rents: the bank's buildings",
+        description:
+          'Every 4 weeks sets the rent on every building the bank owns to the highest level that still fills it, as market rents drift. Their tenants pay a little over market, by the chief’s expertise.',
+      },
+      {
+        id: 'privateRents',
+        label: 'Rents: your own buildings',
+        description:
+          'The same for the buildings you own privately. The bank pays the chief either way.',
+      },
+    ],
+  },
 };
 
 /** Seat order on the Executive floor grid (after the CEO). */
-export const EXEC_SEAT_ORDER: readonly ExecSeat[] = ['coo', 'cfo', 'cpo', 'cmo', 'cto', 'cro'];
+export const EXEC_SEAT_ORDER: readonly ExecSeat[] = [
+  'coo',
+  'cfo',
+  'cpo',
+  'cmo',
+  'cto',
+  'cro',
+  'creo',
+];
