@@ -396,6 +396,13 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     state.flags.lessonsDone ??= learnedLessons(state);
     return s;
   },
+  // v25: an HR floor can fill branch manager vacancies (§16.11). On by default,
+  // as in new games.
+  24: (s) => {
+    const state = s as unknown as GameState;
+    state.people.hrHiring ??= true;
+    return s;
+  },
 };
 
 /** The v22 portrait fields; an object with all of them and no `eyes` is a face. */

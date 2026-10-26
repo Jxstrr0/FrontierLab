@@ -180,6 +180,7 @@ export function newGame(opts: NewGameOptions): GameState {
       candidatesRefreshWeek: {},
       rerolls: {},
       benefits: {},
+      hrHiring: true,
     },
     products: { catalog: {}, developments: [] },
     underwriting: { activeModelId: model.id, models: { [model.id]: model }, loansBooked: 0 },
