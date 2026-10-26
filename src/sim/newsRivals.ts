@@ -192,6 +192,7 @@ export function rateWatchStory(ctx: NewsContext): Story | undefined {
     tab: 'banking',
     icon: 'coin',
     priority: P.rateWatch,
+    group: 'youRoutine',
     tokens: {
       city: cityName(cityId),
       leader: leader.name,

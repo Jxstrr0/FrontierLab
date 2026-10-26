@@ -6,6 +6,9 @@ import {
   NEWS_ARCHIVE_ISSUES,
   NEWS_ARTICLES_MAX,
   NEWS_ARTICLES_MIN,
+  NEWS_GROUP_CAPS,
+  NEWS_ROUTINE_EVERY_WEEKS,
+  NEWS_WORLD,
 } from '../../src/config/balance';
 import { LEDGER_TEMPLATES } from '../../src/data/ledgerTemplates';
 import { isoDate } from '../../src/sim/calendar';
@@ -84,16 +87,35 @@ describe('The Weekly Ledger over three years', () => {
     for (const c of cbChecks) expect(c.headline).toContain(c.rate);
   });
 
-  it("quotes your bank's revenue from the weekly close", () => {
-    expect(revenueChecks).toHaveLength(156);
+  it("quotes your bank's revenue from the weekly close, at least every NEWS_ROUTINE_EVERY_WEEKS weeks", () => {
+    expect(revenueChecks.length).toBeGreaterThanOrEqual(156 / NEWS_ROUTINE_EVERY_WEEKS);
     for (const c of revenueChecks) expect(c.headline + c.body).toContain(c.revenue);
   });
 
   it('reads like a living paper: every tab gets stories and many templates appear', () => {
     const tabs = new Set(issues.flatMap((i) => i.articles.map((a) => a.tab)));
-    expect([...tabs].sort()).toEqual(['banking', 'business', 'markets', 'politics', 'sports']);
+    expect([...tabs].sort()).toEqual([
+      'banking',
+      'business',
+      'markets',
+      'politics',
+      'sports',
+      'world',
+    ]);
     const keys = new Set(issues.flatMap((i) => i.articles.map((a) => a.ref!.split(':')[0])));
-    expect(keys.size).toBeGreaterThan(15);
+    expect(keys.size).toBeGreaterThan(40);
+  });
+
+  it('gives most of each issue to the world beyond your bank (§24.1)', () => {
+    for (const issue of issues) {
+      const world = issue.articles.filter((a) => a.tab === 'world');
+      expect(world.length).toBeGreaterThanOrEqual(NEWS_WORLD.minPerIssue);
+      expect(world.length).toBeLessThanOrEqual(NEWS_GROUP_CAPS.world!);
+      const routine = issue.articles.filter((a) =>
+        /^(BANK_WEEK_|LOAN_|RATE_WATCH)/.test(a.ref ?? ''),
+      );
+      expect(routine.length).toBeLessThanOrEqual(NEWS_GROUP_CAPS.youRoutine!);
+    }
   });
 
   it('keeps the last 52 issues', () => {

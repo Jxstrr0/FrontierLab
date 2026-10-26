@@ -484,7 +484,7 @@ Tabs: Overview · Loans · Credit.
 - **Cash flow:** Cash from operations, Investing, Financing, Net cash flow, summed over the period.
 - **The Weekly Ledger card** (the period's latest issue):
   - masthead and date
-  - tabs: Top | Banking | Business | Markets | Politics | Sports
+  - tabs: Top | World | Banking | Business | Markets | Politics | Sports (they scroll sideways on a phone)
   - two-column article grid (icon vignette, headline, 1–2 sentence body)
 - **Earlier this month / quarter** (roll-ups only): a card listing each earlier issue's date and lead headline; the archive in the menu has the full issues.
 - When Finance is short-staffed, the figures read "Delayed".
