@@ -49,8 +49,9 @@ export function generateCity(
   }
   const layout = state.world.cities[cityId]!.layout;
   const lots = generateLots(state, cityId, lotCount(city, layout, competitorsFor(state, cityId)));
-  seedRivals(state, cityId, lots);
+  // Lots first: seeding folds each rival's branches into one office (C2b) and frees the rest.
   for (const lot of lots) state.world.lots[lot.id] = lot;
+  seedRivals(state, cityId, lots);
   generateSites(state, cityId);
   generateCompetitionSites(state, cityId);
   generateCapitalMarketSites(state, cityId);

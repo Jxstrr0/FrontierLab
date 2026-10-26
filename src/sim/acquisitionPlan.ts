@@ -19,6 +19,7 @@ import { productSpec } from './products';
 import { securityPrice } from './securities';
 import { stockSplit, type StockSplit } from './shareDeals';
 import type { GameState, RivalBank } from './state';
+import { rivalMult } from './rivalOffices';
 
 export interface CityShare {
   cityId: string;
@@ -138,7 +139,7 @@ export function planDeal(
   const deposits = bank.branches.reduce((s, b) => s + b.deposits, 0);
   const bookLoans = bank.branches.reduce((s, b) => s + b.loans, 0);
   const leaseDeposits = bank.branches.reduce(
-    (s, b) => s + (state.world.lots[b.lotId]?.deposit ?? 0),
+    (s, b) => s + (state.world.lots[b.lotId]?.deposit ?? 0) * rivalMult(b),
     0,
   );
   const debtSettled = debtOwedTo(state, bank.id);

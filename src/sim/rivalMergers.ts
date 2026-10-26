@@ -16,6 +16,7 @@ import { rivalCapitalRatio, rivalLoans } from './rivalBooks';
 import { trailingProfit } from './rivalExpansion';
 import { withMarks } from './securities';
 import type { GameState, RivalBank } from './state';
+import { giveRivalOffice } from './rivalOffices';
 
 /** Countries a rival calls home: a chartered bank's own, else CONTENT §15's. */
 export const homeOf = (bank: RivalBank): string[] => bank.home ?? RIVALS[bank.id]?.home ?? [];
@@ -102,11 +103,8 @@ export function mergeRivals(
   const price = perShare * target.shares;
   payOutHolders(state, target, perShare);
   buyer.equity -= premium * Math.max(0, target.equity);
-  for (const branch of target.branches) {
-    buyer.branches.push({ ...branch, negativeWeeks: 0 });
-    const lot = state.world.lots[branch.lotId];
-    if (lot) lot.occupant = { type: 'rival', id: buyer.id };
-  }
+  // Offices in a city they share fold into one (C2b).
+  for (const branch of target.branches) giveRivalOffice(state, buyer, branch);
   for (const c of target.cities) if (!buyer.cities.includes(c)) buyer.cities.push(c);
   buyer.capitalRatio = rivalCapitalRatio(buyer);
   moveCorporateDebt(state, target, buyer);

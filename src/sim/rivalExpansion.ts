@@ -1,10 +1,12 @@
-// Rival expansion and closures (SIMULATION §18.4). Monthly, a profitable,
-// well-capitalised rival may open a branch on the best free storefront in each
-// city it serves (score = footTraffic × (1 − localShare) × incomeFit), while
-// leaving the city room for you, and a rival with a network may enter a new
-// city: one in a home country, or anywhere once it serves a few. Weekly, a
-// branch whose contribution has been negative for 26 weeks (after its first
-// year) closes and frees its lot.
+// Rival expansion and closures (SIMULATION §18.4, C2b). Each rival lab holds
+// one sales office per city. Monthly, a profitable, well-capitalised rival may
+// grow its office a size in each city it serves (the chance is divided by the
+// units the step adds, so a network grows about as fast as when it opened
+// branches), while leaving the city room for you, and a rival with a network
+// may enter a new city on its best free storefront (score = footTraffic ×
+// (1 − localShare) × incomeFit): one in a home country, or anywhere once it
+// serves a few. Weekly, an office whose contribution has been negative for 26
+// weeks (after its first year) shrinks a size, or closes when it is a Starter.
 import {
   RIVAL_CLOSURE,
   RIVAL_EXPANSION,
@@ -25,6 +27,8 @@ import { nominalIndex } from './nominal';
 import { countryOfCity } from './rates';
 import { stream, type Rng } from './rng';
 import { incomeFit, overallOf } from './rivals';
+import { sizeMult, sizeName } from './branch/officeSize';
+import { growStep, rivalMult, rivalOfficeIn, rivalUnits, rivalUnitsIn } from './rivalOffices';
 import type { GameState, Lot, RivalBank, RivalBranch } from './state';
 
 /** Profit over the last four reported quarters (0 until a year has been reported). */
@@ -34,11 +38,22 @@ export function trailingProfit(bank: RivalBank): number {
   return bank.quarters.slice(-n).reduce((sum, q) => sum + q.netIncome, 0);
 }
 
-/** Whether rivals may still open in a city, given its lots (§18.4). */
-export function cityHasRoom(lots: Lot[]): boolean {
+/**
+ * Whether rivals may still grow in a city (§18.4). Offices count by size (C2b):
+ * an office of size s fills sizeMult(s) storefronts' worth of the city, yours
+ * and theirs.
+ */
+export function cityHasRoom(state: GameState, cityId: string, lots: Lot[]): boolean {
   if (lots.length === 0) return false;
-  const free = lots.filter((l) => !l.occupant).length;
-  const rival = lots.filter((l) => l.occupant?.type === 'rival').length;
+  let rival = 0;
+  for (const bank of Object.values(state.rivals)) {
+    if (bank.status === 'active') rival += rivalUnitsIn(bank, cityId);
+  }
+  let yours = 0;
+  for (const b of Object.values(state.branches)) {
+    if (b.cityId === cityId && b.status !== 'closed') yours += sizeMult(b);
+  }
+  const free = lots.length - rival - yours;
   return (
     free / lots.length >= RIVAL_EXPANSION.minFreeLotShare &&
     rival / lots.length < RIVAL_EXPANSION.maxRivalLotShare
@@ -73,12 +88,13 @@ export function bestExpansionLot(lots: Lot[], bank: RivalBank, rng: Rng): Lot | 
   return best;
 }
 
-/** Opens a branch for `bank` on `lot` with a fresh quality draw (rivalsAi stream). */
+/** Opens an office of `size` for `bank` on `lot` with a fresh quality draw (rivalsAi stream). */
 export function openRivalBranch(
   state: GameState,
   bank: RivalBank,
   lot: Lot,
   rng: Rng,
+  size = 0,
 ): RivalBranch {
   const shift = difficultyOf(state).rivalQuality;
   const quality = STRATEGY_PROFILES[bank.strategy].quality.map((q) =>
@@ -88,6 +104,7 @@ export function openRivalBranch(
     id: newId(state, `rb_${bank.id}`),
     cityId: lot.cityId,
     lotId: lot.id,
+    size,
     openedWeek: state.clock.week,
     quality,
     overall: overallOf(quality),
@@ -99,10 +116,7 @@ export function openRivalBranch(
   };
   lot.occupant = { type: 'rival', id: bank.id };
   bank.branches.push(branch);
-  bank.equity -=
-    RIVAL_EXPANSION.buildCost *
-    (CITIES[lot.cityId]?.costIndex ?? 1) *
-    nominalIndex(state, lot.cityId);
+  bank.equity -= buildCost(state, lot.cityId) * rivalMult(branch);
   pushEvent(
     state,
     'RIVAL_BRANCH_OPENED',
@@ -120,9 +134,30 @@ export function openRivalBranch(
   return branch;
 }
 
+/** One storefront's build cost for a rival, × city cost index × the nominal index. */
+function buildCost(state: GameState, cityId: string): number {
+  return RIVAL_EXPANSION.buildCost * (CITIES[cityId]?.costIndex ?? 1) * nominalIndex(state, cityId);
+}
+
+/** Grows a rival's office one size, paying for the units it adds (C2b). */
+export function growRivalOffice(state: GameState, bank: RivalBank, office: RivalBranch): void {
+  const step = growStep(office);
+  if (step <= 0) return;
+  bank.equity -= buildCost(state, office.cityId) * step;
+  office.size += 1;
+  pushEvent(
+    state,
+    'RIVAL_OFFICE_GROWN',
+    { rivalId: bank.id, bank: bank.name, city: office.cityId, size: sizeName(office.size) },
+    3,
+    office.cityId,
+  );
+}
+
 /**
- * Monthly expansion check for every active rival (§18.4): a roll per city it
- * serves (so a wider network grows faster), then one roll to enter a new city.
+ * Monthly expansion check for every active rival (§18.4, C2b): a roll per
+ * city it serves to grow its office there (so a wider network grows faster),
+ * then one roll to enter a new city.
  */
 export function runExpansion(state: GameState): void {
   if (state.clock.week % RIVAL_EXPANSION.everyWeeks !== 0) return;
@@ -137,15 +172,23 @@ export function runExpansion(state: GameState): void {
     for (const cityId of [...bank.cities].sort()) {
       // Draw first so every rival consumes the stream the same way.
       const roll = rng.next();
-      if (!eligible || roll >= chance) continue;
+      const office = rivalOfficeIn(bank, cityId);
+      // A step that adds more units is rarer, so units grow at `chance` a city.
+      const step = office ? growStep(office) : 1;
+      if (!eligible || step <= 0 || roll >= chance / step) continue;
       const lots = allLots.filter((l) => l.cityId === cityId);
-      if (!cityHasRoom(lots)) continue;
-      const lot = bestExpansionLot(lots, bank, rng);
-      if (lot) openRivalBranch(state, bank, lot, rng);
+      if (!cityHasRoom(state, cityId, lots)) continue;
+      if (office) {
+        growRivalOffice(state, bank, office);
+      } else {
+        // A city it serves without an office (one closed): reopen there.
+        const lot = bestExpansionLot(lots, bank, rng);
+        if (lot) openRivalBranch(state, bank, lot, rng);
+      }
     }
     const entry = rng.next();
     if (!eligible || entry >= RIVAL_EXPANSION.entryChance * mult) continue;
-    if (bank.branches.length < RIVAL_EXPANSION.entryMinBranches) continue;
+    if (rivalUnits(bank) < RIVAL_EXPANSION.entryMinUnits) continue;
     const cityId = entryCity(state, bank, allLots);
     if (cityId) enterCity(state, bank, cityId, allLots, rng);
   }
@@ -166,7 +209,7 @@ export function entryCity(state: GameState, bank: RivalBank, allLots: Lot[]): st
     if (!city || city.regional || bank.cities.includes(cityId)) continue;
     if (!abroad && !home.includes(city.country)) continue;
     const lots = allLots.filter((l) => l.cityId === cityId);
-    if (!cityHasRoom(lots)) continue;
+    if (!cityHasRoom(state, cityId, lots)) continue;
     const free = lots.filter((l) => !l.occupant).length;
     if (free > bestFree) {
       bestFree = free;
@@ -176,7 +219,7 @@ export function entryCity(state: GameState, bank: RivalBank, allLots: Lot[]): st
   return best;
 }
 
-/** Opens a rival's first branch in a city and adds the city to its network. */
+/** Opens a rival's first office in a city and adds the city to its network. */
 function enterCity(state: GameState, bank: RivalBank, cityId: string, allLots: Lot[], rng: Rng) {
   const lots = allLots.filter((l) => l.cityId === cityId);
   const lot = bestExpansionLot(lots, bank, rng);
@@ -199,14 +242,18 @@ function enterCity(state: GameState, bank: RivalBank, cityId: string, allLots: L
   );
 }
 
-/** Removes a branch from its bank and frees its lot. */
+/** Removes an office from its bank and frees its lot. */
 export function removeRivalBranch(state: GameState, bank: RivalBank, branch: RivalBranch): void {
   bank.branches = bank.branches.filter((b) => b.id !== branch.id);
   const lot = state.world.lots[branch.lotId];
   if (lot?.occupant?.id === bank.id) delete lot.occupant;
 }
 
-/** Weekly closure check: 26 negative weeks after the first year, outside downturns (§18.4). Keeps a bank's last branch. */
+/**
+ * Weekly closure check: 26 negative weeks after the first year, outside
+ * downturns (§18.4). A bigger office shrinks a size, losing that share of its
+ * books (C2b); a Starter closes, except a bank's last office.
+ */
 export function runClosures(state: GameState): void {
   for (const bank of Object.values(state.rivals)) {
     if (bank.status !== 'active') continue;
@@ -217,7 +264,12 @@ export function runClosures(state: GameState): void {
       const phase = countryOfCity(state, branch.cityId).phase;
       if (RIVAL_CLOSURE.holdPhases.includes(phase)) continue;
       branch.negativeWeeks = branch.contribution < 0 ? branch.negativeWeeks + 1 : 0;
-      if (branch.negativeWeeks < RIVAL_CLOSURE.negativeWeeks || bank.branches.length <= 1) continue;
+      if (branch.negativeWeeks < RIVAL_CLOSURE.negativeWeeks) continue;
+      if (branch.size > 0) {
+        shrinkRivalOffice(state, bank, branch);
+        continue;
+      }
+      if (bank.branches.length <= 1) continue;
       const lot = state.world.lots[branch.lotId];
       removeRivalBranch(state, bank, branch);
       pushEvent(
@@ -235,4 +287,21 @@ export function runClosures(state: GameState): void {
       );
     }
   }
+}
+
+/** Shrinks an office a size; its books shrink in proportion (C2b). */
+export function shrinkRivalOffice(state: GameState, bank: RivalBank, office: RivalBranch): void {
+  const before = rivalMult(office);
+  office.size -= 1;
+  const keep = rivalMult(office) / before;
+  office.deposits *= keep;
+  office.loans *= keep;
+  office.negativeWeeks = 0;
+  pushEvent(
+    state,
+    'RIVAL_OFFICE_SHRUNK',
+    { rivalId: bank.id, bank: bank.name, city: office.cityId, size: sizeName(office.size) },
+    3,
+    office.cityId,
+  );
 }

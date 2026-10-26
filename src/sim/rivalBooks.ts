@@ -33,15 +33,18 @@ import { countryOfCity } from './rates';
 import { rivalOverall } from './rivalMarketing';
 import { matureDeposits } from './rivals';
 import { priceWarBump } from './rivalPrices';
+import { rivalMult } from './rivalOffices';
+import { sizeMult } from './branch/officeSize';
 import type { GameState, Lot, RivalBank, RivalBranch } from './state';
 
 /** Distance weight from the share formula: w = 1 / (1 + d / 6) (§9.3). */
 const weight = (d: number) => 1 / (1 + d / DISTANCE_FALLOFF);
 
 /**
- * Local competition factor on a rival branch's target (assumption, DESIGN §7):
- * crowding by every other branch within RIVAL_RADIUS, plus pressure from your
- * open branches nearby that win a strong share of prospects.
+ * Local competition factor on a rival office's target (assumption, DESIGN §7):
+ * crowding by every other office within RIVAL_RADIUS, weighted by its size
+ * (C2b), plus pressure from your open offices nearby that win a strong share
+ * of prospects.
  */
 export function competitionFactor(state: GameState, branch: RivalBranch): number {
   const lot = state.world.lots[branch.lotId];
@@ -52,14 +55,14 @@ export function competitionFactor(state: GameState, branch: RivalBranch): number
     if (rival.status !== 'active') continue;
     for (const rb of rival.branches) {
       if (rb.id === branch.id || rb.cityId !== branch.cityId) continue;
-      crowd += nearWeight(lot, state.world.lots[rb.lotId]);
+      crowd += rivalMult(rb) * nearWeight(lot, state.world.lots[rb.lotId]);
     }
   }
   let pressure = 0;
   for (const own of Object.values(state.branches)) {
     if (own.status !== 'open' || own.cityId !== branch.cityId) continue;
     const w = nearWeight(lot, state.world.lots[own.lotId]);
-    crowd += w;
+    crowd += sizeMult(own) * w;
     pressure += w * Math.max(0, own.last.share - c.playerShareRef);
   }
   const crowding = 1 / (1 + c.crowdK * Math.max(0, crowd - c.crowdFree));
@@ -88,7 +91,7 @@ export function updateBranchBooks(state: GameState, bank: RivalBank, branch: Riv
   const age = state.clock.week - branch.openedWeek;
   const ramp = branch.openedWeek > 0 ? rampShare(age) : 1;
   // A running campaign (§18.9) lifts the rating its deposits mature toward.
-  const rated = { cityId: branch.cityId, overall: rivalOverall(bank, branch) };
+  const rated = { cityId: branch.cityId, size: branch.size, overall: rivalOverall(bank, branch) };
   const target = matureDeposits(state, rated) * competitionFactor(state, branch) * ramp;
   branch.deposits += RIVAL_BOOK_EMA * (target - branch.deposits);
   const ldr = RIVAL_LDR * (1 + RIVAL_LDR_DEMAND_SLOPE * (loanDemand(c) - 1));
@@ -119,8 +122,9 @@ export function branchEarnings(
   // Running costs follow the city's cost index and today's price list (§4.6).
   const costIndex = (CITIES[branch.cityId]?.costIndex ?? 1) * listLevel(state, branch.cityId);
   const fees = (branch.deposits * RIVAL_FEE_YIELD * f.feeMult) / WEEKS_PER_YEAR;
+  // An office costs what the branches it stands for did (C2b).
   const costs =
-    RIVAL_BRANCH_COST * costIndex * f.costMult +
+    RIVAL_BRANCH_COST * rivalMult(branch) * costIndex * f.costMult +
     (branch.deposits * RIVAL_SERVICING) / WEEKS_PER_YEAR;
   const lossRate = RIVAL_BASE_LOSS_RATE * f.lossMult * (1 + f.cycleSens * (creditCycle(c) - 1));
   const losses = (branch.loans * Math.max(0, lossRate)) / WEEKS_PER_YEAR;

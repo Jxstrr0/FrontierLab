@@ -23,6 +23,7 @@ import { countryOfCity, defaultPrice, marketRef } from './rates';
 import type { Rng } from './rng';
 import { overallOf } from './rivals';
 import type { Book, Branch, GameState, RivalBank, RivalBranch } from './state';
+import { rivalMult } from './rivalOffices';
 
 /** Which of your products an acquired branch offers: everything it can serve (its customers had them). */
 function startsOn(state: GameState, spec: ProductSpec, branch: Branch): boolean {
@@ -85,8 +86,9 @@ export function convertRivalBranch(
     openedWeek: state.clock.week,
     status: 'open',
     build: { ...ACQUIRED_BUILDS[bank.strategy] },
-    size: 0,
-    lease: { weeklyRent: lot.weeklyRent, deposit: lot.deposit },
+    // The rival's office keeps its size (C2b); the lease scales with it.
+    size: rb.size,
+    lease: { weeklyRent: lot.weeklyRent * rivalMult(rb), deposit: lot.deposit * rivalMult(rb) },
     staff: {
       count: 0,
       target: 0,

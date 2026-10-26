@@ -892,7 +892,10 @@ export const RIVAL_BASE_LOSS_RATE = 0.006;
 export const RIVAL_EXPANSION = {
   everyWeeks: 4,
   minCr: 0.11,
-  /** Chance per monthly check, in each city it serves, that an eligible rival opens a branch there. */
+  /**
+   * Chance per monthly check, in each city it serves, that an eligible rival
+   * grows its office there, divided by the units the next size adds (C2b).
+   */
   chance: 0.06,
   /** Trailing profit needs this many reported quarters (so no openings in year one). */
   minQuarters: 4,
@@ -904,13 +907,13 @@ export const RIVAL_EXPANSION = {
   buildCost: 450_000,
   reviews: [20, 120] as [number, number],
   /**
-   * Entering a new city (§18.4): an eligible rival with at least entryMinBranches
-   * branches rolls entryChance each monthly check to open its first branch in a
+   * Entering a new city (§18.4): an eligible rival with at least entryMinUnits
+   * units (offices counted by size multiplier, C2b) rolls entryChance each monthly check to open its first branch in a
    * generated city it doesn't serve, in a home country, or anywhere once it
    * serves abroadMinCities cities. The city with the most free lots wins.
    */
   entryChance: 0.05,
-  entryMinBranches: 6,
+  entryMinUnits: 6,
   abroadMinCities: 3,
 } as const;
 /**

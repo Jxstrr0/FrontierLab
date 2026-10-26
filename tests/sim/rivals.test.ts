@@ -9,6 +9,8 @@ import { rampShare } from '../../src/sim/rivalBooks';
 import { runClosures } from '../../src/sim/rivalExpansion';
 import { rivalReviewCards } from '../../src/sim/rivalReviews';
 import type { GameEvent, GameState } from '../../src/sim/state';
+import { rivalUnitsIn } from '../../src/sim/rivalOffices';
+import { sizeMultOf } from '../../src/sim/branch/officeSize';
 
 const game = (competitors = 5, seed = 42) =>
   newGame({ seed, cityId: 'cal', bankName: 'Test Bank', competitors });
@@ -67,23 +69,28 @@ describe('rival expansion and closures', () => {
     const events = run(s, 260);
     // The city grows new storefronts every two years (CONTENT §3): count them all.
     const lots = Object.values(s.world.lots);
-    const opened = events.filter((e) => e.type === 'RIVAL_BRANCH_OPENED');
-    expect(opened.length).toBeGreaterThan(0);
-    const newBranches = Object.values(s.rivals).flatMap((r) =>
-      r.branches.filter((b) => b.openedWeek > 0),
-    );
-    expect(newBranches.length).toBeGreaterThan(0);
-    const rivalLots = lots.filter((l) => l.occupant?.type === 'rival').length;
-    expect(rivalLots).toBeLessThanOrEqual(
-      Math.ceil(RIVAL_EXPANSION.maxRivalLotShare * lots.length),
-    );
+    // One office per rival lab per city (C2b): growth is a size at a time.
+    const grown = events.filter((e) => e.type === 'RIVAL_OFFICE_GROWN');
+    expect(grown.length).toBeGreaterThan(0);
+    for (const r of Object.values(s.rivals)) {
+      const cities = r.branches.map((b) => b.cityId);
+      expect(new Set(cities).size).toBe(cities.length);
+    }
+    // Growth stops once rivals fill maxRivalLotShare; the last step adds at most 4 units.
+    const units = Object.values(s.rivals).reduce((x, r) => x + rivalUnitsIn(r, 'cal'), 0);
+    expect(units).toBeLessThanOrEqual(RIVAL_EXPANSION.maxRivalLotShare * lots.length + 4);
     expectConsistentLots(s);
   }, 30_000);
 
   it('closes a branch after 26 negative weeks and frees its lot', () => {
     const s = game();
-    const bank = Object.values(s.rivals).find((r) => r.branches.length > 1)!;
-    const branch = bank.branches[0]!;
+    const bank = Object.values(s.rivals)[0]!;
+    const office = bank.branches[0]!;
+    // A second, Starter office elsewhere: the one that loses money closes.
+    const lot = Object.values(s.world.lots).find((l) => !l.occupant)!;
+    lot.occupant = { type: 'rival', id: bank.id };
+    const branch = { ...office, id: 'rb_extra', cityId: 'van', lotId: lot.id, size: 0 };
+    bank.branches.push(branch);
     s.clock.week = 60;
     branch.contribution = -1;
     branch.negativeWeeks = 25;
@@ -93,9 +100,25 @@ describe('rival expansion and closures', () => {
     expect(s.events.log.some((e) => e.type === 'RIVAL_BRANCH_CLOSED')).toBe(true);
   });
 
+  it('shrinks a bigger office a size first, with its books (C2b)', () => {
+    const s = game();
+    const bank = Object.values(s.rivals)[0]!;
+    const office = bank.branches[0]!;
+    office.size = 2;
+    const deposits = office.deposits;
+    s.clock.week = 60;
+    office.contribution = -1;
+    office.negativeWeeks = 25;
+    runClosures(s);
+    expect(bank.branches).toContain(office);
+    expect(office.size).toBe(1);
+    expect(office.deposits).toBeCloseTo((deposits * sizeMultOf(1)) / sizeMultOf(2), 0);
+    expect(s.events.log.some((e) => e.type === 'RIVAL_OFFICE_SHRUNK')).toBe(true);
+  });
+
   it('ignores negative weeks during the first year', () => {
     const s = game();
-    const bank = Object.values(s.rivals).find((r) => r.branches.length > 1)!;
+    const bank = Object.values(s.rivals)[0]!;
     const branch = bank.branches[0]!;
     s.clock.week = 30;
     branch.contribution = -1;
