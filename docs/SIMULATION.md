@@ -67,7 +67,7 @@ How the economy works, step by step. Every CAPS name is a key in `src/config/bal
 
 - Use the `sfc32` PRNG.
 - Transcendental math (exp, log, non-integer powers, cos, tanh) goes through `src/sim/detmath.ts`, built from + − × ÷ and sqrt only. Engines are free to round `Math.pow` and friends differently (Node 22 and 24 already disagree), and these are bit-identical everywhere. ESLint bans the Math versions and `**` in `src/sim`.
-- **Per-system streams:** each stream's seed = hash(saveSeed, streamName). Stream names include `macro`, `rivals`, `demand`, `loanDesk`, `market`, `ventures`, `incidents`, `news`, `citygen:{cityId}`, `people` and `auctions`. Adding draws to one system then never reshuffles another, which keeps balancing stable.
+- **Per-system streams:** each stream's seed = hash(saveSeed, streamName). Stream names include `macro`, `rivals`, `demand`, `loanDesk`, `market`, `ventures`, `incidents`, `news`, `politics` (bills and votes, split from `news` on 2026-10-26), `citygen:{cityId}`, `people` and `auctions`. Adding draws to one system then never reshuffles another, which keeps balancing stable.
 - **Storage:** every stream's state lives in `GameState.rng`.
 - **Helpers:**
   - `next()`, `range(a, b)`, `int(a, b)`
@@ -984,7 +984,7 @@ A deliberately simple "country up or down" investment (DESIGN §5.12a). Your boo
 
 ## 24. News (The Weekly Ledger)
 
-- **Each week**, compose 6–12 articles from `events.log`, by priority:
+- **Each week**, compose 6–14 articles from `events.log`, macro state and the world desks below, by priority (the World desk keeps `NEWS_WORLD.minPerIssue` (2) stories first, however busy the week):
   1. your company's events
   2. central bank decisions in countries where you operate, then elsewhere
   3. rival actions in your cities
@@ -993,9 +993,15 @@ A deliberately simple "country up or down" investment (DESIGN §5.12a). Your boo
   6. sports
   7. filler: housing, politics, rankings
 - **Templates:** each event type has 2–4 headline/body templates (CONTENT). Fill numbers from the event payload. Never repeat the same template for the same subject in consecutive weeks.
-- **Tabs filter by category:** Top = the 6 highest priority; Banking; Business; Markets; Politics; Sports.
+- **Tabs filter by category:** Top = the 6 highest priority; World; Banking; Business; Markets; Politics; Sports.
+- **Your routine stories are rationed (2026-10-26, owner's ask: more stories that aren't about your bank).** The weekly figures print when the week is news (a loss, a swing back to profit, a record at least `NEWS_RECORD_MARGIN` (10%) above every earlier week once `NEWS_RECORD_MIN_WEEKS` (12) have passed) or every `NEWS_ROUTINE_EVERY_WEEKS` (4) weeks; a Watch-tier capital note on a change of tier or every 4 weeks (Restricted and Critical every week). Weekly figures, the loan tally, the Watch note and the rate watch share the `youRoutine` cap of 2 per issue; auctions are capped at 1.
+- **24.1 World desk.** `NEWS_WORLD.perIssue` (4) stories a week from around the ten countries, none about your bank (World tab). Each slot picks the home country with `homeShare` (25%), else one abroad, then a beat (`src/data/newsWorldBeats.ts`) that fits the country: its phase (strikes in a slowdown or recession, layoffs and gloom in a recession, hiring in an expansion with unemployment ≤ `lowUnemployment` 4.5%, new plants and transit lines in an expansion or recovery), inflation ≥ `highInflation` (3.5%) for price stories, house prices over a year (> `housingHot` 4% for rents, falling for building slowdowns), the month (southern seasons flipped for Australia) and its climate (typhoons in Hong Kong and Japan, monsoon in Singapore, bushfires in Australia). One beat per issue; a beat rests `cooldownWeeks` (26) in a country. Flavour only: nothing changes in the simulation. Priority 40 at home, 36 abroad; group cap 4.
+- **24.2 Company desk.** A listed company whose share price moved at least max(`moverMin` 6%, `moverSigma` 2.2 × its weekly volatility, vol ÷ √52) this week gets a Markets story quoting its real closing price, with a reason that fits its sector and direction (cap 2, priority 44 + |move| ÷ 2, at most +10). With `corporateChance` (35%) an issue also carries corporate news from a non-bank listed company: a new chief executive, a product launch or a new site. The reasons explain a move the market model already made; nothing here moves a price.
+- **24.3 Money Column.** Every `NEWS_COLUMN.everyWeeks` (2) weeks, a personal-finance column for the home country (Business tab, priority 32). Topic: a rate move within `rateWindowWeeks` (13), inflation ≥ 3.5%, house prices up over 4%, or a slowdown/recession; one is picked at random when several apply; otherwise an evergreen tip. It quotes the real policy rate, inflation, house-price change and unemployment.
+- **Sports abroad:** each week one league from a country you don't operate in takes its turn in the Sports tab (priority 22, cap 1), and every league's season finish reports at year end (yours rank higher).
 - **Archive:** keep the last 52 issues.
-- **Politics:** fictional, neutral parties. Policy proposals (fee caps, capital buffers) can become regulatory events, e.g. CAPITAL_BUFFER +1pp for 4 quarters in that country.
+- **Politics:** fictional, neutral parties. Policy proposals (fee caps, capital buffers) can become regulatory events, e.g. CAPITAL_BUFFER +1pp for 4 quarters in that country. Bills and votes draw from their own `politics` stream, so news changes never change which laws pass.
+- **Polls and elections:** every `NEWS_POLL_EVERY_WEEKS` (6) weeks every country's poll drifts (σ 1.2 points, floor 8%) and renormalises; the home poll makes a story. Every country votes every `NEWS_ELECTIONS.termWeeks` (208), the first votes staggered `staggerWeeks` (21) apart by country. The campaign is announced `campaignWeeks` (6) ahead with the latest poll; on the day the poll leader wins with `leaderWinP` (70%), otherwise the runner-up, and the winner gains `winnerBounce` (8) poll points. Priority 60 where you operate, 42 elsewhere; cap 2. Who governs is flavour only.
 
 ## 25. Balance targets
 
