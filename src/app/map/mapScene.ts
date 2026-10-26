@@ -27,7 +27,8 @@ export interface Scene {
 let cached: Scene | null = null;
 const cameras = new Map<string, ViewCamera>();
 
-function paperColour(): string {
+/** The map paper colour from the --paper token. */
+export function paperColour(): string {
   if (typeof getComputedStyle !== 'function') return PAPER_FALLBACK;
   const v = getComputedStyle(document.documentElement).getPropertyValue('--paper').trim();
   return v || PAPER_FALLBACK;

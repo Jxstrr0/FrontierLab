@@ -9,6 +9,7 @@
 import { compressToUTF16, decompressFromUTF16 } from 'lz-string';
 import type { LogoShape } from '../../data/types';
 import { dateOf } from '../calendar';
+import { coverMetaFor, type CoverMeta } from '../coverMeta';
 import type { GameState, Settings } from '../state';
 import { checksum, deserialize, serialize } from './serialize';
 
@@ -34,6 +35,8 @@ export interface SaveMeta {
   savedAt: number;
   /** checksum() of the compressed save; missing on slots written before v12. */
   checksum?: string;
+  /** What the title screen's skyline prints (coverWorld.ts); missing on older cards. */
+  cover?: CoverMeta;
 }
 
 export const STORAGE_FULL =
@@ -70,6 +73,7 @@ export function slotMetaFor(slot: SlotId, state: GameState): SaveMeta {
     day: state.clock.day,
     cash: state.company.cash,
     savedAt: Date.now(),
+    cover: coverMetaFor(state),
   };
 }
 
@@ -161,6 +165,26 @@ export function savePrefs(prefs: Partial<Settings>): void {
     store()?.setItem(PREFS_KEY, JSON.stringify(prefs));
   } catch {
     // Preferences are a convenience; ignore storage failures.
+  }
+}
+
+const COVER_INDEX_KEY = `${PREFIX}coverCityIndex`;
+
+/** Which city the title cover shows a new player this launch (docs/COVER_SCREEN.md §4.1). */
+export function loadCoverIndex(): number {
+  try {
+    const n = Number(store()?.getItem(COVER_INDEX_KEY) ?? 0);
+    return Number.isInteger(n) && n >= 0 ? n : 0;
+  } catch {
+    return 0;
+  }
+}
+
+export function saveCoverIndex(index: number): void {
+  try {
+    store()?.setItem(COVER_INDEX_KEY, String(index));
+  } catch {
+    // A convenience only; ignore storage failures.
   }
 }
 

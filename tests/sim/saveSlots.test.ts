@@ -1,9 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  allSlotMeta,
+  latestSlot,
+  loadCoverIndex,
   loadFromSlot,
   SAVE_DAMAGED,
+  saveCoverIndex,
   saveToSlot,
   slotMeta,
+  slotMetaFor,
   STORAGE_FULL,
 } from '../../src/sim/save/storage';
 import { runScript } from '../helpers/scenario';
@@ -57,5 +62,45 @@ describe('save slots', () => {
     vi.stubGlobal('window', { localStorage: fakeStorage(10) });
     expect(saveToSlot('3', runScript(5))).toBe(STORAGE_FULL);
     expect(STORAGE_FULL).toMatch(/^Storage full — export your save/);
+  });
+});
+
+describe('save cards for the title cover', () => {
+  let ls: ReturnType<typeof fakeStorage>;
+  beforeEach(() => {
+    ls = fakeStorage();
+    vi.stubGlobal('window', { localStorage: ls });
+  });
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('remembers the current city for the skyline', () => {
+    const s = runScript(10);
+    const meta = slotMetaFor('1', s);
+    expect(meta.cover).toMatchObject({
+      cityId: s.world.currentCityId,
+      seed: s.meta.seed,
+      homeCityId: s.meta.homeCityId,
+    });
+  });
+
+  it('still lists older cards written without a cover', () => {
+    saveToSlot('2', runScript(5));
+    const meta = JSON.parse(ls.items.get('vaultstreet.meta.2')!);
+    delete meta.cover;
+    ls.items.set('vaultstreet.meta.2', JSON.stringify(meta));
+    expect(allSlotMeta()['2']?.bankName).toBe(meta.bankName);
+    expect(latestSlot()?.cover).toBeUndefined();
+    expect(() => loadFromSlot('2')).not.toThrow();
+  });
+
+  it('keeps the rotation index per device, defaulting to 0', () => {
+    expect(loadCoverIndex()).toBe(0);
+    saveCoverIndex(7);
+    expect(loadCoverIndex()).toBe(7);
+    ls.items.set('vaultstreet.coverCityIndex', 'nonsense');
+    expect(loadCoverIndex()).toBe(0);
+    vi.stubGlobal('window', {});
+    expect(loadCoverIndex()).toBe(0);
+    expect(() => saveCoverIndex(1)).not.toThrow();
   });
 });
