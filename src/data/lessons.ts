@@ -306,7 +306,7 @@ export const PLACE_TIPS: Record<string, TipText> = {
   },
   carDealer: {
     title: 'Car dealer',
-    line: 'Buy cars with your own money. On Dealer financing the bank can pay the dealer to send its car-loan customers to our branches here.',
+    line: 'Buy cars with your own money. It’s personal spending: the bank’s books don’t see it.',
   },
   auctionHouse: {
     title: 'Auction house',

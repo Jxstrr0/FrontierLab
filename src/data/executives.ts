@@ -84,7 +84,7 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
         id: 'capital',
         label: 'Capital',
         description:
-          'Keeps the capital ratio safe without selling shares: below 10.5% sells company stocks and trims risk appetite.',
+          'Keeps the capital ratio safe without selling shares: below 10.5% sells company stocks and trims risk appetite, alongside a CRO if you have one.',
       },
       {
         id: 'shares',

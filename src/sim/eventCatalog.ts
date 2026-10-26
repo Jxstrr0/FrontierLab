@@ -212,9 +212,6 @@ export interface EventPayloads {
   HOME_REBUILT: { homeId: string; name: string; value: Money };
   CAR_BOUGHT: { carId: string; name: string; price: Money };
   CAR_SOLD: { carId: string; name: string; price: Money };
-  DEALER_SIGNED: { siteId: Id; city: Id; dealer: string };
-  /** `expired`: the term ran out (else you ended it). */
-  DEALER_ENDED: { siteId: Id; city: Id; dealer: string; expired: boolean };
   /** A house listed its next sale (auctions.ts); item = the headline lot, week = sale week. */
   AUCTION_PREVIEW: {
     houseId: string;
