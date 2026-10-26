@@ -46,6 +46,7 @@ export default tseslint.config(
         { name: 'window', message: 'src/sim must not touch the DOM.' },
         { name: 'document', message: 'src/sim must not touch the DOM.' },
         { name: 'localStorage', message: 'localStorage lives in src/sim/save/ only.' },
+        { name: 'indexedDB', message: 'IndexedDB lives in src/sim/save/ only.' },
       ],
       'no-restricted-syntax': [
         'error',
@@ -57,8 +58,8 @@ export default tseslint.config(
     },
   },
   {
-    // The one place allowed to use browser storage and wall time (save timestamps).
-    files: ['src/sim/save/storage.ts'],
+    // The only places allowed to use browser storage and wall time (save timestamps).
+    files: ['src/sim/save/storage.ts', 'src/sim/save/slotData.ts'],
     rules: { 'no-restricted-globals': 'off', 'no-restricted-properties': 'off' },
   },
   prettier,

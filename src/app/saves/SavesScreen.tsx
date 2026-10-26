@@ -44,17 +44,17 @@ export function SavesScreen(p: { inGame?: boolean }) {
   const replaceWith = (state: GameState, what: string) =>
     inGame ? setPending({ kind: 'replace', state, what }) : play(state);
 
-  const saveHere = (slot: SlotId) => {
+  const saveHere = async (slot: SlotId) => {
     const game = peekGame();
     if (!game) return;
-    const err = saveToSlot(slot, game);
+    const err = await saveToSlot(slot, game);
     if (err) toast(err, 'bad');
     else toast(`Saved to ${SLOT_LABEL[slot].toLowerCase()}.`, 'good');
     refresh();
   };
-  const load = (slot: SlotId) => {
+  const load = async (slot: SlotId) => {
     try {
-      replaceWith(loadFromSlot(slot), SLOT_LABEL[slot].toLowerCase());
+      replaceWith(await loadFromSlot(slot), SLOT_LABEL[slot].toLowerCase());
     } catch (e) {
       toast((e as Error).message, 'bad');
     }
@@ -64,11 +64,9 @@ export function SavesScreen(p: { inGame?: boolean }) {
     const c = pending;
     setPending(null);
     if (!c) return;
-    if (c.kind === 'overwrite') saveHere(c.slot);
-    else if (c.kind === 'delete') {
-      deleteSlot(c.slot);
-      refresh();
-    } else play(c.state);
+    if (c.kind === 'overwrite') void saveHere(c.slot);
+    else if (c.kind === 'delete') void deleteSlot(c.slot).then(refresh);
+    else play(c.state);
   };
 
   return (

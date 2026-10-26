@@ -28,10 +28,10 @@ function coverIndexThisLaunch(): number {
 export function TitleScreen() {
   const latest = latestSlot();
   const choice = useMemo(() => pickCoverCity(latest, coverIndexThisLaunch(), START_CITIES), []);
-  const resume = () => {
+  const resume = async () => {
     if (!latest) return;
     try {
-      setGame(loadFromSlot(latest.slot));
+      setGame(await loadFromSlot(latest.slot));
       screen.value = 'game';
     } catch (e) {
       toast((e as Error).message, 'bad');

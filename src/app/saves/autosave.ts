@@ -1,12 +1,13 @@
 // The weekly autosave without the stall (Stage 10 performance pass). The game is
 // serialized on the main thread (it changes every tick, so it's captured at
 // once), compressed in a Web Worker, then written to the autosave slot by
-// src/sim/save/storage.ts, in exactly the format saveToSlot uses. If workers
+// src/sim/save/storage.ts, in exactly the format saveToSlot uses. Writes land
+// in order, and one that finds a newer save already in the slot is dropped. If workers
 // aren't available it falls back to saving synchronously.
 import { compressToUTF16 } from 'lz-string';
 import { serialize } from '../../sim/save/serialize';
 import type { GameState } from '../../sim/state';
-import { saveToSlot, slotMeta, slotMetaFor, writeSlot, type SaveMeta } from '../saves';
+import { saveToSlot, slotMetaFor, writeSlot, type SaveMeta } from '../saves';
 
 interface Job {
   json: string;
@@ -28,9 +29,9 @@ export function isSuperseded(jobSavedAt: number, stored: SaveMeta | null): boole
 }
 
 function finish(job: Job, data: string): void {
-  if (isSuperseded(job.meta.savedAt, slotMeta('auto'))) return;
-  const err = writeSlot('auto', data, job.meta);
-  if (err) job.onError(err);
+  void writeSlot('auto', data, job.meta, (stored) => isSuperseded(job.meta.savedAt, stored)).then(
+    (err) => err && job.onError(err),
+  );
 }
 
 function startWorker(): Worker | null {
@@ -61,8 +62,7 @@ function startWorker(): Worker | null {
 export function autosave(state: GameState, onError: (message: string) => void): void {
   const w = startWorker();
   if (!w) {
-    const err = saveToSlot('auto', state);
-    if (err) onError(err);
+    void saveToSlot('auto', state).then((err) => err && onError(err));
     return;
   }
   const id = ++nextId;

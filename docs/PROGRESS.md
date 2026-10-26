@@ -10,6 +10,16 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-10-26 — Bigger save storage (v0.11.7)
+- **Owner's ask:** expand save storage.
+- **Why it filled.** Saves lived in the browser's localStorage, which allows about 5 MB for the whole site, and every page on jxstrr0.github.io shares it. Measured: a quiet game is ~0.3 MB a slot, but a big 10-year game (~180 branches) is ~2.7 MB, so on iPhone an autosave plus one manual slot of a late game hit "Storage full".
+- **What changes.** The saved games now live in **IndexedDB**, the browser's database storage, whose quota is a share of the phone's free space (hundreds of MB or more). The game also asks the browser once to keep its saves when space runs low. The small slot cards (bank name, date, cash, cover) stay in localStorage so the title and Save game screens list them instantly. Still four slots, same export codes.
+- **Your saves:** move across by themselves the first time the game touches them, freeing the old space; until then they still load from where they were. Browsers without IndexedDB keep using localStorage as before.
+- **Code:** new `src/sim/save/slotData.ts` (the IndexedDB store, the localStorage fallback, the move of older saves and one queue so writes land in order); `saveToSlot`, `writeSlot`, `loadFromSlot` and `deleteSlot` in `storage.ts` now return promises, and their callers wait on them (Exit to title waits for its save so Continue shows it). The autosave's "a newer save already landed" check now runs inside the queue. ESLint now also blocks `indexedDB` in `src/sim/` outside the two save files.
+- **Dependency:** `fake-indexeddb` (dev only, for tests; never shipped) stands in for the browser's IndexedDB in `tests/sim/saveIndexedDb.test.ts`.
+- **Checked:** lint, full test suite (824, including new IndexedDB tests: a save bigger than localStorage's whole quota fits, older saves move across, writes land in order, a failed card write restores the previous save) and build clean. In Chromium at 390×844: the save sits in IndexedDB with only its card in localStorage, it loads back after a reload and from Continue, with no console errors. No schema change, and the determinism snapshot is unchanged.
+- **Docs:** DATA_MODEL §10, DESIGN decision log.
+
 ### 2026-10-26 — Market rents follow the cycle, and a Chief Real Estate Officer (v0.11.6, schema v29)
 - **Owner's ask:** make market rent track the city, and add a C-suite member who manages property rents, for the bank's buildings and your own. The formulas were agreed first: rents lag the cycle, expertise is pricing power, exact reviews every 4 weeks, rents only (foreclosed homes and buying stay yours).
 - **What changes.** A building's market rent used to be fixed at purchase. Now it eases toward **base rent × the country's commercial property index** by 5% a week (half-life about 14 weeks): in a boom the value jumps first and rents catch up over months, so a rent you set last year drifts off market. The stepper's hint says where market rent is heading. A newly bought building starts at today's market rent; your rent is kept inside its 50–160% range as the market moves.

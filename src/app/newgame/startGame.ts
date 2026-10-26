@@ -17,6 +17,5 @@ export function startGame(opts: Omit<NewGameOptions, 'version'>): void {
   setTutorialStep(state, initialTutorialStep());
   setGame(state);
   screen.value = 'game';
-  const err = saveToSlot('auto', state);
-  if (err) reportSaveError(err);
+  void saveToSlot('auto', state).then((err) => err && reportSaveError(err));
 }
