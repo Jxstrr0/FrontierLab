@@ -82,7 +82,7 @@ describe('The paper over five years', () => {
   });
 
   it('runs world stories from many countries and a fortnightly Money Column', () => {
-    const world = all.filter((a) => a.tab === 'world');
+    const world = all.filter((a) => a.ref!.startsWith('WORLD_'));
     expect(new Set(world.map((a) => a.ref!.split(':')[1]!.split('#')[0])).size).toBe(
       Object.keys(state.world.countries).length,
     );

@@ -580,6 +580,17 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     }
     return s;
   },
+  35: (s) => {
+    // The world calendar, commodities and the archive (§24.4–24.6) start empty:
+    // prices begin at their base, and the archive fills from the next issue.
+    const desk = (s as unknown as GameState).news.desk;
+    if (desk) {
+      desk.scheduled ??= [];
+      desk.commodities ??= {};
+      desk.archive ??= [];
+    }
+    return s;
+  },
 };
 
 /** The rich list's fortune range up to schema v31. */

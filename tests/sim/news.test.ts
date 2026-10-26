@@ -108,9 +108,10 @@ describe('The Weekly Ledger over three years', () => {
 
   it('gives most of each issue to the world beyond your bank (§24.1)', () => {
     for (const issue of issues) {
-      const world = issue.articles.filter((a) => a.tab === 'world');
-      expect(world.length).toBeGreaterThanOrEqual(NEWS_WORLD.minPerIssue);
-      expect(world.length).toBeLessThanOrEqual(NEWS_GROUP_CAPS.world!);
+      const worldTab = issue.articles.filter((a) => a.tab === 'world');
+      expect(worldTab.length).toBeGreaterThanOrEqual(NEWS_WORLD.minPerIssue);
+      const desk = issue.articles.filter((a) => a.ref!.startsWith('WORLD_'));
+      expect(desk.length).toBeLessThanOrEqual(NEWS_GROUP_CAPS.world!);
       const routine = issue.articles.filter((a) =>
         /^(BANK_WEEK_|LOAN_|RATE_WATCH)/.test(a.ref ?? ''),
       );
