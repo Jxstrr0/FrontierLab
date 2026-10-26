@@ -4,11 +4,20 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 **Current stage:** 10 — Art pass, onboarding, polish, launch (built and live; awaiting the owner's iPhone check). All ten roadmap stages are built. Still open: the owner's testing and tuning pass, an Add to Home Screen test on a real iPhone, and the Vault Street card on Kelbo.Website (in a separate session in that repo).
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `0d0dc26718fc32` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `1d63a8b8c0bfbf` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-26 — Content trim merged (v0.11.2)
+- **Owner's ask:** update pull request #2 (the 2026-10-25 content trim, v0.10.4, entry below) and merge it.
+- **Brought up to date.** `main` had moved 29 commits and ten save versions since the trim was written. I merged `main` into the branch and kept both sides. The trim's save migration was written as 14 → 15, but `main` already uses 15–25 for other features, so it now runs last as **25 → 26** (schema v26), with the same steps: dealer deals removed, their fees folded into marketing, held foreclosed homes turned to renting, merged funding types retyped, and the Grand Opening Week package renamed Street Team. The old migration test still walks a v14 save all the way up.
+- **One change made while merging: Community Sponsors keeps families.** With today's `main`, moving Community Sponsors from families to businesses pulled the 20-city median of first-year loans/deposits from 77.0% to 73.9%, under the 75% floor. Businesses bring deposits but borrow little. Now it reaches **families and businesses**, with the small Branch lift the trim added, so it's still distinct from Direct Mail (retirees and families, no rating lift). That holds 76.2%, and every 20-city checkpoint passes.
+- **Leftovers tidied:** the car dealer's first-look tip (added on `main` after the trim) still mentioned dealer financing; it now says the showroom is personal spending.
+- **Balance:** seeds 1–20, steady: all checkpoints in range. Seed 42 across all six strategies matches `main`, except one lumpy week on the steady run's first branch (a single −$188k write-off in week 258 that lands in the week-260 four-week average; the weeks around it match `main` to within $500).
+- **Determinism:** snapshot `0d0dc26718fc32` → `1d63a8b8c0bfbf` (intended: the trim changes content).
+- **Checked:** full suite, lint and build clean.
 
 ### 2026-10-26 — The HR floor hires branch managers (v0.11.1)
 - **Owner's ask:** let the HR floor auto-hire managers for branches that don't have one, as the COO already does.
@@ -231,6 +240,21 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 - **Save format:** unchanged (no new state). The determinism snapshot moved `0f42b6c195480e` → `009a66bf5840b5` only because of the bigger starting cash: with the old $750K it reproduces the old hash.
 - **Tests:** 706 (currency conversion and typed money, the developer payment keeps the books balanced). Lint, typecheck and balance clean. Checked at 390×844 with ¥ selected: the button reads "Add ¥1.50B to company cash", cash went $900K → $10.9M, no console errors.
 - **Not converted:** a few plain-sentence refusal messages from commands (e.g. "You need $332,000") still print in dollars.
+### 2026-10-25 — Content trim: less overlap, same game (v0.10.4)
+- **Owner's asks** (after a content audit for bloat): 1 fix foreclosed homes, 2–3 keep risk appetite on HQ with both CFO and CRO able to move it, 4 and 5 fix the overlapping campaigns and agency package, 6 universities stay, 7 currencies stay, 8 remove the dealer financing screen, 9 merge funding types to four, 10 the consumer loans as I see fit.
+- **1. Foreclosed homes lose Hold.** Hold and Rent carried the same 6% cost, and only Rent earned anything, so Hold was never the right choice. The card now offers **Rent / Sell all**, and new pools start renting.
+- **2–3. Risk appetite.** It stays one dial on the HQ Products floor. The CRO's switch still tunes it up and down. The CFO's Capital switch now steps it down while capital is weak *even with a CRO seated* (before, the CFO stood aside). The two take turns, 2 weeks apart in the 4-week cycle, so the dial never moves twice in one week; in a capital squeeze it can come down every 2 weeks. The card now says who is steering it ("Your CRO tunes this every 4 weeks, and your CFO steps it down while capital is under 10.5%. You can still set it yourself.").
+- **4. Campaigns.** Still ten. Paperless Pledge now lifts the **Products** rating (it repeated Free Lobby Coffee's Branch lift). Community Sponsors now reaches **businesses** with a small Branch lift (it repeated Direct Mail's families). Direct Mail keeps retirees and families. My first try (Direct Mail on retirees only, plus extra new deposits) pulled first-year loans/deposits down to 69.9% across 20 cities, under the 75% floor, so I dropped it.
+- **5. Agencies.** Northwind & Pike's two-week package is renamed **Street Team** (was "Grand Opening Week", which read like a new branch's own opening boost). Same price and effect; dropping it would have left that agency with nothing to sell.
+- **8. Dealer financing is gone.** The car dealer is just the showroom now. Running deals end when a save loads; the fees they charged move into the marketing line, so past statements keep the same totals.
+- **9. Funding types: six to four.** Brokered Deposits merged into **Term Interbank** (26–104 weeks, $2–50M, +0.50%, repayable early) and Senior Bond into **Covered Bond** (3–10 years, $25–500M, +0.85%, still needs mortgage cover). Overnight and the central bank window are unchanged. Existing lots and offers convert on load.
+- **10. Line of Credit stays.** On a closer look it is the only revolving credit business customers take, so it isn't a duplicate of Personal Loan or Credit Card. Changing it would only have moved the balance numbers.
+- **Not touched:** the audit's item 3 (popups with only an OK button, such as Dividend due, that pause the game). Your reply's "3" read as part of the risk-appetite answer, so I left those popups alone; say the word if you want them turned into toasts.
+- **Save format:** schema v15 with migration 14 → 15 when written; renumbered to v26 / 25 → 26 when merged on 2026-10-26 (all of the above, `tests/sim/migrateV14.test.ts`).
+- **Determinism snapshot** `0f42b6c195480e` → `05ae9fae13ba53` (intended: rented REO, the campaign retune and the funding mix all change play).
+- **Balance:** `npm run balance` (seed 42, all six strategies, 10 years) shows the same warnings as before the change: steady's week-52 income (now 17.1k against $20k, was 1.6k) and aggressive's year-3 assets vs steady. Across seeds 1–20, every first- and second-year band passes (week 52 loans/deposits 75.1%, was 77.6%).
+- **Tests:** 704, lint, typecheck and build clean. One test changed meaning: the CFO-capital test's no-CFO bank still fails, but now by insolvency before takeover (the retuned campaigns leave it about $50k shorter of cash, past its credit line), so it accepts either kind of failure. Checked at 390×844 in a browser: the risk appetite card with both executives seated, the dealer's showroom without tabs, the foreclosed homes card with Rent / Sell all. No console errors.
+- **Docs:** DESIGN §3.1, §5.11 and seven decision-log entries; SIMULATION §13.6, §17.2, §21.3; CONTENT §8, §11, §12, §14; SCREENS §10, §16, §19; DATA_MODEL v15; ROADMAP Stage 9; ART_DIRECTION pins.
 
 ### 2026-10-25 — CFO share sales on their own switch; the build sheet remembers your fit-out (v0.10.3)
 - **Owner's asks:** (A) a separate CFO toggle for private offerings and share sales; (B) the build sheet should remember the last branch's parts instead of resetting the vault, lobby and the rest.

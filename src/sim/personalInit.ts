@@ -22,7 +22,6 @@ export function initPersonalEmpire(state: GameState): void {
   state.personal.empire = emptyEmpire();
   state.auctions = {};
   state.clubs = {};
-  state.dealerDeals = {};
   seedAuctions(state);
   seedClubs(state);
   seedRichList(state);

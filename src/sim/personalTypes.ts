@@ -1,6 +1,6 @@
 // Stage 9 state types (SIMULATION §22, DESIGN §5.16, SCREENS §19–20, §23): the
 // founder's homes, cars and collectibles, auction houses' schedules, sports
-// clubs, car-dealer financing deals, the rich list and insider-trading cases.
+// clubs, the rich list and insider-trading cases.
 import type { Id, Money, Week } from '../data/types';
 
 export interface OwnedHome {
@@ -118,14 +118,6 @@ export interface ClubState {
     /** Transfer fees paid and release settlements this season. */
     transfers?: Money;
   };
-}
-
-export interface DealerDeal {
-  siteId: Id;
-  cityId: Id;
-  signedWeek: Week;
-  endWeek: Week;
-  feePerYear: Money;
 }
 
 export interface RichFortune {

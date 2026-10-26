@@ -479,6 +479,7 @@ If `L > liqTarget + 0.05`: repay central bank window borrowing first, then overn
 - **Interest** is paid weekly from corporate cash.
 - **Maturity:** L −= amount. If that breaches LIQ_MIN, §13.5 runs.
 - **Covered bonds** require mortgage balances ≥ 1.25 × covered bonds outstanding.
+- **Types offered:** Term Interbank and Covered Bond (CONTENT §12). Brokered Deposits and Senior Bond merged into them in schema v15.
 
 ### 13.7 Payroll partnerships (Employers layer)
 - **Signing:**
@@ -702,7 +703,7 @@ Levels 1–5 (Very conservative to Very aggressive):
 | Exec | Domain | Delegations |
 |---|---|---|
 | COO | HR, all branches | **Expansion:** opens branches for you in the cities you mark for growth (one at most every 4 weeks, in the growth city with the most room, at the busiest free storefront clear of your other branches, in your usual fit-out, keeping 8 weeks of costs in cash). **Company troubles:** settles company and city incidents the way a delegated manager would (§17.1), valuing effects in weeks of company revenue with error shrinking with Expertise; cases marked `yours` (bank run, rescue offer, poached executives) always come to you. **Branch operations:** auto-hires managers for new branches and turns on default delegation. **HR benefits:** keeps average morale at or over the **morale target** you dial (`executives.moraleTarget`, one of `EXEC_DELEGATION.moraleTargets` 70 / 80 / 90, default 70) at least cost, within `benefitsBudgetShare` (8%) of payroll. **HR division:** auto-staffs every floor to 100% coverage. **Pay reviews:** on the **cadence** you dial (`executives.payReviewCadence`: quarterly = every 13 weeks, annual = every 52, `PAY_REVIEW.cadences`, default quarterly) sets every executive to `execMarketSalary × (1 + payPremium)` and every branch manager to their market pay (§6.5) × `(1 + payPremium)`, rounded to the salary steps and inside the allowed ranges; it also runs at once when switched on and whenever you change the premium (`setPayPremium`, −10% to +30% in 5% steps, default +5%). **Branch guidance (staffing):** see below. |
-| CFO | Finance, Treasury | Halves statement delays. **Treasury:** auto-funding, bond share and buying funding offers to keep LR within ±2pp of target. **Capital:** at Watch or worse, sells the company's stocks and steps risk appetite down every 4 weeks (unless the CRO runs appetite). **Share sales** (its own switch since 2026-10-25, so the owner can keep their stake undiluted): at Restricted or Critical, sells new shares through the cheapest investment bank (private placement while private, within the round limits; secondary once listed), sized to reach 12% plus any regulator buffer, or what the charter floor needs. Never launches the IPO. **Dividends:** proposes a dividend at board meetings. **Branch guidance (funding),** with the CRO: see below. |
+| CFO | Finance, Treasury | Halves statement delays. **Treasury:** auto-funding, bond share and buying funding offers to keep LR within ±2pp of target. **Capital:** at Watch or worse, sells the company's stocks and steps risk appetite down every 4 weeks, 2 weeks after the CRO's turn (`cfoAppetitePhase`), so a seated CRO keeps tuning it too and the two never move it twice in one week. **Share sales** (its own switch since 2026-10-25, so the owner can keep their stake undiluted): at Restricted or Critical, sells new shares through the cheapest investment bank (private placement while private, within the round limits; secondary once listed), sized to reach 12% plus any regulator buffer, or what the charter floor needs. Never launches the IPO. **Dividends:** proposes a dividend at board meetings. **Branch guidance (funding),** with the CRO: see below. |
 | CPO | Products | **Pricing:** keeps the company lineup priced like a delegated manager (§17.1) when Apply-to-all is on. **Developments:** starts one when none is running, within a budget cap of 1% of revenue. **Models:** switches to the bureau package with the best defaults saved per dollar. **Branch guidance (lineup):** see below. |
 | CTO | IT | App rating bonus (§16.9); runs digital projects. An empty seat applies the vacancy penalty. |
 | CRO | Risk | Tunes risk appetite to hold CR ≥ 12% and the annualized loss rate ≤ 1.2% (expansion target); Loan Desk policy. **Branch guidance (lending),** with the CFO: see below. |
@@ -914,9 +915,9 @@ A deliberately simple "country up or down" investment (DESIGN §5.12a). Your boo
   - Reference: the original showed about 8.7% ROI at 85% occupancy.
 - **21.3 REO** (foreclosed homes, aggregated per city):
   - units = `Σ recovery / avgHomeValue(city)`; value tracks `hpi`; carrying cost 6% per year
-  - **Sell all:** 90% of value, settles in 1–4 weeks, cash to corporate cash
-  - **Rent:** yield 4.5% per year of value at 90% occupancy
-  - **Hold**
+  - **Rent** (every pool starts here): yield 4.5% per year of value at 90% occupancy
+  - **Sell all:** 90% of value, settles in 1–4 weeks, cash to corporate cash; carrying cost and rent stop
+  - (Hold, carrying the cost with no rent, was removed in schema v15: Rent always beat it.)
   - RWA weight 1.0.
 - **21.4 Ownership:** choose Company or Private at purchase. Private property counts in personal wealth only.
 - **21.5 Details (Stage 7):**
@@ -1081,5 +1082,5 @@ Group the constants like this, with the defaults shown above:
   - `VENTURES` (pipeline, growth, rounds, failure, IPO and acquisition odds), `VENTURE_DEBT`, `VENTURE_MARGIN`, `VENTURE_GEN`, `VENTURE_IPO`, `VENTURE_NEWS`
   - `VENTURE_RISK_WEIGHT = 2.5`, `VENTURE_DEBT_RISK_WEIGHT = 1.5`, `PROPERTY_RISK_WEIGHT = 1.0`, `FX_RISK_WEIGHT = 1.0`
   - `CONVENTIONS`, `REAL_ESTATE`, `REO`, `LOBBYING`, `FX`, `FX_START_INDEX = 100`
-- **PERSONAL:** `PERSONAL_TAX = 0`, `INSIDER_WINDOW_WEEKS = 2`, `INSIDER_PROB = 0.15`, `TRAVEL_KM_PER_WEEK = 24_140`, `FLIGHT_FARE = 80_000` (× destination costIndex), `EARTH_RADIUS_KM = 6_371`, `JET = { upkeepRate: 0.08, depreciation: 0.06, resaleHaircut: 0.1 }`; Stage 9: `HOMES_CFG`, `CARS_CFG`, `COLLECTIBLES_CFG`, `AUCTIONS`, `DEALER_FINANCING`, `FRANCHISE`, `RICH_LIST`, `INSIDER` (src/config/balance.ts)
+- **PERSONAL:** `PERSONAL_TAX = 0`, `INSIDER_WINDOW_WEEKS = 2`, `INSIDER_PROB = 0.15`, `TRAVEL_KM_PER_WEEK = 24_140`, `FLIGHT_FARE = 80_000` (× destination costIndex), `EARTH_RADIUS_KM = 6_371`, `JET = { upkeepRate: 0.08, depreciation: 0.06, resaleHaircut: 0.1 }`; Stage 9: `HOMES_CFG`, `CARS_CFG`, `COLLECTIBLES_CFG`, `AUCTIONS`, `FRANCHISE`, `RICH_LIST`, `INSIDER` (src/config/balance.ts)
 - **FEATURES:** flags per stage (ROADMAP)

@@ -49,7 +49,6 @@ export const PNL_LINES: readonly PnlLine[] = [
   'travel',
   'franchiseRevenue',
   'franchiseCosts',
-  'dealerFees',
   'loanLosses',
   'depreciation',
   'tax',
@@ -101,7 +100,6 @@ export const OPEX: readonly PnlLine[] = [
   'lobbying',
   'travel',
   'franchiseCosts',
-  'dealerFees',
 ];
 /** Lines that don't move corporate cash (§14.3). */
 export const NON_CASH: readonly PnlLine[] = [

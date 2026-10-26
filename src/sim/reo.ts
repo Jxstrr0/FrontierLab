@@ -1,7 +1,7 @@
 // Foreclosed homes, tick step 8 (SIMULATION §21.3). Defaulted mortgages leave
 // a pool per city (books.ts addReo). Each week the pool's value follows the
-// country's house price index (a non-cash propertyGains mark); Hold and Rent
-// carry a 6%/yr cost, Rent also earns 4.5%/yr at 90% occupancy, and a Sell all
+// country's house price index (a non-cash propertyGains mark); while rented
+// they carry a 6%/yr cost and earn 4.5%/yr at 90% occupancy, and a Sell all
 // settles at its sell week for 90% of value: the cash is investing cash and the
 // 10% haircut a property loss. New foreclosures afterwards start a fresh pool.
 import { REO, WEEKS_PER_YEAR } from '../config/balance';
@@ -16,7 +16,7 @@ export function cityHpi(state: GameState, cityId: string): number {
   return (country && state.world.countries[country]?.hpi) || 100;
 }
 
-/** §21.3: this week's carrying cost (Hold and Rent) and rent income (Rent only). */
+/** §21.3: this week's carrying cost and rent income (both stop once selling). */
 export function reoWeek(pool: ReoPool): { carrying: number; rent: number } {
   const carrying = pool.mode === 'selling' ? 0 : (pool.value * REO.carryingCost) / WEEKS_PER_YEAR;
   const rent =

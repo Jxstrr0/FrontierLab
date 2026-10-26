@@ -1,22 +1,19 @@
 // Stage 9 personal commands (SIMULATION §22, SCREENS §19): offer on a vacation
-// home, rebuild or sell one you own; buy a car at a dealer and sell it; sign or
-// end a dealer financing deal. Homes and cars are bought with personal cash and
-// only in the city where they stand (DESIGN §5.17); managing what you own works
-// from anywhere. Dealer financing is the bank's deal: its fee is a company expense.
-import { DEALER_FINANCING, HOMES_CFG } from '../../config/balance';
+// home, rebuild or sell one you own; buy a car at a dealer and sell it. Homes
+// and cars are bought with personal cash and only in the city where they stand
+// (DESIGN §5.17); managing what you own works from anywhere.
+import { HOMES_CFG } from '../../config/balance';
 import { CARS } from '../../data/cars';
 import { HOMES } from '../../data/homes';
 import { pushEvent } from '../events';
 import { newId } from '../ids';
 import {
-  activeDealerDeal,
   carResale,
   homeAsking,
   homeHpi,
   homeLockWeeks,
   homeOfferAcceptance,
   homeSalePrice,
-  openBranchesIn,
   ownedHome,
   rebuildCost,
 } from '../personalValues';
@@ -131,43 +128,4 @@ export function sellCar(state: GameState, ownedId: string): CommandResult<{ pric
     price,
   });
   return ok({ price });
-}
-
-/**
- * Signs dealer financing at this dealer (SCREENS §19): the bank pays
- * DEALER_FINANCING.feePerYear (weekly, P&L dealerFees) for termWeeks, and
- * auto-loan demand at its branches in the city rises × (1 + demandBoost).
- */
-export function signDealerDeal(state: GameState, siteId: string): CommandResult {
-  const site = state.world.sites[siteId];
-  if (site?.kind !== 'autoDealer') return fail('That dealer is not on the map.');
-  if (activeDealerDeal(state, siteId)) return fail('You already have a deal with this dealer.');
-  if (site.cityId !== state.world.currentCityId)
-    return fail('You need to be in this city to sign.');
-  if (openBranchesIn(state, site.cityId) === 0)
-    return fail('Open a branch in this city first: the dealer refers customers to it.');
-  const week = state.clock.week;
-  state.dealerDeals[siteId] = {
-    siteId,
-    cityId: site.cityId,
-    signedWeek: week,
-    endWeek: week + DEALER_FINANCING.termWeeks,
-    feePerYear: DEALER_FINANCING.feePerYear,
-  };
-  pushEvent(state, 'DEALER_SIGNED', { siteId, city: site.cityId, dealer: site.refId });
-  return ok();
-}
-
-/** Ends a dealer financing deal early (no fee after this week). */
-export function endDealerDeal(state: GameState, siteId: string): CommandResult {
-  const deal = state.dealerDeals[siteId];
-  if (!deal) return fail('There is no deal with this dealer.');
-  delete state.dealerDeals[siteId];
-  pushEvent(state, 'DEALER_ENDED', {
-    siteId,
-    city: deal.cityId,
-    dealer: state.world.sites[siteId]?.refId ?? 'The dealer',
-    expired: false,
-  });
-  return ok();
 }

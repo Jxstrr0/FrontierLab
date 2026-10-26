@@ -265,7 +265,7 @@ Tabs: Overview · Loans · Credit.
   - "Close HR floor" (release the floor)
 - **Products:**
   - house model (rosette, cost/app, model name) and Manage models (sliders for each data input that sum to 100%, with a live rosette and cost)
-  - risk appetite Segmented (1–5)
+  - risk appetite Segmented (1–5), with a line naming who else steers it when a CRO (Risk appetite switch) or CFO (Capital switch) is seated
   - company deposits and loans line chart with week-over-week changes
   - **Product lineup** (category Segmented + product cards like §5.2, at company level) and the "Apply rates to all branches" toggle
   - Product developments list (progress bar, weeks left) and New product
@@ -434,7 +434,7 @@ Tabs: Overview · Loans · Credit.
     - weekly net rent income
     - ROI %
   - **Real estate sale:** For Sale toggle
-- **Foreclosed homes** (Company → Real estate): units, value, carrying cost, and Sell all / Rent / Hold.
+- **Foreclosed homes** (Company → Real estate): units, value, carrying cost, rent income, and Rent / Sell all.
 - **Map pins:** a building's pin shows only while it's for sale ("For sale" tag, never "For lease") or once you own it (your seal; "Selling" while For Sale is on). Unlisted buildings say "Not for sale right now; listings refresh every 4 weeks".
 
 ## 17. Convention
@@ -458,9 +458,7 @@ Tabs: Overview · Loans · Credit.
 ## 19. Vacation home · Car dealer · Auction house
 
 - **Vacation home:** address, location, "Personal purchase — not a rental property", asking price, Offer purchase. Once owned: Rebuild (cost, weeks, value gain).
-- **Car dealer:** tabs Showroom | Dealer financing.
-  - Showroom: car carousel (maker, model, price, a line of flavour, Buy with personal cash).
-  - Dealer financing: partner with the dealer for auto-loan referrals in this city (fee, expected volume, Sign).
+- **Car dealer:** the showroom, a car carousel (maker, model, price, a line of flavour, Buy with personal cash).
 - **Auction house:** tabs Buy | Sell.
   - Buy: upcoming auctions (lot card: vignette, name, estimate, date). Details shows the description, max bid stepper and Place bid.
   - Sell: your items (purchase price, fair value, status Unverified / Genuine / Counterfeit with a stamp), Appraise (shows the fee), Consign.

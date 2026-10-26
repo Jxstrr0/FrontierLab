@@ -1,32 +1,24 @@
 // The founder's homes and cars over time (SIMULATION §22), tick step 11: home
 // values follow their country's hpi, rebuilds finish (+HOMES_CFG.rebuildGain),
 // cars lose CARS_CFG.depreciation a year (classics gain classicGain), and
-// upkeep for both comes out of personal cash. Car-dealer financing deals bill
-// the company their weekly fee and lapse at the end of their term. Also keeps
-// the weekly net worth log the Personal Wealth screen reads. Collectibles'
+// upkeep for both comes out of personal cash. Also keeps the weekly net worth
+// log the Personal Wealth screen reads. Collectibles'
 // drift and insurance live with the auctions (auctions.ts); insider cases
 // resolve at quarter-end (insider.ts).
-import {
-  DEALER_FINANCING,
-  HOMES_CFG,
-  WEALTH_HISTORY_WEEKS,
-  WEEKS_PER_YEAR,
-} from '../config/balance';
+import { HOMES_CFG, WEALTH_HISTORY_WEEKS, WEEKS_PER_YEAR } from '../config/balance';
 import { HOMES } from '../data/homes';
 import { pushEvent } from './events';
-import { spend } from './ledger';
 import { netWorth } from './netWorth';
 import { carUpkeepWeekly, carYearlyChange, homeHpi, homeUpkeepWeekly } from './personalValues';
 import type { GameState } from './state';
 
 export { insiderQuarter } from './insider';
 
-/** Weekly (tick step 11): asset values, rebuilds, upkeep; dealer financing fees. */
+/** Weekly (tick step 11): asset values, rebuilds and upkeep. */
 export function runPersonalAssets(state: GameState): void {
   if (state.flags.gameOver) return;
   runHomes(state);
   runCars(state);
-  runDealerDeals(state);
 }
 
 function runHomes(state: GameState): void {
@@ -56,28 +48,6 @@ function runCars(state: GameState): void {
     state.personal.cash -= carUpkeepWeekly(car.value);
   }
 }
-
-function runDealerDeals(state: GameState): void {
-  const week = state.clock.week;
-  for (const [siteId, deal] of Object.entries(state.dealerDeals)) {
-    if (week >= deal.endWeek) {
-      delete state.dealerDeals[siteId];
-      pushEvent(state, 'DEALER_ENDED', {
-        siteId,
-        city: deal.cityId,
-        dealer: state.world.sites[siteId]?.refId ?? 'The dealer',
-        expired: true,
-      });
-      continue;
-    }
-    // The bank pays the referral fee (P&L dealerFees, opex), never the founder.
-    spend(state, 'dealerFees', deal.feePerYear / WEEKS_PER_YEAR);
-  }
-}
-
-/** Weekly fee a deal costs the company. */
-export const dealerFeeWeekly = (feePerYear: number = DEALER_FINANCING.feePerYear) =>
-  feePerYear / WEEKS_PER_YEAR;
 
 /** End of the weekly tick (after markets): logs net worth for the weekly change. */
 export function recordNetWorth(state: GameState): void {

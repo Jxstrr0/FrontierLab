@@ -3,7 +3,13 @@
 // lineup's price and Offered state, company totals per product, the deposits
 // and loans trend, development status and model labels. Nothing here mutates
 // GameState.
-import { DEV_TIER, DEV_TERMS, RISK_APPETITE } from '../../../config/balance';
+import {
+  DEV_TIER,
+  DEV_TERMS,
+  EXEC_DELEGATION,
+  RISK_APPETITE,
+  TIER_THRESHOLDS,
+} from '../../../config/balance';
 import { DATA_INPUTS } from '../../../data/bureaus';
 import { DEV_TEMPLATES, type DevTemplate } from '../../../data/devTemplates';
 import { PRODUCTS, type ProductSpec } from '../../../data/products';
@@ -42,6 +48,23 @@ export function riskHint(level: number): string {
   if (vol === 1 && pd === 1) return 'Standard loan volumes and default rates.';
   const more = vol > 1;
   return `About ${pctChange(vol)}% ${more ? 'more' : 'fewer'} loans, with defaults ${pctChange(pd)}% ${pd > 1 ? 'higher' : 'lower'}.`;
+}
+
+/**
+ * Who else moves the dial (SIMULATION §17.2): the CRO tunes it both ways, the
+ * CFO's Capital switch steps it down while capital is weak. Undefined when
+ * neither is seated with the switch on, so the card says nothing.
+ */
+export function riskSteering(s: GameState): string | undefined {
+  const cro = !!s.executives.seats.cro?.delegations.appetite;
+  const cfo = !!s.executives.seats.cfo?.delegations.capital;
+  const adequate = TIER_THRESHOLDS.find((t) => t.tier === 'adequate')!.minCr;
+  const croLine = `your CRO tunes this every ${EXEC_DELEGATION.croEveryWeeks} weeks`;
+  const cfoLine = `your CFO steps it down while capital is under ${+(adequate * 100).toFixed(1)}%`;
+  const parts = [cro && croLine, cfo && cfoLine].filter(Boolean) as string[];
+  if (parts.length === 0) return undefined;
+  const text = parts.join(', and ');
+  return `${text[0]!.toUpperCase()}${text.slice(1)}. You can still set it yourself.`;
 }
 
 // ─── Development form ─────────────────────────────────────────────────────────

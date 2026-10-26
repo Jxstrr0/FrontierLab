@@ -73,7 +73,7 @@ describe('property panel views', () => {
 
   it('lists foreclosed homes per city with carrying cost', () => {
     const s = game();
-    s.reo.cal = { units: 12.4, value: 5_200_000, mode: 'hold', hpiRef: 100 };
+    s.reo.cal = { units: 12.4, value: 5_200_000, mode: 'rent', hpiRef: 100 };
     const [row] = reoRows(s);
     expect(row).toMatchObject({ cityId: 'cal', city: 'Calgary', units: 12 });
     expect(row!.carrying).toBeCloseTo(6_000, 6);

@@ -69,7 +69,7 @@ describe('real estate ties out', () => {
 
     // Foreclosed homes funded by shareholders, so the identity holds from the start.
     const reoValue = 3_000_000;
-    const pool = (s.reo.cal ??= { units: 0, value: 0, mode: 'hold', hpiRef: 100 });
+    const pool = (s.reo.cal ??= { units: 0, value: 0, mode: 'rent', hpiRef: 100 });
     pool.value += reoValue;
     pool.units += 10;
     s.company.paidInCapital += reoValue;
@@ -85,14 +85,13 @@ describe('real estate ties out', () => {
         const p = s.realEstate.properties[companyId]!;
         expect(cmd.setPropertyRent(s, companyId, p.marketRent * 1.2).ok).toBe(true);
       }
-      if (week === 6) expect(cmd.setReoMode(s, 'cal', 'rent').ok).toBe(true);
       if (week === 12) {
         expect(cmd.setPropertyForSale(s, companyId, true).ok).toBe(true);
       }
       if (week === 18 && s.reo.cal) {
         cashBeforeReoSale = s.company.cash;
         expect(cmd.setReoMode(s, 'cal', 'selling').ok).toBe(true);
-        expect(cmd.setReoMode(s, 'cal', 'hold').ok).toBe(false);
+        expect(cmd.setReoMode(s, 'cal', 'rent').ok).toBe(false);
       }
       checkIdentity(s);
       advanceWeeks(s, 1);

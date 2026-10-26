@@ -253,14 +253,16 @@ Chosen on New Game (`src/data/logoShapes.ts`); the outline of the bank's mark ev
 | charging | Charging Station | On ($80/wk) | Branch +0.10; YP boost ×1.05 |
 | saturday | Saturday Hours | Mornings ($600/wk) · Full day ($1,100/wk) | capacity ×1.10 / ×1.20; Service +0.15 / +0.30; FAM, YP ×1.05 / ×1.10 |
 | signup_bonus | Sign-Up Bonus | $50 · $150 · $300 per new deposit account | deposit take-up ×1.15 / 1.30 / 1.50; cohort churn ×1.15 / 1.30 / 1.45 for 26 weeks; Rates +0.10 / 0.20 / 0.30 |
-| paperless | Paperless Pledge | Half (+$0.05/acct/wk) · Full (+$0.10/acct/wk) | Branch +0.10 / +0.20; YP, STU ×1.05 / ×1.10 |
+| paperless | Paperless Pledge | Half (+$0.05/acct/wk) · Full (+$0.10/acct/wk) | Products +0.10 / +0.20; YP, STU ×1.05 / ×1.10 |
 | direct_mail | Direct Mail | Light ($300/wk) · Heavy ($700/wk) | awareness +0.010 / +0.020; RET, FAM ×1.08 / ×1.15 |
 | workshops | Money Workshops | Monthly ($250/wk) · Weekly ($600/wk) | awareness +0.006 / +0.012; STU, YP ×1.08 / ×1.15; Service +0.10 |
-| sponsors | Community Sponsors | Modest ($300/wk) · Generous ($800/wk) | awareness +0.010 / +0.022; FAM ×1.10; reputation |
+| sponsors | Community Sponsors | Modest ($300/wk) · Generous ($800/wk) | awareness +0.010 / +0.022; Branch +0.05 / +0.10; FAM ×1.1, BIZ ×1.08 / ×1.15 |
 | social | Social Media | Steady ($400/wk) · Viral push ($900/wk) | awareness +0.012 / +0.026; STU, YP ×1.10 / ×1.20 |
 | search | Local Paid Search | Moderate ($450/wk) · Aggressive ($1,000/wk) | awareness +0.014 / +0.030; YP, BIZ ×1.08 / ×1.15; Loan Desk λ ×1.10 / ×1.20 |
 
 Weekly campaign costs scale by city.costIndex. Per-account costs don't.
+
+Content trim (2026-10-25): each campaign now has its own job. Free Lobby Coffee lifts Branch, Paperless Pledge lifts Products (it used to repeat Lobby Coffee's Branch bump), Direct Mail reaches retirees and families, and Community Sponsors adds businesses and a small Branch lift to its families (it used to be a cheaper Direct Mail: awareness and families only). A version with Direct Mail on retirees alone plus a deposit take-up boost was tried and dropped: it pulled first-year loans/deposits under the 75% floor. So was moving Community Sponsors from families to businesses outright (merged 2026-10-26): businesses bring deposits but borrow little, and the 20-city median of first-year loans/deposits fell from 77.0% to 73.9%; keeping families and adding businesses holds 76.2%.
 
 ## 9. HQ floors
 
@@ -311,7 +313,7 @@ Benefit effects scale linearly up to the stated amount, then flatten (capped at 
 | Agency | Package | Length | Cost | Total brand boost |
 |---|---|---|---|---|
 | Brightwell Creative | City Blitz | 8 wk | 180,000 | +0.25 |
-| Northwind & Pike | Grand Opening Week | 2 wk | 45,000 | +0.10 (one city) |
+| Northwind & Pike | Street Team | 2 wk | 45,000 | +0.10 (one city) |
 | Studio Halcyon | Prestige Campaign | 12 wk | 420,000 | +0.30, plus Branch +0.1 in that city for 26 weeks |
 
 ## 12. Funding types (Treasury)
@@ -319,11 +321,11 @@ Benefit effects scale linearly up to the stated amount, then flatten (capped at 
 | type | Name | Basis | Spread | Term (wk) | Size (× scale) | Cost | Term | Stability | Flexibility | Discretion |
 |---|---|---|---|---|---|---|---|---|---|---|
 | overnight | Overnight Interbank | policy | +0.20% | 1 (auto-roll) | — | 8 | 1 | 3 | 10 | 8 |
-| term_interbank | Term Interbank | policy | +0.55% | 26–52 | 5–50M | 7 | 4 | 6 | 5 | 8 |
-| brokered | Brokered Deposits | policy | +0.45% | 26–104 | 2–30M | 7 | 5 | 4 | 3 | 6 |
-| covered_bond | Covered Bond | FTP_long | +0.70% | 260 | 25–250M | 6 | 9 | 9 | 2 | 9 |
-| senior_bond | Senior Bond | FTP_long | +1.20% | 156–520 | 25–500M | 4 | 9 | 8 | 2 | 9 |
+| term_interbank | Term Interbank | policy | +0.50% | 26–104 | 2–50M | 7 | 5 | 5 | 5 | 7 |
+| covered_bond | Covered Bond | FTP_long | +0.85% | 156–520 | 25–500M | 5 | 9 | 9 | 2 | 9 |
 | cb_window | Central Bank Window | policy | +1.00% | 1 | unlimited | 5 | 1 | 10 | 10 | 1 |
+
+Content trim (2026-10-25): Brokered Deposits merged into Term Interbank and Senior Bond into Covered Bond, each new type keeping the pair's combined offer weight (8 and 4). Covered bonds still need mortgage cover (SIMULATION §13.6).
 
 Counterparty names: Harbor Clearing Bank · Meridian Treasury · Atlas Money Markets · Pinecrest Capital · Northwind Securities · Bellwether Funding · Granite Bay Trust · Cobalt Street Markets · Ironbridge Capital · Silverpine Partners.
 
@@ -361,7 +363,7 @@ Counterparty names: Harbor Clearing Bank · Meridian Treasury · Atlas Money Mar
 |---|---|---|---|
 | Hospital | 2,000 | 1.10 | |
 | University | 3,500 staff | 1.00 | also offers the student partnership |
-| Auto Plant | 2,500 | 1.00 | also offers a dealer-financing referral link |
+| Auto Plant | 2,500 | 1.00 | |
 | Tech Campus | 1,800 | 1.60 | |
 | City Hall | 5,000 | 1.05 | one per city |
 | Port Authority | 1,500 | 1.00 | waterfront cities |

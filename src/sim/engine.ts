@@ -121,7 +121,7 @@ export function weeklyTick(state: GameState): void {
   checkFailure(state);
   runPersonal(state); // 11
   runTravel(state); // 11 (allowance reset, jet upkeep, DESIGN §5.17)
-  runPersonalAssets(state); // 11 (homes, cars, collectibles, dealer deals, §22)
+  runPersonalAssets(state); // 11 (homes, cars, collectibles, §22)
   runAuctions(state); // 11 (auction houses, §22)
   runFranchises(state); // 11 (sports clubs, SCREENS §20)
   runMarkets(state); // 12

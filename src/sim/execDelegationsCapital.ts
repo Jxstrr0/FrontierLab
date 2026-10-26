@@ -3,8 +3,9 @@
 // player's own commands, in the order a careful finance chief would.
 // Capital:
 //   1. at Watch or worse, sell the company's stock holdings (risk weight 2.5×)
-//   2. at Watch or worse, step risk appetite down every few weeks (unless a CRO
-//      already runs appetite) so new lending carries less risk
+//   2. at Watch or worse, step risk appetite down every few weeks so new
+//      lending carries less risk. A CRO tuning appetite keeps doing so too: the
+//      two act on different weeks of the cycle, so they never step it twice at once
 // Share sales (its own switch, so you can keep your stake from being diluted):
 //   3. at Restricted or Critical, sell new shares through the cheapest
 //      investment bank: a private placement while private (rounds and spacing
@@ -17,7 +18,6 @@ import { trade } from './commands/markets';
 import { privatePlacement, secondaryOffering } from './commands/marketsEquity';
 import { setRiskAppetite } from './commands/products';
 import { placementQuote, placementStatus, secondaryQuote } from './equityOffers';
-import { delegationOn } from './execSeats';
 import type { GameState } from './state';
 
 /** The investment bank with the lowest fee (ties by id, so the pick is stable). */
@@ -74,11 +74,7 @@ export function cfoCapital(state: GameState): void {
   if (!WEAK.has(capitalSnapshot(state).tier)) return;
   sellCompanyStocks(state);
   const level = state.company.riskAppetite;
-  if (
-    level > 1 &&
-    state.clock.week % X.croEveryWeeks === 0 &&
-    !delegationOn(state, 'cro', 'appetite')
-  )
+  if (level > 1 && state.clock.week % X.croEveryWeeks === X.cfoAppetitePhase)
     setRiskAppetite(state, level - 1);
 }
 

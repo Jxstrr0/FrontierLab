@@ -35,7 +35,7 @@ export type PanelRoute =
   // Stage 9 (FEATURES.personalEmpire)
   | { type: 'wealth' }
   | { type: 'vacationHome'; siteId: string }
-  | { type: 'carDealer'; siteId: string; tab?: 'showroom' | 'financing' }
+  | { type: 'carDealer'; siteId: string }
   | { type: 'auctionHouse'; siteId: string; tab?: 'buy' | 'sell' }
   | { type: 'franchise'; clubId: string }
   // Stage 8 (FEATURES.multiCity): the airport's departures; `jet` = "Fly now" in your own plane.

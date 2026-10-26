@@ -85,7 +85,9 @@ export const AGENCIES: Record<string, AgencySpec> = {
     id: 'northwind_pike',
     name: 'Northwind & Pike',
     packages: [
-      { id: 'grand_opening', name: 'Grand Opening Week', weeks: 2, cost: 45_000, boost: 0.1 },
+      // The cheap starter package: a short push a founder can afford (renamed from
+      // "Grand Opening Week" so it isn't mistaken for a new branch's own opening boost).
+      { id: 'street_team', name: 'Street Team', weeks: 2, cost: 45_000, boost: 0.1 },
     ],
   },
   halcyon: {

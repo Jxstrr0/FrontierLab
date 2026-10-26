@@ -97,18 +97,18 @@ export const CAMPAIGNS: Record<string, CampaignSpec> = {
   paperless: {
     id: 'paperless',
     name: 'Paperless Pledge',
-    effectHint: 'Branch rating + · Students and young professionals +',
+    effectHint: 'Products rating + · Students and young professionals +',
     levels: [
       {
         label: 'Half',
         cost: { type: 'perAccount', amount: 0.05 },
-        bumps: { branch: 0.1 },
+        bumps: { products: 0.1 },
         segments: { YP: 1.05, STU: 1.05 },
       },
       {
         label: 'Full',
         cost: { type: 'perAccount', amount: 0.1 },
-        bumps: { branch: 0.2 },
+        bumps: { products: 0.2 },
         segments: { YP: 1.1, STU: 1.1 },
       },
     ],
@@ -146,10 +146,22 @@ export const CAMPAIGNS: Record<string, CampaignSpec> = {
   sponsors: {
     id: 'sponsors',
     name: 'Community Sponsors',
-    effectHint: 'Awareness ++ · Families +',
+    effectHint: 'Awareness ++ · Branch rating + · Families and businesses +',
     levels: [
-      { label: 'Modest', cost: weekly(300), awareness: 0.01, segments: { FAM: 1.1 } },
-      { label: 'Generous', cost: weekly(800), awareness: 0.022, segments: { FAM: 1.1 } },
+      {
+        label: 'Modest',
+        cost: weekly(300),
+        awareness: 0.01,
+        bumps: { branch: 0.05 },
+        segments: { FAM: 1.1, BIZ: 1.08 },
+      },
+      {
+        label: 'Generous',
+        cost: weekly(800),
+        awareness: 0.022,
+        bumps: { branch: 0.1 },
+        segments: { FAM: 1.1, BIZ: 1.15 },
+      },
     ],
   },
   social: {
