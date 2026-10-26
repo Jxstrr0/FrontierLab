@@ -1496,6 +1496,29 @@ export const EXEC_DELEGATION = {
   buyMinCr: 0.12,
   buyReserveYears: 1,
   buySpareShare: 0.5,
+  /**
+   * CFO Investing (§17.2): every investEveryWeeks weeks (on week ≡ investPhase)
+   * each Investing switch sells listed stocks at or below investTrimAt of their
+   * average cost (not bought again for investCooldownWeeks), buys one stock (the
+   * largest gap to a market-cap weighting) and backs one Investment floor startup
+   * scoring investMinScore or more on average. For the bank: never at a
+   * restricted tier; stocks stay under investStockCap and startup stakes under
+   * investVentureCap of total assets; one stock buy is at most investStockLot of
+   * total assets; the capital ratio stays at or above buyMinCr after each buy and
+   * expansionReserveWeeks of costs stay in cash. For you: keeps buyReserveYears
+   * of CEO salary and spends at most investSpareShare of the cash above that on
+   * one purchase. Stock buys under investMinTrade are skipped.
+   */
+  investEveryWeeks: 4,
+  investPhase: 2,
+  investTrimAt: 0.75,
+  investCooldownWeeks: 52,
+  investMinScore: 6,
+  investStockCap: 0.05,
+  investVentureCap: 0.03,
+  investStockLot: 0.01,
+  investSpareShare: 0.25,
+  investMinTrade: 10_000,
 } as const;
 
 /**
