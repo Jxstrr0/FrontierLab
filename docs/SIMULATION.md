@@ -182,7 +182,7 @@ These are read by other systems:
 - **Marketing** multiplies campaign effects by `0.8 + 0.4 × marketing/100`.
 - **Ethics** multiplies mis-selling, fraud and walkout incident odds by `1.6 − ethics/100` (§23).
 - **No manager:** Service −0.3, morale −5, and no delegation.
-- **Market pay and poaching** (2026-10-25). A manager's market pay is their hiring ask × `(1 + MANAGER_PAY.tenureGrowth (0.03) × years at the bank)`: rivals pay more for experience, so a fixed salary slowly falls behind. Each week a rival may poach each manager with probability `MANAGER_PAY.poachBase (0.0006) × (pay/market < 0.9 ? 3 : pay/market ≥ 1.1 ? 0.5 : 1)` (stream `managerPoach`). A poached manager leaves at once, every branch delegation comes back to you, and a `MANAGER_POACHED` event and toast say so; the COO's Branch operations rehires. `MANAGER_PAY.salaryStep` (1,000) is the salary stepper's step.
+- **Market pay and poaching** (2026-10-25). A manager's market pay is their hiring ask × `(1 + MANAGER_PAY.tenureGrowth (0.03) × years at the bank)`: rivals pay more for experience, so a fixed salary slowly falls behind. Each week a rival may poach each manager with probability `MANAGER_PAY.poachBase (0.0006) × (pay/market < 0.9 ? 3 : pay/market ≥ 1.1 ? 0.5 : 1)` (stream `managerPoach`). A poached manager leaves at once, every branch delegation comes back to you, and a `MANAGER_POACHED` event and toast say so; the COO's Branch operations, or the HR floor (§16.11), rehires. `MANAGER_PAY.salaryStep` (1,000) is the salary stepper's step.
 
 ## 7. Awareness and marketing
 
@@ -674,6 +674,11 @@ Levels 1–5 (Very conservative to Very aggressive):
 ### 16.10 HQ marketing
 - **Brand campaigns** run per city or per country with a weekly cost and a gain to `b`.
 - **Agency packages:** a one-time `b` boost spread over the package length, with no staff needed.
+
+### 16.11 HR hires branch managers
+- With an HR floor and `people.hrHiring` on (the default; switch on the HR floor, `setHrHiring`), each week (tick step 8, right after the executives) every **open** branch with no manager gets the candidate in its city with the highest total of the four skills (people + product + marketing + ethics; ties go to the first listed), hired with the player's own `hireManager`, so at the candidate's asking salary. A branch still being built waits until it opens; a city with no candidates waits for its next pool.
+- HR only fills the seat: the branch's delegations stay as they were. The COO's **Branch operations** (§17.2) runs first in the same week and does the same hire plus default delegation, so with both on the COO's version wins.
+- This also refills a branch whose manager was poached (§6.5) the following week.
 
 ## 17. People AI
 

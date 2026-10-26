@@ -18,6 +18,7 @@ import { startBrandCampaign, stopBrandCampaign } from './commands/marketing';
 import { setRiskAppetite } from './commands/products';
 import { hireManager } from './commands/staff';
 import { execMult } from './execSeats';
+import { strongestCandidate, unstaffedBranches } from './hrHiring';
 import {
   annualPayroll,
   benefitsWeeklyCost,
@@ -38,12 +39,8 @@ export { companyLossRate };
 
 /** Branch operations: a manager for every open branch, with default delegation on. */
 export function cooBranchOps(state: GameState): void {
-  for (const branch of Object.values(state.branches)) {
-    if (branch.status !== 'open' || branch.managerId) continue;
-    const pool = state.people.managerCandidates[branch.cityId] ?? [];
-    const avg = (m: (typeof pool)[number]) =>
-      m.skills.people + m.skills.product + m.skills.marketing + m.skills.ethics;
-    const best = [...pool].sort((a, b) => avg(b) - avg(a))[0];
+  for (const branch of unstaffedBranches(state)) {
+    const best = strongestCandidate(state.people.managerCandidates[branch.cityId] ?? []);
     if (!best || !hireManager(state, branch.id, best.id).ok) continue;
     branch.delegation = { ...X.cooDelegation };
   }
