@@ -562,6 +562,14 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     }
     return s;
   },
+  33: (s) => {
+    // Price lists (§4.6) start at 1: catalogue prices and rents step to the
+    // nominal index at the next year end, so a long save catches up then.
+    for (const c of Object.values((s as unknown as GameState).world.countries)) {
+      if (c) c.listIndex ??= 1;
+    }
+    return s;
+  },
 };
 
 /** The rich list's fortune range up to schema v31. */

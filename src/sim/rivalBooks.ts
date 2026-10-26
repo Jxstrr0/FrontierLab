@@ -28,6 +28,7 @@ import { COUNTRIES } from '../data/countries';
 import { tileDistance } from './citygen';
 import { creditCycle, loanDemand } from './macro';
 import { clamp } from './math';
+import { listLevel } from './nominal';
 import { countryOfCity } from './rates';
 import { matureDeposits } from './rivals';
 import { priceWarBump } from './rivalPrices';
@@ -112,7 +113,8 @@ export function branchEarnings(
     f.nim +
     RIVAL_NIM_POLICY_SLOPE * (c.policyRate - neutral) -
     (bump * branch.deposits) / Math.max(1, branch.loans);
-  const costIndex = CITIES[branch.cityId]?.costIndex ?? 1;
+  // Running costs follow the city's cost index and today's price list (§4.6).
+  const costIndex = (CITIES[branch.cityId]?.costIndex ?? 1) * listLevel(state, branch.cityId);
   const fees = (branch.deposits * RIVAL_FEE_YIELD * f.feeMult) / WEEKS_PER_YEAR;
   const costs =
     RIVAL_BRANCH_COST * costIndex * f.costMult +

@@ -6,6 +6,7 @@
 import { AGENCIES, type AgencyPackageSpec } from '../../data/brandCampaigns';
 import { CITIES } from '../../data/cities';
 import * as cmd from '../../sim/commands';
+import { agencyPackagePrice } from '../../sim/hqMarketing';
 import type { Site } from '../../sim/state';
 import { Card, Row, SectionTitle } from '../components';
 import { money } from '../format/format';
@@ -73,7 +74,8 @@ function PackageCard(p: {
   const branches = Object.values(s.branches).some(
     (b) => b.cityId === p.cityId && b.status !== 'closed',
   );
-  const short = pkg.cost > s.company.cash;
+  const price = agencyPackagePrice(s, pkg);
+  const short = price > s.company.cash;
   const buy = () => {
     const r = act(cmd.buyAgencyPackage, {
       agencyId: p.agencyId,
@@ -89,7 +91,7 @@ function PackageCard(p: {
         <span class="small muted">{pkg.weeks} weeks</span>
       </div>
       <Row label="City" value={p.city} />
-      <Row label="Cost" value={money(pkg.cost, sym)} strong />
+      <Row label="Cost" value={money(price, sym)} strong />
       <Row label="Brand awareness" value={`${pointsText(pkg.boost)} in total`} tone="good" />
       <Row label="Spread over" value={`${pointsText(pkg.boost / pkg.weeks)} /week`} tone="dim" />
       {pkg.branchBonus && (
@@ -105,7 +107,7 @@ function PackageCard(p: {
         disabled={!here || short}
         onClick={buy}
       >
-        Buy · {money(pkg.cost, sym)}
+        Buy · {money(price, sym)}
       </button>
       <p class={`small mk-note mk-center ${short ? 'tone-bad' : 'muted'}`}>
         {!here

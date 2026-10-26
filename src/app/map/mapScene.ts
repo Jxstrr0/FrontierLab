@@ -19,6 +19,8 @@ const PAPER_FALLBACK = '#E3E9DF';
 
 export interface Scene {
   key: string;
+  /** Storefront count the scene was built with. */
+  lots: number;
   city: CitySpec;
   map: CityMap;
   createRenderer(): MapRenderer;
@@ -47,14 +49,17 @@ export function mapPlaces(s: GameState, cityId: string): MapPlaces {
 
 /**
  * The scene for a city and seed; lots, offices and sites only matter on first
- * build (they never move; who leases them is drawn from the occupants).
+ * build (they never move; who leases them is drawn from the occupants). A city
+ * that grows new storefronts (cityGrowth.ts) gets a fresh scene.
  */
 export function sceneFor(city: CitySpec, seed: number, lots: Lot[], places: MapPlaces = {}): Scene {
+  // `key` names the camera's place; the cache also rebuilds when the city grows new lots.
   const key = `${city.id}:${seed}:${places.layout ?? ''}`;
-  if (cached?.key === key) return cached;
+  if (cached?.key === key && cached.lots === lots.length) return cached;
   const map = generateCityMap(city, seed, lots, places);
   cached = {
     key,
+    lots: lots.length,
     city,
     map,
     createRenderer: () =>

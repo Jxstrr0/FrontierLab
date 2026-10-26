@@ -12,6 +12,7 @@ import { CITIES } from '../../data/cities';
 import type { RatingCategory, SegmentId } from '../../data/types';
 import { campaignMult } from '../hq';
 import { clamp } from '../math';
+import { listLevel } from '../nominal';
 import type { Branch, GameState } from '../state';
 
 export interface CampaignEffects {
@@ -40,8 +41,10 @@ export function activeLevels(branch: Branch): { id: string; level: CampaignLevel
 }
 
 /** Sums every active campaign's effects at this branch (CONTENT §8). */
-export function campaignEffects(branch: Branch): CampaignEffects {
-  const costIndex = CITIES[branch.cityId]?.costIndex ?? 1;
+export function campaignEffects(state: GameState, branch: Branch): CampaignEffects {
+  // Costs at the city's cost index and today's price list (§4.6).
+  const priceLevel = listLevel(state, branch.cityId);
+  const costIndex = (CITIES[branch.cityId]?.costIndex ?? 1) * priceLevel;
   const fx: CampaignEffects = {
     awareness: 0,
     bumps: { rates: 0, products: 0, service: 0, branch: 0 },
@@ -64,8 +67,8 @@ export function campaignEffects(branch: Branch): CampaignEffects {
     fx.loanDesk *= level.loanDesk ?? 1;
     if (level.cost.type === 'weekly') fx.weeklyCost += level.cost.amount * costIndex;
     else if (level.cost.type === 'perNewDepositAccount')
-      fx.perNewDepositAccount += level.cost.amount;
-    else fx.perAccount += level.cost.amount;
+      fx.perNewDepositAccount += level.cost.amount * priceLevel;
+    else fx.perAccount += level.cost.amount * priceLevel;
     if (level.churn && (!fx.churn || level.churn.mult > fx.churn.mult)) fx.churn = level.churn;
   }
   return fx;

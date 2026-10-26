@@ -15,6 +15,7 @@ import { BranchHero } from '../branch/BranchHero';
 import { CITIES } from '../../data/cities';
 import { ATTENTION } from '../../config/balance';
 import { cashCoverWeeks } from '../../sim/cashCover';
+import { listLevel, listPrice } from '../../sim/nominal';
 import { coverText } from '../company/CompanyPanel';
 
 export function BuildPanel(p: { lotId: string }) {
@@ -95,7 +96,7 @@ export function BuildPanel(p: { lotId: string }) {
                   />
                 </span>
                 <span class="part-tile-price">
-                  {part.cost === 0 ? 'Free' : moneyFull(part.cost, sym)}
+                  {part.cost === 0 ? 'Free' : moneyFull(listPrice(s, part.cost, lot.cityId), sym)}
                 </span>
               </button>
             );
@@ -109,7 +110,7 @@ export function BuildPanel(p: { lotId: string }) {
                 value={
                   EQUIPMENT[build[slot]]!.cost === 0
                     ? 'Free'
-                    : moneyFull(EQUIPMENT[build[slot]]!.cost, sym)
+                    : moneyFull(listPrice(s, EQUIPMENT[build[slot]]!.cost, lot.cityId), sym)
                 }
               />
             ))}
@@ -148,6 +149,7 @@ export function BuildPanel(p: { lotId: string }) {
           slot={picking}
           current={build[picking]}
           sym={sym}
+          level={listLevel(s, lot.cityId)}
           onSelect={(id) => {
             setBuild({ ...build, [picking]: id });
             setPicking(null);

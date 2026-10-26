@@ -26,6 +26,7 @@ import { pushEvent } from './events';
 import { staffMods } from './hq';
 import { postPnl, spend } from './ledger';
 import { clamp, ema } from './math';
+import { listLevel } from './nominal';
 import { productSpec } from './products';
 import { marketRef } from './rates';
 import type { Branch, GameState, Partnership, Site } from './state';
@@ -49,10 +50,13 @@ export function incomeFactor(site: Site, kind: PartnershipKind): number {
   return kind === 'student' ? city : city * (site.employer?.incomeMult ?? 1);
 }
 
-/** CONTENT §14: employees × $160 × income mult × city incomeIndex (students: per-student fee). */
-export function signingFee(site: Site, kind: PartnershipKind): number {
+/**
+ * CONTENT §14: employees × $160 × income mult × city incomeIndex (students:
+ * per-student fee), at today's price list in the site's country (§4.6).
+ */
+export function signingFee(state: GameState, site: Site, kind: PartnershipKind): number {
   const perHead = kind === 'student' ? STUDENT_PARTNERSHIP.feePerStudent : PARTNER_FEE_PER_EMPLOYEE;
-  return headcount(site, kind) * perHead * incomeFactor(site, kind);
+  return headcount(site, kind) * perHead * incomeFactor(site, kind) * listLevel(state, site.cityId);
 }
 
 /** Balance per participating person at income factor 1. */
@@ -100,8 +104,8 @@ export function balanceTarget(
 }
 
 /** Renewal fee: today's signing fee × (1.5 − health/100) (§13.7). */
-export function renewalFee(site: Site, p: Partnership): number {
-  return signingFee(site, p.kind) * (PARTNER_RENEWAL.base - p.health / 100);
+export function renewalFee(state: GameState, site: Site, p: Partnership): number {
+  return signingFee(state, site, p.kind) * (PARTNER_RENEWAL.base - p.health / 100);
 }
 
 /** Weeks since signing (1 at the first weekly tick after signing). */

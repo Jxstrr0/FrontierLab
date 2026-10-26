@@ -115,7 +115,7 @@ export function MapView() {
     const lots = cityLots(s);
     const scene = sceneFor(city, s.meta.seed, lots, mapPlaces(s, city.id));
     // Rebuilding after the fonts load keeps the view: the camera is remembered per scene.
-    const build = `${scene.key}|${fontsReady ? 'fonts' : 'fallback'}`;
+    const build = `${scene.key}|${lots.length}|${fontsReady ? 'fonts' : 'fallback'}`;
     if (build !== keys.current.build) {
       if (keys.current.scene) rememberCamera(keys.current.scene, c.camera);
       keys.current = { scene: scene.key, build, pins: STALE, occupants: STALE };

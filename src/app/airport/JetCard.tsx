@@ -5,6 +5,7 @@
 import { useState } from 'preact/hooks';
 import { JETS, type JetSpec } from '../../data/jets';
 import * as cmd from '../../sim/commands';
+import { listPrice } from '../../sim/nominal';
 import { jetResale, jetUpkeepWeekly } from '../../sim/travel';
 import { Card, Confirm, Row, SectionTitle } from '../components';
 import { money } from '../format/format';
@@ -79,7 +80,9 @@ export function JetCard(p: { onFlyNow: () => void }) {
         personal cash ({money(s.personal.cash, sym)}).
       </p>
       <div class="stack">
-        {Object.values(JETS).map((j) => {
+        {Object.values(JETS).map((spec) => {
+          // Today's price list (§4.6); the same figure buyJet charges.
+          const j = { ...spec, price: listPrice(s, spec.price) };
           const short = s.personal.cash < j.price;
           return (
             <Card key={j.id}>

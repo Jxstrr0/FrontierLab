@@ -7,6 +7,7 @@ import { CARS } from '../../data/cars';
 import { HOMES } from '../../data/homes';
 import { pushEvent } from '../events';
 import { newId } from '../ids';
+import { listPrice } from '../nominal';
 import {
   carResale,
   homeAsking,
@@ -100,17 +101,18 @@ export function buyCar(state: GameState, siteId: string, carId: string): Command
   const e = state.personal.empire;
   if (spec.limited && e.cars.some((c) => c.carId === carId))
     return fail(`Only one ${spec.name} per owner.`);
-  if (spec.price > state.personal.cash)
-    return fail(`You need ${money(spec.price)} in personal cash.`);
-  state.personal.cash -= spec.price;
+  // Dealer prices follow today's price list in the dealer's country (§4.6).
+  const price = listPrice(state, spec.price, site.cityId);
+  if (price > state.personal.cash) return fail(`You need ${money(price)} in personal cash.`);
+  state.personal.cash -= price;
   e.cars.push({
     id: newId(state, 'car'),
     carId,
-    price: spec.price,
-    value: spec.price,
+    price,
+    value: price,
     boughtWeek: state.clock.week,
   });
-  pushEvent(state, 'CAR_BOUGHT', { carId, name: spec.name, price: spec.price });
+  pushEvent(state, 'CAR_BOUGHT', { carId, name: spec.name, price });
   return ok();
 }
 

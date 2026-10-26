@@ -56,6 +56,8 @@ export interface EventPayloads {
     address: string;
     cities: number;
   };
+  /** A city opened new storefronts (city growth, CONTENT §3). */
+  CITY_GROWTH: { city: Id; lots: number };
   /** Quarter-end report. `pct` is the change in revenue from the previous quarter. */
   RIVAL_EARNINGS: {
     rivalId: Id;

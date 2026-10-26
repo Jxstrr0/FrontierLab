@@ -13,6 +13,7 @@ import {
 import { CITIES } from '../../data/cities';
 import { EQUIPMENT, isFitout, BUILD_SLOTS } from '../../data/equipment';
 import { earn, postPnl, spend } from '../ledger';
+import { listLevel } from '../nominal';
 import type { Branch, BranchPnl, GameState } from '../state';
 import type { CampaignEffects } from './marketing';
 import { managerOf } from './staff';
@@ -31,11 +32,13 @@ export function addBranchCosts(
   wk.manager += (managerOf(state, branch)?.salary ?? 0) / WEEKS_PER_YEAR;
   wk.rent += branch.lease.weeklyRent;
   wk.marketing += fx.weeklyCost + fx.perNewDepositAccount * newDepositAccounts;
+  // Upkeep and overhead follow today's price list in the branch's country (§4.6).
+  const level = listLevel(state, branch.cityId);
   for (const slot of BUILD_SLOTS) {
-    const cost = EQUIPMENT[branch.build[slot]]?.cost ?? 0;
+    const cost = (EQUIPMENT[branch.build[slot]]?.cost ?? 0) * level;
     wk.equipment += (cost * (isFitout(slot) ? FITOUT_UPKEEP : EQUIP_MAINT)) / WEEKS_PER_YEAR;
   }
-  wk.overhead += BRANCH_OVERHEAD * (city?.costIndex ?? 1);
+  wk.overhead += BRANCH_OVERHEAD * (city?.costIndex ?? 1) * level;
   wk.atmFees += (EQUIPMENT[branch.build.atm]?.atmProductivity ?? 0) * ATM_FEE.usage * ATM_FEE.fee;
 }
 

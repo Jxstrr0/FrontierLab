@@ -16,6 +16,7 @@ import { EQUIPMENT } from '../../data/equipment';
 import type { ProductSpec } from '../../data/products';
 import { loanDemand } from '../macro';
 import { cityRoom } from './cityMarket';
+import { listLevel } from '../nominal';
 import { clamp, roundToStep } from '../math';
 import { countryOfCity, defaultPrice, ftpFor, marketRef } from '../rates';
 import { stream, type Rng } from '../rng';
@@ -129,6 +130,7 @@ function delegateMarketing(state: GameState, branch: Branch): void {
   const last = branch.pnl.at(-1);
   if (!lot || !last) return;
   const country = countryOfCity(state, branch.cityId);
+  const priceLevel = listLevel(state, branch.cityId);
   const customers = Math.max(branch.customers, 1);
   // Contribution per customer per week: revenue less interest, funding and losses.
   const l = last.lines;
@@ -166,7 +168,7 @@ function delegateMarketing(state: GameState, branch: Branch): void {
       const extraCustomersPerWeek = prospectsPerAwareness * da * share;
       // A customer won mid-horizon earns for half of it on average.
       const value = extraCustomersPerWeek * perCustomer * H * (H / 2) * cmo;
-      const net = value - level.cost.amount * H;
+      const net = value - level.cost.amount * priceLevel * H;
       if (net > bestNet) {
         bestNet = net;
         bestLevel = i + 1;

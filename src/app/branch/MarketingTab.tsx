@@ -10,11 +10,12 @@ import { SpotArt } from '../components/SpotArt';
 import { money } from '../format/format';
 import { act, useGame } from '../store';
 import { campaignCostText } from './selectors';
+import { listLevel } from '../../sim/nominal';
 
 export function MarketingTab({ branch }: { branch: Branch }) {
   const s = useGame();
   const sym = s.settings.currency;
-  const fx = campaignEffects(branch);
+  const fx = campaignEffects(s, branch);
   const last = branch.pnl[branch.pnl.length - 1];
   return (
     <div class="stack">
@@ -40,12 +41,13 @@ function CampaignCard({ branch, spec }: { branch: Branch; spec: CampaignSpec }) 
   const s = useGame();
   const level = branch.campaigns[spec.id] ?? 0;
   const costIndex = CITIES[branch.cityId]?.costIndex ?? 1;
+  const priceLevel = listLevel(s, branch.cityId);
   const active = level > 0 ? spec.levels[level - 1] : undefined;
   const first = spec.levels[0];
   const cost = active
-    ? campaignCostText(active.cost, costIndex, s.settings.currency)
+    ? campaignCostText(active.cost, costIndex, priceLevel, s.settings.currency)
     : first
-      ? `From ${campaignCostText(first.cost, costIndex, s.settings.currency)}`
+      ? `From ${campaignCostText(first.cost, costIndex, priceLevel, s.settings.currency)}`
       : '';
   const locked = branch.delegation.marketing;
   const options = ['Off', ...spec.levels.map((l) => l.label)];
