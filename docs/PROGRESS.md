@@ -10,6 +10,18 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-10-26 — Changes now reach `main` through pull requests (workflow rule, docs only)
+- **Owner's ask:** go back to creating pull requests and auto-merging them when there is no conflict, as a standing rule.
+- **Why.** Several sessions often work at once. Pushing straight to `main` kept colliding on the version number and this file, so two features in a row had to be rebased and renumbered (v0.10.15 became v0.10.17, v0.10.18 became v0.10.19).
+- **The rule** (CLAUDE.md, "Branches and pull requests", merged as pull request #4):
+  1. Every change goes on its own short branch from the latest `main`.
+  2. Claude opens a ready (not draft) pull request to `main`. The Deploy workflow builds and tests it.
+  3. Claude turns on GitHub auto-merge (merge commit) straight away, so it lands by itself when the checks pass and the branch is deleted. If GitHub refuses, Claude merges it without asking once it is green and conflict-free.
+  4. On a conflict, Claude merges `main` into the branch, bumps the version past whatever landed, re-runs lint, tests and build, and pushes. The owner is asked only when both sides changed the same logic.
+  5. A red check is fixed on the branch. Nothing red is merged.
+- **Repo settings.** GitHub reported auto-merge as off when pull request #4 opened, so it was merged by hand once green. The owner has since switched on "Allow auto-merge". For auto-merge to wait on CI rather than merge at once, `main` also needs a branch protection rule or ruleset requiring the `build` check (Settings → Rules). Head branches are already deleted on merge.
+- `docs/DEPLOYMENT.md` notes that every merge to `main` deploys. No code, sim or save change; determinism snapshot unchanged (`000acf5c010cae`).
+
 ### 2026-10-26 — The clock can never run under the weekly results (v0.10.20)
 - **Owner's ask:** make 100% sure there is no way time runs while the weekly results (The Weekly Ledger) are showing.
 - **What was checked.** The game clock moves in exactly one place, the loop in `src/app/loop.ts` (plus the `?debug` fast-forward, which is not reachable in play). Flights, commands and the tutorial never move the clock. The loop already refused to advance a day while any modal, panel or sheet was open, and the HUD's speed buttons sit under the modal's scrim, so the clock was already held. Two soft spots remained and are closed:
