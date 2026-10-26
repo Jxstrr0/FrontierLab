@@ -68,6 +68,21 @@ export function bestRent(marketRent: number, pricingPower = 0): number {
   return clamp(stepped, min, max);
 }
 
+/**
+ * §21.2: the rent that holds a building at occupancy `target` (an occupancy
+ * dial stop): the occTarget curve solved for rent,
+ * marketRent × (1 + pricingPower) × (1 + (occBase − target)/occSlope), stepped
+ * and kept in range like bestRent. At or above occMax it is bestRent.
+ */
+export function rentForOccupancy(marketRent: number, pricingPower: number, target: number): number {
+  if (target >= REAL_ESTATE.occMax) return bestRent(marketRent, pricingPower);
+  const ratio = 1 + (REAL_ESTATE.occBase - target) / REAL_ESTATE.occSlope;
+  const raw = marketRent * (1 + pricingPower) * ratio;
+  const stepped = Math.floor(raw / REAL_ESTATE.rentStep) * REAL_ESTATE.rentStep;
+  const { min, max } = rentBounds(marketRent);
+  return clamp(stepped, min, max);
+}
+
 export interface PropertyWeek {
   revenue: number;
   maintenance: number;

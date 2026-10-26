@@ -4,11 +4,23 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 **Current stage:** 10 — Art pass, onboarding, polish, launch (built and live; awaiting the owner's iPhone check). All ten roadmap stages are built. Still open: the owner's testing and tuning pass, an Add to Home Screen test on a real iPhone, and the Vault Street card on Kelbo.Website (in a separate session in that repo).
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `1a41be4f7a56d1` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `16e44c3f3d5282` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-26 — CREO occupancy dials and Buying (v0.11.8, schema v30)
+- **Owner's ask:** add 80-85-90-95-100 occupancy sliders to the CREO, and let the chief buy property for the bank and for you personally. The rules were agreed first: the dial uses the existing occupancy maths, the bank buys within an asset cap with capital and cash safety, your purchases keep a reserve, and the chief buys the best yield at asking.
+- **Occupancy dials.** Under each Rents switch: **80% / 85% / 90% / 95% / 100%** (default 100, which is today's "highest rent that still fills it"). A lower stop sets a higher rent per m² so the building settles at that occupancy. Under the game's occupancy curve that earns *less* in total (90%: about +5% per m² but about 4% less rent revenue, plus more vacancy cost), so the tagline shows the net rent at your stop and the difference from 100%. Changing the dial reprices at once.
+- **Buying: the bank's buildings / your own buildings.** Every 4 weeks each switch buys at most one listed building, in any city, at its asking price (the seller always accepts, and no travel is needed). It picks the one with the best yearly net rent ÷ price that the budget allows.
+  - **Bank:** buildings stay under 5% of total assets; the capital ratio stays at 12% or more after the purchase; 8 weeks of costs stay in cash; never at a restricted capital tier.
+  - **You:** a year of your CEO salary stays aside, and one building costs at most half of the rest.
+  - The profile note says what the chief would buy next and when, or what's holding them back. A new building is priced by the chief's Rents straight away when that switch is on.
+- **Your save (schema v30):** both dials start at 100%. If you already have a CREO, the two Buying switches arrive **off**, so nothing is bought until you switch them on. A new hire starts with them on, like every delegation.
+- **Code:** `EXEC_DELEGATION.occTarget(s)` and `buyEveryWeeks` / `buyAssetCap` / `buyMinCr` / `buyReserveYears` / `buySpareShare` in `balance.ts`; `rentForOccupancy` in `propertyMath.ts`; new `src/sim/execBuying.ts` (`nextPurchase`, `creoBuy`); the purchase itself is shared with your own offers in new `src/sim/propertyBuy.ts`; `setOccupancyTarget` command; `OccupancyDial.tsx` and a buying line in `PropertyNote.tsx`.
+- **Checked:** lint, full test suite (831, new `tests/sim/creoBuying.test.ts`) and build clean. Determinism snapshot `1a41be4f7a56d1` → `16e44c3f3d5282` (intended: the hashed state gains the dial targets). Balance run: only the week-260 income warning that was already on main. At 390×844 the dials and buying notes fit with no overflow or console errors; after 8 weeks with the switches on, the chief had bought 2 buildings for the bank and 2 for you.
+- **Docs:** SIMULATION §17.2 and §21.2, SCREENS §10.1, DATA_MODEL §12, DESIGN §5 and decision log.
 
 ### 2026-10-26 — Bigger save storage (v0.11.7)
 - **Owner's ask:** expand save storage.

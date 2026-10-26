@@ -510,6 +510,20 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     }
     return s;
   },
+  // v30: the CREO's occupancy dials and Buying switches. A seated chief (and
+  // the switches remembered for the seat) gets them off, so nothing is bought
+  // until you say so; candidates come with them on like any new hire.
+  29: (s) => {
+    const ex = (s as unknown as GameState).executives;
+    ex.occTargets ??= { company: EXEC_DELEGATION.occTarget, personal: EXEC_DELEGATION.occTarget };
+    for (const id of ['bankBuys', 'privateBuys']) {
+      if (ex.seats.creo) ex.seats.creo.delegations[id] ??= false;
+      const mem = ex.remembered.creo;
+      if (mem) mem[id] ??= false;
+      for (const c of ex.candidates.creo ?? []) c.delegations[id] ??= true;
+    }
+    return s;
+  },
 };
 
 /** Funding types merged away in schema 26, and the type each became. */

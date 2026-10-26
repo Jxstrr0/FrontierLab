@@ -203,13 +203,25 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
         id: 'bankRents',
         label: "Rents: the bank's buildings",
         description:
-          'Every 4 weeks sets the rent on every building the bank owns to the highest level that still fills it, as market rents drift. Their tenants pay a little over market, by the chief’s expertise.',
+          'Every 4 weeks sets the rent on every building the bank owns to hold the occupancy you dial, as market rents drift: at 100% the highest rent that still fills it. Their tenants pay a little over market, by the chief’s expertise.',
       },
       {
         id: 'privateRents',
         label: 'Rents: your own buildings',
         description:
           'The same for the buildings you own privately. The bank pays the chief either way.',
+      },
+      {
+        id: 'bankBuys',
+        label: "Buying: the bank's buildings",
+        description:
+          'Every 4 weeks buys the listed building with the best rent yield, in any city, at its asking price. Keeps the bank’s buildings under 5% of its assets, capital at 12% or more and 8 weeks of costs in cash.',
+      },
+      {
+        id: 'privateBuys',
+        label: 'Buying: your own buildings',
+        description:
+          'The same with your own money: keeps a year of your salary aside and spends at most half of the rest on one building.',
       },
     ],
   },

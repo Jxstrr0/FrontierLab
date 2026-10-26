@@ -1417,9 +1417,10 @@ export const EXEC_PAY = {
  * the loss rate > croMaxLoss, raises it when CR ≥ croRaiseCr and the loss rate ≤
  * croRaiseLoss, up to croMaxAppetite. CREO (Chief Real Estate Officer):
  * every rentEveryWeeks weeks, Rents sets each managed building's rent to the
- * highest level that still fills it (propertyMath.bestRent); tenants of a
- * managed building accept rent up to × (1 + rentPricingPower × expertise/100)
- * over market with no loss of occupancy (§21.2).
+ * level that holds its occupancy dial (propertyMath.rentForOccupancy; 100%
+ * is the highest that still fills it); tenants of a managed building accept
+ * rent up to × (1 + rentPricingPower × expertise/100) over market with no loss
+ * of occupancy (§21.2); Buying buys listed buildings for the bank or for you.
  */
 export const EXEC_DELEGATION = {
   cooDelegation: { staffing: true, products: true, marketing: true, troubles: true, loans: true },
@@ -1473,6 +1474,28 @@ export const EXEC_DELEGATION = {
   /** CREO Rents (§21.2): review cadence and the pricing power a 100-expertise chief brings. */
   rentEveryWeeks: 4,
   rentPricingPower: 0.1,
+  /**
+   * CREO occupancy dials (§21.2), one under each Rents switch: the occupancy
+   * each review prices for, default and stops. 1 means as full as tenants allow
+   * (REAL_ESTATE.occMax, the bestRent level); lower stops charge more per m²
+   * but earn less in total.
+   */
+  occTarget: 1,
+  occTargets: [0.8, 0.85, 0.9, 0.95, 1] as readonly number[],
+  /**
+   * CREO Buying (§21.1): every buyEveryWeeks weeks each Buying switch buys at
+   * most one listed building, the best net yield at asking in any city. For the
+   * bank: its buildings stay under buyAssetCap of total assets, the capital ratio
+   * stays at or above buyMinCr after the purchase, expansionReserveWeeks of costs
+   * stay in cash, and never at a restricted capital tier. For you: keeps
+   * buyReserveYears of CEO salary, and a building costs at most buySpareShare
+   * of the cash above that.
+   */
+  buyEveryWeeks: 4,
+  buyAssetCap: 0.05,
+  buyMinCr: 0.12,
+  buyReserveYears: 1,
+  buySpareShare: 0.5,
 } as const;
 
 /**
