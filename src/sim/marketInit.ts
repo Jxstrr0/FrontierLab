@@ -89,6 +89,7 @@ export function emptyExecutives(): ExecutivesState {
     payReviewCadence: PAY_REVIEW.defaultCadence,
     moraleTarget: EXEC_DELEGATION.moraleTarget,
     brandTarget: EXEC_DELEGATION.brandTarget,
+    occTargets: { company: EXEC_DELEGATION.occTarget, personal: EXEC_DELEGATION.occTarget },
   };
 }
 

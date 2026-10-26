@@ -1,9 +1,10 @@
-// Delegation dials (SCREENS §10.1): the stepped sliders under three of the
+// Delegation dials (SCREENS §10.1): the stepped sliders under some of the
 // executives' switches, each with a tagline saying what the chosen stop would
 // mean for the company right now (estimates from src/sim/execPolicy.ts):
 //   COO · HR benefits   morale target 70 / 80 / 90
 //   COO · Pay reviews   quarterly or annual, with the pay premium (PayPolicy.tsx)
 //   CMO · Brand campaigns   awareness target 40–70%
+//   CREO · Rents (bank, yours)   occupancy 80–100% (OccupancyDial.tsx)
 import { EXEC_DELEGATION } from '../../config/balance';
 import * as cmd from '../../sim/commands';
 import { brandEstimate, cadenceEstimate, moraleEstimate } from '../../sim/execPolicy';
@@ -12,6 +13,7 @@ import type { GameState } from '../../sim/state';
 import { StepSlider } from '../components';
 import { money, pct, signedPct } from '../format/format';
 import { act } from '../store';
+import { OccupancyDial } from './OccupancyDial';
 import { PayPolicy } from './PayPolicy';
 
 /** "+$1.2K/wk", "−$400/wk" or "no change" for a weekly cost difference. */
@@ -99,5 +101,8 @@ export function DelegationDial(p: { s: GameState; seat: ExecSeat; id: string }) 
   if (p.seat === 'coo' && p.id === 'hrBenefits') return <MoraleDial s={p.s} />;
   if (p.seat === 'coo' && p.id === 'payReviews') return <CadenceDial s={p.s} />;
   if (p.seat === 'cmo' && p.id === 'brand') return <BrandDial s={p.s} />;
+  if (p.seat === 'creo' && p.id === 'bankRents') return <OccupancyDial s={p.s} owner="company" />;
+  if (p.seat === 'creo' && p.id === 'privateRents')
+    return <OccupancyDial s={p.s} owner="personal" />;
   return null;
 }
