@@ -9,6 +9,7 @@ import { pushEvent } from './events';
 import { campaignMult } from './hq';
 import { spend } from './ledger';
 import { clamp } from './math';
+import { listPrice } from './nominal';
 import type { BrandCampaign, GameState } from './state';
 
 export function hasMarketingFloor(state: GameState): boolean {
@@ -67,16 +68,25 @@ export function coveredCities(state: GameState, c: BrandCampaign): string[] {
     .sort();
 }
 
-/** Weekly cost of a campaign at its scope (CONTENT §11). */
-export function brandCampaignCost(spec: BrandCampaignSpec, scope: 'city' | 'country'): number {
-  return spec.costPerWeek[scope] ?? 0;
+/** Weekly cost of a campaign at its scope (CONTENT §11), at today's home price list (§4.6). */
+export function brandCampaignCost(
+  state: GameState,
+  spec: BrandCampaignSpec,
+  scope: 'city' | 'country',
+): number {
+  return listPrice(state, spec.costPerWeek[scope] ?? 0);
+}
+
+/** An agency package's price at today's home price list (§4.6). */
+export function agencyPackagePrice(state: GameState, pkg: { cost: number }): number {
+  return listPrice(state, pkg.cost);
 }
 
 /** Weekly cost of every running brand campaign. */
 export function brandCampaignsWeeklyCost(state: GameState): number {
   return state.marketing.campaigns.reduce((sum, c) => {
     const spec = BRAND_CAMPAIGNS[c.campaignId];
-    return sum + (spec ? brandCampaignCost(spec, c.scope) : 0);
+    return sum + (spec ? brandCampaignCost(state, spec, c.scope) : 0);
   }, 0);
 }
 

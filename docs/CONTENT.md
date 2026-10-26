@@ -73,9 +73,11 @@ Each city's generator mixes these districts in proportions set by city size.
 
 **How many storefronts** (2026-10-25): `round(LOTS_BASE[size] + LOTS_PER_RIVAL[size] × rival banks in the city)`, with `LOTS_BASE = { S: 12, M: 18, L: 24, XL: 32 }` and `LOTS_PER_RIVAL = { S: 4, M: 4.5, L: 5, XL: 6 }`. With the usual rival count that is about 20 / 32 / 44 / 62 storefronts (it was 36 / 56 / 80 / 110), so good corners feel slightly scarce and a city with more competitors has more of them. At the start about three times the advised branch count (SIMULATION §9.2) is free; rivals take more as they grow. Cities already on the map in a save (layout 1) keep their original count.
 
+**Cities grow** (2026-10-26): every `CITY_GROWTH.everyYears` (2) at the year end, each generated city (not a regional site) adds `CITY_GROWTH.share` (10%) of the storefronts it started with, at least one, drawn by district share from the city's own `citygrow:{cityId}` stream and placed on free street frontage like the originals, until it has added `maxGrowth` (1.5×) its starting count or runs out of frontage. The paper reports it ("{city} grows: {n} new storefronts"). Rivals expand into the new corners the same way they do into free ones (SIMULATION §18.4).
+
 How a lot's values are derived:
 - **Traffic:** district value × city density (default 1) × U(0.65, 1.35).
-- **Rent:** base × city.rentIndex × (traffic / (district traffic × density))^0.6 × U(0.9, 1.1).
+- **Rent:** base × city.rentIndex × (traffic / (district traffic × density))^0.6 × U(0.9, 1.1) × today's price list (SIMULATION §4.6; 1 at the start). Every rent, free or leased, moves with the price list at each year end; a lease deposit stays as paid.
 - **Deposit:** 6 × rent.
 - **incomeIndex:** district income × city.incomeIndex × U(0.9, 1.1).
 - **Position:** a point drawn around the district centre (balance `CITYGEN.layout`), snapped to the nearest free tile facing a street. Streets run every 4th row and column (`CITY_LAYOUT.block`); water cities have a wavy shoreline near the far edge (`CITY_LAYOUT.shore`).

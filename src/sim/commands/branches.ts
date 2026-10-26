@@ -27,6 +27,7 @@ import { marketWage, staffNeeded } from '../branch/staff';
 import { overallOf } from '../rivals';
 import { pushEvent } from '../events';
 import { newId } from '../ids';
+import { listPrice } from '../nominal';
 import { postCash, postPnl, spend } from '../ledger';
 import { roundToStep } from '../math';
 import { countryOfCity, defaultPrice } from '../rates';
@@ -37,7 +38,11 @@ import { fail, money, ok, type CommandResult } from './result';
 /** Itemized cost of a build on a lot: parts, lease deposit and the first week's rent. */
 export function buildQuote(state: GameState, lotId: string, build: BuildSpec) {
   const lot = state.world.lots[lotId];
-  const parts = BUILD_SLOTS.reduce((sum, slot) => sum + (EQUIPMENT[build[slot]]?.cost ?? 0), 0);
+  // Catalogue prices at today's price list in the lot's country (§4.6).
+  const parts = BUILD_SLOTS.reduce(
+    (sum, slot) => sum + listPrice(state, EQUIPMENT[build[slot]]?.cost ?? 0, lot?.cityId),
+    0,
+  );
   const deposit = lot?.deposit ?? 0;
   const rent = lot?.weeklyRent ?? 0;
   return { parts, deposit, rent, total: parts + deposit + rent };
@@ -164,7 +169,7 @@ export function buildBranch(
   }
 
   // Start ratings at their targets so the first week reflects what was built.
-  const fx = campaignEffects(branch);
+  const fx = campaignEffects(state, branch);
   branch.ratings.rates = ratesTarget(state, branch, fx);
   branch.ratings.products = productsTarget(state, branch, fx);
   branch.ratings.service = serviceTarget(state, branch, fx);
@@ -180,7 +185,7 @@ export function buildBranch(
       id: newId(state, 'fa'),
       kind: fitout ? 'fitout' : 'equipment',
       slot,
-      cost: item.cost,
+      cost: listPrice(state, item.cost, lot.cityId),
       lifeWeeks: fitout ? FITOUT_LIFE_WEEKS : EQUIPMENT_LIFE_WEEKS,
       ageWeeks: 0,
       ownerId: id,

@@ -6,6 +6,7 @@ import { FLIGHT_FARE, JET, TRAVEL_KM_PER_WEEK, WEEKS_PER_YEAR } from '../config/
 import { CITIES } from '../data/cities';
 import { JETS } from '../data/jets';
 import { cityDistanceKm } from './geo';
+import { listPrice } from './nominal';
 import type { GameState } from './state';
 
 export interface FlightQuote {
@@ -23,9 +24,9 @@ export function kmRemaining(state: GameState): number {
   return Math.max(0, TRAVEL_KM_PER_WEEK - state.world.travel.kmThisWeek);
 }
 
-/** One-way fare to a destination past the allowance: FLIGHT_FARE × its costIndex. */
-export function fareTo(cityId: string): number {
-  return Math.round(FLIGHT_FARE * (CITIES[cityId]?.costIndex ?? 1));
+/** One-way fare to a destination past the allowance: FLIGHT_FARE × its costIndex × today's price list. */
+export function fareTo(state: GameState, cityId: string): number {
+  return listPrice(state, FLIGHT_FARE * (CITIES[cityId]?.costIndex ?? 1), cityId);
 }
 
 /** Your jet's range in km: null for global, undefined without a jet. */
@@ -49,7 +50,7 @@ export function flightQuote(state: GameState, to: string, jet = false): FlightQu
   if (km <= kmRemaining(state)) {
     return { to, km, mode: 'free', fare: 0, personalPays: 0, bankPays: 0 };
   }
-  const fare = fareTo(to);
+  const fare = fareTo(state, to);
   const personalPays = Math.min(fare, Math.max(0, state.personal.cash));
   return { to, km, mode: 'fare', fare, personalPays, bankPays: fare - personalPays };
 }

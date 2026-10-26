@@ -18,8 +18,10 @@ import { CITIES, type CitySpec } from '../data/cities';
 import { DISTRICT_SPECS } from '../data/districts';
 import { STREET_KINDS, STREET_NAMES } from '../data/names';
 import type { DistrictId } from '../data/types';
+import type { CityGeometry } from './cityGeo';
 import { geometryFor, placeNear } from './cityPlacement';
-import { stream } from './rng';
+import { listLevel } from './nominal';
+import { stream, type Rng } from './rng';
 import type { GameState, Lot } from './state';
 import { dhypot, dpow } from './detmath';
 
@@ -45,42 +47,64 @@ export function generateLots(state: GameState, cityId: string, total: number): L
 
   for (const [district, share] of Object.entries(shares) as [DistrictId, number][]) {
     if (district === 'waterfront' && !city.water) continue;
-    const spec = DISTRICT_SPECS[district];
     const count = Math.max(1, Math.round(total * share));
     for (let i = 0; i < count; i++) {
-      // Draw a point near the district centre, then snap it to the nearest free
-      // tile facing a street (cityPlacement).
-      const { x, y } = placeNear(city, geo, district, rng, used, 'lot');
-
-      // A dense city scales traffic up (CitySpec.density); rent follows only the
-      // lot's noise, since the city's rent level is already its rentIndex.
-      const typical = spec.footTraffic * (city.density ?? 1);
-      const footTraffic = Math.round(typical * rng.range(...LOT_TRAFFIC_NOISE));
-      const weeklyRent = Math.round(
-        spec.baseRent *
-          city.rentIndex *
-          dpow(footTraffic / typical, RENT_TRAFFIC_EXP) *
-          rng.range(...LOT_RENT_NOISE),
-      );
       index += 1;
-      lots.push({
-        id: `lot_${cityId}_${String(index).padStart(4, '0')}`,
-        cityId,
-        tile: { x, y },
-        district,
-        kind: 'storefront',
-        address: `${rng.int(1, CITYGEN.maxStreetNumber)} ${rng.pick(STREET_NAMES)} ${rng.pick(STREET_KINDS)}`,
-        footTraffic,
-        mix: { ...spec.mix },
-        incomeIndex: spec.income * city.incomeIndex * rng.range(...LOT_INCOME_NOISE),
-        homeownerShare: spec.homeowners,
-        weeklyRent,
-        deposit: weeklyRent * LEASE_DEPOSIT_WEEKS,
-        buildingSeed: rng.int(0, CITYGEN.maxSeed),
-      });
+      const id = `lot_${cityId}_${String(index).padStart(4, '0')}`;
+      lots.push(rollLot(state, { city, geo, district, rng, used, id }));
     }
   }
   return lots;
+}
+
+/**
+ * One storefront near a district centre: a free street-facing tile, then its
+ * traffic, rent, mix and income from the district (CONTENT §3). Rent is quoted
+ * at today's price list (§4.6), which is 1 when a game starts.
+ */
+export function rollLot(
+  state: GameState,
+  at: {
+    city: CitySpec;
+    geo: CityGeometry;
+    district: DistrictId;
+    rng: Rng;
+    used: Set<string>;
+    id: string;
+  },
+): Lot {
+  const { city, geo, district, rng, used, id } = at;
+  const spec = DISTRICT_SPECS[district];
+  // Draw a point near the district centre, then snap it to the nearest free
+  // tile facing a street (cityPlacement).
+  const { x, y } = placeNear(city, geo, district, rng, used, 'lot');
+
+  // A dense city scales traffic up (CitySpec.density); rent follows only the
+  // lot's noise, since the city's rent level is already its rentIndex.
+  const typical = spec.footTraffic * (city.density ?? 1);
+  const footTraffic = Math.round(typical * rng.range(...LOT_TRAFFIC_NOISE));
+  const weeklyRent = Math.round(
+    spec.baseRent *
+      city.rentIndex *
+      dpow(footTraffic / typical, RENT_TRAFFIC_EXP) *
+      rng.range(...LOT_RENT_NOISE) *
+      listLevel(state, city.id),
+  );
+  return {
+    id,
+    cityId: city.id,
+    tile: { x, y },
+    district,
+    kind: 'storefront',
+    address: `${rng.int(1, CITYGEN.maxStreetNumber)} ${rng.pick(STREET_NAMES)} ${rng.pick(STREET_KINDS)}`,
+    footTraffic,
+    mix: { ...spec.mix },
+    incomeIndex: spec.income * city.incomeIndex * rng.range(...LOT_INCOME_NOISE),
+    homeownerShare: spec.homeowners,
+    weeklyRent,
+    deposit: weeklyRent * LEASE_DEPOSIT_WEEKS,
+    buildingSeed: rng.int(0, CITYGEN.maxSeed),
+  };
 }
 
 /** Straight-line tile distance between two lots. */

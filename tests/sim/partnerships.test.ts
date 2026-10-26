@@ -50,13 +50,13 @@ function sign(s: GameState, site: Site, branchId: string, kind: 'payroll' | 'stu
 
 describe('partnership formulas', () => {
   it('prices the signing fee per CONTENT §14', () => {
-    const { employer, university } = setup();
+    const { s, employer, university } = setup();
     const e = employer.employer!;
-    expect(signingFee(employer, 'payroll')).toBeCloseTo(
+    expect(signingFee(s, employer, 'payroll')).toBeCloseTo(
       e.employees * 160 * e.incomeMult * CITIES.cal!.incomeIndex,
       6,
     );
-    expect(signingFee(university, 'student')).toBeCloseTo(
+    expect(signingFee(s, university, 'student')).toBeCloseTo(
       STUDENT_PARTNERSHIP.students.M * STUDENT_PARTNERSHIP.feePerStudent * CITIES.cal!.incomeIndex,
       6,
     );
@@ -176,8 +176,8 @@ describe('payroll partnerships', () => {
       advanceWeeks(s, 1);
       tally();
     }
-    const quote = renewalFee(employer, p);
-    expect(quote).toBeCloseTo(signingFee(employer, 'payroll') * (1.5 - p.health / 100), 6);
+    const quote = renewalFee(s, employer, p);
+    expect(quote).toBeCloseTo(signingFee(s, employer, 'payroll') * (1.5 - p.health / 100), 6);
     const r = cmd.renewPartnership(s, p.id);
     expect(r.ok).toBe(true);
     expect(p.termWeeks).toBe(2 * PARTNER_CONTRACT_WEEKS);

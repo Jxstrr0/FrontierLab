@@ -4,11 +4,38 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 **Current stage:** 10 — Art pass, onboarding, polish, launch (built and live; awaiting the owner's iPhone check). All ten roadmap stages are built. Still open: the owner's testing and tuning pass, an Add to Home Screen test on a real iPhone, and the Vault Street card on Kelbo.Website (in a separate session in that repo).
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `0d4812231c21bf` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `0fd549055f5122` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-26 — Price lists and growing cities (v0.11.13, schema v34)
+
+**What you asked for:** ideas to keep competition alive late in a game. You approved six: new rivals get chartered, rivals buy each other, cities get new lots, rivals do their own marketing and tech, index the catalogue, and share buybacks plus share-for-share mergers. You said no to size-based rules on your bank for now. I'm shipping them as three pull requests; this is the first (catalogue prices and new lots).
+
+**Price lists (SIMULATION §4.6).**
+- Every country now has a price list. It starts at 1 and, at each year end, jumps to that country's nominal index (the economy's price level from the last change). Prices on screen therefore hold still for a whole year, like a printed price list, and then step up.
+- Charged at the list: branch builds and equipment, equipment upkeep and branch overhead, branch campaigns, brand campaigns and agency packages, lobbying, cars, jets, flights, office floor fit-outs, partnership fees, the rebrand bill after a merger, three incident options (vault upgrade, apology, flood), and a rival branch's weekly running cost.
+- Rents follow too: at each review every storefront rent, your branch leases, office listings and leased offices go up by the same step. A lease deposit stays at what you paid.
+- Not indexed: vacation homes (they follow house prices), sports clubs, collectibles and startups (they have their own markets), percentage fees, and budgets you set yourself.
+- **What it means for your save:** prices and rents stay as they are until your next new year, then catch up in one step. In a long save that step is big (about 4× by year 18), because nothing was indexed before.
+
+**Growing cities (CONTENT §3).** Every two years at the year end, each city you've visited adds 10% of the storefronts it started with, until it has 1.5× more. They are spread across the districts like the originals and show on the map straight away. The Weekly Ledger reports it. Rivals expand into the new corners the same way as any free lot, and so can you.
+
+**Checks.**
+- `npm run lint`, all tests and `npm run build` pass. The new `tests/sim/priceLists.test.ts` covers the review, rents, priced builds, cars and fit-outs, the migration, and city growth up to its cap.
+- **Balance.** The 20-city median (`--years 5 --seeds 1-20`) is inside every band. Week 260 income reads $35.2k (main read $33.3k, a miss).
+  - One band was re-based: week 104 revenue now starts at $80k (was $85k). Main already read $84k there, so the miss predates this change. A year-2 branch is still growing (SIMULATION §25 has the reason).
+  - Seed 42 steady is in range except week 260 income. A $206k default lands inside its four-week average; the branch earns about $62k a week on either side.
+  - Seed 42 aggressive, 25 years: about $109B of total assets at year 25 (was $116B), with every company check in range.
+- **Determinism snapshot** updated to `0fd549055f5122` (intended: rents, costs and new lots).
+
+**Code map.** `src/sim/nominal.ts` (`listLevel`, `listPrice`), `src/sim/priceList.ts` (yearly review), `src/sim/cityGrowth.ts`, `src/sim/citygen.ts` (`rollLot`, shared by generation and growth), year end in `src/sim/engine.ts`, migration 33 in `src/sim/save/migrations.ts`, `CITY_GROWTH` in `src/config/balance.ts`. The map rebuilds its scene when a city's lot count changes (`src/app/map/mapScene.ts`).
+
+**Docs:** SIMULATION §4.6 and §25, CONTENT §3, DATA_MODEL §12 (v34), DESIGN decision log.
+
+**Next:** the rivals pull request (charters, rival-on-rival M&A, rival marketing and tech), then buybacks and share-for-share mergers.
 
 ### 2026-10-26 — A growing world: rivals that grow, lighter M&A, six more milestones (v0.11.12, schema v33)
 - **Owner's ask:** look at how rivals grow and stay competitive, lighten M&A regulation, add six new milestones, and let a save live into the trillion-dollar range and beyond.

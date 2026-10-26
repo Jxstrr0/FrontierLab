@@ -58,7 +58,7 @@ export function signBlocker(
   const spec = productSpec(state, productId);
   if (!spec || !isDeposit(spec) || !isOffered(host, productId))
     return 'Pick a deposit account the host branch offers as the package.';
-  const fee = signingFee(site, kind);
+  const fee = signingFee(state, site, kind);
   if (state.company.cash < fee) return `Not enough cash: you need ${money(fee)}.`;
   return undefined;
 }
@@ -74,7 +74,7 @@ export function signPartnership(
   const blocker = signBlocker(state, siteId, hostBranchId, productId, kind);
   if (blocker) return fail(blocker);
   const site = state.world.sites[siteId]!;
-  const fee = signingFee(site, kind);
+  const fee = signingFee(state, site, kind);
   const p: Partnership = {
     id: newId(state, 'pship'),
     siteId,
@@ -121,7 +121,7 @@ export function renewPartnership(
   const site = p && state.world.sites[p.siteId];
   if (!p || !site || p.status !== 'active') return fail('That partnership has ended.');
   if (!canRenew(state, p)) return fail('Renewal opens in the last year of the contract.');
-  const fee = renewalFee(site, p);
+  const fee = renewalFee(state, site, p);
   if (state.company.cash < fee) return fail(`Not enough cash: you need ${money(fee)}.`);
   postCash(state, -fee, 'investing');
   p.termWeeks += PARTNER_CONTRACT_WEEKS;

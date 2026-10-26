@@ -26,7 +26,7 @@ export function YoursCard(p: { site: Site; partnership: Partnership }) {
   const host = s.branches[ps.hostBranchId];
   const { year, of } = yearOfTerm(s, ps);
   const curve = contractCurve(s, site, ps);
-  const fee = renewalFee(site, ps);
+  const fee = renewalFee(s, site, ps);
   const renewable = canRenew(s, ps);
   const weeksToWindow = ps.termWeeks - PARTNER_RENEWAL.windowWeeks - elapsedWeeks(s, ps);
   const renewNote = renewable

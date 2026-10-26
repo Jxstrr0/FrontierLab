@@ -45,6 +45,8 @@ export function PartPicker(p: {
   slot: BuildSlot;
   current: string;
   sym: string;
+  /** Today's price-list level for the lot's country (§4.6). */
+  level: number;
   onSelect: (id: string) => void;
   onClose: () => void;
 }) {
@@ -74,7 +76,9 @@ export function PartPicker(p: {
                   <div class="small part-fact">{f}</div>
                 ))}
                 <div class="part-foot">
-                  <span class="part-price">{e.cost === 0 ? 'Free' : moneyFull(e.cost, p.sym)}</span>
+                  <span class="part-price">
+                    {e.cost === 0 ? 'Free' : moneyFull(Math.round(e.cost * p.level), p.sym)}
+                  </span>
                   <button
                     type="button"
                     class={`btn btn-small ${isCurrent ? 'btn-secondary' : 'btn-primary'}`}

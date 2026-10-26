@@ -14,7 +14,7 @@ export function AddFloorSheet(p: { office: Office; onClose: () => void }) {
   const sym = s.settings.currency;
   const o = p.office;
   const full = usedFloors(o) >= o.floors.length;
-  const fitout = cmd.floorFitout(o.cityId);
+  const fitout = cmd.floorFitout(s, o.cityId);
   const short = s.company.cash < fitout;
   const add = (dept: DeptId) => {
     if (act(cmd.addFloor, o.id, dept).ok) {

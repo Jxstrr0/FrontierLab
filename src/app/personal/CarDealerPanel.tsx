@@ -5,6 +5,7 @@ import { CARS_CFG } from '../../config/balance';
 import { CARS, type CarSpec } from '../../data/cars';
 import { CITIES } from '../../data/cities';
 import * as cmd from '../../sim/commands';
+import { listPrice } from '../../sim/nominal';
 import { carUpkeepWeekly } from '../../sim/personalValues';
 import type { Site } from '../../sim/state';
 import { Badge, Card, Carousel, Confirm, Panel, Row } from '../components';
@@ -53,7 +54,9 @@ function Showroom(p: { site: Site }) {
         {pct(CARS_CFG.classicGain, 0)}. Upkeep {pct(CARS_CFG.upkeepRate, 0)} a year.
       </p>
       <Carousel label="Cars in the showroom" class="pw-carousel">
-        {Object.values(CARS).map((car) => {
+        {Object.values(CARS).map((spec) => {
+          // Today's price list in the dealer's country (§4.6); the same figure buyCar charges.
+          const car = { ...spec, price: listPrice(s, spec.price, p.site.cityId) };
           const n = owned(car.id);
           const blocker = !here
             ? 'Visit this city to buy.'

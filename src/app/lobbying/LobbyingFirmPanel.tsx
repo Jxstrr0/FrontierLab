@@ -6,6 +6,7 @@ import { useState } from 'preact/hooks';
 import { LOBBYING } from '../../config/balance';
 import { LOBBY_FIRMS, type LobbyCampaignSpec } from '../../data/lobbying';
 import * as cmd from '../../sim/commands';
+import { lobbyingPrice } from '../../sim/lobbying';
 import { Badge, Card, Confirm, Panel, Row, SectionTitle } from '../components';
 import { moneyFull, pct } from '../format/format';
 import { LayerMedallion } from '../map/LayerIcon';
@@ -64,7 +65,7 @@ export function LobbyingFirmPanel(p: { siteId: string }) {
           <Card key={spec.id}>
             <div class="lb-title">{spec.title}</div>
             <p class="muted small lb-desc">{spec.description}</p>
-            <Row label="Cost" value={moneyFull(spec.cost, sym)} strong />
+            <Row label="Cost" value={moneyFull(lobbyingPrice(s, spec, site.cityId), sym)} strong />
             <Row label="Success chance" value={pct(spec.success, 0)} />
             <Row label="Exposure risk" value={pct(spec.exposure, 0)} tone="bad" />
             <Row label="Outcome" value={`in ${lo}–${hi} weeks`} tone="dim" />
@@ -74,7 +75,7 @@ export function LobbyingFirmPanel(p: { siteId: string }) {
               disabled={!!blocked}
               onClick={() => setAsking(spec)}
             >
-              Lobby · {moneyFull(spec.cost, sym)}
+              Lobby · {moneyFull(lobbyingPrice(s, spec, site.cityId), sym)}
             </button>
             {blocked && <p class="small muted lb-center">{blocked}</p>}
           </Card>
@@ -126,10 +127,10 @@ export function LobbyingFirmPanel(p: { siteId: string }) {
           title="Hire the firm?"
           body={
             <p>
-              {asking.title} for {moneyFull(asking.cost, sym)}, paid now. It works{' '}
-              {pct(asking.success, 0)} of the time, and there's a {pct(asking.exposure, 0)} chance
-              The Weekly Ledger finds out: a fine of {pct(LOBBYING.exposeFine, 0)} of the fee and a
-              dent in your brand.
+              {asking.title} for {moneyFull(lobbyingPrice(s, asking, site.cityId), sym)}, paid now.
+              It works {pct(asking.success, 0)} of the time, and there's a {pct(asking.exposure, 0)}{' '}
+              chance The Weekly Ledger finds out: a fine of {pct(LOBBYING.exposeFine, 0)} of the fee
+              and a dent in your brand.
             </p>
           }
           confirmLabel="Lobby"

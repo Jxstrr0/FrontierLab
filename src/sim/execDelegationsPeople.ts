@@ -171,7 +171,7 @@ export function cmoBrand(state: GameState): void {
   ].sort();
   const cityCampaigns = Object.values(BRAND_CAMPAIGNS)
     .filter((c) => c.scopes.includes('city') && !c.needsFranchise)
-    .sort((a, b) => brandCampaignCost(a, 'city') - brandCampaignCost(b, 'city'));
+    .sort((a, b) => brandCampaignCost(state, a, 'city') - brandCampaignCost(state, b, 'city'));
   for (const cityId of cities) {
     const b = state.world.cities[cityId]?.brandAwareness ?? 0;
     const running = state.marketing.campaigns.filter(
@@ -181,7 +181,10 @@ export function cmoBrand(state: GameState): void {
       for (const c of running) stopBrandCampaign(state, c.id);
     } else if (b < target - X.brandSlack) {
       const next = cityCampaigns.find((spec) => !running.some((c) => c.campaignId === spec.id));
-      if (next && brandCampaignsWeeklyCost(state) + brandCampaignCost(next, 'city') <= budget)
+      if (
+        next &&
+        brandCampaignsWeeklyCost(state) + brandCampaignCost(state, next, 'city') <= budget
+      )
         startBrandCampaign(state, { campaignId: next.id, scope: 'city', targetId: cityId });
     }
   }
