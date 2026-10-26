@@ -146,7 +146,7 @@ function afterWeek(s: GameState): void {
   announceEvents(s);
   if (s.flags.gameOver) {
     s.clock.speed = 0;
-    saveToSlot('auto', s);
+    void saveToSlot('auto', s);
     modal.value = { type: 'gameover' };
     return;
   }
