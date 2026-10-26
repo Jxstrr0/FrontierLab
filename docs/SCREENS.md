@@ -478,7 +478,7 @@ Tabs: Overview · Loans · Credit.
 
 ## 21. Weekly results (modal)
 
-- **Header:** bank medallion, "Weekly results" ("Monthly results" / "Quarterly results" when the setting rolls the period up), ✕.
+- **Header:** bank medallion, "Weekly results" ("Monthly results" / "Quarterly results" when the setting rolls the period up), ✕. Under it: "Week 9 · ending 7 Mar 2027" or "February 2027 · 4 weeks, ending 28 Feb 2027"; the date is the last day the week (or period) covers. A monthly or quarterly report opens on the tick that closes the period's last week, never partway into the next one.
 - **Date line:** "Week N · ending {date}", or for a roll-up "{October 2027 | Q4 2027} · N weeks, ending {date}" (a snapshot week belongs to the month or quarter its last day falls in, so a month is 4 or 5 weeks).
 - **Headline figures:** revenue and net income for the period, each with the change on the last week / month / quarter ("First month of trading" when there is none).
 - **Cash flow:** Cash from operations, Investing, Financing, Net cash flow, summed over the period.
