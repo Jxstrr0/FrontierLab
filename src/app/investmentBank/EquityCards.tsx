@@ -62,7 +62,7 @@ export function PlacementCard(p: { bankId: string }) {
         your private valuation.
       </p>
       <Stepper
-        label="New shares (% of the bank)"
+        label="New shares (% of the lab)"
         value={share}
         min={0.01}
         max={PLACEMENT.maxPct}
@@ -94,7 +94,7 @@ export function PlacementCard(p: { bankId: string }) {
       {confirm && (
         <Confirm
           title="Raise private capital?"
-          body={`${investor} buys ${count(q.shares)} new shares at ${sharePrice(q.price, sym)}. Your stake shrinks as the bank grows its capital.`}
+          body={`${investor} buys ${count(q.shares)} new shares at ${sharePrice(q.price, sym)}. Your stake shrinks as the lab grows its capital.`}
           confirmLabel="Raise"
           onConfirm={raise}
           onCancel={() => setConfirm(false)}
@@ -175,7 +175,7 @@ export function IpoCard(p: { bankId: string }) {
           {confirm && (
             <Confirm
               title="Launch your IPO?"
-              body={`The bank offers ${count(q.shares)} new shares at ${sharePrice(q.price, sym)} and lists at the end of the quarter. Once public, the market prices your shares every week.`}
+              body={`The lab offers ${count(q.shares)} new shares at ${sharePrice(q.price, sym)} and lists at the end of the quarter. Once public, the market prices your shares every week.`}
               confirmLabel="Launch IPO"
               onConfirm={launch}
               onCancel={() => setConfirm(false)}

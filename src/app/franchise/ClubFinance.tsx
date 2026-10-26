@@ -19,7 +19,7 @@ export function ClubFinance({ view }: { view: ClubView }) {
         {f.revenue.map(([label, v]) => (
           <Row
             key={label}
-            label={label === 'Sponsorship' && bankSponsor ? 'Sponsorship (your bank)' : label}
+            label={label === 'Sponsorship' && bankSponsor ? 'Sponsorship (your lab)' : label}
             value={moneyFull(v, sym)}
           />
         ))}
@@ -42,7 +42,7 @@ export function ClubFinance({ view }: { view: ClubView }) {
       </Card>
       <p class="muted small fr-note">
         {view.club.owner === 'company'
-          ? 'The club’s income and costs go through the bank’s books each week.'
+          ? 'The club’s income and costs go through the lab’s books each week.'
           : 'The club’s profit or loss goes to your personal cash each week.'}{' '}
         Seasons start in week {FRANCHISE.seasonStartWeek}.
       </p>

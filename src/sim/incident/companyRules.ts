@@ -200,7 +200,7 @@ const RECAP_OFFER: IncidentRule = {
   apply(state, _inc, optionId) {
     if (optionId === 'decline') {
       takeover(state);
-      return 'The regulator has taken control of the bank.';
+      return 'The regulator has taken control of the lab.';
     }
     const q = acceptRecap(state);
     return `New shareholders put in ${compactMoney(q.amount, state.settings.currency)}.`;

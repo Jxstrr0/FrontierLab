@@ -21,7 +21,7 @@ export const OTHER_FIXES: readonly string[] = [
 
 /** The extra warning at Critical (SIMULATION §15, emergency recapitalisation). */
 export const CRITICAL_FIX_NOTE =
-  'Below 4.5% for 8 weeks, the regulator offers an emergency rescue. Accept it, or it takes over the bank.';
+  'Below 4.5% for 8 weeks, the regulator offers an emergency rescue. Accept it, or it takes over the lab.';
 
 /** The target a struggling bank should climb back to. */
 export const CAPITAL_FIX_TITLE: Partial<Record<Tier, string>> = {

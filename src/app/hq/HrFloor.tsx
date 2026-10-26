@@ -117,7 +117,7 @@ function BenefitCard({ spec }: { spec: BenefitSpec }) {
       <div class="hq-benefit-foot">
         <span class="small">
           {locked
-            ? 'Available once your bank is listed'
+            ? 'Available once your lab is listed'
             : value > 0
               ? `About ${money(cost, sym)} /week`
               : 'Off'}

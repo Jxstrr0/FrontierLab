@@ -92,7 +92,7 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
         icon: 'spark',
         priority: here ? P.rivalLocal + 6 : P.rivalAbroad + 6,
         tokens: {
-          bank: str(p.bank, 'A new bank'),
+          bank: str(p.bank, 'A new lab'),
           city: cityName(str(p.city)),
           kind: STRATEGY_WORD[str(p.strategy)] ?? 'bank',
           n: String(num(p.branches)),

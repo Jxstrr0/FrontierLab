@@ -76,7 +76,7 @@ export function ClubForSale({ view }: { view: ClubView }) {
           {blocker && <p class="small tone-bad fr-center">{blocker}</p>}
           <p class="muted small fr-center">
             {account === 'company'
-              ? 'Owned by the bank: the club sits on the balance sheet and its income and costs go through the company books.'
+              ? 'Owned by the lab: the club sits on the balance sheet and its income and costs go through the company books.'
               : 'Owned by you: the club’s profit or loss goes to your personal cash each week.'}
           </p>
         </div>

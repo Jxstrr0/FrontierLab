@@ -98,7 +98,7 @@ describe('labels', () => {
         { mode: 'fare', fare: 124_000, bankPays: 84_000, firstVisit: false },
         'C$',
       ),
-    ).toBe('Welcome to London · Ticket C$167K (the bank paid C$113K)');
+    ).toBe('Welcome to London · Ticket C$167K (the lab paid C$113K)');
     expect(
       arrivalText('Tokyo', { mode: 'jet', fare: 0, bankPays: 0, firstVisit: false }, '$'),
     ).toBe('Welcome to Tokyo');

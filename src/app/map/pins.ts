@@ -160,11 +160,11 @@ function lotPin(s: GameState, map: CityMap, lot: Lot, pending: Record<string, nu
     return {
       ...base,
       kind: 'rival',
-      label: `${bank?.name ?? 'Rival bank'} branch, ${lot.address}`,
+      label: `${bank?.name ?? 'Rival lab'} branch, ${lot.address}`,
       ink: bank?.ink ?? '#5a5a5a',
       monogram: bank?.monogram ?? '?',
       badge: false,
-      caption: rivalShortName(bank?.name ?? 'Rival bank'),
+      caption: rivalShortName(bank?.name ?? 'Rival lab'),
     };
   }
   return {
@@ -209,7 +209,7 @@ export function siteName(s: GameState | undefined, site: Site): string {
     case 'bureau':
       return `${site.refId} credit bureau`;
     case 'rivalHq':
-      return `${s?.rivals[site.refId]?.name ?? 'Rival bank'} head office`;
+      return `${s?.rivals[site.refId]?.name ?? 'Rival lab'} head office`;
     case 'investmentBank':
       return INVESTMENT_BANKS[site.refId]?.name ?? 'Investment bank';
     case 'property':

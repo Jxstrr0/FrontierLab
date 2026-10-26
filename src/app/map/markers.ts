@@ -187,7 +187,7 @@ export function stackTier(kind: PinKind, owned = false): number {
 /** The colour a type's glyph and words are printed in on its ink. */
 export const glyphInk = (id: MarkerId): string => MARKERS[id].glyph ?? 'var(--ivory)';
 
-/** "Harbourline Bank" → "Harbourline", "Banque Lumière" → "Lumière": the caption under a rival's crest. */
+/** "Harbourline AI" → "Harbourline", "Lumière IA" → "Lumière": the caption under a rival's crest. */
 export function rivalShortName(name: string): string {
   const generic = new Set(RIVAL_CAPTION_GENERIC_WORDS.map((w) => w.toLowerCase()));
   const words = name.split(/\s+/).filter(Boolean);

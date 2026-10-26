@@ -127,11 +127,11 @@ describe('shape language', () => {
 
 describe('captions', () => {
   it("shortens a rival's name to its distinctive words", () => {
-    expect(rivalShortName('Harbourline Bank')).toBe('Harbourline');
-    expect(rivalShortName('Banque Lumière')).toBe('Lumière');
-    expect(rivalShortName('Kingsbury & Co')).toBe('Kingsbury');
-    expect(rivalShortName('Thameside Building Society')).toBe('Thameside');
-    expect(rivalShortName('Southern Cross Savings')).toBe('Southern Cross');
+    expect(rivalShortName('Harbourline AI')).toBe('Harbourline');
+    expect(rivalShortName('Lumière IA')).toBe('Lumière');
+    expect(rivalShortName('Kingsbury Cognition')).toBe('Kingsbury');
+    expect(rivalShortName('Thameside Open Lab')).toBe('Thameside');
+    expect(rivalShortName('Southern Cross AI')).toBe('Southern Cross');
     expect(rivalShortName('Fizz')).toBe('Fizz');
     for (const r of Object.values(RIVALS)) expect(rivalShortName(r.name).length).toBeGreaterThan(2);
   });
@@ -214,7 +214,7 @@ describe('clustering like with like', () => {
       pin('b', 'rival', 0, { caption: 'Volt' }),
       pin('c', 'rival', 0, { caption: 'Fizz' }),
     ];
-    expect(clusterLabel('rival', rivals)).toBe('3 rival bank buildings: Fizz, Volt. Zoom in');
+    expect(clusterLabel('rival', rivals)).toBe('3 rival lab buildings: Fizz, Volt. Zoom in');
     const places = [pin('a', 'bureau', 0), pin('b', 'employer', 0, { alert: true })];
     expect(clusterLabel('medallion', places)).toBe(
       '2 places: Credit bureau, Employer, open incident. Zoom in',

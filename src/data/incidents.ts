@@ -354,7 +354,7 @@ export const INCIDENT_SPECS: Record<string, IncidentSpec> = {
         id: 'settle',
         label: 'Settle',
         effect:
-          'Pay {fine} from your personal cash. The story dents the bank’s ratings for a while.',
+          'Pay {fine} from your personal cash. The story dents the lab’s ratings for a while.',
       },
       {
         id: 'fight',
@@ -390,7 +390,7 @@ export const INCIDENT_SPECS: Record<string, IncidentSpec> = {
         label: 'Accept the new shares',
         effect: '{shares} new shares; capital ratio back to 10.5%.',
       },
-      { id: 'decline', label: 'Decline', effect: 'The regulator takes over the bank. Game over.' },
+      { id: 'decline', label: 'Decline', effect: 'The regulator takes over the lab. Game over.' },
     ],
     worst: 'decline',
   },

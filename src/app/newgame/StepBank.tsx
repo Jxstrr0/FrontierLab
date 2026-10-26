@@ -36,7 +36,7 @@ export function StepBank(p: { draft: Draft; patch: (d: Partial<Draft>) => void }
           size={104}
         />
         <div class="preview-text">
-          <div class="preview-name">{draft.bankName.trim() || 'Your bank'}</div>
+          <div class="preview-name">{draft.bankName.trim() || 'Your lab'}</div>
           <div class="small muted">{inkName} ink</div>
         </div>
       </div>
@@ -48,7 +48,7 @@ export function StepBank(p: { draft: Draft; patch: (d: Partial<Draft>) => void }
           type="text"
           value={draft.bankName}
           maxLength={NAME_MAX}
-          placeholder="Name your bank"
+          placeholder="Name your lab"
           autoComplete="off"
           autoCapitalize="words"
           onInput={(e) => setName((e.target as HTMLInputElement).value)}
@@ -124,7 +124,7 @@ export function StepBank(p: { draft: Draft; patch: (d: Partial<Draft>) => void }
         <div class="style-preview">
           <BranchArt
             exterior="ext_storefront"
-            bankName={draft.bankName.trim() || 'Your bank'}
+            bankName={draft.bankName.trim() || 'Your lab'}
             style={draft.houseStyle}
             brandInk={draft.brandInk}
             monogram={draft.monogram || '··'}

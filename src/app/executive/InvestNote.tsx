@@ -7,7 +7,7 @@ import type { GameState } from '../../sim/state';
 import { money, pct } from '../format/format';
 
 function lines(s: GameState, account: Account): string[] {
-  const who = account === 'company' ? 'For the bank' : 'For you';
+  const who = account === 'company' ? 'For the lab' : 'For you';
   const sym = s.settings.currency;
   const n = weeksToInvest(s);
   const when = `in ${n} ${n === 1 ? 'week' : 'weeks'}`;

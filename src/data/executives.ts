@@ -95,7 +95,7 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
       },
       {
         id: 'bankInvests',
-        label: "Investing: the bank's money",
+        label: "Investing: the lab's money",
         description:
           "Every 4 weeks buys a stock, spread across the market by company size, and backs the best-scoring startup on the Investment floor's list. Sells stocks 25% under cost. Stocks stay under 5% of assets, startups under 3%, the capital ratio at 12% or more.",
       },
@@ -213,21 +213,21 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
     delegations: [
       {
         id: 'bankRents',
-        label: "Rents: the bank's buildings",
+        label: "Rents: the lab's buildings",
         description:
-          'Every 4 weeks sets the rent on every building the bank owns to hold the occupancy you dial, as market rents drift: at 100% the highest rent that still fills it. Their tenants pay a little over market, by the chief’s expertise.',
+          'Every 4 weeks sets the rent on every building the lab owns to hold the occupancy you dial, as market rents drift: at 100% the highest rent that still fills it. Their tenants pay a little over market, by the chief’s expertise.',
       },
       {
         id: 'privateRents',
         label: 'Rents: your own buildings',
         description:
-          'The same for the buildings you own privately. The bank pays the chief either way.',
+          'The same for the buildings you own privately. The lab pays the chief either way.',
       },
       {
         id: 'bankBuys',
-        label: "Buying: the bank's buildings",
+        label: "Buying: the lab's buildings",
         description:
-          'Every 4 weeks buys the listed building with the best rent yield, in any city, at its asking price. Keeps the bank’s buildings under 5% of its assets, capital at 12% or more and 8 weeks of costs in cash.',
+          'Every 4 weeks buys the listed building with the best rent yield, in any city, at its asking price. Keeps the lab’s buildings under 5% of its assets, capital at 12% or more and 8 weeks of costs in cash.',
       },
       {
         id: 'privateBuys',

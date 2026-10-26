@@ -1,4 +1,4 @@
-// Rival banks and strategy profiles (docs/CONTENT.md §15).
+// Rival AI labs and strategy profiles (docs/CONTENT.md §15).
 import type { CountryId } from './types';
 
 export type Strategy = 'incumbent' | 'disruptor' | 'premium' | 'community';
@@ -17,7 +17,7 @@ const r = (s: RivalSpec) => s;
 export const RIVALS: Record<string, RivalSpec> = {
   harbourline: r({
     id: 'harbourline',
-    name: 'Harbourline Bank',
+    name: 'Harbourline AI',
     strategy: 'incumbent',
     home: ['CA'],
     ink: '#1F3A5F',
@@ -25,7 +25,7 @@ export const RIVALS: Record<string, RivalSpec> = {
   }),
   maplecrown: r({
     id: 'maplecrown',
-    name: 'Maple Crown Financial',
+    name: 'Maple Crown Intelligence',
     strategy: 'incumbent',
     home: ['CA'],
     ink: '#8E2C2C',
@@ -33,28 +33,28 @@ export const RIVALS: Record<string, RivalSpec> = {
   }),
   prairiemutual: r({
     id: 'prairiemutual',
-    name: 'Prairie Mutual',
+    name: 'Prairie Open Models',
     strategy: 'community',
     home: ['CA'],
     ink: '#B08A3E',
   }),
   nimbus: r({
     id: 'nimbus',
-    name: 'Nimbus',
+    name: 'Nimbus Labs',
     strategy: 'disruptor',
     home: ['CA', 'US'],
     ink: '#2AA6B8',
   }),
   granville: r({
     id: 'granville',
-    name: 'Granville Private',
+    name: 'Granville Research',
     strategy: 'premium',
     home: ['CA'],
     ink: '#2B2B2B',
   }),
   libertyridge: r({
     id: 'libertyridge',
-    name: 'Liberty Ridge Bank',
+    name: 'Liberty Ridge Labs',
     strategy: 'incumbent',
     home: ['US'],
     ink: '#27466E',
@@ -62,7 +62,7 @@ export const RIVALS: Record<string, RivalSpec> = {
   }),
   eastgate: r({
     id: 'eastgate',
-    name: 'Eastgate Financial',
+    name: 'Eastgate Intelligence',
     strategy: 'incumbent',
     home: ['US'],
     ink: '#4A6B3A',
@@ -70,7 +70,7 @@ export const RIVALS: Record<string, RivalSpec> = {
   }),
   copperfield: r({
     id: 'copperfield',
-    name: 'Copperfield Federal',
+    name: 'Copperfield Collective',
     strategy: 'community',
     home: ['US'],
     ink: '#A8643A',
@@ -78,7 +78,7 @@ export const RIVALS: Record<string, RivalSpec> = {
   fizz: r({ id: 'fizz', name: 'Fizz', strategy: 'disruptor', home: ['US', 'UK'], ink: '#E2557A' }),
   whitmore: r({
     id: 'whitmore',
-    name: 'Whitmore Trust',
+    name: 'Whitmore Institute',
     strategy: 'premium',
     home: ['US'],
     ink: '#3B3355',
@@ -86,7 +86,7 @@ export const RIVALS: Record<string, RivalSpec> = {
   }),
   kingsbury: r({
     id: 'kingsbury',
-    name: 'Kingsbury & Co',
+    name: 'Kingsbury Cognition',
     strategy: 'incumbent',
     home: ['UK'],
     ink: '#2C3E66',
@@ -94,28 +94,28 @@ export const RIVALS: Record<string, RivalSpec> = {
   }),
   thameside: r({
     id: 'thameside',
-    name: 'Thameside Building Society',
+    name: 'Thameside Open Lab',
     strategy: 'community',
     home: ['UK'],
     ink: '#3E7A6E',
   }),
   albion: r({
     id: 'albion',
-    name: 'Albion Mutual',
+    name: 'Albion Machine Works',
     strategy: 'incumbent',
     home: ['UK'],
     ink: '#6B2D4A',
   }),
   belgrave: r({
     id: 'belgrave',
-    name: 'Belgrave Private',
+    name: 'Belgrave Research',
     strategy: 'premium',
     home: ['UK'],
     ink: '#1E1E28',
   }),
   lumiere: r({
     id: 'lumiere',
-    name: 'Banque Lumière',
+    name: 'Lumière IA',
     strategy: 'incumbent',
     home: ['EA'],
     ink: '#7A2E46',
@@ -123,7 +123,7 @@ export const RIVALS: Record<string, RivalSpec> = {
   }),
   rheinmark: r({
     id: 'rheinmark',
-    name: 'Rheinmark Bank',
+    name: 'Rheinmark KI',
     strategy: 'incumbent',
     home: ['EA'],
     ink: '#34495E',
@@ -131,7 +131,7 @@ export const RIVALS: Record<string, RivalSpec> = {
   }),
   oranjeburg: r({
     id: 'oranjeburg',
-    name: 'Oranjeburg Bank',
+    name: 'Oranjeburg Labs',
     strategy: 'incumbent',
     home: ['EA'],
     ink: '#C0652A',
@@ -140,7 +140,7 @@ export const RIVALS: Record<string, RivalSpec> = {
   volt: r({ id: 'volt', name: 'Volt', strategy: 'disruptor', home: ['EA'], ink: '#5B4BD6' }),
   alpenhaus: r({
     id: 'alpenhaus',
-    name: 'Alpenhaus Privatbank',
+    name: 'Alpenhaus Research',
     strategy: 'premium',
     home: ['CH'],
     ink: '#2F3B45',
@@ -148,14 +148,14 @@ export const RIVALS: Record<string, RivalSpec> = {
   }),
   helvetic: r({
     id: 'helvetic',
-    name: 'Helvetic Cantonal',
+    name: 'Helvetic Open Models',
     strategy: 'community',
     home: ['CH'],
     ink: '#B03A3A',
   }),
   sakuragi: r({
     id: 'sakuragi',
-    name: 'Sakuragi Trust',
+    name: 'Sakuragi Intelligence',
     strategy: 'incumbent',
     home: ['JP'],
     ink: '#A0425A',
@@ -163,7 +163,7 @@ export const RIVALS: Record<string, RivalSpec> = {
   }),
   hoshino: r({
     id: 'hoshino',
-    name: 'Hoshino Bank',
+    name: 'Hoshino Labs',
     strategy: 'incumbent',
     home: ['JP'],
     ink: '#2E3F78',
@@ -171,14 +171,14 @@ export const RIVALS: Record<string, RivalSpec> = {
   }),
   komorebi: r({
     id: 'komorebi',
-    name: 'Komorebi Pay',
+    name: 'Komorebi AI',
     strategy: 'disruptor',
     home: ['JP'],
     ink: '#4E9A5A',
   }),
   southerncross: r({
     id: 'southerncross',
-    name: 'Southern Cross Savings',
+    name: 'Southern Cross AI',
     strategy: 'incumbent',
     home: ['AU'],
     ink: '#22476B',
@@ -186,21 +186,21 @@ export const RIVALS: Record<string, RivalSpec> = {
   }),
   wattle: r({
     id: 'wattle',
-    name: 'Wattle Mutual',
+    name: 'Wattle Collective',
     strategy: 'community',
     home: ['AU'],
     ink: '#C99A2E',
   }),
   tide: r({
     id: 'tide',
-    name: 'Tide Money',
+    name: 'Tidewater AI',
     strategy: 'disruptor',
     home: ['AU', 'SG'],
     ink: '#1E9BB0',
   }),
   lionport: r({
     id: 'lionport',
-    name: 'Lionport Bank',
+    name: 'Lionport Labs',
     strategy: 'incumbent',
     home: ['SG'],
     ink: '#9C2F2F',
@@ -208,7 +208,7 @@ export const RIVALS: Record<string, RivalSpec> = {
   }),
   jadeharbour: r({
     id: 'jadeharbour',
-    name: 'Jade Harbour Bank',
+    name: 'Jade Harbour AI',
     strategy: 'incumbent',
     home: ['HK'],
     ink: '#2F7A6A',
@@ -216,14 +216,14 @@ export const RIVALS: Record<string, RivalSpec> = {
   }),
   peak: r({
     id: 'peak',
-    name: 'Peak Private',
+    name: 'Peak Research',
     strategy: 'premium',
     home: ['HK', 'SG'],
     ink: '#3A3A4A',
   }),
   volgastate: r({
     id: 'volgastate',
-    name: 'Volga State Bank',
+    name: 'Volga State Labs',
     strategy: 'incumbent',
     home: ['RU'],
     ink: '#7A2430',
@@ -231,7 +231,7 @@ export const RIVALS: Record<string, RivalSpec> = {
   }),
   birchcrest: r({
     id: 'birchcrest',
-    name: 'Birchcrest Bank',
+    name: 'Birchcrest AI',
     strategy: 'incumbent',
     home: ['RU'],
     ink: '#3A5A40',
@@ -240,14 +240,14 @@ export const RIVALS: Record<string, RivalSpec> = {
   komet: r({ id: 'komet', name: 'Komet', strategy: 'disruptor', home: ['RU'], ink: '#E0663A' }),
   ambermark: r({
     id: 'ambermark',
-    name: 'Ambermark Private',
+    name: 'Ambermark Research',
     strategy: 'premium',
     home: ['RU'],
     ink: '#4A3A5A',
   }),
   nevasavings: r({
     id: 'nevasavings',
-    name: 'Neva Savings Union',
+    name: 'Neva Open Models',
     strategy: 'community',
     home: ['RU'],
     ink: '#4A7A9A',

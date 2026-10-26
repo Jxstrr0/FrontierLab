@@ -111,7 +111,7 @@ export function KitTab({ view }: { view: ClubView }) {
           label="Shirt sponsor"
           options={[
             { value: 'outside', label: 'Outside sponsor' },
-            { value: 'bank', label: 'Your bank' },
+            { value: 'bank', label: 'Your lab' },
           ]}
           value={club.kit.sponsor}
           onChange={setSponsor}

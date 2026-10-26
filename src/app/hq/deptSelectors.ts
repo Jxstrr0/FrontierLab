@@ -57,10 +57,10 @@ export function coverageView(s: GameState, dept: HqDeptId): CoverageView {
     text: `Needs ${needs} · Coverage ${pctText}`,
     note:
       ramp < 1
-        ? `Requirements are phasing in (${Math.round(ramp * 100)}% applied) as the bank grows.`
+        ? `Requirements are phasing in (${Math.round(ramp * 100)}% applied) as the lab grows.`
         : short
           ? 'Short-staffed: hire up or raise pay to close the gap.'
-          : 'Fully staffed for the bank you run today.',
+          : 'Fully staffed for the lab you run today.',
   };
 }
 
@@ -72,7 +72,7 @@ const LINES: Record<HqDeptId, [ok: string, short: string]> = {
   ],
   hr: [
     'Hiring is moving and morale is steady.',
-    "We can't keep up with hiring, and morale is slipping across the bank.",
+    "We can't keep up with hiring, and morale is slipping across the lab.",
   ],
   products: [
     'Models and launches are on schedule.',

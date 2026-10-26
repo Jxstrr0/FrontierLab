@@ -25,7 +25,7 @@ export function RealEstateCard() {
       {buildings.length === 0 ? (
         <Card>
           <p class="muted small re-note">
-            The bank owns no buildings yet. Buildings for sale show on the map under Real Estate.
+            The lab owns no buildings yet. Buildings for sale show on the map under Real Estate.
           </p>
         </Card>
       ) : (

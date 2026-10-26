@@ -95,5 +95,5 @@ export function boardHint(bank: RivalBank): string {
   const req = requiredPremium(bank);
   if (bank.status === 'distressed')
     return 'Regulators want the failed bank sold. Offers near the asking price usually succeed.';
-  return `A bank in this shape usually wants about ${Math.round(req * 100)}% over the ${bank.listed ? 'share price' : 'book value'}.`;
+  return `A lab in this shape usually wants about ${Math.round(req * 100)}% over the ${bank.listed ? 'share price' : 'book value'}.`;
 }

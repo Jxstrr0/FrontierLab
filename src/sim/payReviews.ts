@@ -89,7 +89,7 @@ export function runManagerPoaching(state: GameState): void {
       branch.status === 'open' && branch.managerId && state.people.managers[branch.managerId];
     if (!m) continue;
     if (!rng.chance(managerPoachChance(m.salary, managerMarketSalary(state, m)))) continue;
-    const rival = rivals.length > 0 ? rng.pick(rivals).name : 'A rival bank';
+    const rival = rivals.length > 0 ? rng.pick(rivals).name : 'A rival lab';
     clearManager(state, branch);
     pushEvent(
       state,
