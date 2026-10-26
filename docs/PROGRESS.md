@@ -10,6 +10,15 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-10-26 — The clock can never run under the weekly results (v0.10.20)
+- **Owner's ask:** make 100% sure there is no way time runs while the weekly results (The Weekly Ledger) are showing.
+- **What was checked.** The game clock moves in exactly one place, the loop in `src/app/loop.ts` (plus the `?debug` fast-forward, which is not reachable in play). Flights, commands and the tutorial never move the clock. The loop already refused to advance a day while any modal, panel or sheet was open, and the HUD's speed buttons sit under the modal's scrim, so the clock was already held. Two soft spots remained and are closed:
+  - **Banked time.** Real time that passed while the results were open stayed in the loop's day accumulator, so the first day after Continue could land instantly. Now any hold (modal, panel, sheet, pause, hidden tab) drops the banked fraction of a day, and a modal opening mid-frame drops it too. Closing the results always costs a full day's worth of real time before the next day, at every speed.
+  - **Mid-frame re-check.** A long frame at 4× can cover several days; the hold is now checked before every day inside a frame (not only after one), so nothing can slip past a modal that a day's tick just opened.
+- **Code.** `frame()` now just measures time and calls `elapse(ms)`, which is exported so tests can drive the loop without timers. `document.hidden` is guarded for non-browser environments. The frame cap is a named constant (`MAX_FRAME_MS`).
+- **Tests.** New `tests/app/loop.test.ts` (7 tests): the results open on the first day of the new week and the clock stops there; a minute of real time at 1×, 2× and 4× moves nothing; stepping the week is refused; the speed setting survives; resuming takes a full day of real time before the next day; panels, sheets and a hidden page hold too; a long frame stops within the frame when the week ends. Removing the hold from the loop makes three of them fail (checked), so they guard it.
+- **No sim or save change.** Determinism snapshot unchanged (`000acf5c010cae`). Lint, build and the full suite clean.
+
 ### 2026-10-26 — Quant Noir: a hyper-modern branding and look (v0.10.19)
 - **Owner's ask:** at least one hyper-futuristic, modern branding and look in the style of a quantitative trading firm.
 - **House style: Quant Noir.** A sixth style on New Game. The sign is a graphite slab with the bank's name in lower-case, widely spaced sans, a brand-ink pixel before it and a light strip under it; the lamps are recessed light bars in the brand ink with a soft cone of light; the planters are graphite cubes with clipped green spheres; the door is a frameless glass slab with a glowing seam and a keypad; and instead of a cloth flag a slim light blade pulses on the mast (still, with reduced motion). It dresses all six exteriors (`branch/houseStyleQuant.tsx`; the shared sign fitting moved to `signFit.ts`).
@@ -40,7 +49,7 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 - **Owner's ask:** make the exterior of the branches incorporate a little more colour.
 - **Material washes.** Every branch front (the hero on the branch panel, the Build branch preview and the New Game style picker) now has a pale second printing under its hatching, the way the map's tint underprint works: terracotta on the Heritage Brick walls, warm limestone on the Classic Columns, the Deco tower and the stone dressings, a cool wash on all the glazing, slate on roof slabs, fascias and the Modern Glass spandrels, verdigris on the Deco setbacks, and leaf green on the planting in every house style's planters. The brand ink joins in on the building itself: the awning stripes of the Plain Storefront, the pediment of the Classic Columns, the canopy of the Modern Glass front and the spandrels and crown of the Deco tower. The Deco sunburst over the door is brass now.
 - **Kept it an engraving.** Washes sit at about a third strength (`.art-wash`, 32%; the awning stripes at 50%), always under the ink hatching and outlines, so the fronts still read as banknote plates and the city ink still rules the linework. The six colours are tokens (`--wash-*` in `tokens.css`, listed in ART_DIRECTION §1.1); `Face` takes an optional `wash` and a small `Wash` component lays colour on its own.
-- **No sim or save change.** Determinism snapshot unchanged (`12dd4c303e05ab`).
+- **No sim or save change.** Determinism snapshot unchanged (`000acf5c010cae`).
 - **Checked** all 25 house style × exterior pairs at 390×844 with no console errors; 753 tests, lint and build clean.
 ### 2026-10-26 — No double-tap zoom or text selection on buttons (v0.10.16)
 - **Owner's ask:** on the iPhone home-screen app, stop double-tap zooming and stop button text getting highlighted while holding a button down.
