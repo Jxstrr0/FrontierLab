@@ -4,11 +4,22 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 **Current stage:** 10 — Art pass, onboarding, polish, launch (built and live; awaiting the owner's iPhone check). All ten roadmap stages are built. Still open: the owner's testing and tuning pass, an Add to Home Screen test on a real iPhone, and the Vault Street card on Kelbo.Website (in a separate session in that repo).
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `00e970fac92bfd` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `0d0dc26718fc32` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-26 — The HR floor hires branch managers (v0.11.1)
+- **Owner's ask:** let the HR floor auto-hire managers for branches that don't have one, as the COO already does.
+- **What changes.** Once you have an HR floor at HQ, any open branch without a manager gets one at the end of the week: HR picks the candidate in that city with the best total skills (the same pick the COO makes) and hires them at their asking salary. It only fills the seat. Unlike the COO, it doesn't switch on the branch's delegations, so you still decide how hands-off each branch is. A branch still being built waits until it opens. It also covers the week after a rival poaches one of your managers.
+- **With a COO too:** the COO's Branch operations runs first that week and hires with delegation switched on, so nothing is hired twice.
+- **The switch.** The HR floor has a new **Branch managers** card: "Hire managers for empty branches" (on by default) and a count of branches without a manager. Turn it off if you'd rather choose your managers yourself. Without an HR floor nothing changes: you hire from the branch as before.
+- **Saves:** schema v25 adds that switch (`people.hrHiring`). Migration 24 → 25 switches it on for existing games, so your next week-end fills any empty branch if you have an HR floor.
+- **Code:** `src/sim/hrHiring.ts` (weekly routine, run right after the executives), the `setHrHiring` command, the card in `src/app/hq/HrFloor.tsx`. The COO's routine now shares the same candidate pick.
+- **Determinism:** the snapshot moved `00e970fac92bfd` → `0d0dc26718fc32`. That's intended: the scripted game has an HR floor and HR now fills a vacancy in it. The balance run (`--years 10 --seed 42 --strategy steady`) is identical before and after, and all its checkpoints stay in range.
+- **Docs:** SIMULATION §16.11 (new) and §6.5, SCREENS §10 (HR floor), DATA_MODEL v25, DESIGN decision log.
+- **Checked:** 6 new tests (the hire and pick, no floor / switch off / branch not yet open, the command, the weekly tick with and without a COO, ties, migration). Full suite, lint and build clean.
 
 ### 2026-10-26 — Title screen: "Living skyline" (v0.11.0)
 - **Owner's ask:** build design pitch 3, the "Living skyline" cover (spec saved as `docs/COVER_SCREEN.md`).
