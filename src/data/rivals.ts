@@ -317,7 +317,7 @@ export const RIVAL_BENCH_TITLES = ['CFO', 'COO', 'CRO'] as const;
 export const RIVAL_BENCH_LABEL: Record<string, string> = {
   CFO: 'Chief financial officer',
   COO: 'Chief operating officer',
-  CRO: 'Chief risk officer',
+  CRO: 'Chief safety officer',
 };
 
 /** Total rival branches at start by city size (CONTENT §15). Disruptors get 1–2 each. */

@@ -237,7 +237,7 @@ export const STOCKS: Record<string, StockSpec> = {
 };
 
 export const SECTORS: { id: SectorId; label: string }[] = [
-  { id: 'banking', label: 'Banking' },
+  { id: 'banking', label: 'AI labs' },
   { id: 'technology', label: 'Technology' },
   { id: 'energy', label: 'Energy' },
   { id: 'auto', label: 'Auto' },

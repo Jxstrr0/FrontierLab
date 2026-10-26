@@ -77,7 +77,7 @@ export function balanceSheetLines(s: GameState): StatementLine[] {
     { label: 'Foreclosed property', value: b.reo, kind: 'sub' },
     ...optional('Stocks', b.investments),
     ...optional('Ventures', b.ventures),
-    ...optional('Venture debt', b.ventureDebt),
+    ...optional('Compute credits', b.ventureDebt),
     ...optional('Real estate', b.realEstate),
     ...optional('Currencies', b.currencies),
     { label: 'Branches and equipment', value: b.fixedAssets, kind: 'sub' },

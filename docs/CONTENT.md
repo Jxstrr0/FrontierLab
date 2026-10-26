@@ -87,10 +87,10 @@ How a lot's values are derived:
 | id | Segment | sensDep | sensLoan | sensFee | Ticket mult: deposits | Ticket mult: lending | Ticket mult: cards |
 |---|---|---|---|---|---|---|---|
 | STU | Students | 0.3 | 0.6 | 1.2 | 0.25 | 0.40 | 0.50 |
-| YP | Young professionals | 0.6 | 0.7 | 0.8 | 0.80 | 0.90 | 0.90 |
-| FAM | Families | 0.5 | 0.9 | 0.7 | 1.00 | 1.10 | 1.00 |
-| RET | Retirees | 1.0 | 0.4 | 0.5 | 1.80 | 0.70 | 1.10 |
-| BIZ | Businesses | 0.4 | 0.7 | 0.5 | 1.50 | 1.00 | 1.40 |
+| YP | Developers | 0.6 | 0.7 | 0.8 | 0.80 | 0.90 | 0.90 |
+| FAM | Consumers | 0.5 | 0.9 | 0.7 | 1.00 | 1.10 | 1.00 |
+| RET | Researchers | 1.0 | 0.4 | 0.5 | 1.80 | 0.70 | 1.10 |
+| BIZ | Small shops | 0.4 | 0.7 | 0.5 | 1.50 | 1.00 | 1.40 |
 
 ### Affinity matrix
 Base probability that a new customer in the segment opens the product, before modifiers.
@@ -251,20 +251,20 @@ Chosen on New Game (`src/data/logoShapes.ts`); the outline of the bank's mark ev
 
 | id | Name | Levels: label (cost) | Effects per level |
 |---|---|---|---|
-| lobby_coffee | Free Lobby Coffee | Drip ($120/wk) · Espresso bar ($260/wk) | Branch +0.20 / +0.40; awareness +0.004 / +0.008 |
-| charging | Charging Station | On ($80/wk) | Branch +0.10; YP boost ×1.05 |
-| saturday | Saturday Hours | Mornings ($600/wk) · Full day ($1,100/wk) | capacity ×1.10 / ×1.20; Service +0.15 / +0.30; FAM, YP ×1.05 / ×1.10 |
-| signup_bonus | Sign-Up Bonus | $50 · $150 · $300 per new deposit account | deposit take-up ×1.15 / 1.30 / 1.50; cohort churn ×1.15 / 1.30 / 1.45 for 26 weeks; Rates +0.10 / 0.20 / 0.30 |
-| paperless | Paperless Pledge | Half (+$0.05/acct/wk) · Full (+$0.10/acct/wk) | Products +0.10 / +0.20; YP, STU ×1.05 / ×1.10 |
-| direct_mail | Direct Mail | Light ($300/wk) · Heavy ($700/wk) | awareness +0.010 / +0.020; RET, FAM ×1.08 / ×1.15 |
-| workshops | Money Workshops | Monthly ($250/wk) · Weekly ($600/wk) | awareness +0.006 / +0.012; STU, YP ×1.08 / ×1.15; Service +0.10 |
+| lobby_coffee | Coffee & Live Demos | Drip ($120/wk) · Espresso bar ($260/wk) | Branch +0.20 / +0.40; awareness +0.004 / +0.008 |
+| charging | Hack Nights | On ($80/wk) | Branch +0.10; YP boost ×1.05 |
+| saturday | Weekend Support | Mornings ($600/wk) · Full day ($1,100/wk) | capacity ×1.10 / ×1.20; Service +0.15 / +0.30; FAM, YP ×1.05 / ×1.10 |
+| signup_bonus | Sign-Up Credits | $50 · $150 · $300 per new deposit account | deposit take-up ×1.15 / 1.30 / 1.50; cohort churn ×1.15 / 1.30 / 1.45 for 26 weeks; Rates +0.10 / 0.20 / 0.30 |
+| paperless | Green Compute Pledge | Half (+$0.05/acct/wk) · Full (+$0.10/acct/wk) | Products +0.10 / +0.20; YP, STU ×1.05 / ×1.10 |
+| direct_mail | Research Newsletter | Light ($300/wk) · Heavy ($700/wk) | awareness +0.010 / +0.020; RET, FAM ×1.08 / ×1.15 |
+| workshops | AI Workshops | Monthly ($250/wk) · Weekly ($600/wk) | awareness +0.006 / +0.012; STU, YP ×1.08 / ×1.15; Service +0.10 |
 | sponsors | Community Sponsors | Modest ($300/wk) · Generous ($800/wk) | awareness +0.010 / +0.022; Branch +0.05 / +0.10; FAM ×1.1, BIZ ×1.08 / ×1.15 |
 | social | Social Media | Steady ($400/wk) · Viral push ($900/wk) | awareness +0.012 / +0.026; STU, YP ×1.10 / ×1.20 |
 | search | Local Paid Search | Moderate ($450/wk) · Aggressive ($1,000/wk) | awareness +0.014 / +0.030; YP, BIZ ×1.08 / ×1.15; Loan Desk λ ×1.10 / ×1.20 |
 
 Weekly campaign costs scale by city.costIndex. Per-account costs don't.
 
-Content trim (2026-10-25): each campaign now has its own job. Free Lobby Coffee lifts Branch, Paperless Pledge lifts Products (it used to repeat Lobby Coffee's Branch bump), Direct Mail reaches retirees and families, and Community Sponsors adds businesses and a small Branch lift to its families (it used to be a cheaper Direct Mail: awareness and families only). A version with Direct Mail on retirees alone plus a deposit take-up boost was tried and dropped: it pulled first-year loans/deposits under the 75% floor. So was moving Community Sponsors from families to businesses outright (merged 2026-10-26): businesses bring deposits but borrow little, and the 20-city median of first-year loans/deposits fell from 77.0% to 73.9%; keeping families and adding businesses holds 76.2%.
+Content trim (2026-10-25): each campaign now has its own job. Coffee & Live Demos lifts Branch, Green Compute Pledge lifts Products (it used to repeat Lobby Coffee's Branch bump), Research Newsletter reaches researchers and families, and Community Sponsors adds businesses and a small Branch lift to its families (it used to be a cheaper Research Newsletter: awareness and families only). A version with Research Newsletter on researchers alone plus a deposit take-up boost was tried and dropped: it pulled first-year loans/deposits under the 75% floor. So was moving Community Sponsors from families to businesses outright (merged 2026-10-26): businesses bring deposits but borrow little, and the 20-city median of first-year loans/deposits fell from 77.0% to 73.9%; keeping families and adding businesses holds 76.2%.
 
 ## 9. HQ floors
 
@@ -277,7 +277,7 @@ Content trim (2026-10-25): each campaign now has its own job. Free Lobby Coffee 
 | marketing | 24 | 72,000 | 1 + 0.15 × branches + 2 per active brand campaign | all campaign effects ×(0.5 + 0.5k′) |
 | it | 24 | 98,000 | 2 + 0.25 × branches + 1 per $5B assets | app rating target ×k′; breach and outage odds ×(1 + 2(1 − k′)) |
 | risk | 24 | 88,000 | 2 + 0.15 × branches + 1 per $750M loans | PD ×(1 + 1.5(1 − k′)); fine odds ×(1 + 3(1 − k′)); weaker loan estimates |
-| executive | 8 (suite) | (per exec) | — | enables executives: COO, CFO, CPO, CMO, CTO, CRO, CREO |
+| executive | 8 (suite) | (per exec) | — | enables executives: COO, CFO, CPO, CMO, CTO, CSO, CREO |
 | investment | 32 | 120,000 | optional | ventures shown = 1 + floor(staff / 4), max 8 |
 
 Stage 4 tuning (2026-10-24): per-branch requirements were cut by about 40% and the Risk PD penalty raised from 0.4 to 1.5 so that a bank without an HQ ends a 6-year steady run clearly behind one with a staffed HQ (balance strategy `nohq`), instead of ahead of it. Shortfall effects read effect(k′) = k′^0.7.
@@ -294,7 +294,7 @@ Salaries scale by city.wageIndex. Desks per floor come from the building (24 or 
 | childcare | Childcare Support | $/employee/yr (0–10,000) | as set | morale +3 at $6k; retention +10% |
 | lunch | Free Lunch & Snacks | $/employee/wk (0–100) | as set | morale +4 at $60 |
 | volunteer | Volunteer Days | $/employee/wk (0–150) | as set | morale +3 at $100; reputation +0.05 on all branches |
-| mortgage_disc | Staff Mortgage Discount | rate discount (0–2%) | employees × 0.3 × 340,000 × discount / yr | morale +3; attraction +3 |
+| mortgage_disc | Compute Allowance | rate discount (0–2%) | employees × 0.3 × 340,000 × discount / yr | morale +3; attraction +3 |
 | wellness | Wellness Program | $/employee/yr (0–2,500) | as set | morale +2; quits −15% |
 | remote_fri | Remote Fridays | on/off (HQ only) | 0 | HQ morale +3; HQ effective staff −3% |
 
@@ -535,15 +535,15 @@ Startups generated during a game (conventions and the Investment floor pipeline,
 
 | Event | City | Week |
 |---|---|---|
-| Alpine Wealth Forum | Zürich | 3 |
-| Fintech Forward | Toronto | 15 |
-| Big Apple Venture Days | New York | 19 |
-| Ledger Summit | London | 24 |
+| Alpine Inference Forum | Zürich | 3 |
+| Model Makers North | Toronto | 15 |
+| Big Apple AI Days | New York | 19 |
+| Thameside Alignment Summit | London | 24 |
 | Foothills Founders Fair | Calgary | 28 |
-| Prairie Innovation Expo | Saskatoon | 33 |
-| Bay Capital Week | San Francisco | 38 |
-| Harbour Tech | Sydney | 41 |
-| Asia Money Forum | Singapore | 45 |
+| Prairie Dev Days | Saskatoon | 33 |
+| Bay Builders Week | San Francisco | 38 |
+| Harbour Dev Summit | Sydney | 41 |
+| Asia Compute Forum | Singapore | 45 |
 
 Announced in the Ledger 4 weeks before. Active for 4 weeks (was 2 and 1 until 2026-10-26, so monthly results never miss one). Calgary's fair is our addition so every start city has a convention before travel arrives.
 
@@ -743,7 +743,7 @@ Fill these per panel and state.
   - Low morale: "The team's frustrated about pay."
 - **Storefront for lease:**
   - "{traffic: Foot traffic is heavy / steady / light here}, {rent: and the rent's steep / fair / cheap}."
-  - Plus a demographic hint ("lots of retirees nearby").
+  - Plus a demographic hint ("lots of researchers nearby").
 - **Office for lease:** "Plenty of desks here. We can bring more teams in-house."
 - **HQ floors** (coverage ≥ 1 / short):
   - Finance: "Books are closed on time." / "We're short on finance staff. Statements are running late."

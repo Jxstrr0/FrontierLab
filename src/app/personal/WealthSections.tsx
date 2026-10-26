@@ -168,7 +168,7 @@ export function OtherAssets() {
             <Row label={FRANCHISES[c.clubId]?.name ?? c.clubId} value={money(c.value, sym)} />
           ))}
           {privateInv > 0 && (
-            <Row label="Ventures, venture debt and currencies" value={money(privateInv, sym)} />
+            <Row label="Ventures, compute credits and currencies" value={money(privateInv, sym)} />
           )}
         </Card>
       )}

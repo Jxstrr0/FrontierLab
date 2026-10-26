@@ -109,7 +109,7 @@ function Financials(p: { startup: Startup }) {
         ) : (
           <>
             <Row label="Cash" value={money(p.startup.cash, sym)} />
-            <Row label="Venture debt" value={money(p.startup.ventureDebt?.balance ?? 0, sym)} />
+            <Row label="Compute credits" value={money(p.startup.ventureDebt?.balance ?? 0, sym)} />
           </>
         )}
         <QuarterBars

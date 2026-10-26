@@ -17,7 +17,7 @@ export function ConventionPanel(p: { siteId: string }) {
   const icon = <LayerMedallion id="conventions" size={32} />;
   if (!v) {
     return (
-      <Panel title="Convention centre" icon={icon} onClose={closePanel}>
+      <Panel title="Conference" icon={icon} onClose={closePanel}>
         <p class="muted">No events are booked here.</p>
       </Panel>
     );

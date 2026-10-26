@@ -59,10 +59,10 @@ export function incomeLabel(index: number): 'Low' | 'Mid' | 'High' {
 
 const SEGMENT_HINT: Record<SegmentId, string> = {
   STU: 'lots of students nearby',
-  YP: 'plenty of young professionals nearby',
-  FAM: 'lots of families nearby',
-  RET: 'lots of retirees nearby',
-  BIZ: 'lots of businesses nearby',
+  YP: 'plenty of developers nearby',
+  FAM: 'lots of consumers nearby',
+  RET: 'lots of researchers nearby',
+  BIZ: 'lots of small shops nearby',
 };
 
 /** The advisor's line for a storefront (CONTENT §25), built from the numbers. */
