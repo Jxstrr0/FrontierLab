@@ -83,6 +83,7 @@ export const DEFAULT_SETTINGS: Settings = {
   textScale: 1,
   layers: {},
   hqTabOrder: [],
+  guides: true,
 };
 
 const DEFAULT_AVATAR: AvatarSpec = {
@@ -235,7 +236,7 @@ export function newGame(opts: NewGameOptions): GameState {
     events: { log: [], scheduled: [] },
     history: { weekly: [], quarterly: [] },
     milestones: {},
-    flags: {},
+    flags: { lessonsDone: [] },
     nextId: 0,
   };
 

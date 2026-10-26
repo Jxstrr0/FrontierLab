@@ -21,7 +21,11 @@
   bottom: calc(var(--safe-bottom) + var(--space-2));
 }
 .tut-bar.is-top {
-  top: calc(var(--safe-top) + var(--space-2));
+  /* --tut-top: the bottom of an open panel's header, in screen px (ring.ts). */
+  top: max(
+    calc(var(--safe-top) + var(--space-2)),
+    calc(var(--tut-top, 0px) / var(--ui-zoom, 1) + var(--space-2))
+  );
 }
 @keyframes tut-in {
   from {

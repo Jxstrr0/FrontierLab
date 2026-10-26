@@ -42,7 +42,12 @@ export function MenuSheet() {
     <Sheet title="Menu" onClose={close}>
       <nav class="menu-list">
         {items.map((it) => (
-          <button type="button" class="menu-item" onClick={it.onClick}>
+          <button
+            type="button"
+            class="menu-item"
+            data-tutorial={`menu-${it.label.toLowerCase().replace(/[^a-z]+/g, '-')}`}
+            onClick={it.onClick}
+          >
             {it.label}
           </button>
         ))}

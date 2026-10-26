@@ -4,7 +4,6 @@
 // The ring lives on <body>, outside #app's text-size zoom, so its viewport
 // coordinates match getBoundingClientRect. It never takes taps (pointer-events:
 // none); a wide translucent shadow dims the rest of the screen lightly.
-import type { Target } from './steps';
 
 /** How often the target is looked up again (the ring itself moves every frame). */
 const RESOLVE_MS = 250;
@@ -23,6 +22,14 @@ const SHELLS = '.panel, .sheet, .modal';
 
 export type Dock = 'top' | 'bottom';
 
+/** A data-tutorial target and the guide's line for it (Part 1 and Part 2 alike). */
+export interface Target {
+  key: string;
+  line: string;
+  /** For map pins: which one, by its data-lot-id. */
+  lotId?: string;
+}
+
 const selectorOf = (t: Target) =>
   `[data-tutorial="${t.key}"]${t.lotId ? `[data-lot-id="${CSS.escape(t.lotId)}"]` : ''}`;
 
@@ -31,10 +38,13 @@ export class RingTracker {
   private el: Element | null = null;
   private index = -1;
   private dock: Dock = 'bottom';
+  /** Where the bar sits while no target is ringed. */
+  private idleDock: Dock = 'bottom';
   private raf = 0;
   private lastResolve = 0;
   private scrolled: Element | null = null;
   private pad = 0;
+  private headerBottom = 0;
 
   constructor(
     private ring: HTMLElement,
@@ -48,6 +58,10 @@ export class RingTracker {
     this.lastResolve = 0;
   }
 
+  setIdleDock(dock: Dock): void {
+    this.idleDock = dock;
+  }
+
   start(): void {
     this.raf = requestAnimationFrame(this.frame);
   }
@@ -56,6 +70,7 @@ export class RingTracker {
     cancelAnimationFrame(this.raf);
     this.ring.style.display = 'none';
     document.documentElement.style.removeProperty('--tut-modal-pad');
+    document.documentElement.style.removeProperty('--tut-top');
   }
 
   private frame = (now: number) => {
@@ -108,6 +123,7 @@ export class RingTracker {
     const el = this.el;
     if (!el || !el.isConnected) {
       this.ring.style.display = 'none';
+      this.setDock(this.idleDock);
       return;
     }
     const r = el.getBoundingClientRect();
@@ -131,18 +147,27 @@ export class RingTracker {
       st.height = `${r.height + RING_PAD * 2}px`;
       st.borderRadius = '12px';
     }
-    const dock: Dock = r.top + r.height / 2 > innerHeight * DOCK_TOP_FROM ? 'top' : 'bottom';
-    if (dock !== this.dock) {
-      this.dock = dock;
-      this.onChange(this.index, dock);
-    }
+    this.setDock(r.top + r.height / 2 > innerHeight * DOCK_TOP_FROM ? 'top' : 'bottom');
+  }
+
+  private setDock(dock: Dock): void {
+    if (dock === this.dock) return;
+    this.dock = dock;
+    this.onChange(this.index, dock);
   }
 
   /**
    * With the bar on top of an open modal (the weekly results), pads the modal's
-   * content so its first lines can scroll out from under the bar.
+   * content so its first lines can scroll out from under the bar. Over a panel,
+   * the bar sits under the panel's header so its Close button stays reachable.
    */
   private makeRoom(): void {
+    const header = this.dock === 'top' ? document.querySelector('.panel .panel-header') : null;
+    const headerBottom = header ? Math.round(header.getBoundingClientRect().bottom) : 0;
+    if (headerBottom !== this.headerBottom) {
+      this.headerBottom = headerBottom;
+      document.documentElement.style.setProperty('--tut-top', `${headerBottom}px`);
+    }
     const bar = this.bar();
     const content = document.querySelector('.modal .modal-content');
     const pad =

@@ -39,6 +39,7 @@ const CHECKS: { [K in keyof Settings]: (v: unknown) => string | null } = {
     new Set(v).size === v.length
       ? null
       : 'The HQ tab order lists each department at most once.',
+  guides: (v) => (isBool(v) ? null : 'Guides are on or off.'),
 };
 
 /** Changes one or more settings. */

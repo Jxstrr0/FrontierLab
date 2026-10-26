@@ -1,7 +1,7 @@
 // The tutorial's step machine (SCREENS §27), pure so it can be unit-tested.
 // Each step watches what the player actually does: entering a step records a
 // baseline (branch count, savings rates, managers, Personal Loans, loans
-// booked) and the step is done when the game moves past it. Nothing advances
+// booked, campaigns) and the step is done when the game moves past it. Nothing advances
 // on a timer. guidance() says where the brass ring should go, as an ordered
 // list of targets (closest to done first); the overlay rings the first one
 // that is on screen.
@@ -28,6 +28,10 @@ export interface BranchObs {
   savings: number;
   personalLoan: boolean;
   managerId?: string;
+  /** Campaign levels as one comparable string, e.g. "mail:1,social:0". */
+  campaigns: string;
+  /** The manager runs marketing here, so the levels are locked. */
+  marketingDelegated: boolean;
 }
 
 /** What a step remembers from when it began. */
@@ -39,8 +43,11 @@ export interface StepMemo {
   personalLoan: Record<string, boolean>;
   managers: Record<string, string | undefined>;
   loansBooked: number;
+  campaigns: Record<string, string>;
   /** Step 5: the weekly results have been on screen. */
   sawWeekly: boolean;
+  /** Step 9: the Company summary has been open. */
+  sawCompany: boolean;
 }
 
 export interface Target {
@@ -64,10 +71,12 @@ export function enterStep(step: number, obs: TutorialObs): StepMemo {
   const savings: Record<string, number> = {};
   const personalLoan: Record<string, boolean> = {};
   const managers: Record<string, string | undefined> = {};
+  const campaigns: Record<string, string> = {};
   for (const b of obs.branches) {
     savings[b.id] = b.savings;
     personalLoan[b.id] = b.personalLoan;
     managers[b.id] = b.managerId;
+    campaigns[b.id] = b.campaigns;
   }
   return {
     step,
@@ -77,20 +86,30 @@ export function enterStep(step: number, obs: TutorialObs): StepMemo {
     personalLoan,
     managers,
     loansBooked: obs.loansBooked,
+    campaigns,
     sawWeekly: false,
+    sawCompany: false,
   };
 }
 
-/** Folds in what has happened since the last look (the weekly results showing up). */
+/** Folds in what has happened since the last look (the weekly results or the Company summary showing up). */
 export function updateMemo(memo: StepMemo, obs: TutorialObs): StepMemo {
-  return obs.modalType === 'weekly' && !memo.sawWeekly ? { ...memo, sawWeekly: true } : memo;
+  if (obs.modalType === 'weekly' && !memo.sawWeekly) return { ...memo, sawWeekly: true };
+  if (memo.step === 9 && obs.panelType === 'company' && !memo.sawCompany) {
+    return { ...memo, sawCompany: true };
+  }
+  return memo;
 }
 
-/** Steps with nothing to do (every branch already has a manager / Personal Loans) are skipped. */
+/**
+ * Steps with nothing to do are skipped: every branch already has a manager or
+ * Personal Loans, or every manager runs the branch's marketing.
+ */
 export function alreadyDone(memo: StepMemo, obs: TutorialObs): boolean {
   if (obs.branches.length === 0) return false;
   if (memo.step === 4) return obs.branches.every((b) => b.managerId);
   if (memo.step === 6) return obs.branches.every((b) => b.personalLoan);
+  if (memo.step === 8) return obs.branches.every((b) => b.marketingDelegated);
   return false;
 }
 
@@ -111,6 +130,12 @@ export function isDone(memo: StepMemo, obs: TutorialObs): boolean {
       return obs.branches.some((b) => b.personalLoan && memo.personalLoan[b.id] === false);
     case 7:
       return obs.loansBooked > memo.loansBooked;
+    case 8:
+      return obs.branches.some(
+        (b) => b.id in memo.campaigns && b.campaigns !== memo.campaigns[b.id],
+      );
+    case 9:
+      return memo.sawCompany && obs.panelType !== 'company';
     default:
       return true;
   }
@@ -157,7 +182,7 @@ export function guidance(memo: StepMemo, obs: TutorialObs): Guidance {
 
 /** Step 7 needs an application on the desk; true when the tutorial should ask for one. */
 export function needsApplication(memo: StepMemo, obs: TutorialObs): boolean {
-  return memo.step === TUTORIAL.last && obs.pendingApps === 0 && obs.branches.length > 0;
+  return memo.step === TUTORIAL.loan && obs.pendingApps === 0 && obs.branches.length > 0;
 }
 
 /** Step 5 with weekly results switched off: the tutorial opens them itself once the week turns. */
