@@ -43,6 +43,6 @@ export function exactMoney(x: number, symbol: string): string {
   return `${sign}${symbol}${v.toLocaleString('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits })}`;
 }
 export const DISTANCE_UNITS = ['km', 'mi'] as const;
-export const WEEKLY_RESULTS_MODES = ['weekly', 'quarterly', 'off'] as const;
+export const WEEKLY_RESULTS_MODES = ['weekly', 'monthly', 'quarterly', 'off'] as const;
 export const DEFAULT_SPEEDS = [1, 2, 4] as const;
 export const TEXT_SCALES = [1, 1.15, 1.3] as const;

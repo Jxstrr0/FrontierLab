@@ -20,7 +20,13 @@ import { initCountries } from '../macro';
 import { checkMilestones } from '../milestones';
 import { faceDetail, type BaseAvatar } from '../people';
 import { initRivalBench, initRivalFinancials, seedMatureBooks } from '../rivals';
-import { EXEC_DELEGATION, FX_START_INDEX, OFFICE_LISTINGS, PAY_REVIEW } from '../../config/balance';
+import {
+  CONVENTIONS,
+  EXEC_DELEGATION,
+  FX_START_INDEX,
+  OFFICE_LISTINGS,
+  PAY_REVIEW,
+} from '../../config/balance';
 import { COUNTRIES } from '../../data/countries';
 import { SEEDED_HOUSE_STYLE_IDS } from '../../data/houseStyles';
 import { DEFAULT_LOGO_SHAPE } from '../../data/logoShapes';
@@ -460,6 +466,23 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
         else delete state.world.officeListings[o.id];
       }
       generateInvestmentSites(state, cityId);
+    }
+    return s;
+  },
+  // v28: conventions are announced four weeks out and open for four (DESIGN
+  // decision log 2026-10-26). Runs still to come or open stretch to the new
+  // length, and their exclusive startups' rounds stay open as long.
+  27: (s) => {
+    const state = s as unknown as GameState;
+    for (const run of state.conventions.runs) {
+      const end = run.startWeek + CONVENTIONS.activeWeeks;
+      if (run.endWeek <= state.clock.week || run.endWeek === end) continue;
+      const old = run.endWeek;
+      run.endWeek = end;
+      for (const id of run.startupIds) {
+        const round = state.ventures.startups[id]?.round;
+        if (round && round.closesWeek === old) round.closesWeek = end;
+      }
     }
     return s;
   },

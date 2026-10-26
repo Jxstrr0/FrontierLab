@@ -12,7 +12,7 @@ export function investmentStaff(state: GameState): number | undefined {
   return state.departments.investment?.staff;
 }
 
-/** First week a run is announced (two weeks before it opens). */
+/** First week a run is announced (CONVENTIONS.announceWeeks before it opens). */
 export const announceWeek = (run: ConventionRun) => run.startWeek - CONVENTIONS.announceWeeks;
 
 /** Where a run is on the calendar at `week`. */

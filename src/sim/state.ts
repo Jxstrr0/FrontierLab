@@ -55,7 +55,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState } from './personalTypes';
 
-export const SCHEMA_VERSION = 27;
+export const SCHEMA_VERSION = 28;
 
 export interface GameState {
   schemaVersion: number;
@@ -176,7 +176,8 @@ export interface Clock {
 export interface Settings {
   currency: '$' | 'C$' | '£' | '€' | '¥';
   units: 'km' | 'mi';
-  weeklyResults: 'weekly' | 'quarterly' | 'off';
+  /** How often the results modal opens: every week, every month, every quarter or never. */
+  weeklyResults: 'weekly' | 'monthly' | 'quarterly' | 'off';
   defaultSpeed: 1 | 2 | 4;
   autoPauseIncidents: boolean;
   autoPauseApplications: boolean;

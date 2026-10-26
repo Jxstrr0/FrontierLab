@@ -4,11 +4,20 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 **Current stage:** 10 — Art pass, onboarding, polish, launch (built and live; awaiting the owner's iPhone check). All ten roadmap stages are built. Still open: the owner's testing and tuning pass, an Add to Home Screen test on a real iPhone, and the Vault Street card on Kelbo.Website (in a separate session in that repo).
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `1257044853cb38` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `12f03e8e195ddc` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-26 — Monthly results, and conventions that last the month (v0.11.5, schema v28)
+- **Owner's ask:** a monthly option for the results report, so 2× and 4× play isn't interrupted every week; conventions and the like need to last the month so a monthly reader doesn't miss them.
+- **What changes.** Settings → **Results** now offers Weekly / Monthly / Quarterly / Off. A monthly (or quarterly) report rolls its weeks up: revenue, net income and cash flow summed over the period, the change shown against the previous month or quarter, the latest Ledger issue in full and an **Earlier this month** card with the lead headline of each earlier week (the full issues stay in the Ledger archive). A week belongs to the month its last day falls in, so a month is 4 or 5 weeks; the first report after you switch may cover a partial month.
+- **Conventions** are now announced **four weeks** ahead and open for **four weeks** (were two and one), so whenever the monthly report lands the next convention is either announced or open. Incidents and expiring loan applications still auto-pause on their own; auctions already show the next sale date on their tab; venture rounds already stay open four weeks.
+- **Your save (schema v28):** your results setting stays as it was. Convention runs that haven't ended yet stretch to four weeks, and their exclusive startups' rounds stay open as long.
+- **Code:** `resultsDue` in `loop.ts` (weekly / first tick after a month or quarter ends), `isMonthStart` in `calendar.ts`, `src/app/weekly/resultsPeriod.ts` (which weeks and issues a period covers, and its totals), `WeeklyResults.tsx` renders any period, `CONVENTIONS` in `balance.ts`, migration 27 → 28.
+- **Checked:** lint, full test suite (new `tests/app/resultsPeriod.test.ts` and `tests/sim/migrateV27.test.ts`; the convention acceptance test retimed) and build clean. Determinism snapshot `1257044853cb38` → `12f03e8e195ddc` (intended: conventions announce and close on different weeks). Phone check at 390×844: the Settings control with four options and a monthly report.
+- **Docs:** SIMULATION §2 and §20.8, CONTENT §19, SCREENS §17, §21 and §26, DATA_MODEL settings and §12, DESIGN §5.12, pillars and decision log.
 
 ### 2026-10-26 — Fewer offices, more buildings (v0.11.4, schema v27)
 - **Owner's ask:** fewer office spaces (you only need a handful), more rental properties, with the high-value ones in the major cities.

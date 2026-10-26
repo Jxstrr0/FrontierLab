@@ -535,7 +535,7 @@ Pentagon order: Management, Product maturity, Market size, Competitiveness, Fina
 | Harbour Tech | Sydney | 41 |
 | Asia Money Forum | Singapore | 45 |
 
-Announced in the Ledger 2 weeks before. Active for 1 week. Calgary's fair is our addition so every start city has a convention before travel arrives.
+Announced in the Ledger 4 weeks before. Active for 4 weeks (was 2 and 1 until 2026-10-26, so monthly results never miss one). Calgary's fair is our addition so every start city has a convention before travel arrives.
 
 ### 19a. Currencies (SIMULATION §19.10)
 

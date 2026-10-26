@@ -277,3 +277,29 @@
     column-rule: 1px solid var(--ink-line);
   }
 }
+
+/* ─── Earlier issues (monthly and quarterly results) ─────────────────────── */
+.earlier-issues {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.earlier-issue {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  font-size: var(--text-14);
+  line-height: 1.35;
+}
+.earlier-issue + .earlier-issue {
+  border-top: 1px solid var(--hairline);
+}
+.earlier-date {
+  flex: 0 0 3.6em;
+  color: var(--ivory-dim);
+  font-variant-numeric: tabular-nums;
+}
+.earlier-headline {
+  flex: 1;
+  min-width: 0;
+}
