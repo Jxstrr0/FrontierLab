@@ -1,7 +1,7 @@
 // Conventions (CONTENT §19, SIMULATION §20.3): this year's and next year's
-// runs from the calendar. Two weeks before a run opens it is announced in the
-// Ledger and 3–6 exclusive startups start raising, their rounds open through
-// the event; it is open for one week, then closes (unsold exclusive lots go
+// runs from the calendar. CONVENTIONS.announceWeeks before a run opens it is
+// announced in the Ledger and 3–6 exclusive startups start raising, their rounds
+// open through the event; it is open for CONVENTIONS.activeWeeks, then closes (unsold exclusive lots go
 // to funds when the rounds close in runVentures). At year end, exclusives you
 // never backed leave the game. Draws from `conventions`.
 import { CONVENTIONS, DAYS_PER_WEEK, VENTURES } from '../config/balance';
@@ -83,7 +83,7 @@ function announce(state: GameState, run: ConventionRun): void {
   );
 }
 
-/** Tick step 8: announce runs two weeks out, open them on their week. */
+/** Tick step 8: announce runs CONVENTIONS.announceWeeks out, open them on their week. */
 export function runConventions(state: GameState): void {
   const week = state.clock.week;
   for (const run of state.conventions.runs) {

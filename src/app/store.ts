@@ -56,7 +56,8 @@ export type InvestmentBankTab = 'market' | 'equity' | 'mna';
 export type BranchTab = 'service' | 'products' | 'loandesk' | 'marketing' | 'finance';
 
 export type ModalRoute =
-  | { type: 'weekly'; week: number }
+  /** `period`: a monthly or quarterly roll-up of the weeks ending at `week` (SCREENS §21); absent for one week. */
+  | { type: 'weekly'; week: number; period?: 'monthly' | 'quarterly' }
   | { type: 'incident' }
   /** `reminder`: opened by the quarterly auto-pause, showing a prompt first (SIMULATION §2). */
   | { type: 'boardMeeting'; reminder?: boolean }

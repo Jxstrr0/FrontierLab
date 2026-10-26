@@ -112,7 +112,7 @@ There's no fixed ending. Milestones, the annual rich list and the "fastest growi
 ### 5.1 Time
 - The date sits top-right. Speeds are Pause, 1×, 2× and 4× (1× = one day per second).
 - The economy settles weekly; quarters and central bank meetings follow the calendar.
-- Weekly results pop up every week by default (setting: every week, every quarter, or off).
+- Results pop up every week by default (setting: every week, every month, every quarter, or off; a month or quarter rolls its weeks up).
 - The game auto-pauses for decisions: incidents, board meetings, and (optional setting) expiring loan applications.
 - Time passes only on the map. Any open panel, sheet or popup holds the clock, and it resumes at the same speed when you return to the map, so results and prompts never land on top of a screen you are reading.
 
@@ -322,7 +322,7 @@ Investment banks on the map, with tabs Market / Equity / M&A:
 - **Foreclosures.** Defaulted mortgages leave foreclosed homes (REO) in each city. Rent them out, or sell them all (fast, at a discount).
 
 ### 5.12 Ventures and conventions
-- **Where startups come from.** The Investment floor surfaces startups that are raising money. Conventions show exclusive ones; they're announced in the Ledger, sit on the map for a week, and must be attended in person.
+- **Where startups come from.** The Investment floor surfaces startups that are raising money. Conventions show exclusive ones; they're announced in the Ledger a month ahead, sit on the map for a month, and must be attended in person.
 - **Startup screen:** description, founded, CEO, pre-money valuation, benchmark pentagon, quarterly financials, the current round with two offer lots (invest as Company or Private), funding history, top shareholders.
 - **Lifecycle.** Startups grow, raise up or down rounds, IPO, get acquired, or fail.
 - **Bank twist:** offer **venture debt** instead of buying shares.
@@ -597,4 +597,5 @@ Add one dated line per decision. Never delete entries; supersede them.
 - 2026-10-25: Northwind & Pike's two-week package is renamed **Street Team** (was Grand Opening Week) so it isn't mistaken for a new branch's own grand-opening boost. Same price and effect.
 - 2026-10-26 (owner's ask): The risk appetite dial moves from the HQ Products floor to the **Finance floor**, next to the capital ratio it protects. Same dial, same CRO and CFO steering; the capital fixes checklist and first-look tips point there. Supersedes the floor named in the 2026-10-25 entry above.
 - 2026-10-26 (owner's ask): **Fewer offices, more buildings.** A bank only ever needs a handful of offices, so each city lists 2/2/3/4 (S/M/L/XL) instead of 3/5/7/9, split across districts by largest remainder. Property buildings go the other way: 6/9/12/15 per city instead of 4/6/8/10, sized by city (up to 16,000 m² in XL cities, 5,000 m² in S), with towers only in the financial, downtown and waterfront districts, so the high-value buildings are in the major cities. Existing saves (schema v27) keep every office they lease, drop spare listings down to the new count, and gain buildings from the city's own `sites7` stream, so nothing already on the map moves. Supersedes the office and building counts in the two 2026-10-24 entries above.
+- 2026-10-26 (owner's ask): **Monthly results.** The results setting gains Monthly (weekly / monthly / quarterly / off). A monthly or quarterly report rolls its weeks up: revenue, net income and cash flow summed, the change against the previous month or quarter, the latest Ledger plus the lead headline of each earlier issue in the period. Snapshot weeks belong to the month their last day falls in (4 or 5 weeks a month). So that a monthly reader never misses a convention, conventions are now announced four weeks ahead and open for four weeks (CONVENTIONS; was two and one), and existing saves' upcoming runs stretch to match (schema v28). Loan applications expiring and incidents still auto-pause on their own; auctions already show the next sale date on their tab.
 - 2026-10-25: Line of Credit stays as it is. In the content audit it looked like a third unsecured consumer loan, but it is the only revolving credit business customers take, so it isn't a duplicate.

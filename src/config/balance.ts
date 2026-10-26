@@ -1834,7 +1834,12 @@ export const VENTURE_DEBT_RISK_WEIGHT = 1.5;
 export const PROPERTY_RISK_WEIGHT = 1.0;
 
 // ─── CONVENTIONS (CONTENT §19) ────────────────────────────────────────────────
-export const CONVENTIONS = { announceWeeks: 2, activeWeeks: 1 } as const;
+/**
+ * Announced this many weeks before opening, then open this many weeks: a month
+ * each way, so a player reading monthly results never misses one (owner's ask,
+ * 2026-10-26; before: 2 and 1).
+ */
+export const CONVENTIONS = { announceWeeks: 4, activeWeeks: 4 } as const;
 
 // ─── REAL ESTATE (SIMULATION §21) ─────────────────────────────────────────────
 export const REAL_ESTATE = {

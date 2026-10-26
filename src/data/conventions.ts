@@ -1,5 +1,5 @@
 // Conventions calendar (docs/CONTENT.md §19): one event per host city each
-// year, announced in the Ledger two weeks before and open for one week
+// year, announced in the Ledger four weeks before and open for four weeks
 // (CONVENTIONS in balance.ts). Calgary's Foothills Founders Fair is our
 // addition so every starting city has one before travel arrives (Stage 8).
 

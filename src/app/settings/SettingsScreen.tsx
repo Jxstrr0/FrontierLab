@@ -27,6 +27,7 @@ import './standalone.css';
 
 const WEEKLY_LABEL: Record<Settings['weeklyResults'], string> = {
   weekly: 'Weekly',
+  monthly: 'Monthly',
   quarterly: 'Quarterly',
   off: 'Off',
 };
@@ -90,9 +91,9 @@ export function SettingsScreen(p: { inGame?: boolean }) {
           />
 
           <SectionTitle>Play</SectionTitle>
-          <Setting label="Weekly results">
+          <Setting label="Results">
             <Segmented
-              label="Weekly results"
+              label="Results"
               value={s.weeklyResults}
               options={WEEKLY_RESULTS_MODES.map((m) => ({ value: m, label: WEEKLY_LABEL[m] }))}
               onChange={(weeklyResults) => change({ weeklyResults })}

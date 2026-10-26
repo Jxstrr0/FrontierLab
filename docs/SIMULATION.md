@@ -60,7 +60,7 @@ How the economy works, step by step. Every CAPS name is a key in `src/config/bal
 
 **Central bank meetings:** each country meets on the fixed week-of-year list in CONTENT (Countries table). A meeting in a given week is processed inside step 1.
 
-**Auto-pause** when any of these needs a decision: an unresolved incident, the weekly results modal (if enabled), the board meeting reminder (once per quarter), or Loan Desk applications expiring this week (optional setting). The clock also holds, without changing the speed setting, while any panel or sheet is open: days pass only on the map.
+**Auto-pause** when any of these needs a decision: an unresolved incident, the results modal (every week, or the first tick after a month or quarter ends, per the setting; a month or quarter rolls its weeks up), the board meeting reminder (once per quarter), or Loan Desk applications expiring this week (optional setting). The clock also holds, without changing the speed setting, while any panel or sheet is open: days pass only on the map.
 
 ## 3. RNG and determinism
 
@@ -894,7 +894,7 @@ A deliberately simple "country up or down" investment (DESIGN §5.12a). Your boo
   - **IPO:** lists at the last round price × U(1.0, 1.5) (`VENTURE_IPO`) with vol 0.45, growth min(4μ, 20%) and no dividend; your stakes move into market holdings at cost, and the listing pop is marked through `investmentGains`.
   - **Investing** as the company (lots and venture debt) is refused at the Restricted and Critical tiers, like acquisitions. A startup you hold or lend to stays visible wherever you are.
   - **Housekeeping:** convention exclusives you never backed leave at year end; finished startups you didn't hold keep only the last 12; held ones stay.
-- **20.8 Conventions:** this year's and next year's runs are kept (`state.conventions.runs`), from the CONTENT §19 calendar. Two weeks before opening a run is announced (Ledger story) and 3–6 exclusive startups appear with rounds open through the event; it is open for 1 week. Its startups are visible and buyable only from that city's convention centre while it is open, and never enter the Investment floor pipeline. The convention centre's map pin shows only from announcement to close.
+- **20.8 Conventions:** this year's and next year's runs are kept (`state.conventions.runs`), from the CONTENT §19 calendar. CONVENTIONS.announceWeeks (4) before opening a run is announced (Ledger story) and 3–6 exclusive startups appear with rounds open through the event; it is open for CONVENTIONS.activeWeeks (4), a month each way so a player reading monthly results never misses one. Its startups are visible and buyable only from that city's convention centre while it is open, and never enter the Investment floor pipeline. The convention centre's map pin shows only from announcement to close.
 
 ## 21. Real estate
 
