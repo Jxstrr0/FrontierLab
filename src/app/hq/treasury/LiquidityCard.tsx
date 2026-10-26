@@ -102,7 +102,7 @@ function TransferCard() {
       <div class="tr-card-title">Transfer cash to Treasury</div>
       <p class="muted small hq-note">
         Corporate cash can top up reserves, but it can't come back out: deposits and reserves belong
-        to the bank's balance sheet.
+        to the lab's balance sheet.
       </p>
       <AmountSlider label="Amount" value={value} max={cash} onChange={setAmount} sym={sym} />
       <button type="button" class="btn btn-primary btn-block" disabled={value <= 0} onClick={go}>

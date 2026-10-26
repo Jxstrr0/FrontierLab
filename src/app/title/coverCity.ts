@@ -140,5 +140,5 @@ export function coverLabel(cityId: string, flags: number): string {
   const base = `An engraved map of ${city.name} printed in ${city.inkName.toLowerCase()}`;
   if (flags <= 0) return `${base}.`;
   const n = WORDS[flags] ?? String(flags);
-  return `${base}, with your bank’s flags on ${n} ${flags === 1 ? 'rooftop' : 'rooftops'}.`;
+  return `${base}, with your lab’s flags on ${n} ${flags === 1 ? 'rooftop' : 'rooftops'}.`;
 }

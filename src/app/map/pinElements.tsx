@@ -214,7 +214,7 @@ export function clusterLabel(group: string, members: PinSpec[]): string {
       places ? `${places} other place${places === 1 ? '' : 's'}` : '',
     ].filter(Boolean);
     what = `Your ${parts.length > 1 ? `${parts.slice(0, -1).join(', ')} and ${parts.at(-1)}` : parts[0]}`;
-  } else if (group === 'rival') what = `${n} rival bank buildings: ${names}`;
+  } else if (group === 'rival') what = `${n} rival lab buildings: ${names}`;
   else what = `${n} places: ${names}`;
   const waiting = members.some((m) => m.badge) ? ', loan applications waiting' : '';
   const alert = members.some((m) => m.alert) ? ', open incident' : '';

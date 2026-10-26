@@ -14,7 +14,7 @@ export function OccupancyDial(p: { s: GameState; owner: Property['owner'] }) {
   const sym = p.s.settings.currency;
   const target = p.s.executives.occTargets[p.owner];
   const e = occupancyEstimate(p.s, p.owner, target);
-  const whose = p.owner === 'company' ? "the bank's" : 'your';
+  const whose = p.owner === 'company' ? "the lab's" : 'your';
   const delta = e.net - e.netFull;
   const hint =
     e.buildings === 0

@@ -94,24 +94,24 @@ export const CLUSTER_STACK_MAX = 3;
  * notes ("Sale wk 4"), the words on price tags ("For lease") and the coins' "$".
  */
 export const PIN_CAPTION_FROM_ZOOM = 1.5;
-/** Words dropped from a rival bank's name for the caption under its crest. */
+/** Words dropped from a rival lab's name for the caption under its crest. */
 export const RIVAL_CAPTION_GENERIC_WORDS = [
-  'Bank',
-  'Banque',
-  'Financial',
-  'Mutual',
-  'Private',
-  'Privatbank',
-  'Federal',
-  'Trust',
+  'AI',
+  'IA',
+  'KI',
+  'Labs',
+  'Lab',
+  'Open',
+  'Models',
+  'Intelligence',
+  'Cognition',
+  'Research',
+  'Institute',
+  'Collective',
+  'Machine',
+  'Works',
   '&',
-  'Co',
-  'Building',
-  'Society',
-  'Cantonal',
-  'Savings',
-  'Money',
-  'Pay',
+  'Partners',
 ] as const;
 /** Pins this far outside the viewport (CSS px) are still placed, so edges don't pop. */
 export const PIN_CULL_MARGIN_PX = 48;

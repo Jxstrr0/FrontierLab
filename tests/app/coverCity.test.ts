@@ -142,7 +142,7 @@ describe('coverLabel', () => {
   it('names the city and ink, and the flags for a returning player', () => {
     expect(coverLabel('sas', 0)).toBe('An engraved map of Saskatoon printed in prairie ochre.');
     expect(coverLabel('sas', 3)).toBe(
-      'An engraved map of Saskatoon printed in prairie ochre, with your bank’s flags on three rooftops.',
+      'An engraved map of Saskatoon printed in prairie ochre, with your lab’s flags on three rooftops.',
     );
     expect(coverLabel('sas', 1)).toMatch(/one rooftop\.$/);
     expect(coverLabel('atlantis', 2)).toBe('An engraved city map');

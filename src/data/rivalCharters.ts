@@ -1,6 +1,6 @@
-// Names and inks for newly chartered rival banks (CONTENT §15, SIMULATION
+// Names and inks for newly founded rival labs (CONTENT §15, SIMULATION
 // §18.7). A charter draws a stem and a strategy suffix (disruptors take a
-// one-word brand instead); every part is invented, with no real bank names.
+// one-word brand instead); every part is invented, with no real company names.
 import type { Strategy } from './rivals';
 
 /** Place-style stems for incumbents, premium and community banks. */
@@ -33,9 +33,9 @@ export const CHARTER_STEMS = [
 
 /** Suffixes by strategy (disruptors use CHARTER_BRANDS). */
 export const CHARTER_SUFFIXES: Record<Exclude<Strategy, 'disruptor'>, readonly string[]> = {
-  incumbent: ['Bank', 'Banking Group', 'Financial'],
-  premium: ['Private', '& Partners', 'Trust'],
-  community: ['Mutual', 'Savings', 'Community Bank'],
+  incumbent: ['AI', 'Labs', 'Intelligence'],
+  premium: ['Research', 'Institute', '& Partners'],
+  community: ['Collective', 'Open Models', 'Open Lab'],
 };
 
 /** One-word app-first brands for disruptors. */

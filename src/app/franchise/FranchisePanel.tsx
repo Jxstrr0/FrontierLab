@@ -44,7 +44,7 @@ export function FranchisePanel(p: { clubId?: string }) {
       onClose={closePanel}
       advisor={{
         text: owned
-          ? 'Winning fills the stadium and lifts the club’s value. Your bank on the shirt spreads the brand.'
+          ? 'Winning fills the stadium and lifts the club’s value. Your lab on the shirt spreads the brand.'
           : 'Fans, a stadium, and a lot of payroll. Interested?',
       }}
       hero={

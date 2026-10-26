@@ -309,5 +309,5 @@ export const TIER_COPY: Record<string, string> = {
 export const PARTNERSHIP_END_COPY: Record<string, string> = {
   terminated: 'been terminated by the employer',
   lapsed: 'lapsed at the end of its term',
-  released: 'been released by the bank',
+  released: 'been released by the lab',
 };

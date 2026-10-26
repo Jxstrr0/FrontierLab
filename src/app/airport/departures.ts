@@ -134,7 +134,7 @@ export function arrivalText(
   const parts = [`Welcome to ${cityName}`];
   if (landed.firstVisit) parts.push('first visit');
   if (landed.mode === 'fare') {
-    const bank = landed.bankPays > 0 ? ` (the bank paid ${money(landed.bankPays, symbol)})` : '';
+    const bank = landed.bankPays > 0 ? ` (the lab paid ${money(landed.bankPays, symbol)})` : '';
     parts.push(`Ticket ${money(landed.fare, symbol)}${bank}`);
   }
   return parts.join(' · ');

@@ -27,8 +27,8 @@ export function StepCity(p: { draft: Draft; patch: (d: Partial<Draft>) => void }
   return (
     <div class="stack">
       <p class="muted step-intro">
-        Where will your first branch open? Its country becomes your bank's home: the central bank
-        you borrow from, the taxes you pay and the exchange you list on.
+        Where will your first branch open? Its country becomes your lab's home: the central bank you
+        borrow from, the taxes you pay and the exchange you list on.
       </p>
       <Segmented label="Region" options={REGION_OPTIONS} value={region} onChange={setRegion} />
       <div class="stack" role="radiogroup" aria-label="Start city">
@@ -52,7 +52,7 @@ export function StepCity(p: { draft: Draft; patch: (d: Partial<Draft>) => void }
               <span class="city-flavour">{CITY_FLAVOUR[id]}</span>
               <span class="city-facts">
                 <Row label="Rents" value={rentWord(city.rentIndex)} />
-                <Row label="Usual rival banks" value={city.rivals} />
+                <Row label="Usual rival labs" value={city.rivals} />
                 <Row label="Market size" value={SIZE_WORD[city.size]} />
                 <Row label="Policy rate" value={pct(COUNTRIES[city.country].startPolicy)} />
               </span>

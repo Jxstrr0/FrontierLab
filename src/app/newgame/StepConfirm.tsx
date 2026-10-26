@@ -32,7 +32,7 @@ export function StepConfirm(p: { draft: Draft; patch: (d: Partial<Draft>) => voi
           value={HOUSE_STYLES.find((h) => h.id === draft.houseStyle)?.name ?? ''}
         />
         <Row label="Start city" value={city.name} />
-        <Row label="Rival banks" value={draft.competitors} />
+        <Row label="Rival labs" value={draft.competitors} />
         <Row label="Difficulty" value={DIFFICULTY_LABEL[draft.difficulty]} />
         <Row label="Starting cash" value={cashLabel(draft.startCash, draft.currency)} />
         <Row label="Currency" value={`${draft.currency} ${CURRENCY_NAME[draft.currency]}`} />

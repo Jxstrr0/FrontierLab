@@ -68,7 +68,7 @@ export function CreditsScreen(p: { inGame?: boolean }) {
           <SectionTitle>Thanks</SectionTitle>
           <p class="small">
             Inspired by the tycoon genre and every late night spent building an empire one tap at a
-            time. Every bank, company and person in the game is invented; any resemblance is a
+            time. Every lab, company and person in the game is invented; any resemblance is a
             coincidence.
           </p>
 

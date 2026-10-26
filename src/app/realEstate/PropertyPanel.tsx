@@ -140,7 +140,7 @@ function ForSale(p: { site: Site; listing: PropertyListing; marketRent: number }
           {blocker && <p class="small tone-bad re-center">{blocker}</p>}
           <p class="muted small re-center">
             {account === 'company'
-              ? 'Owned by the bank: rent and costs go through the company books.'
+              ? 'Owned by the lab: rent and costs go through the company books.'
               : 'Owned by you: rent and costs go through your personal cash.'}
           </p>
         </div>

@@ -72,7 +72,7 @@ export const CITY_FLAVOUR: Record<string, string> = {
   nyc: 'The biggest stage there is: huge demand, towering rents, no mercy.',
   chi: 'Steady trade and broad neighbourhoods in a market that plays fair.',
   sfo: 'Tech money everywhere, but every storefront costs a fortune.',
-  sea: 'A fast-growing port where new arrivals are still picking a bank.',
+  sea: 'A fast-growing port where new arrivals are still picking a lab.',
   lon: 'An old money capital with rivals on every corner.',
   par: 'Elegant boulevards and careful savers who value a good name.',
   fra: 'The continent’s banking desk: orderly, competitive and fair.',

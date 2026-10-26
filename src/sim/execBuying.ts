@@ -83,7 +83,7 @@ function bankBlocker(state: GameState, c: BuyPick): string | undefined {
     return 'Waiting for spare cash: the chief keeps 8 weeks of costs in reserve.';
   const bs = balanceSheet(state);
   if (bs.realEstate + c.value > d.buyAssetCap * bs.assets)
-    return `The bank's buildings would pass ${Math.round(d.buyAssetCap * 100)}% of its assets.`;
+    return `The lab's buildings would pass ${Math.round(d.buyAssetCap * 100)}% of its assets.`;
   const snap = capitalSnapshot(state);
   // Cash (no risk weight) becomes a building booked at its value; the price gap hits equity.
   const crAfter =

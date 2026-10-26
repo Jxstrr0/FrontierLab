@@ -33,8 +33,8 @@ export function MnaTab(_p: { bankId: string }) {
   return (
     <>
       <p class="muted small">
-        Buy a rival bank for cash. Its branches convert to your brand over eight weeks. The
-        regulator checks your capital and local market share first.
+        Buy a rival lab for cash. Its branches convert to your brand over eight weeks. The regulator
+        checks your capital and local market share first.
       </p>
       <Integrations s={s} />
       <SectionTitle>Banks</SectionTitle>
@@ -78,7 +78,7 @@ function RivalCard(p: { s: GameState; bank: RivalBank; onOffer: () => void }) {
       {distressed && (
         <p class="ma-sale small">
           Seized by regulators. On sale for {weeks} more week{weeks === 1 ? '' : 's'}, then split
-          among other banks.
+          among other labs.
         </p>
       )}
       {facts.market ? (

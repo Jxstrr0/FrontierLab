@@ -73,7 +73,7 @@ export function trade(
     return fail('The company cannot trade its own shares.');
   if (!isListedSecurity(state, securityId))
     return fail(
-      securityId === SELF_ID ? 'Your bank is not listed yet.' : 'That company is not listed.',
+      securityId === SELF_ID ? 'Your lab is not listed yet.' : 'That company is not listed.',
     );
   const price = securityPrice(state, securityId);
   if (price <= 0) return fail('That stock is not trading.');
