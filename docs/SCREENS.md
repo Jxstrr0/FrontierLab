@@ -62,10 +62,13 @@ Wealth · Company · Branches · Portfolio · The Ledger (archive) · Milestones
 
 ## 1. Title and New Game
 
-**Title screen:**
-- engraved logo lockup "Vault Street"
-- Continue (latest autosave), New Game, Load, Settings
-- version string, "A Longlight Interactive game", and a **Check for updates** button: it asks the site for a newer version and reloads into it, or says you have the latest (handy in the home-screen app, which iOS often resumes rather than reloading)
+**Title screen ("Living skyline", docs/COVER_SCREEN.md):** top to bottom, inside the 16 px safe-area gutters:
+- **Skyline panel**, full width, `clamp(300px, 50svh, 440px)` tall, on map paper: a live engraving of a real city drawn by the map renderer in that city's ink, panning slowly left and right (±26 px at 358 px wide, 26 s a sweep). A 1 px outer rule and a hairline inner rule in the city ink frame it, with the city name repeated as microprint in the band between them. **Returning player:** the city they're in, from the latest save card, with their bank's flags on the lots and offices they hold there (and rivals' flags in rival inks); the camera frames their nearest flag. **New player:** one of the 20 storefront cities, a different one each launch, starting with Saskatoon, with three showcase flags in Vault Blue. Until it's printed the panel shows its paper, rules and a faint guilloche; then the city crossfades in (400 ms). Reduced motion (system or in-game) holds it still and centred; the pan pauses while the page is hidden. Screen readers hear one description ("An engraved map of Saskatoon printed in prairie ochre, with your bank's flags on three rooftops.").
+- **Caption row:** "Now showing {city}" (new player) or a brand-ink dot with "{bank} · {city}" (returning; an older save card without the cover record says "{bank} · Now showing {city}"), and five small brass dots, the first filled.
+- **Wordmark** "VAULT STREET" on one line (Bodoni Moda 900, 38 px), and the tagline "Found a bank. Build an empire."
+- **Menu:** Continue (primary, latest save) and New game (secondary; primary when there's no save), full width and 48 px tall; then Load · Settings · Credits as a row of three 44 px pills.
+- **Footer**, one line: "A Longlight Interactive game · v{version}" and a **Check for updates** button: it asks the site for a newer version and reloads into it, or says you have the latest (handy in the home-screen app, which iOS often resumes rather than reloading).
+- **Wide screens (≥ 900 px) and landscape:** two columns, the panel on the left at `min(60vw, 760px)` and full height, the words, menu and footer in a centred column on the right (max 360 px). Landscape phones under 500 px tall stack instead, with the panel at 45% of the height.
 
 **New Game wizard** (5 steps, with Back and Next):
 1. **Your bank:**
