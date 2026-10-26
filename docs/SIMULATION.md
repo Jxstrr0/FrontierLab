@@ -600,7 +600,7 @@ If Finance coverage' < 0.9, the newest `ceil((0.9 − k') × 10)` weeks show as 
 ## 16. HQ
 
 ### 16.1 Offices
-- **Listings:** floors 3–10, desks per floor 24 or 32 (set per building).
+- **Listings:** OFFICE_LISTINGS.countBySize per city (S 2, M 2, L 3, XL 4; a bank only ever needs a handful of offices), split across the financial, downtown and midtown districts by largest remainder; floors 3–10, desks per floor 24 or 32 (set per building).
 - **Rent:** weekly rent = `floors × OFFICE_RENT_PER_FLOOR ($1,100) × city.rentIndex`. Deposit = 8 × weekly rent.
 - **Floors:** each floor slot holds one department. Fit-out = FLOOR_FITOUT ($120,000) × city.costIndex, a fixed asset.
 - **Desks per floor:** set by the building, 24 or 32 (the original showed both). Investment floors always have 32. The Executive suite always has 7 desks (you plus six executives).
@@ -921,7 +921,7 @@ A deliberately simple "country up or down" investment (DESIGN §5.12a). Your boo
   - RWA weight 1.0.
 - **21.4 Ownership:** choose Company or Private at purchase. Private property counts in personal wealth only.
 - **21.5 Details (Stage 7):**
-  - Each city has REAL_ESTATE.buildingsPerCity property buildings (S 4, M 6, L 8, XL 10; 1,500–12,000 m²). Every 4 weeks `max(1, round(0.4 × unowned))` are listed; listings not picked again disappear. An unowned building's occupancy is drawn once from U(0.75, 0.95). Estimates follow cre weekly; asking prices stay fixed.
+  - Each city has REAL_ESTATE.buildingsPerCity property buildings (S 6, M 9, L 12, XL 15), sized by city (`sqmRangeBySize`: S 1,500–5,000 m², M 2,000–7,000, L 3,000–12,000, XL 4,000–16,000) so the big cities hold the high-value towers; a building outside the financial, downtown and waterfront districts stays under `lowRiseMaxSqm` (5,000 m²). Every 4 weeks `max(1, round(0.4 × unowned))` are listed; listings not picked again disappear. An unowned building's occupancy is drawn once from U(0.75, 0.95). Estimates follow cre weekly; asking prices stay fixed.
   - **Offers** are answered at once. A rejected offer locks that listing until the city's next refresh. The offer stepper runs from 80% of asking up to asking.
   - **Books:** a company purchase pays investing cash and enters the balance sheet at the estimate; paying more or less than the estimate is posted to `propertyGains` (non-cash), as are weekly revaluations with cre. Rent → `rentalIncome`; maintenance and vacancy → `propertyCosts`. Company purchases are refused at the Restricted and Critical tiers.
   - Rent can be set from 50% to 160% of market rent in steps of 5 per m². Turning For Sale off cancels a pending sale. A sold building returns to the listable pool.

@@ -472,10 +472,14 @@ export const RISK_APPETITE = {
 export const DEFAULT_RISK_APPETITE = 3;
 
 // ─── HQ (§16) ─────────────────────────────────────────────────────────────────
-/** Office listings per city by size, and how they're built (§16.1, CONTENT §9). */
+/**
+ * Office listings per city by size, and how they're built (§16.1, CONTENT §9).
+ * A bank only ever needs a handful of offices, so each city lists just a few
+ * (owner's ask, 2026-10-26; before: 3/5/7/9).
+ */
 export const OFFICE_LISTINGS = {
-  countBySize: { S: 3, M: 5, L: 7, XL: 9 },
-  /** Share of listings per district (the rest of the city has none). */
+  countBySize: { S: 2, M: 2, L: 3, XL: 4 },
+  /** Share of listings per district, by largest remainder (the rest of the city has none). */
   districts: { financial: 0.5, downtown: 0.3, midtown: 0.2 },
   floors: [3, 10] as [number, number],
   /** Chance a building has 32 desks per floor rather than 24. */
@@ -1855,9 +1859,20 @@ export const REAL_ESTATE = {
   /** For Sale: completes in 2–8 weeks at value × normal(1, saleSigma). */
   saleWeeks: [2, 8] as [number, number],
   saleSigma: 0.04,
-  /** Property buildings per city by size, their floor area and starting occupancy. */
-  buildingsPerCity: { S: 4, M: 6, L: 8, XL: 10 } as Record<'S' | 'M' | 'L' | 'XL', number>,
-  sqmRange: [1500, 12000] as [number, number],
+  /**
+   * Property buildings per city by size, their floor area and starting occupancy.
+   * Bigger cities have more buildings and taller, higher-value ones (owner's
+   * ask, 2026-10-26; before: 4/6/8/10 buildings, all 1,500–12,000 m²).
+   */
+  buildingsPerCity: { S: 6, M: 9, L: 12, XL: 15 } as Record<'S' | 'M' | 'L' | 'XL', number>,
+  sqmRangeBySize: {
+    S: [1500, 5000],
+    M: [2000, 7000],
+    L: [3000, 12000],
+    XL: [4000, 16000],
+  } as Record<'S' | 'M' | 'L' | 'XL', [number, number]>,
+  /** Outside the tall districts (financial, downtown, waterfront) a building is at most this big. */
+  lowRiseMaxSqm: 5000,
   sqmPerFloor: 800,
   startOcc: [0.75, 0.95] as [number, number],
   /** Annual rent you can set, as a share of market rent, and the stepper step per m². */

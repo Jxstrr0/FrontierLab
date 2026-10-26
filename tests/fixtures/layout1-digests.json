@@ -1,76 +1,76 @@
 {
   "newGame11": {
     "sas": {
-      "places": "130c21e7b03b26",
-      "map": "16a323675c99ef"
+      "places": "000fea87281719",
+      "map": "198bc24f1650d2"
     },
     "cal": {
-      "places": "1992cbdf9ee4f0",
-      "map": "1bdaccef8a7f8d"
+      "places": "002caf6ad35f4d",
+      "map": "127c4cf36690b7"
     },
     "van": {
-      "places": "03d2d022f44271",
-      "map": "0895400361b47c"
+      "places": "15cf817a296dfb",
+      "map": "14dd49547887a0"
     },
     "tor": {
-      "places": "0e5f81f7a30bdf",
-      "map": "009504ec335d14"
+      "places": "1f2e5d7a1b1b39",
+      "map": "04256fb49e563e"
     },
     "mtl": {
-      "places": "0f7cfe1f1e5a6a",
-      "map": "0de6910512ad3a"
+      "places": "1dfe46f0987c77",
+      "map": "009600eaebd2fa"
     },
     "nyc": {
-      "places": "0c4181b10f78b6",
-      "map": "1e5326a1562a40"
+      "places": "1b815bb1185abe",
+      "map": "084d23294f5c52"
     },
     "chi": {
-      "places": "1c1da47337a9da",
-      "map": "0c53f031d449f5"
+      "places": "104b214de98779",
+      "map": "1e7a18998558e9"
     },
     "sfo": {
-      "places": "19602aa764c13c",
-      "map": "03841274e9fedc"
+      "places": "192f74825b18dd",
+      "map": "0e3d95c0545d9b"
     },
     "sea": {
-      "places": "01a2aa401e8b6d",
-      "map": "1091f78d9fded8"
+      "places": "1e9608ba995b9c",
+      "map": "0f60f8fcd54ed8"
     },
     "lon": {
-      "places": "1dda37c1fb873a",
-      "map": "0ae4648d7340c2"
+      "places": "1d3bf3754ed2bf",
+      "map": "0e8ac145e9cf91"
     },
     "par": {
-      "places": "0bbfbbeb55bc66",
-      "map": "179cb2d758941b"
+      "places": "12076e5168c664",
+      "map": "15c103cced98ef"
     },
     "fra": {
-      "places": "1a8dc65a7b211d",
-      "map": "1b3db6b0addc30"
+      "places": "172f4b6b368a94",
+      "map": "023f2b01de9f2b"
     },
     "ams": {
-      "places": "1a35b97e18ec0c",
-      "map": "08aa6ea327cc3f"
+      "places": "03de42ddda8f48",
+      "map": "17a9776e252fb9"
     },
     "zur": {
-      "places": "0a0512c0c8f03f",
-      "map": "0f4e9efe82e587"
+      "places": "0a8cc7d3c972f6",
+      "map": "040b3274f937cb"
     },
     "tyo": {
-      "places": "1a1ef6a23a611f",
-      "map": "0648072600c68a"
+      "places": "0b21876f417495",
+      "map": "1e03c8cd9804f4"
     },
     "syd": {
-      "places": "0ce8530b166359",
-      "map": "08e7cb5c0beca2"
+      "places": "0aeebb04cc7074",
+      "map": "1b4fc656811ebd"
     },
     "sin": {
-      "places": "0a37836f43f266",
-      "map": "0524f5420b63e4"
+      "places": "12428cf90aa76c",
+      "map": "0e0e093c2c3757"
     },
     "hkg": {
-      "places": "1d562e786f3639",
-      "map": "0aefef97f4b388"
+      "places": "0e662afb696208",
+      "map": "02ff95e1d95de9"
     },
     "fmm": {
       "places": "0ca8fc983723a9",
@@ -87,16 +87,16 @@
   },
   "save": {
     "cal": {
-      "places": "08d97f262b5592",
-      "map": "177c798646654d"
+      "places": "005454206604ed",
+      "map": "01422ec0ca489d"
     },
     "nyc": {
-      "places": "1a6893e0a83c02",
-      "map": "17e7af61f05569"
+      "places": "110237315c856a",
+      "map": "12cc1ccded0dd6"
     },
     "lon": {
-      "places": "162c0def83f873",
-      "map": "11f138c3ee9511"
+      "places": "15b7bde11837f0",
+      "map": "1aab2d013f48d1"
     }
   }
 }
