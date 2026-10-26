@@ -16,6 +16,8 @@ import { generateInvestmentSites } from '../investmentSites';
 import { initInvestments } from '../investmentsInit';
 import { initCapitalMarkets, initRivalShares } from '../marketInit';
 import { emptyCorporateDebt } from '../corporateDebt';
+import { generateExecutive } from '../execCandidates';
+import { hasExecFloor } from '../execSeats';
 import { initCountries } from '../macro';
 import { checkMilestones } from '../milestones';
 import { faceDetail, type BaseAvatar } from '../people';
@@ -23,6 +25,7 @@ import { initRivalBench, initRivalFinancials, seedMatureBooks } from '../rivals'
 import {
   CONVENTIONS,
   EXEC_DELEGATION,
+  EXECUTIVES,
   FX_START_INDEX,
   OFFICE_LISTINGS,
   PAY_REVIEW,
@@ -31,7 +34,13 @@ import { COUNTRIES } from '../../data/countries';
 import { SEEDED_HOUSE_STYLE_IDS } from '../../data/houseStyles';
 import { DEFAULT_LOGO_SHAPE } from '../../data/logoShapes';
 import type { CountryId } from '../../data/types';
-import { SCHEMA_VERSION, type BranchGuidance, type ExecSeat, type GameState } from '../state';
+import {
+  SCHEMA_VERSION,
+  type BranchGuidance,
+  type ExecSeat,
+  type Executive,
+  type GameState,
+} from '../state';
 
 type RawSave = Record<string, unknown> & { schemaVersion: number };
 
@@ -483,6 +492,21 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
         const round = state.ventures.startups[id]?.round;
         if (round && round.closesWeek === old) round.closesWeek = end;
       }
+    }
+    return s;
+  },
+  // v29: the Chief Real Estate Officer seat. A company with an Executive floor
+  // and candidate pools gets the new seat's candidates from the same stream;
+  // market rents start easing toward today's level on the first tick, so no
+  // building changes here.
+  28: (s) => {
+    const state = s as unknown as GameState;
+    const ex = state.executives;
+    if (hasExecFloor(state) && ex.candidatesRefreshWeek >= 0 && !ex.candidates.creo) {
+      const pool: Executive[] = [];
+      for (let i = 0; i < EXECUTIVES.candidatesPerSeat; i++)
+        pool.push(generateExecutive(state, 'creo'));
+      ex.candidates.creo = pool;
     }
     return s;
   },

@@ -19,6 +19,7 @@ import { grantFairValue } from '../execGrants';
 import { seatExecutive, vacateSeat } from '../execSeatChanges';
 import { execMarketSalary, hasExecFloor } from '../execSeats';
 import { newId } from '../ids';
+import { reviewRents } from '../execDelegationsProperty';
 import { payReviewsOn, runPayReview } from '../payReviews';
 import { spend } from '../ledger';
 import { roundToStep } from '../math';
@@ -111,8 +112,9 @@ export function setExecDelegation(
   if (!EXEC_SEATS[seat].delegations.some((d) => d.id === id)) return fail('Unknown delegation.');
   exec.delegations[id] = on;
   seedGrowthCities(state);
-  // Switching Pay reviews on runs the first review at once.
+  // Switching Pay reviews on runs the first review at once; so does a Rents switch.
   if (seat === 'coo' && id === 'payReviews' && on) runPayReview(state);
+  if (seat === 'creo' && on) reviewRents(state, id === 'bankRents' ? 'company' : 'personal');
   return ok();
 }
 

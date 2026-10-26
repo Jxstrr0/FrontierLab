@@ -1,10 +1,18 @@
 // An owned building (SCREENS §16): address, space, estimated value and price
-// paid; Real estate income (annual rent per m² stepper, occupancy, weekly rent
-// revenue, maintenance, vacancy cost, net and ROI); Real estate sale (the For
-// Sale toggle with its status).
-import { REAL_ESTATE } from '../../config/balance';
+// paid; Real estate income (annual rent per m² stepper with where market rent
+// is heading, who manages the rent, occupancy, weekly rent revenue,
+// maintenance, vacancy cost, net and ROI); Real estate sale (the For Sale
+// toggle with its status).
+import { EXEC_DELEGATION, REAL_ESTATE } from '../../config/balance';
 import * as cmd from '../../sim/commands';
-import { occupancyTarget, propertyRoi, propertyWeek, rentBounds } from '../../sim/propertyMath';
+import { rentPricingPower, rentsManaged } from '../../sim/execSeats';
+import {
+  marketRentNow,
+  occupancyTarget,
+  propertyRoi,
+  propertyWeek,
+  rentBounds,
+} from '../../sim/propertyMath';
 import type { Property, Site } from '../../sim/state';
 import { Card, Row, SectionTitle, Stepper, Toggle } from '../components';
 import { count, money, moneyFull, moneyStepper, pct } from '../format/format';
@@ -17,7 +25,12 @@ export function OwnedProperty(p: { property: Property; site: Site }) {
   const wk = propertyWeek(prop);
   const roi = propertyRoi(prop);
   const bounds = rentBounds(prop.marketRent);
-  const target = occupancyTarget(prop.rent, prop.marketRent);
+  const managed = rentsManaged(s, prop.owner);
+  const power = rentPricingPower(s, prop.owner);
+  const target = occupancyTarget(prop.rent, prop.marketRent, power);
+  const heading = marketRentNow(s, p.site);
+  const drifting = Math.abs(heading - prop.marketRent) / Math.max(1, prop.marketRent) > 0.005;
+  const chief = s.executives.seats.creo;
   const weeksLeft = prop.saleWeek !== undefined ? Math.max(1, prop.saleWeek - s.clock.week) : 0;
   const [lo, hi] = REAL_ESTATE.saleWeeks;
   return (
@@ -40,8 +53,17 @@ export function OwnedProperty(p: { property: Property; site: Site }) {
           step={REAL_ESTATE.rentStep}
           onChange={(v) => act(cmd.setPropertyRent, prop.id, v)}
           {...moneyStepper(sym, money)}
-          hint={`Market rent ${money(prop.marketRent, sym)} /m²/yr`}
+          hint={
+            `Market rent ${money(prop.marketRent, sym)} /m²/yr` +
+            (drifting ? `, heading to ${money(heading, sym)}` : '')
+          }
         />
+        {managed && chief && (
+          <p class="muted small">
+            {chief.name} (CREO) reviews this rent every {EXEC_DELEGATION.rentEveryWeeks} weeks;
+            tenants here pay up to {pct(power, 0)} over market.
+          </p>
+        )}
         <Row label="Occupancy" value={pct(prop.occupancy, 1)} />
         {Math.abs(target - prop.occupancy) > 0.005 && (
           <Row label="Heading toward" value={pct(target, 1)} tone="dim" />

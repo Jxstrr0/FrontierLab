@@ -35,7 +35,7 @@ const tick = (s: GameState) => {
 describe('candidate pools', () => {
   it('fills every seat once there is an Executive floor, skills in range', () => {
     const s = execGame();
-    for (const seat of ['coo', 'cfo', 'cpo', 'cmo', 'cto', 'cro'] as const) {
+    for (const seat of ['coo', 'cfo', 'cpo', 'cmo', 'cto', 'cro', 'creo'] as const) {
       const pool = s.executives.candidates[seat]!;
       expect(pool).toHaveLength(EXECUTIVES.candidatesPerSeat);
       for (const c of pool) {
