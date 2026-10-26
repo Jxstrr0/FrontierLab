@@ -45,7 +45,8 @@ export function overallOf(q: [number, number, number, number]): number {
   );
 }
 
-function monogramOf(name: string): string {
+/** Two letters for a bank's badge: the initials of its first two words. */
+export function monogramOf(name: string): string {
   const words = name
     .replace(/[^A-Za-zÀ-ÿ ]/g, '')
     .split(/\s+/)
@@ -81,7 +82,7 @@ export function seedRivals(state: GameState, cityId: string, lots: Lot[]): void 
   // A bank you've bought or the regulator has seized is gone from every city.
   const gone = (id: string) => {
     const status = state.rivals[id]?.status;
-    return status === 'acquired' || status === 'seized';
+    return status === 'acquired' || status === 'seized' || status === 'merged';
   };
   const candidates = shuffle(
     Object.values(RIVALS).filter((r) => r.home.includes(city.country) && !gone(r.id)),
@@ -189,8 +190,19 @@ export function initRivalBench(state: GameState, bank: RivalBank): void {
 }
 
 function ensureRival(state: GameState, spec: RivalSpec, c: CountryState): RivalBank {
-  const existing = state.rivals[spec.id];
-  if (existing) return existing;
+  return state.rivals[spec.id] ?? newRivalBank(state, spec, c);
+}
+
+/**
+ * A new rival bank with no branches yet, priced off country `c`'s rules for its
+ * strategy, added to state.rivals. Used for the banks in CONTENT §15 and for
+ * chartered banks (rivalCharters.ts).
+ */
+export function newRivalBank(
+  state: GameState,
+  spec: Pick<RivalSpec, 'id' | 'name' | 'strategy' | 'ink' | 'ticker'>,
+  c: CountryState,
+): RivalBank {
   const prices: Record<string, number> = {};
   const edge = difficultyOf(state).rivalRateEdge;
   for (const p of Object.values(PRODUCTS)) {

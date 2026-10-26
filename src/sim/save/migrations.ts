@@ -580,6 +580,11 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     }
     return s;
   },
+  35: (s) => {
+    // Chartered rivals, rival mergers and rival campaigns (§18.7–18.9) add only
+    // optional fields and a 'merged' status; existing rivals need nothing.
+    return s;
+  },
 };
 
 /** The rich list's fortune range up to schema v31. */

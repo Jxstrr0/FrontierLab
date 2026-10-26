@@ -30,6 +30,7 @@ import { creditCycle, loanDemand } from './macro';
 import { clamp } from './math';
 import { listLevel } from './nominal';
 import { countryOfCity } from './rates';
+import { rivalOverall } from './rivalMarketing';
 import { matureDeposits } from './rivals';
 import { priceWarBump } from './rivalPrices';
 import type { GameState, Lot, RivalBank, RivalBranch } from './state';
@@ -82,11 +83,13 @@ export function rampShare(age: number): number {
 }
 
 /** Deposits move toward target × ramp; loans follow at the LDR (§18.1). */
-export function updateBranchBooks(state: GameState, branch: RivalBranch): void {
+export function updateBranchBooks(state: GameState, bank: RivalBank, branch: RivalBranch): void {
   const c = countryOfCity(state, branch.cityId);
   const age = state.clock.week - branch.openedWeek;
   const ramp = branch.openedWeek > 0 ? rampShare(age) : 1;
-  const target = matureDeposits(state, branch) * competitionFactor(state, branch) * ramp;
+  // A running campaign (§18.9) lifts the rating its deposits mature toward.
+  const rated = { cityId: branch.cityId, overall: rivalOverall(bank, branch) };
+  const target = matureDeposits(state, rated) * competitionFactor(state, branch) * ramp;
   branch.deposits += RIVAL_BOOK_EMA * (target - branch.deposits);
   const ldr = RIVAL_LDR * (1 + RIVAL_LDR_DEMAND_SLOPE * (loanDemand(c) - 1));
   branch.loans = branch.deposits * ldr;
@@ -133,7 +136,9 @@ export function rivalLoans(bank: RivalBank): number {
 
 export function rivalCapitalRatio(bank: RivalBank): number {
   const rwa = rivalLoans(bank) * RIVAL_LOAN_RISK_WEIGHT;
-  return rwa > 0 ? bank.equity / rwa : 0;
+  // A newly chartered bank has capital but no loans yet: count it as fully capitalised.
+  if (rwa <= 0) return bank.equity > 0 ? 1 : 0;
+  return bank.equity / rwa;
 }
 
 /** Weekly books and financials for every active rival (tick step 3). */
@@ -143,7 +148,7 @@ export function runRivalFinancials(state: GameState): void {
     let revenue = 0;
     let preTax = 0;
     for (const branch of bank.branches) {
-      updateBranchBooks(state, branch);
+      updateBranchBooks(state, bank, branch);
       const e = branchEarnings(state, bank, branch);
       branch.contribution = e.contribution;
       revenue += e.revenue;

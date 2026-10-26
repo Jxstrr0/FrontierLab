@@ -98,7 +98,9 @@ export function branchCheckpoints(m: BranchMetrics): Check[] {
     // once home fills up. Week 104 sits lower: in a tighter city rivals stand closer (CONTENT §3).
     // Since rivals learn (§18.3) a first branch that never upgrades gives up a little share a year.
     // The 20-city median reads $84k revenue at week 104 (2026-10-26), so year 2 starts at $80k.
-    const [revLo, incLo] = wk < 156 ? [80e3, 33e3] : [85e3, 35e3];
+    // Rivals that replace lost banks, advertise and keep their branches (§18.7–18.9) take a
+    // little more of a never-upgraded first branch's income: $31k at week 104, $32k after.
+    const [revLo, incLo] = wk < 156 ? [80e3, 31e3] : [85e3, 32e3];
     checks.push({
       label: `Week ${wk} deposits`,
       value: M(s.dep),
