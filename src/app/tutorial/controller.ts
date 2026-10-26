@@ -5,12 +5,15 @@
 // reading (the start and the loan step), asking for a tutorial application on
 // step 7, and opening the weekly results on step 5 when the player has them
 // switched off. The "seen" preference is written when the tutorial ends.
+// Whenever Part 1 isn't running, Part 2's guides and tips take over
+// (lessonController.ts).
 import { effect, signal } from '@preact/signals';
 import { TUTORIAL, TUTORIAL_TEXT } from '../../data/tutorial';
 import * as cmd from '../../sim/commands';
 import { pause } from '../loop';
 import { loadTutorialSeen, saveTutorialSeen } from '../saves';
-import { act, bump, modal, panel, peekGame, rev, toast } from '../store';
+import { act, bump, modal, panel, peekGame, rev, sheet, toast } from '../store';
+import { evaluateLessons, resetLessonView } from './lessonController';
 import { observe } from './observe';
 import {
   alreadyDone,
@@ -40,11 +43,13 @@ export function watchTutorial(): () => void {
     void rev.value;
     void panel.value;
     void modal.value;
+    void sheet.value;
     schedule();
   });
   return () => {
     stop();
     tutorialMemo.value = null;
+    resetLessonView();
   };
 }
 
@@ -63,6 +68,9 @@ function evaluate(): void {
   const step = s?.flags.tutorialStep;
   if (!s || !isActiveStep(step)) {
     if (tutorialMemo.peek()) tutorialMemo.value = null;
+    // The offer and the closing card wait for an answer before Part 2 starts.
+    if (s && (step === undefined || step >= TUTORIAL.done)) evaluateLessons(s);
+    else resetLessonView();
     return;
   }
   const obs = observe(s, panel.peek(), modal.peek());
@@ -71,7 +79,7 @@ function evaluate(): void {
     memo = enterStep(step, obs);
     tutorialMemo.value = memo;
     // Reading steps start paused; step 5 is where the player starts the clock.
-    if (step === TUTORIAL.first || step === TUTORIAL.last) pause();
+    if (step === TUTORIAL.first || step === TUTORIAL.loan) pause();
     if (alreadyDone(memo, obs)) return goTo(nextStep(step));
   }
   memo = updateMemo(memo, obs);

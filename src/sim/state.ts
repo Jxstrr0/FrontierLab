@@ -55,7 +55,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState, DealerDeal } from './personalTypes';
 
-export const SCHEMA_VERSION = 23;
+export const SCHEMA_VERSION = 24;
 
 export interface GameState {
   schemaVersion: number;
@@ -129,11 +129,18 @@ export interface GameState {
   history: { weekly: WeeklySnapshot[]; quarterly: QuarterReport[] };
   milestones: Record<string, Week>;
   /**
-   * `tutorialStep` (Stage 10, optional so older saves load as-is): undefined =
-   * never offered, 0 = offer prompt, 1–7 = the SCREENS §27 steps, 8 = closing
-   * card, 9 = finished or skipped (src/app/tutorial/steps.ts).
+   * `tutorialStep` (Stage 10): undefined = never offered, 0 = offer prompt,
+   * 1–9 = the SCREENS §27.1 steps, 10 = closing card, 11 = finished or skipped
+   * (src/data/tutorial.ts; 1–7, 8 and 9 before schema v24).
+   * `lesson`: the Part 2 guide in progress (SCREENS §27.2) and its step.
+   * `lessonsDone`: guides and first-look tips already seen (schema v24).
    */
-  flags: { gameOver?: 'takeover' | 'insolvency'; tutorialStep?: number };
+  flags: {
+    gameOver?: 'takeover' | 'insolvency';
+    tutorialStep?: number;
+    lesson?: { id: string; step: number };
+    lessonsDone: string[];
+  };
   /** Monotonic counter for generated ids. */
   nextId: number;
 }
@@ -181,6 +188,8 @@ export interface Settings {
   layers: Record<string, boolean>;
   /** The HQ bottom tabs in the order you arranged them (schema v22); departments not listed follow in DEPT_ORDER. */
   hqTabOrder: DeptId[];
+  /** Part 2 of the tutorial: guides for new mechanics and first-look tips (schema v24). */
+  guides: boolean;
 }
 
 export interface AvatarSpec {

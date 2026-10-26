@@ -528,6 +528,7 @@ Tabs: Overview · Loans · Credit.
   - auto-pause on incidents and on expiring applications
   - sound, reduced motion, text size (100 / 115 / 130%)
   - edit founder avatar
+  - **Tutorial:** Replay tutorial, the Guides switch and "Show the guides again" (§27)
   - **Developer:** a "Developer tools" switch, saved on this device only (not in the game save). When on, in a game, a button adds `DEV_PAYMENT` ($10,000,000) to corporate cash as paid-in capital (`devPayment` command; no shares issued, the books still balance). From the title screen it only notes that the tools work inside a game.
 - **Saves:**
   - autosave card
@@ -536,7 +537,10 @@ Tabs: Overview · Loans · Credit.
 
 ## 27. Tutorial
 
-Advisor-led steps, each highlighting its target with a brass ring:
+Led by your first branch manager in a bar with their portrait, name, step and line; each step lights its target with a brass ring and moves on when you do the thing, never on a timer. When the ring's target is low on the screen the bar docks at the top, under an open panel's header so its Close button stays reachable.
+
+### 27.1 Part 1: Opening week
+Steps (each skipped when there's nothing to do, e.g. every branch already has a manager):
 1. Tap a storefront
 2. Build a branch
 3. Set the savings rate
@@ -544,8 +548,26 @@ Advisor-led steps, each highlighting its target with a brass ring:
 5. Unpause and read the first weekly results
 6. Turn on Personal Loans
 7. Approve your first business loan
+8. Run a campaign (Marketing tab: any campaign above Off; skipped where the manager runs marketing)
+9. Meet the bank (open the Company summary from your cash, top left: corporate cash versus deposits, and the capital ratio; done when you close it)
 
-It's skippable from the advisor bar, and replayable in Settings.
+Then a closing card that says the guides will return as the bank grows. "Skip tutorial" sits in the bar; Settings → Replay tutorial starts it again.
+
+### 27.2 Part 2: Growing the bank
+After Part 1 is finished or skipped, with Settings → Guides on (the default):
+- **Guides** start on the map, one at a time, when a mechanic opens up, and pause the clock. Each has a "Skip guide" button and a step count; a step that ends on reading shows "Got it".
+
+  | Guide | Starts when | Steps |
+  |---|---|---|
+  | Capital is slipping | capital tier Watch or worse | open the Company summary, read the capital fixes, close it (ends early if capital recovers) |
+  | Headquarters | the founder ramp begins (third branch) and you have no office | tap an office for lease; pick Finance and HR, Rent office; read Coverage on the HQ floor, close it |
+  | The executive suite | you have an Executive suite and no executives | Menu → HQ → Executive suite → an empty seat → Hire; then "Got it" on choosing their jobs |
+  | Going public | every IPO rule is met while private | tap an investment bank; read the IPO card on the Equity tab, close it (ends early once listed) |
+  | A second city | the city you're in is well covered (§3) and you've never flown | tap the city name → Go to the airport; read the departures, fly or close |
+  | Your own fortune | personal cash reaches GUIDES.wealthCash | Menu → Personal wealth; read it, close it |
+
+- **First-look tips** show once, the first time you open each HQ floor, each map place (rival branch and HQ, central bank, bureau, agency, employer, university, investment bank and its M&A tab, startup, property, convention, lobbying firm, airport, vacation home, car dealer, auction house, sports club), Personal wealth, the Ledger, a branch's Finance tab, a board meeting and an incident. They end on "Got it" or when you move on. Popup tips dock at the top, clear of the choices. A finished guide marks the tips it already covered.
+- **Settings:** a Guides switch, and "Show the guides again" to see every guide and tip once more.
 
 ## 28. Milestones (menu → Milestones)
 

@@ -92,6 +92,7 @@ function SeatGrid(p: { onHire: (seat: ExecSeat) => void; onOpen: (seat: ExecSeat
               <button
                 type="button"
                 class="exec-seat is-empty"
+                data-tutorial="exec-seat"
                 aria-label={`Hire a ${spec.title}`}
                 onClick={() => p.onHire(seat)}
               >
@@ -110,6 +111,7 @@ function SeatGrid(p: { onHire: (seat: ExecSeat) => void; onOpen: (seat: ExecSeat
             <button
               type="button"
               class="exec-seat"
+              data-tutorial="exec-open"
               aria-label={`${exec.name}, ${spec.title}`}
               onClick={() => p.onOpen(seat)}
             >
