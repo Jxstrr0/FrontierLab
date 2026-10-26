@@ -1,6 +1,5 @@
 // Branch staff, manager, delegation and marketing commands.
 import {
-  MANAGER_BASE_SALARY,
   MANAGER_POOL_SIZE,
   MANAGER_SALARY_RANGE,
   MAX_STAFF_MULT,
@@ -16,7 +15,7 @@ import { roundToStep } from '../math';
 import { generateManager } from '../people';
 import type { Delegation, GameState } from '../state';
 import { fail, money, ok, type CommandResult } from './result';
-import { clearManager } from '../payReviews';
+import { clearManager, managerBaseSalary } from '../payReviews';
 
 export function setStaffTarget(state: GameState, branchId: string, target: number): CommandResult {
   const branch = state.branches[branchId];
@@ -33,7 +32,7 @@ export function setWage(state: GameState, branchId: string, wage: number): Comma
   const branch = state.branches[branchId];
   if (!branch) return fail('That branch no longer exists.');
   if (branch.delegation.staffing) return fail('Your manager handles wages here.');
-  const mkt = marketWage(branch.cityId);
+  const mkt = marketWage(state, branch.cityId);
   const [lo, hi] = WAGE_RANGE;
   const w = roundToStep(wage, WAGE_STEP);
   if (!(w >= mkt * lo && w <= mkt * hi))
@@ -122,7 +121,7 @@ export function setManagerSalary(
   const branch = state.branches[branchId];
   const mgr = branch?.managerId ? state.people.managers[branch.managerId] : undefined;
   if (!branch || !mgr) return fail('This branch has no manager.');
-  const ref = (CITIES[branch.cityId]?.wageIndex ?? 1) * MANAGER_BASE_SALARY;
+  const ref = managerBaseSalary(state, branch.cityId);
   const [lo, hi] = MANAGER_SALARY_RANGE;
   if (!(salary >= ref * lo && salary <= ref * hi))
     return fail(`Salary can be set from ${money(ref * lo)} to ${money(ref * hi)}.`);

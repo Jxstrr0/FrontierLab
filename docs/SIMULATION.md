@@ -133,6 +133,14 @@ These are read by other systems:
 | `mortgageLgdMult` | `1 + 3 × max(0, −hpiYoY)` |
 | `equityMarketDrift` | Expansion +8%/yr, Slowdown 0, Recession −15%/yr, Recovery +18%/yr (§19) |
 
+### 4.6 The nominal index (added 2026-10-26)
+Each country carries `nominal`, its price-and-wealth level: 1 at the start of a game, and every week `nominal ×= 1 + (gdp + inflation + NOMINAL_INDEX.trend) / 100 / 52` (`trend` = 4 percentage points, the one dial). In an expansion that is about 9% a year; over a cycle about 8%, so the level doubles in roughly nine years. It is read by:
+- **Balances.** New-account tickets (§9.6) are × the city's country index, and every deposit and amortizing loan balance drifts up by the week's growth (`nominalWeeklyGrowth`, on top of chequing's organic growth), paired with reserves as usual; revolving targets, card spend and card annual fees are × the index, and `feeIndex` (fee product prices, yours and rivals') steps up by the same yearly rate instead of inflation alone. So a mature branch's books and fees, and the whole bank, keep growing with the economy once a city is full, and the loan-to-deposit ratio holds.
+- **Pay.** `marketWage`, department market salaries, manager base salaries and executive market pay are × the index of the city they're paid in, so wages rise with incomes (delegated staffing and the COO's pay reviews follow; a manual player sees "Underpaid").
+- **Rivals.** A rival branch's mature deposits (§18.1) and the build cost of a new branch are × the index.
+- **The rich list** (§22) grows with the home country's index.
+Fixed catalogue prices (builds, equipment, campaigns, rents, servicing) are not indexed, so they get relatively cheaper over a long game. The §25 checkpoints are in start-of-game money: `npm run balance` deflates them by the home country's index and prints the index in its yearly table.
+
 ## 5. Rates
 
 - **FTP:** `FTP_short = policyRate` and `FTP_long = policyRate + termPremium`. Each product has a tenor of short or long (CONTENT Products).
@@ -144,13 +152,13 @@ These are read by other systems:
     - **Deposit rates** move toward `old + β × Δ`, with β = DEPOSIT_BETA_UP (0.45) on hikes and DEPOSIT_BETA_DOWN (0.75) on cuts. They get there over 4–8 weeks (each rival picks a lag).
     - **Loan rates** move by 0.9 × Δ within 2 weeks.
   - Each rival also drifts toward its target at 2% of the gap per week, so the beta discount fades over about a year.
-  - Fee products re-price yearly by inflation.
+  - Fee products re-price yearly by the economy's nominal growth (§4.6; by inflation alone until 2026-10-26), yours and rivals' alike.
 - **Credit cards** use a fixed APR that isn't FTP-linked. They re-price only on large moves (|ΔFTP| ≥ 1pp since the last change).
 
 ## 6. Branch staff, capacity, managers
 
 ### 6.1 Market wage
-`marketWage(city) = BASE_TELLER_WAGE (24.00/hr) × city.wageIndex`.
+`marketWage(city) = BASE_TELLER_WAGE (24.00/hr) × city.wageIndex × nominal` (the country's nominal index, §4.6).
 
 ### 6.2 Morale
 1. `M* = 50 + 40 × tanh(3 × (wage/marketWage − 1)) + 0.15 × (managerPeople − 50) + benefitsMorale + campaignMorale − 25 × max(0, W − 1) − incidentPenalty − (no manager ? 5 : 0)`
@@ -752,14 +760,16 @@ Levels 1–5 (Very conservative to Very aggressive):
 - **18.1 State:**
   - strategy, brand color and monogram
   - branches: lot, quality profile, prices
-  - per-branch aggregate books: deposits and loans grow toward the city's mature size × quality over 156 weeks
+  - per-branch aggregate books: deposits and loans grow toward the city's mature size × quality × the nominal index (§4.6) over 156 weeks
   - cash, capital ratio, public/private, shares and price, executives
 - **18.2 Prices:** per §5, using strategy offsets.
 - **18.3 Ratings:** the strategy quality profile ± normal(0, 0.2) per branch. Overall usually 3.0–4.4. Their app rating comes from the strategy.
+  - **Rivals learn (2026-10-26):** at each year end, every rival branch in a city where you run open branches whose overall is below your average overall there moves each quality coin up by `RIVAL_LEARNING.step` (0.1), capped at `maxQuality` (4.6); a rival sharing a city with you lifts its app rating by the same step toward yours. A rival you out-serve closes the gap over the years instead of standing still.
 - **18.4 Expansion** (monthly check per rival):
-  - If trailing profit > 0 and CR > 11%: open one branch at the best free lot by `score = footTraffic × (1 − localShare) × incomeFit(strategy)`.
-  - Disruptors open rarely, at 0.25× the rate.
+  - If trailing profit > 0 and CR > 11%: in **each city it serves**, a `chance` (6%, disruptors ×0.25) roll to open one branch at the best free lot by `score = footTraffic × (1 − localShare) × incomeFit(strategy)`, while the city keeps room (`maxRivalLotShare` 40% of lots rival-held, `minFreeLotShare` 20% free; were 30%/30% until 2026-10-26). The build cost (`buildCost` × costIndex × the nominal index) comes off equity.
+  - **Entering a new city (2026-10-26):** the same month, a rival with at least `entryMinBranches` (6) branches rolls `entryChance` (5%, disruptors ×0.25) to open its first branch in a generated city with storefronts it doesn't serve: one in its home country, or any city once it serves `abroadMinCities` (3) cities. It picks the city with the most free lots (ties by id); `RIVAL_CITY_ENTRY` event and Ledger story. Cities you haven't visited aren't generated, so rivals grow where the world exists.
   - Close a branch whose contribution has been negative for 26 weeks.
+  - A bank you have bought or the regulator has seized is never seeded into a city generated later.
 - **18.5 Financials:**
   - Branch earnings = `NIM_city × assets + fees − costs`, using the same constants as yours, simplified.
   - Quarterly revenue and net income are reported.
@@ -828,8 +838,8 @@ Levels 1–5 (Very conservative to Very aggressive):
 - **Premium:** `premium = P_offer / price − 1`. Private rivals use price = BVPS × 1.0.
 - **Acceptance:** `accept = sigmoid((premium − req)/0.06)`.
   - `req` = 0.30 for healthy targets, 0.15 for Watch-tier targets, −0.20 for distressed sales.
-  - Rejected offers can be raised once per 4 weeks.
-- **Regulator check:** pro-forma CR ≥ 10.5% AND your deposit share in every affected city ≤ 35%. A Lobbying "Fast-track merger" win relaxes the share limit to 45% for one deal.
+  - Rejected offers can be raised once per 2 weeks (`MERGERS.retryWeeks`; was 4 until 2026-10-26).
+- **Regulator check (lightened 2026-10-26):** pro-forma CR ≥ 9% (`minProFormaCr`; was 10.5%, so the bank may sit in the Watch tier after a deal) AND your deposit share in every affected city ≤ 50% (`maxCityShare`; was 35%). A Lobbying "Fast-track merger" win relaxes the share limit to 65% (`fastTrackShare`; was 45%) for one deal. A **distressed sale** skips the share test altogether (`distressedShareExempt`): the regulator wants the failed network rescued, and the offer sheet says so in the share row.
 - **Payment:** cash only in v1.
 - **On close:**
   - Goodwill = price − target book equity (floored at 0; a negative difference is booked as a gain).
@@ -933,7 +943,7 @@ A deliberately simple "country up or down" investment (DESIGN §5.12a). Your boo
   - **REO:** carrying cost is charged in Hold and Rent; selling has none, can't be called off, and includes foreclosures that arrive meanwhile. The 10% haircut at settlement is a property loss. Mode changes don't require being in that city.
   - Deals of $10M or more make the paper.
 - **21.6 Lobbying** (DESIGN §5.8.10, `src/data/lobbying.ts`, `LOBBYING`):
-  - Campaigns: **Ease the capital buffer** ($2.5M, 55% success, 12% exposure): tier thresholds in that country drop 1pp for 52 weeks. **Fast-track a merger review** ($1.5M, 60%, 10%): the next deal that closes may reach 45% of a city's deposits (MERGERS.fastTrackShare). **Stall the capital buffer bill** ($1.2M, 50%, 15%): only while a capital-buffer bill is pending there; a win makes it fail its vote.
+  - Campaigns: **Ease the capital buffer** ($2.5M, 55% success, 12% exposure): tier thresholds in that country drop 1pp for 52 weeks. **Fast-track a merger review** ($1.5M, 60%, 10%): the next deal that closes may reach 65% of a city's deposits (MERGERS.fastTrackShare). **Stall the capital buffer bill** ($1.2M, 50%, 15%): only while a capital-buffer bill is pending there; a win makes it fail its vote.
   - The fee is paid at the start (`lobbying`, opex); the outcome arrives in 4–8 weeks (a stall no later than the vote). One pending campaign per type; a fast-track can't be bought while one is unused.
   - Exposure is rolled win or lose: a fine of 50% of the fee and −0.03 brand awareness in your cities in that country, plus a Ledger exposé.
 
@@ -963,7 +973,7 @@ A deliberately simple "country up or down" investment (DESIGN §5.12a). Your boo
   - **Counterfeits:** authenticity is hidden. Fake odds by house: 4% / 8% / 6%.
   - **Appraise:** fee 1% of purchase price, takes 1 week, reveals the truth. A fake is worth $0 and can't be consigned.
   - **Consigning** a genuine item: hammer price = value × lognormal(1, 0.15), minus a 10% seller fee.
-- **Rich list:** a generated list of 50 fixed fortunes drawn log-uniform between $150M and $2B (`RICH_LIST.fortune`; was $1.5B–$120B until 2026-10-26, which no founder could reach), each growing 4–8% a year. Yearly rank event. A founder typically enters the list in years 8–12 and needs a long, strong game to top it.
+- **Rich list:** a generated list of 50 fixed fortunes drawn log-uniform between $150M and $2B (`RICH_LIST.fortune`; was $1.5B–$120B until 2026-10-26, which no founder could reach), each growing with the home country's nominal index (§4.6; `richList.nominalRef` remembers the level at the last ranking, so an older save just starts from its current level) times its own real growth of −2% to +5% a year (`RICH_LIST.growth`; was a flat 4–8% before the index existed). Yearly rank event. A founder typically enters the list in years 8–12 and needs a long, strong game to top it.
 
 ## 23. Incidents
 
@@ -1005,9 +1015,9 @@ Run `npm run balance` with seed 42 and the start city Calgary, unless noted. Bra
 | First branch weekly income turns positive | week 6–16 |
 | Branch at week 26 | deposits $15–30M; income positive |
 | Branch at week 52 | deposits $30–50M; loans 75–90% of deposits; customers 3,000–5,000; income +$20k–$40k/week [was $15k–$30k] |
-| Mature branch (week 104+) | deposits $40–70M (organic chequing growth keeps it creeping up) [was $40–65M]; loans 70–90% of deposits [was 75–90%]; revenue $95k–$150k/week from week 156, $85k+ at week 104 [was $110k+ from week 208]; income +$38k–$70k/week from week 156, +$33k+ at week 104 [was +$45k+ from week 208]. With fewer storefronts per city (CONTENT §3, 2026-10-25) rival branches stand closer to yours, so year 2 ramps a little slower. Since the city-wide customer pool (§9.2, 2026-10-25) the home city fills at about 7 branches by year 4, so the first branch levels off instead of climbing through years 4–5. Loan-ratio, revenue and income checkpoints in a recession or the 26 weeks after it read n/a |
+| Mature branch (week 104+) | deposits $38–70M (organic chequing growth keeps it creeping up; in start-of-game money) [was $40–65M, then $40–70M until 2026-10-26]; loans 70–90% of deposits [was 75–90%]; revenue $85k–$150k/week [was $110k+ from week 208, then $95k+ from week 156 until 2026-10-26]; income +$35k–$70k/week from week 156, +$33k+ at week 104 [was +$45k+ from week 208, then +$38k+ until 2026-10-26]. Since rivals learn (§18.3), a first branch the steady script never upgrades gives up about 1.5% of its deposits a year to them, which is where the 2026-10-26 lower edges come from (seed 42 reads $40.3M, $88k and $38k real at week 260 against $43.6M, $97k and a one-week default loss before). With fewer storefronts per city (CONTENT §3, 2026-10-25) rival branches stand closer to yours, so year 2 ramps a little slower. Since the city-wide customer pool (§9.2, 2026-10-25) the home city fills at about 7 branches by year 4, so the first branch levels off instead of climbing through years 4–5. Loan-ratio, revenue and income checkpoints in a recession or the 26 weeks after it read n/a |
 | Payback of a mid build on an average lot | ≤ 40 weeks from opening |
-| Year 2 (steady) | 4–8 branches; HQ required; cash never < 0 |
+| Year 2 (steady) | 3–8 branches [was 4–8 until 2026-10-26: a balance sheet that grows with the economy (§4.6) binds capital a little sooner, and seed 42 reads 3]; HQ required; cash never < 0 |
 | Capital first binds (no raises) | years 1–3; private placements and the IPO are the intended growth fuel |
 | IPO eligible (steady) | years 3–6 |
 | Year 10 (steady) | 60–250 branches; total assets $6–40B [was 60–200; $8–40B] |
@@ -1023,6 +1033,8 @@ Run `npm run balance` with seed 42 and the start city Calgary, unless noted. Bra
 **Note (Stage 8):** steady now expands to other cities once the home city has no good lots left (years 5–6). Year 10: seed 42 223 branches / $9.8B assets, seed 7 171 / $7.2B, seed 99 167 / $8.1B. Seed 42 sits just above the branch band and seed 7 just below the asset band; left for the full tuning pass (owner: testing and tuning come later).
 
 **Updated 2026-10-24 (Stage 10 balance pass):** `npm run balance` now checks each strategy's own targets (`scripts/strategyTargets.ts`): the first-branch checkpoints apply to steady only, as this section always said; turtle is compared with a steady run on the same seed; aggressive's year-3 growth is total assets against steady's, and its first-recession tier must be Watch or worse; stress checks steady never reaches Critical and runs aggressive under the same forced recession (must reach Restricted or Critical). Three bands moved, with reasons: mature deposits to $40–70M and loans to 70–90% of deposits (chequing balances keep growing for five years while loan demand doesn't — the seed-42 branch reads $67M and 74% at week 260), and year 10 to 60–250 branches and $6–40B of assets (since Stage 8 steady expands to other cities, which the old band didn't foresee; seeds 42/7/99 read 235/171/167 branches and $10.3/7.2/8.1B). Seed 42: every target met for steady, turtle, aggressive and stress. Seeds 7 and 99 still miss the first-branch checkpoints (their median Midtown lot is weaker) — part of the owner's later tuning pass.
+
+**Note (2026-10-26, the nominal index §4.6):** every money band in this table is in start-of-game money. Balances and wages now grow with each country's economy (about 9% a year in an expansion), so `npm run balance` deflates the first-branch checkpoints and the year-10 asset band by the home country's index before judging them, prints the index in its yearly table, and labels the asset check "(real)". Nominal figures run far above the bands in a long game by design: seed 42 steady reads about $20B of deposits at year 10 (index 2.2) where the real figure is $9B.
 
 **Strategies** (`scripts/strategies/*.ts`):
 - `idle`: one branch, no further actions

@@ -144,12 +144,14 @@ describe('outcomes', () => {
     expect(s.lobbying.fastTrack).toBe(true);
     const plan = {
       proFormaCr: 0.2,
-      cityShares: [{ cityId: 'cal', share: 0.4 }],
+      cityShares: [{ cityId: 'cal', share: (MERGERS.maxCityShare + MERGERS.fastTrackShare) / 2 }],
       shareLimit: MERGERS.fastTrackShare,
       fastTrack: true,
     } as Parameters<typeof regulatorChecks>[0];
     expect(regulatorChecks(plan, () => 'Calgary')[1]!.ok).toBe(true);
-    expect(regulatorChecks(plan, () => 'Calgary')[1]!.detail).toMatch(/limit 45\.0%/);
+    expect(regulatorChecks(plan, () => 'Calgary')[1]!.detail).toMatch(
+      new RegExp(`limit ${(MERGERS.fastTrackShare * 100).toFixed(1)}%`),
+    );
     const strict = { ...plan, shareLimit: MERGERS.maxCityShare, fastTrack: false };
     expect(regulatorChecks(strict, () => 'Calgary')[1]!.ok).toBe(false);
 

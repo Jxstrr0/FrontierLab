@@ -89,7 +89,7 @@ function Staff({ branch }: { branch: Branch }) {
   const s = useGame();
   const st = branch.staff;
   const { needed, max } = staffBounds(branch);
-  const wage = wageBounds(branch.cityId);
+  const wage = wageBounds(s, branch.cityId);
   const sym = s.settings.currency;
   const wait = waitLabel(branch.waitIndex);
   const locked = branch.delegation.staffing;

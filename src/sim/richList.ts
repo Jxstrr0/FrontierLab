@@ -1,8 +1,9 @@
 // The rich list (SIMULATION §22): RICH_LIST.size generated fortunes (names from
 // the CONTENT §26 pools, a source of wealth, worth log-uniform in
-// RICH_LIST.fortune), each growing by U(RICH_LIST.growth) a year. At each year
-// end you are ranked by net worth among them (no rank below the last place)
-// and a RICH_LIST event reaches The Weekly Ledger. Stream: `richList`.
+// RICH_LIST.fortune), each growing with the home country's nominal index (§4.6)
+// plus U(RICH_LIST.growth) a year. At each year end you are ranked by net worth
+// among them (no rank below the last place) and a RICH_LIST event reaches The
+// Weekly Ledger. Stream: `richList`.
 import { RICH_LIST } from '../config/balance';
 import { FIRST_NAMES, LAST_NAMES } from '../data/names';
 import { RICH_SOURCES } from '../data/richList';
@@ -11,6 +12,7 @@ import { pushEvent } from './events';
 import { netWorth } from './netWorth';
 import { stream } from './rng';
 import type { GameState, RichFortune } from './state';
+import { homeCountry } from './treasury';
 
 /** Most draws spent looking for an unused name before accepting a repeat. */
 const NAME_TRIES = 20;
@@ -47,7 +49,13 @@ export function richListYear(state: GameState): void {
   const list = state.personal.empire.richList;
   if (list.fortunes.length === 0) return;
   const rng = stream(state, 'richList');
-  for (const f of list.fortunes) f.worth = round(f.worth * (1 + rng.range(...RICH_LIST.growth)));
+  // The economy's growth since the last ranking (1 the first time, so an older save just starts).
+  const level = homeCountry(state).nominal;
+  const economy = level / (list.nominalRef ?? level);
+  list.nominalRef = level;
+  for (const f of list.fortunes) {
+    f.worth = round(f.worth * economy * (1 + rng.range(...RICH_LIST.growth)));
+  }
   list.fortunes.sort(byWorth);
   const worth = netWorth(state).total;
   const prev = list.rank;
