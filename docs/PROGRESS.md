@@ -3,13 +3,29 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C1 in progress (v0.1.1, save schema 1). C1a (floors, executives, segments, campaigns, benefits, conferences, incidents, stock sector, map layers) is done; C1b (rival lab names and "the bank" wording) and C1c (the newspaper) are next. The owner's decisions are in the design brief and CONVERSION_PLAN §5.
+**Current stage:** C1 in progress (v0.1.2, save schema 1). C1a (floors, executives, segments, campaigns, benefits, conferences, incidents, stock sector, map layers) and C1b (rival lab names, "the lab" wording) are done; C1c (the newspaper) is next. The owner's decisions are in the design brief and CONVERSION_PLAN §5.
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `1064ce4d8fffde` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `10973fba7111a6` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-26 — Stage C1b: rival labs and "the lab" (v0.1.2)
+
+**What you asked for:** keep going with C1 while C1a merged.
+
+**What C1b changed.** Text only; ids, numbers and the save shape are untouched.
+- **Rival names.** All 33 rivals are now AI labs with invented names, for example Harbourline AI, Maple Crown Intelligence, Prairie Open Models, Kingsbury Cognition, Lumière IA, Rheinmark KI and Neva Open Models. The four app-first disruptors keep short brands (Nimbus Labs, Fizz, Volt, Komet). Tide Money became Tidewater AI and Eastgate became Eastgate Intelligence, to stay clear of real company names.
+- **New rivals mid-game** take lab suffixes: AI, Labs or Intelligence for big labs; Research, Institute or & Partners for research labs; Collective, Open Models or Open Lab for open-model groups.
+- **Map captions** under rival crests drop the new generic words, so "Harbourline AI" still reads "Harbourline".
+- **"The bank" → "the lab".** About 200 places where the game means your company now say lab: the title tagline ("Found a lab. Build an empire."), the new-game wizard, executives, M&A, shares, property, the franchise, tutorial tips, goals and error messages. Rival labels say "Rival lab" and "Rival labs".
+
+**Left as bank words on purpose:** money and banking mechanics (bank run, central bank, investment bank, deposits, payroll "needs a bank", a customer review about mortgage rates), branches, and code comments. The newspaper is C1c.
+
+**Checks.**
+- `npm run lint`, all 856 tests and `npm run build` pass.
+- **Determinism snapshot** moved from `1064ce4d8fffde` to `10973fba7111a6`. With the text changes in `src/sim` and `src/data` put back, the old hash comes back exactly.
 
 ### 2026-10-26 — Stage C1a: the first AI words (v0.1.1)
 

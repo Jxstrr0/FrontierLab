@@ -136,12 +136,12 @@ export const TUTORIAL_STEPS: Record<number, TutorialStepText> = {
     },
   },
   9: {
-    title: 'Meet the bank',
-    idle: 'Tap your bank’s cash, top left, to open the Company summary.',
+    title: 'Meet the lab',
+    idle: 'Tap your lab’s cash, top left, to open the Company summary.',
     lines: {
       'capital-meter':
-        'This is the bank behind the branches. Deposits aren’t ours to spend: corporate cash, top left, pays the bills. Capital limits how much we can lend, so keep this ratio out of the red. Close this when you’re done.',
-      'hud-bank': 'Tap your bank’s cash, top left, to open the Company summary.',
+        'This is the lab behind the branches. Deposits aren’t ours to spend: corporate cash, top left, pays the bills. Capital limits how much we can lend, so keep this ratio out of the red. Close this when you’re done.',
+      'hud-bank': 'Tap your lab’s cash, top left, to open the Company summary.',
       'panel-close': 'Close this panel first.',
     },
   },
@@ -152,7 +152,7 @@ export const TUTORIAL_TEXT = {
   offerYes: 'Show me',
   offerNo: 'No thanks',
   finale:
-    'That’s opening week done. As the bank grows I’ll show you each new part when it opens up: headquarters, executives, going public, new cities. Tap the advisor line in any panel for tips.',
+    'That’s opening week done. As the lab grows I’ll show you each new part when it opens up: headquarters, executives, going public, new cities. Tap the advisor line in any panel for tips.',
   finaleDone: 'Let’s go',
   /** A modal the step doesn't need (an incident, the board) is open. */
   waitModal: 'Deal with this first. I’ll wait.',

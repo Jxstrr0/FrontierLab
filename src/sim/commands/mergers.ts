@@ -62,7 +62,7 @@ export function offerMerger(
   stockPct = 0,
 ): CommandResult<{ offerId: string }> {
   const quote = mergerQuote(state, rivalId, pricePerShare, stockPct);
-  if (!quote) return fail('That bank no longer exists.');
+  if (!quote) return fail('That lab no longer exists.');
   if (quote.blocker) return fail(quote.blocker);
   const bank = state.rivals[rivalId]!;
   const offer: MergerOffer = {

@@ -60,8 +60,8 @@ function settle(offer: MergerOffer, status: MergerOffer['status'], reason?: stri
 function answer(state: GameState, offer: MergerOffer): void {
   const bank = state.rivals[offer.rivalId];
   if (!bank || (bank.status !== 'active' && bank.status !== 'distressed')) {
-    settle(offer, 'lapsed', `${bank?.name ?? 'The bank'} is no longer for sale.`);
-    pushLapsed(state, offer, bank?.name ?? 'The bank', offer.reason!);
+    settle(offer, 'lapsed', `${bank?.name ?? 'The lab'} is no longer for sale.`);
+    pushLapsed(state, offer, bank?.name ?? 'The lab', offer.reason!);
     return;
   }
   const plan = planDeal(state, bank, offer.pricePerShare, offer.stockPct);

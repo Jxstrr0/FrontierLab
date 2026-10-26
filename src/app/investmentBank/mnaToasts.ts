@@ -1,6 +1,6 @@
 // Toasts for M&A events (SIMULATION §19.8): the answer to your offer arrives
 // at the next weekly tick, so say it out loud. Spread into loop.ts EVENT_TEXT.
-const name = (p: Record<string, unknown>) => String(p.bank ?? 'The bank');
+const name = (p: Record<string, unknown>) => String(p.bank ?? 'The lab');
 
 export const MNA_EVENT_TEXT: Record<string, (p: Record<string, unknown>) => string> = {
   ACQUISITION_CLOSED: (p) => `Deal closed: ${name(p)} is yours. Its branches start converting.`,

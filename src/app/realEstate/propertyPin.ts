@@ -9,7 +9,7 @@ export function propertyPinInfo(s: GameState, site: Site): SitePinInfo {
   const sqm = `${(site.property?.sqm ?? 0).toLocaleString('en-US')} m² building`;
   const owned = s.realEstate.properties[site.id];
   if (owned) {
-    const who = owned.owner === 'company' ? 'owned by your bank' : 'owned by you';
+    const who = owned.owner === 'company' ? 'owned by your lab' : 'owned by you';
     return {
       visible: true,
       suffix: `, ${sqm}, ${who}${owned.forSale ? ', for sale' : ''}`,

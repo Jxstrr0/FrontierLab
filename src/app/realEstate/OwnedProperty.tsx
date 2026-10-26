@@ -40,7 +40,7 @@ export function OwnedProperty(p: { property: Property; site: Site }) {
         <Row label="Space" value={`${count(prop.sqm)} m²`} />
         <Row label="Estimated value" value={money(prop.value, sym)} strong />
         <Row label="Purchase price" value={money(prop.purchasePrice, sym)} />
-        <Row label="Owner" value={prop.owner === 'company' ? 'Your bank' : 'You, privately'} />
+        <Row label="Owner" value={prop.owner === 'company' ? 'Your lab' : 'You, privately'} />
       </Card>
 
       <SectionTitle>Real estate income</SectionTitle>

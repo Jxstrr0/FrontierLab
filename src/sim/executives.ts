@@ -90,7 +90,7 @@ function rollResignations(state: GameState): void {
     .sort((a, b) => a.id.localeCompare(b.id));
   for (const exec of execs) {
     if (!rng.chance(resignChance(exec, market, loyaltyBonus))) continue;
-    const rival = rivals.length > 0 ? rng.pick(rivals).name : 'A rival bank';
+    const rival = rivals.length > 0 ? rng.pick(rivals).name : 'A rival lab';
     raiseIncident(state, 'EXEC_POACHED', 'company', exec.seat, {
       seat: exec.seat,
       execId: exec.id,

@@ -103,7 +103,7 @@ function bankStockBudget(state: GameState): number | string {
   const bs = balanceSheet(state);
   const room = X.investStockCap * bs.assets - holdingsValue(state, 'company');
   if (room <= 0)
-    return `The bank's stocks are at ${Math.round(X.investStockCap * 100)}% of its assets.`;
+    return `The lab's stocks are at ${Math.round(X.investStockCap * 100)}% of its assets.`;
   const snap = capitalSnapshot(state);
   // Cash (no risk weight) becomes stock at 2.5×; the commission comes off CET1.
   const crRoom =
@@ -147,7 +147,7 @@ function bankStartupBlocker(state: GameState, price: number): string | undefined
   if (price > state.company.cash - expansionReserve(state)) return RESERVE;
   const bs = balanceSheet(state);
   if (bs.ventures + price > X.investVentureCap * bs.assets)
-    return `The bank's startup stakes would pass ${Math.round(X.investVentureCap * 100)}% of its assets.`;
+    return `The lab's startup stakes would pass ${Math.round(X.investVentureCap * 100)}% of its assets.`;
   const snap = capitalSnapshot(state);
   // The stake is marked at the price paid, so CET1 holds and RWA grows by 2.5×.
   if (snap.cet1 / Math.max(1, snap.rwa + price * VENTURE_RISK_WEIGHT) < X.buyMinCr)

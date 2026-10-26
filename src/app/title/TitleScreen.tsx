@@ -54,7 +54,7 @@ export function TitleScreen() {
       <div class="title-side">
         <div class="title-words">
           <h1 class="title-wordmark">Frontier Lab</h1>
-          <p class="title-tagline">Found a bank. Build an empire.</p>
+          <p class="title-tagline">Found a lab. Build an empire.</p>
         </div>
 
         <nav class="title-menu" aria-label="Main menu">

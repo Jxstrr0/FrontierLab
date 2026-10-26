@@ -26,7 +26,7 @@ export function retryWeek(state: GameState, rivalId: string): number | undefined
 /** Why the company can't make this offer at all, before any price is considered. */
 export function targetBlocker(state: GameState, rivalId: string): string | undefined {
   const bank = state.rivals[rivalId];
-  if (!bank) return 'That bank no longer exists.';
+  if (!bank) return 'That lab no longer exists.';
   if (bank.status !== 'active' && bank.status !== 'distressed')
     return `${bank.name} is no longer for sale.`;
   if (bank.branches.length === 0) return `${bank.name} has no branches left to buy.`;

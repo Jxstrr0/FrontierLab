@@ -54,12 +54,12 @@ export const CHAPTERS: Record<ChapterId, ChapterText> = {
     title: 'Capital is slipping',
     steps: [
       {
-        idle: 'Our capital ratio is slipping. Tap your bank’s cash, top left, to see it.',
+        idle: 'Our capital ratio is slipping. Tap your lab’s cash, top left, to see it.',
         here: 'Capital is our own money set against risky loans. Under 10.5% the regulator starts to hold us back. These are the ways back up. Close this when you’ve read them.',
         lines: {
           'capital-fixes':
             'Capital is our own money set against risky loans. Under 10.5% the regulator starts to hold us back. These are the ways back up. Close this when you’ve read them.',
-          'hud-bank': 'Our capital ratio is slipping. Tap your bank’s cash, top left, to see it.',
+          'hud-bank': 'Our capital ratio is slipping. Tap your lab’s cash, top left, to see it.',
           'panel-close': CLOSE_FIRST,
         },
       },
@@ -72,7 +72,7 @@ export const CHAPTERS: Record<ChapterId, ChapterText> = {
         idle: 'From the third branch we need a head office. Offices for lease are tags on the map: open Layers and switch on Offices if you can’t see them.',
         lines: {
           'pin-office':
-            'From the third branch the bank needs a head office: Finance, HR and the teams behind the branches. Tap an office for lease.',
+            'From the third branch the lab needs a head office: Finance, HR and the teams behind the branches. Tap an office for lease.',
           'panel-close': CLOSE_FIRST,
         },
       },
@@ -88,10 +88,10 @@ export const CHAPTERS: Record<ChapterId, ChapterText> = {
       },
       {
         idle: 'Open HQ from the menu to see your teams.',
-        here: 'Each floor hires towards the staff the bank needs. Coverage shows how close a team is: under 100%, things start to slip. Add floors from the last tab as we grow. Close HQ when you’re ready.',
+        here: 'Each floor hires towards the staff the lab needs. Coverage shows how close a team is: under 100%, things start to slip. Add floors from the last tab as we grow. Close HQ when you’re ready.',
         lines: {
           'hq-coverage':
-            'Each floor hires towards the staff the bank needs. Coverage shows how close a team is: under 100%, things start to slip. Add floors from the last tab as we grow. Close HQ when you’re ready.',
+            'Each floor hires towards the staff the lab needs. Coverage shows how close a team is: under 100%, things start to slip. Add floors from the last tab as we grow. Close HQ when you’re ready.',
           'menu-hq': 'Tap HQ.',
           'hud-menu': OPEN_MENU,
         },
@@ -105,9 +105,9 @@ export const CHAPTERS: Record<ChapterId, ChapterText> = {
         idle: 'Open HQ from the menu, then the Executive suite.',
         lines: {
           'exec-pick':
-            'Expertise lifts their part of the bank; Loyalty keeps them from being poached. Tap Hire on whoever you like.',
+            'Expertise lifts their part of the lab; Loyalty keeps them from being poached. Tap Hire on whoever you like.',
           'exec-seat':
-            'Each seat runs part of the bank and can take whole jobs off your hands. A COO is a good first hire: tap an empty seat.',
+            'Each seat runs part of the lab and can take whole jobs off your hands. A COO is a good first hire: tap an empty seat.',
           'tab-executive': 'Open the Executive suite tab.',
           'menu-hq': 'Tap HQ.',
           'hud-menu': OPEN_MENU,
@@ -136,10 +136,10 @@ export const CHAPTERS: Record<ChapterId, ChapterText> = {
       },
       {
         idle: 'Tap an investment bank on the map.',
-        here: 'An IPO sells part of the bank on the stock market for fresh capital. After it, the board votes on your pay and dividends, and the share price follows our results. There’s no rush. Close this when you’ve had a look.',
+        here: 'An IPO sells part of the lab on the stock market for fresh capital. After it, the board votes on your pay and dividends, and the share price follows our results. There’s no rush. Close this when you’ve had a look.',
         lines: {
           'ipo-card':
-            'An IPO sells part of the bank on the stock market for fresh capital. After it, the board votes on your pay and dividends, and the share price follows our results. There’s no rush. Close this when you’ve had a look.',
+            'An IPO sells part of the lab on the stock market for fresh capital. After it, the board votes on your pay and dividends, and the share price follows our results. There’s no rush. Close this when you’ve had a look.',
           'tab-equity': 'Open the Equity tab.',
           'pin-investmentBank': 'Tap an investment bank on the map.',
         },
@@ -170,7 +170,7 @@ export const CHAPTERS: Record<ChapterId, ChapterText> = {
     steps: [
       {
         idle: 'Your salary and dividends have built up. Open the menu, top right.',
-        here: 'This is your money, kept apart from the bank’s. Spend it on homes, cars and collectibles, invest it, or buy more of the bank. Close this when you’re done.',
+        here: 'This is your money, kept apart from the lab’s. Spend it on homes, cars and collectibles, invest it, or buy more of the lab. Close this when you’re done.',
         lines: {
           'menu-personal-wealth': 'Tap Personal wealth.',
           'hud-menu': 'Your salary and dividends have built up. Open the menu, top right.',
@@ -238,7 +238,7 @@ export const FLOOR_TIPS: Record<DeptId, TipText> = {
   },
   investment: {
     title: 'Investment floor',
-    line: 'The bank’s own portfolio: stocks, startups, property and compute credits. More staff finds more startups looking for money.',
+    line: 'The lab’s own portfolio: stocks, startups, property and compute credits. More staff finds more startups looking for money.',
   },
 };
 
@@ -249,8 +249,8 @@ export const PLACE_TIPS: Record<string, TipText> = {
     line: 'Rivals publish their rates and reviews. Beat their rates or their service and customers drift our way.',
   },
   rivalHq: {
-    title: 'Rival bank HQ',
-    line: 'Rival banks lend to our company: business loans and a credit line. That’s corporate cash for building, never our customers’ deposits.',
+    title: 'Rival lab HQ',
+    line: 'Rival labs lend to our company: business loans and a credit line. That’s corporate cash for building, never our customers’ deposits.',
   },
   centralBank: {
     title: 'Central bank',
@@ -274,7 +274,7 @@ export const PLACE_TIPS: Record<string, TipText> = {
   },
   investmentBank: {
     title: 'Investment bank',
-    line: 'Trade shares and currencies here, raise capital by selling shares, and buy rival banks on the M&A tab.',
+    line: 'Trade shares and currencies here, raise capital by selling shares, and buy rival labs on the M&A tab.',
   },
   startup: {
     title: 'Startup',
@@ -298,7 +298,7 @@ export const PLACE_TIPS: Record<string, TipText> = {
   },
   wealth: {
     title: 'Personal wealth',
-    line: 'Your own money, kept apart from the bank’s: salary, dividends and anything you buy. Trading your own bank’s shares just before earnings risks an investigation.',
+    line: 'Your own money, kept apart from the lab’s: salary, dividends and anything you buy. Trading your own lab’s shares just before earnings risks an investigation.',
   },
   vacationHome: {
     title: 'Vacation home',
@@ -306,7 +306,7 @@ export const PLACE_TIPS: Record<string, TipText> = {
   },
   carDealer: {
     title: 'Car dealer',
-    line: 'Buy cars with your own money. It’s personal spending: the bank’s books don’t see it.',
+    line: 'Buy cars with your own money. It’s personal spending: the lab’s books don’t see it.',
   },
   auctionHouse: {
     title: 'Auction house',
@@ -314,7 +314,7 @@ export const PLACE_TIPS: Record<string, TipText> = {
   },
   franchise: {
     title: 'Sports club',
-    line: 'Own a club with your own money. A strong kit sponsorship lifts the bank’s brand.',
+    line: 'Own a club with your own money. A strong kit sponsorship lifts the lab’s brand.',
   },
   ledger: {
     title: 'The Weekly Ledger',
@@ -330,7 +330,7 @@ export const OTHER_TIPS = {
   },
   'ib-mna': {
     title: 'Mergers & acquisitions',
-    line: 'Make an offer for a rival bank. A higher premium is likelier to be accepted, and the regulator checks our capital afterwards. Their branches take our name over eight weeks.',
+    line: 'Make an offer for a rival lab. A higher premium is likelier to be accepted, and the regulator checks our capital afterwards. Their branches take our name over eight weeks.',
   },
   'modal-board': {
     title: 'Board meeting',

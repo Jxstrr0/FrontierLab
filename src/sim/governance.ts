@@ -21,7 +21,7 @@ export function quarterLabel(state: GameState): string {
 
 /** Why the board can't meet right now, or undefined when it can. */
 export function boardBlocker(state: GameState): string | undefined {
-  if (state.flags.gameOver) return 'The bank is no longer yours to run.';
+  if (state.flags.gameOver) return 'The lab is no longer yours to run.';
   if (!hasExecFloor(state)) return 'The board meets on the Executive floor. Add one at HQ first.';
   if (state.governance.lastBoardQuarter === quarterLabel(state))
     return `The board already met this quarter (${quarterLabel(state)}).`;

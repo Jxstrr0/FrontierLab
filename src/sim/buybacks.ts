@@ -65,7 +65,7 @@ export function nextBuybackWeek(state: GameState): number {
 export function buybackBlocker(state: GameState, q: BuybackQuote): string | undefined {
   if (state.stock.status !== 'public') return 'Only a listed bank can buy back its shares.';
   if (state.clock.week < nextBuybackWeek(state)) return 'One buyback a quarter.';
-  if (q.shares <= 0) return `The public must keep at least ${BUYBACK.minFloat * 100}% of the bank.`;
+  if (q.shares <= 0) return `The public must keep at least ${BUYBACK.minFloat * 100}% of the lab.`;
   if (q.price <= 0) return 'Your shares are not trading.';
   if (state.company.cash < q.cost) return 'Not enough cash.';
   const tier = tierFor(q.crAfter, capitalBufferPp(state));

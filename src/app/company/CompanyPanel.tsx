@@ -26,7 +26,7 @@ const EXPLAINERS: { title: string; body: string }[] = [
   },
   {
     title: 'Capital limits growth',
-    body: 'Capital is what the bank owns after its debts. The regulator compares it with your risky assets, and the tier decides how freely you can grow.',
+    body: 'Capital is what the lab owns after its debts. The regulator compares it with your risky assets, and the tier decides how freely you can grow.',
   },
   {
     title: 'Liquidity keeps the doors open',
