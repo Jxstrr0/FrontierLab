@@ -7,7 +7,8 @@
 // COO's sheet adds the growth cities their Expansion delegation may build in,
 // each with an "Open a branch now" button (GrowthCities.tsx). Seats that give
 // branch guidance show what they are telling managers (GuidanceNote.tsx); the
-// CREO shows the buildings it manages (PropertyNote.tsx).
+// CREO shows the buildings it manages (PropertyNote.tsx) and the CFO what it
+// invests in next (InvestNote.tsx).
 import { useState } from 'preact/hooks';
 import * as cmd from '../../sim/commands';
 import type { ExecSeat } from '../../sim/state';
@@ -27,6 +28,7 @@ import { DelegationDial } from './DelegationDials';
 import { ExecGrantForm } from './ExecGrantForm';
 import { GrowthCities } from './GrowthCities';
 import { GUIDANCE_SEATS, GuidanceNote } from './GuidanceNote';
+import { InvestNote } from './InvestNote';
 import { PropertyNote } from './PropertyNote';
 import { dayOf, execSalaryStepper, seatSpec, vestProgress } from './execSelectors';
 
@@ -76,6 +78,7 @@ export function ExecProfileSheet(p: { seat: ExecSeat; onClose: () => void }) {
               {p.seat === 'coo' && <GrowthCities s={s} />}
               {GUIDANCE_SEATS.includes(p.seat) && <GuidanceNote s={s} seat={p.seat} />}
               {p.seat === 'creo' && <PropertyNote s={s} />}
+              {p.seat === 'cfo' && <InvestNote s={s} />}
               {p.seat === 'cfo' && (
                 <p class="muted small exec-note">
                   Statement delays are halved while a CFO is seated.

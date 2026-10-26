@@ -524,6 +524,19 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     }
     return s;
   },
+  // v31: the CFO's Investing switches. Like v30, a seated CFO (and the switches
+  // remembered for the seat) gets them off; candidates come with them on.
+  30: (s) => {
+    const ex = (s as unknown as GameState).executives;
+    ex.trimmedStocks ??= { company: {}, personal: {} };
+    for (const id of ['bankInvests', 'privateInvests']) {
+      if (ex.seats.cfo) ex.seats.cfo.delegations[id] ??= false;
+      const mem = ex.remembered.cfo;
+      if (mem) mem[id] ??= false;
+      for (const c of ex.candidates.cfo ?? []) c.delegations[id] ??= true;
+    }
+    return s;
+  },
 };
 
 /** Funding types merged away in schema 26, and the type each became. */
