@@ -332,7 +332,7 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 | Personal | `offerHome`, `rebuildHome`, `sellHome`, `buyCar`, `sellCar`, `placeBid`, `clearBid`, `appraiseCollectible`, `consignCollectible`, `withdrawConsignment`, `buyJet`, `sellJet`, `buyClub`, `sellClub`, `setKit`, `setKitSponsor`, `signPlayer`, `releasePlayer` |
 | Settings and saves | `setSettings`, `setFounderAvatar`, `moveHqTab`, `resetHqTabOrder`; saves are not commands: `saveToSlot`, `loadFromSlot` (`src/sim/save/storage.ts`), `exportCode`, `importCode` (`serialize.ts`) |
 
-## 12. Implemented so far (schema v29)
+## 12. Implemented so far (schema v30)
 
 `src/sim/state.ts` is the source of truth; this section records how it differs from the guide above. Later stages add the rest with a schema bump and a migration.
 
@@ -361,6 +361,7 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 - **Schema v26 removes** (content trim): `dealerDeals` and the `dealerFees` P&L line (dealer financing is gone), and the `hold` value of `ReoPool.mode` (now `'rent' | 'selling'`). Migration 25 → 26 deletes `dealerDeals`, folds `dealerFees` into `marketing` in the open ledger and every weekly snapshot, drops `DEALER_*` events from the log, turns held REO pools into rented ones, retypes funding lots and offers (`brokered` → `term_interbank`, `senior_bond` → `covered_bond`, with the new type's radar), and renames a running `grand_opening` agency package to `street_team`.
 - **Schema v27** (fewer offices, more buildings): no new fields. Migration 26 → 27 keeps every office listing you lease, deletes spare unleased listings beyond `OFFICE_LISTINGS.countBySize` (lowest numbers kept), and calls `generateInvestmentSites` again for each generated city to add property buildings up to `REAL_ESTATE.buildingsPerCity` from the city's `sites7` stream, so existing lots, listings and buildings stay put.
 - **Schema v28** (monthly results, longer conventions): `settings.weeklyResults` gains `'monthly'`; no new fields. Migration 27 → 28 stretches every convention run not yet over to `startWeek + CONVENTIONS.activeWeeks` and moves its exclusive startups' `round.closesWeek` with it.
+- **Schema v30** (the CREO's occupancy dials and Buying): `ExecutivesState.occTargets: { company, personal }`, each one of `EXEC_DELEGATION.occTargets` (default 1); the CREO seat gains delegations `bankBuys` and `privateBuys`. Migration 29 → 30 sets both dials to 100% and adds the two switches off for a seated chief and the seat's remembered switches (on for candidates, like any new hire), so nothing is bought until you switch it on.
 - **Schema v29** (market rents follow the cycle, the CREO): `ExecSeat` gains `'creo'` (delegations `bankRents`, `privateRents`); `Property.marketRent` now moves weekly toward base × cre/100 rather than staying fixed; no new fields. Migration 28 → 29 seeds the new seat's candidate pool from the `execs` stream when the save has an Executive floor with pools; buildings are left as they are and drift from the first tick.
 - **Not yet present:** nothing from the v1 plan.
 - **Added fields:**
