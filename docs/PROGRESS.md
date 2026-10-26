@@ -4,11 +4,26 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 **Current stage:** 10 — Art pass, onboarding, polish, launch (built and live; awaiting the owner's iPhone check). All ten roadmap stages are built. Still open: the owner's testing and tuning pass, an Add to Home Screen test on a real iPhone, and the Vault Street card on Kelbo.Website (in a separate session in that repo).
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `16e44c3f3d5282` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `0c31d208606976` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-26 — CFO Investing (v0.11.9, schema v31)
+- **Owner's ask:** does the Investment department actually invest? It didn't: the floor only finds startups (more analysts, more startups to choose from) and shows your portfolio, as in the original. So the CFO gets two new switches, agreed first with the owner: startups and stocks, for the bank and for you, best scorecard, spread across the market, trim losers, separate caps.
+- **Investing: the bank's money / your money.** Every 4 weeks each switch:
+  1. sells any stock that has fallen to 75% or less of what was paid for it, and leaves it alone for a year;
+  2. buys one stock, spreading money across the market by company size (the biggest company first, then whichever is furthest under its share), so the holdings end up close to the market index;
+  3. backs the best-scoring startup on the Investment floor's list (average of the five scores 6 or more) that it doesn't hold yet, by taking one of the round's offers.
+  - **Bank:** stocks stay under 5% of total assets and startup stakes under 3%; one stock buy is at most 1% of assets; the capital ratio stays at 12% or more after every buy; 8 weeks of costs stay in cash; never at a restricted tier. The Capital switch still sells the company's stocks if the ratio drops to Watch.
+  - **You:** a year of your CEO salary stays aside, and one purchase spends at most a quarter of the rest.
+  - Rival banks' shares are never bought or sold by the CFO. The trim applies to every listed stock in the account, including ones you bought yourself.
+  - The CFO's profile says what it will buy next and when, or what's holding it back.
+- **Your save (schema v31):** if you already have a CFO, both switches arrive **off**. A new hire starts with them on, like every delegation.
+- **Code:** `EXEC_DELEGATION.invest*` in `balance.ts`; new `src/sim/execInvesting.ts` (`nextStock`, `nextStartup`, `cfoInvest`), using the same trade and startup commands you use; `InvestNote.tsx` on the CFO's profile; migration 30 → 31.
+- **Checked:** lint, full test suite (839, new `tests/sim/cfoInvesting.test.ts`) and build clean. Determinism snapshot `16e44c3f3d5282` → `0c31d208606976` (intended: only the schema version and the new empty `trimmedStocks` field differ; with those reverted the old hash comes back). At 390×844 the profile lines fit with no overflow or console errors; after 8 weeks with both switches on, the CFO had bought 2 stocks for the bank and 2 for you. About 30% of new startups score 6 or more, so a small floor (one startup in view) yields a pick every few months; more analysts show more.
+- **Docs:** SIMULATION §17.2, SCREENS §10.1, DATA_MODEL §12, DESIGN decision log.
 
 ### 2026-10-26 — CREO occupancy dials and Buying (v0.11.8, schema v30)
 - **Owner's ask:** add 80-85-90-95-100 occupancy sliders to the CREO, and let the chief buy property for the bank and for you personally. The rules were agreed first: the dial uses the existing occupancy maths, the bank buys within an asset cap with capital and cash safety, your purchases keep a reserve, and the chief buys the best yield at asking.

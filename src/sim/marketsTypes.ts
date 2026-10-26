@@ -77,6 +77,8 @@ export interface ExecutivesState {
   brandTarget: number;
   /** Occupancy the CREO's Rents price for, per owner (schema v30), each one of EXEC_DELEGATION.occTargets. */
   occTargets: { company: number; personal: number };
+  /** Stocks the CFO's Investing sold at a loss, per account: id → week sold (schema v31). */
+  trimmedStocks: { company: Record<Id, Week>; personal: Record<Id, Week> };
 }
 
 export type PayReviewCadence = 'quarterly' | 'annual';
