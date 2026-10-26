@@ -1,7 +1,7 @@
 // Finance floor content (SCREENS §10, DESIGN §5.8.1): total revenue and net
 // income with the weekly change, a 5-week bar chart, the company statements
 // (Income / Balance sheet / Cash flow × Week / Quarter / Year), the capital
-// ratio meter and the liquidity ratio. Weeks a short-staffed team hasn't
+// ratio meter, the liquidity ratio and the risk appetite dial. Weeks a short-staffed team hasn't
 // closed (statementDelayWeeks) show as "Delayed" instead of numbers.
 import { capitalSnapshot } from '../../sim/capital';
 import { statementDelayWeeks } from '../../sim/hq';
@@ -12,6 +12,7 @@ import { CapitalMeter, TIER_LABEL, TIER_TONE } from '../company/CapitalMeter';
 import { Statements } from '../company/Statements';
 import { capitalRatioText, delta, money, pct, shortDate } from '../format/format';
 import { useGame } from '../store';
+import { RiskAppetite } from './finance/RiskAppetite';
 
 const CHART_WEEKS = 5;
 
@@ -81,6 +82,9 @@ export function FinanceFloor() {
         />
         <Row label="Target" value={pct(s.treasury.liqTarget, 1)} tone="dim" />
       </Card>
+
+      <SectionTitle>Risk appetite</SectionTitle>
+      <RiskAppetite />
 
       <SectionTitle>Statements</SectionTitle>
       <Statements state={s} delayWeeks={delay} />

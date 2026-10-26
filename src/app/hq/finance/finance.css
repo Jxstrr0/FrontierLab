@@ -1,0 +1,18 @@
+/* Finance floor: the risk appetite card (SCREENS §10). */
+.fin-risk-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+.fin-risk-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-16);
+}
+.fin-risk-ends {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--space-1);
+}

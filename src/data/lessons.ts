@@ -206,7 +206,7 @@ export interface TipText {
 export const FLOOR_TIPS: Record<DeptId, TipText> = {
   finance: {
     title: 'Finance floor',
-    line: 'Finance keeps the books: full statements and the capital summary. Short-staffed, the statements run late, and once we’re public that costs fines and share price.',
+    line: 'Finance keeps the books: full statements, the capital summary and our risk appetite. Short-staffed, the statements run late, and once we’re public that costs fines and share price.',
   },
   hr: {
     title: 'HR floor',
@@ -214,7 +214,7 @@ export const FLOOR_TIPS: Record<DeptId, TipText> = {
   },
   products: {
     title: 'Products floor',
-    line: 'Set rates for every branch at once, pick our risk appetite, tune the house underwriting model, and develop new products. A better model lifts every branch’s Products rating.',
+    line: 'Set rates for every branch at once, tune the house underwriting model, and develop new products. A better model lifts every branch’s Products rating.',
   },
   treasury: {
     title: 'Treasury floor',
