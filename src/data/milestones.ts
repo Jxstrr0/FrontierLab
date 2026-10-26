@@ -1,6 +1,7 @@
-// Milestones (DESIGN §5.18): the goals the Milestones screen lists. `news`
-// marks those that get their own Ledger story; the rest already make the paper
-// through their own events (the IPO, a merger, the rich list).
+// Milestones (DESIGN §5.18): the goals the Milestones screen lists, in roughly
+// the order a game reaches them. `news` marks those that get their own Ledger
+// story; the rest already make the paper through their own events (the IPO, a
+// merger, a club purchase, the rich list).
 export interface MilestoneSpec {
   id: string;
   title: string;
@@ -62,6 +63,20 @@ export const MILESTONES: MilestoneSpec[] = [
     news: false,
   },
   {
+    id: 'hundred_branches',
+    title: '100 branches',
+    goal: 'Run 100 open branches.',
+    line: '{bank} now runs a hundred branches.',
+    news: true,
+  },
+  {
+    id: 'ten_cities',
+    title: 'Ten cities',
+    goal: 'Run branches in ten cities.',
+    line: '{bank} now has branches in ten cities.',
+    news: true,
+  },
+  {
     id: 'deposits_1b',
     title: 'A billion in deposits',
     goal: 'Hold a billion in customer deposits.',
@@ -76,11 +91,39 @@ export const MILESTONES: MilestoneSpec[] = [
     news: true,
   },
   {
+    id: 'assets_10b',
+    title: 'Ten billion in assets',
+    goal: 'Grow total assets past ten billion.',
+    line: 'Total assets at {bank} passed ten billion.',
+    news: true,
+  },
+  {
+    id: 'five_acquisitions',
+    title: 'Five acquisitions',
+    goal: 'Buy five rival banks.',
+    line: '{bank} closed its fifth acquisition.',
+    news: false,
+  },
+  {
+    id: 'club_owner',
+    title: 'Club owner',
+    goal: 'Buy a sports club, for the bank or for yourself.',
+    line: 'The founder of {bank} now owns a sports club.',
+    news: false,
+  },
+  {
     id: 'billionaire',
     title: 'Billionaire founder',
     goal: 'Reach a personal net worth of a billion.',
     line: 'The founder of {bank} is now a billionaire on paper.',
     news: true,
+  },
+  {
+    id: 'rich_list',
+    title: 'On the rich list',
+    goal: 'Rank among the fifty largest fortunes at a year end.',
+    line: 'The founder of {bank} has made the rich list.',
+    news: false,
   },
   {
     id: 'rich_list_1',

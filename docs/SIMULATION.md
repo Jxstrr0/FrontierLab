@@ -963,7 +963,7 @@ A deliberately simple "country up or down" investment (DESIGN §5.12a). Your boo
   - **Counterfeits:** authenticity is hidden. Fake odds by house: 4% / 8% / 6%.
   - **Appraise:** fee 1% of purchase price, takes 1 week, reveals the truth. A fake is worth $0 and can't be consigned.
   - **Consigning** a genuine item: hammer price = value × lognormal(1, 0.15), minus a 10% seller fee.
-- **Rich list:** a generated list of 50 fixed fortunes, each growing 4–8% a year. Yearly rank event.
+- **Rich list:** a generated list of 50 fixed fortunes drawn log-uniform between $150M and $2B (`RICH_LIST.fortune`; was $1.5B–$120B until 2026-10-26, which no founder could reach), each growing 4–8% a year. Yearly rank event. A founder typically enters the list in years 8–12 and needs a long, strong game to top it.
 
 ## 23. Incidents
 

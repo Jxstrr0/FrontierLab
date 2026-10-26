@@ -369,7 +369,7 @@ Investment banks on the map, with tabs Market / Equity / M&A:
   - a private jet
   - a sports franchise, whose kit sponsorship boosts your bank's brand
 - **Personal Wealth screen:** total assets with weekly change, a donut (cash, stocks, real estate, other), and holdings with cost basis and gains.
-- **Annual rich list.**
+- **Annual rich list.** Fifty fortunes sized to the game world ($150M–$2B at the start, growing 4–8% a year): you can enter it in the first decade, and topping it is the last milestone.
 - **Insider trading:** trading your own bank's stock just before earnings risks an investigation.
 
 ### 5.17 Travel
@@ -382,7 +382,7 @@ Investment banks on the map, with tabs Market / Equity / M&A:
 - **Private jet:** bought with personal cash (Corvid 600, 6,000 km range; Albatross 8000, global). Adds a "Fly now" option from any map, and its flights never cost a ticket (assumption); a hop beyond the jet's range flies by the normal rules.
 
 ### 5.18 Goals, milestones, failure
-- **Milestones:** first branch, first loan, first profitable quarter, 10 branches, HQ fully staffed, IPO, first acquisition, $1B in deposits, five countries, billionaire founder, rich list #1.
+- **Milestones:** first branch, first loan, first profitable quarter, 10 branches, HQ fully staffed, IPO, first acquisition, 100 branches, ten cities, $1B in deposits, five countries, $10B in assets, five acquisitions, club owner, billionaire founder, on the rich list, rich list #1.
 - **Failure:**
   - **Regulatory takeover:** Critical capital for too long, after an emergency recapitalisation offer is declined or fails.
   - **Insolvency:** corporate cash below zero for four weeks with no credit available.
@@ -604,3 +604,4 @@ Add one dated line per decision. Never delete entries; supersede them.
 - 2026-10-26 (owner's ask): **CFO Investing.** The Investment floor only finds startups and never invests by itself (as in the original), so the CFO gets two switches, the bank's money and yours. Every 4 weeks each sells stocks 25% under cost (no rebuy for a year), buys one stock toward a market-cap weighting and backs the best-scoring floor startup (average 6 or more) it doesn't hold yet. Bank: stocks under 5% and startup stakes under 3% of assets, capital ratio 12% or more after each buy, 8 weeks of costs in cash, never at a restricted tier. Yours: a year of CEO salary kept, at most a quarter of the rest per purchase. Owner's picks: startups and stocks (not venture debt), both accounts, best scorecard, spread across the market, trim losers, separate caps. A CFO already seated gets the switches off.
 - 2026-10-26 (owner's report): **Monthly results showed one week.** The report opened on the first tick after the month changed, but by then the week just closed already ended in the new month, so it showed that one week as the new month ("January · 1 week") with a meaningless change on last month. It now opens on the tick that closes the month's (or quarter's) last week and covers every week of it. The results date now shows the last day covered (it showed the next day). The quarter-end report uses the same rule: a week ending the day before a quarter starts counts for the old quarter (it fell into the new one).
 - 2026-10-25: Line of Credit stays as it is. In the content audit it looked like a third unsecured consumer loan, but it is the only revolving credit business customers take, so it isn't a duplicate.
+- 2026-10-26 (owner's ask: content past the few-billion stage): **Late-game goals.** A 20-year headless run fills every city by year 11 (179 branches, ~$12B of deposits) and then only creeps, and the rich list's top fortune ($120B growing 6% a year) was out of any founder's reach, so the final milestone could never land. The rich list now spans $150M–$2B (old saves rescale in place, keeping each fortune's rank), and six milestones fill the gap between the first acquisition and the top of the list: 100 branches, ten cities, $10B in assets, five acquisitions, a sports club, and entering the rich list. Compact money gains a trillions tier. Still open (bigger design calls, noted in PROGRESS): rivals stay small (the biggest has about $70M of equity), and after year 11 retained earnings pile up as cash with nothing in the bank's world to buy.

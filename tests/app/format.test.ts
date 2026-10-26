@@ -16,6 +16,7 @@ import {
 describe('format', () => {
   it('compacts money for cards and headlines', () => {
     expect(money(1_482_000_000)).toBe('$1.48B');
+    expect(money(2_100_000_000_000)).toBe('$2.10T');
     expect(money(29_800_000)).toBe('$29.8M');
     expect(money(83_700)).toBe('$83.7K');
     expect(money(950)).toBe('$950');
