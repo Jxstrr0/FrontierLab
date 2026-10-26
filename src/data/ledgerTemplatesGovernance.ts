@@ -26,7 +26,7 @@ export const GOVERNANCE_TEMPLATES = {
     },
     {
       h: 'No dividend at {bank} after shareholder revolt',
-      b: 'Outside holders rejected a {dps} payout as too rich for the bank’s earnings. Only {forPct} voted for it.',
+      b: 'Outside holders rejected a {dps} payout as too rich for the lab’s earnings. Only {forPct} voted for it.',
     },
   ],
   BOARD_SALARY_VOTE: [
@@ -54,7 +54,7 @@ export const GOVERNANCE_TEMPLATES = {
     },
     {
       h: '{name} joins {bank}',
-      b: 'The bank filled its {title} role with {name}, rounding out the leadership bench.',
+      b: 'The lab filled its {title} role with {name}, rounding out the leadership bench.',
     },
   ],
   EXEC_RESIGNED: [
@@ -64,7 +64,7 @@ export const GOVERNANCE_TEMPLATES = {
     },
     {
       h: 'Shake-up at {bank} as {name} departs',
-      b: 'The {title} has left the bank. A search for a successor is under way.',
+      b: 'The {title} has left the lab. A search for a successor is under way.',
     },
     {
       h: '{bank} loses its {short}',
@@ -74,7 +74,7 @@ export const GOVERNANCE_TEMPLATES = {
   EXEC_FIRED: [
     {
       h: '{bank} fires {short} {name}',
-      b: 'The bank dismissed its {title} this week. Severance is put at {severance}.',
+      b: 'The lab dismissed its {title} this week. Severance is put at {severance}.',
     },
     {
       h: '{name} shown the door at {bank}',

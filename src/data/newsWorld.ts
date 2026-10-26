@@ -257,16 +257,16 @@ export const COUNTRIES_WITH_THE: CountryId[] = ['US', 'UK', 'EA'];
 
 /** Each country's fictional share index, as the paper names it. */
 export const INDEX_NAMES: Record<CountryId, string> = {
-  CA: 'Ledger Canada Index',
-  US: 'Ledger US Composite',
-  UK: 'Ledger UK Index',
-  EA: 'Ledger Eurozone Index',
-  CH: 'Ledger Swiss Index',
-  JP: 'Ledger Japan Index',
-  AU: 'Ledger Australia Index',
-  SG: 'Ledger Singapore Index',
-  HK: 'Ledger Hong Kong Index',
-  RU: 'Ledger Russia Index',
+  CA: 'Inference Canada Index',
+  US: 'Inference US Composite',
+  UK: 'Inference UK Index',
+  EA: 'Inference Eurozone Index',
+  CH: 'Inference Swiss Index',
+  JP: 'Inference Japan Index',
+  AU: 'Inference Australia Index',
+  SG: 'Inference Singapore Index',
+  HK: 'Inference Hong Kong Index',
+  RU: 'Inference Russia Index',
 };
 
 /** What analysts blame for a year of rising or falling home prices, by phase. */

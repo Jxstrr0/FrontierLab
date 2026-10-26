@@ -7,11 +7,11 @@ export const REAL_ESTATE_TEMPLATES = {
   PROPERTY_BOUGHT: [
     {
       h: '{bank} buys {address} for {price}',
-      b: 'The bank adds the {city} building to its books and says the tenants stay put.',
+      b: 'The lab adds the {city} building to its books and says the tenants stay put.',
     },
     {
       h: 'Landlord {bank}: lender snaps up {address}',
-      b: 'A {price} purchase in {city}. Rent from the building will now flow to the bank.',
+      b: 'A {price} purchase in {city}. Rent from the building will now flow to the lab.',
     },
   ],
   PROPERTY_BOUGHT_PERSONAL: [
@@ -21,13 +21,13 @@ export const REAL_ESTATE_TEMPLATES = {
     },
     {
       h: 'Founder turns landlord: {founder} pays {price} for {city} block',
-      b: '{address} changes hands. The bank says the deal has nothing to do with it.',
+      b: '{address} changes hands. The lab says the deal has nothing to do with it.',
     },
   ],
   PROPERTY_SOLD: [
     {
       h: '{bank} sells {address} for {price}',
-      b: 'The bank cashes in on the {city} building. Brokers say the buyer was quick to sign.',
+      b: 'The lab cashes in on the {city} building. Brokers say the buyer was quick to sign.',
     },
     {
       h: '{bank} lets go of {city} building',
@@ -51,7 +51,7 @@ export const REAL_ESTATE_TEMPLATES = {
     },
     {
       h: 'Bulk sale: {bank} sells {units} foreclosed homes',
-      b: 'Investors paid {price} for the {city} portfolio. The bank takes a small haircut to free up capital.',
+      b: 'Investors paid {price} for the {city} portfolio. The lab takes a small haircut to free up capital.',
     },
   ],
 } satisfies Record<string, LedgerTemplate[]>;

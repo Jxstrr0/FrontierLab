@@ -12,7 +12,7 @@ type Tab = 'top' | LedgerTab;
 const TABS: { id: Tab; label: string }[] = [
   { id: 'top', label: 'Top' },
   { id: 'world', label: 'World' },
-  { id: 'banking', label: 'Banking' },
+  { id: 'banking', label: 'AI' },
   { id: 'business', label: 'Business' },
   { id: 'markets', label: 'Markets' },
   { id: 'politics', label: 'Politics' },
@@ -23,7 +23,7 @@ const TABS: { id: Tab; label: string }[] = [
 export function Masthead(p: { date: string; edition?: string }) {
   return (
     <header class="masthead">
-      <h3 class="masthead-title">The Weekly Ledger</h3>
+      <h3 class="masthead-title">The Weekly Inference</h3>
       <div class="masthead-line">
         <span>{p.edition ?? ''}</span>
         <span>{p.date}</span>

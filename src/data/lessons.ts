@@ -254,7 +254,7 @@ export const PLACE_TIPS: Record<string, TipText> = {
   },
   centralBank: {
     title: 'Central bank',
-    line: 'The central bank sets the base rate. When it moves, loan demand, defaults and what savers expect all follow. Its meetings make the Ledger.',
+    line: 'The central bank sets the base rate. When it moves, loan demand, defaults and what savers expect all follow. Its meetings make the Inference.',
   },
   bureau: {
     title: 'Credit bureau',
@@ -290,7 +290,7 @@ export const PLACE_TIPS: Record<string, TipText> = {
   },
   lobbyingFirm: {
     title: 'Lobbying firm',
-    line: 'Pay to push a rule change. It can fail, and the Ledger may find out.',
+    line: 'Pay to push a rule change. It can fail, and the Inference may find out.',
   },
   airport: {
     title: 'Airport',
@@ -317,7 +317,7 @@ export const PLACE_TIPS: Record<string, TipText> = {
     line: 'Own a club with your own money. A strong kit sponsorship lifts the lab’s brand.',
   },
   ledger: {
-    title: 'The Weekly Ledger',
+    title: 'The Weekly Inference',
     line: 'Every story comes from what happened in the game: rate decisions, rivals, earnings. Back issues are here.',
   },
 };

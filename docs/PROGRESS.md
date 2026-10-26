@@ -3,13 +3,31 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C1 in progress (v0.1.2, save schema 1). C1a (floors, executives, segments, campaigns, benefits, conferences, incidents, stock sector, map layers) and C1b (rival lab names, "the lab" wording) are done; C1c (the newspaper) is next. The owner's decisions are in the design brief and CONVERSION_PLAN §5.
+**Current stage:** C1 done (v0.1.3, save schema 1): floors, executives, segments, campaigns, benefits, conferences, incidents, stock sector, map layers, rival labs, "the lab" wording and the newspaper. Next is C2 (main offices, sales offices and data centers). The owner's decisions are in the design brief and CONVERSION_PLAN §5.
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `10973fba7111a6` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `0d03bb5a89221d` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-26 — Stage C1c: The Weekly Inference (v0.1.3)
+
+**What you asked for:** keep going after C1b.
+
+**What C1c changed.** Text only; ids, numbers and the save shape are untouched.
+- **The newspaper is now The Weekly Inference** (decision A10, an invented name). The menu entry, archive, masthead, tutorial and tips say The Inference. Its tab that was Banking is now **AI**.
+- **Market indices:** the Ledger Composite and the ten country indices are now the Inference Composite, Inference US Composite and so on.
+- **Incident stories** match C1a's incidents: server-room break-ins, heatwaves, API key leaks, and staff who "downed laptops".
+- **News stories** say "the lab" where they mean a company (about 50 phrases), and conference stories point to the conference on the map.
+
+**Left for later:** stories about loans, deposits and capital stay bank-flavoured until C3/C4, and the stories on the AI tab are still about rival lenders until C6 brings the benchmark leaderboard.
+
+**Checks.**
+- `npm run lint`, all 856 tests and `npm run build` pass.
+- **Determinism snapshot** moved from `10973fba7111a6` to `0d03bb5a89221d`. With the text changes in `src/sim` and `src/data` put back, the old hash comes back exactly.
+
+**Next:** C2, main offices, sales offices and data centers.
 
 ### 2026-10-26 — Stage C1b: rival labs and "the lab" (v0.1.2)
 
