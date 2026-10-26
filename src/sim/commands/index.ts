@@ -26,3 +26,4 @@ export * from './personal';
 export * from './auctions';
 export * from './franchise';
 export * from './tutorial';
+export * from './dev';

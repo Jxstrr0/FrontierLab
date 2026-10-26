@@ -221,6 +221,37 @@ export const RIVALS: Record<string, RivalSpec> = {
     home: ['HK', 'SG'],
     ink: '#3A3A4A',
   }),
+  volgastate: r({
+    id: 'volgastate',
+    name: 'Volga State Bank',
+    strategy: 'incumbent',
+    home: ['RU'],
+    ink: '#7A2430',
+    ticker: 'VSB',
+  }),
+  birchcrest: r({
+    id: 'birchcrest',
+    name: 'Birchcrest Bank',
+    strategy: 'incumbent',
+    home: ['RU'],
+    ink: '#3A5A40',
+    ticker: 'BCB',
+  }),
+  komet: r({ id: 'komet', name: 'Komet', strategy: 'disruptor', home: ['RU'], ink: '#E0663A' }),
+  ambermark: r({
+    id: 'ambermark',
+    name: 'Ambermark Private',
+    strategy: 'premium',
+    home: ['RU'],
+    ink: '#4A3A5A',
+  }),
+  nevasavings: r({
+    id: 'nevasavings',
+    name: 'Neva Savings Union',
+    strategy: 'community',
+    home: ['RU'],
+    ink: '#4A7A9A',
+  }),
 };
 
 export interface StrategyProfile {

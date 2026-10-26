@@ -4,12 +4,242 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 **Current stage:** 10 — Art pass, onboarding, polish, launch (built and live; awaiting the owner's iPhone check). All ten roadmap stages are built. Still open: the owner's testing and tuning pass, an Add to Home Screen test on a real iPhone, and the Vault Street card on Kelbo.Website (in a separate session in that repo).
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `05ae9fae13ba53` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `1d63a8b8c0bfbf` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
 
+### 2026-10-26 — Content trim merged (v0.11.2)
+- **Owner's ask:** update pull request #2 (the 2026-10-25 content trim, v0.10.4, entry below) and merge it.
+- **Brought up to date.** `main` had moved 29 commits and ten save versions since the trim was written. I merged `main` into the branch and kept both sides. The trim's save migration was written as 14 → 15, but `main` already uses 15–25 for other features, so it now runs last as **25 → 26** (schema v26), with the same steps: dealer deals removed, their fees folded into marketing, held foreclosed homes turned to renting, merged funding types retyped, and the Grand Opening Week package renamed Street Team. The old migration test still walks a v14 save all the way up.
+- **One change made while merging: Community Sponsors keeps families.** With today's `main`, moving Community Sponsors from families to businesses pulled the 20-city median of first-year loans/deposits from 77.0% to 73.9%, under the 75% floor. Businesses bring deposits but borrow little. Now it reaches **families and businesses**, with the small Branch lift the trim added, so it's still distinct from Direct Mail (retirees and families, no rating lift). That holds 76.2%, and every 20-city checkpoint passes.
+- **Leftovers tidied:** the car dealer's first-look tip (added on `main` after the trim) still mentioned dealer financing; it now says the showroom is personal spending.
+- **Balance:** seeds 1–20, steady: all checkpoints in range. Seed 42 across all six strategies matches `main`, except one lumpy week on the steady run's first branch (a single −$188k write-off in week 258 that lands in the week-260 four-week average; the weeks around it match `main` to within $500).
+- **Determinism:** snapshot `0d0dc26718fc32` → `1d63a8b8c0bfbf` (intended: the trim changes content).
+- **Checked:** full suite, lint and build clean.
+
+### 2026-10-26 — The HR floor hires branch managers (v0.11.1)
+- **Owner's ask:** let the HR floor auto-hire managers for branches that don't have one, as the COO already does.
+- **What changes.** Once you have an HR floor at HQ, any open branch without a manager gets one at the end of the week: HR picks the candidate in that city with the best total skills (the same pick the COO makes) and hires them at their asking salary. It only fills the seat. Unlike the COO, it doesn't switch on the branch's delegations, so you still decide how hands-off each branch is. A branch still being built waits until it opens. It also covers the week after a rival poaches one of your managers.
+- **With a COO too:** the COO's Branch operations runs first that week and hires with delegation switched on, so nothing is hired twice.
+- **The switch.** The HR floor has a new **Branch managers** card: "Hire managers for empty branches" (on by default) and a count of branches without a manager. Turn it off if you'd rather choose your managers yourself. Without an HR floor nothing changes: you hire from the branch as before.
+- **Saves:** schema v25 adds that switch (`people.hrHiring`). Migration 24 → 25 switches it on for existing games, so your next week-end fills any empty branch if you have an HR floor.
+- **Code:** `src/sim/hrHiring.ts` (weekly routine, run right after the executives), the `setHrHiring` command, the card in `src/app/hq/HrFloor.tsx`. The COO's routine now shares the same candidate pick.
+- **Determinism:** the snapshot moved `00e970fac92bfd` → `0d0dc26718fc32`. That's intended: the scripted game has an HR floor and HR now fills a vacancy in it. The balance run (`--years 10 --seed 42 --strategy steady`) is identical before and after, and all its checkpoints stay in range.
+- **Docs:** SIMULATION §16.11 (new) and §6.5, SCREENS §10 (HR floor), DATA_MODEL v25, DESIGN decision log.
+- **Checked:** 6 new tests (the hire and pick, no floor / switch off / branch not yet open, the command, the weekly tick with and without a COO, ties, migration). Full suite, lint and build clean.
+
+### 2026-10-26 — Title screen: "Living skyline" (v0.11.0)
+- **Owner's ask:** build design pitch 3, the "Living skyline" cover (spec saved as `docs/COVER_SCREEN.md`).
+- **What you'll see.** The top half of the title screen is now a real engraved city, drawn by the same renderer as the in-game map and printed in that city's ink, inside a paper panel with the map's frame rules and the city's name as microprint. It drifts slowly left and right. Under it: a caption, the one-line "VAULT STREET" wordmark, the tagline, Continue / New game, a row of Load · Settings · Credits, and a one-line footer with the version and Check for updates. On a computer or tablet it becomes two columns.
+- **Returning player:** the city you were last in, with your bank's flags (and the rivals' flags) on the right rooftops, framed so your nearest branch is in view. The caption reads "{your bank} · {city}" with a dot in your brand ink. **New player:** a different city every launch, starting with Saskatoon and going through all 20 storefront cities, with three showcase flags in Vault Blue.
+- **How it stays fast.** The menu appears as quickly as before (about 0.3 s on the production build here); the city fades in once it's printed (about 2 s here at iPhone resolution). The printing code is its own download, so it never delays the menu. The city is printed once into one wide picture, then the old renderer is thrown away; the drift is a CSS animation, so nothing redraws while it moves. The picture is capped at 4 million pixels for iPhone memory. If anything goes wrong, the panel just stays blank paper. The menu never waits for it and there's never an error.
+- **How it knows your city without opening the save.** Each save's slot card (the small record the Load screen shows) now also remembers your current city, the game seed, that city's street layout, your start city and rival count, and which lots fly your flag. Cities are generated from the seed, so that's enough to rebuild your city's streets exactly. A test checks this against real played games, including a city flown to later and an old-layout save. This record lives on the slot card, not in the game itself, so **no save format change** (still schema v24). Cards saved before this update show your bank's name with a rotating city until your next autosave fills the record in.
+- **Settings respected.** Reduced motion (the phone's setting or the in-game one) stops the drift. The drift pauses when the app is in the background. Leaving the title frees the picture; coming back (Exit to title) prints it again with whatever you just built.
+- **Code:** `src/app/title/CoverSkyline.tsx` (panel), `coverPrint.ts` (printing, lazy), `coverCity.ts` (pure choices: city, camera, strip size, label; unit-tested), `src/sim/coverMeta.ts` and `coverWorld.ts` (slot card record and rebuild), numbers in `src/config/cover.ts`. The old rosette lockup and corner ornaments are gone.
+- **Docs:** SCREENS §1 rewritten, ART_DIRECTION §2.2 "The cover" added, DESIGN decision log line.
+- **Determinism:** unchanged; no sim or balance code changed.
+- **Checked** in Chrome at 390×844 (DPR 3) for a new player (Saskatoon, then Calgary on relaunch) and a returning player (three flags, Continue resumes, Exit to title rebuilds), system and in-game reduced motion, 1280×800 two columns and a short landscape phone; no console errors, no sideways scroll. New tests: 12 for the cover choices, 4 for the city rebuild, 3 for slot cards. Full suite (798), lint and build clean.
+
+### 2026-10-26 — Tutorial Part 2: guides for the rest of the game (v0.10.21)
+- **Owner's ask:** make sure the tutorial covers everything it needs to, even if it has a second part later in the game for new mechanics.
+- **What was missing.** The 7-step tutorial taught the first branch well but never touched branch marketing or the bank layer (corporate cash versus deposits, capital), and nothing after opening week was explained at all: HQ, executives, capital trouble, going public, travel, personal wealth, or any of the map places and HQ floors.
+- **Part 1 is now 9 steps.** Two new steps after the business loan: **Run a campaign** (Marketing tab, pick any level; skipped if the manager runs marketing) and **Meet the bank** (tap your cash, top left: the guide explains that deposits aren't spendable, corporate cash pays the bills, and capital limits lending; done when you close the Company summary). The closing card now says the guide will be back as the bank grows.
+- **Part 2: guides.** The same manager returns, in the same bar with the brass ring, when a mechanic opens up. One at a time, only while you're on the map, and the clock pauses so you can read:
+  - **Headquarters** at the third branch (when HQ requirements start): find an office for lease, move in Finance and HR, then what Coverage means.
+  - **The executive suite** once you have one: open HQ, hire into an empty seat, then choose the jobs they run.
+  - **Capital is slipping** if the capital tier falls to Watch or worse: the Company summary's list of fixes. Ends early if capital recovers.
+  - **Going public** when every IPO rule is met: an investment bank's Equity tab and the IPO card. No pressure to list; ends early if you do.
+  - **A second city** when the city you're in is well covered and you've never flown: the travel sheet and the departures board.
+  - **Your own fortune** once personal cash reaches $250,000 (`GUIDES.wealthCash` in balance.ts): Menu → Personal wealth.
+- **Part 2: first-look tips.** The first time you open each HQ floor (9), each map place (rival branch and HQ, central bank, bureau, agency, employer, university, investment bank, startup, property, convention, lobbying firm, airport, vacation home, car dealer, auction house, sports club), Personal wealth, the Ledger, a branch's Finance tab, the M&A tab, a board meeting or an incident, the guide gives one short explanation with a **Got it** button. Moving on also counts as seen. Popup tips sit at the top so they never cover the choices. A finished guide marks the tips it already said (e.g. the executive guide covers the Executive suite tip).
+- **Settings → Tutorial** now has Replay tutorial, a **Guides** switch, and **Show the guides again**.
+- **Fix while there:** when the guide bar moved to the top of the screen it covered an open panel's Close button. It now sits just under the panel header.
+- **How it's built.** Same pieces as Part 1: the words in `src/data/lessons.ts`, a pure step machine in `src/app/tutorial/lessons.ts` (unit-tested), and `lessonController.ts` to run it. The ring finds targets by `data-tutorial` names; map pins now carry `pin-{kind}` (e.g. `pin-office`). Commands `setLesson`, `finishLesson`, `resetLessons`.
+- **Saves:** schema v24. Migration 23 → 24 renumbers an old save's tutorial closing card and "finished" (8 → 10, 9 → 11), switches guides on, and skips the guides an older bank has no need for (it already has an HQ, an executive, a listing, a flight, or that floor). So your current game won't be walked through things you've already done; you'll only see a tip the first time you open a place you hadn't opened since this update.
+- **Determinism:** the snapshot moved `000acf5c010cae` → `00e970fac92bfd` only for the new save fields (with `settings.guides`, `flags.lessonsDone` and the version number stripped, the old hash comes back exactly). No sim or balance change.
+- **Checked** in Chrome at 390×844: Part 1 steps 8–9 and every guide (HQ, executives, IPO, travel, wealth) played through by tapping the ringed targets, plus floor and incident tips; no console errors. 25 tutorial tests (new: steps 8–9, guide triggers and steps, tips, commands, migration); full suite, lint and build clean.
+
+### 2026-10-26 — Changes now reach `main` through pull requests (workflow rule, docs only)
+- **Owner's ask:** go back to creating pull requests and auto-merging them when there is no conflict, as a standing rule.
+- **Why.** Several sessions often work at once. Pushing straight to `main` kept colliding on the version number and this file, so two features in a row had to be rebased and renumbered (v0.10.15 became v0.10.17, v0.10.18 became v0.10.19).
+- **The rule** (CLAUDE.md, "Branches and pull requests", merged as pull request #4):
+  1. Every change goes on its own short branch from the latest `main`.
+  2. Claude opens a ready (not draft) pull request to `main`. The Deploy workflow builds and tests it.
+  3. Claude turns on GitHub auto-merge (merge commit) straight away, so it lands by itself when the checks pass and the branch is deleted. If GitHub refuses, Claude merges it without asking once it is green and conflict-free.
+  4. On a conflict, Claude merges `main` into the branch, bumps the version past whatever landed, re-runs lint, tests and build, and pushes. The owner is asked only when both sides changed the same logic.
+  5. A red check is fixed on the branch. Nothing red is merged.
+- **Repo settings.** GitHub reported auto-merge as off when pull request #4 opened, so it was merged by hand once green. The owner has since switched on "Allow auto-merge". For auto-merge to wait on CI rather than merge at once, `main` also needs a branch protection rule or ruleset requiring the `build` check (Settings → Rules). Head branches are already deleted on merge.
+- `docs/DEPLOYMENT.md` notes that every merge to `main` deploys. No code, sim or save change; determinism snapshot unchanged (`000acf5c010cae`).
+
+### 2026-10-26 — The clock can never run under the weekly results (v0.10.20)
+- **Owner's ask:** make 100% sure there is no way time runs while the weekly results (The Weekly Ledger) are showing.
+- **What was checked.** The game clock moves in exactly one place, the loop in `src/app/loop.ts` (plus the `?debug` fast-forward, which is not reachable in play). Flights, commands and the tutorial never move the clock. The loop already refused to advance a day while any modal, panel or sheet was open, and the HUD's speed buttons sit under the modal's scrim, so the clock was already held. Two soft spots remained and are closed:
+  - **Banked time.** Real time that passed while the results were open stayed in the loop's day accumulator, so the first day after Continue could land instantly. Now any hold (modal, panel, sheet, pause, hidden tab) drops the banked fraction of a day, and a modal opening mid-frame drops it too. Closing the results always costs a full day's worth of real time before the next day, at every speed.
+  - **Mid-frame re-check.** A long frame at 4× can cover several days; the hold is now checked before every day inside a frame (not only after one), so nothing can slip past a modal that a day's tick just opened.
+- **Code.** `frame()` now just measures time and calls `elapse(ms)`, which is exported so tests can drive the loop without timers. `document.hidden` is guarded for non-browser environments. The frame cap is a named constant (`MAX_FRAME_MS`).
+- **Tests.** New `tests/app/loop.test.ts` (7 tests): the results open on the first day of the new week and the clock stops there; a minute of real time at 1×, 2× and 4× moves nothing; stepping the week is refused; the speed setting survives; resuming takes a full day of real time before the next day; panels, sheets and a hidden page hold too; a long frame stops within the frame when the week ends. Removing the hold from the loop makes three of them fail (checked), so they guard it.
+- **No sim or save change.** Determinism snapshot unchanged (`000acf5c010cae`). Lint, build and the full suite clean.
+
+### 2026-10-26 — Quant Noir: a hyper-modern branding and look (v0.10.19)
+- **Owner's ask:** at least one hyper-futuristic, modern branding and look in the style of a quantitative trading firm.
+- **House style: Quant Noir.** A sixth style on New Game. The sign is a graphite slab with the bank's name in lower-case, widely spaced sans, a brand-ink pixel before it and a light strip under it; the lamps are recessed light bars in the brand ink with a soft cone of light; the planters are graphite cubes with clipped green spheres; the door is a frameless glass slab with a glowing seam and a keypad; and instead of a cloth flag a slim light blade pulses on the mast (still, with reduced motion). It dresses all six exteriors (`branch/houseStyleQuant.tsx`; the shared sign fitting moved to `signFit.ts`).
+- **Exterior: Lattice Pavilion.** A sixth build option: a thin roof slab floating over a box of smoked glass crossed by a diagrid, the seal hanging in the glazing, a slate mezzanine line, and a light wall in solid brand ink beside the door with a ticker of ivory dashes. Quality 5.0 at $340,000, the Deco Tower's tier, so it is a modern alternative rather than a better buy (`branch/facadesFuture.tsx`, CONTENT §7).
+- **Logo shapes and inks.** Three plain geometric shapes, Tile (a sharp square), Pebble (a rounded square) and Octagon, make nine (a full 3 × 3 picker). Four sharper inks, Graphite, Circuit Blue, Ultraviolet and Magenta, make twelve (three rows of four); all keep ivory text at 4.5:1 or better.
+- **Nothing existing changes.** A game started without a style, and saves from before styles existed, draw from the five original styles only (`SEEDED_HOUSE_STYLE_IDS`), so seed picks, old saves and the determinism snapshot (`000acf5c010cae`, set by the faces change below) are untouched. No save schema change.
+- **Checked** Quant Noir on all six fronts and every style on the Lattice Pavilion at 390×844, plus the New Game pickers, with no console errors; 757 tests, lint and build clean.
+
+### 2026-10-26 — More detailed faces and a grouped portrait creator (v0.10.18)
+- **Owner's ask:** update the profile picture creator and the faces: same art style, more detail.
+- **Faces, redrawn.** Every portrait in the game (founder, managers, candidates, executives, startup and venture CEOs, advisors, review cards) is still an engraved banknote plate, with much more in it:
+  - **Eyes** have whites, an inked iris with a pupil and a tiny catchlight, a heavier upper lid with a lash flick, a faint lower lid, and a shadow under the brow on the dark side.
+  - **Brows** are little strips of hair strokes, tapering outward.
+  - **Nose** has a shaded bridge, wings and nostrils. **Lips** have a cupid's bow, a shaded lower lip and a chin shadow.
+  - **Hair** keeps its hatching and gains sparser strand lines over it. **Ears** show the inner curve.
+  - The head has extra shade under the jaw and at the temple, the neck a tendon line, and the whole plate sits on ruled lines that get denser toward the frame, like a real banknote vignette.
+  - **Attire:** the suit has a knotted, cross-hatched tie, a shaded lapel, buttons, a pocket square and sleeve seams; the blouse soft folds and a pendant; the sweater a cross-knit texture with a shirt collar; the turtleneck fold lines.
+  - Tiny plates (the advisor bar, review cards) keep the stronger shapes and drop the fine marks so they stay readable at 28–40 px.
+- **Four new parts in the creator**, so you can shape the face itself:
+  - **Eyes:** Almond, Round, Hooded, Upturned. **Brows:** Soft arch, Straight, Bold. **Mouth:** Smile, Composed, Grin (teeth showing). **Age:** Fresh, Seasoned (smile lines, a forehead line, faint crow's feet), Veteran (deeper lines, pouches, hollow cheeks, neck lines and silver hair).
+  - **Glasses** gains a fourth option, Half-rim.
+- **The creator itself** is split into **Face** (head shape, eyes, brows, mouth, age, skin tone) and **Style** (hair, facial hair, glasses, attire), each row shows where you are (e.g. 3/4), the preview is bigger, and a **Shuffle** button deals a random face to start from. Same picker in Settings → Edit founder avatar.
+- **How everyone else got a face.** New people don't draw the four new parts from the people RNG: they hash them from the parts they already have (`faceDetail` in `src/sim/people.ts`). That way the candidate pools and everything downstream for every seed are exactly as before, verified by stripping the new fields from the 260-week run and recovering the old hash. The determinism snapshot still moves, `12dd4c303e05ab` → `000acf5c010cae`, only for the new fields, the schema number and the fourth glasses option.
+- **Existing saves:** schema v23 (migration 22 → 23) walks the save and gives every face the same hashed detail a new game would; your founder gets the defaults (almond eyes, soft arch, smile, fresh), which is exactly how they drew before.
+- **Files:** the face lives in `src/art/portraitFace.ts` (eyes, brows, nose, mouth, age lines) and `src/art/portraitTrim.ts` (ears, glasses); `portraits.ts` assembles, `portraitAttire.ts` dresses.
+- **Checked** the Founder step at 390×844 (top, after Shuffle, scrolled to Style) with no console errors, plus 24 seeded faces and every part option rendered at 120 px and 36 px.  757 tests (new: every generated person has detail in range, detail derives from the other parts and varies, migration 20 → 21 keeps the founder and gives everyone else their face; settings command accepts the new parts and still refuses `shade`), lint, typecheck and build clean.
+### 2026-10-26 — Colour on the branch fronts (v0.10.17)
+- **Owner's ask:** make the exterior of the branches incorporate a little more colour.
+- **Material washes.** Every branch front (the hero on the branch panel, the Build branch preview and the New Game style picker) now has a pale second printing under its hatching, the way the map's tint underprint works: terracotta on the Heritage Brick walls, warm limestone on the Classic Columns, the Deco tower and the stone dressings, a cool wash on all the glazing, slate on roof slabs, fascias and the Modern Glass spandrels, verdigris on the Deco setbacks, and leaf green on the planting in every house style's planters. The brand ink joins in on the building itself: the awning stripes of the Plain Storefront, the pediment of the Classic Columns, the canopy of the Modern Glass front and the spandrels and crown of the Deco tower. The Deco sunburst over the door is brass now.
+- **Kept it an engraving.** Washes sit at about a third strength (`.art-wash`, 32%; the awning stripes at 50%), always under the ink hatching and outlines, so the fronts still read as banknote plates and the city ink still rules the linework. The six colours are tokens (`--wash-*` in `tokens.css`, listed in ART_DIRECTION §1.1); `Face` takes an optional `wash` and a small `Wash` component lays colour on its own.
+- **No sim or save change.** Determinism snapshot unchanged (`000acf5c010cae`).
+- **Checked** all 25 house style × exterior pairs at 390×844 with no console errors; 753 tests, lint and build clean.
+### 2026-10-26 — No double-tap zoom or text selection on buttons (v0.10.16)
+- **Owner's ask:** on the iPhone home-screen app, stop double-tap zooming and stop button text getting highlighted while holding a button down.
+- `base.css` now sets `touch-action: manipulation` on the page (this turns off double-tap zoom but keeps pinch zoom for accessibility) plus `user-select: none` and `-webkit-touch-callout: none`, so a long press no longer selects text or opens the iOS copy/look-up menu. Text boxes (names, amounts, save codes) stay selectable so you can still edit and copy them. CSS only.
+
+### 2026-10-25 — Branch counts on Growth cities (v0.10.15)
+- **Owner's ask:** show how many branches you already have in each city on the COO's Growth cities list.
+- Each city's hint now starts with your count there, e.g. "3 branches. Next: 622 Lantern Road, €320K" (or the reason nothing can be built). Branches being built count; closed ones don't, matching the city coverage check. UI only, no state or save change; SCREENS §10.1 updated.
+
+### 2026-10-25 — Reorder the HQ tabs (v0.10.14)
+- **Owner's ask:** be able to reorder the HQ tabs.
+- **Tab order.** The Office sheet (the Office button at the top of HQ) gains a **Tab order** card: the floors you have, in the order their tabs run along the bottom bar, each with ▲ ▼ arrows (44 px round buttons) that move it past its neighbour, and a **Reset order** button once anything has moved. Moves skip departments you have no floor for, and a floor you add later slots in where the usual order puts it. Arrows rather than dragging: the tab bar already scrolls sideways under a thumb, so a drag there would fight it.
+- **Saved with the game.** `settings.hqTabOrder` (schema v22; migration 21 → 22 sets an empty list, which means the usual order). Two commands, `moveHqTab` and `resetHqTabOrder`; `setSettings` also validates the list (each department at most once). The HQ panel reads the order through one shared helper (`src/sim/hqTabs.ts`), and the tab labels and icons moved to `tabIcons.ts` so the Office sheet can show the same icons.
+- **Determinism:** the snapshot moved `1ca6909f9fa30a` → `12dd4c303e05ab` for the new settings field only (verified by stripping it).
+- **Checked** the Office sheet at 390×844: moving a floor reorders the bottom tabs at once, Reset restores the usual order, no console errors. New tests: default order, moves skip missing floors and stop at the ends, unbuilt departments keep their place, refusals and reset, setting validation, migration 21 → 22.
+
+### 2026-10-25 — Delegation dials (v0.10.13)
+- **Owner's ask:** keep simple delegations as yes/no switches, and give the ones with a target a stepped slider (HR benefits morale 70 / 80 / 90, pay reviews quarterly or annual, brand campaigns' awareness 50 / 60…) with a small tagline under it showing the company impact ("+6% cost, 5 morale").
+- **Dials.** A new stepped-slider control (`StepSlider`: a rail with a few named stops, each a 44 px tap target, the chosen one lit in brass) sits under three switches on the executive profiles:
+  - COO · **HR benefits → Morale target** 70 / 80 / 90. Tagline: the extra weekly benefits cost, its share of payroll against the 8% budget, and the morale it should reach ("Benefits +$1.2K/wk (3.4% of payroll, budget 8%) · morale 68 → about 80"), noting when the budget stops short.
+  - COO · **Pay reviews → Review cadence** Quarterly | Annual, with the pay premium stepper moved under it. Tagline: reviews a year, how far pay can lag the market between reviews (0.8% quarterly, 3% annual, from the 3%-a-year market drift), and what the next review would add to annual pay across executives and managers.
+  - CMO · **Brand campaigns → Awareness target** 40 / 50 / 60 / 70%. Tagline: the change in weekly campaign spend and its share of revenue against the 3% budget, how many branch cities get pushed, and the change in new-customer flow once awareness sits at the target.
+- **Honest estimates.** The taglines come from `src/sim/execPolicy.ts`, which walks the delegations' own rules (the same benefit-step scoring, the same campaign budget check) on a copy of the state, so what they show is what the switch will do. The benefits routine was refactored to share that step logic without mutating state; its behaviour is unchanged (verified below).
+- **State and saves.** `executives.moraleTarget`, `executives.brandTarget` and `executives.payReviewCadence` (schema v21; migration 20 → 21 sets 70, 50% and quarterly, exactly what the switches always did). Three new commands set them, accepting only the dial's stops. The CMO's branch guidance band now sits around the dialled target too. `PAY_REVIEW.everyWeeks` became `PAY_REVIEW.cadences` (13 / 52 weeks) with `defaultCadence`.
+- **Copy.** The HR benefits, Pay reviews, Brand campaigns and CMO guidance descriptions now refer to "your target" and "as often as you choose"; the manager card's "Your COO reviews this pay once a quarter" follows the cadence.
+- **Housekeeping.** Prettier reflowed nine one-line `shape=` props from the logo-shape commit that had slipped past the formatter; no code change.
+- **Determinism:** the snapshot moved `0c8122394b4893` → `1ca6909f9fa30a` for the three new state fields only; stripping them from the final state reproduces the old hash, so the benefits refactor changed nothing.
+- **Checked** the COO and CMO sheets at 390×844: stops are 44×62 px, taps change the stored targets, taglines update per stop, no console errors. New tests: dial commands accept only the stops, defaults, the routines read the dials (benefits, brand, 13- vs 52-week reviews), estimates are pure and move the right way, migration 20 → 21.
+
+### 2026-10-25 — Logo shapes on the start page (v0.10.12)
+- **Owner's ask:** different logo shapes for the bank on the start page.
+- **Logo shape.** Step 1 of New Game has a new **Logo shape** row between the monogram and the brand ink: six chips, each a small medallion in that shape with your monogram and ink, so you see the choice before you make it. The shapes are **Coin** (the classic round medallion), **Shield**, **Lozenge** (a diamond), **Hexagon**, **Plaque** (a square with cut corners) and **Rosette** (a scalloped wax seal). The big preview at the top and the confirm step use it.
+- **One outline everywhere.** A single function (`src/art/logoShapes.ts`) draws the outline, so the medallion in the top bar and on every panel, the seal on each branch front, the plaque over the counter inside, the mark over an owned building's door and your own stock card all share the shape. Map pins keep their crest, and rivals keep the round medallion; a branch still converting from a rival wears the old round seal until it is done.
+- **Existing saves:** schema v20 (migration 19 → 20) sets `round`, so an older bank looks exactly as it did. The slot cards record the shape too.
+- **Stronger hiring pools (owner's ask: slightly more very good candidates).** Branch manager skills now roll from normal(62, 16) instead of normal(60, 15) (MANAGER_SKILL), so about one candidate skill in eight is 80+ rather than one in eleven, with the share of weak rolls about the same. Executive skills roll in 35–93 instead of 35–90 (EXECUTIVES.skillRange), so about one in five is 80+ rather than one in six. The graduate program bonus and the clamps are unchanged.
+- **Balance:** the 20-seed 5-year steady panel and all four 10-year strategies on seed 42 stay in range. The determinism snapshot moved twice: `0c2a99c12fc3fb` → `1bdfb320d06bb3` for the new `meta.logoShape` field (verified by stripping it), then → `0c8122394b4893` for the manager skill change, which is intended.
+- **Checked** all six shapes on the New Game step and on a branch's front and Inside views at 390×844, with no console errors. 738 tests (new: shape stored, round default, migration 19 → 20, every outline closes), lint, typecheck and build clean.
+
+### 2026-10-25 — House styles for branch fronts, cheaper rerolls (v0.10.11)
+- **Owner's asks:** make staff rerolls 25% cheaper per reroll; do the building exterior too, stylized per company, with the style chosen at the start of the game.
+- **Rerolls:** the first paid reroll now costs 7.5% of the role's market pay instead of 10%, so every reroll is 25% cheaper (a Calgary manager about $5,300 then $10,600; a first executive about $13,200). It still doubles until the free 4-weekly list.
+- **House style.** Step 1 of New Game has a new **House style** choice under the brand ink, with a live storefront showing your name and colours:
+  - **Old Exchange:** gilt letters on a dark fascia, carriage lanterns, box trees, a brand-ink panelled door.
+  - **Jazz Age:** a stepped sign in capitals with chevrons, globe lamps, tall urns, a glazed door with brass bands and a sunburst, a swallowtail flag.
+  - **Clean Line:** slim lower-case letters with a brand-ink tile, light bars, a trough of grasses, a glass door, a hanging banner.
+  - **Market Street:** a rounded painted sign, hanging lanterns that sway, pots of flowers, a brand-ink door with a wreath, a pennant.
+  - **Civic Stone:** capitals cut into a stone band, sconces (lamp standards on the Classic Columns steps), classical urns, a dark bronze door.
+  - It dresses all five exterior options. Your full bank name is on every branch's sign, so your branches look like yours and nobody else's.
+- **Livelier fronts:** two passers-by stroll the pavement and the flag stirs. Motion stops with reduced motion.
+- **Existing saves:** schema v19 (migration 18 → 19) picks a style from the game's seed. Quick Start does the same.
+- **Balance:** no change. The determinism snapshot moved `03b9402390e27e` → `0c2a99c12fc3fb` only because the save gained `meta.houseStyle`; with it removed the hash matches exactly.
+- **Checked** every style on every exterior at 390×844 and the New Game step, with no console errors. 734 tests (new: style stored, seed default, migration 18 → 19), lint, typecheck and build clean.
+
+### 2026-10-25 — Livelier HQ floors and a branch Inside view (v0.10.10)
+- **Owner's ask:** upgrade the office and branch interior art: same style, more alive, higher quality.
+- **HQ floors, redrawn.** Same engraved isometric look, much more in the room:
+  - A plank floor (carpet in the Executive suite), skirting and cornice, wall tops inked like an architect's cut, windows that throw pale daylight across the floor, a clock and a door.
+  - Workers sit at glowing screens with their own hairstyles and desk clutter, still tinted by team mood, with empty desks dashed.
+  - Each department furnishes its own floor. Finance has cabinets and certificates, HR a water cooler and pinboard, Products a whiteboard, Treasury and IT a live ticker (IT adds blinking server racks), Marketing posters and an easel, Risk a safe and a chart, and the Executive suite books, a sofa, a painting and a huddle table.
+  - Busy floors have someone walking the aisle with a folder and two colleagues chatting at the back.
+- **New: a branch Inside view.** An "Inside" pill on the branch picture switches to the banking hall, drawn from what you built:
+  - the teller line's own shape (glazed counter, express counter, pods or concierge desks)
+  - the lobby's floor and its glass advisor offices
+  - the vault door in its style next to a safe-deposit wall
+  - the ATMs, and your monogram over the counter
+  - It fills with your real staff (tellers, then advisors, then a greeter), tinted by morale, and a queue as long as the wait, with someone always walking in. During fit-out there's a ladder and boxes.
+  - The build screen has the same switch, so you can see the hall your parts make before you pay.
+- **Motion is gentle** (breathing, typing, flickering screens, swaying plants, a turning clock hand) and switches off with reduced motion, from the phone or the in-game setting.
+- **How it's built:** a shared isometric kit in `src/app/components/` (`isoKit`, `isoRoom`, `isoPeople`, `isoProps`, `isoWall`, `interior.css`) used by the HQ floor (`hq/OfficeInterior.tsx`, `hq/officeDecor.tsx`) and the branch hall (`branch/BranchInterior.tsx`, `interiorParts.tsx`, `interiorWall.tsx`, `BranchHero.tsx`). Art only: no game state, save or balance change.
+- **Checked** at 390×844 for every department and five branch fit-outs, plus fit-out and the build preview, with no console errors. 731 tests, lint, typecheck and build clean.
+
+### 2026-10-25 — Branch guidance from the COO, CMO and CPO (v0.10.9)
+- **Owner's ask:** give the other C-suite seats a branch guidance delegation where it fits how they work, so managers stay independent and their skill still matters, but they get helpful steering from above.
+- **COO, Branch guidance: staffing.** Every 4 weeks it looks at staff morale in branches whose manager runs staffing. Below 65 it tells managers to pay up to 6% more and staff up to 15% more; above 82 it lets them trim. The manager's People skill still sets their base wage.
+- **CMO, Branch guidance: marketing.** It watches brand awareness in the cities where managers run marketing. Under 40% it pushes them to value campaigns up to 60% more, so they buy more of them; above 60% they ease off. Managers still pick which campaigns pay.
+- **CPO, Branch guidance: lineup.** It watches the products rating where managers run products. Under 3★ it has them cut fees (up to 9%) and carry more products; at 4★ or better they charge a little more. Product skill still decides how close each manager prices.
+- **The CTO gets none.** Digital projects are HQ work with no branch decision to steer.
+- **Each profile shows what its executive is telling managers right now**, like the CFO's and CRO's note already did.
+- **Tried in a live game:** a year with one delegated branch, switches on vs off. Morale ended at 40 vs 33, revenue about 3% higher, and the balance sheet stayed balanced throughout.
+- **Existing saves:** schema v18 (migration 17 → 18). Executives already in a seat start with the new switch off, so nothing changes until you turn it on. New hires come with it on.
+- **Balance:** the 10-year runs (steady, aggressive and turtle) stay inside every target; those scripted runs don't hire executives. The determinism snapshot moved `06e4a3cf5f24d3` → `03b9402390e27e` only because the save gained the new fields; with them removed the hash matches the old one exactly.
+- **Tests:** 731 (each new part moving up and down with its reading and changing the manager's wages, prices or campaign value; switching off; no reading with no delegated branch; migration 17 → 18).
+
+### 2026-10-25 — Quarterly pay reviews (v0.10.8)
+- **Owner's ask:** the COO's Pay reviews should run every quarter, not once a year.
+- **What changed.** `PAY_REVIEW.everyWeeks` is now 13 (was 52). With the switch on, every executive and branch manager is reset to market pay plus your premium four times a year, so pay tracks the market more closely and rarely drifts into the "underpaid" poaching zone. It still also runs at once when you switch it on or change the premium. The wording on the COO card, the pay policy note and the manager card now says "once a quarter".
+- **Existing saves:** no shape change, so no migration; the next review comes 13 weeks after the last one.
+- **Balance:** the 10-year steady run stays inside every target. Determinism snapshot unchanged (the scripted run doesn't use Pay reviews).
+- **Tests:** 726 pass. Lint, typecheck and build clean.
+
+### 2026-10-25 — Pay to reroll manager and executive candidates (v0.10.7)
+- **Owner's ask:** a paid reroll for branch manager and C-suite applications.
+- **How it works.** Both hire sheets end with a "New candidates · $fee" button. A recruiter deals a fresh list for 10% of the role's market pay (about $7,100 for a Calgary manager, about $17,600 for a first executive). Each further reroll before the free refresh doubles the fee. The free list every 4 weeks still comes on time and resets the fee. Executive rerolls only touch the seat you're hiring for.
+- **What changed.** Closing the manager sheet no longer deals a free new list, since that would make the paid button pointless. The tutorial guide still stays on the list until your first manager.
+- **Where the money goes.** Manager fees count as manager pay and executive fees as executive pay on the income statement.
+- **Existing saves:** schema v17 (migration 16 → 17) adds the reroll counts, starting at zero.
+- **Balance:** no change. The determinism snapshot moved `18e729fd965135` → `06e4a3cf5f24d3` only because two empty fields joined the save; with them removed the hash matches the old one exactly.
+- **Tests:** 726 (paid manager reroll with the guide kept, doubling, reset and not-enough-cash; executive reroll touching one seat only; migration 16 → 17). Lint, typecheck and build clean. Clicked both sheets at 390×844 with no console errors.
+
+### 2026-10-25 — Moscow and St Petersburg (v0.10.6)
+- **Owner's ask:** add Moscow as a start city and a city in general, with a huge, high-density urban presence; add St Petersburg too.
+- **A new country, Russia.** Its central bank is the Bank of Russia, at 6% (higher than anywhere else; neutral 5%). Savers earn more and loans pay more there. The ruble is the most volatile currency at the investment banks. Five original rival banks are based there (Volga State Bank and Birchcrest Bank, both listed, plus Komet, Ambermark Private and Neva Savings Union). There's also a lobbying firm, an auction house (Sokolov & Lind), a stock exchange, an ice hockey league and political parties for the Ledger.
+- **Moscow** is an extra-large city (the biggest grid, 84 tiles), with a river, a big park, cream-stone blocks and a new landmark: a stepped stone tower with a needle spire. **St Petersburg** is a large canal city with a church of onion domes. Both show under the **Europe** tab on New Game, with low wages and modest rents.
+- **"High density" is a real mechanic.** Cities have a new `density` setting (default 1). Moscow is 1.35 and St Petersburg 1.15: every storefront sees that much more foot traffic, the city's pool of possible customers is that much bigger, and the advice for how many branches a city supports rises with it (Moscow about 16, Tokyo 12).
+- **Why Russia's inflation target is 2%, not the real 4%.** The game's economy model centres every country's inflation near 2%. With a 4% target the central bank kept cutting to the floor, which made loans boom past deposits. At 2% the rate holds around 6–7.5%.
+- **Keeping old worlds the same.** Russia rolls its economy and currency from its own random streams. Adding it doesn't change when Canada or the US hit recessions in existing seeds (the first try did, and a 10-year test run lost its recession).
+- **Existing saves:** schema v16 (migration 15 → 16) adds Russia's economy and currency. You can fly to Moscow and St Petersburg from any save.
+- **Balance:** the 10-year runs (steady, aggressive and turtle; seed 42, Calgary) stay inside every target. Starting in Moscow lands inside the first-branch bands, with revenue a little above them thanks to the high rates. St Petersburg runs lean, like Saskatoon and Montréal. The determinism snapshot moved `1744ec22a99c2a` → `18e729fd965135` (Russia joins the news, currency and rival rolls).
+- **Tests:** 724 (new: a Moscow start with Russian rivals and denser lots, a year in Moscow with balanced books, flying to St Petersburg, Russia's own streams and migration 15 → 16). Lint, typecheck and build clean. Checked both maps at 390×844 with no console errors.
+
+### 2026-10-25 — CFO + CRO branch guidance, COO pay reviews, managers can be poached (v0.10.5)
+- **Owner's asks:** (A) let the CFO and CRO jointly change how branch managers handle products and risk; (B) a C-suite toggle that pays executives and branch managers market ± a percentage you set, rising every year, so they're harder to poach.
+- **A. Branch guidance.** The CFO and the CRO each have a new switch, "Branch guidance: funding" and "Branch guidance: lending". Every 4 weeks the CFO nudges the deposit rates of managers you've delegated "Products & rates" to: up when liquidity is under target, down when it's well above. The CRO nudges their loan rates and Loan Desk approvals: dearer and stricter when capital is under 12% or losses run high, a little looser when both are healthy. Steps are 0.10 pp; deposits never go above the funding cost and loans never below it. Their profiles show the guidance in force. With a switch off, that half goes back to neutral.
+- **B. Pay reviews.** The COO has a new "Pay reviews" switch and a **Pay premium over market** stepper (−10% to +30%, default +5%). Once a year, and right away when you switch it on or change the premium, every executive and branch manager is set to market pay plus the premium. Manager market pay now rises 3% a year with their time at the bank, so fixed pay drifts behind.
+- **Poaching.** To make pay matter, rival banks can now poach branch managers: rarely at market pay, three times as often under 90% of market, half as often at 110% or more. You get a toast, the branch's delegations come back to you, and the COO's Branch operations (if on) hires a replacement. Executives paid 110%+ of market are now half as likely to resign. The manager card shows market pay and whether they're underpaid.
+- **Existing saves:** schema v15 (migration 14 → 15). Your current CFO, CRO and COO get the new switches **off**, so nothing changes until you flip them; "Where to look" will count them as switched-off delegations. New hires start with them on.
+- **Balance:** the 10-year runs (steady, aggressive, turtle; seed 42) stay inside every target. The balance bot now rehires poached managers, as an owner would. The determinism snapshot moved `009a66bf5840b5` → `1744ec22a99c2a` (new fields and manager poaching).
+- **Tests:** 717 (guidance steps, caps and reset; prices and approvals move; migration 14 → 15; market pay and tenure; poaching odds and hand-back; pay reviews and the premium range; the well-paid resignation factor). Lint, typecheck and build clean. Checked at 390×844: the COO's premium stepper, the CRO's guidance readout and an underpaid manager's card, with no console errors.
+
+### 2026-10-25 — Developer payment, bigger starting cash, real currency conversion (v0.10.4)
+- **Owner's asks:** (A) a $10,000,000 payment in a developer settings toggle; (B) raise the starting cash a little; (C) make the currencies worth the same as each other instead of 1:1.
+- **A. Developer tools.** Settings has a new **Developer** section. Switch on "Developer tools" (remembered on this device only, not in your save) and, inside a game, a button adds $10,000,000 to company cash. It counts as money the owner put in (paid-in capital), so the books still balance and no shares are issued. Command: `devPayment` in `src/sim/commands/dev.ts`; amount `DEV_PAYMENT` in `balance.ts`.
+- **B. Starting cash** is up about 20%: $600K / **$900K** (default) / $1.2M / $1.5M (was $500K / $750K / $1M / $1.25M). The 10-year balance run still lands inside every target.
+- **C. Currencies.** Before, picking ¥ just put a ¥ in front of the same number, so ¥750K was the same as $750K. Now each symbol has a fixed exchange rate ($ 1, C$ 1.35, £ 0.80, € 0.90, ¥ 150) and every amount converts: the starting cash reads $900K, C$1.22M, £720K, €810K or ¥135M, all the same value. This covers the top bar, panels, statements, news, incidents, and anything you type (wages, prices, dividends, offers, currency trades), which is typed in your currency and converted back. Yen shows no cents. The game's own numbers are unchanged; only what you see converts. The rates live in `src/data/settingsOptions.ts`.
+- **Save format:** unchanged (no new state). The determinism snapshot moved `0f42b6c195480e` → `009a66bf5840b5` only because of the bigger starting cash: with the old $750K it reproduces the old hash.
+- **Tests:** 706 (currency conversion and typed money, the developer payment keeps the books balanced). Lint, typecheck and balance clean. Checked at 390×844 with ¥ selected: the button reads "Add ¥1.50B to company cash", cash went $900K → $10.9M, no console errors.
+- **Not converted:** a few plain-sentence refusal messages from commands (e.g. "You need $332,000") still print in dollars.
 ### 2026-10-25 — Content trim: less overlap, same game (v0.10.4)
 - **Owner's asks** (after a content audit for bloat): 1 fix foreclosed homes, 2–3 keep risk appetite on HQ with both CFO and CRO able to move it, 4 and 5 fix the overlapping campaigns and agency package, 6 universities stay, 7 currencies stay, 8 remove the dealer financing screen, 9 merge funding types to four, 10 the consumer loans as I see fit.
 - **1. Foreclosed homes lose Hold.** Hold and Rent carried the same 6% cost, and only Rent earned anything, so Hold was never the right choice. The card now offers **Rent / Sell all**, and new pools start renting.
@@ -20,7 +250,7 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 - **9. Funding types: six to four.** Brokered Deposits merged into **Term Interbank** (26–104 weeks, $2–50M, +0.50%, repayable early) and Senior Bond into **Covered Bond** (3–10 years, $25–500M, +0.85%, still needs mortgage cover). Overnight and the central bank window are unchanged. Existing lots and offers convert on load.
 - **10. Line of Credit stays.** On a closer look it is the only revolving credit business customers take, so it isn't a duplicate of Personal Loan or Credit Card. Changing it would only have moved the balance numbers.
 - **Not touched:** the audit's item 3 (popups with only an OK button, such as Dividend due, that pause the game). Your reply's "3" read as part of the risk-appetite answer, so I left those popups alone; say the word if you want them turned into toasts.
-- **Save format:** schema v15 with migration 14 → 15 (all of the above, `tests/sim/migrateV14.test.ts`).
+- **Save format:** schema v15 with migration 14 → 15 when written; renumbered to v26 / 25 → 26 when merged on 2026-10-26 (all of the above, `tests/sim/migrateV14.test.ts`).
 - **Determinism snapshot** `0f42b6c195480e` → `05ae9fae13ba53` (intended: rented REO, the campaign retune and the funding mix all change play).
 - **Balance:** `npm run balance` (seed 42, all six strategies, 10 years) shows the same warnings as before the change: steady's week-52 income (now 17.1k against $20k, was 1.6k) and aggressive's year-3 assets vs steady. Across seeds 1–20, every first- and second-year band passes (week 52 loans/deposits 75.1%, was 77.6%).
 - **Tests:** 704, lint, typecheck and build clean. One test changed meaning: the CFO-capital test's no-CFO bank still fails, but now by insolvency before takeover (the retuned campaigns leave it about $50k shorter of cash, past its credit line), so it accepts either kind of failure. Checked at 390×844 in a browser: the risk appetite card with both executives seated, the dealer's showroom without tabs, the foreclosed homes card with Rent / Sell all. No console errors.

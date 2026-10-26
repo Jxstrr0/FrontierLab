@@ -2,9 +2,12 @@ import { describe, expect, it } from 'vitest';
 import {
   capitalRatioText,
   delta,
+  exactMoney,
+  figure,
   gameDate,
   money,
   moneyFull,
+  moneyStepper,
   pct,
   percentText,
   signedPct,
@@ -16,7 +19,27 @@ describe('format', () => {
     expect(money(29_800_000)).toBe('$29.8M');
     expect(money(83_700)).toBe('$83.7K');
     expect(money(950)).toBe('$950');
-    expect(money(-12_500, '£')).toBe('−£12.5K');
+    expect(money(-12_500, '£')).toBe('−£10.0K');
+  });
+
+  it('converts money to the chosen currency at fixed rates', () => {
+    expect(money(900_000, '$')).toBe('$900K');
+    expect(money(900_000, 'C$')).toBe('C$1.22M');
+    expect(money(900_000, '£')).toBe('£720K');
+    expect(money(900_000, '€')).toBe('€810K');
+    expect(money(900_000, '¥')).toBe('¥135M');
+    expect(moneyFull(1_000, '¥')).toBe('¥150,000');
+    expect(figure(1_000, '€')).toBe('900');
+    expect(exactMoney(4.5, '$')).toBe('$4.50');
+    expect(exactMoney(4.5, '¥')).toBe('¥675');
+    expect(delta(1_100, 1_000, '¥').text).toBe('+¥15,000 (+10%)');
+  });
+
+  it('lets money steppers be typed in the chosen currency', () => {
+    const yen = moneyStepper('¥');
+    expect(yen.format(1_000)).toBe('¥150,000');
+    expect(yen.editText(1_000)).toBe('150000');
+    expect(yen.parse('¥150,000')).toBe(1_000);
   });
 
   it('prints full money and rates', () => {

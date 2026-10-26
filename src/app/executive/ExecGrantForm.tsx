@@ -7,7 +7,7 @@ import { EXEC_PAY } from '../../config/balance';
 import * as cmd from '../../sim/commands';
 import type { EquityGrant, ExecSeat } from '../../sim/state';
 import { Segmented, Stepper } from '../components';
-import { count, money } from '../format/format';
+import { count, exactMoney, money, moneyStepper } from '../format/format';
 import { act, toast, useGame } from '../store';
 import { grantCost, vestingPreview } from './execSelectors';
 
@@ -60,14 +60,13 @@ export function ExecGrantForm(p: { seat: ExecSeat; onDone: () => void }) {
             min={STRIKE_STEP}
             max={Math.max(1, price * 3)}
             step={STRIKE_STEP}
-            format={(v) => `${sym}${v.toFixed(2)}`}
+            {...moneyStepper(sym, exactMoney)}
             onChange={setStrike}
-            hint={`Share price ${sym}${price.toFixed(2)}`}
+            hint={`Share price ${exactMoney(price, sym)}`}
           />
         ) : (
           <div class="exec-rsu-note muted small">
-            RSUs are shares, worth {sym}
-            {price.toFixed(2)} each today.
+            RSUs are shares, worth {exactMoney(price, sym)} each today.
           </div>
         )}
       </div>

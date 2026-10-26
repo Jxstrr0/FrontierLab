@@ -40,8 +40,10 @@ export const START_DATE = '2027-01-04';
 
 // ─── START ────────────────────────────────────────────────────────────────────
 /** Default spendable cash; the New Game wizard offers START_CASH_OPTIONS. */
-export const START_CASH = 750_000;
-export const START_CASH_OPTIONS = [500_000, 750_000, 1_000_000, 1_250_000] as const;
+export const START_CASH = 900_000;
+export const START_CASH_OPTIONS = [600_000, 900_000, 1_200_000, 1_500_000] as const;
+/** The Settings developer tools' one-tap payment into corporate cash (SCREENS §26). */
+export const DEV_PAYMENT = 10_000_000;
 /** Rival banks in each city (the wizard's competitor count); clamped to the rivals available. */
 export const COMPETITORS = { min: 1, max: 5 } as const;
 
@@ -200,8 +202,14 @@ export const START_STAFF_MORALE = 70;
 /** Manager candidates (§6.5). */
 export const MANAGER_POOL_SIZE = 3;
 export const MANAGER_POOL_REFRESH_WEEKS = 4;
-export const MANAGER_SKILL = { mean: 60, sd: 15, min: 25, max: 98 } as const;
+export const MANAGER_SKILL = { mean: 62, sd: 16, min: 25, max: 98 } as const;
 export const MANAGER_SALARY_SPREAD = { base: 0.7, slope: 0.6 } as const;
+/**
+ * Paying a recruiter for a fresh candidate list (SIMULATION §6.5, §17.2): the
+ * first reroll costs feeShare × the role's market salary, and each further one
+ * before the pool's free refresh multiplies the fee by `growth`.
+ */
+export const CANDIDATE_REROLL = { feeShare: 0.075, growth: 2 } as const;
 export const MANAGER_MARKETING = { base: 0.8, slope: 0.4 } as const;
 export const NO_MANAGER_SERVICE = 0.3;
 
@@ -1342,13 +1350,16 @@ export const EXECUTIVES = {
   resignLoyalty: 1.5,
   underpaidRatio: 0.9,
   underpaidMult: 2,
+  /** Paid at least wellPaidRatio × market: resignation chance × wellPaidMult. */
+  wellPaidRatio: 1.1,
+  wellPaidMult: 0.5,
   grantMult: 0.5,
   salaryBase: 180_000,
   salaryPerBillion: 60_000,
   salaryMax: 2_500_000,
   refreshWeeks: 4,
   candidatesPerSeat: 3,
-  skillRange: [35, 90] as [number, number],
+  skillRange: [35, 93] as [number, number],
   /** EXEC_POACHED counter-offer: salary × (1 + raise), loyalty + loyaltyGain. */
   counterRaise: 0.25,
   counterLoyalty: 10,
@@ -1404,7 +1415,9 @@ export const EXEC_PAY = {
  */
 export const EXEC_DELEGATION = {
   cooDelegation: { staffing: true, products: true, marketing: true, troubles: true, loans: true },
+  /** HR benefits: the morale floor the COO holds (a dial on their profile), default and stops. */
   moraleTarget: 70,
+  moraleTargets: [70, 80, 90] as readonly number[],
   moraleSlack: 5,
   benefitsEveryWeeks: 4,
   benefitsBudgetShare: 0.08,
@@ -1416,7 +1429,9 @@ export const EXEC_DELEGATION = {
   devTier: 'medium',
   devBudgetShare: 0.01,
   revenueWeeks: 13,
+  /** Brand campaigns: the awareness the CMO holds in each city (a dial on their profile), default and stops. */
   brandTarget: 0.5,
+  brandTargets: [0.4, 0.5, 0.6, 0.7] as readonly number[],
   brandSlack: 0.05,
   brandBudgetShare: 0.03,
   croEveryWeeks: 4,
@@ -1447,6 +1462,77 @@ export const EXEC_DELEGATION = {
   expansionSpacing: 12,
   /** COO Company troubles: option error shrinks with the COO's expertise like a manager's skills. */
   troublesError: 0.5,
+} as const;
+
+/**
+ * Branch guidance (§17.2), the CFO and CRO steering delegated managers together.
+ * Each half is a whole step in [min, max], moved one step every everyWeeks:
+ * the CFO's deposit step up while liquidity is below liqTarget − liqLow and down
+ * above liqTarget + liqHigh; the CRO's loan step up (tighter) when capital or
+ * losses miss the croMinCr / croMaxLoss marks and down at croRaiseCr /
+ * croRaiseLoss. A step moves delegated rate prices by rateStep and the
+ * delegated Loan Desk PD threshold by × (1 − thresholdStep × loan step).
+ * The COO, CMO and CPO steer the rest the same way (schema v18):
+ * - COO staffing: up while delegated-staffing branches average morale below
+ *   moraleLow, down above moraleHigh; a step adds wageStep to their wages and
+ *   staffStep to their staff target.
+ * - CMO marketing: up while average brand awareness in your branch cities is
+ *   below EXEC_DELEGATION.brandTarget − brandBand, down above target + brandBand;
+ *   a step adds marketingStep to the value managers put on awareness.
+ * - CPO products: up while delegated-products branches average a products
+ *   rating below productsLow, down at productsHigh or better; a step cuts
+ *   delegated fees by feeStep and lowers the lineup's affinity bar by affinityStep.
+ * A switched-off part returns to 0.
+ */
+export const GUIDANCE = {
+  everyWeeks: 4,
+  min: -1,
+  max: 3,
+  rateStep: 0.001,
+  thresholdStep: 0.12,
+  liqLow: 0.01,
+  liqHigh: 0.05,
+  moraleLow: 65,
+  moraleHigh: 82,
+  wageStep: 0.02,
+  staffStep: 0.05,
+  brandBand: 0.1,
+  marketingStep: 0.2,
+  productsLow: 3,
+  productsHigh: 4,
+  feeStep: 0.03,
+  affinityStep: 0.25,
+} as const;
+
+/**
+ * Pay reviews (COO, §17.2): on the cadence you choose (quarterly or annual,
+ * in weeks) the COO sets each executive's and branch manager's pay to market
+ * × (1 + the pay premium you choose), within premiumRange in premiumStep
+ * steps, so pay rises with the market.
+ */
+export const PAY_REVIEW = {
+  cadences: { quarterly: 13, annual: 52 } as const,
+  defaultCadence: 'quarterly' as const,
+  premiumRange: [-0.1, 0.3] as [number, number],
+  premiumStep: 0.05,
+  defaultPremium: 0.05,
+} as const;
+
+/**
+ * Branch manager pay market and poaching (§17.1). Market pay is the hiring ask
+ * (MANAGER_BASE_SALARY × wageIndex × the skill spread) × (1 + tenureGrowth ×
+ * years at the bank): rivals pay more for experience. Weekly poaching chance:
+ * poachBase × underpaidMult below underpaidRatio × market, × wellPaidMult at
+ * wellPaidRatio × market or more. Salaries move in salaryStep.
+ */
+export const MANAGER_PAY = {
+  tenureGrowth: 0.03,
+  poachBase: 0.0006,
+  underpaidRatio: 0.9,
+  underpaidMult: 3,
+  wellPaidRatio: 1.1,
+  wellPaidMult: 0.5,
+  salaryStep: 1_000,
 } as const;
 
 /**
@@ -1849,3 +1935,14 @@ export const MILESTONE_HQ_DEPTS = [
   'it',
   'risk',
 ] as const;
+
+// ─── TUTORIAL PART 2 (SCREENS §27.2) ──────────────────────────────────────────
+/**
+ * When the "Your own fortune" guide starts: personal cash at or above
+ * wealthCash (a year or so of CEO salary). The other guides start on game
+ * conditions the sim already has (founder ramp, capital tier, IPO checklist,
+ * city coverage).
+ */
+export const GUIDES = {
+  wealthCash: 250_000,
+} as const;

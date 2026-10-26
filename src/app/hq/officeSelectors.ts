@@ -8,6 +8,7 @@ import { DEPARTMENTS, DEPT_ORDER } from '../../data/departments';
 import { assetBookValue } from '../../sim/balanceSheet';
 import { deptAvailable } from '../../sim/commands';
 import { deptDesks } from '../../sim/hq';
+import { visibleHqTabs } from '../../sim/hqTabs';
 import type { DeptId, GameState, Office } from '../../sim/state';
 
 /** Your offices, oldest lease first. */
@@ -26,9 +27,9 @@ export function officeAddress(s: GameState, office: Office): string {
   return s.world.officeListings[office.listingId]?.address ?? 'Head office';
 }
 
-/** Departments with at least one floor, in tab order (SCREENS §10). */
+/** Departments with at least one floor, in your tab order (SCREENS §10). */
 export function hqDepts(s: GameState): DeptId[] {
-  return DEPT_ORDER.filter((d) => deptDesks(s, d) > 0);
+  return visibleHqTabs(s);
 }
 
 /** Desks one floor of this department gives in this office. */

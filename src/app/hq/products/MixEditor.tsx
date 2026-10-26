@@ -7,7 +7,7 @@ import { DATA_INPUTS } from '../../../data/bureaus';
 import type { ModelSource } from '../../../sim/underwriting';
 import { previewModel } from '../../../sim/underwriting';
 import { Card, Row } from '../../components';
-import { count } from '../../format/format';
+import { count, exactMoney } from '../../format/format';
 import { useGame } from '../../store';
 import { fromPercents, percentTotal, rebalance, type PercentMix } from './mixMath';
 import { ModelRosette } from './ModelRosette';
@@ -27,7 +27,7 @@ export function MixEditor(p: {
     <div class="stack">
       <Card>
         <ModelRosette radar={preview.radar} label="Preview" />
-        <Row label="Cost per application" value={`${sym}${preview.costPerApp.toFixed(2)}`} strong />
+        <Row label="Cost per application" value={exactMoney(preview.costPerApp, sym)} strong />
         <Row label="Model quality" value={`${radarText(preview.quality)} / 10`} />
         {p.source === 'hosted' && (
           <p class="muted small hq-note">Hosted models carry the bureau's markup.</p>
@@ -65,7 +65,7 @@ export function MixEditor(p: {
               <div class="muted small">
                 {locked
                   ? `Unlocks at ${count(input.minLoansBooked ?? 0)} loans booked (${count(s.underwriting.loansBooked)} so far)`
-                  : `${sym}${input.costPerApp.toFixed(2)} per application`}
+                  : `${exactMoney(input.costPerApp, sym)} per application`}
               </div>
             </div>
           );

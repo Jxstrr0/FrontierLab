@@ -9,66 +9,6 @@
   margin: 0 0 var(--space-3);
 }
 
-/* ─── Office interior hero ─────────────────────────────────────────────── */
-/* Engraved in the city ink on ivory (the Vignette supplies --art-ink). */
-.hq-floor {
-  fill: var(--ivory);
-  stroke: var(--art-ink);
-  stroke-width: 1.1;
-  stroke-linejoin: round;
-}
-.hq-wall {
-  fill: var(--ivory);
-  stroke: var(--art-ink);
-  stroke-width: 1.1;
-  stroke-linejoin: round;
-}
-.hq-desk {
-  fill: none;
-  stroke: var(--art-ink);
-  stroke-width: 0.9;
-  stroke-linejoin: round;
-  stroke-linecap: round;
-  stroke-dasharray: 1.6 1.4;
-  opacity: 0.55;
-}
-.hq-desk.is-taken {
-  opacity: 1;
-  stroke-dasharray: none;
-}
-.hq-desk-top {
-  fill: var(--ivory);
-}
-.hq-screen {
-  fill: var(--art-ink);
-  fill-opacity: 0.35;
-}
-.hq-chair {
-  fill: none;
-}
-.hq-person {
-  stroke: var(--art-ink);
-  stroke-width: 0.8;
-}
-.hq-head {
-  fill: var(--ivory);
-}
-.hq-mood-good {
-  fill: var(--jade);
-}
-.hq-mood-warn {
-  fill: var(--brass);
-}
-.hq-mood-bad {
-  fill: var(--oxblood);
-}
-.hq-interior-caption {
-  font-family: var(--font-ui);
-  font-size: 10px;
-  font-weight: 600;
-  fill: var(--art-ink);
-}
-
 /* ─── Office switcher ──────────────────────────────────────────────────── */
 .hq-switcher {
   display: flex;
@@ -283,6 +223,53 @@
 }
 .hq-release {
   margin-top: var(--space-4);
+}
+
+/* Tab order on the Office sheet (SCREENS §10): one row per floor, arrows to move it. */
+.hq-tab-order {
+  list-style: none;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+}
+.hq-tab-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--tap-min);
+  border-top: 1px solid var(--hairline);
+}
+.hq-tab-row:first-child {
+  border-top: 0;
+}
+.hq-tab-icon {
+  flex: none;
+  color: var(--brass-light);
+}
+.hq-tab-name {
+  flex: 1;
+  min-width: 0;
+}
+.hq-tab-move {
+  flex: none;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--hairline);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--brass-light);
+  cursor: pointer;
+}
+.hq-tab-move:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+.hq-tab-move:active:not(:disabled) {
+  background: rgb(184 145 61 / 18%);
+}
+.hq-tab-reset {
+  margin-top: var(--space-2);
 }
 .hq-confirm-list {
   margin: 0;

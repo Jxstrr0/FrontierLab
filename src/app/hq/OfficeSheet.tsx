@@ -2,7 +2,8 @@
 // which department sits on each floor of the building, its rent, and the two
 // release actions, each with a confirm that spells out what happens (staff
 // above the remaining desks let go with severance, fit-out written off, the
-// deposit back for a whole office).
+// deposit back for a whole office). Between them, the order of the HQ tabs
+// (TabOrderCard.tsx).
 import { useState } from 'preact/hooks';
 import { DEPARTMENTS } from '../../data/departments';
 import * as cmd from '../../sim/commands';
@@ -10,6 +11,7 @@ import type { DeptId, Office } from '../../sim/state';
 import { Card, Confirm, Row, Sheet } from '../components';
 import { money } from '../format/format';
 import { act, openPanel, useGame } from '../store';
+import { TabOrderCard } from './TabOrderCard';
 import {
   floorToRelease,
   hqDepts,
@@ -62,6 +64,7 @@ export function OfficeSheet(p: { office: Office; dept?: DeptId; onClose: () => v
             ))}
           </ol>
         </Card>
+        <TabOrderCard s={s} />
         <div class="stack hq-release">
           {p.dept && (
             <button

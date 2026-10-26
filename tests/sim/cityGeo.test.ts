@@ -123,6 +123,8 @@ describe('layout 2 geography', () => {
 describe('layout 1 never changes', () => {
   it('generates the same lots, sites and map as before layout versions', () => {
     for (const id of Object.keys(CITIES)) {
+      // Cities added after layout 2 (Moscow, St Petersburg) never had a layout 1.
+      if (!digests.newGame11[id]) continue;
       const s = newGame({ seed: 11, cityId: id, layout: 1 });
       expect(placesDigest(s, id), id).toBe(digests.newGame11[id]!.places);
       expect(mapDigest(cityMap(s, id)), id).toBe(digests.newGame11[id]!.map);

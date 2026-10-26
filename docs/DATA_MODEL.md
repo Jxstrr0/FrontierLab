@@ -57,7 +57,8 @@ export interface GameState {
   news: { issues: LedgerIssue[] };   // last 52
   history: { weekly: WeeklySnapshot[]; quarterly: QuarterReport[] };   // weekly: keep 260
   milestones: Record<string, Week>;  // id → week achieved
-  flags: { tutorialStep?: number; gameOver?: 'takeover'|'insolvency' };
+  flags: { tutorialStep?: number; gameOver?: 'takeover'|'insolvency';
+           lesson?: { id: string; step: number }; lessonsDone: string[] };  // SCREENS §27
 }
 ```
 
@@ -149,6 +150,7 @@ export interface People {
   managers: Record<Id, Manager>; execs: Record<Id, Exec>;
   managerCandidates: Manager[]; execCandidates: Record<string /*role*/, Exec[]>; candidatesRefreshWeek: Week;
   benefits: Record<string /*benefitId*/, number /*control value*/>;
+  hrHiring: boolean; // HR floor fills manager vacancies (v25)
 }
 export interface Manager { id: Id; name: string; portrait: AvatarSpec; skills: { people: Score; product: Score; marketing: Score; ethics: Score }; salary: Money; sinceWeek: Week; branchId?: Id }
 export interface Exec {
@@ -274,8 +276,10 @@ export interface Settings {
   currency: '$'|'C$'|'£'|'€'|'¥'; units: 'km'|'mi'; weeklyResults: 'weekly'|'quarterly'|'off';
   defaultSpeed: 1|2|4; autoPauseIncidents: boolean; autoPauseApplications: boolean;
   sound: boolean; reducedMotion: boolean; textScale: 1|1.15|1.3; layers: Record<string, boolean>;
+  hqTabOrder: DeptId[];   // HQ tabs as you arranged them; [] = DEPT_ORDER (schema v22)
+  guides: boolean;        // tutorial Part 2 on or off (schema v24)
 }
-export interface AvatarSpec { head: number; hair: number; facial: number; glasses: number; attire: number; tone: number; shade: number }
+export interface AvatarSpec { head: number; hair: number; facial: number; glasses: number; attire: number; tone: number; shade: number; eyes: number; brows: number; mouth: number; age: number }
 ```
 
 ## 9. Static data shapes (`src/data`)
@@ -323,9 +327,9 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 | Governance and executives | `holdBoardMeeting(dividendPerShare, ceoSalary)`, `hireExec(seat, candidateId)`, `fireExec`, `setExecSalary`, `setExecDelegation`, `addGrant(seat, type, shares, strike)`, `setGrowthCity(cityId, on)`, `cooOpenBranch(cityId)` |
 | Incidents | `resolveIncident(id, optionId)` |
 | Personal | `offerHome`, `rebuildHome`, `sellHome`, `buyCar`, `sellCar`, `placeBid`, `clearBid`, `appraiseCollectible`, `consignCollectible`, `withdrawConsignment`, `buyJet`, `sellJet`, `buyClub`, `sellClub`, `setKit`, `setKitSponsor`, `signPlayer`, `releasePlayer` |
-| Settings and saves | `setSettings`, `setFounderAvatar`; saves are not commands: `saveToSlot`, `loadFromSlot` (`src/sim/save/storage.ts`), `exportCode`, `importCode` (`serialize.ts`) |
+| Settings and saves | `setSettings`, `setFounderAvatar`, `moveHqTab`, `resetHqTabOrder`; saves are not commands: `saveToSlot`, `loadFromSlot` (`src/sim/save/storage.ts`), `exportCode`, `importCode` (`serialize.ts`) |
 
-## 12. Implemented so far (schema v15)
+## 12. Implemented so far (schema v26)
 
 `src/sim/state.ts` is the source of truth; this section records how it differs from the guide above. Later stages add the rest with a schema bump and a migration.
 
@@ -340,12 +344,23 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 - **Schema v12 adds** (audit follow-up): `DeskWeek.arrived` (applications that arrived this week), `RivalBank.execs` (the CFO/COO/CRO bench: `{ title, name }[]`), `WeeklySnapshot.appRating` (for the IT floor's trend) and, optional, `Book.last.defaultedLoans` (business loans that defaulted in the week). `milestones` now fills (id → week reached). Migration 11 → 12 draws every rival's bench from the `rivalBench` stream, adds `arrived: 0` to every desk tally and records milestones already reached without news.
 - **Schema v13 adds** (hands-off play): `executives.remembered` (per seat, the delegation toggles its last holder left; applied to the next hire), `executives.growthCities` (city id → true: where the COO's Expansion may build) and `executives.lastExpansionWeek` (-1 before the first COO build). `IncidentSpec.yours` and `NEW_BRANCH.by` ('coo') are data, not state. Migration 12 → 13 adds the three fields and switches every waiting candidate's delegations on (the new default).
 - **Schema v14 adds:** `company.lastBuild` (optional `BuildSpec`: the fit-out of your last own build; the build sheet and the COO's Expansion start from it) and the CFO's `shares` delegation (Share sales, split out of Capital). Migration 13 → 14 sets a seated CFO's and the remembered CFO toggles' `shares` to their `capital`, switches it on for waiting CFO candidates, and fills `lastBuild` from the newest branch.
-- **Schema v15 removes** (content trim): `dealerDeals` and the `dealerFees` P&L line (dealer financing is gone), and the `hold` value of `ReoPool.mode` (now `'rent' | 'selling'`). Migration 14 → 15 deletes `dealerDeals`, folds `dealerFees` into `marketing` in the open ledger and every weekly snapshot, drops `DEALER_*` events from the log, turns held REO pools into rented ones, retypes funding lots and offers (`brokered` → `term_interbank`, `senior_bond` → `covered_bond`, with the new type's radar), and renames a running `grand_opening` agency package to `street_team`.
+- **Schema v15 adds:** `company.guidance` (`{ deposits, loans }`, whole steps of the CFO and CRO's branch guidance), `executives.payPremium` (the COO's pay premium over market, default 0.05) and `executives.lastPayReviewWeek` (−1 before the first), plus the delegations `cfo.guidance`, `cro.guidance` and `coo.payReviews`. Migration 14 → 15 fills the fields and adds the new switches off for seated executives and remembered toggles (so nothing changes until you flip one) and on for waiting candidates. The RNG gains a `managerPoach` stream when first used.
+- **Schema v16 adds** Russia (`RU`) and its cities Moscow and St Petersburg. `world.countries.RU` and `fx.level.RU`/`fx.history.RU` join the per-country records; Russia draws its cycle and currency from its own `macro:RU` and `fx:RU` streams (`CountrySpec.ownStream`). `CitySpec.density` (optional, data only) scales a city's foot traffic and customer pool. Migration 15 → 16 initialises Russia's economy (`initCountries`) and starts the ruble at the index start.
+- **Schema v17 adds** `people.rerolls` (city id → paid manager rerolls since that pool's free refresh) and `executives.rerolls` (seat → paid rerolls since the pools' free refresh). Migration 16 → 17 starts both empty.
+- **Schema v18 adds** `company.guidance.staffing`, `.marketing` and `.products` (the COO's, CMO's and CPO's branch guidance steps) and a `guidance` delegation on those three seats. Migration 17 → 18 starts the steps at 0 and the switches off for seated executives and remembered toggles (on for waiting candidates).
+- **Schema v19 adds** `meta.houseStyle` (`HouseStyle`: `'heritage' | 'deco' | 'modern' | 'garden' | 'civic'`, later also `'quant'`, the branch fronts' house style chosen at New Game; a game started without one gets `SEEDED_HOUSE_STYLE_IDS[seed % 5]`, always one of the first five). Migration 18 → 19 picks one from the seed the same way.
+- **Schema v23 adds** `eyes`, `brows`, `mouth` and `age` to every `AvatarSpec` (founder, managers and candidates, executives, startup and venture CEOs), and a fourth glasses option. New people get the four from `faceDetail()` in `people.ts`, a hash of their other parts, so the people RNG stream is unchanged. Migration 22 → 23 walks the whole save and applies the same hash to every face; the founder's gets zeros (almond eyes, soft arch, smile, fresh), which is exactly how it drew before.
+- **Schema v24 adds** tutorial Part 2 (SCREENS §27.2): `settings.guides` (boolean), `flags.lesson` (the guide in progress and its step, optional) and `flags.lessonsDone` (ids of guides and first-look tips already seen). Part 1 grew from 7 to 9 steps, so `flags.tutorialStep` now runs 1–9 with 10 = closing card and 11 = finished. Migration 23 → 24 moves 8 → 10 and 9 → 11, switches guides on, and pre-marks the guides an older bank has no need for (`hq` with an office, `exec` with an executive, `ipo` once listed, `travel` and `place-airport` after a flight, `floor-{dept}` for each floor it has).
+- **Schema v25 adds** `people.hrHiring` (boolean): with an HR floor, HR hires the strongest candidate for every open branch without a manager each week (SIMULATION §16.11). Migration 24 → 25 switches it on, as for new games.
+- **Schema v22 adds** `settings.hqTabOrder` (`DeptId[]`, the HQ tabs in the order you arranged them; departments not listed follow in `DEPT_ORDER`). Migration 21 → 22 sets `[]`.
+- **Schema v21 adds** `executives.payReviewCadence` (`'quarterly' | 'annual'`), `executives.moraleTarget` (70 / 80 / 90) and `executives.brandTarget` (0.4–0.7): the delegation dials. Migration 20 → 21 sets quarterly, 70 and 0.5, what the switches always did.
+- **Schema v20 adds** `meta.logoShape` (`'round' | 'shield' | 'lozenge' | 'hex' | 'plaque' | 'rosette'`, the outline of the bank's mark chosen at New Game; `'round'` when none is chosen). Migration 19 → 20 sets `'round'`, so older banks keep the medallion they have always worn. The slot card record (`SaveMeta`) carries it too, optional for cards written before.
+- **Schema v26 removes** (content trim): `dealerDeals` and the `dealerFees` P&L line (dealer financing is gone), and the `hold` value of `ReoPool.mode` (now `'rent' | 'selling'`). Migration 25 → 26 deletes `dealerDeals`, folds `dealerFees` into `marketing` in the open ledger and every weekly snapshot, drops `DEALER_*` events from the log, turns held REO pools into rented ones, retypes funding lots and offers (`brokered` → `term_interbank`, `senior_bond` → `covered_bond`, with the new type's radar), and renames a running `grand_opening` agency package to `street_team`.
 - **Not yet present:** nothing from the v1 plan.
 - **Added fields:**
   - `ledger`: P&L lines and cash movements since the last weekly close, so commands between ticks land in the right week.
   - `nextId`: counter for generated ids.
-  - `meta.difficulty` (`'easy' | 'normal' | 'hard' | 'expert'`), `meta.competitors` (1–5) and `meta.startCash` (schema v2; migration 1 → 2 fills Normal, the city's usual rival count and $750k).
+  - `meta.difficulty` (`'easy' | 'normal' | 'hard' | 'expert'`), `meta.competitors` (1–5) and `meta.startCash` (schema v2; migration 1 → 2 fills Normal, the city's usual rival count and $750k, what every v1 game started with).
   - Schema v4 changes no shape: migration 3 → 4 moves lots onto tiles facing the Stage 3 street grid (lots already on frontage stay put).
   - The drawable city (streets, water, parks, landmarks, building heights) is not saved: `src/art/citygen.ts` regenerates it from the save seed, the city and its lots.
   - `Branch.desk` (`DeskWeek`: `week`, `arrived` (v12), `approved`, `refused`, `declined`, `expired`): this week's Loan Desk outcomes, reset when the week turns (schema v3; migration 2 → 3 adds an empty tally).

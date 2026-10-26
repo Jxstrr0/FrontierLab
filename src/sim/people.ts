@@ -16,10 +16,36 @@ import { stream, type Rng } from './rng';
 import type { AvatarSpec, GameState, Manager } from './state';
 
 /** Portrait part counts (ART_DIRECTION §4). */
-const PORTRAIT_PARTS = { head: 4, hair: 12, facial: 4, glasses: 3, attire: 4, tone: 6, shade: 3 };
+const PORTRAIT_PARTS = { head: 4, hair: 12, facial: 4, glasses: 4, attire: 4, tone: 6, shade: 3 };
+const FACE_DETAIL = { eyes: 4, brows: 3, mouth: 3 };
+/** Age by weight: fresh and seasoned faces are common, veterans rarer. */
+const AGE_WEIGHTS = [0, 0, 1, 1, 2];
+
+/** The parts a v22 save already had; eyes, brows, mouth and age derive from them. */
+export type BaseAvatar = Omit<AvatarSpec, 'eyes' | 'brows' | 'mouth' | 'age'>;
+
+/**
+ * Eyes, brows, mouth and age for a face, hashed from its other parts so the
+ * same person always has the same face without drawing on the people RNG
+ * (which keeps every older seed's candidates as they were). Save migration
+ * v22 → v23 uses the same rule.
+ */
+export function faceDetail(a: BaseAvatar): Pick<AvatarSpec, 'eyes' | 'brows' | 'mouth' | 'age'> {
+  let h = 0x811c9dc5;
+  for (const v of [a.head, a.hair, a.facial, a.glasses, a.attire, a.tone, a.shade]) {
+    h = Math.imul(h ^ (v + 1), 0x01000193) >>> 0;
+  }
+  h = Math.imul(h ^ (h >>> 13), 0x5bd1e995) >>> 0;
+  return {
+    eyes: h % FACE_DETAIL.eyes,
+    brows: (h >>> 4) % FACE_DETAIL.brows,
+    mouth: (h >>> 8) % FACE_DETAIL.mouth,
+    age: AGE_WEIGHTS[(h >>> 12) % AGE_WEIGHTS.length]!,
+  };
+}
 
 export function randomAvatar(rng: Rng): AvatarSpec {
-  return {
+  const base: BaseAvatar = {
     head: rng.int(0, PORTRAIT_PARTS.head - 1),
     hair: rng.int(0, PORTRAIT_PARTS.hair - 1),
     facial: rng.int(0, PORTRAIT_PARTS.facial - 1),
@@ -28,6 +54,7 @@ export function randomAvatar(rng: Rng): AvatarSpec {
     tone: rng.int(0, PORTRAIT_PARTS.tone - 1),
     shade: rng.int(0, PORTRAIT_PARTS.shade - 1),
   };
+  return { ...base, ...faceDetail(base) };
 }
 
 export function personName(rng: Rng): string {
@@ -83,4 +110,5 @@ export function refreshManagerPool(state: GameState, cityId: string, force = fal
   for (let i = 0; i < MANAGER_POOL_SIZE; i++) pool.push(generateManager(state, cityId));
   state.people.managerCandidates[cityId] = pool;
   state.people.candidatesRefreshWeek[cityId] = state.clock.week;
+  delete state.people.rerolls[cityId];
 }

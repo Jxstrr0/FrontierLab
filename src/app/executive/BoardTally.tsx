@@ -3,7 +3,7 @@
 // motion the final tallies show at once.
 import { useEffect, useState } from 'preact/hooks';
 import type { BoardMeeting, BoardVote } from '../../sim/state';
-import { moneyFull } from '../format/format';
+import { exactMoney, moneyFull } from '../format/format';
 
 /** UI timing for the tally animation (not simulation tuning). */
 const TALLY = { itemMs: 1200, frameMs: 40 } as const;
@@ -34,7 +34,7 @@ export function BoardTally(p: {
   return (
     <div class="stack">
       <Tally
-        label={`Dividend of ${p.sym}${m.dividend.proposed.toFixed(2)} a share`}
+        label={`Dividend of ${exactMoney(m.dividend.proposed, p.sym)} a share`}
         vote={m.dividend}
         progress={share(0)}
       />
@@ -67,7 +67,7 @@ export function BoardTally(p: {
 function dividendLine(m: BoardMeeting, sym: string): string {
   if (!m.dividend.passed) return 'The board voted the dividend down. Nothing will be paid.';
   if (m.dividend.proposed <= 0) return 'No dividend this quarter.';
-  return `Approved: ${sym}${m.dividend.proposed.toFixed(2)} a share, paid in three weeks.`;
+  return `Approved: ${exactMoney(m.dividend.proposed, sym)} a share, paid in three weeks.`;
 }
 
 function Tally(p: { label: string; vote: BoardVote; progress: number }) {

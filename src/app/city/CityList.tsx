@@ -135,7 +135,12 @@ function LotRow(p: {
         data-tutorial="my-branch"
         data-lot-id={lot.id}
       >
-        <Medallion ink={s.meta.brandInk} monogram={s.meta.monogram} size={32} />
+        <Medallion
+          ink={s.meta.brandInk}
+          monogram={s.meta.monogram}
+          shape={s.meta.logoShape}
+          size={32}
+        />
         <span class="lot-main">
           <span class="lot-address">{lot.address}</span>
           <span class="lot-occupant">{branch?.name ?? 'Your branch'}</span>

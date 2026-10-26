@@ -293,6 +293,104 @@
   color: var(--vault-deep);
 }
 
+/* Stepped slider: a rail with named 44 px stops; --frac places each stop. */
+.dial {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.dial-label {
+  font-size: var(--text-14);
+  color: var(--ivory-dim);
+}
+.dial-track {
+  position: relative;
+  height: 62px;
+}
+.dial-rail,
+.dial-fill {
+  position: absolute;
+  top: 21px;
+  left: 22px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--hairline);
+}
+.dial-rail {
+  right: 22px;
+}
+.dial-fill {
+  width: calc((100% - 44px) * var(--frac, 0%) / 100%);
+  background: var(--brass);
+  transition: width var(--dur-panel) var(--ease-out);
+}
+.dial-stop {
+  position: absolute;
+  top: 0;
+  left: calc(22px + (100% - 44px) * var(--frac, 0%) / 100%);
+  width: var(--tap-min);
+  height: 62px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ivory-dim);
+  font: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.dial-dot {
+  display: block;
+  box-sizing: border-box;
+  width: 12px;
+  height: 12px;
+  margin-top: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--hairline);
+  background: var(--vault-deep);
+  transition:
+    width var(--dur-panel) var(--ease-out),
+    height var(--dur-panel) var(--ease-out),
+    margin var(--dur-panel) var(--ease-out),
+    background-color var(--dur-panel) var(--ease-out);
+}
+.dial-stop.is-passed .dial-dot {
+  border-color: var(--brass);
+}
+.dial-stop.is-active .dial-dot {
+  width: 20px;
+  height: 20px;
+  margin-top: 12px;
+  border-color: var(--brass);
+  background: var(--brass);
+}
+.dial-name {
+  margin-top: 6px;
+  font-size: var(--text-12);
+  white-space: nowrap;
+}
+.dial-stop.is-active .dial-name {
+  color: var(--ivory);
+  font-weight: 600;
+}
+.dial-stop:focus-visible {
+  outline: none;
+}
+.dial-stop:focus-visible .dial-dot {
+  outline: 2px solid var(--brass);
+  outline-offset: 2px;
+}
+.dial-hint {
+  font-size: var(--text-12);
+  color: var(--ivory-dim);
+}
+.dial.is-disabled {
+  opacity: 0.55;
+}
+
 /* ─── Panel, sheet, modal ──────────────────────────────────────────────── */
 .panel {
   position: fixed;

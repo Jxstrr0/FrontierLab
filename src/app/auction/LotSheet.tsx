@@ -6,7 +6,7 @@ import { AUCTIONS } from '../../config/balance';
 import { buyerCost } from '../../sim/auctions';
 import * as cmd from '../../sim/commands';
 import { Row, Sheet, Stepper } from '../components';
-import { money, moneyFull, pct } from '../format/format';
+import { money, moneyFull, moneyStepper, pct } from '../format/format';
 import { act, toast, useGame } from '../store';
 import { CollectibleIcon } from './AuctionArt';
 import { bidBounds, saleDateText, type HouseView, type LotRow } from './auctionView';
@@ -57,7 +57,7 @@ export function LotSheet(p: { view: HouseView; row: LotRow; sym: string; onClose
             max={b.max}
             step={b.step}
             onChange={setBid}
-            format={(v) => moneyFull(v, p.sym)}
+            {...moneyStepper(p.sym)}
             disabled={!p.view.here}
           />
           <Row label="If you win, you pay up to" value={moneyFull(worst, p.sym)} />

@@ -146,21 +146,21 @@ export const CAMPAIGNS: Record<string, CampaignSpec> = {
   sponsors: {
     id: 'sponsors',
     name: 'Community Sponsors',
-    effectHint: 'Awareness ++ · Branch rating + · Businesses +',
+    effectHint: 'Awareness ++ · Branch rating + · Families and businesses +',
     levels: [
       {
         label: 'Modest',
         cost: weekly(300),
         awareness: 0.01,
         bumps: { branch: 0.05 },
-        segments: { BIZ: 1.08 },
+        segments: { FAM: 1.1, BIZ: 1.08 },
       },
       {
         label: 'Generous',
         cost: weekly(800),
         awareness: 0.022,
         bumps: { branch: 0.1 },
-        segments: { BIZ: 1.15 },
+        segments: { FAM: 1.1, BIZ: 1.15 },
       },
     ],
   },

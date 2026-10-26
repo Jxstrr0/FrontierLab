@@ -16,6 +16,7 @@ import { emptyWeek } from './branch/week';
 import { isQuarterStart, isYearStart } from './calendar';
 import { evaluateCapital } from './capital';
 import { runExecutives } from './executives';
+import { hrFillVacancies } from './hrHiring';
 import { governanceQuarter, runGovernance } from './governance';
 import { marketsQuarter, runMarkets } from './market';
 import { runFx } from './fx';
@@ -45,6 +46,7 @@ import { composeNews } from './news';
 import { runPartnerships } from './partnerships';
 import { rivalsQuarter, runRivals } from './rivalAi';
 import { refreshManagerPool } from './people';
+import { runManagerPoaching } from './payReviews';
 import { ftpLong, ftpShort, updateMarketRefs } from './rates';
 import { regulatorReview } from './riskFloor';
 import { repriceRivalFees, updateRivalPrices } from './rivalPrices';
@@ -104,6 +106,8 @@ export function weeklyTick(state: GameState): void {
   runBrandMarketing(state); // 8 (brand marketing)
   runCorporateDebt(state); // 8 (corporate debt)
   runExecutives(state); // 8 (executives, §17.2)
+  hrFillVacancies(state); // 8 (HR fills manager vacancies, §16.11)
+  runManagerPoaching(state); // 8 (branch managers poached, §17.1)
   runGovernance(state); // 8 (dividends due)
   runMergers(state); // 8 (M&A responses and integrations, §19.8)
   runRealEstate(state); // 8 (owned buildings, listings, sales, §21.1–21.2)

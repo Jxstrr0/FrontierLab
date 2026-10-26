@@ -1,13 +1,14 @@
 // Whole-engine checks: the balance identity and cash-flow reconciliation hold
 // every week of a scripted run (SIMULATION §1, §14.3).
 import { describe, expect, it } from 'vitest';
+import { START_CASH } from '../../src/config/balance';
 import { balanceSheet } from '../../src/sim/balanceSheet';
 import { FEE_INCOME, NON_CASH, summarize } from '../../src/sim/ledger';
 import { runScript } from '../helpers/scenario';
 
 describe('engine', () => {
   it('keeps assets = liabilities + equity and reconciles cash every week', () => {
-    let lastCash = 750_000;
+    let lastCash = START_CASH;
     let lastTaxPayable = 0;
     let weeksChecked = 0;
     const s = runScript(156, (state, week) => {

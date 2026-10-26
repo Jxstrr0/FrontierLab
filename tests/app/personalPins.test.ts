@@ -1,6 +1,6 @@
 // Pin rules for vacation homes and car dealers (SCREENS §19): "For sale" while
 // nobody owns a home, your seal once it's yours ("Rebuilding" while it runs),
-// and a seal on a dealer while a financing deal is active. Never "For lease".
+// and a plain medallion on a car dealer. Never "For lease".
 import { describe, expect, it } from 'vitest';
 import { personalPinInfo } from '../../src/app/personal/personalPins';
 import * as cmd from '../../src/sim/commands';

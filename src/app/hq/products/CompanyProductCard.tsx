@@ -76,8 +76,8 @@ export function CompanyProductCard(p: { spec: ProductSpec; country: CountryId })
         max={spec.max}
         step={spec.step}
         format={fmt}
-        parse={(t) => parsePrice(spec, t)}
-        editText={(v) => editPrice(spec, v)}
+        parse={(t) => parsePrice(spec, t, sym)}
+        editText={(v) => editPrice(spec, v, sym)}
         onChange={(v) => act(cmd.setCompanyPrice, spec.id, v, p.country)}
         hint={
           atHq

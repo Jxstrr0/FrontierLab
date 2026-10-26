@@ -17,6 +17,7 @@ import { addEffect, incidentPMult } from './effects';
 import { DIVIDEND_DUE, EXEC_POACHED } from './execRules';
 import { fraudShield, num, ratingHit, type IncidentRule } from './helpers';
 import { INSIDER_PROBE } from './insiderRule';
+import { newsExact } from '../newsFormat';
 import { compactMoney } from './text';
 
 const P = INCIDENT_PARAMS;
@@ -190,7 +191,7 @@ const RECAP_OFFER: IncidentRule = {
   prepare(state, _scope, data) {
     const q = recapQuote(state);
     data.amount = q.amount;
-    data.price = `${state.settings.currency}${q.price.toFixed(2)}`;
+    data.price = newsExact(q.price, state.settings.currency);
     data.shares = q.shares;
     data.floor = FAILURE.takeoverCr;
     data.weeks = Math.max(RECAP.offerWeeks, state.company.lowCapitalWeeks);

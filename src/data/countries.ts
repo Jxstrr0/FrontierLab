@@ -13,6 +13,12 @@ export interface CountrySpec {
   meetingWeeks: number[];
   peggedTo?: CountryId;
   pegSpread?: Rate;
+  /**
+   * Draws its business cycle and currency from its own RNG streams
+   * (`macro:{id}`, `fx:{id}`) instead of the shared ones, so adding the
+   * country after launch left every existing seed's world unchanged.
+   */
+  ownStream?: boolean;
 }
 
 export const COUNTRIES: Record<CountryId, CountrySpec> = {
@@ -108,5 +114,17 @@ export const COUNTRIES: Record<CountryId, CountrySpec> = {
     meetingWeeks: [5, 11, 18, 24, 31, 38, 44, 50],
     peggedTo: 'US',
     pegSpread: 0.0025,
+  },
+  RU: {
+    id: 'RU',
+    name: 'Russia',
+    centralBank: 'Bank of Russia',
+    // A high-rate economy: savers earn more, borrowers pay more.
+    startPolicy: 0.06,
+    neutral: 0.05,
+    inflationTarget: 2.0,
+    corpTax: 0.25,
+    meetingWeeks: [6, 12, 17, 24, 30, 38, 43, 51],
+    ownStream: true,
   },
 };

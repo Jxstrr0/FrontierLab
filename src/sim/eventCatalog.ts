@@ -128,6 +128,10 @@ export interface EventPayloads {
   /** An executive resigned or was poached (EXEC_POACHED decides first). */
   EXEC_RESIGNED: { seat: string; title: string; name: string; bank: string };
   EXEC_FIRED: { seat: string; title: string; name: string; severance: Money };
+  /** A rival hired away a branch manager (payReviews.ts, §17.1). */
+  MANAGER_POACHED: { branchId: Id; branch: string; name: string; rival: string };
+  /** The COO's pay review: salaries raised and cut, and the premium over market. */
+  PAY_REVIEW: { raised: number; cut: number; premium: number };
 
   // ─── Capital markets (market.ts, equity commands) ─────────────────────────
   PLACEMENT: { bank: string; investor: string; shares: number; price: Money; raised: Money };

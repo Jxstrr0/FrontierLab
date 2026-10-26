@@ -8,6 +8,7 @@ import { DAYS_PER_WEEK } from '../../config/balance';
 import { execSalaryBounds, maxCeoSalary } from '../../sim/commands';
 import { VEST_WEEKS, grantFairValue, vestedAfter } from '../../sim/execGrants';
 import { delegationOn } from '../../sim/execSeats';
+export { execRerollFee } from '../../sim/candidateRerolls';
 import { boardBlocker, quarterLabel } from '../../sim/governance';
 import {
   ceoMarketSalary,

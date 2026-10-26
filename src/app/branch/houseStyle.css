@@ -1,0 +1,77 @@
+/* House style dressing on the branch fronts (ART_DIRECTION §3): gilt and
+   lamp light in brass, the sign lettering for each style, a flag that stirs
+   in the breeze and, for Quant Noir, graphite slabs and light strips that
+   pulse (all stopped with reduced motion, see interior.css). */
+.vignette .hs-noir {
+  fill: var(--ledger-ink);
+}
+.vignette .hs-mono {
+  font-family: var(--font-ui);
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  fill: var(--ivory);
+}
+.in-alive .hs-pulse {
+  animation: hs-pulse 2.6s ease-in-out infinite;
+}
+@keyframes hs-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+.vignette .hs-gilt {
+  fill: var(--brass);
+}
+.vignette .hs-gilt-line {
+  fill: none;
+  stroke: var(--brass);
+  stroke-width: 0.6;
+}
+.vignette .hs-serif {
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+.vignette .hs-spaced {
+  letter-spacing: 0.08em;
+}
+.vignette .hs-sans {
+  font-family: var(--font-ui);
+  font-weight: 700;
+}
+.vignette .hs-italic {
+  font-style: italic;
+}
+.vignette .hs-cut {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+}
+.vignette .hs-leaf {
+  fill: var(--wash-leaf);
+  opacity: 0.55;
+}
+.vignette .hs-leaf-line {
+  stroke: var(--wash-leaf);
+}
+.vignette .hs-glow {
+  fill: var(--brass);
+  opacity: 0.55;
+}
+.in-alive .hs-flag {
+  transform-box: fill-box;
+  transform-origin: 0 50%;
+  animation: hs-flag 2.8s ease-in-out infinite;
+}
+@keyframes hs-flag {
+  0%,
+  100% {
+    transform: skewY(0deg) scaleX(1);
+  }
+  50% {
+    transform: skewY(4deg) scaleX(0.94);
+  }
+}

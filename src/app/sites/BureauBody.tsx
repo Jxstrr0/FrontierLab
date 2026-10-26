@@ -17,6 +17,7 @@ import { NameField } from '../hq/products/NameField';
 import { INPUT_IDS, radarText } from '../hq/products/productSelectors';
 import { act, toast, useGame } from '../store';
 import '../hq/products/products.css';
+import { exactMoney } from '../format/format';
 
 export function BureauBody(p: { site: Site }) {
   const s = useGame();
@@ -85,7 +86,7 @@ function PackageCard(p: { pkg: BureauPackageSpec; here: boolean }) {
         {current && <Badge tone="good">House model</Badge>}
       </div>
       <ModelRosette radar={radar} label={pkg.name} />
-      <Row label="Cost per application" value={`${sym}${pkg.costPerApp.toFixed(2)}`} strong />
+      <Row label="Cost per application" value={exactMoney(pkg.costPerApp, sym)} strong />
       <Row label="Model quality" value={`${radarText(modelQuality({ radar }))} / 10`} />
       {current ? (
         <p class="muted small hq-note">Current house model.</p>

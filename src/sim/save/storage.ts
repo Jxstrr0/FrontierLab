@@ -7,7 +7,9 @@
 // This is the only module allowed to touch browser storage (CLAUDE.md); the
 // simulation itself never calls it.
 import { compressToUTF16, decompressFromUTF16 } from 'lz-string';
+import type { LogoShape } from '../../data/types';
 import { dateOf } from '../calendar';
+import { coverMetaFor, type CoverMeta } from '../coverMeta';
 import type { GameState, Settings } from '../state';
 import { checksum, deserialize, serialize } from './serialize';
 
@@ -25,12 +27,16 @@ export interface SaveMeta {
   bankName: string;
   monogram: string;
   brandInk: string;
+  /** The mark's outline; missing on slots written before v20 (drawn round). */
+  logoShape?: LogoShape;
   date: string;
   day: number;
   cash: number;
   savedAt: number;
   /** checksum() of the compressed save; missing on slots written before v12. */
   checksum?: string;
+  /** What the title screen's skyline prints (coverWorld.ts); missing on older cards. */
+  cover?: CoverMeta;
 }
 
 export const STORAGE_FULL =
@@ -62,10 +68,12 @@ export function slotMetaFor(slot: SlotId, state: GameState): SaveMeta {
     bankName: state.meta.bankName,
     monogram: state.meta.monogram,
     brandInk: state.meta.brandInk,
+    logoShape: state.meta.logoShape,
     date: gameDate(state.meta.startDate, state.clock.day),
     day: state.clock.day,
     cash: state.company.cash,
     savedAt: Date.now(),
+    cover: coverMetaFor(state),
   };
 }
 
@@ -160,6 +168,26 @@ export function savePrefs(prefs: Partial<Settings>): void {
   }
 }
 
+const COVER_INDEX_KEY = `${PREFIX}coverCityIndex`;
+
+/** Which city the title cover shows a new player this launch (docs/COVER_SCREEN.md §4.1). */
+export function loadCoverIndex(): number {
+  try {
+    const n = Number(store()?.getItem(COVER_INDEX_KEY) ?? 0);
+    return Number.isInteger(n) && n >= 0 ? n : 0;
+  } catch {
+    return 0;
+  }
+}
+
+export function saveCoverIndex(index: number): void {
+  try {
+    store()?.setItem(COVER_INDEX_KEY, String(index));
+  } catch {
+    // A convenience only; ignore storage failures.
+  }
+}
+
 const TUTORIAL_SEEN_KEY = `${PREFIX}tutorialSeen`;
 
 /** Whether this browser has finished or skipped the tutorial before (SCREENS §27). */
@@ -176,6 +204,27 @@ export function saveTutorialSeen(seen: boolean): void {
   try {
     if (seen) store()?.setItem(TUTORIAL_SEEN_KEY, '1');
     else store()?.removeItem(TUTORIAL_SEEN_KEY);
+  } catch {
+    // A convenience only; ignore storage failures.
+  }
+}
+
+const DEV_TOOLS_KEY = `${PREFIX}devTools`;
+
+/** Whether this browser shows the developer tools in Settings (SCREENS §26). */
+export function loadDevTools(): boolean {
+  try {
+    return store()?.getItem(DEV_TOOLS_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+/** Switches the developer tools on or off for this browser. */
+export function saveDevTools(on: boolean): void {
+  try {
+    if (on) store()?.setItem(DEV_TOOLS_KEY, '1');
+    else store()?.removeItem(DEV_TOOLS_KEY);
   } catch {
     // A convenience only; ignore storage failures.
   }

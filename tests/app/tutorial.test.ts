@@ -15,6 +15,7 @@ import {
   type StepMemo,
 } from '../../src/app/tutorial/steps';
 import type { ModalRoute, PanelRoute } from '../../src/app/store';
+import { CAMPAIGNS } from '../../src/data/campaigns';
 import { REFERENCE_BUILDS } from '../../src/data/equipment';
 import { TUTORIAL, TUTORIAL_TEXT } from '../../src/data/tutorial';
 import * as cmd from '../../src/sim/commands';
@@ -32,7 +33,7 @@ const start = () => {
 const look = (s: GameState, panel: PanelRoute | null = null, modal: ModalRoute | null = null) =>
   observe(s, panel, modal);
 
-/** Plays the seven steps with commands; returns the memo trail and the game. */
+/** Plays the nine steps with commands; returns the memo trail and the game. */
 function playThrough(): { s: GameState; trail: number[] } {
   const s = start();
   const trail: number[] = [];
@@ -113,13 +114,36 @@ function playThrough(): { s: GameState; trail: number[] } {
     cmd.decideApplication(s, app.id, Math.min(app.maxRate, 0.2));
   }
   advance(memo);
+
+  // 8. Run a campaign.
+  const marketing: PanelRoute = { type: 'branch', branchId, tab: 'marketing' };
+  memo = enterStep(8, look(s, marketing));
+  expect(alreadyDone(memo, look(s, marketing))).toBe(false);
+  expect(isDone(memo, look(s, marketing))).toBe(false);
+  const campaign = Object.keys(CAMPAIGNS)[0]!;
+  expect(cmd.setCampaignLevel(s, branchId, campaign, 1).ok).toBe(true);
+  expect(isDone(memo, look(s, marketing))).toBe(true);
+  advance(memo);
+
+  // 9. Meet the bank: done once the Company summary has been open and is closed.
+  memo = enterStep(9, look(s));
+  expect(guidance(memo, look(s)).targets.map((t) => t.key)).toEqual([
+    'capital-meter',
+    'hud-bank',
+    'panel-close',
+  ]);
+  const company: PanelRoute = { type: 'company' };
+  memo = updateMemo(memo, look(s, company));
+  expect(isDone(memo, look(s, company))).toBe(false);
+  expect(isDone(memo, look(s))).toBe(true);
+  advance(memo);
   return { s, trail };
 }
 
 describe('tutorial step machine', () => {
-  it('walks the seven steps of SCREENS §27, each on the player’s own action', () => {
+  it('walks the nine steps of SCREENS §27.1, each on the player’s own action', () => {
     const { s, trail } = playThrough();
-    expect(trail).toEqual([1, 2, 3, 4, 5, 6, 7]);
+    expect(trail).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9]);
     expect(s.flags.tutorialStep).toBe(TUTORIAL.finale);
     expect(s.underwriting.loansBooked).toBeGreaterThan(0);
   });
@@ -162,10 +186,13 @@ describe('tutorial step machine', () => {
     cmd.setOffered(s, r.branchId, 'personal_loan', true);
     expect(alreadyDone(enterStep(6, look(s)), look(s))).toBe(true);
     expect(alreadyDone(enterStep(4, look(s)), look(s))).toBe(false);
+    expect(alreadyDone(enterStep(8, look(s)), look(s))).toBe(false);
+    s.branches[r.branchId]!.delegation.marketing = true;
+    expect(alreadyDone(enterStep(8, look(s)), look(s))).toBe(true);
   });
 
-  it('only steps 1–7 are active; the closing card follows step 7', () => {
-    expect([undefined, 0, 1, 7, 8, 9].map(isActiveStep)).toEqual([
+  it('only steps 1–9 are active; the closing card follows step 9', () => {
+    expect([undefined, 0, 1, 9, 10, 11].map(isActiveStep)).toEqual([
       false,
       false,
       true,
@@ -181,7 +208,7 @@ describe('tutorial step machine', () => {
 describe('tutorial commands', () => {
   it('validates the step', () => {
     const s = newGame({ seed: 1, cityId: 'cal' });
-    expect(cmd.setTutorialStep(s, 10).ok).toBe(false);
+    expect(cmd.setTutorialStep(s, 12).ok).toBe(false);
     expect(cmd.setTutorialStep(s, 2.5).ok).toBe(false);
     expect(cmd.setTutorialStep(s, TUTORIAL.done).ok).toBe(true);
     expect(s.flags.tutorialStep).toBe(TUTORIAL.done);
@@ -192,7 +219,7 @@ describe('tutorial commands', () => {
     const r = cmd.buildBranch(s, { lotId: freeLot(s).id, build: REFERENCE_BUILDS.basic });
     if (!r.ok) throw new Error(r.reason);
     expect(cmd.requestTutorialApplication(s, r.branchId).ok).toBe(false);
-    cmd.setTutorialStep(s, TUTORIAL.last);
+    cmd.setTutorialStep(s, TUTORIAL.loan);
     expect(cmd.requestTutorialApplication(s, r.branchId).ok).toBe(true);
     expect(cmd.requestTutorialApplication(s, r.branchId).ok).toBe(false);
     expect(Object.keys(s.loanDesk.applications)).toHaveLength(1);

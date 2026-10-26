@@ -174,14 +174,15 @@ These are read by other systems:
 - `served = captured × clamp((C − visitRate × customers) / captured, 0, 1)`
 
 ### 6.5 Branch managers
-- **Hiring.** Hire from 3 candidates; the pool refreshes every 4 weeks, and also whenever the hire sheet is closed without hiring (`rerollManagerCandidates`, drawn from the `people` stream). Until your first manager is hired, the first candidate (the tutorial guide) is kept.
-  - Skills: People, Product, Marketing and Ethics, each drawn from normal(60, 15) and clamped to 25–98.
+- **Hiring.** Hire from 3 candidates; the pool refreshes free every 4 weeks. **Paid reroll** (`rerollManagerCandidates`, drawn from the `people` stream): a recruiter deals 3 new candidates for CANDIDATE_REROLL.feeShare (7.5%; 10% before 2026-10-25) × the city's manager market pay (MANAGER_BASE_SALARY × wageIndex), rounded to $100; each further reroll before the free refresh multiplies the fee by CANDIDATE_REROLL.growth (2). The free refresh resets the count; a paid reroll doesn't move its date. The fee is posted to `managers`. Until your first manager is hired, the first candidate (the tutorial guide) is kept.
+  - Skills: People, Product, Marketing and Ethics, each drawn from normal(62, 16) and clamped to 25–98 (v0.10.12: a slightly stronger pool, about one in eight scores 80+ rather than one in eleven).
   - Salary ask: `MANAGER_BASE_SALARY (72,000) × city.wageIndex × (0.7 + 0.6 × avgSkill/100)`.
 - **People** lifts morale and skill (§6.2, §6.3) and the Service rating (§8).
 - **Product** sets delegated pricing quality and Loan Desk estimate accuracy (§11, §17).
 - **Marketing** multiplies campaign effects by `0.8 + 0.4 × marketing/100`.
 - **Ethics** multiplies mis-selling, fraud and walkout incident odds by `1.6 − ethics/100` (§23).
 - **No manager:** Service −0.3, morale −5, and no delegation.
+- **Market pay and poaching** (2026-10-25). A manager's market pay is their hiring ask × `(1 + MANAGER_PAY.tenureGrowth (0.03) × years at the bank)`: rivals pay more for experience, so a fixed salary slowly falls behind. Each week a rival may poach each manager with probability `MANAGER_PAY.poachBase (0.0006) × (pay/market < 0.9 ? 3 : pay/market ≥ 1.1 ? 0.5 : 1)` (stream `managerPoach`). A poached manager leaves at once, every branch delegation comes back to you, and a `MANAGER_POACHED` event and toast say so; the COO's Branch operations, or the HR floor (§16.11), rehires. `MANAGER_PAY.salaryStep` (1,000) is the salary stepper's step.
 
 ## 7. Awareness and marketing
 
@@ -237,7 +238,7 @@ Targets are computed each week. Displayed ratings follow them with `ema(rating, 
 ### 9.2 Prospects
 `P = footTraffic × PROSPECT_RATE (0.040) × (0.25 + 0.75 × e) × loanDemand^0.5 × (1 − penetration)^SATURATION_EXP (2.8) × cityRoom × noise(±5%)`. (Stage 1 tuning: 0.030 → 0.040 and 2.5 → 2.8.)
 
-**City-wide pool (added 2026-10-25):** `cityRoom = 1 − reach^CITY_SATURATION_EXP (3)`, where `reach = clamp(your customers across every branch in the city ÷ CITY_MARKET[size], 0, 1)` and `CITY_MARKET = { S: 32,000, M: 38,000, L: 50,000, XL: 72,000 }` (`src/sim/branch/cityMarket.ts`). Without it each lot brought its own foot traffic, so profit kept rising until almost every lot in a city was yours (about 30 branches in a small city). With it, total profit levels off at about 5 branches in a small city, 7–9 in a medium one, 9–12 in a large one and 12–15 in an extra-large one, and extra branches mostly split customers with your own. A first branch alone barely feels it (reach ≈ 0.3 → room 0.97). `CITY_BRANCH_GUIDE = { S: 5, M: 7, L: 9, XL: 12 }` is advice only: the storefront panel and the scripted strategies use it. Delegated marketing (§17.1) uses the same multiplier.
+**City-wide pool (added 2026-10-25):** `cityRoom = 1 − reach^CITY_SATURATION_EXP (3)`, where `reach = clamp(your customers across every branch in the city ÷ (CITY_MARKET[size] × city density), 0, 1)` and `CITY_MARKET = { S: 32,000, M: 38,000, L: 50,000, XL: 72,000 }` (`src/sim/branch/cityMarket.ts`). Without it each lot brought its own foot traffic, so profit kept rising until almost every lot in a city was yours (about 30 branches in a small city). With it, total profit levels off at about 5 branches in a small city, 7–9 in a medium one, 9–12 in a large one and 12–15 in an extra-large one, and extra branches mostly split customers with your own. A first branch alone barely feels it (reach ≈ 0.3 → room 0.97). Dense cities (CONTENT §2, `density`, Moscow 1.35) scale the pool and the guide. `CITY_BRANCH_GUIDE = { S: 5, M: 7, L: 9, XL: 12 }` is advice only: the storefront panel and the scripted strategies use it. Delegated marketing (§17.1) uses the same multiplier.
 
 **Pacing intent:** like the original's stores, a branch should reach most of its mature size within about a year, with most of the growth in the first six months, rather than compounding for a decade. High intake plus strong saturation does that, so a mid build pays back in under ~40 weeks.
 
@@ -675,6 +676,11 @@ Levels 1–5 (Very conservative to Very aggressive):
 - **Brand campaigns** run per city or per country with a weekly cost and a gain to `b`.
 - **Agency packages:** a one-time `b` boost spread over the package length, with no staff needed.
 
+### 16.11 HR hires branch managers
+- With an HR floor and `people.hrHiring` on (the default; switch on the HR floor, `setHrHiring`), each week (tick step 8, right after the executives) every **open** branch with no manager gets the candidate in its city with the highest total of the four skills (people + product + marketing + ethics; ties go to the first listed), hired with the player's own `hireManager`, so at the candidate's asking salary. A branch still being built waits until it opens; a city with no candidates waits for its next pool.
+- HR only fills the seat: the branch's delegations stay as they were. The COO's **Branch operations** (§17.2) runs first in the same week and does the same hire plus default delegation, so with both on the COO's version wins.
+- This also refills a branch whose manager was poached (§6.5) the following week.
+
 ## 17. People AI
 
 ### 17.1 Branch manager (when delegated)
@@ -696,16 +702,30 @@ Levels 1–5 (Very conservative to Very aggressive):
 
 | Exec | Domain | Delegations |
 |---|---|---|
-| COO | HR, all branches | **Expansion:** opens branches for you in the cities you mark for growth (one at most every 4 weeks, in the growth city with the most room, at the busiest free storefront clear of your other branches, in your usual fit-out, keeping 8 weeks of costs in cash). **Company troubles:** settles company and city incidents the way a delegated manager would (§17.1), valuing effects in weeks of company revenue with error shrinking with Expertise; cases marked `yours` (bank run, rescue offer, poached executives) always come to you. **Branch operations:** auto-hires managers for new branches and turns on default delegation. **HR benefits:** keeps average morale ≥ 70 at least cost. **HR division:** auto-staffs every floor to 100% coverage. |
-| CFO | Finance, Treasury | Halves statement delays. **Treasury:** auto-funding, bond share and buying funding offers to keep LR within ±2pp of target. **Capital:** at Watch or worse, sells the company's stocks and steps risk appetite down every 4 weeks, 2 weeks after the CRO's turn (`cfoAppetitePhase`), so a seated CRO keeps tuning it too and the two never move it twice in one week. **Share sales** (its own switch since 2026-10-25, so the owner can keep their stake undiluted): at Restricted or Critical, sells new shares through the cheapest investment bank (private placement while private, within the round limits; secondary once listed), sized to reach 12% plus any regulator buffer, or what the charter floor needs. Never launches the IPO. **Dividends:** proposes a dividend at board meetings. |
-| CPO | Products | **Pricing:** keeps the company lineup priced like a delegated manager (§17.1) when Apply-to-all is on. **Developments:** starts one when none is running, within a budget cap of 1% of revenue. **Models:** switches to the bureau package with the best defaults saved per dollar. |
+| COO | HR, all branches | **Expansion:** opens branches for you in the cities you mark for growth (one at most every 4 weeks, in the growth city with the most room, at the busiest free storefront clear of your other branches, in your usual fit-out, keeping 8 weeks of costs in cash). **Company troubles:** settles company and city incidents the way a delegated manager would (§17.1), valuing effects in weeks of company revenue with error shrinking with Expertise; cases marked `yours` (bank run, rescue offer, poached executives) always come to you. **Branch operations:** auto-hires managers for new branches and turns on default delegation. **HR benefits:** keeps average morale at or over the **morale target** you dial (`executives.moraleTarget`, one of `EXEC_DELEGATION.moraleTargets` 70 / 80 / 90, default 70) at least cost, within `benefitsBudgetShare` (8%) of payroll. **HR division:** auto-staffs every floor to 100% coverage. **Pay reviews:** on the **cadence** you dial (`executives.payReviewCadence`: quarterly = every 13 weeks, annual = every 52, `PAY_REVIEW.cadences`, default quarterly) sets every executive to `execMarketSalary × (1 + payPremium)` and every branch manager to their market pay (§6.5) × `(1 + payPremium)`, rounded to the salary steps and inside the allowed ranges; it also runs at once when switched on and whenever you change the premium (`setPayPremium`, −10% to +30% in 5% steps, default +5%). **Branch guidance (staffing):** see below. |
+| CFO | Finance, Treasury | Halves statement delays. **Treasury:** auto-funding, bond share and buying funding offers to keep LR within ±2pp of target. **Capital:** at Watch or worse, sells the company's stocks and steps risk appetite down every 4 weeks, 2 weeks after the CRO's turn (`cfoAppetitePhase`), so a seated CRO keeps tuning it too and the two never move it twice in one week. **Share sales** (its own switch since 2026-10-25, so the owner can keep their stake undiluted): at Restricted or Critical, sells new shares through the cheapest investment bank (private placement while private, within the round limits; secondary once listed), sized to reach 12% plus any regulator buffer, or what the charter floor needs. Never launches the IPO. **Dividends:** proposes a dividend at board meetings. **Branch guidance (funding),** with the CRO: see below. |
+| CPO | Products | **Pricing:** keeps the company lineup priced like a delegated manager (§17.1) when Apply-to-all is on. **Developments:** starts one when none is running, within a budget cap of 1% of revenue. **Models:** switches to the bureau package with the best defaults saved per dollar. **Branch guidance (lineup):** see below. |
 | CTO | IT | App rating bonus (§16.9); runs digital projects. An empty seat applies the vacancy penalty. |
-| CRO | Risk | Tunes risk appetite to hold CR ≥ 12% and the annualized loss rate ≤ 1.2% (expansion target); Loan Desk policy. |
-| CMO | Marketing | Runs brand campaigns to hold `b` near 0.5 in active cities within a budget cap of 3% of revenue. |
+| CRO | Risk | Tunes risk appetite to hold CR ≥ 12% and the annualized loss rate ≤ 1.2% (expansion target); Loan Desk policy. **Branch guidance (lending),** with the CFO: see below. |
+| CMO | Marketing | Runs brand campaigns to hold `b` near the **awareness target** you dial (`executives.brandTarget`, one of `EXEC_DELEGATION.brandTargets` 40–70%, default 50%) in active cities within a budget cap of 3% of revenue. **Branch guidance (marketing):** see below. |
 
-**Resignation:** weekly probability `0.002 × (1.5 − loyalty/100) × (pay/market < 0.9 ? 2 : 1) × (unvested grants ? 0.5 : 1)`. Triggers the `EXEC_POACHED` incident.
+**Branch guidance** (`src/sim/branchGuidance.ts`, 2026-10-25): the C-suite steers the branch managers you delegate to, so managers still decide with their own skills but aim where HQ points them. The CFO and CRO steer managers who handle products or loan approvals (and the CPO's company pricing, which uses the same rule); the COO, CMO and CPO (schema v18) steer managers who handle staffing, marketing and products. `company.guidance` holds five whole steps in `GUIDANCE.min..max` (−1..+3), moved one step every `GUIDANCE.everyWeeks` (4):
+- **Deposits (CFO):** +1 while the liquidity ratio is below `liqTarget − 0.01`, −1 above `liqTarget + 0.05`.
+- **Loans (CRO):** +1 (tighter) while CR < 12% or losses > 1.2% a year; −1 when CR ≥ 14% and losses ≤ 0.9% (the CRO's appetite marks).
+- **Effect:** a delegated manager's deposit rate moves by `deposits × GUIDANCE.rateStep (0.10 pp)`, never above FTP; loan rates by `loans × 0.10 pp`, never below FTP; the delegated Loan Desk's PD threshold is × `(1 − 0.12 × loans)` and its offered rate rises by the same loan offset.
+- **Staffing (COO):** +1 while open delegated-staffing branches average staff morale below `GUIDANCE.moraleLow` (65), −1 above `moraleHigh` (82). Effect: delegated wages × `(1 + 0.02 × staffing)` and staff target × `(1 + 0.05 × staffing)`, on top of the manager's People skill.
+- **Marketing (CMO):** +1 while average brand awareness across the cities of open delegated-marketing branches is below the dialled `brandTarget − GUIDANCE.brandBand` (40% at the default target), −1 above `brandTarget + brandBand` (60%). Effect: the awareness value a delegated manager weighs each campaign against (§17.1) × `(1 + 0.2 × marketing)`.
+- **Products (CPO):** +1 while open delegated-products branches average a products rating below `productsLow` (3★), −1 at `productsHigh` (4★) or better. Effect: delegated fee prices × `(1 − 0.03 × products)` (also the CPO's own company pricing) and the lineup's affinity bar (`DELEGATE.minAffinity`) × `(1 − 0.25 × products)`, so more products go on.
+- With no delegated branch to read, a part holds its step. A part whose switch is off or whose seat is empty returns to 0 that week.
 
-**Candidate pools** refresh every 4 weeks. A University Graduate Program adds +10 to candidate skills. Candidates come with every delegation on; a seat remembers the toggles its last holder left, and the next hire for that seat starts with those (schema v13), so a resignation never silently changes how the bank is run.
+**Delegation dials** (`src/sim/execPolicy.ts`, 2026-10-25): three delegations carry a stepped slider under their switch, and a tagline estimates what the chosen stop means right now, by the routine's own rule and without changing anything:
+- **Morale target** (COO · HR benefits): walks the routine's benefit steps from today's benefits (most morale per dollar up, least morale lost per dollar down) until the estimated average morale reaches the target or the 8% budget runs out, and reports the weekly benefits cost, its change, its share of payroll and the morale it reaches (`moraleEstimate`).
+- **Awareness target** (CMO · Brand campaigns): for each city with an open branch, a campaign starts where `b < target − brandSlack` (the cheapest city campaign not already running, only while the 3% budget covers it) and running ones stop where `b > target + brandSlack`; reports the weekly spend, its change and share of revenue, how many cities are pushed, and the change in new-customer flow once those cities sit at the target, from the awareness factor in §9.1 with each branch's own `a` held (`brandEstimate`).
+- **Review cadence** (COO · Pay reviews): reviews a year, how far pay can lag the market between reviews (`MANAGER_PAY.tenureGrowth × weeks ÷ 52`: ~0.8% quarterly, 3% annual) and what the next review would add to annual pay across executives and managers (`nextReviewDelta`).
+
+**Resignation:** weekly probability `0.002 × (1.5 − loyalty/100) × (pay/market < 0.9 ? 2 : pay/market ≥ 1.1 ? 0.5 : 1) × (unvested grants ? 0.5 : 1)`. Triggers the `EXEC_POACHED` incident.
+
+**Candidate pools** refresh every 4 weeks. Candidate skills roll uniformly in EXECUTIVES.skillRange (35–93; v0.10.12 raised the top from 90 so a few more very good candidates turn up). A seat's pool can be rerolled sooner for a recruiter's fee (`rerollExecCandidates`): CANDIDATE_REROLL.feeShare × the executive market salary, doubling with each reroll of that seat until the free refresh; posted to `execPay`. A University Graduate Program adds +10 to candidate skills. Candidates come with every delegation on; a seat remembers the toggles its last holder left, and the next hire for that seat starts with those (schema v13), so a resignation never silently changes how the bank is run.
 
 **Growth cities and "Open now":** `setGrowthCity` marks a city the COO may build in (only cities you have visited, not regional sites); hiring a COO with Expansion on, or switching it on, with none marked seeds the list with the cities you already have branches in. `cooOpenBranch(cityId)` has a seated COO build their usual pick at once, needing only the cash for the build (no reserve, no cadence); it works from any city, because the COO travels for you.
 
@@ -976,7 +996,7 @@ Run `npm run balance` with seed 42 and the start city Calgary, unless noted. Bra
 
 | Checkpoint | Target |
 |---|---|
-| First branch build + lease deposit (mid build, average lot) | $300k–$450k, leaving room for at most one more basic branch from the $750k start |
+| First branch build + lease deposit (mid build, average lot) | $300k–$450k, leaving room for at most one more basic branch from the $900k start |
 | First branch weekly income turns positive | week 6–16 |
 | Branch at week 26 | deposits $15–30M; income positive |
 | Branch at week 52 | deposits $30–50M; loans 75–90% of deposits; customers 3,000–5,000; income +$20k–$40k/week [was $15k–$30k] |
@@ -1016,8 +1036,8 @@ Group the constants like this, with the defaults shown above:
   - `DAY_MS = 1000`, `SPEEDS = [0, 1, 2, 4]`
   - `START_DATE = '2027-01-04'`, `QUARTER_ENDS`
 - **START:**
-  - `START_CASH = 750_000`, `CHARTER_CAPITAL = 2_000_000` (in reserves), `START_SHARES = 10_000_000`
-  - `START_CASH_OPTIONS = [500_000, 750_000, 1_000_000, 1_250_000]`; `COMPETITORS = { min: 1, max: 5 }`
+  - `START_CASH = 900_000`, `CHARTER_CAPITAL = 2_000_000` (in reserves), `START_SHARES = 10_000_000`
+  - `START_CASH_OPTIONS = [600_000, 900_000, 1_200_000, 1_500_000]`; `DEV_PAYMENT = 10_000_000` (Settings developer tools); `COMPETITORS = { min: 1, max: 5 }`
   - `DIFFICULTY` per level (`demandMult` on prospects §9.2, `rivalQuality` coins added at rival seeding, `rivalRateEdge` pp toward customers on rival rates §18.2, `lossMult` on new-loan and business-loan PDs §10.3, §11):
 
     | Level | demandMult | rivalQuality | rivalRateEdge | lossMult |

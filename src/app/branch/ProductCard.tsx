@@ -73,8 +73,8 @@ export function ProductCard(p: { branch: Branch; spec: ProductSpec; onLoanDesk: 
           max={spec.max}
           step={spec.step}
           format={fmt}
-          parse={(t) => parsePrice(spec, t)}
-          editText={(v) => editPrice(spec, v)}
+          parse={(t) => parsePrice(spec, t, sym)}
+          editText={(v) => editPrice(spec, v, sym)}
           onChange={(v) => act(cmd.setPrice, branch.id, spec.id, v)}
           hint={priceHint}
           disabled={atHq || delegated}

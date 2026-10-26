@@ -9,6 +9,7 @@ import { useGame } from '../../store';
 import { ManageModelsSheet } from './ManageModelsSheet';
 import { ModelRosette } from './ModelRosette';
 import { modelSourceText, radarText } from './productSelectors';
+import { exactMoney } from '../../format/format';
 
 /** A paid cost this much above the model's list cost reads as a surcharge. */
 const SURCHARGE_SHOWN = 0.005;
@@ -33,7 +34,7 @@ export function HouseModelCard() {
         {u.switching && <Badge tone="warn">Switching</Badge>}
       </div>
       <ModelRosette radar={model.radar} label="House model" />
-      <Row label="Cost per application" value={`${sym}${paid.toFixed(2)}`} strong />
+      <Row label="Cost per application" value={exactMoney(paid, sym)} strong />
       {surcharge && (
         <p class="small tone-bad hq-note">
           Includes a short-staffing surcharge: the model lists at {sym}

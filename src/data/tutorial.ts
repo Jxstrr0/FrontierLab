@@ -1,5 +1,6 @@
-// Tutorial content (SCREENS §27, DESIGN §5.20): the step numbers stored in
-// state.flags.tutorialStep, each step's title, and the guide's lines. The guide
+// Tutorial content, Part 1 "Opening week" (SCREENS §27.1, DESIGN §5.20): the
+// step numbers stored in state.flags.tutorialStep, each step's title, and the
+// guide's lines. Part 2, the guides for later mechanics, is in lessons.ts. The guide
 // is the first branch manager (a candidate until you hire one). Lines are keyed
 // by the target the brass ring is on, so the words always match what is lit up.
 // `{guide}` is replaced with the guide's first name.
@@ -9,11 +10,13 @@ export const TUTORIAL = {
   /** Returning players are asked first. */
   offer: 0,
   first: 1,
-  last: 7,
+  /** "Approve a business loan": the step that asks for a tutorial application. */
+  loan: 7,
+  last: 9,
   /** The closing card, shown until dismissed. */
-  finale: 8,
-  /** Finished or skipped. */
-  done: 9,
+  finale: 10,
+  /** Finished or skipped (Part 2's guides run from here). */
+  done: 11,
 } as const;
 
 /** Every data-tutorial target the steps point at. */
@@ -33,7 +36,11 @@ export type TutorialTarget =
   | 'play'
   | 'panel-close'
   | 'weekly-continue'
-  | 'loan-approve';
+  | 'loan-approve'
+  | 'tab-marketing'
+  | 'campaign-level'
+  | 'hud-bank'
+  | 'capital-meter';
 
 export interface TutorialStepText {
   title: string;
@@ -118,6 +125,26 @@ export const TUTORIAL_STEPS: Record<number, TutorialStepText> = {
       'my-branch': 'A local business has applied for a loan. Tap your branch to see it.',
     },
   },
+  8: {
+    title: 'Run a campaign',
+    idle: OPEN_BRANCH,
+    lines: {
+      'campaign-level':
+        'Campaigns bring new customers through the door. Each costs a little every week: pick a level on any card.',
+      'tab-marketing': 'Campaigns are on the Marketing tab. Tap it.',
+      'my-branch': OPEN_BRANCH,
+    },
+  },
+  9: {
+    title: 'Meet the bank',
+    idle: 'Tap your bank’s cash, top left, to open the Company summary.',
+    lines: {
+      'capital-meter':
+        'This is the bank behind the branches. Deposits aren’t ours to spend: corporate cash, top left, pays the bills. Capital limits how much we can lend, so keep this ratio out of the red. Close this when you’re done.',
+      'hud-bank': 'Tap your bank’s cash, top left, to open the Company summary.',
+      'panel-close': 'Close this panel first.',
+    },
+  },
 };
 
 export const TUTORIAL_TEXT = {
@@ -125,13 +152,13 @@ export const TUTORIAL_TEXT = {
   offerYes: 'Show me',
   offerNo: 'No thanks',
   finale:
-    'That’s opening week done. Grow carefully: deposits fund loans, and capital limits growth. Tap the advisor line in any panel for tips.',
+    'That’s opening week done. As the bank grows I’ll show you each new part when it opens up: headquarters, executives, going public, new cities. Tap the advisor line in any panel for tips.',
   finaleDone: 'Let’s go',
   /** A modal the step doesn't need (an incident, the board) is open. */
   waitModal: 'Deal with this first. I’ll wait.',
   /** The weekly results opened during another step. */
   weeklyAside: 'Have a read, then tap Continue.',
   skip: 'Skip tutorial',
-  skipped: 'Tutorial skipped. You can replay it from Settings.',
+  skipped: 'Tutorial skipped. Replay it, or switch off the guides, in Settings.',
   fallbackGuide: 'Your branch manager',
 } as const;

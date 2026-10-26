@@ -2,10 +2,11 @@
 // each a small weekly routine that only uses the player's own commands:
 //   COO  branchOps   hires the best candidate for an open branch with no manager
 //                    and turns on default delegation (EXEC_DELEGATION.cooDelegation)
-//   COO  hrBenefits  one benefit step a week to hold average morale ≥ 70 at least cost
+//   COO  hrBenefits  one benefit step a week to hold average morale at or over
+//                    the target you dial (executives.moraleTarget) at least cost
 //   COO  hrDivision  sets every HQ team's target to cover its requirement
-//   CMO  brand       starts or stops city brand campaigns to hold awareness near 0.5
-//                    within 3% of weekly revenue
+//   CMO  brand       starts or stops city brand campaigns to hold awareness near
+//                    the target you dial (executives.brandTarget) within 3% of revenue
 //   CRO  appetite    every few weeks, one appetite step toward CR ≥ 12% and losses ≤ 1.2%
 // The CRO's Loan Desk policy runs inside the Loan Desk (branch/loanDesk.ts).
 import { DEPT_DEFAULT_EFF, EXEC_DELEGATION as X, WEEKS_PER_YEAR } from '../config/balance';
@@ -17,6 +18,7 @@ import { startBrandCampaign, stopBrandCampaign } from './commands/marketing';
 import { setRiskAppetite } from './commands/products';
 import { hireManager } from './commands/staff';
 import { execMult } from './execSeats';
+import { strongestCandidate, unstaffedBranches } from './hrHiring';
 import {
   annualPayroll,
   benefitsWeeklyCost,
@@ -27,20 +29,18 @@ import {
   staffMods,
 } from './hq';
 import { brandCampaignCost, brandCampaignsWeeklyCost, hasMarketingFloor } from './hqMarketing';
-import { lossTable } from './riskFloor';
+import { companyLossRate } from './riskFloor';
 import type { GameState } from './state';
 import { weeklyRevenue } from './execDelegationsFinance';
+
+export { companyLossRate };
 
 // ─── COO ──────────────────────────────────────────────────────────────────────
 
 /** Branch operations: a manager for every open branch, with default delegation on. */
 export function cooBranchOps(state: GameState): void {
-  for (const branch of Object.values(state.branches)) {
-    if (branch.status !== 'open' || branch.managerId) continue;
-    const pool = state.people.managerCandidates[branch.cityId] ?? [];
-    const avg = (m: (typeof pool)[number]) =>
-      m.skills.people + m.skills.product + m.skills.marketing + m.skills.ethics;
-    const best = [...pool].sort((a, b) => avg(b) - avg(a))[0];
+  for (const branch of unstaffedBranches(state)) {
+    const best = strongestCandidate(state.people.managerCandidates[branch.cityId] ?? []);
     if (!best || !hireManager(state, branch.id, best.id).ok) continue;
     branch.delegation = { ...X.cooDelegation };
   }
@@ -67,36 +67,50 @@ export function averageMorale(state: GameState): { morale: number; hqShare: numb
     : { morale: 100, hqShare: 0 };
 }
 
-/** Morale points a benefit level adds across the company (HQ-only benefits weighted by HQ share). */
-function moraleAt(state: GameState, id: string, value: number, hqShare: number): number {
-  const benefits = state.people.benefits;
-  const before = benefits[id];
-  benefits[id] = value;
-  const mods = staffMods(state);
-  if (before === undefined) delete benefits[id];
-  else benefits[id] = before;
+/** Morale points a benefits map adds across the company (HQ-only benefits weighted by HQ share). */
+export function moraleFrom(
+  state: GameState,
+  benefits: Record<string, number>,
+  hqShare: number,
+): number {
+  const mods = staffMods(state, benefits);
   return mods.morale + mods.hqMorale * hqShare;
 }
 
+/** Weekly cost of a benefits map (benefitsWeeklyCost for the live one). */
+export function costOf(state: GameState, benefits: Record<string, number>): number {
+  let sum = 0;
+  for (const [id, v] of Object.entries(benefits)) sum += benefitWeeklyCost(state, id, v);
+  return sum;
+}
+
+/** The COO's weekly benefits budget: benefitsBudgetShare of annual payroll. */
+export function benefitsBudget(state: GameState): number {
+  return (X.benefitsBudgetShare * annualPayroll(state)) / WEEKS_PER_YEAR;
+}
+
 /**
- * HR benefits: one step up for the cheapest morale when below target (within
- * the benefits budget), one step down when well above target or over budget.
+ * The one benefit step the COO would take from a benefits map: up for the most
+ * morale per dollar when raising (staying inside the budget), down for the
+ * least morale lost per dollar saved when cutting. Pure: nothing is changed.
  */
-export function cooBenefits(state: GameState): void {
-  if (!state.departments.hr || state.clock.week % X.benefitsEveryWeeks !== 0) return;
-  const { morale, hqShare } = averageMorale(state);
-  const budget = (X.benefitsBudgetShare * annualPayroll(state)) / WEEKS_PER_YEAR;
-  const spent = benefitsWeeklyCost(state);
-  const raise = morale < X.moraleTarget && spent < budget;
-  if (!raise && morale <= X.moraleTarget + X.moraleSlack && spent <= budget) return;
+export function benefitStep(
+  state: GameState,
+  benefits: Record<string, number>,
+  hqShare: number,
+  raise: boolean,
+  budget: number,
+): { id: string; value: number } | undefined {
+  const spent = costOf(state, benefits);
   let best: { id: string; value: number; score: number } | undefined;
   for (const spec of Object.values(BENEFITS)) {
     if (spec.publicOnly || spec.control === 'toggle') continue;
-    const v = state.people.benefits[spec.id] ?? 0;
+    const v = benefits[spec.id] ?? 0;
     const next = raise ? Math.min(spec.max, v + spec.step) : Math.max(spec.min, v - spec.step);
     if (next === v) continue;
     const dMorale = Math.abs(
-      moraleAt(state, spec.id, next, hqShare) - moraleAt(state, spec.id, v, hqShare),
+      moraleFrom(state, { ...benefits, [spec.id]: next }, hqShare) -
+        moraleFrom(state, benefits, hqShare),
     );
     const dCost = Math.abs(
       benefitWeeklyCost(state, spec.id, next) - benefitWeeklyCost(state, spec.id, v),
@@ -106,6 +120,23 @@ export function cooBenefits(state: GameState): void {
     const score = raise ? dMorale / dCost : dCost / dMorale;
     if (!best || score > best.score) best = { id: spec.id, value: next, score };
   }
+  return best && { id: best.id, value: best.value };
+}
+
+/**
+ * HR benefits: one step up for the cheapest morale when below the target you
+ * dialled (within the benefits budget), one step down when well above it or
+ * over budget.
+ */
+export function cooBenefits(state: GameState): void {
+  if (!state.departments.hr || state.clock.week % X.benefitsEveryWeeks !== 0) return;
+  const { morale, hqShare } = averageMorale(state);
+  const target = state.executives.moraleTarget;
+  const budget = benefitsBudget(state);
+  const spent = benefitsWeeklyCost(state);
+  const raise = morale < target && spent < budget;
+  if (!raise && morale <= target + X.moraleSlack && spent <= budget) return;
+  const best = benefitStep(state, state.people.benefits, hqShare, raise, budget);
   if (best) setBenefit(state, best.id, best.value);
 }
 
@@ -126,10 +157,11 @@ export function cooDivision(state: GameState): void {
 
 // ─── CMO ──────────────────────────────────────────────────────────────────────
 
-/** Brand: city campaigns to hold awareness near target in every city with a branch, within budget. */
+/** Brand: city campaigns to hold awareness near your target in every city with a branch, within budget. */
 export function cmoBrand(state: GameState): void {
   if (!hasMarketingFloor(state)) return;
   const budget = X.brandBudgetShare * weeklyRevenue(state);
+  const target = state.executives.brandTarget;
   const cities = [
     ...new Set(
       Object.values(state.branches)
@@ -145,9 +177,9 @@ export function cmoBrand(state: GameState): void {
     const running = state.marketing.campaigns.filter(
       (c) => c.scope === 'city' && c.targetId === cityId,
     );
-    if (b > X.brandTarget + X.brandSlack) {
+    if (b > target + X.brandSlack) {
       for (const c of running) stopBrandCampaign(state, c.id);
-    } else if (b < X.brandTarget - X.brandSlack) {
+    } else if (b < target - X.brandSlack) {
       const next = cityCampaigns.find((spec) => !running.some((c) => c.campaignId === spec.id));
       if (next && brandCampaignsWeeklyCost(state) + brandCampaignCost(next, 'city') <= budget)
         startBrandCampaign(state, { campaignId: next.id, scope: 'city', targetId: cityId });
@@ -167,18 +199,6 @@ export function cmoBrand(state: GameState): void {
 }
 
 // ─── CRO ──────────────────────────────────────────────────────────────────────
-
-/** Annualized loss rate across every loan product (last 13 weeks). */
-export function companyLossRate(state: GameState): number {
-  let losses = 0;
-  let balanceWeeks = 0;
-  for (const r of lossTable(state)) {
-    losses += r.losses;
-    balanceWeeks += r.avgBalance * r.weeks;
-  }
-  // Σ (average balance × weeks) is the balance-weeks, so this is a yearly rate.
-  return balanceWeeks > 0 ? (losses / balanceWeeks) * WEEKS_PER_YEAR : 0;
-}
 
 /** Risk appetite: one step at a time toward the CR and loss-rate targets. */
 export function croAppetite(state: GameState): void {

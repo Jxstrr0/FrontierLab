@@ -1,18 +1,29 @@
 // Executive commands (SIMULATION §17.2, SCREENS §10.1): hire from a seat's
 // candidate pool, fire (severance in weeks of salary, P&L execPay), set salary,
 // switch delegations and add stock option or RSU grants. All need an Executive
-// floor at HQ. Also the COO's growth cities and "Open a branch now" (§17.2).
-import { EXEC_PAY, EXECUTIVES, WEEKS_PER_YEAR } from '../../config/balance';
+// floor at HQ. Also the COO's growth cities and "Open a branch now" (§17.2),
+// and the delegation dials: pay review cadence, morale target, brand target.
+import {
+  EXEC_DELEGATION,
+  EXEC_PAY,
+  EXECUTIVES,
+  PAY_REVIEW,
+  WEEKS_PER_YEAR,
+} from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { EXEC_SEATS } from '../../data/executives';
+import { execRerollFee } from '../candidateRerolls';
+import { generateExecutive } from '../execCandidates';
 import { canGrowIn, expansionPlan, seedGrowthCities } from '../execDelegationsGrowth';
 import { grantFairValue } from '../execGrants';
 import { seatExecutive, vacateSeat } from '../execSeatChanges';
 import { execMarketSalary, hasExecFloor } from '../execSeats';
 import { newId } from '../ids';
+import { payReviewsOn, runPayReview } from '../payReviews';
 import { spend } from '../ledger';
 import { roundToStep } from '../math';
-import type { EquityGrant, ExecSeat, GameState } from '../state';
+import type { EquityGrant, ExecSeat, Executive, GameState } from '../state';
+import type { PayReviewCadence } from '../marketsTypes';
 import { buildBranch } from './branches';
 import { fail, money, ok, type CommandResult } from './result';
 
@@ -47,6 +58,27 @@ export function hireExec(state: GameState, seat: ExecSeat, candidateId: string):
   return ok();
 }
 
+/**
+ * Pays a recruiter for a fresh set of candidates for an empty seat (SIMULATION
+ * §17.2). The fee doubles with each reroll until the pools' free refresh.
+ */
+export function rerollExecCandidates(
+  state: GameState,
+  seat: ExecSeat,
+): CommandResult<{ fee: number }> {
+  if (!hasExecFloor(state)) return fail(NO_FLOOR);
+  if (!isSeat(seat)) return fail('Unknown seat.');
+  if (state.executives.seats[seat]) return fail(`You already have a ${EXEC_SEATS[seat].short}.`);
+  const fee = execRerollFee(state, seat);
+  if (state.company.cash < fee) return fail(`Not enough cash: new candidates cost ${money(fee)}.`);
+  spend(state, 'execPay', fee);
+  const pool: Executive[] = [];
+  for (let i = 0; i < EXECUTIVES.candidatesPerSeat; i++) pool.push(generateExecutive(state, seat));
+  state.executives.candidates[seat] = pool;
+  state.executives.rerolls[seat] = (state.executives.rerolls[seat] ?? 0) + 1;
+  return ok({ fee });
+}
+
 export function fireExec(state: GameState, seat: ExecSeat): CommandResult<{ severance: number }> {
   const exec = state.executives.seats[seat];
   if (!exec) return fail('That seat is already empty.');
@@ -79,6 +111,50 @@ export function setExecDelegation(
   if (!EXEC_SEATS[seat].delegations.some((d) => d.id === id)) return fail('Unknown delegation.');
   exec.delegations[id] = on;
   seedGrowthCities(state);
+  // Switching Pay reviews on runs the first review at once.
+  if (seat === 'coo' && id === 'payReviews' && on) runPayReview(state);
+  return ok();
+}
+
+/**
+ * Sets the pay premium over market that the COO's Pay reviews aim for
+ * (PAY_REVIEW.premiumRange, in premiumStep steps); with Pay reviews on, pay
+ * moves to it at once.
+ */
+export function setPayPremium(state: GameState, premium: number): CommandResult {
+  const [lo, hi] = PAY_REVIEW.premiumRange;
+  const p = Math.round(premium / PAY_REVIEW.premiumStep) * PAY_REVIEW.premiumStep;
+  if (!Number.isFinite(premium) || p < lo - 1e-9 || p > hi + 1e-9)
+    return fail(`Pick a premium from ${Math.round(lo * 100)}% to +${Math.round(hi * 100)}%.`);
+  state.executives.payPremium = Number(p.toFixed(2));
+  if (payReviewsOn(state)) runPayReview(state);
+  return ok();
+}
+
+/** How often the COO's Pay reviews run: quarterly or annual (PAY_REVIEW.cadences). */
+export function setPayReviewCadence(state: GameState, cadence: PayReviewCadence): CommandResult {
+  if (!(cadence in PAY_REVIEW.cadences)) return fail('Pick quarterly or annual reviews.');
+  state.executives.payReviewCadence = cadence;
+  return ok();
+}
+
+/** The average morale the COO's HR benefits holds (one of EXEC_DELEGATION.moraleTargets). */
+export function setMoraleTarget(state: GameState, target: number): CommandResult {
+  if (!EXEC_DELEGATION.moraleTargets.includes(target))
+    return fail(`Pick a morale target of ${EXEC_DELEGATION.moraleTargets.join(', ')}.`);
+  state.executives.moraleTarget = target;
+  return ok();
+}
+
+/** The city awareness the CMO's Brand campaigns hold (one of EXEC_DELEGATION.brandTargets). */
+export function setBrandTarget(state: GameState, target: number): CommandResult {
+  const stops = EXEC_DELEGATION.brandTargets;
+  const match = stops.find((t) => Math.abs(t - target) < 1e-9);
+  if (match === undefined)
+    return fail(
+      `Pick an awareness target of ${stops.map((t) => `${Math.round(t * 100)}%`).join(', ')}.`,
+    );
+  state.executives.brandTarget = match;
   return ok();
 }
 
