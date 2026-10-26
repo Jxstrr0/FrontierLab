@@ -81,7 +81,7 @@ export interface CountryState {
 export interface CityState {
   id: Id; generated: boolean; brandAwareness: Pct; marketRef: Record<string /*productId*/, number>;
   layout?: 1 | 2;   // map layout version: 1 = the original shared grid (cities generated before schema 11), 2 = per-city looks (ART_DIRECTION §2.1); missing = 1
-  grownLots?: number; // storefronts added since generation (city growth, CONTENT §3; v34)
+  grownLots?: number; // storefronts added since generation (city growth, CONTENT §3; v35)
 }
 export interface Lot {
   id: Id; cityId: Id; tile: { x: number; y: number }; district: DistrictId;
@@ -333,7 +333,7 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 | Personal | `offerHome`, `rebuildHome`, `sellHome`, `buyCar`, `sellCar`, `placeBid`, `clearBid`, `appraiseCollectible`, `consignCollectible`, `withdrawConsignment`, `buyJet`, `sellJet`, `buyClub`, `sellClub`, `setKit`, `setKitSponsor`, `signPlayer`, `releasePlayer` |
 | Settings and saves | `setSettings`, `setFounderAvatar`, `moveHqTab`, `resetHqTabOrder`; saves are not commands: `saveToSlot`, `loadFromSlot` (`src/sim/save/storage.ts`), `exportCode`, `importCode` (`serialize.ts`) |
 
-## 12. Implemented so far (schema v34)
+## 12. Implemented so far (schema v35)
 
 `src/sim/state.ts` is the source of truth; this section records how it differs from the guide above. Later stages add the rest with a schema bump and a migration.
 
@@ -364,8 +364,9 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 - **Schema v28** (monthly results, longer conventions): `settings.weeklyResults` gains `'monthly'`; no new fields. Migration 27 → 28 stretches every convention run not yet over to `startWeek + CONVENTIONS.activeWeeks` and moves its exclusive startups' `round.closesWeek` with it.
 - **Schema v30** (the CREO's occupancy dials and Buying): `ExecutivesState.occTargets: { company, personal }`, each one of `EXEC_DELEGATION.occTargets` (default 1); the CREO seat gains delegations `bankBuys` and `privateBuys`. Migration 29 → 30 sets both dials to 100% and adds the two switches off for a seated chief and the seat's remembered switches (on for candidates, like any new hire), so nothing is bought until you switch it on.
 - **Schema v31** (the CFO's Investing): `ExecutivesState.trimmedStocks: { company, personal }`, each a map of listed company id → week the chief sold it at a loss (not bought back for `EXEC_DELEGATION.investCooldownWeeks`); the CFO seat gains delegations `bankInvests` and `privateInvests`. Migration 30 → 31 adds empty maps and the two switches off for a seated CFO and the seat's remembered switches (on for candidates).
-- **Schema v34** (price lists and growing cities): `CountryState.listIndex` (the price list, SIMULATION §4.6; steps to `nominal` at each year end) and the optional `CityState.grownLots` (storefronts added since generation, CONTENT §3; grown lots are `lot_{city}_gNNN`). Migration 33 → 34 sets every list to 1, so a long save's prices and rents catch up at its next year end. The new `CITY_GROWTH` event needs no state.
+- **Schema v35** (price lists and growing cities): `CountryState.listIndex` (the price list, SIMULATION §4.6; steps to `nominal` at each year end) and the optional `CityState.grownLots` (storefronts added since generation, CONTENT §3; grown lots are `lot_{city}_gNNN`). Migration 34 → 35 sets every list to 1, so a long save's prices and rents catch up at its next year end. The new `CITY_GROWTH` event needs no state.
 - **Schema v33** (a growing world): `CountryState.nominal` (the nominal index, SIMULATION §4.6; 1 at the start) and the optional `richList.nominalRef` (the home index at the last ranking). Migration 32 → 33 sets every country's index to 1, so an older save starts growing from its current level. Six new milestone ids (`twenty_cities`, `ten_countries`, `ten_acquisitions`, `assets_100b`, `worth_10b`, `assets_1t`) catch up quietly on load; the new `RIVAL_CITY_ENTRY` event needs no state.
+- **Schema v34** (the Ledger's world beyond your bank, SIMULATION §24.1–24.3): `NewsDesk.worldRecent` (`${beat}:${country}` → week it last ran, for the World desk cooldown) and `NewsDesk.elections` (per country: `governing` party index into `PARTIES` and `nextWeek` of its vote). `LedgerTab` gains `'world'`. Migration 33 → 34 gives an existing desk empty maps; each country's first campaign is then scheduled on the next issue, staggered by country. A new RNG stream `politics` carries the bills and votes (split from `news`).
 - **Schema v32** (late-game goals): no new fields. Migration 31 → 32 rescales every rich-list fortune from the old $1.5B–$120B span to `RICH_LIST.fortune` ($150M–$2B), keeping each fortune's place and the list sorted; `rank` is left for the next year end. Six new milestone ids (`hundred_branches`, `ten_cities`, `assets_10b`, `five_acquisitions`, `club_owner`, `rich_list`) fill in through the usual quiet catch-up on load.
 - **Schema v29** (market rents follow the cycle, the CREO): `ExecSeat` gains `'creo'` (delegations `bankRents`, `privateRents`); `Property.marketRent` now moves weekly toward base × cre/100 rather than staying fixed; no new fields. Migration 28 → 29 seeds the new seat's candidate pool from the `execs` stream when the save has an Executive floor with pools; buildings are left as they are and drift from the first tick.
 - **Not yet present:** nothing from the v1 plan.
@@ -378,7 +379,7 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
   - `Branch.desk` (`DeskWeek`: `week`, `arrived` (v12), `approved`, `refused`, `declined`, `expired`): this week's Loan Desk outcomes, reset when the week turns (schema v3; migration 2 → 3 adds an empty tally).
   - `company.negativeCashWeeks`, `company.lowCapitalWeeks`: counters for the game-over checks (schema v2).
   - `company.retainedEarnings`, `company.leaseDeposits` (an asset). `company.liquidityRatio` is `null` while there are no deposits.
-  - `CountryState`: `hpiHistory`, `prevFtpShort`/`prevFtpLong` (to detect moves), `cardAnchor`, `startPolicy`, `feeIndex`, `marketReturn`, `nominal` (v33), `listIndex` (v34), `forceRecessionAtWeek`.
+  - `CountryState`: `hpiHistory`, `prevFtpShort`/`prevFtpLong` (to detect moves), `cardAnchor`, `startPolicy`, `feeIndex`, `marketReturn`, `nominal` (v33), `listIndex` (v35), `forceRecessionAtWeek`.
   - `Lot.address`; `Branch.builtDay`, `Branch.last` (prospects, captured, served, share); `ReviewCard` unchanged.
   - `LoanApplication.estPd` (the noisy estimate behind the risk band); `BusinessLoan.payment`.
   - `QuarterReport.endWeek`; `WeeklySnapshot.netRevenue`, `capitalRatio`, `tier`, `totals.liquid`, `totals.taxPayable`.

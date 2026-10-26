@@ -3,10 +3,14 @@
 // each story type has 2–4 variants so the same subject never reads the same
 // two weeks running. Fictional names only. Rival templates live in
 // ledgerTemplatesRivals.ts and macro, markets, sports and politics in
-// ledgerTemplatesWorld.ts; all are merged into LEDGER_TEMPLATES.
+// ledgerTemplatesWorld.ts, the World desk in ledgerTemplatesGlobe.ts and the
+// company desk, Money Column and elections in ledgerTemplatesDesk.ts; all are
+// merged into LEDGER_TEMPLATES.
 import { CAPITAL_TEMPLATES } from './ledgerTemplatesCapital';
 import { INVESTMENTS_TEMPLATES } from './ledgerTemplatesInvestments';
 import { EMPIRE_TEMPLATES } from './ledgerTemplatesEmpire';
+import { DESK_TEMPLATES } from './ledgerTemplatesDesk';
+import { GLOBE_TEMPLATES } from './ledgerTemplatesGlobe';
 import { RIVAL_TEMPLATES } from './ledgerTemplatesRivals';
 import { WORLD_TEMPLATES } from './ledgerTemplatesWorld';
 
@@ -356,6 +360,8 @@ export const LEDGER_TEMPLATES = {
   ...CAPITAL_TEMPLATES,
   ...INVESTMENTS_TEMPLATES,
   ...EMPIRE_TEMPLATES,
+  ...GLOBE_TEMPLATES,
+  ...DESK_TEMPLATES,
 };
 
 export type TemplateKey = keyof typeof LEDGER_TEMPLATES;

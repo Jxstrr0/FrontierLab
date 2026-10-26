@@ -143,7 +143,7 @@
   gap: var(--space-3);
   border-bottom: 1px solid var(--ink-line);
   margin-bottom: var(--space-2);
-  /* Six tabs overflow a phone: they scroll sideways under the masthead. */
+  /* Seven tabs overflow a phone: they scroll sideways under the masthead. */
   overflow-x: auto;
   scrollbar-width: none;
   scroll-snap-type: x proximity;

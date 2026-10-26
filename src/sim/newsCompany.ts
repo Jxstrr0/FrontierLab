@@ -287,6 +287,7 @@ function loanStory(ctx: NewsContext): Story | undefined {
     subject: 'you',
     icon: 'coin',
     priority: P.companyRoutine,
+    group: 'youRoutine',
     tokens: {
       bank: ctx.bank,
       n: String(loans.length),

@@ -65,7 +65,7 @@ describe('price lists (§4.6)', () => {
     const raw = JSON.parse(JSON.stringify(s)) as GameState & { schemaVersion: number };
     for (const c of Object.values(raw.world.countries))
       delete (c as { listIndex?: number }).listIndex;
-    raw.schemaVersion = 33;
+    raw.schemaVersion = 34;
     const out = migrate(raw as never) as unknown as GameState & { schemaVersion: number };
     expect(out.schemaVersion).toBe(SCHEMA_VERSION);
     expect(out.world.countries.CA!.listIndex).toBe(1);
