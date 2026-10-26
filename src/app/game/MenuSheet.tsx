@@ -9,13 +9,14 @@ import { openPanel, peekGame, screen, setGame, sheet, toast } from '../store';
 
 export function MenuSheet() {
   const close = () => (sheet.value = null);
-  const exit = () => {
+  const exit = async () => {
     const s = peekGame();
+    stopLoop();
     if (s) {
-      const err = saveToSlot('auto', s);
+      // Wait for the save so the title's Continue card shows it.
+      const err = await saveToSlot('auto', s);
       if (err) toast(err, 'bad');
     }
-    stopLoop();
     setGame(null);
     screen.value = 'title';
   };

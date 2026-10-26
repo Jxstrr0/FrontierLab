@@ -288,11 +288,13 @@ export interface AvatarSpec { head: number; hair: number; facial: number; glasse
 
 ## 10. Saves
 
-- **localStorage keys** (all written by `src/sim/save/storage.ts`; the names are fixed so existing saves keep loading):
-  - `vaultstreet.save.{slot}` and `vaultstreet.meta.{slot}` for slots `auto` (written each weekly tick), `1`, `2`, `3`: the compressed game and its slot card
+- **Slot data in IndexedDB** (`src/sim/save/slotData.ts`): database `vaultstreet`, object store `saves`, keyed by slot id (`auto`, written each weekly tick, `1`, `2`, `3`); the value is the compressed game. Its quota is a share of the device's free space, not localStorage's ~5 MB per site (a big 10-year game is ~2.7 MB a slot). The app asks `navigator.storage.persist()` once so the browser keeps saves when space runs low. Where IndexedDB is missing or won't open, the data falls back to the localStorage key below. All slot reads and writes run in order through one queue.
+- **localStorage keys** (written by `src/sim/save/storage.ts` and `slotData.ts`; the names are fixed so existing saves keep loading):
+  - `vaultstreet.meta.{slot}`: the slot card (read at once by menus), written after its data, with a checksum of it
+  - `vaultstreet.save.{slot}`: the compressed game before v0.11.7, and the fallback. On first use it is copied into IndexedDB and removed; until then it is still read from here
   - `vaultstreet.prefs` (settings also live inside each save; this key holds title-screen prefs)
   - `vaultstreet.tutorialSeen`
-- **Format:** `JSON.stringify(state)`, compressed with lz-string `compressToUTF16` for localStorage.
+- **Format:** `JSON.stringify(state)`, compressed with lz-string `compressToUTF16` (the same string in IndexedDB or localStorage, so the card's checksum carries across).
 - **Export code:** `"VS" + schemaVersion + ":" + compressToEncodedURIComponent(json)`. Offer copy-to-clipboard and `navigator.share` when available.
 - **Import:**
   1. Parse the prefix.
@@ -383,5 +385,5 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
   - Optional, absent until first used: `products.digitalDone` (completed digital templates), `company.companyOffered` (HQ lineup), `UnderwritingModel.hostedBy` (bureau-hosted custom models; ids `model_N`).
   - `UnderwritingState.switching = { fromId, weeksLeft }` (the old model blending out) instead of `switchingTo`; `activeModelId` is the new model from the moment you switch.
   - Commands: `startDevelopment`, `cancelDevelopment`, `deleteProduct` (`commands/development.ts`); `buyBureauModel`, `commissionBureauModel`, `saveCustomModel`, `activateModel` (`commands/underwriting.ts`); `setApplyRatesToAll`, `setCompanyPrice`, `setCompanyOffered` (`commands/products.ts`).
-- **Saves:** `src/sim/save/serialize.ts` has `serialize`, `deserialize` (with migrations and a required-keys check), `checksum` (cyrb53) and `exportCode`/`importCode`. localStorage slots live in `src/sim/save/storage.ts` (§10).
+- **Saves:** `src/sim/save/serialize.ts` has `serialize`, `deserialize` (with migrations and a required-keys check), `checksum` (cyrb53) and `exportCode`/`importCode`. Save slots live in `src/sim/save/storage.ts`, their data store in `slotData.ts` (§10).
 
