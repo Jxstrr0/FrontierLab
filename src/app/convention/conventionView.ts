@@ -53,7 +53,7 @@ export function conventionAdvisor(v: ConventionView): string {
       ? "Founders everywhere. Let's find a deal."
       : `You need to be in ${v.city} to make a deal here.`;
   if (v.phase === 'announced' || v.phase === 'upcoming')
-    return `Doors open in ${v.weeksToGo} week${v.weeksToGo === 1 ? '' : 's'}. Deals are made on the floor that week.`;
+    return `Doors open in ${v.weeksToGo} week${v.weeksToGo === 1 ? '' : 's'}. Deals are made on the floor while they're open.`;
   return 'The halls are empty until next year.';
 }
 

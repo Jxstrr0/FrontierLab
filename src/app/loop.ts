@@ -12,7 +12,7 @@
 import { CAPITAL_BUFFER_PP, DAY_MS, DAYS_PER_WEEK, FEATURES } from '../config/balance';
 import { CITIES } from '../data/cities';
 import { INCIDENT_SPECS } from '../data/incidents';
-import { isQuarterStart } from '../sim/calendar';
+import { isMonthStart, isQuarterStart } from '../sim/calendar';
 import { advanceDay } from '../sim/engine';
 import { boardDue, quarterLabel } from '../sim/governance';
 import type { GameEvent, GameState } from '../sim/state';
@@ -156,13 +156,27 @@ function afterWeek(s: GameState): void {
     pause('Loan applications expire this week');
     toast('Loan applications expire this week.', 'info');
   }
-  const freq = s.settings.weeklyResults;
   const quarter = isQuarterStart(s.meta.startDate, s.clock.day);
-  if (freq === 'weekly' || (freq === 'quarterly' && quarter)) {
-    modal.value = { type: 'weekly', week: s.clock.week - 1 };
-  }
+  const due = resultsDue(s.settings.weeklyResults, s.meta.startDate, s.clock.day);
+  if (due === 'weekly') modal.value = { type: 'weekly', week: s.clock.week - 1 };
+  else if (due) modal.value = { type: 'weekly', week: s.clock.week - 1, period: due };
   promptIncidents(s);
   promptBoard(s, quarter);
+}
+
+/**
+ * Which results the tick that began `day` should show (SCREENS §21, §26): every
+ * week, the first tick after a month or quarter ends, or none.
+ */
+export function resultsDue(
+  freq: GameState['settings']['weeklyResults'],
+  startDate: string,
+  day: number,
+): 'weekly' | 'monthly' | 'quarterly' | null {
+  if (freq === 'weekly') return 'weekly';
+  if (freq === 'monthly' && isMonthStart(startDate, day)) return 'monthly';
+  if (freq === 'quarterly' && isQuarterStart(startDate, day)) return 'quarterly';
+  return null;
 }
 
 /**

@@ -177,7 +177,7 @@ function PanelHost() {
 function ModalHost() {
   const m = modal.value;
   if (!m) return null;
-  if (m.type === 'weekly') return <WeeklyResults week={m.week} />;
+  if (m.type === 'weekly') return <WeeklyResults week={m.week} period={m.period} />;
   if (m.type === 'incident') return FEATURES.competition ? <IncidentModal /> : null;
   if (m.type === 'boardMeeting') return FEATURES.capitalMarkets ? <BoardMeetingModal /> : null;
   return <GameOverModal />;

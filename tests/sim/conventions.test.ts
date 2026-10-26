@@ -1,6 +1,6 @@
 // Conventions (CONTENT §19, SIMULATION §20.3): the calendar, the Foothills
-// Founders Fair acceptance run in Calgary (announced two weeks out, open for a
-// week, then closed) and the rule that its ventures can only be bought there,
+// Founders Fair acceptance run in Calgary (announced four weeks out, open for
+// four weeks, then closed) and the rule that its ventures can only be bought there,
 // while it is open.
 import { describe, expect, it } from 'vitest';
 import { conventionPinInfo } from '../../src/app/convention/conventionPin';
@@ -51,15 +51,15 @@ describe('Foothills Founders Fair (acceptance)', () => {
     const track = () => s.ventures.pipeline.forEach((id) => pipelineSeen.add(id));
 
     // Before the announcement: hidden pin, no startups yet.
-    advanceWeeks(s, 24 - s.clock.week);
+    advanceWeeks(s, 22 - s.clock.week);
     track();
     expect(run.announced).toBe(false);
     expect(conventionPinInfo(s, venue(s)).visible).toBe(false);
 
-    // Two weeks before (week 25): announced, 3–6 exclusive startups raising.
+    // Four weeks before (week 23): announced, 3–6 exclusive startups raising.
     advanceWeeks(s, 1);
     track();
-    expect(s.clock.week).toBe(25);
+    expect(s.clock.week).toBe(23);
     expect(run.announced).toBe(true);
     expect(
       s.events.log.some(
@@ -70,7 +70,7 @@ describe('Foothills Founders Fair (acceptance)', () => {
     expect(run.startupIds.length).toBeLessThanOrEqual(6);
     const pin = conventionPinInfo(s, venue(s));
     expect(pin.visible).toBe(true);
-    expect(pin.tag).toBe('Opens in 2 weeks');
+    expect(pin.tag).toBe('Opens in 4 weeks');
     const ids = run.startupIds;
     for (const id of ids) {
       const st = s.ventures.startups[id]!;
@@ -81,12 +81,12 @@ describe('Foothills Founders Fair (acceptance)', () => {
     const before = cmd.buyStartupLot(s, first, 0, 'company');
     expect(before.ok).toBe(false);
 
-    advanceWeeks(s, 1);
+    advanceWeeks(s, 3);
     track();
     expect(conventionPinInfo(s, venue(s)).tag).toBe('Opens in 1 week');
     expect(cmd.buyStartupLot(s, first, 0, 'company').ok).toBe(false);
 
-    // Week 27: open.
+    // Week 27: open, for four weeks.
     advanceWeeks(s, 1);
     track();
     expect(
@@ -102,9 +102,13 @@ describe('Foothills Founders Fair (acceptance)', () => {
     expect(cmd.buyStartupLot(s, first, 0, 'company').ok).toBe(true);
     expect(s.company.cash).toBeCloseTo(cash - price, 4);
 
-    // Week 28: closed, pin hidden, rounds closed with unsold lots taken by funds.
+    // Week 30: still open; week 31: closed, pin hidden, rounds closed with unsold lots taken by funds.
+    advanceWeeks(s, 3);
+    track();
+    expect(conventionPinInfo(s, venue(s))).toMatchObject({ visible: true, tag: 'Open now' });
     advanceWeeks(s, 1);
     track();
+    expect(s.clock.week).toBe(31);
     expect(conventionPinInfo(s, venue(s)).visible).toBe(false);
     const after = cmd.buyStartupLot(s, second, 0, 'company');
     expect(after).toEqual({ ok: false, reason: 'The convention is over.' });

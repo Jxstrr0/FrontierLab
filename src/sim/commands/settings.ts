@@ -22,7 +22,7 @@ const CHECKS: { [K in keyof Settings]: (v: unknown) => string | null } = {
   currency: (v) => (oneOf(CURRENCY_SYMBOLS, v) ? null : 'Pick one of the listed currency symbols.'),
   units: (v) => (oneOf(DISTANCE_UNITS, v) ? null : 'Distance units are km or mi.'),
   weeklyResults: (v) =>
-    oneOf(WEEKLY_RESULTS_MODES, v) ? null : 'Weekly results can be weekly, quarterly or off.',
+    oneOf(WEEKLY_RESULTS_MODES, v) ? null : 'Results can be weekly, monthly, quarterly or off.',
   defaultSpeed: (v) => (oneOf(DEFAULT_SPEEDS, v) ? null : 'Default speed is 1×, 2× or 4×.'),
   autoPauseIncidents: (v) => (isBool(v) ? null : 'Auto-pause on incidents is on or off.'),
   autoPauseApplications: (v) => (isBool(v) ? null : 'Auto-pause on applications is on or off.'),

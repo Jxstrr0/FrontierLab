@@ -32,6 +32,14 @@ export function isQuarterStart(startDate: string, day: number): boolean {
   return quarterOf(now) !== quarterOf(prev) || now.getUTCFullYear() !== prev.getUTCFullYear();
 }
 
+/** True on the first weekly tick after a month ends. */
+export function isMonthStart(startDate: string, day: number): boolean {
+  if (day < DAYS_PER_WEEK) return false;
+  const now = dateOf(startDate, day);
+  const prev = dateOf(startDate, day - DAYS_PER_WEEK);
+  return now.getUTCMonth() !== prev.getUTCMonth() || now.getUTCFullYear() !== prev.getUTCFullYear();
+}
+
 /** True on the first weekly tick of a new year. */
 export function isYearStart(startDate: string, day: number): boolean {
   if (day < DAYS_PER_WEEK) return false;

@@ -444,7 +444,7 @@ Tabs: Overview · Loans · Credit.
 - **Hero:** exhibition hall vignette.
 - **Ventures carousel:** exclusive startups.
 - **Networking:** 1–2 cards (an executive candidate, a partnership lead).
-- **Before it opens:** the dates and "Opens in N weeks". The convention centre's pin shows only from the announcement to the end of the event.
+- **Before it opens:** the dates and "Opens in N weeks" (announced 4 weeks ahead; open for 4 weeks). The convention centre's pin shows only from the announcement to the end of the event.
 
 ## 18. Airport and travel
 
@@ -475,13 +475,15 @@ Tabs: Overview · Loans · Credit.
 
 ## 21. Weekly results (modal)
 
-- **Header:** bank medallion, "Weekly results", ✕.
-- **Headline figures:** weekly revenue and weekly net income, each with weekly change.
-- **Cash flow:** Cash from operations, Investing, Financing, Net cash flow.
-- **The Weekly Ledger card:**
+- **Header:** bank medallion, "Weekly results" ("Monthly results" / "Quarterly results" when the setting rolls the period up), ✕.
+- **Date line:** "Week N · ending {date}", or for a roll-up "{October 2027 | Q4 2027} · N weeks, ending {date}" (a snapshot week belongs to the month or quarter its last day falls in, so a month is 4 or 5 weeks).
+- **Headline figures:** revenue and net income for the period, each with the change on the last week / month / quarter ("First month of trading" when there is none).
+- **Cash flow:** Cash from operations, Investing, Financing, Net cash flow, summed over the period.
+- **The Weekly Ledger card** (the period's latest issue):
   - masthead and date
   - tabs: Top | Banking | Business | Markets | Politics | Sports
   - two-column article grid (icon vignette, headline, 1–2 sentence body)
+- **Earlier this month / quarter** (roll-ups only): a card listing each earlier issue's date and lead headline; the archive in the menu has the full issues.
 - When Finance is short-staffed, the figures read "Delayed".
 - Close resumes the game.
 
@@ -525,7 +527,7 @@ Tabs: Overview · Loans · Credit.
 
 - **Settings:**
   - currency symbol ($, C$, £, €, ¥) and distance units (km/mi)
-  - weekly results frequency (every week / every quarter / off)
+  - results frequency (every week / every month / every quarter / off)
   - default speed
   - auto-pause on incidents and on expiring applications
   - sound, reduced motion, text size (100 / 115 / 130%)
