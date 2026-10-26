@@ -1,7 +1,6 @@
 // Per-city geography (layout versions, cityGeo.ts): layout 2 fits every lot and
 // site of every city for many seeds, bridges and the big park behave, layout 1
-// is exactly the original grid (old saves never move), and v10 saves migrate
-// to layout 1 while cities first visited afterwards get layout 2.
+// is exactly the original grid (old saves never move).
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { generateCityMap } from '../../src/art/citygen';
@@ -11,11 +10,9 @@ import { cityLook, CITY_LOOKS } from '../../src/data/cityLooks';
 import { cityGeometry } from '../../src/sim/cityGeo';
 import { isFrontage } from '../../src/sim/cityLayout';
 import { newGame } from '../../src/sim/newGame';
-import { importCode } from '../../src/sim/save/serialize';
 import type { GameState } from '../../src/sim/state';
 import { mapDigest, placesDigest } from '../helpers/layoutDigest';
 import { fly } from '../helpers/world';
-import * as cmd from '../../src/sim/commands';
 
 const digests = JSON.parse(
   readFileSync(new URL('../fixtures/layout1-digests.json', import.meta.url), 'utf8'),
@@ -129,30 +126,5 @@ describe('layout 1 never changes', () => {
       expect(placesDigest(s, id), id).toBe(digests.newGame11[id]!.places);
       expect(mapDigest(cityMap(s, id)), id).toBe(digests.newGame11[id]!.map);
     }
-  });
-});
-
-describe('v10 save migration', () => {
-  const code = readFileSync(
-    new URL('../fixtures/stage10-save-v10.txt', import.meta.url),
-    'utf8',
-  ).trim();
-
-  it('keeps every visited city on layout 1, exactly where it was', () => {
-    const s = importCode(code);
-    for (const id of ['cal', 'nyc', 'lon']) {
-      expect(s.world.cities[id]!.layout).toBe(1);
-      expect(placesDigest(s, id)).toBe(digests.save[id]!.places);
-      expect(mapDigest(cityMap(s, id))).toBe(digests.save[id]!.map);
-    }
-  });
-
-  it('gives a city first visited after loading the new geography', () => {
-    const s = importCode(code);
-    expect(s.world.cities.par).toBeUndefined();
-    const r = cmd.travelTo(s, 'par');
-    expect(r.ok).toBe(true);
-    expect(s.world.cities.par!.layout).toBe(2);
-    expectAllOnFrontage(s, 'par');
   });
 });

@@ -14,9 +14,8 @@ import {
   runBranchGuidance,
 } from '../../src/sim/branchGuidance';
 import * as cmd from '../../src/sim/commands';
-import { migrate } from '../../src/sim/save/migrations';
 import { stream } from '../../src/sim/rng';
-import { SCHEMA_VERSION, type GameState } from '../../src/sim/state';
+import { type GameState } from '../../src/sim/state';
 import { execGame, hire } from '../helpers/executives';
 
 /** Puts the clock on a guidance week. */
@@ -87,30 +86,6 @@ describe('branch guidance', () => {
     expect(price('savings')).toBeGreaterThanOrEqual(savings);
   });
 
-  it('migrates v14 saves with the new switches off for seated executives', () => {
-    const s = execGame();
-    hire(s, 'cfo');
-    const raw = JSON.parse(JSON.stringify(s)) as Record<string, unknown> & {
-      schemaVersion: number;
-    };
-    const ex = raw.executives as GameState['executives'];
-    delete ex.seats.cfo!.delegations.guidance;
-    delete (ex as Partial<GameState['executives']>).payPremium;
-    delete (raw.company as Partial<GameState['company']>).guidance;
-    raw.schemaVersion = 14;
-    const up = migrate(raw) as unknown as GameState;
-    expect(up.schemaVersion).toBe(SCHEMA_VERSION);
-    expect(up.company.guidance).toEqual({
-      deposits: 0,
-      loans: 0,
-      staffing: 0,
-      marketing: 0,
-      products: 0,
-    });
-    expect(up.executives.seats.cfo!.delegations.guidance).toBe(false);
-    expect(up.executives.candidates.coo![0]!.delegations.payReviews).toBe(true);
-    expect(up.executives.payPremium).toBeGreaterThan(0);
-  });
   it('has the COO pay and staff more while morale is low, and trim when high', () => {
     const s = execGame();
     hire(s, 'coo');
@@ -185,32 +160,5 @@ describe('branch guidance', () => {
     s.clock.week += 1;
     runBranchGuidance(s);
     expect(s.company.guidance.staffing).toBe(0);
-  });
-
-  it('migrates v17 saves with the COO, CMO and CPO switches off for seated executives', () => {
-    const s = execGame(['marketing']);
-    hire(s, 'coo');
-    hire(s, 'cmo');
-    const raw = JSON.parse(JSON.stringify(s)) as Record<string, unknown> & {
-      schemaVersion: number;
-    };
-    const ex = raw.executives as GameState['executives'];
-    delete ex.seats.coo!.delegations.guidance;
-    delete ex.seats.cmo!.delegations.guidance;
-    for (const c of ex.candidates.cpo ?? []) delete c.delegations.guidance;
-    raw.company = { ...(raw.company as object), guidance: { deposits: 1, loans: 0 } };
-    raw.schemaVersion = 17;
-    const up = migrate(raw) as unknown as GameState;
-    expect(up.schemaVersion).toBe(SCHEMA_VERSION);
-    expect(up.company.guidance).toEqual({
-      deposits: 1,
-      loans: 0,
-      staffing: 0,
-      marketing: 0,
-      products: 0,
-    });
-    expect(up.executives.seats.coo!.delegations.guidance).toBe(false);
-    expect(up.executives.seats.cmo!.delegations.guidance).toBe(false);
-    expect(up.executives.candidates.cpo![0]!.delegations.guidance).toBe(true);
   });
 });

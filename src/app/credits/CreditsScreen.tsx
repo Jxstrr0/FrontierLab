@@ -28,7 +28,7 @@ export function CreditsScreen(p: { inGame?: boolean }) {
       <Panel title="Credits" onClose={back}>
         <div class="stack credits">
           <Card class="credits-card">
-            <h1 class="credits-wordmark">Vault Street</h1>
+            <h1 class="credits-wordmark">Frontier Lab</h1>
             <Rule />
             <p class="credits-lead">A Longlight Interactive game</p>
             <p class="credits-role">

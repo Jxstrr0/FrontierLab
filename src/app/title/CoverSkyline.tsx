@@ -99,7 +99,7 @@ export function CoverSkyline(p: { choice: CoverChoice }) {
   }, [p.choice, size]);
 
   const ink = city?.ink ?? 'var(--ledger-ink)';
-  const micro = Array.from({ length: 12 }, () => city?.name ?? 'Vault Street').join(' · ');
+  const micro = Array.from({ length: 12 }, () => city?.name ?? 'Frontier Lab').join(' · ');
   const style = {
     '--cover-ink': ink,
     '--cover-pan': `${printed?.pan ?? 0}px`,

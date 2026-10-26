@@ -35,7 +35,7 @@ function fakeStorage(quota = Infinity) {
   return ls;
 }
 
-const DATA_KEY = (slot: string) => `vaultstreet.save.${slot}`;
+const DATA_KEY = (slot: string) => `frontierlab.save.${slot}`;
 
 describe('save slots in IndexedDB', () => {
   let ls: ReturnType<typeof fakeStorage>;

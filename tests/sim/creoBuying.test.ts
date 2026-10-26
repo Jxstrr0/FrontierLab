@@ -2,8 +2,7 @@
 // §17.2; DESIGN decision log 2026-10-26): a dial stop prices each managed
 // building to hold that occupancy (100% = bestRent), at once when changed;
 // Buying buys the best-yield listing at asking for the bank or for you, within
-// each budget; migration 29 → 30 adds the dials and the switches (off for a
-// seated chief).
+// each budget.
 import { describe, expect, it } from 'vitest';
 import { EXEC_DELEGATION, REAL_ESTATE } from '../../src/config/balance';
 import { balanceSheet } from '../../src/sim/balanceSheet';
@@ -14,12 +13,9 @@ import { creoBuy, creoRent, nextPurchase, personalBuyLimit } from '../../src/sim
 import { occupancyEstimate } from '../../src/sim/execDelegationsProperty';
 import { rentPricingPower } from '../../src/sim/execSeats';
 import { postCash } from '../../src/sim/ledger';
-import { migrate } from '../../src/sim/save/migrations';
 import { bestRent, occupancyTarget, rentForOccupancy } from '../../src/sim/propertyMath';
-import { SCHEMA_VERSION, type GameState } from '../../src/sim/state';
+import { type GameState } from '../../src/sim/state';
 import { execGame, hire, identityGap } from '../helpers/executives';
-
-type Raw = Record<string, unknown> & { schemaVersion: number };
 
 function fund(s: GameState, amount: number) {
   postCash(s, amount, 'financing');
@@ -132,27 +128,5 @@ describe('buying for you', () => {
     expect(s.personal.cash).toBeCloseTo(cash - pick.asking, 2);
     expect(s.realEstate.properties[pick.siteId]!.owner).toBe('personal');
     expect(pick.yield).toBeGreaterThan(0);
-  });
-});
-
-describe('save migration', () => {
-  it('adds the dials and the Buying switches, off for a seated chief (29 → 30)', () => {
-    const s0 = chiefGame({ bankRents: true });
-    const raw = JSON.parse(JSON.stringify(s0)) as Raw;
-    const ex = (raw as unknown as GameState).executives;
-    delete (ex as Partial<typeof ex>).occTargets;
-    delete ex.seats.creo!.delegations.bankBuys;
-    delete ex.seats.creo!.delegations.privateBuys;
-    raw.schemaVersion = 29;
-    const s = migrate(raw) as unknown as GameState;
-    expect(s.schemaVersion).toBe(SCHEMA_VERSION);
-    expect(s.executives.occTargets).toEqual({ company: 1, personal: 1 });
-    expect(s.executives.seats.creo!.delegations).toMatchObject({
-      bankRents: true,
-      bankBuys: false,
-      privateBuys: false,
-    });
-    advanceWeeks(s, 4);
-    expect(owned(s, 'company')).toHaveLength(0);
   });
 });

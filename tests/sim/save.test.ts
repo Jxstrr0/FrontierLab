@@ -8,7 +8,7 @@ describe('saves', () => {
   it('round-trips through JSON and an export code', () => {
     const s = runScript(60);
     const code = exportCode(s);
-    expect(code.startsWith(`VS${SCHEMA_VERSION}:`)).toBe(true);
+    expect(code.startsWith(`FL${SCHEMA_VERSION}:`)).toBe(true);
     const back = importCode(code);
     expect(back).toEqual(s);
     expect(deserialize(serialize(s))).toEqual(s);
@@ -23,8 +23,13 @@ describe('saves', () => {
   });
 
   it('rejects codes from newer versions and junk', () => {
-    expect(() => importCode('VS999:abc')).toThrow(/newer version/);
-    expect(() => importCode('hello')).toThrow(/start with "VS"/);
+    expect(() => importCode('FL999:abc')).toThrow(/newer version/);
+    expect(() => importCode('hello')).toThrow(/start with "FL"/);
     expect(() => deserialize('{"foo":1}')).toThrow(/doesn't look like/);
+  });
+
+  it('turns away Vault Street codes with a clear message', () => {
+    const vs = exportCode(runScript(1)).replace(/^FL/, 'VS');
+    expect(() => importCode(vs)).toThrow(/Vault Street save code/);
   });
 });

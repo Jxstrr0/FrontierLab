@@ -45,7 +45,7 @@ export const STORAGE_FULL =
   'Storage full — export your save as a code, then delete a slot and try again.';
 export const SAVE_DAMAGED = 'That save is damaged and cannot be loaded.';
 
-const PREFIX = 'vaultstreet.';
+const PREFIX = 'frontierlab.';
 const metaKey = (slot: SlotId) => `${PREFIX}meta.${slot}`;
 const PREFS_KEY = `${PREFIX}prefs`;
 const store = localStore;

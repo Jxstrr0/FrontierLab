@@ -1,8 +1,6 @@
-import { SCHEMA_VERSION } from '../../src/sim/state';
 import { describe, expect, it } from 'vitest';
 import { deskWeek, recordDesk } from '../../src/sim/branch/loanDesk';
 import { newGame } from '../../src/sim/newGame';
-import { migrate } from '../../src/sim/save/migrations';
 import { openScriptedBranch, runScript } from '../helpers/scenario';
 
 describe('loan desk weekly tally', () => {
@@ -27,24 +25,5 @@ describe('loan desk weekly tally', () => {
       }
     });
     expect(seen).toBeGreaterThan(0);
-  });
-
-  it('migrates a v2 save by giving each branch an empty tally', () => {
-    const s = runScript(4) as unknown as Record<string, unknown>;
-    const branches = s.branches as Record<string, Record<string, unknown>>;
-    for (const b of Object.values(branches)) delete b.desk;
-    s.schemaVersion = 2;
-    const up = migrate(s as Record<string, unknown> & { schemaVersion: number });
-    expect(up.schemaVersion).toBe(SCHEMA_VERSION);
-    for (const b of Object.values(up.branches as Record<string, Record<string, unknown>>)) {
-      expect(b.desk).toEqual({
-        week: 0,
-        arrived: 0,
-        approved: 0,
-        refused: 0,
-        declined: 0,
-        expired: 0,
-      });
-    }
   });
 });

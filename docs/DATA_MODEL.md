@@ -292,14 +292,14 @@ export interface AvatarSpec { head: number; hair: number; facial: number; glasse
 
 ## 10. Saves
 
-- **Slot data in IndexedDB** (`src/sim/save/slotData.ts`): database `vaultstreet`, object store `saves`, keyed by slot id (`auto`, written each weekly tick, `1`, `2`, `3`); the value is the compressed game. Its quota is a share of the device's free space, not localStorage's ~5 MB per site (a big 10-year game is ~2.7 MB a slot). The app asks `navigator.storage.persist()` once so the browser keeps saves when space runs low. Where IndexedDB is missing or won't open, the data falls back to the localStorage key below. All slot reads and writes run in order through one queue.
-- **localStorage keys** (written by `src/sim/save/storage.ts` and `slotData.ts`; the names are fixed so existing saves keep loading):
-  - `vaultstreet.meta.{slot}`: the slot card (read at once by menus), written after its data, with a checksum of it
-  - `vaultstreet.save.{slot}`: the compressed game before v0.11.7, and the fallback. On first use it is copied into IndexedDB and removed; until then it is still read from here
-  - `vaultstreet.prefs` (settings also live inside each save; this key holds title-screen prefs)
-  - `vaultstreet.tutorialSeen`
+- **Slot data in IndexedDB** (`src/sim/save/slotData.ts`): database `frontierlab`, object store `saves`, keyed by slot id (`auto`, written each weekly tick, `1`, `2`, `3`); the value is the compressed game. Its quota is a share of the device's free space, not localStorage's ~5 MB per site (a big 10-year game is ~2.7 MB a slot). The app asks `navigator.storage.persist()` once so the browser keeps saves when space runs low. Where IndexedDB is missing or won't open, the data falls back to the localStorage key below. All slot reads and writes run in order through one queue.
+- **localStorage keys** (written by `src/sim/save/storage.ts` and `slotData.ts`; the names are fixed so existing saves keep loading; Frontier Lab uses its own `frontierlab.` prefix so it never shares slots with Vault Street on the same site):
+  - `frontierlab.meta.{slot}`: the slot card (read at once by menus), written after its data, with a checksum of it
+  - `frontierlab.save.{slot}`: the compressed game before v0.11.7, and the fallback. On first use it is copied into IndexedDB and removed; until then it is still read from here
+  - `frontierlab.prefs` (settings also live inside each save; this key holds title-screen prefs)
+  - `frontierlab.tutorialSeen`
 - **Format:** `JSON.stringify(state)`, compressed with lz-string `compressToUTF16` (the same string in IndexedDB or localStorage, so the card's checksum carries across).
-- **Export code:** `"VS" + schemaVersion + ":" + compressToEncodedURIComponent(json)`. Offer copy-to-clipboard and `navigator.share` when available.
+- **Export code:** `"FL" + schemaVersion + ":" + compressToEncodedURIComponent(json)`. Vault Street codes (`"VS…"`) are turned away with a clear message. Offer copy-to-clipboard and `navigator.share` when available.
 - **Import:**
   1. Parse the prefix.
   2. Decompress.
@@ -336,9 +336,11 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 | Personal | `offerHome`, `rebuildHome`, `sellHome`, `buyCar`, `sellCar`, `placeBid`, `clearBid`, `appraiseCollectible`, `consignCollectible`, `withdrawConsignment`, `buyJet`, `sellJet`, `buyClub`, `sellClub`, `setKit`, `setKitSponsor`, `signPlayer`, `releasePlayer` |
 | Settings and saves | `setSettings`, `setFounderAvatar`, `moveHqTab`, `resetHqTabOrder`; saves are not commands: `saveToSlot`, `loadFromSlot` (`src/sim/save/storage.ts`), `exportCode`, `importCode` (`serialize.ts`) |
 
-## 12. Implemented so far (schema v38)
+## 12. Implemented so far (schema v1)
 
 `src/sim/state.ts` is the source of truth; this section records how it differs from the guide above. Later stages add the rest with a schema bump and a migration.
+
+**Frontier Lab renumbering (stage C0, 2026-10-26):** the state below is Vault Street's final shape (its schema v38), renumbered as Frontier Lab schema 1. Vault Street's 37 migration steps were dropped, so the schema numbers and migrations mentioned in the entries below are history only.
 
 - **Present (Stages 1–3):** `meta`, `clock`, `rng`, `settings`, `world` (one country and one city in Stage 1), `company`, `branches`, `people` (managers only), `products.catalog`, `underwriting`, `treasury`, `loanDesk`, `rivals`, `reo`, `events` (`log`, `scheduled`), `history`, `milestones`, `flags`.
 - **Stage 4 (schema v5) adds:** `offices`, `departments`, `hq` (`ramp` and per-department `coverage`: `required`, `k`, `kPrime`, `eff`), `people.benefits`, `products.developments` and developed catalog entries, `underwriting.switching`, `treasury.lots`/`offers`/`offersRefreshWeek`, `marketing` (brand `campaigns`, agency `packages`, prestige `cityBonus`), `risk` (13 weeks of `losses` by product, regulator `reviews`), `world.officeListings` (office buildings for lease) and `world.sites` (credit bureaus and marketing agencies on the map). New P&L lines: `hqStaff`, `benefits`, `development`. Migration 4 → 5 adds them all and generates each city's listings and sites from the `sites:{cityId}` stream, so storefront lots don't move.

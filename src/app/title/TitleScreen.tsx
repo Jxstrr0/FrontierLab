@@ -53,7 +53,7 @@ export function TitleScreen() {
 
       <div class="title-side">
         <div class="title-words">
-          <h1 class="title-wordmark">Vault Street</h1>
+          <h1 class="title-wordmark">Frontier Lab</h1>
           <p class="title-tagline">Found a bank. Build an empire.</p>
         </div>
 

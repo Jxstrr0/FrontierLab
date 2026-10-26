@@ -21,8 +21,7 @@ import { execRerollFee } from '../../src/sim/candidateRerolls';
 import { staffEff, statementDelayWeeks } from '../../src/sim/hq';
 import { incidentChance, raiseIncident } from '../../src/sim/incidents';
 import { sharesHeld } from '../../src/sim/shares';
-import { migrate } from '../../src/sim/save/migrations';
-import { SCHEMA_VERSION, type Executive, type GameState } from '../../src/sim/state';
+import { type Executive, type GameState } from '../../src/sim/state';
 import { execGame, hire, holderTotal, identityGap } from '../helpers/executives';
 
 /** Advances exactly one week of ticks without the rest of the engine's randomness mattering. */
@@ -83,21 +82,6 @@ describe('candidate pools', () => {
     s.company.cash = fee * 10;
     hire(s, 'cfo');
     expect(cmd.rerollExecCandidates(s, 'cfo').ok).toBe(false);
-  });
-
-  it('adds reroll counts to v16 saves', () => {
-    const s = execGame();
-    const raw = JSON.parse(JSON.stringify(s)) as Record<string, unknown> & {
-      schemaVersion: number;
-    };
-    delete (raw.people as Partial<GameState['people']>).rerolls;
-    delete (raw.executives as Partial<GameState['executives']>).rerolls;
-    raw.schemaVersion = 16;
-    const up = migrate(raw) as unknown as GameState;
-    expect(up.schemaVersion).toBe(SCHEMA_VERSION);
-    expect(up.people.rerolls).toEqual({});
-    expect(up.executives.rerolls).toEqual({});
-    expect(cmd.rerollExecCandidates(up, 'cfo').ok).toBe(true);
   });
 
   it('refuses to hire without an Executive floor', () => {
@@ -350,57 +334,5 @@ describe('delegation defaults and seat memory (schema v13)', () => {
     refreshExecCandidates(s, true);
     const next = hire(s, 'cfo');
     expect(next.delegations).toMatchObject({ treasury: true, capital: false, dividends: false });
-  });
-});
-
-describe('migration 13 → 14', () => {
-  it('splits Share sales out of the CFO’s Capital switch without changing what it does', () => {
-    const s = execGame();
-    const cfo = hire(s, 'cfo');
-    cfo.delegations.capital = false;
-    s.executives.remembered.cfo = { treasury: true, capital: true, dividends: true };
-    refreshExecCandidates(s, true);
-    const raw = JSON.parse(JSON.stringify(s)) as Record<string, unknown> & {
-      schemaVersion: number;
-    };
-    const ex = raw.executives as GameState['executives'];
-    delete ex.seats.cfo!.delegations.shares;
-    for (const c of ex.candidates.cfo ?? []) delete c.delegations.shares;
-    const company = raw.company as GameState['company'];
-    delete company.lastBuild;
-    raw.schemaVersion = 13;
-    const up = migrate(raw) as unknown as GameState;
-    expect(up.schemaVersion).toBe(SCHEMA_VERSION);
-    expect(up.executives.seats.cfo!.delegations.shares).toBe(false);
-    expect(up.executives.remembered.cfo!.shares).toBe(true);
-    expect(up.executives.candidates.cfo![0]!.delegations.shares).toBe(true);
-    const newest = Object.values(up.branches).sort((a, b) => b.builtDay - a.builtDay)[0];
-    expect(up.company.lastBuild).toEqual(newest?.build);
-  });
-});
-
-describe('migration 12 → 13', () => {
-  it('adds the new executive fields and switches waiting candidates on', () => {
-    const s = execGame();
-    refreshExecCandidates(s, true);
-    const raw = JSON.parse(JSON.stringify(s)) as Record<string, unknown> & {
-      schemaVersion: number;
-    };
-    const ex = raw.executives as Record<string, unknown>;
-    delete ex.remembered;
-    delete ex.growthCities;
-    delete ex.lastExpansionWeek;
-    for (const pool of Object.values(ex.candidates as Record<string, Executive[]>))
-      for (const c of pool) for (const id of Object.keys(c.delegations)) c.delegations[id] = false;
-    raw.schemaVersion = 12;
-    const up = migrate(raw) as unknown as GameState;
-    expect(up.schemaVersion).toBe(SCHEMA_VERSION);
-    expect(up.executives).toMatchObject({
-      remembered: {},
-      growthCities: {},
-      lastExpansionWeek: -1,
-    });
-    const first = up.executives.candidates.coo![0]!;
-    expect(Object.values(first.delegations).every(Boolean)).toBe(true);
   });
 });
