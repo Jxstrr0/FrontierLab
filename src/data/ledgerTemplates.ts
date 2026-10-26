@@ -73,6 +73,36 @@ const BANK_TEMPLATES = {
       b: '{bank} has closed the branch after a review of its network.{moved}',
     },
   ],
+  DATA_CENTER_STARTED: [
+    {
+      h: '{bank} breaks ground on {name}',
+      b: 'Crews are fitting out a GPU hall at {site}, {city}. {bank} expects it running in {weeks} weeks.',
+    },
+    {
+      h: 'Compute coming to {city}',
+      b: '{bank} has started building {name} at {site}. Power and cooling go in first.',
+    },
+  ],
+  DATA_CENTER_OPENED: [
+    {
+      h: '{name} switches on',
+      b: '{bank} brought {gpus} GPUs online in {city} this week. Customers nearby should notice faster answers.',
+    },
+    {
+      h: 'The lights are on at {name}',
+      b: 'The halls in {city} are humming: {gpus} GPUs now run for {bank}.',
+    },
+  ],
+  DATA_CENTER_CLOSED: [
+    {
+      h: '{bank} shuts {name}',
+      b: 'The racks in {city} are being sold off and the power feed disconnected.',
+    },
+    {
+      h: 'Power down at {name}',
+      b: '{bank} is closing its {city} data center and selling the equipment.',
+    },
+  ],
   LOAN_ONE: [
     {
       h: '{lead} secures {leadAmount} loan',

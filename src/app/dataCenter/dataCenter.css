@@ -1,0 +1,10 @@
+/* Data center screens (SCREENS §5b): reuse the build tiles; options in the
+   picker sheet that can't be chosen are dimmed. */
+.dc-option:disabled,
+.part-tile:disabled {
+  opacity: 0.55;
+}
+.dc-option.is-current {
+  border-color: var(--brass-light);
+  opacity: 1;
+}
