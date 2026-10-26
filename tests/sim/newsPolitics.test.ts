@@ -35,6 +35,9 @@ const emptyDesk = (): NewsDesk => ({
   assetMarks: {},
   worldRecent: {},
   elections: {},
+  scheduled: [],
+  commodities: {},
+  archive: [],
 });
 
 describe('politics', () => {

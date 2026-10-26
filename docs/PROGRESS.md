@@ -4,11 +4,39 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 **Current stage:** 10 — Art pass, onboarding, polish, launch (built and live; awaiting the owner's iPhone check). All ten roadmap stages are built. Still open: the owner's testing and tuning pass, an Add to Home Screen test on a real iPhone, and the Vault Street card on Kelbo.Website (in a separate session in that repo).
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `137475fc737d76` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `04e6d86aaed346` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-26 — A bigger world in the Ledger: world calendar, commodities, the archive, 26 more stories (v0.13.0, schema v36)
+- **Owner's ask:** more world stories and story types, pitched first. From the pitch you picked the world calendar, commodities plus the archive, and about 25 more one-off stories. Running story arcs and a recurring cast weren't picked, so they aren't built.
+- **26 more kinds of world story (61 in all):**
+  - **Crime and courts:** jewel and museum heists, an art-forgery trial, scam warnings, landmark court rulings, a smuggling bust.
+  - **Science:** a new species, a comet, an AI milestone, a dinosaur fossil, a record deep-sea dive, a giant telescope.
+  - **Travel and food:** a restaurant with a waiting list, food festivals, a "most liveable city" ranking, a new tallest tower, new flight routes.
+  - **Culture:** a bestselling novel, a record-breaking video game, a hit musical, a mystery mural, an orchestra's anniversary.
+  - **Odd news:** a record-sized vegetable, an escaped zoo animal, a world-record attempt, a 100-plus birthday, a homing pigeon that came home.
+  - Book, game, show and species names are all invented.
+- **Commodity prices.** Oil, gold, wheat, coffee and copper prices move every week. They drift up in a boom and down in a downturn (gold the other way), and grow slowly with the world's prices. A big week makes a Markets story with a reason ("Oil jumps 8.0% on a cold snap in the north"). So does a one-year high or low, at most once every two months per commodity. The first issue of each month runs a wrap of all five.
+- **From the archive.** Every fourth issue, the paper keeps its lead story for good. Every four weeks it reprints one from 1, 2, 3, 5 or 10 years earlier: your first branch, an election, a zoo escape. Each story is reprinted at most once. These are your save's own headlines, so no two players see the same archive.
+- **A world calendar.**
+  - **Nations Cup** every four years (2030, 2034…): announced four weeks ahead in a host city, then the hosts' opening game, the group stage, the semi-finals and the final.
+  - **World Games** every four years (2028, 2032…): opening ceremony, a star athlete at halfway, a closing medal table.
+  - **World Expo** every five years: opens in May, closes six months later.
+  - **Every year:** film awards in March, New Year fireworks, a science prize in October and the Grand Sale Weekend in November, which is a record or a flop depending on your home economy.
+  - Nations are the game's ten economies, and the host is a random game city.
+- **Two small fixes found along the way.** Branch review cards and commodity prices now use their own random numbers. Before, any change to the newspaper also reshuffled which review cards your branches showed. I checked a 260-week game against the last version: apart from review cards, the game state is identical, so none of this changes gameplay. Review cards in your save reshuffle once.
+- **Your save (schema v36):** loads as is. Commodities start at their base prices, the archive starts filling from the next issue, and the next fixture on the calendar runs when its week comes round.
+- **Code:**
+  - New files: `src/sim/newsWorldCalendar.ts`, `newsTournaments.ts`, `newsCommodities.ts`, `newsArchive.ts`.
+  - Content: `src/data/worldCalendar.ts`, `commodities.ts`, `newsWorldBeatsMore.ts`, `ledgerTemplatesGlobeMore.ts`, `ledgerTemplatesCalendar.ts`.
+  - Dials in `balance.ts`: `NEWS_COMMODITIES`, `NEWS_ARCHIVE`, `NEWS_CALENDAR`, plus new priorities and caps.
+  - `newsPrice` and `newsDate` added to `newsFormat.ts`.
+  - No new dependencies.
+- **Checked:** lint, full test suite (878; new `tests/sim/newsCalendar.test.ts` covers tournament scripts, a six-year run with every fixture, commodity prices near their anchors, archive reprints of real headlines each at most once, and the migration) and build all clean. `npm run balance` has all checkpoints in range. Determinism snapshot `137475fc737d76` → `04e6d86aaed346` (intended: the paper's contents and the new streams). At 390×844 the Ledger renders with no overflow and no console errors.
+- **Docs:** SIMULATION §3 streams and §24.1, §24.4–24.6; CONTENT §23; DATA_MODEL §12; DESIGN §5.15 and the decision log.
 
 ### 2026-10-26 — Price lists and growing cities (v0.12.1, schema v35)
 

@@ -1,6 +1,7 @@
 // The Weekly Ledger (SIMULATION §24): composes each week's issue from the event
 // log, macro state and the world beyond your bank (World desk, company desk,
-// elections, the Money Column), never repeating a template for the same subject in
+// elections, the Money Column, commodities, the world calendar and reprints
+// from the archive), never repeating a template for the same subject in
 // back-to-back weeks, and keeps the last NEWS_ARCHIVE_ISSUES issues. Story
 // sources live in news*.ts; this module gathers their candidates, ranks them
 // by the §24 priority order, caps each kind, pads a thin issue with filler,
@@ -35,7 +36,9 @@ import {
   marketStory,
   rankingStory,
 } from './newsMacro';
+import { archiveStory, keepForArchive, markReprinted } from './newsArchive';
 import { columnStory } from './newsColumn';
+import { commodityStories, moveCommodities } from './newsCommodities';
 import { corporateStory, moverStories } from './newsCompanyDesk';
 import { electionStories } from './newsElections';
 import { driftPolls, politicsStories, pollStory, runPolitics } from './newsPolitics';
@@ -43,6 +46,7 @@ import { rateWatchStory, rivalStories } from './newsRivals';
 import { runSports } from './newsSports';
 import { newsContext, type Story } from './newsStory';
 import { closeStories } from './newsWeek';
+import { calendarStories } from './newsWorldCalendar';
 import { worldDeskStories } from './newsWorldDesk';
 import { stream, type Rng } from './rng';
 import type { GameEvent, GameState, LedgerArticle, NewsDesk } from './state';
@@ -57,6 +61,9 @@ function ensureDesk(state: GameState): NewsDesk {
     assetMarks: {},
     worldRecent: {},
     elections: {},
+    scheduled: [],
+    commodities: {},
+    archive: [],
   });
 }
 
@@ -90,6 +97,7 @@ export function composeNews(state: GameState): void {
   // or fewer stories never change which laws pass (SIMULATION §3).
   runPolitics(state, desk, stream(state, 'politics'));
   driftPolls(state, desk, rng);
+  moveCommodities(state, desk, stream(state, 'commodities'));
   const ctx = newsContext(state, issueEvents(state, desk));
   const sports = runSports(ctx, desk, rng);
   const home = state.world.countries[ctx.home];
@@ -114,7 +122,11 @@ export function composeNews(state: GameState): void {
     ...electionStories(ctx, desk, rng),
     ...worldDeskStories(ctx, desk, rng),
     ...moverStories(ctx, rng),
+    ...commodityStories(ctx, desk, rng),
+    ...calendarStories(ctx, desk, rng),
   ];
+  const reprint = archiveStory(ctx, desk);
+  if (reprint) candidates.push(reprint);
   const corporate = corporateStory(ctx, rng);
   if (corporate) candidates.push(corporate);
   const column = columnStory(ctx, rng);
@@ -140,12 +152,11 @@ export function composeNews(state: GameState): void {
   spare.push(...sports.spare);
 
   const chosen = select(candidates, spare);
+  markReprinted(desk, chosen);
   const articles = render(state, chosen, rng);
-  state.news.issues.push({
-    week: ctx.week,
-    date: isoDate(state.meta.startDate, state.clock.day),
-    articles,
-  });
+  const date = isoDate(state.meta.startDate, state.clock.day);
+  state.news.issues.push({ week: ctx.week, date, articles });
+  keepForArchive(desk, ctx.week, date, articles);
   if (state.news.issues.length > NEWS_ARCHIVE_ISSUES)
     state.news.issues.splice(0, state.news.issues.length - NEWS_ARCHIVE_ISSUES);
   desk.cursor = {

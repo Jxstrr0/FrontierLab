@@ -19,6 +19,7 @@ import {
   type WorldBeat,
 } from '../data/newsWorldBeats';
 import type { TemplateKey } from '../data/ledgerTemplates';
+import { TITLE_POOLS } from '../data/newsWorldBeatsMore';
 import { dateOf } from './calendar';
 import { hpiYoY } from './macro';
 import { grouped, newsMoney, newsPct } from './newsFormat';
@@ -118,6 +119,7 @@ function beatStory(ctx: NewsContext, beat: WorldBeat, c: CountryState, rng: Rng)
       money: newsMoney(money, ctx.sym),
       name: `${rng.pick(FIRST_NAMES)} ${rng.pick(LAST_NAMES)}`,
       job: rng.pick(WORLD_JOBS),
+      title: beat.pool ? rng.pick(TITLE_POOLS[beat.pool]) : '',
       gdp: newsPct(c.gdp),
       infl: newsPct(c.inflation),
       unemp: newsPct(c.unemployment),
