@@ -16,6 +16,17 @@ export interface OwnedHome {
   rebuilds?: number;
 }
 
+/** A trophy asset you own (§22a). */
+export interface OwnedTrophy {
+  id: Id;
+  trophyId: string;
+  price: Money;
+  value: Money;
+  boughtWeek: Week;
+  /** The home price list level when the value was last marked. */
+  levelRef: number;
+}
+
 export interface OwnedCar {
   id: Id;
   carId: string;
@@ -152,4 +163,6 @@ export interface PersonalEmpire {
   offerLocks?: Record<string, Week>;
   /** Net worth at each weekly close, oldest first (WEALTH_HISTORY_WEEKS), for the weekly change. */
   netWorthLog?: Money[];
+  /** Trophy assets (§22a, schema v39). */
+  trophies?: OwnedTrophy[];
 }

@@ -996,6 +996,15 @@ A deliberately simple "country up or down" investment (DESIGN §5.12a). Your boo
   - **Consigning** a genuine item: hammer price = value × lognormal(1, 0.15), minus a 10% seller fee.
 - **Rich list:** a generated list of 50 fixed fortunes drawn log-uniform between $150M and $2B (`RICH_LIST.fortune`; was $1.5B–$120B until 2026-10-26, which no founder could reach), each growing with the home country's nominal index (§4.6; `richList.nominalRef` remembers the level at the last ranking, so an older save just starts from its current level) times its own real growth of −2% to +5% a year (`RICH_LIST.growth`; was a flat 4–8% before the index existed). Yearly rank event. A founder typically enters the list in years 8–12 and needs a long, strong game to top it.
 
+### 22a Trophy assets
+- Eight catalogue items (CONTENT §20 "Trophy assets") priced $1B–$12B at the start, bought with personal cash, one of each.
+- **Price:** catalogue price × your home price list (§4.6), so asking prices step with the economy each year.
+- **Value (tick step 11):** `value *= level / levelRef` when the home list steps, then `value *= 1 + drift / 52` (drift per item, −6% to +3% a year). Counted in net worth under Other assets.
+- **Upkeep:** `value × upkeep / 52` a week from personal cash (0.2% to 8% a year by item).
+- **Sale:** value × (1 − 5%) (`TROPHIES_CFG.sellFee`).
+- **Perk:** owning the airline makes every flight free (`fareTo` returns 0).
+- Every purchase and sale makes The Weekly Ledger.
+
 ## 23. Incidents
 
 - Each incident type has a weekly base probability, a scope (branch, city, company or personal), conditions, multipliers, a cooldown (default 8 weeks per scope) and 2–3 options with costs and effects.

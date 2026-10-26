@@ -1420,6 +1420,13 @@ export const JET = { upkeepRate: 0.08, depreciation: 0.06, resaleHaircut: 0.1 } 
 
 // ─── PERSONAL EMPIRE (SIMULATION §22, Stage 9) ────────────────────────────────
 /** Vacation homes: value tracks the country's hpi; upkeep per year; rebuild; sale fee. */
+/**
+ * Trophy assets (§22a): bought at the home price list, sold for value less
+ * sellFee. A purchase or sale always makes The Weekly Ledger.
+ */
+export const TROPHIES_CFG = {
+  sellFee: 0.05,
+} as const;
 export const HOMES_CFG = {
   upkeepRate: 0.01,
   rebuildCost: 0.25,

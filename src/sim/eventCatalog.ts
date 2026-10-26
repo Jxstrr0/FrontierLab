@@ -241,6 +241,9 @@ export interface EventPayloads {
 
   // ─── Personal empire (Stage 9; payloads are refined by each system) ───────
   HOME_BOUGHT: { homeId: string; name: string; price: Money };
+  /** You bought or sold a trophy asset (§22a). */
+  TROPHY_BOUGHT: { trophyId: string; name: string; kind: string; price: Money };
+  TROPHY_SOLD: { trophyId: string; name: string; kind: string; price: Money };
   HOME_SOLD: { homeId: string; name: string; price: Money };
   HOME_REBUILT: { homeId: string; name: string; value: Money };
   CAR_BOUGHT: { carId: string; name: string; price: Money };

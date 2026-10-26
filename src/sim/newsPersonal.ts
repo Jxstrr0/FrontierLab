@@ -1,6 +1,6 @@
 // The Weekly Ledger's Stage 9 personal stories (SIMULATION §24): your place on
 // the year-end rich list, insider-trading probes and their fines, and home
-// purchases of HOMES_CFG.newsMin or more.
+// purchases of HOMES_CFG.newsMin or more, and every trophy asset bought or sold (§22a).
 import { HOMES_CFG, NEWS_PRIORITY as P } from '../config/balance';
 import { newsMoney } from './newsFormat';
 import { num, str, type NewsContext, type Story } from './newsStory';
@@ -69,6 +69,21 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
         icon: 'house',
         priority: P.companyRoutine,
         tokens: { ...base, home: str(p.name, 'a home'), price: newsMoney(num(p.price), ctx.sym) },
+      };
+    case 'TROPHY_BOUGHT':
+    case 'TROPHY_SOLD':
+      return {
+        key: e.type,
+        subject: `trophy:${str(p.trophyId)}`,
+        tab: 'business',
+        icon: 'trophy',
+        priority: P.companyRoutine,
+        tokens: {
+          ...base,
+          trophy: str(p.name),
+          kind: str(p.kind).toLowerCase(),
+          price: newsMoney(num(p.price), ctx.sym),
+        },
       };
     default:
       return undefined;
