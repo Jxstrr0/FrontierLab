@@ -4,11 +4,19 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 **Current stage:** 10 — Art pass, onboarding, polish, launch (built and live; awaiting the owner's iPhone check). All ten roadmap stages are built. Still open: the owner's testing and tuning pass, an Add to Home Screen test on a real iPhone, and the Vault Street card on Kelbo.Website (in a separate session in that repo).
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `0c31d208606976` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `1abea5732e311f` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-26 — Monthly results cover the whole month (v0.11.10)
+- **Owner's report (screen recording):** monthly results said "January 2041 · 1 week, ending 7 Jan" and "February 2041 · 1 week", so the month's revenue and net income (and the change on last month) were one week's.
+- **Why.** A week belongs to the month its last day falls in. The report opened on the first tick after the month changed, but that tick closes a week that (unless the month began exactly on the tick) already ends in the new month. So the report showed just that week, labelled as the new month. It only worked when a game began on the right weekday, which is why the tests missed it.
+- **Fix.** The monthly (and quarterly) report now opens on the tick that closes the month's last week and sums every week of it (4 or 5), compared with the full month before. The header date is now the last day covered: it used to show the next day. The quarter-end report (the Ledger's earnings story, EPS and ROE) had the mirror slip: when a tick landed exactly on a quarter's first day, the week that ended the day before was counted in the new quarter. It now stays in the old one.
+- **Also worth knowing:** "Revenue" includes the non-cash marks on what the bank holds (stocks, startup stakes, buildings). A week when those fall sharply, such as a quarter's earnings week, can show negative revenue on its own. Summed over a month, it is diluted but still counted.
+- **Checked:** lint, full test suite (841; new tests: a game starting on a Thursday reports whole months, and a week ending 31 March stays in Q1) and build clean. Determinism snapshot `0c31d208606976` → `1abea5732e311f` (intended: only the quarter-end fix changes the hash). Balance run: only the week-260 income warning already on main. At 390×844 the monthly report reads "February 2027 · 4 weeks, ending 28 Feb 2027" with no console errors.
+- **Docs:** SIMULATION §2 and step 13, SCREENS §21, DESIGN decision log.
 
 ### 2026-10-26 — CFO Investing (v0.11.9, schema v31)
 - **Owner's ask:** does the Investment department actually invest? It didn't: the floor only finds startups (more analysts, more startups to choose from) and shows your portfolio, as in the original. So the CFO gets two new switches, agreed first with the owner: startups and stocks, for the bank and for you, best scorecard, spread across the market, trim losers, separate caps.

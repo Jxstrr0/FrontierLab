@@ -32,6 +32,12 @@ export function isQuarterStart(startDate: string, day: number): boolean {
   return quarterOf(now) !== quarterOf(prev) || now.getUTCFullYear() !== prev.getUTCFullYear();
 }
 
+/** True when `day` is the first day of a quarter: the week ending the day before closed the last one. */
+export function isFirstDayOfQuarter(startDate: string, day: number): boolean {
+  const d = dateOf(startDate, day);
+  return d.getUTCDate() === 1 && d.getUTCMonth() % 3 === 0;
+}
+
 /** True on the first weekly tick after a month ends. */
 export function isMonthStart(startDate: string, day: number): boolean {
   if (day < DAYS_PER_WEEK) return false;

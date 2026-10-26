@@ -12,28 +12,47 @@ import {
   snapshotEndDay,
 } from '../../src/app/weekly/resultsPeriod';
 import { DAYS_PER_WEEK } from '../../src/config/balance';
-import { isMonthStart, isoDate } from '../../src/sim/calendar';
+import { isoDate } from '../../src/sim/calendar';
 import { advanceWeeks } from '../../src/sim/engine';
 import { newGame } from '../../src/sim/newGame';
 
 const START = '2027-01-04'; // a Monday
 
 describe('resultsDue', () => {
-  it('opens weekly results every week and the others on the first tick after a month or quarter', () => {
+  it('opens weekly results every week and the others when a month or quarter’s last week closes', () => {
     const ticks = Array.from({ length: 20 }, (_, i) => (i + 1) * DAYS_PER_WEEK);
     const monthly = ticks.filter((d) => resultsDue('monthly', START, d) === 'monthly');
     const quarterly = ticks.filter((d) => resultsDue('quarterly', START, d) === 'quarterly');
-    // The first tick on or after each month's first day: Mon 1 Feb, Mon 1 Mar, Mon 5 Apr, Mon 3 May.
-    expect(monthly.map((d) => isoDate(START, d))).toEqual([
-      '2027-02-01',
-      '2027-03-01',
-      '2027-04-05',
-      '2027-05-03',
+    // Months close with snapshots 4 (ends Sun 31 Jan), 8 (28 Feb), 12 (28 Mar; the
+    // week of 29 Mar ends 4 Apr, so it is April's) and 16 (25 Apr).
+    expect(monthly.map((d) => d / DAYS_PER_WEEK)).toEqual([4, 8, 12, 16]);
+    expect(monthly.map((d) => isoDate(START, snapshotEndDay(d / DAYS_PER_WEEK)))).toEqual([
+      '2027-01-31',
+      '2027-02-28',
+      '2027-03-28',
+      '2027-04-25',
     ]);
-    expect(quarterly.map((d) => isoDate(START, d))).toEqual(['2027-04-05']);
+    expect(quarterly.map((d) => d / DAYS_PER_WEEK)).toEqual([12]);
     expect(ticks.every((d) => resultsDue('weekly', START, d) === 'weekly')).toBe(true);
     expect(ticks.every((d) => resultsDue('off', START, d) === null)).toBe(true);
-    expect(isMonthStart(START, 0)).toBe(false);
+    expect(resultsDue('monthly', START, 0)).toBe(null);
+  });
+
+  it('reports every week of the month that just ended, whatever weekday the game began', () => {
+    // A start mid-week (the reported bug): a Thursday, so ticks never fall on the 1st.
+    const start = '2040-01-05';
+    const s = newGame({ seed: 42, cityId: 'cal', startDate: start });
+    advanceWeeks(s, 30);
+    for (let d = DAYS_PER_WEEK; d <= 30 * DAYS_PER_WEEK; d += DAYS_PER_WEEK) {
+      if (resultsDue('monthly', start, d) !== 'monthly') continue;
+      const week = d / DAYS_PER_WEEK;
+      const { now } = periodSnapshots(s, 'monthly', week);
+      expect(now.length === 4 || now.length === 5 || week < 5).toBe(true);
+      // The next week starts a new month, and every reported week is in this one.
+      expect(periodKey('monthly', start, week + 1)).not.toBe(periodKey('monthly', start, week));
+      for (const x of now)
+        expect(periodKey('monthly', start, x.week)).toBe(periodKey('monthly', start, week));
+    }
   });
 });
 
@@ -82,5 +101,21 @@ describe('periods', () => {
     const jan = periodSnapshots(s, 'monthly', 4);
     expect(jan.now.map((x) => x.week)).toEqual([1, 2, 3, 4]);
     expect(jan.prev).toEqual([]);
+  });
+});
+
+describe('quarter-end report', () => {
+  it('keeps a week that ends the day before a quarter starts in the old quarter', () => {
+    // Started Thursday 4 March: the 4th tick falls on Thursday 1 April, so
+    // snapshots 1–4 (ending 10, 17, 24 and 31 March) are all Q1.
+    const s = newGame({ seed: 42, cityId: 'cal', startDate: '2027-03-04' });
+    advanceWeeks(s, 4);
+    const q = s.history.quarterly.at(-1)!;
+    expect(q.q).toBe(1);
+    expect(q.endWeek).toBe(4);
+    expect(q.revenue).toBeCloseTo(
+      s.history.weekly.filter((w) => w.week <= 4).reduce((sum, w) => sum + w.revenue, 0),
+      6,
+    );
   });
 });
