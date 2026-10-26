@@ -333,7 +333,7 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 | Personal | `offerHome`, `rebuildHome`, `sellHome`, `buyCar`, `sellCar`, `placeBid`, `clearBid`, `appraiseCollectible`, `consignCollectible`, `withdrawConsignment`, `buyJet`, `sellJet`, `buyClub`, `sellClub`, `setKit`, `setKitSponsor`, `signPlayer`, `releasePlayer` |
 | Settings and saves | `setSettings`, `setFounderAvatar`, `moveHqTab`, `resetHqTabOrder`; saves are not commands: `saveToSlot`, `loadFromSlot` (`src/sim/save/storage.ts`), `exportCode`, `importCode` (`serialize.ts`) |
 
-## 12. Implemented so far (schema v35)
+## 12. Implemented so far (schema v36)
 
 `src/sim/state.ts` is the source of truth; this section records how it differs from the guide above. Later stages add the rest with a schema bump and a migration.
 
@@ -393,4 +393,4 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
   - `UnderwritingState.switching = { fromId, weeksLeft }` (the old model blending out) instead of `switchingTo`; `activeModelId` is the new model from the moment you switch.
   - Commands: `startDevelopment`, `cancelDevelopment`, `deleteProduct` (`commands/development.ts`); `buyBureauModel`, `commissionBureauModel`, `saveCustomModel`, `activateModel` (`commands/underwriting.ts`); `setApplyRatesToAll`, `setCompanyPrice`, `setCompanyOffered` (`commands/products.ts`).
 - **Saves:** `src/sim/save/serialize.ts` has `serialize`, `deserialize` (with migrations and a required-keys check), `checksum` (cyrb53) and `exportCode`/`importCode`. Save slots live in `src/sim/save/storage.ts`, their data store in `slotData.ts` (§10).
-
+- **Schema v36** (world calendar, commodities, archive; SIMULATION §24.4–24.6): `NewsDesk.scheduled` (`ScheduledStory[]`: stories written ahead for a week, a tournament's rounds or an expo's close), `NewsDesk.commodities` (weekly prices per commodity id, newest last, at most 53) and `NewsDesk.archive` (`ArchivedStory[]`: every fourth issue's lead story with week, date, tab, icon, headline, body and an optional `reprinted` flag). Migration 35 → 36 gives an existing desk empty ones. New RNG streams `commodities` and `reviews` (branch review cards, split from `news`).

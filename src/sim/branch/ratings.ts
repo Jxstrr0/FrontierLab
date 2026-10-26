@@ -199,7 +199,8 @@ export function addReviews(
 ): void {
   branch.ratings.reviewCount += served * REVIEW_RATE;
   if (served <= 0) return;
-  const rng = stream(state, 'news');
+  // Own stream (split from `news` 2026-10-26), so newspaper changes never reshuffle reviews.
+  const rng = stream(state, 'reviews');
   const cats: RatingCategory[] = ['rates', 'products', 'service', 'branch'];
   const sorted = [...cats].sort((a, b) => branch.ratings[b] - branch.ratings[a]);
   const picks: RatingCategory[] = [sorted[0]!, sorted[sorted.length - 1]!];
