@@ -170,6 +170,7 @@ Stage 1 tuning (2026-10-24): base tickets for savings (14,000 → 9,000), GIC (2
 | ext_glass | Modern Glass | 3.5 | 120,000 |
 | ext_columns | Classic Columns | 4.5 | 210,000 |
 | ext_deco | Deco Tower Front | 5.0 | 340,000 |
+| ext_lattice | Lattice Pavilion | 5.0 | 340,000 |
 
 **Lobby** (fit-out):
 
@@ -217,7 +218,7 @@ Reference builds:
 
 ### 7a. House styles
 
-Chosen on New Game (`src/data/houseStyles.ts`); every branch front wears it, whatever the exterior option.
+Chosen on New Game (`src/data/houseStyles.ts`); every branch front wears it, whatever the exterior option. A game started without a style, and saves from before styles existed, draw one of the first five from the seed (`SEEDED_HOUSE_STYLE_IDS`), so adding a style never changes an old game.
 
 | id | Name | Sign | Lamps | Planters | Door | Flag |
 |---|---|---|---|---|---|---|
@@ -226,6 +227,7 @@ Chosen on New Game (`src/data/houseStyles.ts`); every branch front wears it, wha
 | modern | Clean Line | lower-case sans with a brand-ink tile | light bars | long trough of grasses | glass with a slim pull | hanging banner |
 | garden | Market Street | rounded painted board, italic | hanging lanterns | pots of flowers in the brand ink | brand ink with a wreath | pennant |
 | civic | Civic Stone | capitals cut into a stone band | sconces (lamp standards on the steps of Classic Columns) | classical urns | dark bronze, panelled | bordered rectangle |
+| quant | Quant Noir | graphite slab, lower-case spaced sans, a brand-ink pixel and light strip | recessed light bars in the brand ink | graphite cubes with clipped spheres | frameless glass with a glowing seam and a keypad | a slim pulsing light blade |
 
 ### 7b. Logo shapes
 
@@ -239,6 +241,9 @@ Chosen on New Game (`src/data/logoShapes.ts`); the outline of the bank's mark ev
 | hex | Hexagon | six sides, flat top and bottom |
 | plaque | Plaque | a square with cut corners |
 | rosette | Rosette | twelve scallops, like a wax seal |
+| tile | Tile | a sharp square, flat on |
+| pebble | Pebble | a softly rounded square |
+| octagon | Octagon | eight sides, flat top and bottom |
 
 ## 8. Branch campaigns
 

@@ -21,7 +21,7 @@ import { faceDetail, type BaseAvatar } from '../people';
 import { initRivalBench, initRivalFinancials, seedMatureBooks } from '../rivals';
 import { EXEC_DELEGATION, FX_START_INDEX, PAY_REVIEW } from '../../config/balance';
 import { COUNTRIES } from '../../data/countries';
-import { HOUSE_STYLE_IDS } from '../../data/houseStyles';
+import { SEEDED_HOUSE_STYLE_IDS } from '../../data/houseStyles';
 import { DEFAULT_LOGO_SHAPE } from '../../data/logoShapes';
 import type { CountryId } from '../../data/types';
 import { SCHEMA_VERSION, type BranchGuidance, type ExecSeat, type GameState } from '../state';
@@ -346,7 +346,8 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
   // from their seed, so existing saves still differ from one another.
   18: (s) => {
     const state = s as unknown as GameState;
-    state.meta.houseStyle ??= HOUSE_STYLE_IDS[state.meta.seed % HOUSE_STYLE_IDS.length]!;
+    state.meta.houseStyle ??=
+      SEEDED_HOUSE_STYLE_IDS[state.meta.seed % SEEDED_HOUSE_STYLE_IDS.length]!;
     return s;
   },
   // v20: the outline of the bank's mark. Older banks keep the round medallion

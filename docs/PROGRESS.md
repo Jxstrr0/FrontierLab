@@ -10,6 +10,14 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-10-26 — Quant Noir: a hyper-modern branding and look (v0.10.19)
+- **Owner's ask:** at least one hyper-futuristic, modern branding and look in the style of a quantitative trading firm.
+- **House style: Quant Noir.** A sixth style on New Game. The sign is a graphite slab with the bank's name in lower-case, widely spaced sans, a brand-ink pixel before it and a light strip under it; the lamps are recessed light bars in the brand ink with a soft cone of light; the planters are graphite cubes with clipped green spheres; the door is a frameless glass slab with a glowing seam and a keypad; and instead of a cloth flag a slim light blade pulses on the mast (still, with reduced motion). It dresses all six exteriors (`branch/houseStyleQuant.tsx`; the shared sign fitting moved to `signFit.ts`).
+- **Exterior: Lattice Pavilion.** A sixth build option: a thin roof slab floating over a box of smoked glass crossed by a diagrid, the seal hanging in the glazing, a slate mezzanine line, and a light wall in solid brand ink beside the door with a ticker of ivory dashes. Quality 5.0 at $340,000, the Deco Tower's tier, so it is a modern alternative rather than a better buy (`branch/facadesFuture.tsx`, CONTENT §7).
+- **Logo shapes and inks.** Three plain geometric shapes, Tile (a sharp square), Pebble (a rounded square) and Octagon, make nine (a full 3 × 3 picker). Four sharper inks, Graphite, Circuit Blue, Ultraviolet and Magenta, make twelve (three rows of four); all keep ivory text at 4.5:1 or better.
+- **Nothing existing changes.** A game started without a style, and saves from before styles existed, draw from the five original styles only (`SEEDED_HOUSE_STYLE_IDS`), so seed picks, old saves and the determinism snapshot (`000acf5c010cae`, set by the faces change below) are untouched. No save schema change.
+- **Checked** Quant Noir on all six fronts and every style on the Lattice Pavilion at 390×844, plus the New Game pickers, with no console errors; 757 tests, lint and build clean.
+
 ### 2026-10-26 — More detailed faces and a grouped portrait creator (v0.10.18)
 - **Owner's ask:** update the profile picture creator and the faces: same art style, more detail.
 - **Faces, redrawn.** Every portrait in the game (founder, managers, candidates, executives, startup and venture CEOs, advisors, review cards) is still an engraved banknote plate, with much more in it:

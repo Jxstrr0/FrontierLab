@@ -36,6 +36,25 @@ export const HOUSE_STYLES: readonly HouseStyleSpec[] = [
     name: 'Civic Stone',
     description: 'Capitals cut into stone, lamp standards and classical urns.',
   },
+  {
+    id: 'quant',
+    name: 'Quant Noir',
+    description:
+      'A graphite light-strip sign in lower case, recessed light bars, a frameless glass door and a light blade for a flag.',
+  },
 ];
 
 export const HOUSE_STYLE_IDS: readonly HouseStyle[] = HOUSE_STYLES.map((h) => h.id);
+
+/**
+ * The five original styles. A game started without a style, and a save from
+ * before styles existed, draws from these by seed, so old games keep the look
+ * they always had when a new style is added to the list above.
+ */
+export const SEEDED_HOUSE_STYLE_IDS: readonly HouseStyle[] = [
+  'heritage',
+  'deco',
+  'modern',
+  'garden',
+  'civic',
+];

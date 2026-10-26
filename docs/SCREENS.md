@@ -71,10 +71,10 @@ Wealth · Company · Branches · Portfolio · The Ledger (archive) · Milestones
 1. **Your bank:**
    - name (max 24 characters)
    - monogram (2 letters, auto-filled from the name)
-   - **logo shape** (6 chips, each a small medallion in the shape: Coin, Shield, Lozenge, Hexagon, Plaque, Rosette; CONTENT §7b), with a one-line description
-   - brand ink (8 swatches)
+   - **logo shape** (9 chips, each a small medallion in the shape: Coin, Shield, Lozenge, Hexagon, Plaque, Rosette, Tile, Pebble, Octagon; CONTENT §7b), with a one-line description
+   - brand ink (12 swatches)
    - live medallion preview (in the chosen shape; the top bar, panel icons, the branch seal and the plaque over the counter all use it)
-   - **house style** (5 chips: Old Exchange, Jazz Age, Clean Line, Market Street, Civic Stone) under a live storefront wearing your name, ink and the style, with the style's one-line description; the confirm step lists it
+   - **house style** (6 chips: Old Exchange, Jazz Age, Clean Line, Market Street, Civic Stone, Quant Noir) under a live storefront wearing your name, ink and the style, with the style's one-line description; the confirm step lists it
 2. **Founder:** name and the avatar builder (portrait parts, §ART): the live portrait with a one-line summary and a Shuffle button, then the parts in two groups, **Face** (head shape, eyes, brows, mouth, age, skin tone swatches) and **Style** (hair, facial hair, glasses, attire), each a row with ‹ › steppers showing the option name and its position (e.g. 3/4). The same picker opens from Settings → Edit founder avatar.
 3. **Start city:** a Segmented row of regions (Canada / U.S. / Europe / Asia-Pacific), opening on the chosen city's region, then a card for each city in that region (all 20 cities with storefronts), each with:
    - the country (euro-area cities show their own country)
