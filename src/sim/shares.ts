@@ -49,3 +49,13 @@ export function founderStake(state: GameState): number {
 export function bookValuePerShare(state: GameState, equity: number): number {
   return equity / Math.max(1, state.company.sharesOutstanding);
 }
+
+/** Retires shares a holder sells back to the bank (a buyback, §19.6a). */
+export function retireShares(state: GameState, holderId: string, shares: number): boolean {
+  const from = state.stock.holders.find((h) => h.id === holderId);
+  if (!from || from.shares < shares || shares <= 0) return false;
+  from.shares -= shares;
+  state.company.sharesOutstanding -= shares;
+  state.stock.holders = state.stock.holders.filter((h) => h.shares > 0 || h.id === FOUNDER_ID);
+  return true;
+}

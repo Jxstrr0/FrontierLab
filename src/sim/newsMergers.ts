@@ -60,7 +60,12 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
     case 'ACQUISITION_CLOSED':
       return {
         ...base,
-        key: p.distressed === true ? 'ACQUISITION_CLOSED_DISTRESSED' : 'ACQUISITION_CLOSED',
+        key:
+          p.distressed === true
+            ? 'ACQUISITION_CLOSED_DISTRESSED'
+            : num(p.stockPct) > 0
+              ? 'ACQUISITION_CLOSED_STOCK'
+              : 'ACQUISITION_CLOSED',
         icon: 'handshake',
         priority: P.companyAlarm,
         tokens: { ...tokens, price: m(p.price), n: String(num(p.branches)) },
