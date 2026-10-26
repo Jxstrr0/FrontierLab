@@ -54,7 +54,7 @@ export function CompanyProductCard(p: { spec: ProductSpec; country: CountryId })
         </div>
       </div>
       <div class="br-product-figures">
-        {n.total > 0 && <Row label="Branches offering" value={`${n.on} of ${n.total}`} />}
+        {n.total > 0 && <Row label="Sales offices offering" value={`${n.on} of ${n.total}`} />}
         {spec.kind !== 'fx' && (
           <>
             <Row label="New accounts last week" value={count(totals.newAccounts)} />
@@ -82,7 +82,7 @@ export function CompanyProductCard(p: { spec: ProductSpec; country: CountryId })
         hint={
           atHq
             ? `Market ${fmt(marketRef(s, cityId, spec.id))} · ${rangeText(spec, sym)}`
-            : 'Branches set their own'
+            : 'Sales offices set their own'
         }
         disabled={!atHq}
       />
@@ -98,7 +98,7 @@ export function CompanyProductCard(p: { spec: ProductSpec; country: CountryId })
       {deleting && (
         <Confirm
           title={`Delete ${spec.name}?`}
-          body="Every branch stops offering it. Its customers and balances move onto the original product, so nothing is lost."
+          body="Every sales office stops offering it. Its customers and balances move onto the original product, so nothing is lost."
           confirmLabel="Delete"
           danger
           onConfirm={() => {

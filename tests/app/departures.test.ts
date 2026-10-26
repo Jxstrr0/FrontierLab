@@ -38,7 +38,7 @@ describe('departure rows', () => {
     const cal = rows.find((r) => r.id === 'cal')!;
     expect(cal.isNew).toBe(false);
     expect(cal.branches).toBe(1);
-    expect(rowNote(cal)).toBe('Canada · 1 branch');
+    expect(rowNote(cal)).toBe('Canada · 1 sales office');
     const fmm = rows.find((r) => r.id === 'fmm')!;
     expect(fmm.isNew).toBe(true);
     expect(fmm.regional).toBe(true);

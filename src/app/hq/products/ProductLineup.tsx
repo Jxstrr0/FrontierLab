@@ -32,11 +32,11 @@ export function ProductLineup() {
     <div class="stack">
       <Card>
         <Toggle
-          label="Apply rates to all branches"
+          label="Apply rates to all sales offices"
           hint={
             on
-              ? 'HQ sets every branch’s prices and lineup.'
-              : 'Branches set their own prices. Turn on to set them here.'
+              ? 'HQ sets every sales office’s prices and lineup.'
+              : 'Sales offices set their own prices. Turn on to set them here.'
           }
           checked={on}
           onChange={(v) => act(cmd.setApplyRatesToAll, v)}
@@ -53,8 +53,8 @@ export function ProductLineup() {
           <Row label={`${COUNTRIES[country].centralBank} policy rate`} value={pct(policy)} />
           <p class="muted small pf-note">
             {on
-              ? `Every branch in ${theCountryName(country)} uses this list.`
-              : `Showing your first branch's prices in ${theCountryName(country)}.`}
+              ? `Every sales office in ${theCountryName(country)} uses this list.`
+              : `Showing your first sales office's prices in ${theCountryName(country)}.`}
           </p>
         </Card>
       )}

@@ -56,7 +56,7 @@ export const INCIDENT_SPECS: Record<string, IncidentSpec> = {
     scope: 'branch',
     trigger: 'rolled',
     baseP: 0.0015,
-    text: 'Thieves broke into the server room at {branch} this morning and got away with {loss} of hardware. Insurance covers {insured}, leaving {net} for us to absorb. The team is shaken.',
+    text: 'Thieves broke into the server room at {sales office} this morning and got away with {loss} of hardware. Insurance covers {insured}, leaving {net} for us to absorb. The team is shaken.',
     money: ['loss', 'net', 'leave'],
     pct: ['insured'],
     options: [
@@ -70,7 +70,7 @@ export const INCIDENT_SPECS: Record<string, IncidentSpec> = {
       {
         id: 'usual',
         label: 'Business as usual',
-        effect: 'Morale −15. Branch rating −0.3 for 8 weeks.',
+        effect: 'Morale −15. Sales office rating −0.3 for 8 weeks.',
         penaltyWeeks: 3,
       },
     ],
@@ -82,7 +82,7 @@ export const INCIDENT_SPECS: Record<string, IncidentSpec> = {
     scope: 'branch',
     trigger: 'rolled',
     baseP: 0.002,
-    text: 'API keys issued at {branch} leaked online, and strangers ran up about {refund} on customers’ accounts before we spotted it.',
+    text: 'API keys issued at {sales office} leaked online, and strangers ran up about {refund} on customers’ accounts before we spotted it.',
     money: ['refund'],
     options: [
       { id: 'refund', label: 'Refund customers', effect: 'Pay back every customer.' },
@@ -136,13 +136,13 @@ export const INCIDENT_SPECS: Record<string, IncidentSpec> = {
     scope: 'branch',
     trigger: 'rolled',
     baseP: 0.001,
-    text: 'Staff at {branch} promised customers things our model can’t do. Complaints are piling up; putting it right costs about {comp}.',
+    text: 'Staff at {sales office} promised customers things our model can’t do. Complaints are piling up; putting it right costs about {comp}.',
     money: ['comp', 'fine'],
     options: [
       {
         id: 'fire',
         label: 'Fire the manager and compensate',
-        effect: 'Customers repaid; the branch needs a new manager.',
+        effect: 'Customers repaid; the sales office needs a new manager.',
         managerSkips: true,
       },
       { id: 'compensate', label: 'Compensate only', effect: 'Customers repaid.' },
@@ -185,13 +185,13 @@ export const INCIDENT_SPECS: Record<string, IncidentSpec> = {
     scope: 'branch',
     trigger: 'rolled',
     baseP: 0.01,
-    text: 'A video of a customer stuck in the queue at {branch} is going round online, and people are piling on.',
+    text: 'A video of a customer stuck in the queue at {sales office} is going round online, and people are piling on.',
     options: [
       { id: 'apology', label: 'Apologise and fix it', effect: 'Service rating +0.2 for 8 weeks.' },
       {
         id: 'ignore',
         label: 'Ignore it',
-        effect: 'Branch awareness −5 points. The press may pick it up.',
+        effect: 'Sales office awareness −5 points. The press may pick it up.',
         penaltyWeeks: 2,
       },
     ],
@@ -217,7 +217,7 @@ export const INCIDENT_SPECS: Record<string, IncidentSpec> = {
     scope: 'branch',
     trigger: 'rolled',
     baseP: 0.0005,
-    text: 'A heatwave knocked out the cooling at {branch} and the servers shut down. We can’t open until it’s repaired.',
+    text: 'A heatwave knocked out the cooling at {sales office} and the servers shut down. We can’t open until it’s repaired.',
     options: [
       { id: 'fast', label: 'Fast repair', effect: 'Closed for 1 week.', penaltyWeeks: 1 },
       { id: 'slow', label: 'Slow repair', effect: 'Closed for 4 weeks.', penaltyWeeks: 4 },
@@ -242,7 +242,7 @@ export const INCIDENT_SPECS: Record<string, IncidentSpec> = {
       {
         id: 'raise',
         label: 'Raise savings rates',
-        effect: 'Savings +1.00% at every branch for 8 weeks.',
+        effect: 'Savings +1.00% at every sales office for 8 weeks.',
       },
       {
         id: 'statement',
@@ -282,7 +282,7 @@ export const INCIDENT_SPECS: Record<string, IncidentSpec> = {
     scope: 'branch',
     trigger: 'rolled',
     baseP: 0.03,
-    text: 'The team at {branch} has walked out over pay and conditions.',
+    text: 'The team at {sales office} has walked out over pay and conditions.',
     options: [
       { id: 'raise', label: 'Raise wages 10%', effect: 'Hourly wage {wage}.' },
       { id: 'bonus', label: 'Pay a bonus', effect: '$1,000 per person. Morale +20.' },
@@ -318,7 +318,7 @@ export const INCIDENT_SPECS: Record<string, IncidentSpec> = {
       {
         id: 'match',
         label: 'Match it',
-        effect: 'Savings +0.15% at every branch in {city} for 26 weeks.',
+        effect: 'Savings +0.15% at every sales office in {city} for 26 weeks.',
         penaltyWeeks: 1,
       },
       {
@@ -336,7 +336,7 @@ export const INCIDENT_SPECS: Record<string, IncidentSpec> = {
     scope: 'branch',
     trigger: 'triggered',
     info: true,
-    text: '{business} has defaulted on its {amount} business loan at {branch}. The loss is already on our books.',
+    text: '{business} has defaulted on its {amount} business loan at {sales office}. The loss is already on our books.',
     money: ['amount'],
     options: OK,
     worst: 'ok',
@@ -370,7 +370,7 @@ export const INCIDENT_SPECS: Record<string, IncidentSpec> = {
     scope: 'company',
     trigger: 'triggered',
     info: true,
-    text: 'Our capital ratio has slipped into the Restricted band. Until it recovers we can’t open branches or pay dividends, and lending is throttled. Retained profits, less risky lending or new shares will lift it.',
+    text: 'Our capital ratio has slipped into the Restricted band. Until it recovers we can’t open sales offices or pay dividends, and lending is throttled. Retained profits, less risky lending or new shares will lift it.',
     options: OK,
     worst: 'ok',
   },

@@ -61,7 +61,7 @@ export function CentralBankFacility() {
       <Row label="Overnight interbank" value={money(t.overnight, sym)} />
       <Row label="Overnight rate" value={pct(overnightRate(s))} tone="dim" />
       <p class="muted small hq-note">
-        The lender of last resort. Every use dents trust: branch ratings fall by{' '}
+        The lender of last resort. Every use dents trust: sales office ratings fall by{' '}
         {WINDOW_STIGMA.rating.toFixed(2)} for {WINDOW_STIGMA.weeks} weeks, and the papers may
         notice. Auto-funding repays the window first once liquidity is comfortably above target.
       </p>
@@ -117,8 +117,8 @@ export function CentralBankFacility() {
           body={
             <p>
               Borrow {moneyFull(borrowValue, sym)} at {pct(windowRate(s))}. Using the window signals
-              trouble: every branch's rating dips for {WINDOW_STIGMA.weeks} weeks and there is a
-              chance it makes the news. Market funding or a cash transfer avoids the stigma.
+              trouble: every sales office's rating dips for {WINDOW_STIGMA.weeks} weeks and there is
+              a chance it makes the news. Market funding or a cash transfer avoids the stigma.
             </p>
           }
           confirmLabel="Borrow anyway"

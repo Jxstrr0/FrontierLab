@@ -1,4 +1,4 @@
-// Line icons for the 14 map layers (SCREENS §2), drawn from the shared icon
+// Line icons for the 16 map layers (SCREENS §2), drawn from the shared icon
 // set (src/art/icons.ts, ART_DIRECTION §7) in the current text colour. Also
 // the type marker that map pins, the Layers legend and panel headers use for
 // non-bank buildings: a medallion, price tag or landmark seal in the type's own
@@ -12,6 +12,7 @@ import { Glyph, LandmarkSeal } from './PinMarks';
 /** Each layer's icon in the shared set (src/art/icons.ts). */
 const LAYER_ICON: Record<MapLayerId, IconName> = {
   branches: 'branch',
+  dataCenters: 'server',
   offices: 'office',
   realEstate: 'realEstate',
   creditBureaus: 'bureau',
@@ -25,6 +26,7 @@ const LAYER_ICON: Record<MapLayerId, IconName> = {
   auctionHouses: 'gavel',
   universities: 'university',
   employers: 'employer',
+  energySites: 'bolt',
 };
 const PATHS = Object.fromEntries(
   Object.entries(LAYER_ICON).map(([id, icon]) => [id, ICON_PATHS[icon]]),

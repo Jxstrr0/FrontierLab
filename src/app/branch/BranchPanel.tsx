@@ -54,7 +54,7 @@ export function BranchPanel(p: { branchId: string; tab: BranchTab }) {
       }
       onClose={closePanel}
       advisor={{
-        name: mgr?.name ?? 'Branch advisor',
+        name: mgr?.name ?? 'Sales office advisor',
         text: advisorLines(s, branch, opening),
         avatar: mgr?.portrait,
       }}
@@ -97,7 +97,7 @@ export function BranchPanel(p: { branchId: string; tab: BranchTab }) {
             </span>
             <span class="muted small">
               Signs, systems and uniforms switch to {s.meta.bankName} over {MERGERS.conversionWeeks}{' '}
-              weeks. The branch already works as yours.
+              weeks. The sales office already works as yours.
             </span>
           </div>
         )}

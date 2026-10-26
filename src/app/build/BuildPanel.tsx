@@ -27,7 +27,7 @@ export function BuildPanel(p: { lotId: string }) {
 
   if (!lot) {
     return (
-      <Panel title="Build branch" onClose={closePanel}>
+      <Panel title="Build sales office" onClose={closePanel}>
         <p class="muted">That storefront no longer exists.</p>
       </Panel>
     );
@@ -50,7 +50,7 @@ export function BuildPanel(p: { lotId: string }) {
   return (
     <>
       <Panel
-        title="Build branch"
+        title="Build sales office"
         subtitle={`${lot.address} · ${districtName(lot)}`}
         onClose={closePanel}
         hero={
@@ -138,9 +138,9 @@ export function BuildPanel(p: { lotId: string }) {
             )}
           </Card>
           <p class="muted small">
-            The branch opens after a one-week fit-out.
+            The sales office opens after a one-week fit-out.
             {thin &&
-              ` A new branch loses money for its first couple of months; this would leave under ${ATTENTION.cashCoverWeeks} weeks of running costs in hand.`}
+              ` A new sales office loses money for its first couple of months; this would leave under ${ATTENTION.cashCoverWeeks} weeks of running costs in hand.`}
           </p>
         </div>
       </Panel>

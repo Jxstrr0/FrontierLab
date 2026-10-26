@@ -119,7 +119,7 @@ export function StepBank(p: { draft: Draft; patch: (d: Partial<Draft>) => void }
       <fieldset class="field">
         <legend class="field-label">House style</legend>
         <span class="field-hint">
-          How every branch front looks: the sign, lamps, planters and flag.
+          How every sales office front looks: the sign, lamps, planters and flag.
         </span>
         <div class="style-preview">
           <BranchArt

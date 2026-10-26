@@ -29,7 +29,7 @@ function maturity(weeks: number): string {
 function blocker(bank: RivalBank, cityId: string, near: boolean): string | undefined {
   if (bank.status !== 'active') return `${bank.name} is not lending.`;
   if (!near)
-    return `${bank.name} lends to banks with a branch in ${CITIES[cityId]?.name ?? 'this city'}. Open one here to borrow.`;
+    return `${bank.name} lends to banks with a sales office in ${CITIES[cityId]?.name ?? 'this city'}. Open one here to borrow.`;
   return undefined;
 }
 

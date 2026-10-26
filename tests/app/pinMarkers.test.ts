@@ -151,7 +151,7 @@ describe('captions', () => {
     const map = generateCityMap(CITIES.cal!, s.meta.seed, lots, { sites });
     const pins = buildPins(s, map, lots, { ...FEATURES, competition: true, hq: true });
     const rival = pins.find((p) => p.kind === 'rival')!;
-    expect(rival.caption).toBe(rivalShortName(rival.label.split(' branch, ')[0]!));
+    expect(rival.caption).toBe(rivalShortName(rival.label.split(' sales office, ')[0]!));
     const hq = pins.find((p) => p.kind === 'rivalHq')!;
     expect(hq.caption).toMatch(/ HQ$/);
   });
@@ -204,10 +204,10 @@ describe('clustering like with like', () => {
 
   it('says what a cluster holds', () => {
     const lots = [pin('l1', 'lot', 0), pin('l2', 'lot', 1)];
-    expect(clusterLabel('lot', lots)).toBe('2 open branch locations. Zoom in');
+    expect(clusterLabel('lot', lots)).toBe('2 open sales office locations. Zoom in');
     const yours = [pin('a', 'mine', 0, { badge: true }), pin('b', 'hq', 0)];
     expect(clusterLabel('yours', yours)).toBe(
-      'Your 1 branch and HQ, loan applications waiting. Zoom in',
+      'Your 1 sales office and HQ, loan applications waiting. Zoom in',
     );
     const rivals = [
       pin('a', 'rival', 0, { caption: 'Fizz' }),

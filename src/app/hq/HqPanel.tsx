@@ -157,8 +157,8 @@ function NoHq() {
             Offices layer; tap one to see its floors, desks and rent.
           </p>
           <p class="muted small">
-            Each floor holds one department. With two branches or fewer nothing is required yet, but
-            Finance, HR and the other teams keep a growing bank running.
+            Each floor holds one department. With two sales offices or fewer nothing is required
+            yet, but Finance, HR and the other teams keep a growing bank running.
           </p>
         </Card>
         <button type="button" class="btn btn-primary btn-block" onClick={showOffices}>

@@ -26,8 +26,8 @@ export function LiquidityCard() {
       {t.freeze && (
         <div class="tr-banner" role="alert">
           <strong>Funding freeze.</strong> Liquid assets are under the {pct(LIQ_MIN, 0)} minimum and
-          auto-funding is off, so branches can't make new loans. Lending resumes once the ratio is
-          back above {pct(LIQ_MIN + FREEZE_RELEASE, 0)}: borrow below, transfer cash in, or turn
+          auto-funding is off, so sales offices can't make new loans. Lending resumes once the ratio
+          is back above {pct(LIQ_MIN + FREEZE_RELEASE, 0)}: borrow below, transfer cash in, or turn
           auto-funding on.
         </div>
       )}

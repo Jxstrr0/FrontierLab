@@ -108,7 +108,7 @@ After the wizard, the map opens with the tutorial (§27).
 - **Captions** from zoom 1.5: places show their type ("Credit bureau") in the type's ink; rival branches show the bank's short name. Captions follow the Text size setting.
 - At the far zoom, nearby pins cluster, but only like with like (yours, rivals, open locations, places, tags; landmarks never cluster). A cluster shows a fanned stack of up to three member marks with a count chip; open locations collapse into a quiet brass dot "×N". Its label names what's inside.
 - Tap a pin to open its panel. Tapping empty map does nothing.
-- **Layers sheet:** a key to the five pin shapes, then an "All" toggle plus one toggle per type (14). Each row shows the actual pins it toggles. Toggles persist in settings.
+- **Layers sheet:** a key to the five pin shapes, then an "All" toggle plus one toggle per type (16). Each row shows the actual pins it toggles. Toggles persist in settings. **Sales Offices** (your offices, rival offices and open locations; id `branches` kept for saved toggles), **Data Centers** (yours, with your crest) and **Energy Sites** (the regional sites, an amber bolt medallion; they used to sit in the Employers layer) each have their own toggle (C2d1). The key's crest row reads "Labs".
 
 ## 3. Available location (storefront)
 

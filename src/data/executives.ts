@@ -30,14 +30,14 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
     delegations: [
       {
         id: 'branchOps',
-        label: 'Branch operations',
-        description: 'Hires a manager for every new branch and turns on default delegation.',
+        label: 'Sales office operations',
+        description: 'Hires a manager for every new sales office and turns on default delegation.',
       },
       {
         id: 'expansion',
         label: 'Expansion',
         description:
-          'Opens a branch every 4 weeks in a growth city with room to grow: the busiest free storefront, your usual fit-out, while 8 weeks of costs stay in cash.',
+          'Opens a sales office every 4 weeks in a growth city with room to grow: the busiest free storefront, your usual fit-out, while 8 weeks of costs stay in cash.',
       },
       {
         id: 'troubles',
@@ -59,11 +59,11 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
         id: 'payReviews',
         label: 'Pay reviews',
         description:
-          'Sets every executive and branch manager to market pay plus your pay premium, as often as you choose, so pay keeps rising with the market and rivals struggle to poach them.',
+          'Sets every executive and office manager to market pay plus your pay premium, as often as you choose, so pay keeps rising with the market and rivals struggle to poach them.',
       },
       {
         id: 'guidance',
-        label: 'Branch guidance: staffing',
+        label: 'Sales office guidance: staffing',
         description:
           'Steers managers who run staffing: every 4 weeks raises their wages and headcount while staff morale is low and trims them when it is high.',
       },
@@ -112,7 +112,7 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
       },
       {
         id: 'guidance',
-        label: 'Branch guidance: funding',
+        label: 'Sales office guidance: funding',
         description:
           'With the CSO, steers delegated managers: every 4 weeks raises their deposit rates while liquidity is under target and trims them when it is well above.',
       },
@@ -127,7 +127,7 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
       {
         id: 'pricing',
         label: 'Pricing',
-        description: 'Prices the company lineup like a branch manager while Apply to all is on.',
+        description: 'Prices the company lineup like a office manager while Apply to all is on.',
       },
       {
         id: 'developments',
@@ -141,7 +141,7 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
       },
       {
         id: 'guidance',
-        label: 'Branch guidance: lineup',
+        label: 'Sales office guidance: lineup',
         description:
           'Steers managers who run products: every 4 weeks cuts their fees and widens their lineup while product ratings are weak, and charges a little more when they are strong.',
       },
@@ -157,11 +157,11 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
         id: 'brand',
         label: 'Brand campaigns',
         description:
-          'Runs brand campaigns to hold awareness in every branch city near your target, within 3% of revenue.',
+          'Runs brand campaigns to hold awareness in every sales office city near your target, within 3% of revenue.',
       },
       {
         id: 'guidance',
-        label: 'Branch guidance: marketing',
+        label: 'Sales office guidance: marketing',
         description:
           'Steers managers who run marketing: every 4 weeks pushes them to spend more on campaigns while brand awareness in their cities is 10 points under your target, and less when 10 points over.',
       },
@@ -195,11 +195,11 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
       {
         id: 'loanPolicy',
         label: 'Loan Desk policy',
-        description: 'Decides Loan Desk applications at branches without a delegated manager.',
+        description: 'Decides Loan Desk applications at sales offices without a delegated manager.',
       },
       {
         id: 'guidance',
-        label: 'Branch guidance: lending',
+        label: 'Sales office guidance: lending',
         description:
           'With the CFO, steers delegated managers: every 4 weeks makes loans dearer and approvals stricter while capital or losses miss target, and looser when both are healthy.',
       },
