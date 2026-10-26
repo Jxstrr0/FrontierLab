@@ -28,7 +28,14 @@ function yesRng(): Rng {
   };
 }
 
-const emptyDesk = (): NewsDesk => ({ proposals: [], seasons: {}, polls: {}, assetMarks: {} });
+const emptyDesk = (): NewsDesk => ({
+  proposals: [],
+  seasons: {},
+  polls: {},
+  assetMarks: {},
+  worldRecent: {},
+  elections: {},
+});
 
 describe('politics', () => {
   it('a passed capital buffer raises the home tier thresholds for a year', () => {

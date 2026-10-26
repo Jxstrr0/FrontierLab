@@ -26,7 +26,10 @@ export type LedgerIconId =
   | 'house'
   | 'ballot'
   | 'person'
-  | 'spark';
+  | 'spark'
+  | 'globe'
+  | 'leaf'
+  | 'plane';
 
 export interface Story {
   key: TemplateKey;

@@ -35,34 +35,33 @@ function table(desk: NewsDesk, league: LeagueSpec): Record<string, Record3> {
   return t;
 }
 
-/** Season finish (at year end) for leagues you follow, then a reset of every league. */
+/** Season finish (at year end) for every league (yours rank higher), then a reset of every league. */
 function seasonStories(ctx: NewsContext, desk: NewsDesk): Story[] {
   const out: Story[] = [];
   for (const country of COUNTRY_ORDER) {
     const league = LEAGUES[country];
     const t = table(desk, league);
-    if (ctx.operated.has(country)) {
-      const standings = league.clubs
-        .map((c, i) => ({ c, i, r: t[c.id]! }))
-        .sort((a, b) => points(b.r) - points(a.r) || b.r[0] - a.r[0] || a.i - b.i);
-      const [champ, runner] = standings;
-      if (champ && runner && champ.r[0] + champ.r[1] + champ.r[2] > 0) {
-        out.push({
-          key: 'SPORTS_SEASON',
-          subject: league.id,
-          tab: 'sports',
-          icon: 'trophy',
-          priority: P.sports + (country === ctx.home ? 10 : 8),
-          group: 'sports',
-          tokens: {
-            club: champ.c.name,
-            pos: ordinal(1),
-            league: league.name,
-            record: recordText(league, champ.r),
-            runnerUp: runner.c.name,
-          },
-        });
-      }
+    const followed = ctx.operated.has(country);
+    const standings = league.clubs
+      .map((c, i) => ({ c, i, r: t[c.id]! }))
+      .sort((a, b) => points(b.r) - points(a.r) || b.r[0] - a.r[0] || a.i - b.i);
+    const [champ, runner] = standings;
+    if (champ && runner && champ.r[0] + champ.r[1] + champ.r[2] > 0) {
+      out.push({
+        key: 'SPORTS_SEASON',
+        subject: league.id,
+        tab: 'sports',
+        icon: 'trophy',
+        priority: followed ? P.sports + (country === ctx.home ? 10 : 8) : P.sportsAbroad + 4,
+        group: followed ? 'sports' : 'sportsAbroad',
+        tokens: {
+          club: champ.c.name,
+          pos: ordinal(1),
+          league: league.name,
+          record: recordText(league, champ.r),
+          runnerUp: runner.c.name,
+        },
+      });
     }
     desk.seasons[league.id] = {};
   }
@@ -151,11 +150,16 @@ export function runSports(
   const s = ctx.state;
   const stories = isYearStart(s.meta.startDate, s.clock.day) ? seasonStories(ctx, desk) : [];
   const spare: Story[] = [];
+  // One league abroad takes its turn each week in "around the leagues".
+  const abroad = COUNTRY_ORDER.filter((c) => !ctx.operated.has(c));
+  const featured = abroad[ctx.week % Math.max(1, abroad.length)];
   for (const country of COUNTRY_ORDER) {
     const league = LEAGUES[country];
     const lead = playRound(league, table(desk, league), rng);
     if (ctx.operated.has(country))
       stories.push({ ...lead, priority: P.sports + (country === ctx.home ? 1 : 0) });
+    else if (country === featured)
+      stories.push({ ...lead, group: 'sportsAbroad', priority: P.sportsAbroad });
     else spare.push({ ...lead, group: undefined, priority: P.filler });
   }
   return { stories, spare };

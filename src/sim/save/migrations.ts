@@ -562,6 +562,16 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     }
     return s;
   },
+  33: (s) => {
+    // The World desk and elections (§24.1, §24 Politics) start fresh: no beat on
+    // cooldown, and each country's first vote is scheduled on the next issue.
+    const desk = (s as unknown as GameState).news.desk;
+    if (desk) {
+      desk.worldRecent ??= {};
+      desk.elections ??= {};
+    }
+    return s;
+  },
 };
 
 /** The rich list's fortune range up to schema v31. */

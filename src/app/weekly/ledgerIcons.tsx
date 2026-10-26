@@ -19,6 +19,9 @@ const LEDGER_ICON: Record<LedgerIconId, IconName> = {
   ballot: 'ballot',
   person: 'person',
   spark: 'spark',
+  globe: 'globe',
+  leaf: 'leaf',
+  plane: 'plane',
 };
 
 /** The article's icon in a small single-ink roundel (a double engraved ring). */

@@ -1,6 +1,6 @@
 // The Weekly Ledger card (ART_DIRECTION §6, SCREENS §21): ivory paper, the
-// masthead between double rules, text tabs (Top | Banking | Business | Markets
-// | Politics | Sports) and the article grid of one stored issue. The weekly
+// masthead between double rules, text tabs (Top | World | Banking | Business |
+// Markets | Politics | Sports) and the article grid of one stored issue. The weekly
 // results and the archive use `LedgerCard`; the game-over screen uses `Masthead`.
 import { useState } from 'preact/hooks';
 import { NEWS_TOP_N } from '../../config/balance';
@@ -11,6 +11,7 @@ type Tab = 'top' | LedgerTab;
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'top', label: 'Top' },
+  { id: 'world', label: 'World' },
   { id: 'banking', label: 'Banking' },
   { id: 'business', label: 'Business' },
   { id: 'markets', label: 'Markets' },

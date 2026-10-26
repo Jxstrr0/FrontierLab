@@ -28,7 +28,14 @@ function game(): GameState {
 
 /** A pending buffer bill in Canada voting in `weeks`. */
 function tableBufferBill(s: GameState, weeks: number) {
-  s.news.desk ??= { proposals: [], seasons: {}, polls: {}, assetMarks: {} };
+  s.news.desk ??= {
+    proposals: [],
+    seasons: {},
+    polls: {},
+    assetMarks: {},
+    worldRecent: {},
+    elections: {},
+  };
   s.news.desk.proposals.push({
     country: 'CA',
     policyId: CAPITAL_BUFFER_POLICY,

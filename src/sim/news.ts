@@ -1,5 +1,6 @@
 // The Weekly Ledger (SIMULATION §24): composes each week's issue from the event
-// log and macro state, never repeating a template for the same subject in
+// log, macro state and the world beyond your bank (World desk, company desk,
+// elections, the Money Column), never repeating a template for the same subject in
 // back-to-back weeks, and keeps the last NEWS_ARCHIVE_ISSUES issues. Story
 // sources live in news*.ts; this module gathers their candidates, ranks them
 // by the §24 priority order, caps each kind, pads a thin issue with filler,
@@ -10,6 +11,7 @@ import {
   NEWS_ARTICLES_MIN,
   NEWS_GROUP_CAPS,
   NEWS_PRIORITY as P,
+  NEWS_WORLD,
 } from '../config/balance';
 import { COUNTRIES } from '../data/countries';
 import { LEDGER_TEMPLATES } from '../data/ledgerTemplates';
@@ -33,18 +35,29 @@ import {
   marketStory,
   rankingStory,
 } from './newsMacro';
-import { politicsStories, pollStory, runPolitics } from './newsPolitics';
+import { columnStory } from './newsColumn';
+import { corporateStory, moverStories } from './newsCompanyDesk';
+import { electionStories } from './newsElections';
+import { driftPolls, politicsStories, pollStory, runPolitics } from './newsPolitics';
 import { rateWatchStory, rivalStories } from './newsRivals';
 import { runSports } from './newsSports';
 import { newsContext, type Story } from './newsStory';
 import { closeStories } from './newsWeek';
+import { worldDeskStories } from './newsWorldDesk';
 import { stream, type Rng } from './rng';
 import type { GameEvent, GameState, LedgerArticle, NewsDesk } from './state';
 
 const COUNTRY_ORDER = Object.keys(COUNTRIES) as CountryId[];
 
 function ensureDesk(state: GameState): NewsDesk {
-  return (state.news.desk ??= { proposals: [], seasons: {}, polls: {}, assetMarks: {} });
+  return (state.news.desk ??= {
+    proposals: [],
+    seasons: {},
+    polls: {},
+    assetMarks: {},
+    worldRecent: {},
+    elections: {},
+  });
 }
 
 /**
@@ -73,7 +86,10 @@ function issueEvents(state: GameState, desk: NewsDesk): GameEvent[] {
 export function composeNews(state: GameState): void {
   const desk = ensureDesk(state);
   const rng = stream(state, 'news');
-  runPolitics(state, desk, rng);
+  // Bills (a passed capital buffer binds) draw from their own stream, so more
+  // or fewer stories never change which laws pass (SIMULATION §3).
+  runPolitics(state, desk, stream(state, 'politics'));
+  driftPolls(state, desk, rng);
   const ctx = newsContext(state, issueEvents(state, desk));
   const sports = runSports(ctx, desk, rng);
   const home = state.world.countries[ctx.home];
@@ -95,7 +111,14 @@ export function composeNews(state: GameState): void {
     ...politicsStories(ctx),
     ...sports.stories,
     ...housingStories(ctx, rng),
+    ...electionStories(ctx, desk, rng),
+    ...worldDeskStories(ctx, desk, rng),
+    ...moverStories(ctx, rng),
   ];
+  const corporate = corporateStory(ctx, rng);
+  if (corporate) candidates.push(corporate);
+  const column = columnStory(ctx, rng);
+  if (column) candidates.push(column);
   const ranking = rankingStory(ctx, desk);
   if (ranking) candidates.push(ranking);
   const market = marketStory(ctx, rng);
@@ -103,7 +126,7 @@ export function composeNews(state: GameState): void {
   if (home) candidates.push(economyStory(home, P.economy, 'economy'));
   const watch = rateWatchStory(ctx);
   if (watch) candidates.push(watch);
-  const poll = pollStory(ctx, desk, rng);
+  const poll = pollStory(ctx, desk);
   if (poll) candidates.push(poll);
 
   // Filler for a thin week: economies abroad (a different one first each week),
@@ -131,7 +154,7 @@ export function composeNews(state: GameState): void {
   };
 }
 
-/** Highest priority first, at most one story per subject and template, kinds capped. */
+/** World desk minimum first, then highest priority, at most one story per subject and template, kinds capped. */
 function select(candidates: Story[], spare: Story[]): Story[] {
   const ranked = candidates
     .map((s, i) => ({ s, i }))
@@ -151,6 +174,11 @@ function select(candidates: Story[], spare: Story[]): Story[] {
     seen.add(id);
     out.push(s);
   };
+  // §24.1: the World desk keeps its minimum even in a busy week.
+  ranked
+    .filter((s) => s.tab === 'world')
+    .slice(0, NEWS_WORLD.minPerIssue)
+    .forEach((s) => take(s, true));
   for (const s of ranked) if (out.length < NEWS_ARTICLES_MAX) take(s, true);
   for (const s of spare) if (out.length < NEWS_ARTICLES_MIN) take(s, false);
   return out;

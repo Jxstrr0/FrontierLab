@@ -61,6 +61,7 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
         key: 'AUCTION_PREVIEW',
         subject: `${str(p.houseId)}:${num(p.week)}`,
         priority: P.housing,
+        group: 'auctions',
         tokens: {
           ...tokens,
           estimate: m(p.estimate),
@@ -70,7 +71,7 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
       };
     case 'AUCTION_RECORD':
       return {
-        ...(p.yours === true ? yours : { ...base, priority: P.politicsLocal }),
+        ...(p.yours === true ? yours : { ...base, priority: P.politicsLocal, group: 'auctions' }),
         key: p.yours === true ? 'AUCTION_RECORD_YOURS' : 'AUCTION_RECORD',
         subject: str(p.itemId),
         tokens: { ...tokens, price: m(p.price), estimate: m(p.estimate) },
