@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { advanceWeeks } from '../../src/sim/engine';
+import { MILESTONES } from '../../src/data/milestones';
 import { checkMilestones } from '../../src/sim/milestones';
 import { newGame } from '../../src/sim/newGame';
 import { migrate } from '../../src/sim/save/migrations';
@@ -36,5 +37,41 @@ describe('milestones', () => {
     const s = newGame({ seed: 3, cityId: 'cal' });
     checkMilestones(s);
     expect(s.milestones.five_countries).toBeUndefined();
+  });
+});
+
+describe('late-game milestones', () => {
+  it('gives every listed milestone a check, with unique ids', () => {
+    const s = newGame({ seed: 3, cityId: 'cal' });
+    checkMilestones(s);
+    expect(new Set(MILESTONES.map((m) => m.id)).size).toBe(MILESTONES.length);
+    expect(MILESTONES.length).toBe(17);
+    expect(Object.keys(s.milestones)).toEqual([]);
+  });
+
+  it('marks the rich list entry apart from its top, and a club bought personally', () => {
+    const s = newGame({ seed: 3, cityId: 'cal' });
+    s.personal.empire.richList.rank = 7;
+    const club = Object.values(s.clubs)[0]!;
+    club.owner = 'personal';
+    checkMilestones(s);
+    expect(s.milestones.rich_list).toBe(s.clock.week);
+    expect(s.milestones.rich_list_1).toBeUndefined();
+    expect(s.milestones.club_owner).toBe(s.clock.week);
+    s.personal.empire.richList.rank = 1;
+    checkMilestones(s);
+    expect(s.milestones.rich_list_1).toBe(s.clock.week);
+  });
+
+  it('counts five closed deals for the fifth acquisition', () => {
+    const s = newGame({ seed: 3, cityId: 'cal' });
+    const deal = {} as (typeof s.mergers.deals)[number];
+    s.mergers.deals = [deal, deal, deal, deal];
+    checkMilestones(s);
+    expect(s.milestones.first_acquisition).toBe(s.clock.week);
+    expect(s.milestones.five_acquisitions).toBeUndefined();
+    s.mergers.deals.push(deal);
+    checkMilestones(s);
+    expect(s.milestones.five_acquisitions).toBe(s.clock.week);
   });
 });

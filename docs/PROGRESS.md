@@ -4,11 +4,23 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 **Current stage:** 10 — Art pass, onboarding, polish, launch (built and live; awaiting the owner's iPhone check). All ten roadmap stages are built. Still open: the owner's testing and tuning pass, an Add to Home Screen test on a real iPhone, and the Vault Street card on Kelbo.Website (in a separate session in that repo).
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `1abea5732e311f` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `1c9471adab35c5` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-26 — Late-game goals (v0.11.11, schema v32)
+- **Owner's ask:** check the later game and make sure there is content to interact with past the few-billion stage.
+- **What a 15–20-year headless run showed (seed 42, steady and aggressive):** every city is full by year 10–11 (179 branches, about $12B of deposits), and from there the bank only creeps: deposits flat, equity up about $300M a year, all of it piling up as cash (aggressive: $4.6B of cash and a 43% capital ratio by year 20, ROE down from 44% to 9%). The rivals never scale: the biggest has 17 branches and about $70M of equity against your $1–3B, so buying them is small change. The founder is a billionaire around year 11–12, but the rich list ran from $1.5B to $120B and grew 6% a year, so "Top of the rich list" (the last milestone) could never land: by year 15 the top fortune was $200B against a founder worth $1.3B. Only 9 of 11 milestones were reachable in practice, and nothing new was announced after "Billionaire founder".
+- **What changes.**
+  - **The rich list now spans $150M–$2B** (was $1.5B–$120B), still 50 fortunes growing 4–8% a year. You enter it around years 8–12 and need a long, strong game to top it (about $5–6B by year 20). Existing saves rescale in place: each fortune keeps its rank; your official rank updates at the next year end as before.
+  - **Six new milestones** between the first acquisition and the top of the list: **100 branches**, **Ten cities**, **Ten billion in assets**, **Five acquisitions**, **Club owner** (buy a sports club, bank or personal) and **On the rich list**. 17 goals in all; the Milestones screen lists them in order. Old saves catch up quietly on load, as before. The three with a Ledger story: 100 branches, ten cities, ten billion.
+  - **Compact money has a trillions tier** ($2.10T) so headline figures past $1,000B stay short.
+- **Still open (design calls for the owner, not made here):** (1) rivals stay small because they only open branches in cities they already serve; letting them expand across their home country would keep competition and M&A alive late on; (2) past year 11 there is no sink for retained earnings besides stocks, property and startups: share buybacks for a listed bank, or deposits that keep growing with the economy, would give the late game a lever; (3) all 20 cities fill at 179 branches, so growth after that is organic only.
+- **Code:** `RICH_LIST.fortune` and `MILESTONE_GOALS` in `balance.ts`; `data/milestones.ts`; predicates in `sim/milestones.ts`; migration 31 → 32; `money()` in `format.ts`.
+- **Checked:** lint, full test suite (new `tests/sim/migrateV31.test.ts`, three late-game milestone tests, the trillions case) and build clean. Determinism snapshot `1abea5732e311f` → `1c9471adab35c5` (intended: the rich list seeds differently and the schema version is in the hash).
+- **Docs:** DESIGN §5.16, §5.18 and decision log, SIMULATION §22, DATA_MODEL §12.
 
 ### 2026-10-26 — Monthly results cover the whole month (v0.11.10)
 - **Owner's report (screen recording):** monthly results said "January 2041 · 1 week, ending 7 Jan" and "February 2041 · 1 week", so the month's revenue and net income (and the change on last month) were one week's.
