@@ -129,8 +129,8 @@ export function LobbyingFirmPanel(p: { siteId: string }) {
             <p>
               {asking.title} for {moneyFull(lobbyingPrice(s, asking, site.cityId), sym)}, paid now.
               It works {pct(asking.success, 0)} of the time, and there's a {pct(asking.exposure, 0)}{' '}
-              chance The Weekly Ledger finds out: a fine of {pct(LOBBYING.exposeFine, 0)} of the fee
-              and a dent in your brand.
+              chance The Weekly Inference finds out: a fine of {pct(LOBBYING.exposeFine, 0)} of the
+              fee and a dent in your brand.
             </p>
           }
           confirmLabel="Lobby"

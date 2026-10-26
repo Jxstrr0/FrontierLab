@@ -37,7 +37,7 @@ export const FRANCHISE_TEMPLATES = {
   NAMING_RIGHTS: [
     {
       h: '{bank} puts its name on the {stadium}',
-      b: 'Home of {club}, the ground will carry the bank’s name for as long as the deal runs. Some fans say they will never call it that.',
+      b: 'Home of {club}, the ground will carry the lab’s name for as long as the deal runs. Some fans say they will never call it that.',
     },
     {
       h: '{stadium} gets a banking makeover',
@@ -47,11 +47,11 @@ export const FRANCHISE_TEMPLATES = {
   KIT_SPONSOR: [
     {
       h: '{bank} name goes on {club} shirts',
-      b: 'The bank replaces the outside sponsor. Fans across {theCountry} will see a lot more of it.',
+      b: 'The lab replaces the outside sponsor. Fans across {theCountry} will see a lot more of it.',
     },
     {
       h: '{club} unveil new shirt sponsor: {bank}',
-      b: 'The deal puts the bank in front of supporters all over {theCountry}.',
+      b: 'The deal puts the lab in front of supporters all over {theCountry}.',
     },
   ],
   CLUB_SIGNED: [

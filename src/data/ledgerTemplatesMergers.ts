@@ -17,7 +17,7 @@ export const MERGERS_TEMPLATES = {
   MERGER_REJECTED: [
     {
       h: '{target} spurns {bank}',
-      b: "{target}'s directors say the offer undervalues the bank. {bank} may come back with more.",
+      b: "{target}'s directors say the offer undervalues the lab. {bank} may come back with more.",
     },
     {
       h: 'No deal: {target} rebuffs {bank}',

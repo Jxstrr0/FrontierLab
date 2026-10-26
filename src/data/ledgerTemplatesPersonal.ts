@@ -31,11 +31,11 @@ export const PERSONAL_TEMPLATES = {
   INSIDER_PROBE: [
     {
       h: 'Regulators probe {founder} over {bank} share trades',
-      b: 'Investigators are looking at trades made weeks before the bank reported. A settlement of {fine} is said to be on the table.',
+      b: 'Investigators are looking at trades made weeks before the lab reported. A settlement of {fine} is said to be on the table.',
     },
     {
       h: 'Insider questions for {bank} founder',
-      b: "{founder}'s personal dealings in the bank's stock before earnings have drawn the securities regulator's attention.",
+      b: "{founder}'s personal dealings in the lab's stock before earnings have drawn the securities regulator's attention.",
     },
   ],
   INSIDER_FINED: [

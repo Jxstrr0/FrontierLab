@@ -33,8 +33,8 @@ export const CALENDAR_TEMPLATES = {
   ],
   // ─── From the archive ───────────────────────────────────────────────────────
   ARCHIVE: [
-    { h: 'From the archive, {ago}: {headline}', b: '{body} (The Weekly Ledger, {date}.)' },
-    { h: '{Ago} in the Ledger: {headline}', b: '“{body}” we wrote on {date}.' },
+    { h: 'From the archive, {ago}: {headline}', b: '{body} (The Weekly Inference, {date}.)' },
+    { h: '{Ago} in the Inference: {headline}', b: '“{body}” we wrote on {date}.' },
   ],
   // ─── Nations Cup ────────────────────────────────────────────────────────────
   CUP_ANNOUNCED: [

@@ -72,7 +72,7 @@ export const DESK_TEMPLATES = {
     },
     {
       h: 'Money Column: rising rates, winners and losers',
-      b: 'At {rate}, borrowers pay more and savers earn more. Check what your bank pays before you leave money idle.',
+      b: 'At {rate}, borrowers pay more and savers earn more. Check what your lab pays before you leave money idle.',
     },
   ],
   COLUMN_RATES_DOWN: [
@@ -164,11 +164,11 @@ export const DESK_TEMPLATES = {
   BANK_WEEK_RECORD: [
     {
       h: 'Record week for {bank}',
-      b: 'Net income of {net} on {revenue} of revenue is the best week in the bank’s history.',
+      b: 'Net income of {net} on {revenue} of revenue is the best week in the lab’s history.',
     },
     {
       h: '{bank} posts its best week yet',
-      b: 'The bank kept {net} from {revenue} of revenue, topping its previous record.',
+      b: 'The lab kept {net} from {revenue} of revenue, topping its previous record.',
     },
   ],
 } as const;

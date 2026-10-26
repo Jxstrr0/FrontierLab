@@ -8,7 +8,7 @@ export const VENTURES_TEMPLATES = {
   CONVENTION_ANNOUNCED: [
     {
       h: '{event} opens in {city} {weeks}',
-      b: 'Founders are booking stands. Exclusive startups will pitch only to investors who attend; find the convention centre on the map.',
+      b: 'Founders are booking stands. Exclusive startups will pitch only to investors who attend; find the conference on the map.',
     },
     {
       h: 'Startups head to {city} for {event}',
