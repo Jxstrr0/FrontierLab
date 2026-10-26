@@ -6,22 +6,42 @@
 export const RIVAL_TEMPLATES = {
   RIVAL_BRANCH_OPENED: [
     {
-      h: 'New branch: {bank} opens in {district}, {city}',
-      b: '{bank} opened a branch at {address} this week.',
+      h: 'New office: {bank} opens in {district}, {city}',
+      b: '{bank} opened a sales office at {address} this week.',
     },
     {
       h: '{bank} expands in {city}',
-      b: 'A new {bank} branch has opened its doors at {address} in {district}.',
+      b: 'A new {bank} sales office has opened its doors at {address} in {district}.',
     },
     {
       h: 'Competition heats up in {district}',
       b: '{bank} is the latest to open on the street, at {address}.',
     },
   ],
+  RIVAL_OFFICE_GROWN: [
+    {
+      h: '{bank} grows in {city}',
+      b: '{bank} has expanded its {city} sales office to a {size} one and is hiring.',
+    },
+    {
+      h: 'Bigger {city} office for {bank}',
+      b: '{bank} is taking more floor space in {city}: its sales office there is now {size}.',
+    },
+  ],
+  RIVAL_OFFICE_SHRUNK: [
+    {
+      h: '{bank} cuts back in {city}',
+      b: 'After a weak run, {bank} has scaled its {city} sales office down to a {size} one.',
+    },
+    {
+      h: 'Smaller {city} office for {bank}',
+      b: '{bank} is giving up floor space in {city} after months of losses. Its office there is now {size}.',
+    },
+  ],
   RIVAL_CITY_ENTRY: [
     {
       h: '{bank} arrives in {city}',
-      b: 'Its first branch in the city opened at {address} in {district}. {bank} now serves {cities} cities.',
+      b: 'Its first sales office in the city opened at {address} in {district}. {bank} now serves {cities} cities.',
     },
     {
       h: '{bank} enters the {city} market',
@@ -35,21 +55,21 @@ export const RIVAL_TEMPLATES = {
   RIVAL_CHARTERED: [
     {
       h: 'New lab on the block: {bank} opens in {city}',
-      b: 'Regulators granted {bank} a charter this year. The new {kind} opened {n} branches in {city} and says more will follow.',
+      b: 'Regulators granted {bank} a charter this year. The new {kind} opened a sales office in {city} and says more will follow.',
     },
     {
       h: '{bank} wins a banking charter',
-      b: 'A new {kind}, {bank}, has opened its doors in {city} with {n} branches.',
+      b: 'A new {kind}, {bank}, has opened its doors in {city}.',
     },
   ],
   RIVAL_MERGER: [
     {
       h: '{buyer} buys {bank} for {price}',
-      b: '{buyer} has agreed to buy {bank} and its {n} branches. The combined bank serves {cities} cities.',
+      b: '{buyer} has agreed to buy {bank} and its {n} sales offices. The combined lab serves {cities} cities.',
     },
     {
       h: 'Bank merger: {bank} sold to {buyer}',
-      b: "Shareholders accepted {buyer}'s {price} offer. {bank}'s {n} branches will carry the {buyer} name.",
+      b: "Shareholders accepted {buyer}'s {price} offer. {bank}'s {n} sales offices will carry the {buyer} name.",
     },
   ],
   RIVAL_CAMPAIGN: [
@@ -75,11 +95,11 @@ export const RIVAL_TEMPLATES = {
   RIVAL_GROWS_UP: [
     {
       h: '{bank} is not a start-up any more',
-      b: 'With {n} branches, the former app-only bank now runs like a high-street lender, and it plans to keep opening.',
+      b: 'With offices in {n} cities, the former app-only lab now runs like an established one, and it plans to keep growing.',
     },
     {
       h: '{bank} grows up',
-      b: 'Once a phone-only challenger, {bank} now has {n} branches and prices like the big banks.',
+      b: 'Once a phone-only challenger, {bank} now has offices in {n} cities and prices like the big labs.',
     },
   ],
   CITY_GROWTH: [
@@ -94,12 +114,12 @@ export const RIVAL_TEMPLATES = {
   ],
   RIVAL_BRANCH_CLOSED: [
     {
-      h: '{bank} shuts {district} branch',
-      b: 'The branch at {address} in {city} has closed after months of losses.',
+      h: '{bank} shuts its {city} office',
+      b: 'The sales office at {address} in {district} has closed after months of losses.',
     },
     {
-      h: '{bank} retreats from {district}',
-      b: 'Customers of the {address} branch are being moved elsewhere in {city}.',
+      h: '{bank} retreats from {city}',
+      b: 'Customers of its {address} office are being moved to other cities.',
     },
   ],
   PRICE_WAR: [

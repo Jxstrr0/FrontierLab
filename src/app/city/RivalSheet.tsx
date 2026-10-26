@@ -10,6 +10,7 @@ import { rivalPriceInCity } from '../../sim/rivalPrices';
 import type { GameState, RivalBank } from '../../sim/state';
 import { AdvisorBar, Badge, CoinRating, Medallion, Sheet } from '../components';
 import { count, pct } from '../format/format';
+import { sizeName } from '../../sim/branch/officeSize';
 
 const STRATEGY_LABEL: Record<RivalBank['strategy'], string> = {
   incumbent: 'Incumbent bank',
@@ -43,20 +44,22 @@ export function RivalSheet(p: { s: GameState; lotId: string; onClose: () => void
   const branch = bank?.branches.find((b) => b.lotId === p.lotId);
   if (!lot || !bank) {
     return (
-      <Sheet title="Rival branch" onClose={p.onClose}>
-        <p class="muted">This branch is no longer here.</p>
+      <Sheet title="Rival sales office" onClose={p.onClose}>
+        <p class="muted">This office is no longer here.</p>
       </Sheet>
     );
   }
   const adWeeks = campaignWeeksLeft(bank, lot.cityId);
+  // C2b: one office per lab per city, sized like yours.
+  const office = branch ? `${sizeName(branch.size).toLowerCase()} sales office` : 'sales office';
   const ours = ourPrice(p.s, lot.cityId, 'savings');
   const theirs = rivalPriceInCity(p.s, bank, 'savings', lot.cityId);
   const advice =
     theirs !== undefined && ours !== undefined
-      ? `This is ${bank.name}'s branch. Their savings rate is ${pct(theirs)}; ours is ${pct(ours)}.`
+      ? `This is ${bank.name}'s ${office}. Their savings rate is ${pct(theirs)}; ours is ${pct(ours)}.`
       : theirs !== undefined
-        ? `This is ${bank.name}'s branch. Their savings rate is ${pct(theirs)}.`
-        : `This is ${bank.name}'s branch.`;
+        ? `This is ${bank.name}'s ${office}. Their savings rate is ${pct(theirs)}.`
+        : `This is ${bank.name}'s ${office}.`;
   return (
     <Sheet title={bank.name} onClose={p.onClose}>
       <div class="stack">
@@ -72,7 +75,7 @@ export function RivalSheet(p: { s: GameState; lotId: string; onClose: () => void
         {branch && (
           <div>
             <CoinRating value={rivalOverall(bank, branch)} />
-            <div class="muted small">{count(branch.reviewCount)} reviews at this branch</div>
+            <div class="muted small">{count(branch.reviewCount)} reviews at this office</div>
             {adWeeks > 0 && (
               <div class="small tone-bad">
                 Advertising in this city: +{RIVAL_MARKETING.boost.toFixed(2)} for {adWeeks} more

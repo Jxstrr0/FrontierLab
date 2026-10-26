@@ -14,6 +14,7 @@ import { stream } from './rng';
 import { trailingProfit } from './rivalExpansion';
 import { overallOf } from './rivals';
 import type { GameState, RivalBank, RivalBranch } from './state';
+import { rivalUnits, rivalUnitsIn } from './rivalOffices';
 
 /** A rival branch's overall rating with any running campaign in its city (§18.9). */
 export function rivalOverall(bank: RivalBank, branch: RivalBranch): number {
@@ -43,7 +44,7 @@ export function launchRivalCampaigns(state: GameState): void {
       if (!eligible || roll >= chance || bank.campaigns?.[cityId]) continue;
       bank.campaigns ??= {};
       bank.campaigns[cityId] = { boost: RIVAL_MARKETING.boost, weeksLeft: RIVAL_MARKETING.weeks };
-      const branches = bank.branches.filter((b) => b.cityId === cityId).length;
+      const branches = rivalUnitsIn(bank, cityId);
       pushEvent(
         state,
         'RIVAL_CAMPAIGN',
@@ -64,7 +65,7 @@ export function runRivalCampaigns(state: GameState): void {
       continue;
     }
     for (const [cityId, c] of Object.entries(bank.campaigns)) {
-      const branches = bank.branches.filter((b) => b.cityId === cityId).length;
+      const branches = rivalUnitsIn(bank, cityId);
       const cost =
         RIVAL_MARKETING.costPerBranch *
         branches *
@@ -109,7 +110,7 @@ export function investInTech(state: GameState, bank: RivalBank): boolean {
 
 /** A disruptor with a big network starts behaving like an incumbent (§18.9). */
 export function growUp(state: GameState, bank: RivalBank): void {
-  if (bank.strategy !== 'disruptor' || bank.branches.length < RIVAL_TECH.growUpBranches) return;
+  if (bank.strategy !== 'disruptor' || rivalUnits(bank) < RIVAL_TECH.growUpBranches) return;
   bank.strategy = 'incumbent';
   pushEvent(
     state,

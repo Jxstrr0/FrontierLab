@@ -23,6 +23,7 @@ import { countryOfCity } from './rates';
 import { stream, type Rng } from './rng';
 import { rivalCapitalRatio } from './rivalBooks';
 import { bestExpansionLot, openRivalBranch } from './rivalExpansion';
+import { nearestSize } from './rivalOffices';
 import { competitorsFor, initRivalBench, newRivalBank } from './rivals';
 import type { GameState, Lot, RivalBank } from './state';
 
@@ -93,11 +94,10 @@ export function charterRival(state: GameState, cityId: string, rng: Rng): RivalB
   initRivalShares(bank);
   initRivalBench(state, bank);
   const lots = Object.values(state.world.lots).filter((l) => l.cityId === cityId);
+  // One office (C2b), sized for the branches a charter used to open.
   const count = rng.int(...RIVAL_CHARTER.branches);
-  for (let i = 0; i < count; i++) {
-    const lot = bestExpansionLot(lots, bank, rng);
-    if (lot) openRivalBranch(state, bank, lot, rng);
-  }
+  const lot = bestExpansionLot(lots, bank, rng);
+  if (lot) openRivalBranch(state, bank, lot, rng, nearestSize(count));
   if (bank.branches.length === 0) {
     delete state.rivals[bank.id];
     return undefined;
