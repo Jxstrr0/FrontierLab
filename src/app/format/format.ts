@@ -7,6 +7,20 @@ import { dateOf } from '../../sim/calendar';
 export { exactMoney, fromCurrency, toCurrency };
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const MONTH_NAMES = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+];
 
 /** Compact money for cards and headlines: $1.48B, $29.8M, $83.7K, $950. */
 export function money(x: number, symbol = '$'): string {
@@ -87,6 +101,12 @@ export function delta(
 export function gameDate(startDate: string, day: number): string {
   const d = dateOf(startDate, day);
   return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
+}
+
+/** "October 2027" for a game day. */
+export function monthYear(startDate: string, day: number): string {
+  const d = dateOf(startDate, day);
+  return `${MONTH_NAMES[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
 }
 
 /** Short "4 Jan" date. */

@@ -38,8 +38,8 @@ export function ConventionPanel(p: { siteId: string }) {
           <Row label="Exhibitors raising" value={String(v.startups.length)} />
           {!open && (
             <p class="muted small cv-note">
-              Exclusive deals are signed on the floor during the event week. Come back when the
-              doors open.
+              Exclusive deals are signed on the floor while the doors are open. Come back when they
+              do.
             </p>
           )}
         </Card>
@@ -52,7 +52,7 @@ export function ConventionPanel(p: { siteId: string }) {
           </Carousel>
         ) : (
           <Card>
-            <p class="muted">The exhibitor list is announced two weeks before the event.</p>
+            <p class="muted">The exhibitor list is announced four weeks before the event.</p>
           </Card>
         )}
         <Networking cityId={v.run.cityId} />

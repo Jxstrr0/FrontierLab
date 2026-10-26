@@ -102,7 +102,7 @@ export interface ConventionRun {
   conventionId: Id;
   cityId: Id;
   year: number;
-  /** First week it is open (announced two weeks before). */
+  /** First week it is open (announced CONVENTIONS.announceWeeks before). */
   startWeek: Week;
   endWeek: Week;
   /** Exclusive startups shown only here (§20.3). */

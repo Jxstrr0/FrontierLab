@@ -11,7 +11,17 @@ import { INCIDENT_SPECS } from '../data/incidents';
 import { investmentBanksIn } from '../data/investmentBanks';
 import { listPendingIpo } from '../sim/equityIpo';
 import { listLots } from '../sim/auctions';
-import { act, bump, modal, openPanel, peekGame, screen, setGame } from './store';
+import {
+  act,
+  bump,
+  closePanel,
+  modal,
+  openPanel,
+  peekGame,
+  screen,
+  setGame,
+  type ModalRoute,
+} from './store';
 import { newGame } from '../sim/newGame';
 import { importCode } from '../sim/save/serialize';
 import { startFlight } from './airport/flight';
@@ -25,6 +35,7 @@ export function installDebug(): void {
     act,
     cmd,
     openPanel,
+    closePanel,
     builds: REFERENCE_BUILDS,
     /** Starts a game (Calgary, seed 42 by default) and opens the game screen. */
     start(seed = 42, cityId = 'cal') {
@@ -41,6 +52,10 @@ export function installDebug(): void {
       if (!lot) return undefined;
       const r = act(cmd.buildBranch, { lotId: lot.id, build: REFERENCE_BUILDS.mid });
       return r.ok ? r.branchId : undefined;
+    },
+    /** Opens a modal by route, e.g. a monthly results report, for screenshots. */
+    openModal(route: ModalRoute) {
+      modal.value = route;
     },
     /** Pauses the clock and closes any open modal (weekly results, game over). */
     pause() {

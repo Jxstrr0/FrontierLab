@@ -87,7 +87,7 @@ describe('convention panel views', () => {
     );
     advanceWeeks(s, 25 - s.clock.week);
     const v = conventionView(s, site)!;
-    expect(v.dates).toBe('12 Jul – 18 Jul 2027');
+    expect(v.dates).toBe('12 Jul – 8 Aug 2027');
     expect(v.phase).toBe('announced');
     expect(conventionAdvisor(v)).toMatch(/2 weeks/);
     advanceWeeks(s, 2);
