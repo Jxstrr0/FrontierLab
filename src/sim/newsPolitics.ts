@@ -4,7 +4,8 @@
 // CAPITAL_BUFFER_PP for CAPITAL_BUFFER_WEEKS (capital.ts applies it at home);
 // every other policy is flavour and its copy promises nothing in the game. A
 // won lobbying stall (lobbying.ts) makes the pending buffer bill fail its vote.
-// Also the home country's opinion poll. Runs inside tick step 16.
+// Also every country's opinion polls (drifting every few weeks; elections in
+// newsElections.ts read them) and the home poll story. Runs inside tick step 16.
 import {
   CAPITAL_BUFFER_PP,
   CAPITAL_BUFFER_WEEKS,
@@ -125,18 +126,37 @@ export function politicsStories(ctx: NewsContext): Story[] {
   return out;
 }
 
-/** The home country's poll every NEWS_POLL_EVERY_WEEKS weeks; shares drift between polls. */
-export function pollStory(ctx: NewsContext, desk: NewsDesk, rng: Rng): Story | undefined {
+/** A country's poll shares (percent by party index), even until the first poll. */
+export function pollShares(desk: NewsDesk, country: CountryId): number[] {
+  const parties = PARTIES[country];
+  return (desk.polls[country] ??= parties.map(() => 100 / parties.length));
+}
+
+/** Party indexes by poll share, leader first (ties to the earlier party). */
+export function pollOrder(shares: number[]): { v: number; i: number }[] {
+  return shares.map((v, i) => ({ v, i })).sort((a, b) => b.v - a.v || a.i - b.i);
+}
+
+/** Every NEWS_POLL_EVERY_WEEKS weeks, every country's poll shares drift and renormalise. */
+export function driftPolls(state: GameState, desk: NewsDesk, rng: Rng): void {
+  if (state.clock.week % NEWS_POLL_EVERY_WEEKS !== 0) return;
+  for (const country of COUNTRY_ORDER) {
+    if (!state.world.countries[country]) continue;
+    const shares = pollShares(desk, country);
+    for (let i = 0; i < shares.length; i++) {
+      shares[i] = Math.max(NEWS_POLL_FLOOR, shares[i]! + rng.normal(0, NEWS_POLL_DRIFT));
+    }
+    const total = shares.reduce((a, b) => a + b, 0);
+    for (let i = 0; i < shares.length; i++)
+      shares[i] = Math.round((shares[i]! / total) * 1000) / 10;
+  }
+}
+
+/** The home country's poll every NEWS_POLL_EVERY_WEEKS weeks (after driftPolls). */
+export function pollStory(ctx: NewsContext, desk: NewsDesk): Story | undefined {
   if (ctx.week % NEWS_POLL_EVERY_WEEKS !== 0) return undefined;
   const parties = PARTIES[ctx.home];
-  const shares = (desk.polls[ctx.home] ??= parties.map(() => 100 / parties.length));
-  for (let i = 0; i < shares.length; i++) {
-    shares[i] = Math.max(NEWS_POLL_FLOOR, shares[i]! + rng.normal(0, NEWS_POLL_DRIFT));
-  }
-  const total = shares.reduce((a, b) => a + b, 0);
-  for (let i = 0; i < shares.length; i++) shares[i] = Math.round((shares[i]! / total) * 1000) / 10;
-  const order = shares.map((v, i) => ({ v, i })).sort((a, b) => b.v - a.v || a.i - b.i);
-  const [first, second] = order;
+  const [first, second] = pollOrder(pollShares(desk, ctx.home));
   if (!first || !second) return undefined;
   return {
     key: 'POLL',
