@@ -3,7 +3,7 @@
 import { CRITICAL_FINE_RWA, WEEKLY_HISTORY } from '../config/balance';
 import { COUNTRIES } from '../data/countries';
 import { balanceSheet, totalDeposits, loanTotals } from './balanceSheet';
-import { previousQuarter } from './calendar';
+import { isFirstDayOfQuarter, previousQuarter } from './calendar';
 import { capitalSnapshot } from './capital';
 import { emptyLedger, postCash, postPnl, spend, summarize } from './ledger';
 import type { GameState, WeeklySnapshot } from './state';
@@ -75,7 +75,10 @@ export function closeWeek(state: GameState): WeeklySnapshot {
 /** Quarter-end (tick step 13): report, pay taxes, Critical-tier fines. */
 export function quarterEnd(state: GameState): void {
   const lastEnd = state.history.quarterly.at(-1)?.endWeek ?? -1;
-  const endWeek = state.clock.week - 1;
+  // A week belongs to the quarter its last day falls in (the results modal's
+  // rule): the week just closed ended last quarter only when today starts this one.
+  const endWeek =
+    state.clock.week - (isFirstDayOfQuarter(state.meta.startDate, state.clock.day) ? 0 : 1);
   const weeks = state.history.weekly.filter((w) => w.week > lastEnd && w.week <= endWeek);
   const { year, q } = previousQuarter(state.meta.startDate, state.clock.day);
   const revenue = weeks.reduce((s, w) => s + w.revenue, 0);

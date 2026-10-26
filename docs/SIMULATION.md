@@ -49,6 +49,7 @@ How the economy works, step by step. Every CAPS name is a key in `src/config/bal
     - ventures report and raise (§20)
     - regulator review (§15)
     - partnership reviews
+    - the quarter's report sums the weeks whose last day falls in it, so when this tick lands on the quarter's first day the week just closed still counts for the old quarter
 14. **Year-end** (first tick of a new year):
     - rankings: Fastest Growing Banks, Rich List
     - next year's conventions calendar
@@ -60,7 +61,7 @@ How the economy works, step by step. Every CAPS name is a key in `src/config/bal
 
 **Central bank meetings:** each country meets on the fixed week-of-year list in CONTENT (Countries table). A meeting in a given week is processed inside step 1.
 
-**Auto-pause** when any of these needs a decision: an unresolved incident, the results modal (every week, or the first tick after a month or quarter ends, per the setting; a month or quarter rolls its weeks up), the board meeting reminder (once per quarter), or Loan Desk applications expiring this week (optional setting). The clock also holds, without changing the speed setting, while any panel or sheet is open: days pass only on the map.
+**Auto-pause** when any of these needs a decision: an unresolved incident, the results modal (every week, or the tick that closes a month's or quarter's last week, per the setting; a week belongs to the month its last day falls in, and the report rolls up every week of the period that just ended), the board meeting reminder (once per quarter), or Loan Desk applications expiring this week (optional setting). The clock also holds, without changing the speed setting, while any panel or sheet is open: days pass only on the map.
 
 ## 3. RNG and determinism
 
