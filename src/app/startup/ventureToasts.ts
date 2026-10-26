@@ -16,7 +16,7 @@ export const VENTURE_EVENT_TEXT: Record<string, (p: Record<string, unknown>) => 
   CONVENTION_ANNOUNCED: (p) =>
     p.local === true ? `${String(p.name)} opens in ${String(p.city)} in two weeks.` : '',
   CONVENTION_OPEN: (p) =>
-    p.local === true ? `${String(p.name)} is open: visit the convention centre.` : '',
+    p.local === true ? `${String(p.name)} is open: visit the conference.` : '',
 };
 
 /** Events that read as bad news. */

@@ -16,7 +16,7 @@ export function conventionTag(weeksToGo: number): string {
 export function conventionPinInfo(s: GameState, site: Site): SitePinInfo {
   const run = site.refId ? liveRun(s, site.refId) : undefined;
   if (!run) return { visible: false, suffix: ', convention centre' };
-  const name = CONVENTIONS_CALENDAR.find((c) => c.id === run.conventionId)?.name ?? 'Convention';
+  const name = CONVENTIONS_CALENDAR.find((c) => c.id === run.conventionId)?.name ?? 'Conference';
   const tag = conventionTag(run.startWeek - s.clock.week);
   return { visible: true, suffix: `, ${name}, ${tag.toLowerCase()}`, tag };
 }

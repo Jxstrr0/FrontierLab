@@ -56,10 +56,10 @@ export function accessBlock(state: GameState, s: Startup): string | undefined {
       : 'This startup is not in your Investment floor pipeline.';
   }
   const run = conventionRunFor(state, s);
-  if (!run) return 'You can only meet this startup at its convention.';
+  if (!run) return 'You can only meet this startup at its conference.';
   const phase = conventionPhase(run, state.clock.week);
-  if (phase === 'over') return 'The convention is over.';
-  if (phase !== 'open') return 'The convention has not opened yet.';
-  if (state.world.currentCityId !== run.cityId) return 'You need to be at the convention.';
+  if (phase === 'over') return 'The conference is over.';
+  if (phase !== 'open') return 'The conference has not opened yet.';
+  if (state.world.currentCityId !== run.cityId) return 'You need to be at the conference.';
   return undefined;
 }

@@ -35,7 +35,7 @@ export function riskSteering(s: GameState): string | undefined {
   const cro = !!s.executives.seats.cro?.delegations.appetite;
   const cfo = !!s.executives.seats.cfo?.delegations.capital;
   const adequate = TIER_THRESHOLDS.find((t) => t.tier === 'adequate')!.minCr;
-  const croLine = `your CRO tunes this every ${EXEC_DELEGATION.croEveryWeeks} weeks`;
+  const croLine = `your CSO tunes this every ${EXEC_DELEGATION.croEveryWeeks} weeks`;
   const cfoLine = `your CFO steps it down while capital is under ${+(adequate * 100).toFixed(1)}%`;
   const parts = [cro && croLine, cfo && cfoLine].filter(Boolean) as string[];
   if (parts.length === 0) return undefined;

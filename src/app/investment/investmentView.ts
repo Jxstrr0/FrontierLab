@@ -17,7 +17,7 @@ export const SLICES: { id: SliceId; label: string }[] = [
   { id: 'stocks', label: 'Stocks' },
   { id: 'ventures', label: 'Ventures' },
   { id: 'realEstate', label: 'Real estate' },
-  { id: 'ventureDebt', label: 'Venture debt' },
+  { id: 'ventureDebt', label: 'Compute credits' },
   { id: 'currencies', label: 'Currencies' },
 ];
 

@@ -225,20 +225,20 @@ export const FLOOR_TIPS: Record<DeptId, TipText> = {
     line: 'Brand campaigns lift awareness across a whole city or country, not just one branch. More awareness means more people walk in.',
   },
   it: {
-    title: 'IT & Security floor',
-    line: 'Our app rating lifts the Products rating and takes pressure off the branches. A short-staffed IT team makes breaches and outages more likely.',
+    title: 'Platform & Security floor',
+    line: 'Our app rating lifts the Products rating and takes pressure off the branches. A short-staffed platform team makes breaches and outages more likely.',
   },
   risk: {
-    title: 'Risk & Compliance floor',
-    line: 'Loss rates, late payers and how the regulator sees us. Short-staffed, defaults and fines go up.',
+    title: 'Safety & Alignment floor',
+    line: 'Safety reviews, loss rates, late payers and how the regulator sees us. Short-staffed, defaults and fines go up.',
   },
   executive: {
     title: 'Executive suite',
-    line: 'Hire executives to run whole parts of the bank, and prepare the quarterly board meeting. Seats switch their jobs on from the day you hire.',
+    line: 'Hire executives to run whole parts of the lab, and prepare the quarterly board meeting. Seats switch their jobs on from the day you hire.',
   },
   investment: {
     title: 'Investment floor',
-    line: 'The bank’s own portfolio: stocks, startups, property and venture debt. More staff finds more startups looking for money.',
+    line: 'The bank’s own portfolio: stocks, startups, property and compute credits. More staff finds more startups looking for money.',
   },
 };
 
@@ -278,15 +278,15 @@ export const PLACE_TIPS: Record<string, TipText> = {
   },
   startup: {
     title: 'Startup',
-    line: 'Invest in a round as the company or with your own money, or lend venture debt instead. Startups can grow, list, sell, or fail.',
+    line: 'Invest in a round as the company or with your own money, or grant compute credits instead. Startups can grow, list, sell, or fail.',
   },
   property: {
     title: 'Property',
     line: 'Buy a building, set the rent per m², and occupancy follows. Rent less upkeep gives the return.',
   },
   convention: {
-    title: 'Convention',
-    line: 'Conventions run for one week and show startups you can’t find anywhere else. You have to be in the city to attend.',
+    title: 'Conference',
+    line: 'Conferences run for one week and show AI startups you can’t find anywhere else. You have to be in the city to attend.',
   },
   lobbyingFirm: {
     title: 'Lobbying firm',
