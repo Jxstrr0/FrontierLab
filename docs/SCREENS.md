@@ -206,6 +206,12 @@ After the wizard, the map opens with the tutorial (§27).
 - **Office size card (C2a):** the size (Starter, Standard, Large or Flagship), the cost to grow to the next one and its new weekly rent, and a **Grow office** button (confirm, showing fit-out, extra lease deposit, total and new rent; the reason shows under the button when it can't). At Flagship the card says it is the largest size.
 - **Footer:** Rename branch, Close branch (confirm, showing what you get back; with one office per city, accounts go to the office in the nearest city).
 
+## 5b. Data centers (stage C2c)
+
+- **Entry points:** a **Build data center** button under Build branch on an available storefront (§3), with its own blocker line; an **Energy site** section on a regional employer's panel (§14) listing your data centers there with a **Build data center** button; your data center's pin on the map (your crest, noted "Data center" or "Fit-out"), its row on the city list, and a **Data centers** list under the Branches screen (§25).
+- **Build data center:** three part tiles (GPU hall, Power, Cooling) with price and what each does; tapping one opens a sheet listing that slot's options. A **Running it** card (GPUs running, power bill and rent a week, fit-out weeks), a note when the power feed can't run the whole hall, then a summary (parts, deposit, first week's rent, total, cash available) and **Build for $X**.
+- **Data center panel:** header with the name, place and city; the advisor says how long the fit-out has left or which cities get faster service. Status card (Online or Fit-out with weeks left, GPUs in the hall, GPUs running (red when power caps it), PUE). Parts as tiles with **Upgrade** (a sheet that greys out parts no better than the fitted one or that you can't afford; the hall is locked during fit-out; "Best fitted" on the top part). Weekly costs (rent, power). **Close data center** with a confirmation showing equipment sold, deposit back and cash back.
+
 ## 6. Rival branch
 
 - **Header:** rival brand + district, with the address.

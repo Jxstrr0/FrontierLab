@@ -337,11 +337,13 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 | Personal | `offerHome`, `rebuildHome`, `sellHome`, `buyCar`, `sellCar`, `placeBid`, `clearBid`, `appraiseCollectible`, `consignCollectible`, `withdrawConsignment`, `buyJet`, `sellJet`, `buyClub`, `sellClub`, `setKit`, `setKitSponsor`, `signPlayer`, `releasePlayer` |
 | Settings and saves | `setSettings`, `setFounderAvatar`, `moveHqTab`, `resetHqTabOrder`; saves are not commands: `saveToSlot`, `loadFromSlot` (`src/sim/save/storage.ts`), `exportCode`, `importCode` (`serialize.ts`) |
 
-## 12. Implemented so far (schema v2)
+## 12. Implemented so far (schema v4)
 
 `src/sim/state.ts` is the source of truth; this section records how it differs from the guide above. Later stages add the rest with a schema bump and a migration.
 
 **Frontier Lab renumbering (stage C0, 2026-10-26):** the state below is Vault Street's final shape (its schema v38), renumbered as Frontier Lab schema 1. Vault Street's 37 migration steps were dropped, so the schema numbers and migrations mentioned in the entries below are history only.
+
+**Frontier Lab schema 4 (stage C2c, data centers):** `dataCenters: Record<Id, DataCenter>` (`id`, `cityId`, `lotId?` or `siteId?`, `name`, `status` fitout/open, `weeksLeft`, `builtWeek`, `openedWeek?`, `build { hall, power, cooling }` part ids, `lease { weeklyRent, deposit }`). A data center on a storefront sets that lot's occupant to `{ type: 'player', id: <data center id> }`, so code that reads a player occupant checks `dataCenters` before `branches`. Its parts are fixed assets owned by its id. Migration 3 → 4 adds an empty table. Events `DATA_CENTER_STARTED { dataCenterId, name, city, site, weeks }`, `DATA_CENTER_OPENED { …, gpus, refit }`, `DATA_CENTER_UPGRADED { …, slot, part }`, `DATA_CENTER_CLOSED`. Commands `buildDataCenter`, `upgradeDataCenter`, `renameDataCenter`, `closeDataCenter`.
 
 **Frontier Lab schema 3 (stage C2b, rival sales offices):** `RivalBranch.size` (0–3). Migration 2 → 3 folds each rival's branches in a city into one office of the nearest size (`foldRivalCity`: books added, quality blended, the other lots freed). Events `RIVAL_OFFICE_GROWN` and `RIVAL_OFFICE_SHRUNK { rivalId, bank, city, size }`.
 

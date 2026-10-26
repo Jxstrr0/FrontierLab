@@ -32,6 +32,11 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
   },
   // 2 → 3 (stage C2b): rival labs hold one sales office per city, with a size.
   2: foldRivalCities,
+  // 3 → 4 (stage C2c): data centers, none yet.
+  3: (s) => {
+    s.dataCenters ??= {};
+    return s;
+  },
 };
 
 /** Upgrades a raw save to the current schema, or throws if it can't. */

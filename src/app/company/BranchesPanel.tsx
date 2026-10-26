@@ -2,12 +2,14 @@
 // weekly income and issues, sortable and filterable by city (chips that scroll
 // sideways). Across countries, rows are grouped under each country and every
 // city carries its country code. Tap a row to open it, from any city.
+// Data centers (C2c) are listed underneath.
 import { Fragment } from 'preact';
 import { useState } from 'preact/hooks';
 import { CITIES } from '../../data/cities';
 import { COUNTRIES } from '../../data/countries';
 import { Badge, Card, Chips, CoinRating, Panel, SectionTitle, Segmented } from '../components';
-import { money } from '../format/format';
+import { count, money } from '../format/format';
+import { usableGpus } from '../../sim/dataCenters';
 import { closePanel, openPanel, useGame } from '../store';
 import {
   branchRows,
@@ -109,6 +111,7 @@ export function BranchesPanel() {
           {rows.length === 0 && <p class="muted">No branches in this city.</p>}
         </div>
       )}
+      <DataCenterList />
     </Panel>
   );
 }
@@ -143,6 +146,33 @@ function BranchCard(p: { r: BranchRow; city: string; sym: string }) {
         )}
       </div>
     </Card>
+  );
+}
+
+/** Your data centers (C2c), wherever they are: energy sites have no storefront on the city list. */
+function DataCenterList() {
+  const s = useGame();
+  const dcs = Object.values(s.dataCenters);
+  if (dcs.length === 0) return null;
+  return (
+    <div class="stack co-stack">
+      <SectionTitle>Data centers · {dcs.length}</SectionTitle>
+      {dcs.map((dc) => (
+        <Card
+          key={dc.id}
+          class="branch-row"
+          onClick={() => openPanel({ type: 'dataCenter', dataCenterId: dc.id })}
+        >
+          <div class="branch-row-head">
+            <span class="branch-row-name">{dc.name}</span>
+            <Badge tone={dc.status === 'open' ? 'good' : 'warn'}>
+              {dc.status === 'open' ? `${count(usableGpus(dc.build))} GPUs` : 'Fit-out'}
+            </Badge>
+          </div>
+          <div class="branch-row-city muted small">{CITIES[dc.cityId]?.name ?? dc.cityId}</div>
+        </Card>
+      ))}
+    </div>
   );
 }
 

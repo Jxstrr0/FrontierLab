@@ -14,6 +14,9 @@ export type PanelRoute =
   | { type: 'storefront'; lotId: string }
   | { type: 'build'; lotId: string }
   | { type: 'branch'; branchId: string; tab?: BranchTab }
+  // Stage C2c: data centers, on a free storefront or a regional energy site.
+  | { type: 'buildDataCenter'; lotId?: string; siteId?: string }
+  | { type: 'dataCenter'; dataCenterId: string }
   | { type: 'office'; listingId: string }
   | { type: 'hq'; officeId?: string; dept?: DeptId }
   | { type: 'bureau'; siteId: string }

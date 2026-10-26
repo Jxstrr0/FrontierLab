@@ -31,6 +31,7 @@ import type { CampaignEffects } from './marketing';
 import { branchPrice, competitiveness, isOffered } from './pricing';
 import { managerOf } from './staff';
 import { cityBrandBonus } from '../hqMarketing';
+import { latencyLift } from '../dataCenters';
 import { ratingMod } from '../incident/effects';
 import {
   affinityOf,
@@ -123,7 +124,8 @@ export function serviceTarget(state: GameState, branch: Branch, fx: CampaignEffe
       (SERVICE_RATING.morale * branch.staff.morale) / 100 +
       (SERVICE_RATING.managerPeople * (mgr?.skills.people ?? 0)) / 100 +
       SERVICE_RATING.modelSpeed * (speed - 5) +
-      fx.bumps.service -
+      fx.bumps.service +
+      latencyLift(state, branch.cityId) -
       SERVICE_RATING.wait * Math.max(0, branch.waitIndex - 1) -
       (mgr ? 0 : NO_MANAGER_SERVICE),
     1,

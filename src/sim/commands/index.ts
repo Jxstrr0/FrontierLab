@@ -27,3 +27,4 @@ export * from './auctions';
 export * from './franchise';
 export * from './tutorial';
 export * from './dev';
+export * from './dataCenters';

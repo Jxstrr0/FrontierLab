@@ -65,6 +65,8 @@ export interface PinSpec {
   /** Oxblood dot: an unresolved incident at this branch (SCREENS §0.2). */
   alert?: boolean;
   branchId?: string;
+  /** Your data center on this lot (C2c). */
+  dataCenterId?: string;
   /** Your office in this building (kind 'hq'). */
   officeId?: string;
   /** Type icon for office, bureau and agency pins (offices also wear the For lease tag). */
@@ -127,6 +129,20 @@ function lotPin(s: GameState, map: CityMap, lot: Lot, pending: Record<string, nu
   const at = anchor(map, lot.tile);
   const occ = lot.occupant;
   const base = { id: lot.id, x: at.x, y: at.y };
+  const dc = occ?.type === 'player' ? s.dataCenters[occ.id] : undefined;
+  if (dc) {
+    // Your data center (C2c): your crest, noted "Data center", opening its panel.
+    return {
+      ...base,
+      kind: 'mine',
+      label: `Your data center, ${dc.name}${dc.status === 'fitout' ? ', fitting out' : ''}`,
+      ink: s.meta.brandInk,
+      monogram: s.meta.monogram,
+      badge: false,
+      dataCenterId: dc.id,
+      tag: dc.status === 'fitout' ? 'Fit-out' : 'Data center',
+    };
+  }
   if (occ?.type === 'player') {
     const branch = s.branches[occ.id];
     const waiting = pending[occ.id] ?? 0;

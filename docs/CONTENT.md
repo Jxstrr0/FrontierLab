@@ -218,6 +218,22 @@ Reference builds:
 - **Mid:** $332k (brick, comfort, standard, steel, wall ATM).
 - **Premium:** $883k (columns, marble, concierge, time-lock, ATM lobby).
 
+### 7c. Data center parts (stage C2c, `src/data/dataCenters.ts`)
+
+| Slot | Part | Cost | Does | Fit-out |
+|---|---|---|---|---|
+| GPU hall | Row hall | $4M | holds 2,000 GPUs | 8 weeks |
+| GPU hall | Twin hall | $11M | holds 6,000 GPUs | 12 weeks |
+| GPU hall | Campus hall | $26M | holds 15,000 GPUs | 16 weeks |
+| Power | Grid feed | $0.8M | runs 3,000 GPUs | — |
+| Power | Own substation | $2.5M | runs 8,000 GPUs | — |
+| Power | Plant tie-in | $6M | runs 20,000 GPUs | — |
+| Cooling | Air handlers | $0.5M | PUE 1.5 | — |
+| Cooling | Liquid loops | $2M | PUE 1.25 | — |
+| Cooling | Immersion tanks | $5M | PUE 1.1 | — |
+
+The default (and cheapest) build is Row hall, Grid feed, Air handlers. Default name "{City} Data Center", numbered when taken.
+
 ### 7a. House styles
 
 Chosen on New Game (`src/data/houseStyles.ts`); every branch front wears it, whatever the exterior option. A game started without a style, and saves from before styles existed, draw one of the first five from the seed (`SEEDED_HOUSE_STYLE_IDS`), so adding a style never changes an old game.

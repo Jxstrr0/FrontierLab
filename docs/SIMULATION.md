@@ -299,6 +299,17 @@ Segment sensitivities are in CONTENT (Segments). FEE_STEP_MIN = $2 for $-denomin
 ### 9.8 Customers
 `customers = round(Σ_p accounts_p / PRODUCTS_PER_CUSTOMER (1.6))`.
 
+### 9.9 Data centers (stage C2c)
+A second building kind beside the sales office (`src/sim/dataCenters.ts`, commands in `src/sim/commands/dataCenters.ts`, parts in CONTENT §7c). Any number per city, on a free storefront lot (lot rent and deposit, like a sales office) or at a regional energy site's employer (`DATA_CENTER.energySiteRent` ($3,000) × the city's cost index a week, no deposit, at most `DATA_CENTER.perEnergySite` (3) per site). You build only in the city you're in, never at a restricted or critical tier. Prices go through the price list (§4.6).
+
+- **Parts:** a GPU hall (GPUs it holds and fit-out weeks), a power feed (GPUs it can run) and cooling (PUE). `usableGpus = min(hall GPUs, power GPUs)`.
+- **Fit-out:** the hall's weeks (8, 12 or 16), counted down in tick step 4 before the sales offices. A fitting-out data center pays rent but no power.
+- **Weekly costs (open):** rent to the Rent line; power `usableGpus × DATA_CENTER.powerPerGpuWeek (12) × PUE × powerIndex` to the Equipment line, where `powerIndex` is `DATA_CENTER.energySitePower` (0.5) at an energy site and the city's cost index elsewhere. Worked example: a Twin hall on a Grid feed with Liquid loops at an energy site runs 3,000 GPUs for 3,000 × 12 × 1.25 × 0.5 = $22,500 a week.
+- **Latency lift:** each sales office's Service target (§8) gains `DATA_CENTER.liftSameCity` (+0.25 stars) when an open data center is in its city, else `DATA_CENTER.liftNear` (+0.1) when one is within `DATA_CENTER.nearKm` (1,200 km). Not additive across data centers. Its compute joins the pool in C4.
+- **Accounts:** the hall is a fit-out asset (`FITOUT_LIFE_WEEKS`), power and cooling equipment (`EQUIPMENT_LIFE_WEEKS`), owned by the data center id; the deposit goes to lease deposits.
+- **Upgrades:** only to a dearer part in the same slot. The old part's book value is written off to depreciation and the new one bought at today's price. Power and cooling take effect at once; a new hall closes the data center for `ceil(hall weeks × DATA_CENTER.upgradeWeeksShare (0.5))` weeks, then it reopens.
+- **Closing:** as a sales office (§6): `CLOSE_RECOVERY` (30%) of book value comes back, the rest is written off, and the deposit is refunded less `CLOSE_RENT_WEEKS` (2) of rent. The lot is freed.
+
 ## 10. Books
 
 One `Book` per (branch, product): `accounts`, `balance`, `bookRate`, `pd` (annual, balance-weighted), `lgd`, plus last-week flow fields for the UI (`newAccounts`, `newVolume`, `deltaAccounts`).
@@ -1042,6 +1053,8 @@ Run `npm run balance` with seed 42 and the start city Calgary, unless noted. Bra
 **Updated 2026-10-26 (stage C2a, sales offices):** a city now holds one office of yours, grown in place (§6.4), with reach that grows with its size (§9.1). The steady script grows its busiest office a size whenever the next size reaches more of the city, the city still has 20% room and cash is over 2× the cost, and opens an office in the next city otherwise. The first-office checkpoints therefore follow the home office as it grows rather than a single storefront that levels off: week 26 and its build and payback bands are unchanged, and the later bands were re-set from the 20-city median (week 52 $57.9M / 5,597 customers / $43k income; week 104 $128M / $268k / $96k; week 156 $194M / $395k / $134k; weeks 208–260 $244–269M / $517–520k / $180–191k; loans 68–71% of deposits, as an office's deposits outgrow its loan demand). Branch counts gave way to offices and cities: seed 42 reads 2 offices at year 2, 20 cities at year 10 with $26B nominal ($11.9B real) of assets, and lists in week 235. Aggressive grows its office down to a 7.5% capital ratio (its own opening bar stays 8.5%), so it runs at Restricted from year 3, as its row expects.
 
 **Updated 2026-10-26 (stage C2b, rival sales offices):** rivals hold one office per city (§18.4). Start-of-game rival strength is unchanged (seeding folds the same draws), but rounding to four sizes shifts market-reference price weights slightly toward smaller labs. Every strategy target and the 20-city median still pass (median payback 36.5 weeks); seed 42's own first-office payback reads 42 weeks and its IPO week 274 (was 39 and 235), a single-seed reference reading per the cross-seed rule above.
+
+**Updated 2026-10-26 (stage C2c, data centers):** steady (cash over 4× the cost) and aggressive (3×) build one Row-hall data center from year 5 on the busiest free lot of a city with their office; stress follows steady. Seed 42 builds in weeks 260–300. Every strategy target and the 20-city median still pass; seed 42 steady's year-10 real assets read $8.4B (was $8.6B: about $5M to build and $35–40k a week of rent and power).
 
 **Note (Stage 5):** the branch checkpoints are a seed-42 reference and assume Expansion. With every country simulated, seed 42's path has a recession at weeks 97–134 and policy cuts to 1.5%, so week 156 reads about $90k revenue / $41k income (below band) before recovering inside it by week 208. Other seeds (e.g. 7, 99) already missed the first-branch checkpoints in Stage 4 because their median Midtown lot is weaker; a cross-seed calibration is open.
 

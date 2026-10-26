@@ -217,6 +217,8 @@ const EVENT_TEXT: Record<string, (p: Record<string, unknown>) => string> = {
   ...VENTURE_EVENT_TEXT,
   ...AUCTION_EVENT_TEXT,
   BRANCH_OPENED: (p) => `${String(p.name)} is open for business.`,
+  DATA_CENTER_OPENED: (p) =>
+    `${String(p.name)} is ${p.refit ? 'back online' : 'online'} with ${Number(p.gpus).toLocaleString('en-US')} GPUs running.`,
   NEW_BRANCH: (p) =>
     p.by === 'coo'
       ? `Your COO leased ${String(p.address)} in ${CITIES[String(p.city)]?.name ?? String(p.city)}. The branch opens after fit-out.`

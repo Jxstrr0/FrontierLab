@@ -171,6 +171,7 @@ export function newGame(opts: NewGameOptions): GameState {
       guidance: { deposits: 0, loans: 0, staffing: 0, marketing: 0, products: 0 },
     },
     branches: {},
+    dataCenters: {},
     offices: {},
     departments: {},
     hq: { ramp: 0, coverage: fullCoverage() },
