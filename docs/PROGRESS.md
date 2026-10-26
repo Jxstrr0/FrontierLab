@@ -4,12 +4,57 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 **Current stage:** 10 — Art pass, onboarding, polish, launch (built and live; awaiting the owner's iPhone check). All ten roadmap stages are built. Still open: the owner's testing and tuning pass, an Add to Home Screen test on a real iPhone, and the Vault Street card on Kelbo.Website (in a separate session in that repo).
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `04e6d86aaed346` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `079f2df756abbe` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
 
+### 2026-10-26 — A field that stays full: charters, rival mergers, rival ads and tech (v0.13.1, schema v37)
+
+**What you asked for:** the second of the three approved changes, covering new rivals getting chartered, rivals buying each other, and rivals doing their own marketing and tech.
+
+**New charters (SIMULATION §18.7).**
+- At each new year, a city that has lost a rival (bought by you, seized, or merged away) has a 35% chance to get a brand-new bank. A full city with lots of empty storefronts has an 8% chance. At most three new banks a year.
+- A new bank has an invented name (Copperleaf Mutual, Glenhaven Private, Zephly and so on; CONTENT §15) and starts private with 2–3 branches and $25M of capital, scaled to today's money.
+- It starts expanding after a profitable year, like any rival. The Weekly Ledger announces it, and its branch sheet says "A new bank, chartered in {year}".
+
+**Rivals buy each other (§18.8).**
+- At each quarter-end, a rival with a profitable year and spare capital may bid for a smaller rival it meets in a city or its home country. It pays book value plus 15–40%, under the same 9% capital rule your deals face.
+- If you own shares in the target, you are paid in cash at the deal price. Any loan the target made you moves to the buyer. The target leaves the market, and the paper runs the story.
+
+**Rival ads and tech (§18.9).**
+- Rivals run 12-week ad campaigns in cities where you have branches. Their branches there get +0.15 rating, which shows on the rival branch sheet, and the rival pays for the airtime.
+- Each year a profitable rival spends 5% of its profit on technology, which improves its app and its products.
+- An app-only bank that reaches 20 branches becomes a high-street bank: full expansion speed and high-street prices.
+
+**A problem found while testing, and the fix.**
+- Once the last change made rival costs keep pace with the economy, whole networks of healthy rival branches closed during the first long recession. Rivals shrank by half over 25 years, and main has this today.
+- A rival's 26-week loss count now pauses while its country is in recession or recovery, so a bank rides out a downturn.
+- Seed 42 aggressive at year 25:
+
+| | Active rivals | Rival branches | Rival deposits | Closures | Failures | Charters | Rival mergers |
+|---|---|---|---|---|---|---|---|
+| Main | 27 | 128 | $49B | 271 | 6 | — | — |
+| This change | 54 | 332 | $122B | 92 | 17 | 42 | 4 |
+
+- Your bank is about $106B at year 25 in both runs.
+
+**Your save (schema v37):** loads as is, since every new field is optional. Charters, mergers, ads and tech start at the next year end, quarter-end or month.
+
+**Checks.**
+- `npm run lint`, all tests and `npm run build` pass. The new `tests/sim/rivalCompetition.test.ts` covers charters, mergers (including a payout to your shares and the balance identity), campaigns, tech and growing up.
+- Three tests needed updating, each for an intended reason. The London rival test now skips a bank chartered later. The lot-cap test counts lots after the city grows. The recession test follows its own bank, since ten years of recession can now topple another rival first.
+- **Balance.** The 20-city median is inside every band after one re-base. A first branch that never upgrades now earns $1–3k a week less, because lost rivals are replaced and they advertise. The income floors are now $31k at week 104 (was $33k) and $32k from week 156 (was $35k); SIMULATION §25 has the reason.
+  - Seed 42 steady misses week-156 deposits by $0.1M and week-260 income (the one-week default again). Single seeds are for reference.
+  - Aggressive is in range everywhere.
+- **Determinism snapshot** updated to `079f2df756abbe` (intended; includes main's world-calendar change).
+
+**Code map.** `src/sim/rivalCharters.ts`, `src/sim/rivalMergers.ts`, `src/sim/rivalMarketing.ts` (ads, tech, growing up, `rivalOverall`), names in `src/data/rivalCharters.ts`, constants `RIVAL_CHARTER`, `RIVAL_MERGERS`, `RIVAL_MARKETING`, `RIVAL_TECH` and `RIVAL_CLOSURE.holdPhases` in `src/config/balance.ts`. They are called from `src/sim/rivalAi.ts`; the news is in `src/sim/newsRivals.ts`.
+
+**Docs:** SIMULATION §18.4, §18.5, §18.7–18.9 and §25, CONTENT §15, DATA_MODEL §12 (v37), DESIGN decision log.
+
+**Next:** share buybacks and share-for-share mergers.
 ### 2026-10-26 — A bigger world in the Ledger: world calendar, commodities, the archive, 26 more stories (v0.13.0, schema v36)
 - **Owner's ask:** more world stories and story types, pitched first. From the pitch you picked the world calendar, commodities plus the archive, and about 25 more one-off stories. Running story arcs and a recurring cast weren't picked, so they aren't built.
 - **26 more kinds of world story (61 in all):**
@@ -28,7 +73,7 @@ Claude Code updates this at the end of every session. Newest entries go at the t
   - **Every year:** film awards in March, New Year fireworks, a science prize in October and the Grand Sale Weekend in November, which is a record or a flop depending on your home economy.
   - Nations are the game's ten economies, and the host is a random game city.
 - **Two small fixes found along the way.** Branch review cards and commodity prices now use their own random numbers. Before, any change to the newspaper also reshuffled which review cards your branches showed. I checked a 260-week game against the last version: apart from review cards, the game state is identical, so none of this changes gameplay. Review cards in your save reshuffle once.
-- **Your save (schema v36):** loads as is. Commodities start at their base prices, the archive starts filling from the next issue, and the next fixture on the calendar runs when its week comes round.
+- **Your save (schema v37):** loads as is. Commodities start at their base prices, the archive starts filling from the next issue, and the next fixture on the calendar runs when its week comes round.
 - **Code:**
   - New files: `src/sim/newsWorldCalendar.ts`, `newsTournaments.ts`, `newsCommodities.ts`, `newsArchive.ts`.
   - Content: `src/data/worldCalendar.ts`, `commodities.ts`, `newsWorldBeatsMore.ts`, `ledgerTemplatesGlobeMore.ts`, `ledgerTemplatesCalendar.ts`.

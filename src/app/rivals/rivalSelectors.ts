@@ -119,5 +119,9 @@ export function failedText(s: GameState, bank: RivalBank): string | undefined {
   if (bank.status === 'seized')
     return `${bank.name} failed. Its branches now belong to other banks.`;
   if (bank.status === 'acquired') return `${bank.name} has been acquired.`;
+  if (bank.status === 'merged') {
+    const buyer = bank.mergedInto ? s.rivals[bank.mergedInto]?.name : undefined;
+    return `${bank.name} was bought by ${buyer ?? 'another bank'}. Its branches now carry the buyer's name.`;
+  }
   return undefined;
 }

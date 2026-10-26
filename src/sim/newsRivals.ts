@@ -1,5 +1,6 @@
 // Rival banks in The Weekly Ledger (SIMULATION §24, priorities 3 and 4):
-// branch openings and closures, new storefronts as cities grow, price wars, failures and network carve-ups
+// branch openings and closures, new storefronts as cities grow, new charters,
+// mergers between rivals, rival ad campaigns, app launches, price wars, failures and network carve-ups
 // (rivals in your cities first), quarterly earnings, dividends and executive
 // exits, plus the weekly "rate watch" on the best savings rate in your city.
 import { NEWS_PRIORITY as P } from '../config/balance';
@@ -16,6 +17,14 @@ import {
 } from './newsStory';
 import { basisPoints, newsAbsPct, newsPct, newsMoney, newsRate } from './newsFormat';
 import type { GameEvent } from './state';
+
+/** How a chartered bank's strategy reads in a headline. */
+const STRATEGY_WORD: Record<string, string> = {
+  incumbent: 'high-street bank',
+  premium: 'private bank',
+  community: 'community bank',
+  disruptor: 'app-only bank',
+};
 
 /** True when the rival has a branch in one of your cities. */
 function isLocal(ctx: NewsContext, rivalId: string): boolean {
@@ -74,6 +83,70 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
         },
       };
     }
+    case 'RIVAL_CHARTERED': {
+      const here = ctx.yourCities.has(str(p.city));
+      return {
+        key: 'RIVAL_CHARTERED',
+        subject: rivalId,
+        tab: 'banking',
+        icon: 'spark',
+        priority: here ? P.rivalLocal + 6 : P.rivalAbroad + 6,
+        tokens: {
+          bank: str(p.bank, 'A new bank'),
+          city: cityName(str(p.city)),
+          kind: STRATEGY_WORD[str(p.strategy)] ?? 'bank',
+          n: String(num(p.branches)),
+        },
+      };
+    }
+    case 'RIVAL_MERGER': {
+      const buyerLocal = isLocal(ctx, str(p.buyerId));
+      return {
+        key: 'RIVAL_MERGER',
+        subject: rivalId,
+        tab: 'banking',
+        icon: 'handshake',
+        priority: buyerLocal ? P.rivalLocal + 8 : P.rivalAbroad + 8,
+        tokens: {
+          buyer: str(p.buyer, 'A rival'),
+          bank: str(p.bank, 'a smaller bank'),
+          price: newsMoney(num(p.price), ctx.sym),
+          n: String(num(p.branches)),
+          cities: String(num(p.cities)),
+        },
+      };
+    }
+    case 'RIVAL_CAMPAIGN':
+      return {
+        key: 'RIVAL_CAMPAIGN',
+        subject: `${rivalId}:${str(p.city)}`,
+        tab: 'banking',
+        icon: 'spark',
+        priority: P.rivalLocal - 5,
+        tokens: {
+          bank: str(p.bank, 'A rival'),
+          city: cityName(str(p.city)),
+          weeks: String(num(p.weeks)),
+        },
+      };
+    case 'RIVAL_APP_LAUNCH':
+      return {
+        key: 'RIVAL_APP_LAUNCH',
+        subject: rivalId,
+        tab: 'banking',
+        icon: 'spark',
+        priority: local ? P.rivalLocal - 8 : P.rivalAbroad - 8,
+        tokens: { bank: str(p.bank, 'A rival'), app: num(p.app).toFixed(1) },
+      };
+    case 'RIVAL_GROWS_UP':
+      return {
+        key: 'RIVAL_GROWS_UP',
+        subject: rivalId,
+        tab: 'banking',
+        icon: 'facade',
+        priority: local ? P.rivalLocal : P.rivalAbroad,
+        tokens: { bank: str(p.bank, 'A rival'), n: String(num(p.branches)) },
+      };
     case 'CITY_GROWTH': {
       const here = ctx.yourCities.has(str(p.city));
       return {

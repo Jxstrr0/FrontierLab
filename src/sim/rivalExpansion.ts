@@ -22,6 +22,7 @@ import { pushEvent } from './events';
 import { newId } from './ids';
 import { clamp } from './math';
 import { nominalIndex } from './nominal';
+import { countryOfCity } from './rates';
 import { stream, type Rng } from './rng';
 import { incomeFit, overallOf } from './rivals';
 import type { GameState, Lot, RivalBank, RivalBranch } from './state';
@@ -33,8 +34,8 @@ export function trailingProfit(bank: RivalBank): number {
   return bank.quarters.slice(-n).reduce((sum, q) => sum + q.netIncome, 0);
 }
 
-/** Lots in a city, and whether rivals may still open there. */
-function cityHasRoom(lots: Lot[]): boolean {
+/** Whether rivals may still open in a city, given its lots (§18.4). */
+export function cityHasRoom(lots: Lot[]): boolean {
   if (lots.length === 0) return false;
   const free = lots.filter((l) => !l.occupant).length;
   const rival = lots.filter((l) => l.occupant?.type === 'rival').length;
@@ -45,7 +46,7 @@ function cityHasRoom(lots: Lot[]): boolean {
 }
 
 /** score = footTraffic × (1 − localShare) × incomeFit(strategy) × jitter (§18.4). */
-function bestExpansionLot(lots: Lot[], bank: RivalBank, rng: Rng): Lot | undefined {
+export function bestExpansionLot(lots: Lot[], bank: RivalBank, rng: Rng): Lot | undefined {
   const branchLots = lots.filter((l) => l.occupant);
   let best: Lot | undefined;
   let bestScore = 0;
@@ -156,7 +157,7 @@ export function runExpansion(state: GameState): void {
  * `abroadMinCities` cities; the one with the most free lots, ties by id.
  */
 export function entryCity(state: GameState, bank: RivalBank, allLots: Lot[]): string | undefined {
-  const home = RIVALS[bank.id]?.home ?? [];
+  const home = bank.home ?? RIVALS[bank.id]?.home ?? [];
   const abroad = bank.cities.length >= RIVAL_EXPANSION.abroadMinCities;
   let best: string | undefined;
   let bestFree = 0;
@@ -205,13 +206,16 @@ export function removeRivalBranch(state: GameState, bank: RivalBank, branch: Riv
   if (lot?.occupant?.id === bank.id) delete lot.occupant;
 }
 
-/** Weekly closure check: 26 negative weeks after the first year (§18.4). Keeps a bank's last branch. */
+/** Weekly closure check: 26 negative weeks after the first year, outside downturns (§18.4). Keeps a bank's last branch. */
 export function runClosures(state: GameState): void {
   for (const bank of Object.values(state.rivals)) {
     if (bank.status !== 'active') continue;
     for (const branch of [...bank.branches]) {
       const age = state.clock.week - branch.openedWeek;
       if (age < RIVAL_CLOSURE.graceWeeks) continue;
+      // A downturn doesn't count toward closing (RIVAL_CLOSURE.holdPhases).
+      const phase = countryOfCity(state, branch.cityId).phase;
+      if (RIVAL_CLOSURE.holdPhases.includes(phase)) continue;
       branch.negativeWeeks = branch.contribution < 0 ? branch.negativeWeeks + 1 : 0;
       if (branch.negativeWeeks < RIVAL_CLOSURE.negativeWeeks || bank.branches.length <= 1) continue;
       const lot = state.world.lots[branch.lotId];

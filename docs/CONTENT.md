@@ -429,6 +429,9 @@ Counterparty names: Harbor Clearing Bank · Meridian Treasury · Atlas Money Mar
 
 Branch counts at start, by city size: S 3–5, M 6–10, L 10–16, XL 16–24 in total across that city's rivals. Disruptors get 1–2 each.
 
+### Chartered banks (2026-10-26)
+New banks chartered during a game (SIMULATION §18.7) take an invented name from `src/data/rivalCharters.ts`: a place-style stem (Ashcombe, Copperleaf, Glenhaven, Lanternhill, Wrenfield and others) with a suffix by strategy (incumbent: Bank, Banking Group, Financial; premium: Private, & Partners, Trust; community: Mutual, Savings, Community Bank), or for a disruptor a one-word brand (Zephly, Pocketwell, Quillo, Lumio, Nuvra, Sprigly, Taffel, Glimmr, Vantlo, Ottery, Brisko, Pennyloop). Names never repeat in a save. Inks come from a ten-colour palette. Their ids are `charter1`, `charter2`, …; they have no head-office building on the map.
+
 ## 16. Other map buildings
 
 - **Investment banks:**

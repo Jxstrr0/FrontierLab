@@ -32,6 +32,56 @@ export const RIVAL_TEMPLATES = {
       b: '{bank} opened its first {city} branch at {address} this week.',
     },
   ],
+  RIVAL_CHARTERED: [
+    {
+      h: 'New bank on the block: {bank} opens in {city}',
+      b: 'Regulators granted {bank} a charter this year. The new {kind} opened {n} branches in {city} and says more will follow.',
+    },
+    {
+      h: '{bank} wins a banking charter',
+      b: 'A new {kind}, {bank}, has opened its doors in {city} with {n} branches.',
+    },
+  ],
+  RIVAL_MERGER: [
+    {
+      h: '{buyer} buys {bank} for {price}',
+      b: '{buyer} has agreed to buy {bank} and its {n} branches. The combined bank serves {cities} cities.',
+    },
+    {
+      h: 'Bank merger: {bank} sold to {buyer}',
+      b: "Shareholders accepted {buyer}'s {price} offer. {bank}'s {n} branches will carry the {buyer} name.",
+    },
+  ],
+  RIVAL_CAMPAIGN: [
+    {
+      h: '{bank} blankets {city} with ads',
+      b: 'Billboards and bus shelters across {city} carry {bank} colours this week, in a campaign set to run {weeks} weeks.',
+    },
+    {
+      h: 'Ad push from {bank} in {city}',
+      b: '{bank} has launched a {weeks}-week marketing drive in {city}, aimed at winning customers from other banks.',
+    },
+  ],
+  RIVAL_APP_LAUNCH: [
+    {
+      h: '{bank} rebuilds its app',
+      b: 'After a year of investment, reviewers now rate the {bank} app {app} stars.',
+    },
+    {
+      h: 'New app from {bank} wins fans',
+      b: '{bank} rolled out a new mobile app this year. Its store rating stands at {app} stars.',
+    },
+  ],
+  RIVAL_GROWS_UP: [
+    {
+      h: '{bank} is not a start-up any more',
+      b: 'With {n} branches, the former app-only bank now runs like a high-street lender, and it plans to keep opening.',
+    },
+    {
+      h: '{bank} grows up',
+      b: 'Once a phone-only challenger, {bank} now has {n} branches and prices like the big banks.',
+    },
+  ],
   CITY_GROWTH: [
     {
       h: '{city} grows: {lots} new storefronts',

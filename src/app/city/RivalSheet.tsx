@@ -3,6 +3,9 @@
 import { CITIES } from '../../data/cities';
 import { PRODUCTS } from '../../data/products';
 import { branchPrice } from '../../sim/branch/pricing';
+import { DAYS_PER_WEEK, RIVAL_MARKETING } from '../../config/balance';
+import { dateOf } from '../../sim/calendar';
+import { campaignWeeksLeft, rivalOverall } from '../../sim/rivalMarketing';
 import { rivalPriceInCity } from '../../sim/rivalPrices';
 import type { GameState, RivalBank } from '../../sim/state';
 import { AdvisorBar, Badge, CoinRating, Medallion, Sheet } from '../components';
@@ -30,6 +33,10 @@ function ourPrice(s: GameState, cityId: string, productId: string): number | und
   return b ? branchPrice(s, b, productId) : undefined;
 }
 
+/** The calendar year of a game week. */
+const yearOf = (s: GameState, week: number) =>
+  dateOf(s.meta.startDate, week * DAYS_PER_WEEK).getUTCFullYear();
+
 export function RivalSheet(p: { s: GameState; lotId: string; onClose: () => void }) {
   const lot = p.s.world.lots[p.lotId];
   const bank = lot?.occupant ? p.s.rivals[lot.occupant.id] : undefined;
@@ -41,6 +48,7 @@ export function RivalSheet(p: { s: GameState; lotId: string; onClose: () => void
       </Sheet>
     );
   }
+  const adWeeks = campaignWeeksLeft(bank, lot.cityId);
   const ours = ourPrice(p.s, lot.cityId, 'savings');
   const theirs = rivalPriceInCity(p.s, bank, 'savings', lot.cityId);
   const advice =
@@ -63,8 +71,19 @@ export function RivalSheet(p: { s: GameState; lotId: string; onClose: () => void
         <AdvisorBar text={advice} />
         {branch && (
           <div>
-            <CoinRating value={branch.overall} />
+            <CoinRating value={rivalOverall(bank, branch)} />
             <div class="muted small">{count(branch.reviewCount)} reviews at this branch</div>
+            {adWeeks > 0 && (
+              <div class="small tone-bad">
+                Advertising in this city: +{RIVAL_MARKETING.boost.toFixed(2)} for {adWeeks} more
+                week{adWeeks === 1 ? '' : 's'}
+              </div>
+            )}
+            {bank.charteredWeek !== undefined && (
+              <div class="muted small">
+                A new bank, chartered in {yearOf(p.s, bank.charteredWeek)}
+              </div>
+            )}
           </div>
         )}
         <div>

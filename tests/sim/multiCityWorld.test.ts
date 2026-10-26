@@ -60,7 +60,12 @@ describe('rivals in cities generated later', () => {
     advanceWeeks(s, 10);
     fly(s, 'lon');
     advanceWeeks(s, 60);
-    for (const r of Object.values(s.rivals).filter((x) => x.cities[0] === 'lon')) {
+    // Banks seeded with the city; one chartered later (§18.7) has fewer quarters.
+    const seeded = Object.values(s.rivals).filter(
+      (x) => x.cities[0] === 'lon' && x.charteredWeek === undefined,
+    );
+    expect(seeded.length).toBeGreaterThan(0);
+    for (const r of seeded) {
       expect(r.quarters.length).toBeGreaterThanOrEqual(4);
       if (r.listed) expect(r.history.length).toBeGreaterThan(10);
       expect(Number.isFinite(r.price)).toBe(true);

@@ -858,7 +858,7 @@ export const RIVAL_NIM_POLICY_SLOPE = 0.25;
 export const RIVAL_LOAN_YIELD_SPREAD = 0.03;
 /** Fee income per $ of deposits a year, before the strategy multiplier. */
 export const RIVAL_FEE_YIELD = 0.02;
-/** Weekly cost of running a branch, × city cost index × strategy cost multiplier. */
+/** Weekly cost of running a branch, × city cost index × strategy cost multiplier × the price list (§4.6). */
 export const RIVAL_BRANCH_COST = 18_000;
 /** Servicing cost per $ of deposits a year. */
 export const RIVAL_SERVICING = 0.004;
@@ -897,8 +897,79 @@ export const RIVAL_EXPANSION = {
  * of standing still.
  */
 export const RIVAL_LEARNING = { step: 0.1, maxQuality: 4.6 } as const;
-/** Close a branch after this many negative weeks, ignoring its first graceWeeks (§18.4). */
-export const RIVAL_CLOSURE = { negativeWeeks: 26, graceWeeks: 52 } as const;
+/**
+ * New rivals get chartered (§18.7): at each year end, every generated city
+ * (not a regional site) rolls `chance` when it has fewer active rival banks than
+ * its usual count, or `roomChance` when it is full but still has `roomShare` of
+ * its storefronts free. At most `maxPerYear` new banks a year. A new bank opens
+ * `branches` storefronts in that city with `capital` × the nominal index of
+ * starting equity, is private, and starts growing after a year like any rival.
+ */
+export const RIVAL_CHARTER = {
+  chance: 0.35,
+  roomChance: 0.08,
+  roomShare: 0.35,
+  maxPerYear: 3,
+  branches: [2, 3] as [number, number],
+  capital: 25_000_000,
+  strategyWeights: { disruptor: 0.35, community: 0.3, premium: 0.2, incumbent: 0.15 },
+} as const;
+/**
+ * Rivals buy each other (§18.8): at each quarter-end, every active rival with a
+ * profitable year and capital `excessCr` above its strategy target rolls
+ * `chance` to bid for the best smaller rival it shares a city or home country
+ * with (equity at most `maxTargetShare` of its own). The price is book value ×
+ * (1 + a premium in `premium`), paid to every holder; the premium comes off the
+ * buyer's equity. The deal needs the buyer's pro-forma capital ratio to stay at
+ * or above MERGERS.minProFormaCr. At most `maxPerQuarter` deals a quarter.
+ */
+export const RIVAL_MERGERS = {
+  chance: 0.04,
+  minQuarters: 4,
+  excessCr: 0.015,
+  maxTargetShare: 0.5,
+  premium: [0.15, 0.4] as [number, number],
+  maxPerQuarter: 1,
+} as const;
+/**
+ * Rival ad campaigns (§18.9): each monthly check, a profitable rival rolls
+ * `chance` × its strategy weight in each city it shares with your branches.
+ * A campaign lifts its branches' overall rating there by `boost` for `weeks`
+ * weeks (in the share formula and its own deposit target) and costs
+ * `costPerBranch` a week per branch there, × the city's cost index and price list.
+ */
+export const RIVAL_MARKETING = {
+  chance: 0.04,
+  boost: 0.15,
+  weeks: 12,
+  costPerBranch: 6_000,
+  weight: { incumbent: 1, premium: 1.2, community: 0.8, disruptor: 0.5 },
+} as const;
+/**
+ * Rival tech (§18.9): at each year end, a rival with a profitable year spends
+ * `spendShare` of that year's profit on technology: its app rating moves `appStep`
+ * toward its strategy's `appCap`, and every branch's Products coin moves
+ * `productStep` up to RIVAL_LEARNING.maxQuality. A disruptor that reaches
+ * `growUpBranches` branches becomes an incumbent (full expansion speed, its
+ * prices drift to the incumbent sheet).
+ */
+export const RIVAL_TECH = {
+  spendShare: 0.05,
+  appStep: { incumbent: 0.08, premium: 0.08, community: 0.1, disruptor: 0.12 },
+  appCap: { incumbent: 4.4, premium: 4.6, community: 4.0, disruptor: 4.9 },
+  productStep: 0.05,
+  growUpBranches: 20,
+} as const;
+/**
+ * Close a branch after this many negative weeks, ignoring its first graceWeeks
+ * (§18.4). Weeks while its country is in one of `holdPhases` don't count: a
+ * bank rides out a downturn instead of closing healthy branches (2026-10-26).
+ */
+export const RIVAL_CLOSURE = {
+  negativeWeeks: 26,
+  graceWeeks: 52,
+  holdPhases: ['recession', 'recovery'] as readonly string[],
+} as const;
 /** Review cards shown on a rival branch panel (derived, not stored). */
 export const RIVAL_REVIEW_CARDS = 4;
 /** New reviews a rival branch collects each week. */

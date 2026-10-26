@@ -39,6 +39,7 @@ import { brandSegmentMults } from '../hqMarketing';
 import { isClosed, takeupMult } from '../incident/effects';
 import { affinityOf, allProducts, baseId, starsOf } from '../products';
 import { cityRoom } from './cityMarket';
+import { rivalOverall } from '../rivalMarketing';
 
 export interface Origination {
   newAccounts: number;
@@ -88,7 +89,8 @@ export function shareOf(state: GameState, branch: Branch): number {
     if (rival.status !== 'active') continue;
     for (const rb of rival.branches) {
       const other = rb.cityId === branch.cityId ? state.world.lots[rb.lotId] : undefined;
-      if (other) competitors.push({ overall: rb.overall, distance: tileDistance(lot, other) });
+      if (other)
+        competitors.push({ overall: rivalOverall(rival, rb), distance: tileDistance(lot, other) });
     }
   }
   for (const own of Object.values(state.branches)) {
