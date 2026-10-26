@@ -21,13 +21,11 @@ describe('city market', () => {
     expect(CITY_MARKET.L).toBeLessThan(CITY_MARKET.XL);
   });
 
-  it('sums customers across your branches and shrinks room as reach grows', () => {
+  it("counts your office's customers and shrinks room as reach grows", () => {
     const s = newGame({ seed: 11, cityId: 'cal', startCash: 1_500_000 });
     expect(cityRoom(s, 'cal')).toBe(1);
     const a = openScriptedBranch(s, 'midtown');
-    const b = openScriptedBranch(s, 'downtown');
-    s.branches[a]!.customers = CITY_MARKET.M * 0.3;
-    s.branches[b]!.customers = CITY_MARKET.M * 0.2;
+    s.branches[a]!.customers = CITY_MARKET.M * 0.5;
     expect(cityCustomers(s, 'cal')).toBeCloseTo(CITY_MARKET.M * 0.5);
     expect(cityReach(s, 'cal')).toBeCloseTo(0.5);
     expect(cityRoom(s, 'cal')).toBeCloseTo(1 - 0.5 ** CITY_SATURATION_EXP);

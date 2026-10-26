@@ -56,6 +56,21 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
         tokens: { bank, name: str(p.name, 'the new branch'), address: address ?? 'Main Street' },
       });
     }
+    case 'OFFICE_GROWN': {
+      const branch = ctx.state.branches[str(p.branchId)];
+      return banking({
+        key: 'OFFICE_GROWN',
+        subject: str(p.branchId),
+        icon: 'facade',
+        priority: P.company,
+        tokens: {
+          bank,
+          name: branch?.name ?? 'its office',
+          city: cityName(str(p.city)),
+          size: str(p.size, 'bigger').toLowerCase(),
+        },
+      });
+    }
     case 'BRANCH_CLOSED': {
       const moved = str(p.movedTo);
       return banking({

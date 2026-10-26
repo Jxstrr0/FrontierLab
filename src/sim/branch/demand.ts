@@ -22,7 +22,6 @@ import { EQUIPMENT } from '../../data/equipment';
 import { needsApproval, type ProductSpec } from '../../data/products';
 import { BUSINESS_ACCT_BIZ_TICKET_MULT, SEGMENT_SPECS } from '../../data/segments';
 import { SEGMENTS, type SegmentId } from '../../data/types';
-import { tileDistance } from '../citygen';
 import { loanDemand } from '../macro';
 import { nominalIndex } from '../nominal';
 import { clamp, noise } from '../math';
@@ -39,6 +38,7 @@ import { brandSegmentMults } from '../hqMarketing';
 import { isClosed, takeupMult } from '../incident/effects';
 import { affinityOf, allProducts, baseId, starsOf } from '../products';
 import { cityRoom } from './cityMarket';
+import { officeTraffic, sizeMult } from './officeSize';
 import { rivalOverall } from '../rivalMarketing';
 
 export interface Origination {
@@ -63,7 +63,8 @@ const attract = (overall: number) => dpow(overall / 5, SHARE_EXP);
 
 /**
  * share = A / (A + Σ w_j A_j + A0), with w_j = 1 / (1 + d_j / 6) for every
- * competitor within RIVAL_RADIUS tiles (§9.3).
+ * competitor within RIVAL_RADIUS tiles (§9.3). City-wide competitors (C2a)
+ * pass distance 0, so w_j = 1.
  */
 export function shareFormula(
   overall: number,
@@ -79,25 +80,29 @@ export function shareFormula(
   return a / (a + others + a0);
 }
 
-/** This branch's share of prospects against every branch nearby (§9.3). */
+/**
+ * This office's share of the city's prospects (§9.3, C2a): every rival lab in
+ * the city competes once, at its branches' average overall, and any other
+ * office of yours there (from an older save) competes too.
+ */
 export function shareOf(state: GameState, branch: Branch): number {
-  const lot = state.world.lots[branch.lotId];
   const city = CITIES[branch.cityId];
-  if (!lot || !city) return 0;
+  if (!city) return 0;
   const competitors: { overall: number; distance: number }[] = [];
   for (const rival of Object.values(state.rivals)) {
     if (rival.status !== 'active') continue;
+    let sum = 0;
+    let n = 0;
     for (const rb of rival.branches) {
-      const other = rb.cityId === branch.cityId ? state.world.lots[rb.lotId] : undefined;
-      if (other)
-        competitors.push({ overall: rivalOverall(rival, rb), distance: tileDistance(lot, other) });
+      if (rb.cityId !== branch.cityId || !state.world.lots[rb.lotId]) continue;
+      sum += rivalOverall(rival, rb);
+      n += 1;
     }
+    if (n > 0) competitors.push({ overall: sum / n, distance: 0 });
   }
   for (const own of Object.values(state.branches)) {
     if (own.id === branch.id || own.status !== 'open' || own.cityId !== branch.cityId) continue;
-    const other = state.world.lots[own.lotId];
-    if (other)
-      competitors.push({ overall: own.ratings.overall, distance: tileDistance(lot, other) });
+    competitors.push({ overall: own.ratings.overall, distance: 0 });
   }
   return shareFormula(branch.ratings.overall, competitors, city.incumbent);
 }
@@ -130,7 +135,7 @@ function special(state: GameState, branch: Branch, spec: ProductSpec): number {
   }
   if (spec.kind === 'wealth') return offices > 0 || spec.noAdvisorOffice ? 1 : 0;
   if (spec.kind === 'safebox') {
-    const boxes = EQUIPMENT[branch.build.vault]?.boxes ?? 0;
+    const boxes = (EQUIPMENT[branch.build.vault]?.boxes ?? 0) * sizeMult(branch);
     return (branch.books[spec.id]?.accounts ?? 0) < boxes ? 1 : 0;
   }
   return 1;
@@ -142,12 +147,13 @@ export function runDemand(state: GameState, branch: Branch, fx: CampaignEffects)
   const rng = stream(state, 'demand');
   const country = countryOfCity(state, branch.cityId);
 
-  // §9.1–9.2 prospects
-  const population = lot.footTraffic * CATCHMENT_MULT;
+  // §9.1–9.2 prospects; a sales office serves its whole city (C2a)
+  const traffic = officeTraffic(state, branch);
+  const population = traffic * CATCHMENT_MULT;
   const penetration = clamp(branch.customers / population, 0, 1);
   const e = effectiveAwareness(state, branch);
   const prospects =
-    lot.footTraffic *
+    traffic *
     PROSPECT_RATE *
     difficultyOf(state).demandMult *
     (AWARENESS_FLOOR + (1 - AWARENESS_FLOOR) * e) *

@@ -14,7 +14,7 @@ import { CITIES } from '../../data/cities';
 import { EXEC_SEATS } from '../../data/executives';
 import { execRerollFee } from '../candidateRerolls';
 import { generateExecutive } from '../execCandidates';
-import { canGrowIn, expansionPlan, seedGrowthCities } from '../execDelegationsGrowth';
+import { canGrowIn, carryOutPlan, expansionPlan, seedGrowthCities } from '../execDelegationsGrowth';
 import { grantFairValue } from '../execGrants';
 import { seatExecutive, vacateSeat } from '../execSeatChanges';
 import { execMarketSalary, hasExecFloor } from '../execSeats';
@@ -25,7 +25,6 @@ import { spend } from '../ledger';
 import { roundToStep } from '../math';
 import type { EquityGrant, ExecSeat, Executive, GameState } from '../state';
 import type { PayReviewCadence } from '../marketsTypes';
-import { buildBranch } from './branches';
 import { fail, money, ok, type CommandResult } from './result';
 
 const NO_FLOOR = 'Executives work from the Executive floor. Add one at HQ first.';
@@ -185,17 +184,17 @@ export function setGrowthCity(state: GameState, cityId: string, on: boolean): Co
   return ok();
 }
 
-/** Asks the COO to open a branch in a city now (their usual pick, needing only the build's cash). */
-export function cooOpenBranch(
-  state: GameState,
-  cityId: string,
-): CommandResult<{ branchId: string }> {
-  if (!state.executives.seats.coo) return fail('You need a COO to open branches for you.');
+/**
+ * Asks the COO to act in a city now: open its sales office (their usual pick)
+ * or grow the one there a size (C2a), needing only the cash for it.
+ */
+export function cooOpenBranch(state: GameState, cityId: string): CommandResult<{ grew: boolean }> {
+  if (!state.executives.seats.coo) return fail('You need a COO to open offices for you.');
   const plan = expansionPlan(state, cityId, false);
-  if (plan.blocker || !plan.lot || !plan.build) return fail(plan.blocker ?? 'Nothing to build.');
-  const r = buildBranch(state, { lotId: plan.lot.id, build: plan.build, via: 'coo' });
-  if (r.ok) state.executives.lastExpansionWeek = state.clock.week;
-  return r;
+  if (plan.blocker) return fail(plan.blocker);
+  if (!carryOutPlan(state, plan)) return fail('Nothing to build.');
+  state.executives.lastExpansionWeek = state.clock.week;
+  return ok({ grew: !!plan.growId });
 }
 
 /** Most shares one grant may carry: EXEC_PAY.grantMaxPct of shares outstanding. */

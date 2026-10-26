@@ -1,6 +1,7 @@
 // HQ departments (SIMULATION §16.2–16.5): staffing, salaries, morale and skill
 // for each floor's team, the founder-mode ramp, staffing requirements and the
 // coverage every shortfall effect reads, plus HR benefits. Tick step 7.
+import { hqUnits } from './branch/officeSize';
 import {
   ATTRACTION_RANGE,
   BENEFIT_CAP,
@@ -39,8 +40,14 @@ import type { Coverage, Department, DeptId, GameState, HqDeptId } from './state'
 
 // ─── Size and requirements ────────────────────────────────────────────────────
 
-export function branchCount(state: GameState): number {
-  return Object.values(state.branches).filter((b) => b.status !== 'closed').length;
+/**
+ * Your offices in HQ units (C2a): each open or fitting-out office counts its
+ * size's hqUnits, so a Flagship weighs on HQ like four Starters.
+ */
+export function officeUnits(state: GameState): number {
+  let units = 0;
+  for (const b of Object.values(state.branches)) if (b.status !== 'closed') units += hqUnits(b);
+  return units;
 }
 
 export function hqStaff(state: GameState): number {
@@ -67,20 +74,20 @@ export function annualPayroll(state: GameState): number {
   return total;
 }
 
-/** Founder-mode ramp (§16.3): requirements phase in from 3 to 6 branches, or at $250M assets. */
+/** Founder-mode ramp (§16.3): requirements phase in from 3 to 6 office units, or at $250M assets. */
 export function founderRamp(state: GameState): number {
   // With the HQ system switched off (FEATURES.hq), no requirements apply.
   if (!FEATURES.hq) return 0;
   const assets = state.history.weekly.at(-1)?.totals.assets ?? 0;
   if (assets >= FOUNDER_MODE_ASSETS) return 1;
-  return clamp((branchCount(state) - FOUNDER_RAMP.fromBranches) / FOUNDER_RAMP.overBranches, 0, 1);
+  return clamp((officeUnits(state) - FOUNDER_RAMP.fromBranches) / FOUNDER_RAMP.overBranches, 0, 1);
 }
 
 /** Staff a department needs (CONTENT §9). */
 export function requiredStaff(state: GameState, id: HqDeptId): number {
   const last = state.history.weekly.at(-1)?.totals;
   const assets = last?.assets ?? 0;
-  const branches = branchCount(state);
+  const branches = officeUnits(state);
   const wholesale = totalWholesale(state);
   const r = DEPT_REQUIREMENTS;
   switch (id) {

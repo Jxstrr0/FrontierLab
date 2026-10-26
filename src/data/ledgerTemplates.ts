@@ -39,6 +39,16 @@ const BANK_TEMPLATES = {
       b: 'Scaffolding went up at {address} as {bank} readies a branch in {city}.',
     },
   ],
+  OFFICE_GROWN: [
+    {
+      h: '{bank} grows its {city} office',
+      b: '{name} takes more floor space and becomes a {size} office. Desks for a bigger sales team are on order.',
+    },
+    {
+      h: 'More room at {name}',
+      b: '{bank} signed for extra space in {city}, turning {name} into a {size} office.',
+    },
+  ],
   BRANCH_OPENED: [
     {
       h: '{bank} opens {name}',

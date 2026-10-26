@@ -291,6 +291,26 @@ export const CITY_MARKET = { S: 32_000, M: 38_000, L: 50_000, XL: 72_000 } as co
 export const CITY_SATURATION_EXP = 3;
 /** Advice only (UI and scripted strategies): about how many branches a city of each size supports. */
 export const CITY_BRANCH_GUIDE = { S: 5, M: 7, L: 9, XL: 12 } as const;
+/**
+ * Sales office sizes (stage C2a, CONVERSION_PLAN §4): one office per city,
+ * upgraded in place. `mult` scales seats (teller stations, advisor offices),
+ * staff needed, ATM throughput, safe deposit boxes, rent, lease deposit,
+ * overhead and the cost and upkeep of the interior slots (lobby, teller line,
+ * vault, ATM). The exterior is one piece at every size. `hqUnits` is how
+ * many offices' worth of HQ work it makes (§16.3 founder ramp, CONTENT §9).
+ */
+export const OFFICE_SIZES = [
+  { name: 'Starter', mult: 1, hqUnits: 1 },
+  { name: 'Standard', mult: 2.5, hqUnits: 2 },
+  { name: 'Large', mult: 5, hqUnits: 3 },
+  { name: 'Flagship', mult: 9, hqUnits: 4 },
+] as const;
+/**
+ * Whole-city catchment (§9.1, C2a): an office's traffic is the city's typical
+ * storefront traffic × min(size mult, CITY_BRANCH_GUIDE) × density ×
+ * OFFICE_TRAFFIC_MULT, so a Flagship draws on what a full branch network used to.
+ */
+export const OFFICE_TRAFFIC_MULT = 1.5;
 export const TAKEUP_CAP = 0.95;
 export const STARS_TAKEUP = { base: 0.6, slope: 0.2 } as const;
 export const MORTGAGE_SPECIAL = {
@@ -505,12 +525,16 @@ export const EXEC_SUITE_DESKS = 7;
 export const INVESTMENT_FLOOR_DESKS = 32;
 /** Releasing a floor or office lets staff above the remaining desks go with this severance. */
 export const SEVERANCE_WEEKS = 4;
-/** Founder-mode ramp: full requirements at this size, or phased in from 3 to 6 branches (§16.3). */
+/**
+ * Founder-mode ramp: full requirements at this size, or phased in from 3 to 6
+ * office units (§16.3; C2a: each office counts its OFFICE_SIZES hqUnits).
+ */
 export const FOUNDER_MODE_ASSETS = 250_000_000;
-export const FOUNDER_RAMP = { fromBranches: 2, overBranches: 4 } as const;
+export const FOUNDER_RAMP = { fromBranches: 3, overBranches: 5 } as const;
 /**
  * Required staff per department (CONTENT §9):
- * base + perBranch × branches + per$ × the department's dollar driver.
+ * base + perBranch × office units (a Starter is 1, a Flagship 4) + per$ × the
+ * department's dollar driver.
  */
 export const DEPT_REQUIREMENTS = {
   finance: { base: 2, perBranch: 0.35, perAssets: 1 / 2e9, public: 4 },
@@ -2292,8 +2316,8 @@ export const FX_START_INDEX = 100;
 
 // ─── MILESTONES (DESIGN §5.18) ────────────────────────────────────────────────
 export const MILESTONE_GOALS = {
-  branches: 10,
-  manyBranches: 100,
+  /** Flagship sales offices for 'Five Flagships' (C2a). */
+  flagships: 5,
   cities: 10,
   deposits: 1_000_000_000,
   countries: 5,

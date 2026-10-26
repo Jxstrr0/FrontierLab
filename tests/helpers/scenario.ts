@@ -44,8 +44,8 @@ export function leaseScriptedOffice(state: GameState): string | undefined {
 }
 
 /**
- * The determinism script: seed 42 in Calgary, one branch on day 0, a second at
- * week 40 when cash allows, a price change and a treasury transfer along the way, then an HQ office with
+ * The determinism script: seed 42 in Calgary, one office on day 0, grown to
+ * Standard at week 40 when cash allows (C2a), a price change and a treasury transfer along the way, then an HQ office with
  * three floors at week 80 and a lunch benefit at week 100.
  * `onWeek` runs after every weekly tick.
  */
@@ -58,7 +58,7 @@ export function runScript(weeks: number, onWeek?: (s: GameState, week: number) =
     const week = day / 7;
     if (week === 10) cmd.setPrice(s, first, 'savings', 0.03);
     if (week === 20) cmd.setCampaignLevel(s, first, 'charging', 1);
-    if (week === 40 && s.company.cash > 500_000) openScriptedBranch(s, 'downtown');
+    if (week === 40 && s.company.cash > 500_000) cmd.upgradeOffice(s, first);
     if (week === 60) cmd.transferToTreasury(s, 100_000);
     if (week === 80) leaseScriptedOffice(s);
     if (week === 100) cmd.setBenefit(s, 'lunch', 40);
