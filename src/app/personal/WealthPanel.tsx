@@ -28,7 +28,7 @@ export function WealthPanel() {
       subtitle={s.meta.founderName}
       onClose={closePanel}
       advisor={{
-        text: 'Your own money, kept apart from the bank’s: salary, dividends and what you buy with them.',
+        text: 'Your own money, kept apart from the lab’s: salary, dividends and what you buy with them.',
       }}
     >
       <div class="stack">

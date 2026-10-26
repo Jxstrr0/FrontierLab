@@ -51,14 +51,14 @@ export const MILESTONES: MilestoneSpec[] = [
   {
     id: 'ipo',
     title: 'Public company',
-    goal: 'List your bank on the stock exchange.',
+    goal: 'List your lab on the stock exchange.',
     line: '{bank} is a public company.',
     news: false,
   },
   {
     id: 'first_acquisition',
     title: 'First acquisition',
-    goal: 'Buy a rival bank.',
+    goal: 'Buy a rival lab.',
     line: '{bank} closed its first acquisition.',
     news: false,
   },
@@ -100,14 +100,14 @@ export const MILESTONES: MilestoneSpec[] = [
   {
     id: 'five_acquisitions',
     title: 'Five acquisitions',
-    goal: 'Buy five rival banks.',
+    goal: 'Buy five rival labs.',
     line: '{bank} closed its fifth acquisition.',
     news: false,
   },
   {
     id: 'club_owner',
     title: 'Club owner',
-    goal: 'Buy a sports club, for the bank or for yourself.',
+    goal: 'Buy a sports club, for the lab or for yourself.',
     line: 'The founder of {bank} now owns a sports club.',
     news: false,
   },
@@ -142,7 +142,7 @@ export const MILESTONES: MilestoneSpec[] = [
   {
     id: 'ten_acquisitions',
     title: 'Ten acquisitions',
-    goal: 'Buy ten rival banks.',
+    goal: 'Buy ten rival labs.',
     line: '{bank} closed its tenth acquisition.',
     news: false,
   },

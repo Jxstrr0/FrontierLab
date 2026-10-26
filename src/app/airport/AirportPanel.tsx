@@ -52,7 +52,7 @@ export function AirportPanel(p: { jet?: boolean }) {
     : [
         `Welcome to ${city.airport.name}. Where are we headed?`,
         usedUp
-          ? "You've used this week's free mileage. Tickets come from your personal cash, and the bank covers any shortfall."
+          ? "You've used this week's free mileage. Tickets come from your personal cash, and the lab covers any shortfall."
           : 'Flights within your weekly mileage are free. Past it, a one-way ticket comes from your personal cash.',
         'Opening branches and buying buildings means being in that city. Your branches run everywhere at once.',
       ];
@@ -114,7 +114,7 @@ export function AirportPanel(p: { jet?: boolean }) {
               <Row label="From your personal cash" value={money(q.personalPays, sym)} />
               {q.bankPays > 0 && (
                 <Row
-                  label="The bank pays (travel expense)"
+                  label="The lab pays (travel expense)"
                   value={money(q.bankPays, sym)}
                   tone="bad"
                 />

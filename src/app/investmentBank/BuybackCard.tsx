@@ -65,7 +65,7 @@ export function BuybackCard() {
       <Row label="Capital ratio after" value={pct(q.crAfter, 1)} tone="dim" />
       {capped && (
         <p class="muted small">
-          Capped so the public keeps at least {pctText(BUYBACK.minFloat)} of the bank.
+          Capped so the public keeps at least {pctText(BUYBACK.minFloat)} of the lab.
         </p>
       )}
       {waiting && (
@@ -87,7 +87,7 @@ export function BuybackCard() {
       {confirm && (
         <Confirm
           title="Buy back shares?"
-          body={`The bank pays ${money(q.cost, sym)} for ${count(q.shares)} of its own shares and retires them. The cash leaves your capital, like a dividend.`}
+          body={`The lab pays ${money(q.cost, sym)} for ${count(q.shares)} of its own shares and retires them. The cash leaves your capital, like a dividend.`}
           confirmLabel="Buy back"
           onConfirm={buy}
           onCancel={() => setConfirm(false)}

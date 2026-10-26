@@ -20,7 +20,7 @@ export function acceptCorporateLoan(
   const offer = d.offers.find((o) => o.id === offerId);
   if (!offer || offer.expiresWeek < state.clock.week) return fail('That offer has expired.');
   const lender = state.rivals[offer.lenderId];
-  if (!lender || lender.status !== 'active') return fail('That bank is no longer lending.');
+  if (!lender || lender.status !== 'active') return fail('That lab is no longer lending.');
   if (offer.amount > loanRoom(state) + CORPORATE_LENDING.dust) {
     return fail(
       `Corporate debt is capped at ${CORPORATE_LENDING.maxEquityShare * 100}% of equity. You can borrow up to ${money(loanRoom(state))} more.`,
@@ -64,7 +64,7 @@ export function repayCorporateLoan(state: GameState, loanId: string): CommandRes
 export function drawCredit(state: GameState, lenderId: string, amount: number): CommandResult {
   if (!validAmount(amount)) return fail('Enter an amount above zero.');
   const lender = state.rivals[lenderId];
-  if (!lender || lender.status !== 'active') return fail('That bank is no longer lending.');
+  if (!lender || lender.status !== 'active') return fail('That lab is no longer lending.');
   if (!lendersNearYou(state).some((r) => r.id === lenderId))
     return fail(`${lender.name} lends to banks with a branch in one of its head office cities.`);
   const line = state.corporateDebt.lines[lenderId];

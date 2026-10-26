@@ -29,7 +29,7 @@ export function StepOptions(p: { draft: Draft; patch: (d: Partial<Draft>) => voi
       <section class="stack">
         <SectionTitle>Competitors</SectionTitle>
         <Stepper
-          label="Rival banks in the city"
+          label="Rival labs in the city"
           value={draft.competitors}
           min={COMPETITORS.min}
           max={COMPETITORS.max}

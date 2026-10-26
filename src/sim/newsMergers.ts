@@ -21,7 +21,7 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
   const p = e.payload;
   const rivalId = str(p.rivalId);
   const base = { subject: rivalId, tab: 'banking' as const };
-  const tokens = { bank: ctx.bank, target: str(p.bank, 'a rival bank') };
+  const tokens = { bank: ctx.bank, target: str(p.bank, 'a rival lab') };
   const m = (x: unknown) => newsMoney(num(x), ctx.sym);
   switch (e.type) {
     case 'MERGER_OFFER':

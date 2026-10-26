@@ -25,17 +25,17 @@ function rentsLine(s: GameState): string {
   const bank = owned(s, 'company');
   const mine = owned(s, 'personal');
   const parts: string[] = [];
-  if (rentsManaged(s, 'company')) parts.push(`${buildings(bank)} of the bank's`);
+  if (rentsManaged(s, 'company')) parts.push(`${buildings(bank)} of the lab's`);
   if (rentsManaged(s, 'personal')) parts.push(`${buildings(mine)} of yours`);
   const power = Math.max(rentPricingPower(s, 'company'), rentPricingPower(s, 'personal'));
   const every = EXEC_DELEGATION.rentEveryWeeks;
   return parts.length === 0
-    ? `Nothing managed yet: ${buildings(bank)} of the bank's and ${buildings(mine)} of yours wait on the switches above.`
+    ? `Nothing managed yet: ${buildings(bank)} of the lab's and ${buildings(mine)} of yours wait on the switches above.`
     : `Managing ${parts.join(' and ')}: tenants pay up to ${pct(power, 0)} over market, and rents are reviewed every ${every} weeks (next in ${weeksTo(s, every)}).`;
 }
 
 function buyLine(s: GameState, owner: Property['owner']): string {
-  const who = owner === 'company' ? 'For the bank' : 'For you';
+  const who = owner === 'company' ? 'For the lab' : 'For you';
   const plan = nextPurchase(s, owner);
   if (!plan.pick) return `${who}: ${plan.blocker}`;
   const c = plan.pick;

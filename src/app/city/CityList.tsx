@@ -167,7 +167,7 @@ function LotRow(p: {
         <Medallion ink={bank?.ink ?? '#888'} monogram={bank?.monogram ?? '?'} size={32} ring />
         <span class="lot-main">
           <span class="lot-address">{lot.address}</span>
-          <span class="lot-occupant lot-rival">{bank?.name ?? 'Rival bank'}</span>
+          <span class="lot-occupant lot-rival">{bank?.name ?? 'Rival lab'}</span>
           <span class="muted small">{facts}</span>
         </span>
       </button>

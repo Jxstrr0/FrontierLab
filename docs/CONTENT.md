@@ -383,40 +383,40 @@ Counterparty names: Harbor Clearing Bank · Meridian Treasury · Atlas Money Mar
 
 | id | Name | Strategy | Home | Brand ink | Listed |
 |---|---|---|---|---|---|
-| harbourline | Harbourline Bank | Incumbent | CA | #1F3A5F navy | yes (HBL) |
-| maplecrown | Maple Crown Financial | Incumbent | CA | #8E2C2C crimson | yes (MCF) |
-| prairiemutual | Prairie Mutual | Community | CA | #B08A3E wheat | no |
-| nimbus | Nimbus | Disruptor | CA, US | #2AA6B8 cyan | no |
-| granville | Granville Private | Premium | CA | #2B2B2B black/gold | no |
-| libertyridge | Liberty Ridge Bank | Incumbent | US | #27466E | yes (LRB) |
-| eastgate | Eastgate Financial | Incumbent | US | #4A6B3A | yes (EGF) |
-| copperfield | Copperfield Federal | Community | US | #A8643A | no |
+| harbourline | Harbourline AI | Incumbent | CA | #1F3A5F navy | yes (HBL) |
+| maplecrown | Maple Crown Intelligence | Incumbent | CA | #8E2C2C crimson | yes (MCF) |
+| prairiemutual | Prairie Open Models | Community | CA | #B08A3E wheat | no |
+| nimbus | Nimbus Labs | Disruptor | CA, US | #2AA6B8 cyan | no |
+| granville | Granville Research | Premium | CA | #2B2B2B black/gold | no |
+| libertyridge | Liberty Ridge Labs | Incumbent | US | #27466E | yes (LRB) |
+| eastgate | Eastgate Intelligence | Incumbent | US | #4A6B3A | yes (EGF) |
+| copperfield | Copperfield Collective | Community | US | #A8643A | no |
 | fizz | Fizz | Disruptor | US, UK | #E2557A | no |
-| whitmore | Whitmore Trust | Premium | US | #3B3355 | yes (WMT) |
-| kingsbury | Kingsbury & Co | Incumbent | UK | #2C3E66 | yes (KBY) |
-| thameside | Thameside Building Society | Community | UK | #3E7A6E | no |
-| albion | Albion Mutual | Incumbent | UK | #6B2D4A | no |
-| belgrave | Belgrave Private | Premium | UK | #1E1E28 | no |
-| lumiere | Banque Lumière | Incumbent | EA (Paris) | #7A2E46 | yes (BLU) |
-| rheinmark | Rheinmark Bank | Incumbent | EA (Frankfurt) | #34495E | yes (RMB) |
-| oranjeburg | Oranjeburg Bank | Incumbent | EA (Amsterdam) | #C0652A | yes (OBG) |
+| whitmore | Whitmore Institute | Premium | US | #3B3355 | yes (WMT) |
+| kingsbury | Kingsbury Cognition | Incumbent | UK | #2C3E66 | yes (KBY) |
+| thameside | Thameside Open Lab | Community | UK | #3E7A6E | no |
+| albion | Albion Machine Works | Incumbent | UK | #6B2D4A | no |
+| belgrave | Belgrave Research | Premium | UK | #1E1E28 | no |
+| lumiere | Lumière IA | Incumbent | EA (Paris) | #7A2E46 | yes (BLU) |
+| rheinmark | Rheinmark KI | Incumbent | EA (Frankfurt) | #34495E | yes (RMB) |
+| oranjeburg | Oranjeburg Labs | Incumbent | EA (Amsterdam) | #C0652A | yes (OBG) |
 | volt | Volt | Disruptor | EA | #5B4BD6 | no |
-| alpenhaus | Alpenhaus Privatbank | Premium | CH | #2F3B45 | yes (APH) |
-| helvetic | Helvetic Cantonal | Community | CH | #B03A3A | no |
-| sakuragi | Sakuragi Trust | Incumbent | JP | #A0425A | yes (SKT) |
-| hoshino | Hoshino Bank | Incumbent | JP | #2E3F78 | yes (HSB) |
-| komorebi | Komorebi Pay | Disruptor | JP | #4E9A5A | no |
-| southerncross | Southern Cross Savings | Incumbent | AU | #22476B | yes (SXS) |
-| wattle | Wattle Mutual | Community | AU | #C99A2E | no |
-| tide | Tide Money | Disruptor | AU, SG | #1E9BB0 | no |
-| lionport | Lionport Bank | Incumbent | SG | #9C2F2F | yes (LPB) |
-| jadeharbour | Jade Harbour Bank | Incumbent | HK | #2F7A6A | yes (JHB) |
-| peak | Peak Private | Premium | HK, SG | #3A3A4A | no |
-| volgastate | Volga State Bank | Incumbent | RU | #7A2430 | yes (VSB) |
-| birchcrest | Birchcrest Bank | Incumbent | RU | #3A5A40 | yes (BCB) |
+| alpenhaus | Alpenhaus Research | Premium | CH | #2F3B45 | yes (APH) |
+| helvetic | Helvetic Open Models | Community | CH | #B03A3A | no |
+| sakuragi | Sakuragi Intelligence | Incumbent | JP | #A0425A | yes (SKT) |
+| hoshino | Hoshino Labs | Incumbent | JP | #2E3F78 | yes (HSB) |
+| komorebi | Komorebi AI | Disruptor | JP | #4E9A5A | no |
+| southerncross | Southern Cross AI | Incumbent | AU | #22476B | yes (SXS) |
+| wattle | Wattle Collective | Community | AU | #C99A2E | no |
+| tide | Tidewater AI | Disruptor | AU, SG | #1E9BB0 | no |
+| lionport | Lionport Labs | Incumbent | SG | #9C2F2F | yes (LPB) |
+| jadeharbour | Jade Harbour AI | Incumbent | HK | #2F7A6A | yes (JHB) |
+| peak | Peak Research | Premium | HK, SG | #3A3A4A | no |
+| volgastate | Volga State Labs | Incumbent | RU | #7A2430 | yes (VSB) |
+| birchcrest | Birchcrest AI | Incumbent | RU | #3A5A40 | yes (BCB) |
 | komet | Komet | Disruptor | RU | #E0663A | no |
-| ambermark | Ambermark Private | Premium | RU | #4A3A5A | no |
-| nevasavings | Neva Savings Union | Community | RU | #4A7A9A | no |
+| ambermark | Ambermark Research | Premium | RU | #4A3A5A | no |
+| nevasavings | Neva Open Models | Community | RU | #4A7A9A | no |
 
 **Strategy offsets and quality profiles:**
 
@@ -430,7 +430,7 @@ Counterparty names: Harbor Clearing Bank · Meridian Treasury · Atlas Money Mar
 Branch counts at start, by city size: S 3–5, M 6–10, L 10–16, XL 16–24 in total across that city's rivals. Disruptors get 1–2 each.
 
 ### Chartered banks (2026-10-26)
-New banks chartered during a game (SIMULATION §18.7) take an invented name from `src/data/rivalCharters.ts`: a place-style stem (Ashcombe, Copperleaf, Glenhaven, Lanternhill, Wrenfield and others) with a suffix by strategy (incumbent: Bank, Banking Group, Financial; premium: Private, & Partners, Trust; community: Mutual, Savings, Community Bank), or for a disruptor a one-word brand (Zephly, Pocketwell, Quillo, Lumio, Nuvra, Sprigly, Taffel, Glimmr, Vantlo, Ottery, Brisko, Pennyloop). Since 2026-10-26 (procedural names), 40% of charters (`NAME_GEN.listedName`) use these listed stems and brands; the rest get a generated one from `src/data/nameParts.ts`: a stem from a head and a tail (Ash + combe, Raven + sford, Maple + water: 40 × 30 combinations), or a coined brand from an onset, vowel, coda and ending (Quinly, Naloop, Polwell), 4–8 letters, with awkward clusters redrawn. Names never repeat in a save. Inks come from a ten-colour palette. Their ids are `charter1`, `charter2`, …; they have no head-office building on the map.
+New labs founded during a game (SIMULATION §18.7) take an invented name from `src/data/rivalCharters.ts`: a place-style stem (Ashcombe, Copperleaf, Glenhaven, Lanternhill, Wrenfield and others) with a suffix by strategy (incumbent: AI, Labs, Intelligence; premium: Research, Institute, & Partners; community: Collective, Open Models, Open Lab), or for a disruptor a one-word brand (Zephly, Pocketwell, Quillo, Lumio, Nuvra, Sprigly, Taffel, Glimmr, Vantlo, Ottery, Brisko, Pennyloop). Since 2026-10-26 (procedural names), 40% of charters (`NAME_GEN.listedName`) use these listed stems and brands; the rest get a generated one from `src/data/nameParts.ts`: a stem from a head and a tail (Ash + combe, Raven + sford, Maple + water: 40 × 30 combinations), or a coined brand from an onset, vowel, coda and ending (Quinly, Naloop, Polwell), 4–8 letters, with awkward clusters redrawn. Names never repeat in a save. Inks come from a ten-colour palette. Their ids are `charter1`, `charter2`, …; they have no head-office building on the map.
 
 ## 16. Other map buildings
 

@@ -22,9 +22,9 @@ interface StepSpec {
 
 const STEPS: StepSpec[] = [
   {
-    title: 'Your bank',
+    title: 'Your lab',
     View: StepBank,
-    blocker: (d) => (d.bankName.trim() && d.monogram ? null : 'Name your bank to continue.'),
+    blocker: (d) => (d.bankName.trim() && d.monogram ? null : 'Name your lab to continue.'),
   },
   {
     title: 'Founder',

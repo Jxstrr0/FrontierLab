@@ -170,7 +170,7 @@ export function ExecProfileSheet(p: { seat: ExecSeat; onClose: () => void }) {
           onConfirm={() => {
             setFiring(false);
             if (act(cmd.fireExec, p.seat).ok) {
-              toast(`${exec.name} has left the bank.`);
+              toast(`${exec.name} has left the lab.`);
               p.onClose();
             }
           }}

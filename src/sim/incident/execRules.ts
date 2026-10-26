@@ -35,7 +35,7 @@ export const EXEC_POACHED: IncidentRule = {
     const rival = Object.values(state.rivals)
       .filter((r) => r.status === 'active')
       .sort((a, b) => a.id.localeCompare(b.id))[0];
-    data.rival ??= rival?.name ?? 'A rival bank';
+    data.rival ??= rival?.name ?? 'A rival lab';
   },
   costs: () => ({ counter: 0, release: 0 }),
   apply(state, inc, optionId) {

@@ -55,7 +55,7 @@ export function ShareSummary(p: { s: GameState }) {
       <Card>
         <Row label="Personal cash" value={money(s.personal.cash, sym)} />
         <Row label="Stocks you hold" value={money(stocks, sym)} />
-        <Row label="Your shares in the bank" value={money(ownShares, sym)} />
+        <Row label="Your shares in the lab" value={money(ownShares, sym)} />
         <Row
           label="Homes, property and other assets"
           value={money(netWorth(s).total - s.personal.cash - stocks - ownShares, sym)}

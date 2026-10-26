@@ -95,7 +95,7 @@ export function StorefrontPanel(p: { lotId: string }) {
           <Row label="Homeowners" value={pct(lot.homeownerShare, 0)} />
         </Card>
 
-        <SectionTitle>Your bank in {cityName}</SectionTitle>
+        <SectionTitle>Your lab in {cityName}</SectionTitle>
         <Card>
           <Row
             label="Your branches here"
