@@ -317,7 +317,8 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 | Branch staff and marketing | `setStaffTarget`, `setWage`, `hireManager`, `fireManager`, `setManagerSalary`, `setDelegation`, `setCampaignLevel` |
 | Loan Desk | `decideApplication(id, 'approve', rate)`, `declineApplication` |
 | Offices and departments | `leaseOffice`, `addFloor`, `releaseFloor`, `setDeptTarget`, `setDeptSalary`, `setBenefit` |
-| Products floor | `startDevelopment`, `cancelDevelopment`, `deleteProduct`, `setRiskAppetite`, `buyBureauModel`, `commissionBureauModel`, `saveCustomModel`, `activateModel` |
+| Finance floor | `setRiskAppetite` |
+| Products floor | `startDevelopment`, `cancelDevelopment`, `deleteProduct`, `buyBureauModel`, `commissionBureauModel`, `saveCustomModel`, `activateModel` |
 | Treasury | `setTreasuryPolicy`, `borrowOffer`, `repayLot`, `transferToTreasury`, `borrowWindow`, `repayWindow` |
 | Partnerships and partners | `signPartnership` (payroll or student), `renewPartnership`, `releasePartnership`, `startGradProgram`, `endGradProgram` |
 | Marketing and lobbying | `startBrandCampaign`, `buyAgencyPackage`, `startLobbying` (was `lobby`) |

@@ -1,6 +1,5 @@
 // Products floor content (SCREENS §10, DESIGN §5.8.3), under the shared team
-// controls: the house underwriting model with Manage models, risk appetite,
-// the company deposits and loans trend, the company product lineup with
+// controls: the house underwriting model with Manage models, the company deposits and loans trend, the company product lineup with
 // "Apply rates to all branches", and product developments with New product.
 import { Card, SectionTitle } from '../components';
 import { useGame } from '../store';
@@ -8,7 +7,6 @@ import { CompanyTrend } from './products/CompanyTrend';
 import { Developments } from './products/Developments';
 import { HouseModelCard } from './products/HouseModelCard';
 import { ProductLineup } from './products/ProductLineup';
-import { RiskAppetite } from './products/RiskAppetite';
 import './products/products.css';
 
 export function ProductsFloor() {
@@ -24,9 +22,6 @@ export function ProductsFloor() {
     <div class="stack">
       <SectionTitle>House model</SectionTitle>
       <HouseModelCard />
-
-      <SectionTitle>Risk appetite</SectionTitle>
-      <RiskAppetite />
 
       <SectionTitle>Deposits and loans</SectionTitle>
       <CompanyTrend />

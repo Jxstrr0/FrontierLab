@@ -4,7 +4,8 @@
 import * as cmd from '../../../sim/commands';
 import { Card, Segmented } from '../../components';
 import { act, useGame } from '../../store';
-import { RISK_LABELS, riskHint, riskSteering } from './productSelectors';
+import { RISK_LABELS, riskHint, riskSteering } from './riskSelectors';
+import './finance.css';
 
 const LEVELS = RISK_LABELS.map((_, i) => ({ value: String(i + 1), label: String(i + 1) }));
 
@@ -14,9 +15,9 @@ export function RiskAppetite() {
   const steering = riskSteering(s);
   return (
     <Card>
-      <div class="pf-risk-head">
+      <div class="fin-risk-head">
         <span class="muted small">Risk appetite</span>
-        <span class="pf-risk-name">{RISK_LABELS[level - 1]}</span>
+        <span class="fin-risk-name">{RISK_LABELS[level - 1]}</span>
       </div>
       <Segmented
         label="Risk appetite, 1 very conservative to 5 very aggressive"
@@ -24,7 +25,7 @@ export function RiskAppetite() {
         value={String(level)}
         onChange={(v) => act(cmd.setRiskAppetite, Number(v))}
       />
-      <div class="pf-risk-ends muted small" aria-hidden="true">
+      <div class="fin-risk-ends muted small" aria-hidden="true">
         <span>{RISK_LABELS[0]}</span>
         <span>{RISK_LABELS[RISK_LABELS.length - 1]}</span>
       </div>
