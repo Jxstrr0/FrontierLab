@@ -166,6 +166,18 @@ export interface OwnStock {
   ipoWithdrawn?: { week: Week; reason: string };
   /** Market step's event cursor: events of `week` already read (§19.5 shocks). */
   scan?: { week: Week; count: number };
+  /** Share buybacks, oldest first (§19.6a); BUYBACK.kept are kept. */
+  buybacks?: Buyback[];
+}
+
+/** One share buyback programme (§19.6a). */
+export interface Buyback {
+  week: Week;
+  shares: number;
+  /** Price paid per share, including the premium. */
+  price: Money;
+  /** Cash spent, fee included. */
+  cost: Money;
 }
 
 // ─── Stock market (SIMULATION §19.1, §19.7) ───────────────────────────────────
@@ -233,6 +245,8 @@ export interface MergerOffer {
   distressed: boolean;
   /** Why it was blocked or rejected, for the UI. */
   reason?: string;
+  /** Share of the price paid in your new shares, 0–1 (§19.8; absent = all cash). */
+  stockPct?: number;
 }
 
 /** Acquired branches converting to your brand (§19.8). */
@@ -252,6 +266,8 @@ export interface DealRecord {
   goodwill: Money;
   branches: number;
   distressed: boolean;
+  /** Part of the price paid in your new shares (§19.8). */
+  stockValue?: Money;
 }
 
 export interface MergersState {

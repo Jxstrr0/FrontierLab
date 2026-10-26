@@ -10,8 +10,9 @@ import { cityLabel } from './mergerRules';
 import { pushEvent } from './events';
 import { spend } from './ledger';
 import { listPrice } from './nominal';
-import { acceptChance, offerPremium, requiredPremium } from './mergerPricing';
+import { acceptChance, boardPrice, offerPremium, requiredPremium } from './mergerPricing';
 import { stream } from './rng';
+import { shareDealBlocker } from './shareDeals';
 import type { GameState, Integration, MergerOffer } from './state';
 
 /** Tick step 8 (corporate items): integrations, then M&A answers. */
@@ -63,15 +64,16 @@ function answer(state: GameState, offer: MergerOffer): void {
     pushLapsed(state, offer, bank?.name ?? 'The bank', offer.reason!);
     return;
   }
-  const plan = planDeal(state, bank, offer.pricePerShare);
+  const plan = planDeal(state, bank, offer.pricePerShare, offer.stockPct);
   const blocked = regulatorBlock(plan, cityLabel);
   if (blocked) {
     settle(offer, 'blocked', blocked);
     pushEvent(state, 'MERGER_BLOCKED', { rivalId: bank.id, bank: bank.name, reason: blocked }, 6);
     return;
   }
-  // The premium is measured against today's reference price (the market may have moved).
-  offer.premium = offerPremium(bank, offer.pricePerShare);
+  // The premium is measured against today's reference price (the market may have moved);
+  // a share-paid part counts at a discount (§19.8).
+  offer.premium = offerPremium(bank, boardPrice(offer.pricePerShare, plan.split.stockPct));
   const p = acceptChance(offer.premium, requiredPremium(bank));
   if (!stream(state, 'mergers').chance(p)) {
     const reason = `${bank.name}'s board turned down ${Math.round(offer.premium * 100)}% over the reference price.`;
@@ -79,20 +81,20 @@ function answer(state: GameState, offer: MergerOffer): void {
     pushEvent(state, 'MERGER_REJECTED', { rivalId: bank.id, bank: bank.name, reason }, 5);
     return;
   }
-  // Closing re-checks what the offer needed: cash and an allowed capital tier.
+  // Closing re-checks what the offer needed: cash, an allowed capital tier and the share cap.
   const tier = state.company.tier;
   const lapse =
     tier === 'restricted' || tier === 'critical'
       ? `The regulator stopped the closing at the ${tier} capital tier.`
       : state.company.cash < plan.cash
         ? 'You no longer had the cash to close.'
-        : undefined;
+        : shareDealBlocker(state, plan.split, offer.stockPct ?? 0);
   if (lapse) {
     settle(offer, 'lapsed', lapse);
     pushLapsed(state, offer, bank.name, lapse);
     return;
   }
-  offer.total = plan.cash;
+  offer.total = plan.cash + plan.split.stockValue;
   settle(offer, 'accepted');
   closeAcquisition(state, bank, plan, stream(state, 'mergers'));
 }

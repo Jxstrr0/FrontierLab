@@ -207,7 +207,7 @@ Eleven stages. Each one ends playable and deployed. A stage usually takes severa
 ---
 
 ## Backlog (post-launch ideas)
-- Share-for-share mergers and share buybacks
+- ~~Share-for-share mergers and share buybacks~~ (built 2026-10-26, SIMULATION §19.6a, §19.8)
 - FX between currencies
 - An investment banking division of your own
 - Branch renovations and relocations

@@ -183,6 +183,8 @@ export interface EventPayloads {
   /** A pending IPO no longer qualified at the quarter-end listing and was pulled. */
   IPO_WITHDRAWN: { bank: string; reason: string };
   SECONDARY_OFFERING: { bank: string; shares: number; price: Money; raised: Money };
+  /** Your bank bought back and retired its own shares (§19.6a). */
+  SHARE_BUYBACK: { bank: string; shares: number; price: Money; cost: Money };
   /** A non-bank listed company's quarterly results; `surprisePct` vs expectations. */
   COMPANY_EARNINGS: {
     companyId: Id;
@@ -209,6 +211,8 @@ export interface EventPayloads {
     branches: number;
     goodwill: Money;
     distressed: boolean;
+    /** Share of the price paid in your new shares (§19.8). */
+    stockPct?: number;
   };
   CONVERSION_DONE: { rivalId: Id; bank: string; buyer: string; branches: number };
   /** An accepted offer that could not close (cash or capital tier), or a target gone from the market. */

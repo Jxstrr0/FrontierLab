@@ -4,11 +4,40 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 **Current stage:** 10 — Art pass, onboarding, polish, launch (built and live; awaiting the owner's iPhone check). All ten roadmap stages are built. Still open: the owner's testing and tuning pass, an Add to Home Screen test on a real iPhone, and the Vault Street card on Kelbo.Website (in a separate session in that repo).
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `079f2df756abbe` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `03f5cbec77b72b` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-26 — Buybacks and share-for-share deals (v0.13.2, schema v38)
+
+**What you asked for:** the last of the three approved changes: share buybacks and share-for-share mergers, as late-game uses for cash and shares.
+
+**Share buybacks (SIMULATION §19.6a).** A new card on the investment bank's Equity tab once you are listed.
+- Buy back up to 10% of your shares at the market price plus 2%, plus a 1% broker's fee. The shares are retired.
+- The money leaves cash and retained earnings, like a dividend. Your stake goes up, and profits and votes are shared among fewer shares. The share price gets a lift of 1–4%.
+- One buyback a quarter. The public must keep at least 10% of the bank, and your capital must stay Adequate or better afterwards. The card says why when a buyback is blocked.
+
+**Share-for-share deals (§19.8).** Once listed, the M&A offer sheet has a "Paid in your shares" choice: Cash, 25%, 50%, 75% or All.
+- The share part is paid in new shares at your market price on closing day. The sheet shows the new shares, the dilution and your stake after.
+- Paying in shares saves cash and makes the regulator's capital test easier, since the new shares add capital.
+- The trade-offs: the target's board counts the share part at 95% of its value, one deal can add at most 50% new shares, and issuing them knocks 2–6% off your price.
+- If you personally own shares in the target, you are paid in the same mix, so part comes back as shares in your own bank.
+
+**Your save (schema v38):** loads as is; the new fields are optional.
+
+**Checks.**
+- `npm run lint`, all tests and `npm run build` pass. The new `tests/sim/buybacksShareDeals.test.ts` covers the buyback's books, cap table, price lift, quarterly limit, float cap and capital rule, and a half-share takeover that closes with the balance identity intact.
+- Checked at 390×844 in Chromium: the buyback card and the offer sheet's share choice lay out cleanly with no console errors.
+- **Balance:** unchanged. Both features are player choices, and the scripted strategies don't use them; the 260-week run is identical apart from the save version.
+- **Determinism snapshot** updated to `03f5cbec77b72b`. Only the schema number changed; with it set back to 37 the old snapshot matches.
+
+**Code map.** `src/sim/buybacks.ts`, `src/sim/shareDeals.ts`, the `buyBackShares` command in `src/sim/commands/marketsEquity.ts`, and `stockPct` on `offerMerger`. Constants `BUYBACK` and `SHARE_DEALS` are in `src/config/balance.ts`. The UI is in `src/app/investmentBank/BuybackCard.tsx` and `OfferSheet.tsx`.
+
+**Docs:** SIMULATION §19.6a and §19.8, SCREENS §12, DATA_MODEL §12 (v38), the DESIGN decision log, and the ROADMAP backlog.
+
+**Next:** all six approved ideas are built. Size-based rules on your bank stay off, as you asked.
 
 ### 2026-10-26 — A field that stays full: charters, rival mergers, rival ads and tech (v0.13.1, schema v37)
 

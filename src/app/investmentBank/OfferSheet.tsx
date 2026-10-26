@@ -1,15 +1,16 @@
 // Offer sheet (SCREENS §12 "Offer M&A sheet"): price per share with the
-// premium, shares to buy and total cost, available cash, the regulator's
-// pre-check (the same tests as next week's answer, without the board's roll),
-// and Offer merger.
+// premium, how much to pay in your own shares once listed (§19.8), shares to
+// buy and total cost, available cash, the regulator's pre-check (the same tests
+// as next week's answer, without the board's roll), and Offer merger.
 import { useState } from 'preact/hooks';
-import { MERGERS } from '../../config/balance';
+import { MERGERS, SHARE_DEALS } from '../../config/balance';
 import * as cmd from '../../sim/commands';
 import { referencePrice, requiredPremium } from '../../sim/mergerPricing';
 import { roundToStep } from '../../sim/math';
 import type { RivalBank } from '../../sim/state';
-import { Medallion, Row, Sheet, Stepper } from '../components';
-import { count, exactMoney, money, moneyStepper, signedPct } from '../format/format';
+import { Medallion, Row, Segmented, Sheet, Stepper } from '../components';
+import { count, exactMoney, money, moneyStepper, pct, signedPct } from '../format/format';
+import { FOUNDER_ID, sharesHeld } from '../../sim/shares';
 import { act, toast, useGame } from '../store';
 import { boardHint, referenceLabel } from './mnaSelectors';
 
@@ -24,12 +25,19 @@ export function OfferSheet(p: { bank: RivalBank; onClose: () => void }) {
   const max = Math.max(min, roundToStep(ref * hi, step));
   const start = roundToStep(ref * (1 + Math.max(0, requiredPremium(bank))), step);
   const [price, setPrice] = useState(Math.min(max, Math.max(min, start)));
-  const quote = cmd.mergerQuote(s, bank.id, price);
+  const [mix, setMix] = useState('0');
+  const listed = s.stock.status === 'public';
+  const stockPct = listed ? Number(mix) : 0;
+  const quote = cmd.mergerQuote(s, bank.id, price, stockPct);
   if (!quote) return null;
   const { plan } = quote;
+  const { split } = plan;
+  const out = s.company.sharesOutstanding;
+  const stakeAfter =
+    (sharesHeld(s, FOUNDER_ID) + split.founderNewShares) / Math.max(1, out + split.newShares);
   const perShare = (v: number) => exactMoney(v, sym);
   const offer = () => {
-    const r = act(cmd.offerMerger, bank.id, price);
+    const r = act(cmd.offerMerger, bank.id, price, stockPct);
     if (r.ok) {
       toast(`Offer sent to ${bank.name}. The answer arrives next week.`, 'good');
       p.onClose();
@@ -70,7 +78,30 @@ export function OfferSheet(p: { bank: RivalBank; onClose: () => void }) {
         {plan.personalShares > 0 && (
           <Row label="Your own shares (paid to you)" value={count(plan.personalShares)} />
         )}
-        <Row label="Total cost" value={money(plan.cash, sym)} strong />
+        {listed && <div class="muted small">Paid in your shares</div>}
+        {listed && (
+          <Segmented
+            label="Paid in your shares"
+            options={mixOptions()}
+            value={mix}
+            onChange={setMix}
+          />
+        )}
+        {split.stockValue > 0 && (
+          <>
+            <Row label="Paid in new shares" value={money(split.stockValue, sym)} />
+            <Row
+              label="New shares issued"
+              value={`${count(split.newShares)} (${pct(split.newShares / Math.max(1, out))})`}
+            />
+            <Row label="Your stake after" value={pct(stakeAfter, 1)} />
+          </>
+        )}
+        <Row
+          label={split.stockValue > 0 ? 'Paid in cash' : 'Total cost'}
+          value={money(plan.cash, sym)}
+          strong
+        />
         <Row
           label="Available cash"
           value={money(s.company.cash, sym)}
@@ -96,7 +127,14 @@ export function OfferSheet(p: { bank: RivalBank; onClose: () => void }) {
             ))}
           </ul>
         </section>
-        <p class="muted small">The answer arrives next week. Payment is in cash.</p>
+        <p class="muted small">
+          The answer arrives next week.{' '}
+          {split.stockValue > 0
+            ? `The board counts the share part at ${Math.round((1 - SHARE_DEALS.boardDiscount) * 100)}% of its value. New shares are issued at your price on closing.`
+            : listed
+              ? 'Payment is in cash.'
+              : 'Payment is in cash. Once listed, you can pay partly in shares.'}
+        </p>
         <button
           type="button"
           class="btn btn-primary btn-block"
@@ -109,4 +147,15 @@ export function OfferSheet(p: { bank: RivalBank; onClose: () => void }) {
       </div>
     </Sheet>
   );
+}
+
+/** Cash, then the share part in SHARE_DEALS.stockStep steps up to all shares. */
+function mixOptions(): { value: string; label: string }[] {
+  const step = SHARE_DEALS.stockStep;
+  const out: { value: string; label: string }[] = [{ value: '0', label: 'Cash' }];
+  for (let k = 1; k * step <= 1 + 1e-9; k++) {
+    const v = Math.min(1, k * step);
+    out.push({ value: String(v), label: v >= 1 ? 'All' : `${Math.round(v * 100)}%` });
+  }
+  return out;
 }
