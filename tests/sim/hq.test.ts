@@ -2,6 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import * as cmd from '../../src/sim/commands';
 import { advanceWeeks } from '../../src/sim/engine';
+import { OFFICE_LISTINGS } from '../../src/config/balance';
 import { balanceSheet } from '../../src/sim/balanceSheet';
 import {
   benefitWeeklyCost,
@@ -34,7 +35,7 @@ describe('office listings', () => {
   it('every city start has offices for lease and map sites on free tiles', () => {
     const s = newGame({ seed: 3, cityId: 'cal' });
     const listings = Object.values(s.world.officeListings);
-    expect(listings.length).toBeGreaterThanOrEqual(3);
+    expect(listings.length).toBe(OFFICE_LISTINGS.countBySize.M);
     const tiles = new Set(Object.values(s.world.lots).map((l) => `${l.tile.x},${l.tile.y}`));
     for (const l of [...listings, ...Object.values(s.world.sites)]) {
       const key = `${l.tile.x},${l.tile.y}`;

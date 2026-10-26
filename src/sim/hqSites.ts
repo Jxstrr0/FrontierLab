@@ -34,13 +34,8 @@ export function generateSites(state: GameState, cityId: string): void {
   const geo = geometryFor(state, cityId);
   const place = (district: DistrictId) => placeNear(city, geo, district, rng, used);
 
-  const total = OFFICE_LISTINGS.countBySize[city.size];
   let index = 0;
-  for (const [district, share] of Object.entries(OFFICE_LISTINGS.districts) as [
-    DistrictId,
-    number,
-  ][]) {
-    const count = Math.max(1, Math.round(total * share));
+  for (const [district, count] of listingsByDistrict(OFFICE_LISTINGS.countBySize[city.size])) {
     for (let i = 0; i < count; i++) {
       const tile = place(district);
       const floors = rng.int(...OFFICE_LISTINGS.floors);
@@ -87,6 +82,26 @@ export function generateSites(state: GameState, cityId: string): void {
     };
     state.world.sites[site.id] = site;
   }
+}
+
+/**
+ * Splits a city's office listings across districts by OFFICE_LISTINGS.districts
+ * shares, largest remainder first, so the total is exact even for 2 listings.
+ */
+export function listingsByDistrict(total: number): [DistrictId, number][] {
+  const shares = Object.entries(OFFICE_LISTINGS.districts) as [DistrictId, number][];
+  const counts = shares.map(([district, share]) => ({
+    district,
+    count: Math.floor(total * share),
+    remainder: total * share - Math.floor(total * share),
+  }));
+  let left = total - counts.reduce((sum, c) => sum + c.count, 0);
+  for (const c of [...counts].sort((a, b) => b.remainder - a.remainder)) {
+    if (left <= 0) break;
+    c.count += 1;
+    left -= 1;
+  }
+  return counts.map((c) => [c.district, c.count]);
 }
 
 function address(rng: Rng): string {

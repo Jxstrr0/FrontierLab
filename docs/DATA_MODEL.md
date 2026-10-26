@@ -330,7 +330,7 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 | Personal | `offerHome`, `rebuildHome`, `sellHome`, `buyCar`, `sellCar`, `placeBid`, `clearBid`, `appraiseCollectible`, `consignCollectible`, `withdrawConsignment`, `buyJet`, `sellJet`, `buyClub`, `sellClub`, `setKit`, `setKitSponsor`, `signPlayer`, `releasePlayer` |
 | Settings and saves | `setSettings`, `setFounderAvatar`, `moveHqTab`, `resetHqTabOrder`; saves are not commands: `saveToSlot`, `loadFromSlot` (`src/sim/save/storage.ts`), `exportCode`, `importCode` (`serialize.ts`) |
 
-## 12. Implemented so far (schema v26)
+## 12. Implemented so far (schema v27)
 
 `src/sim/state.ts` is the source of truth; this section records how it differs from the guide above. Later stages add the rest with a schema bump and a migration.
 
@@ -357,6 +357,7 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 - **Schema v21 adds** `executives.payReviewCadence` (`'quarterly' | 'annual'`), `executives.moraleTarget` (70 / 80 / 90) and `executives.brandTarget` (0.4–0.7): the delegation dials. Migration 20 → 21 sets quarterly, 70 and 0.5, what the switches always did.
 - **Schema v20 adds** `meta.logoShape` (`'round' | 'shield' | 'lozenge' | 'hex' | 'plaque' | 'rosette'`, the outline of the bank's mark chosen at New Game; `'round'` when none is chosen). Migration 19 → 20 sets `'round'`, so older banks keep the medallion they have always worn. The slot card record (`SaveMeta`) carries it too, optional for cards written before.
 - **Schema v26 removes** (content trim): `dealerDeals` and the `dealerFees` P&L line (dealer financing is gone), and the `hold` value of `ReoPool.mode` (now `'rent' | 'selling'`). Migration 25 → 26 deletes `dealerDeals`, folds `dealerFees` into `marketing` in the open ledger and every weekly snapshot, drops `DEALER_*` events from the log, turns held REO pools into rented ones, retypes funding lots and offers (`brokered` → `term_interbank`, `senior_bond` → `covered_bond`, with the new type's radar), and renames a running `grand_opening` agency package to `street_team`.
+- **Schema v27** (fewer offices, more buildings): no new fields. Migration 26 → 27 keeps every office listing you lease, deletes spare unleased listings beyond `OFFICE_LISTINGS.countBySize` (lowest numbers kept), and calls `generateInvestmentSites` again for each generated city to add property buildings up to `REAL_ESTATE.buildingsPerCity` from the city's `sites7` stream, so existing lots, listings and buildings stay put.
 - **Not yet present:** nothing from the v1 plan.
 - **Added fields:**
   - `ledger`: P&L lines and cash movements since the last weekly close, so commands between ticks land in the right week.

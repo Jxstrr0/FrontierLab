@@ -4,11 +4,19 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 **Current stage:** 10 — Art pass, onboarding, polish, launch (built and live; awaiting the owner's iPhone check). All ten roadmap stages are built. Still open: the owner's testing and tuning pass, an Add to Home Screen test on a real iPhone, and the Vault Street card on Kelbo.Website (in a separate session in that repo).
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `1d63a8b8c0bfbf` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `1257044853cb38` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-26 — Fewer offices, more buildings (v0.11.4, schema v27)
+- **Owner's ask:** fewer office spaces (you only need a handful), more rental properties, with the high-value ones in the major cities.
+- **What changes.** Each city now lists **2 / 2 / 3 / 4** offices for lease (S / M / L / XL) instead of 3 / 5 / 7 / 9. Property buildings go up to **6 / 9 / 12 / 15** per city instead of 4 / 6 / 8 / 10, and their size now depends on the city: up to 5,000 m² in a small city, 16,000 m² (about 20 storeys) in New York or London. Towers over 5,000 m² only stand in the financial, downtown and waterfront districts; buildings elsewhere stay low-rise. Rent per m² was already higher in the big cities, so the biggest values now sit there.
+- **Your save (schema v27):** every office you lease stays. Spare "For lease" listings are trimmed down to the new count (lowest numbers kept). Each city you've visited gains new buildings for sale from its own map stream, so nothing already on the map moves; the extra buildings show up at the city's next listings refresh (every 4 weeks).
+- **Code:** `OFFICE_LISTINGS.countBySize`, `REAL_ESTATE.buildingsPerCity`, `sqmRangeBySize` and `lowRiseMaxSqm` in `balance.ts`; `listingsByDistrict` (largest remainder) in `hqSites.ts`; `investmentSites.ts` sizes by city and tops up an existing city; migration 26 → 27.
+- **Checked:** lint, full test suite (new `tests/sim/migrateV26.test.ts`) and build clean. Determinism snapshot updated to `1257044853cb38` (new games place agencies and buildings differently). The layout-1 digests fixture was regenerated; a side check confirmed that old saves keep every lot and every non-property site exactly where it was.
+- **Docs:** SIMULATION §16.1 and §21.5, CONTENT §16, DATA_MODEL §12, DESIGN decision log.
 
 ### 2026-10-26 — Risk appetite moves to the Finance floor (v0.11.3)
 - **Owner's ask:** move risk appetite to the Finance floor.
