@@ -1,4 +1,5 @@
-// Branch commands: lease a storefront and build a branch on it, rename or close a branch.
+// Branch commands: lease a storefront and build a sales office on it (one per
+// city, at a size, C2a), grow it a size, rename or close it.
 import {
   BRANCH_NAME_MAX,
   CLOSE_RECOVERY,
@@ -20,10 +21,18 @@ import { isDeposit, isLoan } from '../../data/products';
 import { allProducts, productSpec } from '../products';
 import { assetBookValue } from '../balanceSheet';
 import { tileDistance } from '../citygen';
+import { cityDistanceKm } from '../geo';
 import { emptyBook } from '../branch/books';
 import { campaignEffects } from '../branch/marketing';
 import { branchTarget, productsTarget, ratesTarget, serviceTarget } from '../branch/ratings';
 import { marketWage, staffNeeded } from '../branch/staff';
+import {
+  MAX_OFFICE_SIZE,
+  officeInCity,
+  sizeMultOf,
+  sizeName,
+  slotMult,
+} from '../branch/officeSize';
 import { overallOf } from '../rivals';
 import { pushEvent } from '../events';
 import { newId } from '../ids';
@@ -35,16 +44,21 @@ import { seedCountryPrices } from './products';
 import type { Book, Branch, GameState } from '../state';
 import { fail, money, ok, type CommandResult } from './result';
 
-/** Itemized cost of a build on a lot: parts, lease deposit and the first week's rent. */
-export function buildQuote(state: GameState, lotId: string, build: BuildSpec) {
+/**
+ * Itemized cost of a build on a lot at a size (C2a): parts (interior slots ×
+ * the size multiplier), lease deposit and the first week's rent (both × it).
+ */
+export function buildQuote(state: GameState, lotId: string, build: BuildSpec, size = 0) {
   const lot = state.world.lots[lotId];
   // Catalogue prices at today's price list in the lot's country (§4.6).
   const parts = BUILD_SLOTS.reduce(
-    (sum, slot) => sum + listPrice(state, EQUIPMENT[build[slot]]?.cost ?? 0, lot?.cityId),
+    (sum, slot) =>
+      sum + listPrice(state, EQUIPMENT[build[slot]]?.cost ?? 0, lot?.cityId) * slotMult(slot, size),
     0,
   );
-  const deposit = lot?.deposit ?? 0;
-  const rent = lot?.weeklyRent ?? 0;
+  const mult = sizeMultOf(size);
+  const deposit = (lot?.deposit ?? 0) * mult;
+  const rent = (lot?.weeklyRent ?? 0) * mult;
   return { parts, deposit, rent, total: parts + deposit + rent };
 }
 
@@ -58,10 +72,13 @@ export function buildBlocker(
   lotId: string,
   build: BuildSpec,
   via?: 'coo',
+  size = 0,
 ): string | undefined {
   const lot = state.world.lots[lotId];
   if (!lot) return 'That storefront no longer exists.';
   if (lot.occupant) return 'This storefront is already taken.';
+  if (officeInCity(state, lot.cityId)) return 'You already have a sales office in this city.';
+  if (size < 0 || size > MAX_OFFICE_SIZE) return 'Pick a valid office size.';
   if (via === 'coo') {
     if (!state.executives.seats.coo) return 'You need a COO to open branches for you.';
   } else if (lot.cityId !== state.world.currentCityId) {
@@ -75,7 +92,7 @@ export function buildBlocker(
   if (tier === 'restricted' || tier === 'critical') {
     return `The regulator won't allow new branches at the ${tier} capital tier.`;
   }
-  const quote = buildQuote(state, lotId, build);
+  const quote = buildQuote(state, lotId, build, size);
   if (state.company.cash < quote.total) return `Not enough cash: you need ${money(quote.total)}.`;
   return undefined;
 }
@@ -94,12 +111,13 @@ export function defaultName(state: GameState, district: string, cityId?: string)
 /** Leases the storefront and builds a branch; it opens after a one-week fit-out (DESIGN §5.3). */
 export function buildBranch(
   state: GameState,
-  args: { lotId: string; build: BuildSpec; name?: string; via?: 'coo' },
+  args: { lotId: string; build: BuildSpec; name?: string; via?: 'coo'; size?: number },
 ): CommandResult<{ branchId: string }> {
-  const blocker = buildBlocker(state, args.lotId, args.build, args.via);
+  const size = args.size ?? 0;
+  const blocker = buildBlocker(state, args.lotId, args.build, args.via, size);
   if (blocker) return fail(blocker);
   const lot = state.world.lots[args.lotId]!;
-  const quote = buildQuote(state, args.lotId, args.build);
+  const quote = buildQuote(state, args.lotId, args.build, size);
   const id = newId(state, 'br');
   const country = countryOfCity(state, lot.cityId);
   const offices = EQUIPMENT[args.build.lobby]?.advisorOffices ?? 0;
@@ -116,7 +134,8 @@ export function buildBranch(
     builtDay: state.clock.day,
     status: 'fitout',
     build: { ...args.build },
-    lease: { weeklyRent: lot.weeklyRent, deposit: lot.deposit },
+    size,
+    lease: { weeklyRent: quote.rent, deposit: quote.deposit },
     staff: {
       count: 0,
       target: 0,
@@ -185,7 +204,7 @@ export function buildBranch(
       id: newId(state, 'fa'),
       kind: fitout ? 'fitout' : 'equipment',
       slot,
-      cost: listPrice(state, item.cost, lot.cityId),
+      cost: listPrice(state, item.cost, lot.cityId) * slotMult(slot, size),
       lifeWeeks: fitout ? FITOUT_LIFE_WEEKS : EQUIPMENT_LIFE_WEEKS,
       ageWeeks: 0,
       ownerId: id,
@@ -217,6 +236,85 @@ export function buildBranch(
   return ok({ branchId: id });
 }
 
+/** What growing an office one size costs: the added interior, deposit and rent. */
+export function upgradeQuote(state: GameState, branchId: string) {
+  const b = state.branches[branchId];
+  if (!b || b.size >= MAX_OFFICE_SIZE) return undefined;
+  const from = sizeMultOf(b.size);
+  const to = sizeMultOf(b.size + 1);
+  const ratio = to / from;
+  const parts = BUILD_SLOTS.reduce(
+    (sum, slot) =>
+      sum +
+      (slot === 'exterior'
+        ? 0
+        : listPrice(state, EQUIPMENT[b.build[slot]]?.cost ?? 0, b.cityId) * (to - from)),
+    0,
+  );
+  const deposit = b.lease.deposit * (ratio - 1);
+  const rent = b.lease.weeklyRent * ratio;
+  return {
+    size: b.size + 1,
+    name: sizeName(b.size + 1),
+    parts,
+    deposit,
+    rent,
+    total: parts + deposit,
+  };
+}
+
+/** Why an office can't grow a size now, or undefined if it can. */
+export function upgradeBlocker(state: GameState, branchId: string): string | undefined {
+  const b = state.branches[branchId];
+  if (!b || b.status !== 'open') return 'Only an open office can grow.';
+  if (b.converting) return 'Wait until the office has converted to your brand.';
+  const quote = upgradeQuote(state, branchId);
+  if (!quote) return 'This office is already the largest size.';
+  const tier = state.company.tier;
+  if (tier === 'restricted' || tier === 'critical') {
+    return `The regulator won't allow expansion at the ${tier} capital tier.`;
+  }
+  if (state.company.cash < quote.total) return `Not enough cash: you need ${money(quote.total)}.`;
+  return undefined;
+}
+
+/**
+ * Grows a sales office one size (C2a): more seats and staff to hire, a bigger
+ * lease and the added interior fit-out, at today's prices. It stays open.
+ */
+export function upgradeOffice(state: GameState, branchId: string): CommandResult<{ size: number }> {
+  const blocker = upgradeBlocker(state, branchId);
+  if (blocker) return fail(blocker);
+  const b = state.branches[branchId]!;
+  const quote = upgradeQuote(state, branchId)!;
+  const from = sizeMultOf(b.size);
+  const to = sizeMultOf(quote.size);
+  for (const slot of BUILD_SLOTS) {
+    if (slot === 'exterior') continue;
+    const item = EQUIPMENT[b.build[slot]];
+    if (!item || item.cost <= 0) continue;
+    const fitout = isFitout(slot);
+    state.company.fixedAssets.push({
+      id: newId(state, 'fa'),
+      kind: fitout ? 'fitout' : 'equipment',
+      slot,
+      cost: listPrice(state, item.cost, b.cityId) * (to - from),
+      lifeWeeks: fitout ? FITOUT_LIFE_WEEKS : EQUIPMENT_LIFE_WEEKS,
+      ageWeeks: 0,
+      ownerId: b.id,
+    });
+  }
+  postCash(state, -quote.parts, 'investing');
+  postCash(state, -quote.deposit, 'investing');
+  state.company.leaseDeposits += quote.deposit;
+  b.lease.deposit += quote.deposit;
+  b.lease.weeklyRent = quote.rent;
+  b.size = quote.size;
+  b.staff.target = Math.max(b.staff.target, staffNeeded(b));
+  pushEvent(state, 'OFFICE_GROWN', { branchId: b.id, city: b.cityId, size: quote.name }, 1, b.id);
+  return ok({ size: quote.size });
+}
+
 export function renameBranch(state: GameState, branchId: string, name: string): CommandResult {
   const branch = state.branches[branchId];
   if (!branch) return fail('That branch no longer exists.');
@@ -227,17 +325,28 @@ export function renameBranch(state: GameState, branchId: string, name: string): 
 }
 
 /** The nearest other branch in the same city, which takes over a closed branch's accounts. */
+/**
+ * Where a closing office's accounts go: the nearest other office in the city,
+ * or (C2a: one office per city) the office in the nearest other city.
+ */
 function successor(state: GameState, branch: Branch): Branch | undefined {
   const lot = state.world.lots[branch.lotId];
-  let best: Branch | undefined;
-  let bestD = Infinity;
-  for (const other of Object.values(state.branches)) {
-    if (other.id === branch.id || other.cityId !== branch.cityId) continue;
+  // Same-city offices first (by tiles), then other cities (by km).
+  const rank = (other: Branch): [number, number] => {
+    if (other.cityId !== branch.cityId) return [1, cityDistanceKm(branch.cityId, other.cityId)];
     const otherLot = state.world.lots[other.lotId];
-    const d = lot && otherLot ? tileDistance(lot, otherLot) : Infinity;
-    if (d < bestD || (d === bestD && best && other.id < best.id)) {
+    return [0, lot && otherLot ? tileDistance(lot, otherLot) : 0];
+  };
+  let best: Branch | undefined;
+  let bestR: [number, number] = [Infinity, Infinity];
+  for (const other of Object.values(state.branches)) {
+    if (other.id === branch.id || other.status === 'closed') continue;
+    const r = rank(other);
+    const closer = r[0] < bestR[0] || (r[0] === bestR[0] && r[1] < bestR[1]);
+    const tie = r[0] === bestR[0] && r[1] === bestR[1] && best && other.id < best.id;
+    if (closer || tie) {
       best = other;
-      bestD = d;
+      bestR = r;
     }
   }
   return best;
@@ -264,7 +373,7 @@ export function closeQuote(state: GameState, branchId: string) {
   const depositRefund = branch.lease.deposit - forfeit;
   const blocker =
     !target && hasLoans(state, branch)
-      ? 'This is your only branch in the city, so its loans have nowhere to go.'
+      ? 'This is your only sales office, so its loans have nowhere to go.'
       : null;
   return {
     targetId: target?.id,
@@ -294,8 +403,9 @@ function mergeBook(into: Book, from: Book, share: number): void {
 
 /**
  * Closes a branch: returns the lease deposit minus two weeks' rent plus 30% of
- * its equipment's book value. Loans move to the nearest branch in the city;
- * accounts and deposits follow with extra churn, or leave if there is none.
+ * its equipment's book value. Loans move to the nearest other office (in the
+ * city, else the nearest city); accounts and deposits follow with extra churn,
+ * or leave if there is none.
  */
 export function closeBranch(
   state: GameState,

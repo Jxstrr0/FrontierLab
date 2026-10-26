@@ -258,20 +258,21 @@ The same rules as ROADMAP: each stage ends playable and deployed, with green CI,
 - Money words stay bank-flavoured until C3, so nothing says "subscriptions" while interest is still being paid.
 - **Accept:** a 2-year run reads as an AI company everywhere except the product and Treasury screens. No balance drift. The snapshot changes only from names.
 
-### C2 — Campuses and city scale
-- **Build:**
-  - Campus sites (a few large lots per city, drawn with office and tall art)
-  - Build slots: exterior, workspace, sales floor, GPU hall, power
-  - New prices and fit-out time
-  - Whole-city catchment (§3.2)
-  - `CITY_MARKET` and `CITY_BRANCH_GUIDE` lowered
-  - Re-keyed thresholds and milestones (§3.9)
-  - Rival campus counts
-  - New balance targets in SIMULATION §25
-- **Accept:**
-  - The steady strategy runs 1–3 campuses per city.
-  - The first campus pays back in about the same game time as a branch did.
-  - The balance script stays within the new targets.
+### C2 — Sales offices, data centers and main offices (split into C2a–C2d)
+Follows the brief's map structure (1–2 main offices worldwide, one sales office per city, data centers anywhere), not the campus rows above. Each part ships on its own, playable and in balance.
+- **C2a — Sales offices (your side): done (v0.1.5, schema 2).**
+  - A sales office is a branch with a **size** (Starter ×1, Standard ×2.5, Large ×5, Flagship ×9), grown in place with `upgradeOffice` (Grow office on the office's Finance tab). Size multiplies seats, staff needed, ATM throughput, safe boxes, rent, deposit, overhead and the interior fit-out; the exterior stays one piece.
+  - One sales office per city: the build flow, the COO's expansion and the strategies refuse a second. The COO's Expansion and Open now grow your office where you have one (Grow now), and open one where you don't.
+  - Whole-city reach (SIMULATION §9.1): the city's median storefront traffic × min(size, `CITY_BRANCH_GUIDE`) × density × `OFFICE_TRAFFIC_MULT` (1.5), so an office reaches more of the city as it grows. Every rival lab in the city competes once, at its branches' average overall, until C2b gives rivals offices too.
+  - Buying a rival folds its branches into your office in each city (books merge, lots are freed); in a city without one, its biggest branch becomes your office.
+  - Closing an office moves its accounts to the office in the nearest city.
+  - Re-keyed thresholds: HQ requirements and the founder ramp count office units (Starter 1, Standard 2, Large 3, Flagship 4; ramp from 3 over 5 units; the assets rule kept); milestones 'First Flagship' and 'Five Flagships' replace 10 and 100 branches; the busiest-city story weighs offices by size; new §25 targets for a growing office and cities at year 10.
+  - Save migration: existing branches get size Starter. A second branch in a city from an old save keeps running; only new builds are refused.
+- **C2b — Rival sales offices:** each rival lab holds one office per city with a size. Expansion = enter a city or grow an office; closures, charters and rival mergers fold the same way. Map pins show one office per lab per city.
+- **C2c — Data centers:** a second building kind, on a free lot or a regional energy site, with GPU hall, power and cooling slots and an 8–16 week fit-out. In C2 it adds a Service (latency) lift to its city and nearby cities and counts toward milestones; its compute joins the pool in C4.
+- **C2d — Main offices and the screens:** HQ as the first main office, a second in another country adding floors; company-wide prices and marketing at HQ with per-city overrides; "branch" → "sales office" on screen; map layers Sales Offices / Data Centers / Energy Sites.
+- **Moved to C5:** the customer account screen (it needs the businesses and contracts built there).
+- **Accept (C2 as a whole):** a steady run opens several cities with one office each and grows them in size; the balance script stays inside the new targets.
 
 ### C3 — The money model (split into C3a–C3c)
 - **C3a:** new product catalog (Plans / API / Apps & Services) on the fee and volume book paths, and ARR books (§3.5).

@@ -5,6 +5,7 @@ import { MILESTONE_GOALS, MILESTONE_HQ_DEPTS } from '../config/balance';
 import { CITIES } from '../data/cities';
 import { MILESTONES } from '../data/milestones';
 import { balanceSheet, totalDeposits } from './balanceSheet';
+import { MAX_OFFICE_SIZE } from './branch/officeSize';
 import { pushEvent } from './events';
 import { yourClubs } from './franchise';
 import { deptDesks } from './hq';
@@ -12,6 +13,8 @@ import { netWorth } from './netWorth';
 import type { GameState } from './state';
 
 const openBranches = (s: GameState) => Object.values(s.branches).filter((b) => b.status === 'open');
+const flagships = (s: GameState) =>
+  openBranches(s).filter((b) => (b.size ?? 0) >= MAX_OFFICE_SIZE).length;
 const cityCount = (s: GameState) => new Set(openBranches(s).map((b) => b.cityId)).size;
 const countryCount = (s: GameState) =>
   new Set(openBranches(s).map((b) => CITIES[b.cityId]?.country)).size;
@@ -20,12 +23,13 @@ const REACHED: Record<string, (s: GameState) => boolean> = {
   first_branch: (s) => openBranches(s).length > 0,
   first_loan: (s) => s.underwriting.loansBooked > 0,
   first_profit: (s) => s.history.quarterly.some((q) => q.netIncome > 0),
-  ten_branches: (s) => openBranches(s).length >= MILESTONE_GOALS.branches,
+  // C2a: ids kept for saves; one office per city, so these now count Flagships.
+  ten_branches: (s) => flagships(s) >= 1,
   hq_staffed: (s) =>
     MILESTONE_HQ_DEPTS.every((d) => deptDesks(s, d) > 0 && (s.hq.coverage[d]?.kPrime ?? 0) >= 1),
   ipo: (s) => s.stock.status === 'public',
   first_acquisition: (s) => s.mergers.deals.length > 0,
-  hundred_branches: (s) => openBranches(s).length >= MILESTONE_GOALS.manyBranches,
+  hundred_branches: (s) => flagships(s) >= MILESTONE_GOALS.flagships,
   ten_cities: (s) => cityCount(s) >= MILESTONE_GOALS.cities,
   deposits_1b: (s) => totalDeposits(s) >= MILESTONE_GOALS.deposits,
   five_countries: (s) => countryCount(s) >= MILESTONE_GOALS.countries,

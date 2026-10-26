@@ -1,23 +1,33 @@
-// The COO's Expansion delegation (SIMULATION §17.2): opening branches for you
-// in the cities you have marked for growth, so the bank can keep spreading
+// The COO's Expansion delegation (SIMULATION §17.2): opening sales offices for
+// you in the cities you have marked for growth, so the lab can keep spreading
 // while you run the top of it. Each week it picks the growth city with the most
-// room, the busiest free storefront clear of your other branches, and your
-// usual fit-out, and builds when the cash left after the build still covers
-// EXEC_DELEGATION.expansionReserveWeeks of weekly costs. One build at most
-// every expansionEveryWeeks. `expansionPlan` is the same choice without acting,
-// for the COO's profile and the "Open a branch now" command.
+// room: one without an office gets one on the busiest free storefront with your
+// usual fit-out; one whose office is busy (C2a) gets it grown a size. It acts
+// when the cash left after still covers EXEC_DELEGATION.expansionReserveWeeks
+// of weekly costs, at most once every expansionEveryWeeks. `expansionPlan` is
+// the same choice without acting, for the COO's profile and "Open now".
 import { EXEC_DELEGATION as X } from '../config/balance';
 import { CITIES } from '../data/cities';
 import { REFERENCE_BUILDS, type BuildSpec } from '../data/equipment';
-import { cityBranchGuide, cityRoom } from './branch/cityMarket';
+import { cityRoom } from './branch/cityMarket';
+import { nextSizeAddsReach, officeInCity } from './branch/officeSize';
 import { tileDistance } from './citygen';
 import { weeklyCosts } from './cashCover';
-import { buildBlocker, buildBranch, buildQuote } from './commands/branches';
+import {
+  buildBlocker,
+  buildBranch,
+  buildQuote,
+  upgradeBlocker,
+  upgradeOffice,
+  upgradeQuote,
+} from './commands/branches';
 import { isGenerated } from './worldGen';
 import type { GameState, Lot } from './state';
 
 export interface ExpansionPlan {
   cityId: string;
+  /** Grow your office here a size (C2a) rather than open one. */
+  growId?: string;
   lot?: Lot;
   build?: BuildSpec;
   total: number;
@@ -48,14 +58,6 @@ export function growthCities(state: GameState): string[] {
 /** A city you could mark for growth: one you have been to, with storefronts. */
 export function canGrowIn(state: GameState, cityId: string): boolean {
   return isGenerated(state, cityId) && !CITIES[cityId]?.regional;
-}
-
-/** Your open or building branches in a city. */
-function branchesIn(state: GameState, cityId: string): number {
-  let n = 0;
-  for (const b of Object.values(state.branches))
-    if (b.cityId === cityId && b.status !== 'closed') n += 1;
-  return n;
 }
 
 /** Cash the COO keeps back: expansionReserveWeeks of weekly costs. */
@@ -101,11 +103,8 @@ export function usualBuilds(state: GameState): BuildSpec[] {
 export function expansionPlan(state: GameState, cityId: string, keepReserve = true): ExpansionPlan {
   const plan: ExpansionPlan = { cityId, total: 0 };
   if (!canGrowIn(state, cityId)) return { ...plan, blocker: 'You have not been to this city yet.' };
-  if (branchesIn(state, cityId) >= cityBranchGuide(cityId))
-    return {
-      ...plan,
-      blocker: 'This city already has about as many of your branches as it can use.',
-    };
+  const office = officeInCity(state, cityId);
+  if (office) return growPlan(state, office.id, keepReserve);
   if (keepReserve && cityRoom(state, cityId) < X.expansionMinRoom)
     return {
       ...plan,
@@ -132,6 +131,41 @@ export function expansionPlan(state: GameState, cityId: string, keepReserve = tr
   };
 }
 
+/** C2a: growing the city's office one size, once it is busy and the city has room. */
+function growPlan(state: GameState, branchId: string, keepReserve: boolean): ExpansionPlan {
+  const office = state.branches[branchId]!;
+  const plan: ExpansionPlan = { cityId: office.cityId, growId: branchId, total: 0 };
+  const quote = upgradeQuote(state, branchId);
+  if (!quote) return { ...plan, blocker: 'Your office here is already the largest size.' };
+  plan.total = quote.total;
+  if (keepReserve && !nextSizeAddsReach(office))
+    return { ...plan, blocker: 'A bigger office would reach no more of this city.' };
+  if (keepReserve && cityRoom(state, office.cityId) < X.expansionMinRoom)
+    return {
+      ...plan,
+      blocker: 'Little room left to grow here: most of the market already uses you.',
+    };
+  const blocker = upgradeBlocker(state, branchId);
+  if (blocker) return { ...plan, blocker };
+  const spare = state.company.cash - (keepReserve ? expansionReserve(state) : 0);
+  if (quote.total > spare)
+    return {
+      ...plan,
+      blocker: keepReserve
+        ? 'Not enough spare cash: the COO keeps 8 weeks of costs in reserve.'
+        : 'Not enough cash to grow the office.',
+    };
+  return plan;
+}
+
+/** Opens the planned office or grows it; true when it did. */
+export function carryOutPlan(state: GameState, plan: ExpansionPlan): boolean {
+  if (plan.blocker) return false;
+  if (plan.growId) return upgradeOffice(state, plan.growId).ok;
+  if (!plan.lot || !plan.build) return false;
+  return buildBranch(state, { lotId: plan.lot.id, build: plan.build, via: 'coo' }).ok;
+}
+
 /** Weekly routine: at most one build per expansionEveryWeeks, in the growth city with the most room. */
 export function cooExpansion(state: GameState): void {
   const ex = state.executives;
@@ -141,10 +175,7 @@ export function cooExpansion(state: GameState): void {
     (a, b) => cityRoom(state, b) - cityRoom(state, a) || a.localeCompare(b),
   );
   for (const cityId of cities) {
-    const plan = expansionPlan(state, cityId);
-    if (plan.blocker || !plan.lot || !plan.build) continue;
-    const r = buildBranch(state, { lotId: plan.lot.id, build: plan.build, via: 'coo' });
-    if (r.ok) {
+    if (carryOutPlan(state, expansionPlan(state, cityId))) {
       ex.lastExpansionWeek = state.clock.week;
       return;
     }

@@ -1,11 +1,11 @@
-// The scripted strategies from SIMULATION §25. Steady and aggressive expand
-// city by city once home runs out of good lots (expansion.ts); turtle and nohq
-// stay in the home city.
+// The scripted strategies from SIMULATION §25. Steady and aggressive grow their
+// offices when busy and open one office per city, city by city (expansion.ts);
+// turtle and nohq stay in the home city.
 import { forceRecession } from './stress';
 import { averageLot, bestLot, buildCost, followDefaults, openBranch } from './common';
 import { manageEquity } from './equity';
 import { hqReady, manageHq } from './hq';
-import { cityFull, hasRoom, nextExpansionLot } from './expansion';
+import { cityFull, growableOffice, hasRoom, nextExpansionLot } from './expansion';
 import type { Strategy } from './types';
 import * as cmd from '../../src/sim/commands';
 import type { GameState } from '../../src/sim/state';
@@ -27,10 +27,11 @@ function expand(
   mult: number,
   minCr: number,
   lending: boolean,
-  opts: { hq?: boolean; travel?: boolean } = {},
+  opts: { hq?: boolean; travel?: boolean; growCr?: number } = {},
 ): void {
-  const { hq = true, travel = true } = opts;
+  const { hq = true, travel = true, growCr = minCr } = opts;
   if (hq && !hqReady(state)) return;
+  if (growOffice(state, mult, growCr)) return;
   if (travel && cityFull(state) && state.company.capitalRatio <= minCr) return;
   if (!travel && !hasRoom(state, state.world.currentCityId)) return;
   const lot = travel ? nextExpansionLot(state) : bestLot(state);
@@ -38,6 +39,16 @@ function expand(
   if (state.company.cash > mult * buildCost(state, lot) && state.company.capitalRatio > minCr) {
     openBranch(state, lot, { lending, delegate: DELEGATE_OPS });
   }
+}
+
+/** Grows the busiest office a size when cash > mult × the cost and capital clears minCr (C2a). */
+function growOffice(state: GameState, mult: number, minCr: number, maxSize = Infinity): boolean {
+  const office = growableOffice(state);
+  if (office && (office.size ?? 0) >= maxSize) return false;
+  const quote = office ? cmd.upgradeQuote(state, office.id) : undefined;
+  if (!office || !quote) return false;
+  if (state.company.cash <= mult * quote.total || state.company.capitalRatio <= minCr) return true;
+  return cmd.upgradeOffice(state, office.id).ok;
 }
 
 export const idle: Strategy = {
@@ -64,6 +75,9 @@ export const turtle: Strategy = {
     followDefaults(s);
     manageHq(s);
     for (const app of Object.values(s.loanDesk.applications)) cmd.declineApplication(s, app.id);
+    // A turtle stays a Standard office: a bigger one needs an HQ team its
+    // deposit-only income can't pay for.
+    if (hqReady(s)) growOffice(s, 2, 0, 1);
     const lot = hasRoom(s, s.world.currentCityId) ? bestLot(s) : undefined;
     if (lot && hqReady(s) && s.company.cash > 2 * buildCost(s, lot)) {
       const id = openBranchTurtle(s, lot.id);
@@ -90,7 +104,7 @@ export const aggressive: Strategy = {
     // Cheapest prices: savers get 0.5pp more, borrowers pay 0.5pp less.
     followDefaults(s, 0.005, -0.005);
     manageHq(s);
-    expand(s, 1.2, 0.085, true);
+    expand(s, 1.2, 0.085, true, { growCr: 0.075 });
   },
 };
 

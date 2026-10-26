@@ -1,5 +1,6 @@
 // Available branch location (SCREENS §3): what a lot offers (rent, traffic, who lives
 // and works nearby, the competition, an area map) and a Build branch button.
+import { sizeName } from '../../sim/branch/officeSize';
 import { CITIES } from '../../data/cities';
 import { SEGMENTS } from '../../data/types';
 import * as cmd from '../../sim/commands';
@@ -37,7 +38,7 @@ export function StorefrontPanel(p: { lotId: string }) {
   const advice =
     storefrontAdvice(lot, cityLots(s)) +
     (cover.full
-      ? ` ${cityName} is well covered already: another branch here would mostly split customers with your own. Another city may pay better.`
+      ? ` You already have your sales office in ${cityName}: grow it from its Finance tab, or open one in another city.`
       : '');
   // The cheapest build tells us whether any build is possible here right now.
   const blocker = cmd.buildBlocker(s, p.lotId, cheapestBuild());
@@ -98,8 +99,8 @@ export function StorefrontPanel(p: { lotId: string }) {
         <SectionTitle>Your lab in {cityName}</SectionTitle>
         <Card>
           <Row
-            label="Your branches here"
-            value={`${count(cover.ours)} of about ${count(cover.guide)}`}
+            label="Your sales office here"
+            value={cover.office ? sizeName(cover.office.size ?? 0) : 'None yet'}
           />
           <StatBar label="Market reached" value={cover.reach * 100} display={pct(cover.reach, 0)} />
         </Card>

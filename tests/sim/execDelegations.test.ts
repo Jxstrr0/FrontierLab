@@ -15,6 +15,7 @@ import {
   cooDivision,
   croAppetite,
 } from '../../src/sim/execDelegationsPeople';
+import { advanceWeeks } from '../../src/sim/engine';
 import { requiredStaff } from '../../src/sim/hq';
 import { refreshManagerPool } from '../../src/sim/people';
 import type { GameState } from '../../src/sim/state';
@@ -149,23 +150,39 @@ describe('COO Expansion (§17.2)', () => {
     return s;
   };
 
-  it('builds in a growth city when the spare cash allows, once per cadence', () => {
+  it('grows your office in a growth city when the spare cash allows, once per cadence', () => {
     const s = setup();
+    const office = Object.values(s.branches)[0]!;
+    while (office.status !== 'open') advanceWeeks(s, 1);
     cmd.setGrowthCity(s, 'cal', true);
+    const before = Object.keys(s.branches).length;
+    // C2a: one office per city, so the COO grows it a size rather than opening another.
+    cooExpansion(s);
+    expect(Object.keys(s.branches)).toHaveLength(before);
+    expect(office.size).toBe(1);
+    expect(s.executives.lastExpansionWeek).toBe(s.clock.week);
+    expect(s.events.log.find((e) => e.type === 'OFFICE_GROWN')).toBeDefined();
+    cooExpansion(s);
+    expect(office.size).toBe(1);
+    s.clock.week += EXEC_DELEGATION.expansionEveryWeeks;
+    cooExpansion(s);
+    expect(office.size).toBe(2);
+    expect(identityGap(s)).toBeLessThan(1);
+  });
+
+  it('opens an office in a growth city without one', () => {
+    const s = setup();
+    expect(cmd.travelTo(s, 'sas').ok).toBe(true);
+    cmd.setGrowthCity(s, 'sas', true);
+    delete s.executives.growthCities.cal;
     const before = Object.keys(s.branches).length;
     cooExpansion(s);
     expect(Object.keys(s.branches)).toHaveLength(before + 1);
-    expect(s.executives.lastExpansionWeek).toBe(s.clock.week);
-    const built = Object.values(s.branches).find((b) => b.status === 'fitout')!;
-    expect(built.cityId).toBe('cal');
+    const built = Object.values(s.branches).find((b) => b.cityId === 'sas')!;
+    expect(built.status).toBe('fitout');
     expect(
       s.events.log.find((e) => e.type === 'NEW_BRANCH' && e.payload.by === 'coo'),
     ).toBeDefined();
-    cooExpansion(s);
-    expect(Object.keys(s.branches)).toHaveLength(before + 1);
-    s.clock.week += EXEC_DELEGATION.expansionEveryWeeks;
-    cooExpansion(s);
-    expect(Object.keys(s.branches)).toHaveLength(before + 2);
     expect(identityGap(s)).toBeLessThan(1);
   });
 
@@ -210,9 +227,14 @@ describe('COO Expansion (§17.2)', () => {
     expect(cmd.cooOpenBranch(s, 'cal').ok).toBe(false);
     expect(cmd.setGrowthCity(s, 'tor', true).ok).toBe(false);
     hire(s, 'coo');
+    const office = Object.values(s.branches)[0]!;
+    while (office.status !== 'open') advanceWeeks(s, 1);
     s.world.currentCityId = 'tor';
+    // C2a: Calgary has your office, so Open now grows it.
+    const size = office.size;
     const r = cmd.cooOpenBranch(s, 'cal');
     expect(r.ok).toBe(true);
+    expect(office.size).toBe(size + 1);
     expect(identityGap(s)).toBeLessThan(1);
   });
 
