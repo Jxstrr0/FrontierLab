@@ -706,7 +706,7 @@ Levels 1–5 (Very conservative to Very aggressive):
 ### 17.2 Executives
 - **Skills:** Leadership, Expertise and Loyalty, each 0–100.
 - **Department multiplier:** `execMult = 0.9 + 0.25 × expertise/100` on the departments in their domain.
-- **Seats:** CEO (you), COO, CFO, CPO, CMO and CTO as in the original, plus CRO as a seventh and a Chief Real Estate Officer (CREO) as an eighth (2026-10-26). The Executive suite has 8 desks. The CREO lifts no department: its Expertise is pricing power on the buildings it manages (§21.2).
+- **Seats:** CEO (you), COO, CFO, CPO, CMO and CTO as in the original, plus CRO as a seventh and a Chief Infrastructure Officer (CIO; seat id `creo`, Vault Street's Chief Real Estate Officer) as an eighth (2026-10-26). The Executive suite has 8 desks. The CREO lifts no department: its Expertise is pricing power on the buildings it manages (§21.2).
 
 **Delegations:**
 

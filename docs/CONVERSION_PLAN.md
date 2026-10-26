@@ -71,7 +71,7 @@ Columns: the original game → Vault Street (today) → Frontier Lab (proposed).
 | Competitor store | Rival branch: reviews, rate sheet | **Rival campus**: reviews, price sheet, model card | |
 | Weekly results + newspaper | The Weekly Ledger (Banking tab) | The Weekly Inference, **AI** tab replaces Banking | Done in C1c |
 | Incidents | Robbery, breach, fraud ring, mis-selling, audit, walkout, flood, run… | Server-room break-in, key leak, abuse ring, capability over-claim, safety audit, walkout, data-centre heatwave, outage… | |
-| Executive floor | 6 seats + CRO + CREO | 6 seats + **CSO** + CREO | |
+| Executive floor | 6 seats + CRO + CREO | 6 seats + **CSO** + **CIO** (the CREO renamed, same job) | Chief Scientist planned as a ninth seat in C6 |
 | Investment floor, ventures | + venture debt | + **compute credits** (same mechanics as venture debt) | |
 | Conventions | Fintech conventions | **AI and developer conferences** | |
 | Real estate | + foreclosed homes (REO) | **Remove REO** | |
@@ -306,6 +306,7 @@ The same rules as ROADMAP: each stage ends playable and deployed, with green CI,
   - Data vendors on the map
   - Training runs using the development system
   - Rival model releases moving the market
+  - A ninth executive seat, the **Chief Scientist** (owner's ask, 2026-10-26): lifts the Research floor and training-run star odds, with delegation over routine training runs
 - **Accept:** a better model visibly lifts the Model rating, win rates and price headroom.
 
 ### C7 — Safety, regulation and valuation
@@ -351,4 +352,4 @@ All open questions were answered on 2026-10-26; the full list (A1–A12) and the
 - **A11 Licence revoked:** not game over; a long mandated pause, then a restart under strict watch, keeping the personal fortune.
 - **A12 Starting money:** a $10–15M seed round, all spendable.
 - **Added:** safety has upside (data-sensitive businesses prefer safe labs; a high tier fast-tracks approvals), models age against a rising frontier bar with a weekly benchmark leaderboard, and a talent war over named researchers (both in C6).
-- **Still open:** what "CREO" means in the brief's section 4.7 (probably the property executive from Vault Street).
+- **CREO (answered 2026-10-26):** it is Vault Street's Chief Real Estate Officer. It keeps the same job (rents and buying for owned buildings) under a new title, **Chief Infrastructure Officer (CIO)**; the stored seat id stays `creo`. "Chief Facilities Officer" was the first idea, but its short form would clash with the CFO. The owner also asked to look at an AI-specific executive: a **Chief Scientist** as a ninth seat, lifting the Research floor and training-run odds, is planned for C6 (it needs the training runs to have something to lift).
