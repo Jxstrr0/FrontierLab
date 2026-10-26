@@ -64,6 +64,16 @@ export const MARKETS_TEMPLATES = {
       b: 'Investors took up {shares} shares at {price}, a small discount to the last close.',
     },
   ],
+  SHARE_BUYBACK: [
+    {
+      h: '{bank} buys back {shares} shares',
+      b: 'The bank spent {cost} on its own stock at {price} a share and retired it.',
+    },
+    {
+      h: '{bank} returns {cost} to shareholders',
+      b: 'A buyback of {shares} shares at {price} leaves fewer shares to share the profits.',
+    },
+  ],
   FX_UP: [
     {
       h: 'The {currency} climbs {pct}',

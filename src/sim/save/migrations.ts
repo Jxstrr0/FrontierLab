@@ -596,6 +596,11 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     // optional fields and a 'merged' status; existing rivals need nothing.
     return s;
   },
+  37: (s) => {
+    // Share buybacks (§19.6a) and share-for-share deals (§19.8) add only
+    // optional fields: stock.buybacks, and stockPct/stockValue on offers and deals.
+    return s;
+  },
 };
 
 /** The rich list's fortune range up to schema v31. */

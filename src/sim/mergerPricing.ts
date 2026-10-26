@@ -1,7 +1,7 @@
 // Rival M&A prices (SIMULATION §19.8, §18.5): the reference price an offer's
 // premium is measured against, a distressed network's asking price, the shares
 // an offer has to buy, and the target's acceptance curve.
-import { MERGERS } from '../config/balance';
+import { MERGERS, SHARE_DEALS } from '../config/balance';
 import { dexp } from './detmath';
 import type { Rng } from './rng';
 import type { GameState, RivalBank } from './state';
@@ -46,6 +46,14 @@ export function referencePrice(bank: RivalBank): number {
 export function offerPremium(bank: RivalBank, pricePerShare: number): number {
   const ref = referencePrice(bank);
   return ref > 0 ? pricePerShare / ref - 1 : 0;
+}
+
+/**
+ * The price per share the target's board weighs (§19.8): the share-paid part
+ * counts at (1 − SHARE_DEALS.boardDiscount), since holders would rather have cash.
+ */
+export function boardPrice(pricePerShare: number, stockPct = 0): number {
+  return pricePerShare * (1 - stockPct * SHARE_DEALS.boardDiscount);
 }
 
 /** Target shares your company already holds (from the Market tab). */

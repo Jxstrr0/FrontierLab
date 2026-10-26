@@ -836,6 +836,16 @@ Levels 1–5 (Very conservative to Very aggressive):
 - Gross proceeds = n × price. Underwriting fee = bank fee %, default 4.55%. Capital raised = gross − fee.
 - Price impact: −2% to −5%, scaled by size up to the 25% cap per offering.
 
+### 19.6a Share buyback
+- A listed bank buys n shares back from the public (entered as a % of outstanding, up to `BUYBACK.maxPct` 10%) and retires them.
+- Price per share = current × 1.02 (`BUYBACK.premium`). Broker's fee = 1% of the gross (`BUYBACK.fee`). Cost = gross + fee.
+- **Books:** cash −cost (financing) and retained earnings −cost, like a dividend, so the balance identity holds. Shares outstanding and the public holder each fall by n; the founder's stake rises.
+- **Limits:**
+  - one programme per 13 weeks (`gapWeeks`)
+  - the public keeps at least 10% of the bank (`minFloat`): n ≤ (public − 0.10 × outstanding) / 0.90
+  - capital after the cost leaves CET1 must stay in the Adequate tier or better
+- Price impact: +1% to +4%, scaled by size up to the 10% cap. The weekly price then follows its target as usual, which now spreads earnings over fewer shares.
+
 ### 19.7 Trading
 - Two accounts: company (Investment floor or portfolio) and personal.
 - Commission 0.1%.
@@ -847,7 +857,11 @@ Levels 1–5 (Very conservative to Very aggressive):
   - `req` = 0.30 for healthy targets, 0.15 for Watch-tier targets, −0.20 for distressed sales.
   - Rejected offers can be raised once per 2 weeks (`MERGERS.retryWeeks`; was 4 until 2026-10-26).
 - **Regulator check (lightened 2026-10-26):** pro-forma CR ≥ 9% (`minProFormaCr`; was 10.5%, so the bank may sit in the Watch tier after a deal) AND your deposit share in every affected city ≤ 50% (`maxCityShare`; was 35%). A Lobbying "Fast-track merger" win relaxes the share limit to 65% (`fastTrackShare`; was 45%) for one deal. A **distressed sale** skips the share test altogether (`distressedShareExempt`): the regulator wants the failed network rescued, and the offer sheet says so in the share row.
-- **Payment:** cash only in v1.
+- **Payment:** cash, or once listed, a share-for-share mix: the offer sheet picks 0%, 25%, 50%, 75% or 100% paid in new shares (`SHARE_DEALS.stockStep`).
+  - **Share part:** S = stockPct × price × shares bought. New shares = S ÷ your share price on closing day, issued to the public; your own holding of the target is paid in the same mix, so its share part becomes founder shares.
+  - **Board:** the target weighs `boardPrice = P_offer × (1 − stockPct × 0.05)` (`boardDiscount`), so an all-share offer needs about 5% more on the price to land the same premium.
+  - **Books:** paid-in capital +S; goodwill = C + S + V − net assets. Pro-forma CET1 adds S, so paying in shares eases the capital test.
+  - **Limits:** one deal may issue at most 50% new shares (`maxNewSharePct`). The issue moves your price −2% to −6% by size up to that cap (`SHARE_DEALS.impact`).
 - **On close:**
   - Goodwill = price − target book equity (floored at 0; a negative difference is booked as a gain).
   - Books and wholesale funding merge.

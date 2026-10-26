@@ -58,6 +58,16 @@ export const MERGERS_TEMPLATES = {
       b: 'Shareholders take the cash, {price} in all. {n} branches start rebranding on Monday.',
     },
   ],
+  ACQUISITION_CLOSED_STOCK: [
+    {
+      h: '{bank} buys {target} in a {price} share deal',
+      b: "{target}'s shareholders take {bank} stock for part of the price. Its {n} branches rebrand over eight weeks.",
+    },
+    {
+      h: '{target} holders swap into {bank}',
+      b: 'The {price} takeover was paid partly in new {bank} shares, bringing {n} branches under one name.',
+    },
+  ],
   ACQUISITION_CLOSED_DISTRESSED: [
     {
       h: '{bank} rescues {target} network',

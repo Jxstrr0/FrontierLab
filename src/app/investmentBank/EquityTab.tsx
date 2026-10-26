@@ -1,10 +1,11 @@
 // Investment bank Equity tab (SCREENS §12): your shares at a glance, then
 // while private the private placement and IPO cards, and once listed the
-// secondary offering card.
+// secondary offering and share buyback cards.
 import { founderStake } from '../../sim/shares';
 import { Card, Row } from '../components';
 import { money, pct } from '../format/format';
 import { useGame } from '../store';
+import { BuybackCard } from './BuybackCard';
 import { IpoCard, PlacementCard, SecondaryCard } from './EquityCards';
 import { sharePrice } from './marketView';
 import './investmentBank.css';
@@ -30,7 +31,10 @@ export function EquityTab(p: { bankId: string }) {
         {listed && st.exchange && <Row label="Exchange" value={st.exchange} tone="dim" />}
       </Card>
       {listed ? (
-        <SecondaryCard bankId={p.bankId} />
+        <>
+          <SecondaryCard bankId={p.bankId} />
+          <BuybackCard />
+        </>
       ) : (
         <>
           <PlacementCard bankId={p.bankId} />

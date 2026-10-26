@@ -129,6 +129,19 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
           raised: m(p.raised),
         },
       });
+    case 'SHARE_BUYBACK':
+      return business({
+        key: 'SHARE_BUYBACK',
+        subject: `${bank}:buyback:${e.week}`,
+        icon: 'coin',
+        priority: P.company,
+        tokens: {
+          bank,
+          shares: grouped(num(p.shares)),
+          price: px(p.price),
+          cost: m(p.cost),
+        },
+      });
     case 'FX_MOVE': {
       const pct = num(p.pct);
       return markets({

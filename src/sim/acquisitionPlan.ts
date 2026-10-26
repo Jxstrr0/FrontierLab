@@ -6,8 +6,9 @@
 // cash it holds is R = D + E − L − X − LD, where X is corporate debt you owe it
 // (settled on closing) and LD the lease deposits on its storefronts. If R would
 // be negative the loans are marked down to fair value until it is zero, so the
-// net assets you take on equal its book equity. You pay C in cash and give up
-// any of its shares your company holds (V at market); goodwill = C + V − net
+// net assets you take on equal its book equity. You pay C in cash and S in new
+// shares (a listed bank's share-for-share part, shareDeals.ts) and give up any
+// of its shares your company holds (V at market); goodwill = C + S + V − net
 // assets, or a bargain gain when that is negative.
 import { MERGERS, STOCK_RISK_WEIGHT } from '../config/balance';
 import { ACQUIRED_LOAN_MIX } from '../data/mergers';
@@ -16,6 +17,7 @@ import { capitalSnapshot } from './capital';
 import { companySharesOf, sharesToBuy } from './mergerPricing';
 import { productSpec } from './products';
 import { securityPrice } from './securities';
+import { stockSplit, type StockSplit } from './shareDeals';
 import type { GameState, RivalBank } from './state';
 
 export interface CityShare {
@@ -35,6 +37,10 @@ export interface DealPlan {
   personalShares: number;
   /** Cash paid by the company, C (the personal holding's share goes to your own account). */
   cash: number;
+  /** The share-for-share part (§19.8): S = split.stockValue, paid in new shares. */
+  split: StockSplit;
+  /** Cash paid for your own holding of the target, into your personal account. */
+  personalCash: number;
   /** Market value of the company's holding given up, V. */
   holdingValue: number;
   deposits: number;
@@ -110,14 +116,23 @@ export function cityShares(state: GameState, bank: RivalBank): CityShare[] {
   });
 }
 
-export function planDeal(state: GameState, bank: RivalBank, pricePerShare: number): DealPlan {
+export function planDeal(
+  state: GameState,
+  bank: RivalBank,
+  pricePerShare: number,
+  stockPct = 0,
+): DealPlan {
   const companyShares = companySharesOf(state, bank.id);
   const personalShares = Math.min(
     state.market.holdings.personal[bank.id]?.shares ?? 0,
     bank.shares - companyShares,
   );
   const shares = sharesToBuy(state, bank.id);
-  const cash = pricePerShare * shares;
+  const price = pricePerShare * shares;
+  const personalValue = pricePerShare * personalShares;
+  const split = stockSplit(state, price, personalValue, stockPct);
+  const cash = price - split.stockValue;
+  const personalCash = personalValue * (1 - split.stockPct);
   const holdingValue = companyShares * securityPrice(state, bank.id);
 
   const deposits = bank.branches.reduce((s, b) => s + b.deposits, 0);
@@ -132,18 +147,19 @@ export function planDeal(state: GameState, bank: RivalBank, pricePerShare: numbe
   const loans = Math.min(bookLoans, Math.max(0, available));
   const reserves = Math.max(0, available - loans);
   const netAssets = loans + reserves + leaseDeposits - deposits + debtSettled;
-  const paid = cash + holdingValue;
+  const paid = cash + split.stockValue + holdingValue;
   const goodwill = Math.max(0, paid - netAssets);
   const gain = Math.max(0, netAssets - paid);
 
-  // Pro-forma capital (§15): CET1 = equity − goodwill − intangibles; cash and reserves carry no risk weight.
+  // Pro-forma capital (§15): CET1 = equity − goodwill − intangibles; cash and reserves carry
+  // no risk weight. New deal shares add their value to equity.
   const loansByProduct = splitByMix(loans, ACQUIRED_LOAN_MIX);
   let rwaAdded = -holdingValue * STOCK_RISK_WEIGHT;
   for (const [pid, amount] of Object.entries(loansByProduct)) {
     rwaAdded += amount * (PRODUCTS[pid]?.riskWeight ?? 1);
   }
   const snap = capitalSnapshot(state);
-  const cet1 = snap.cet1 + gain - goodwill;
+  const cet1 = snap.cet1 + split.stockValue + gain - goodwill;
   const proFormaCr = cet1 / Math.max(1, snap.rwa + rwaAdded);
 
   return {
@@ -154,6 +170,8 @@ export function planDeal(state: GameState, bank: RivalBank, pricePerShare: numbe
     companyShares,
     personalShares,
     cash,
+    split,
+    personalCash,
     holdingValue,
     deposits,
     loans,
