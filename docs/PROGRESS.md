@@ -10,6 +10,10 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-10-26 — No double-tap zoom or text selection on buttons (v0.10.16)
+- **Owner's ask:** on the iPhone home-screen app, stop double-tap zooming and stop button text getting highlighted while holding a button down.
+- `base.css` now sets `touch-action: manipulation` on the page (this turns off double-tap zoom but keeps pinch zoom for accessibility) plus `user-select: none` and `-webkit-touch-callout: none`, so a long press no longer selects text or opens the iOS copy/look-up menu. Text boxes (names, amounts, save codes) stay selectable so you can still edit and copy them. CSS only.
+
 ### 2026-10-25 — Branch counts on Growth cities (v0.10.15)
 - **Owner's ask:** show how many branches you already have in each city on the COO's Growth cities list.
 - Each city's hint now starts with your count there, e.g. "3 branches. Next: 622 Lantern Road, €320K" (or the reason nothing can be built). Branches being built count; closed ones don't, matching the city coverage check. UI only, no state or save change; SCREENS §10.1 updated.
