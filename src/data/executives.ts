@@ -94,6 +94,18 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
           'Below 8%, sells new shares to get back to 12%: a private placement while private, a secondary offering once listed. Never launches your IPO.',
       },
       {
+        id: 'bankInvests',
+        label: "Investing: the bank's money",
+        description:
+          "Every 4 weeks buys a stock, spread across the market by company size, and backs the best-scoring startup on the Investment floor's list. Sells stocks 25% under cost. Stocks stay under 5% of assets, startups under 3%, the capital ratio at 12% or more.",
+      },
+      {
+        id: 'privateInvests',
+        label: 'Investing: your money',
+        description:
+          'The same for your own account. Keeps a year of your salary and spends at most a quarter of the rest at a time.',
+      },
+      {
         id: 'dividends',
         label: 'Dividends',
         description: 'Proposes a dividend at each board meeting.',

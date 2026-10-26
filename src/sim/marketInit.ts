@@ -90,6 +90,7 @@ export function emptyExecutives(): ExecutivesState {
     moraleTarget: EXEC_DELEGATION.moraleTarget,
     brandTarget: EXEC_DELEGATION.brandTarget,
     occTargets: { company: EXEC_DELEGATION.occTarget, personal: EXEC_DELEGATION.occTarget },
+    trimmedStocks: { company: {}, personal: {} },
   };
 }
 

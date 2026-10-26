@@ -1,7 +1,7 @@
 // Executives (SIMULATION §17.2), tick step 8: candidate pools, weekly payroll
 // (P&L execPay, cash), equity grants (execGrants.ts), the delegations each
 // executive has switched on (execDelegations*.ts, payReviews.ts; the CREO's
-// rents in execDelegationsProperty.ts), the CFO and
+// rents in execDelegationsProperty.ts, the CFO's investing in execInvesting.ts), the CFO and
 // CRO's branch guidance (branchGuidance.ts) and resignations, which raise the
 // EXEC_POACHED incident. Hiring, firing and grants are player commands in
 // commands/executives.ts; seat lookups other systems read are in execSeats.ts.
@@ -13,6 +13,7 @@ import { cfoCapital, cfoShares } from './execDelegationsCapital';
 import { cooExpansion } from './execDelegationsGrowth';
 import { creoBankRents, creoPrivateRents } from './execDelegationsProperty';
 import { creoBankBuys, creoPrivateBuys } from './execBuying';
+import { cfoBankInvests, cfoPrivateInvests } from './execInvesting';
 import {
   cfoTreasury,
   cpoDevelopments,
@@ -46,6 +47,8 @@ const DELEGATIONS: [ExecSeat, string, (s: GameState) => void][] = [
   ['cfo', 'treasury', cfoTreasury],
   ['cfo', 'capital', cfoCapital],
   ['cfo', 'shares', cfoShares],
+  ['cfo', 'bankInvests', cfoBankInvests],
+  ['cfo', 'privateInvests', cfoPrivateInvests],
   ['cto', 'digital', ctoDigital],
   ['cpo', 'developments', cpoDevelopments],
   ['cpo', 'models', cpoModels],
