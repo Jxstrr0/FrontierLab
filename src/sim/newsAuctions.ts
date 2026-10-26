@@ -4,29 +4,14 @@
 // unmasks a fake.
 import { DAYS_PER_WEEK, NEWS_PRIORITY as P } from '../config/balance';
 import { dateOf } from './calendar';
-import { newsMoney } from './newsFormat';
+import { MONTH_NAMES, newsMoney } from './newsFormat';
 import { num, str, type NewsContext, type Story } from './newsStory';
 import type { GameEvent } from './state';
-
-const MONTHS = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];
 
 /** "18 March" for the day a sale week starts. */
 function saleDate(ctx: NewsContext, week: number): string {
   const d = dateOf(ctx.state.meta.startDate, week * DAYS_PER_WEEK);
-  return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]}`;
+  return `${d.getUTCDate()} ${MONTH_NAMES[d.getUTCMonth()]}`;
 }
 
 export function auctionStories(ctx: NewsContext): Story[] {

@@ -65,10 +65,10 @@ describe('chartered rivals (§18.7)', () => {
     if (next) expect(next.name).not.toBe(bank.name);
   });
 
-  it('migrates a v35 save unchanged', () => {
+  it('migrates a v36 save unchanged', () => {
     const s = newGame({ seed: 5, cityId: 'cal' });
     const raw = JSON.parse(JSON.stringify(s)) as GameState & { schemaVersion: number };
-    raw.schemaVersion = 35;
+    raw.schemaVersion = 36;
     const out = migrate(raw as never) as unknown as GameState & { schemaVersion: number };
     expect(out.schemaVersion).toBe(SCHEMA_VERSION);
   });

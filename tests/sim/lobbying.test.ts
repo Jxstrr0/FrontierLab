@@ -35,6 +35,9 @@ function tableBufferBill(s: GameState, weeks: number) {
     assetMarks: {},
     worldRecent: {},
     elections: {},
+    scheduled: [],
+    commodities: {},
+    archive: [],
   };
   s.news.desk.proposals.push({
     country: 'CA',

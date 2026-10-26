@@ -215,9 +215,9 @@ export interface RivalBank {
   cities: Id[]; branches: RivalBranch[]; cash: Money; equity: Money; capitalRatio: number;
   listed: boolean; ticker?: string; shares: number; price: Money; execs: { title: string; name: string }[];
   status: 'active'|'distressed'|'seized'|'acquired'|'merged'; priceLags: Record<string, { target: number; weeksLeft: number }>;
-  home?: CountryId[]; charteredWeek?: Week;      // chartered banks (v36)
-  mergedInto?: Id;                               // set with status 'merged' (v36)
-  campaigns?: Record<Id /*city*/, { boost: number; weeksLeft: number }>;   // rival ads (v36)
+  home?: CountryId[]; charteredWeek?: Week;      // chartered banks (v37)
+  mergedInto?: Id;                               // set with status 'merged' (v37)
+  campaigns?: Record<Id /*city*/, { boost: number; weeksLeft: number }>;   // rival ads (v37)
 }
 export interface RivalBranch {
   id: Id; lotId: Id; openedWeek: Week; quality: [Stars, Stars, Stars, Stars]; // rates, products, service, branch
@@ -336,7 +336,7 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 | Personal | `offerHome`, `rebuildHome`, `sellHome`, `buyCar`, `sellCar`, `placeBid`, `clearBid`, `appraiseCollectible`, `consignCollectible`, `withdrawConsignment`, `buyJet`, `sellJet`, `buyClub`, `sellClub`, `setKit`, `setKitSponsor`, `signPlayer`, `releasePlayer` |
 | Settings and saves | `setSettings`, `setFounderAvatar`, `moveHqTab`, `resetHqTabOrder`; saves are not commands: `saveToSlot`, `loadFromSlot` (`src/sim/save/storage.ts`), `exportCode`, `importCode` (`serialize.ts`) |
 
-## 12. Implemented so far (schema v36)
+## 12. Implemented so far (schema v37)
 
 `src/sim/state.ts` is the source of truth; this section records how it differs from the guide above. Later stages add the rest with a schema bump and a migration.
 
@@ -367,7 +367,7 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 - **Schema v28** (monthly results, longer conventions): `settings.weeklyResults` gains `'monthly'`; no new fields. Migration 27 → 28 stretches every convention run not yet over to `startWeek + CONVENTIONS.activeWeeks` and moves its exclusive startups' `round.closesWeek` with it.
 - **Schema v30** (the CREO's occupancy dials and Buying): `ExecutivesState.occTargets: { company, personal }`, each one of `EXEC_DELEGATION.occTargets` (default 1); the CREO seat gains delegations `bankBuys` and `privateBuys`. Migration 29 → 30 sets both dials to 100% and adds the two switches off for a seated chief and the seat's remembered switches (on for candidates, like any new hire), so nothing is bought until you switch it on.
 - **Schema v31** (the CFO's Investing): `ExecutivesState.trimmedStocks: { company, personal }`, each a map of listed company id → week the chief sold it at a loss (not bought back for `EXEC_DELEGATION.investCooldownWeeks`); the CFO seat gains delegations `bankInvests` and `privateInvests`. Migration 30 → 31 adds empty maps and the two switches off for a seated CFO and the seat's remembered switches (on for candidates).
-- **Schema v36** (a field that stays full, SIMULATION §18.7–18.9): `RivalBank` gains optional `home` and `charteredWeek` (chartered banks, ids `charterN`), `mergedInto` with the new status `'merged'` (bought by another rival), and `campaigns` (city → `{ boost, weeksLeft }`). Migration 35 → 36 changes nothing: every new field is optional. New events: `RIVAL_CHARTERED`, `RIVAL_MERGER`, `RIVAL_CAMPAIGN`, `RIVAL_APP_LAUNCH`, `RIVAL_GROWS_UP`. New RNG streams: `charters`, `rivalMergers`, `rivalAds`.
+- **Schema v37** (a field that stays full, SIMULATION §18.7–18.9): `RivalBank` gains optional `home` and `charteredWeek` (chartered banks, ids `charterN`), `mergedInto` with the new status `'merged'` (bought by another rival), and `campaigns` (city → `{ boost, weeksLeft }`). Migration 36 → 37 changes nothing: every new field is optional. New events: `RIVAL_CHARTERED`, `RIVAL_MERGER`, `RIVAL_CAMPAIGN`, `RIVAL_APP_LAUNCH`, `RIVAL_GROWS_UP`. New RNG streams: `charters`, `rivalMergers`, `rivalAds`.
 - **Schema v35** (price lists and growing cities): `CountryState.listIndex` (the price list, SIMULATION §4.6; steps to `nominal` at each year end) and the optional `CityState.grownLots` (storefronts added since generation, CONTENT §3; grown lots are `lot_{city}_gNNN`). Migration 34 → 35 sets every list to 1, so a long save's prices and rents catch up at its next year end. The new `CITY_GROWTH` event needs no state.
 - **Schema v33** (a growing world): `CountryState.nominal` (the nominal index, SIMULATION §4.6; 1 at the start) and the optional `richList.nominalRef` (the home index at the last ranking). Migration 32 → 33 sets every country's index to 1, so an older save starts growing from its current level. Six new milestone ids (`twenty_cities`, `ten_countries`, `ten_acquisitions`, `assets_100b`, `worth_10b`, `assets_1t`) catch up quietly on load; the new `RIVAL_CITY_ENTRY` event needs no state.
 - **Schema v34** (the Ledger's world beyond your bank, SIMULATION §24.1–24.3): `NewsDesk.worldRecent` (`${beat}:${country}` → week it last ran, for the World desk cooldown) and `NewsDesk.elections` (per country: `governing` party index into `PARTIES` and `nextWeek` of its vote). `LedgerTab` gains `'world'`. Migration 33 → 34 gives an existing desk empty maps; each country's first campaign is then scheduled on the next issue, staggered by country. A new RNG stream `politics` carries the bills and votes (split from `news`).
@@ -397,4 +397,4 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
   - `UnderwritingState.switching = { fromId, weeksLeft }` (the old model blending out) instead of `switchingTo`; `activeModelId` is the new model from the moment you switch.
   - Commands: `startDevelopment`, `cancelDevelopment`, `deleteProduct` (`commands/development.ts`); `buyBureauModel`, `commissionBureauModel`, `saveCustomModel`, `activateModel` (`commands/underwriting.ts`); `setApplyRatesToAll`, `setCompanyPrice`, `setCompanyOffered` (`commands/products.ts`).
 - **Saves:** `src/sim/save/serialize.ts` has `serialize`, `deserialize` (with migrations and a required-keys check), `checksum` (cyrb53) and `exportCode`/`importCode`. Save slots live in `src/sim/save/storage.ts`, their data store in `slotData.ts` (§10).
-
+- **Schema v36** (world calendar, commodities, archive; SIMULATION §24.4–24.6): `NewsDesk.scheduled` (`ScheduledStory[]`: stories written ahead for a week, a tournament's rounds or an expo's close), `NewsDesk.commodities` (weekly prices per commodity id, newest last, at most 53) and `NewsDesk.archive` (`ArchivedStory[]`: every fourth issue's lead story with week, date, tab, icon, headline, body and an optional `reprinted` flag). Migration 35 → 36 gives an existing desk empty ones. New RNG streams `commodities` and `reviews` (branch review cards, split from `news`).

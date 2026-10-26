@@ -188,6 +188,36 @@ export interface NewsDesk {
   worldRecent: Record<string, Week>;
   /** Elections (§24 Politics): each country's governing party (index in PARTIES) and next vote. */
   elections: Partial<Record<CountryId, { governing: number; nextWeek: Week }>>;
+  /** World calendar (§24.6): stories already written for a coming week (a tournament's rounds, an expo's close). */
+  scheduled: ScheduledStory[];
+  /** Commodities (§24.4): weekly prices per commodity id, newest last, at most a year and a week. */
+  commodities: Record<string, number[]>;
+  /** From the archive (§24.5): every fourth issue's lead story, kept for good. */
+  archive: ArchivedStory[];
+}
+
+/** A Ledger story written ahead for `week` (fields as a news Story). */
+export interface ScheduledStory {
+  week: Week;
+  key: string;
+  subject: string;
+  tab: LedgerTab;
+  icon: string;
+  priority: number;
+  group?: string;
+  tokens: Record<string, string>;
+}
+
+export interface ArchivedStory {
+  week: Week;
+  /** ISO date of the issue. */
+  date: string;
+  tab: LedgerTab;
+  icon: string;
+  headline: string;
+  body: string;
+  /** Set once the story has been reprinted, so it runs again at most once. */
+  reprinted?: boolean;
 }
 
 // ─── Competition tracker ──────────────────────────────────────────────────────

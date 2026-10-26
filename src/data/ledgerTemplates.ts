@@ -10,7 +10,9 @@ import { CAPITAL_TEMPLATES } from './ledgerTemplatesCapital';
 import { INVESTMENTS_TEMPLATES } from './ledgerTemplatesInvestments';
 import { EMPIRE_TEMPLATES } from './ledgerTemplatesEmpire';
 import { DESK_TEMPLATES } from './ledgerTemplatesDesk';
+import { CALENDAR_TEMPLATES } from './ledgerTemplatesCalendar';
 import { GLOBE_TEMPLATES } from './ledgerTemplatesGlobe';
+import { GLOBE_MORE_TEMPLATES } from './ledgerTemplatesGlobeMore';
 import { RIVAL_TEMPLATES } from './ledgerTemplatesRivals';
 import { WORLD_TEMPLATES } from './ledgerTemplatesWorld';
 
@@ -361,6 +363,8 @@ export const LEDGER_TEMPLATES = {
   ...INVESTMENTS_TEMPLATES,
   ...EMPIRE_TEMPLATES,
   ...GLOBE_TEMPLATES,
+  ...GLOBE_MORE_TEMPLATES,
+  ...CALENDAR_TEMPLATES,
   ...DESK_TEMPLATES,
 };
 
