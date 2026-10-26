@@ -18,6 +18,7 @@ import type { Branch, BranchPnl, GameState } from '../state';
 import type { CampaignEffects } from './marketing';
 import { managerOf } from './staff';
 import type { BranchWeek } from './week';
+import { sizeMult, slotMult } from './officeSize';
 
 /** Wages, manager, rent, campaigns, upkeep, overhead and ATM fees for the week. */
 export function addBranchCosts(
@@ -35,11 +36,13 @@ export function addBranchCosts(
   // Upkeep and overhead follow today's price list in the branch's country (§4.6).
   const level = listLevel(state, branch.cityId);
   for (const slot of BUILD_SLOTS) {
-    const cost = (EQUIPMENT[branch.build[slot]]?.cost ?? 0) * level;
+    const cost = (EQUIPMENT[branch.build[slot]]?.cost ?? 0) * level * slotMult(slot, branch.size);
     wk.equipment += (cost * (isFitout(slot) ? FITOUT_UPKEEP : EQUIP_MAINT)) / WEEKS_PER_YEAR;
   }
-  wk.overhead += BRANCH_OVERHEAD * (city?.costIndex ?? 1) * level;
-  wk.atmFees += (EQUIPMENT[branch.build.atm]?.atmProductivity ?? 0) * ATM_FEE.usage * ATM_FEE.fee;
+  const mult = sizeMult(branch);
+  wk.overhead += BRANCH_OVERHEAD * (city?.costIndex ?? 1) * level * mult;
+  wk.atmFees +=
+    (EQUIPMENT[branch.build.atm]?.atmProductivity ?? 0) * mult * ATM_FEE.usage * ATM_FEE.fee;
 }
 
 /** Records the branch P&L row and posts company lines. Funding credit/charge are internal and net out. */

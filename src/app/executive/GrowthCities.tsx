@@ -1,18 +1,20 @@
 // Growth cities on the COO's profile (SCREENS §10.1): every city you have been
-// to, with a switch for whether the Expansion delegation may build there and an
-// "Open a branch now" button that has the COO build their usual pick at once.
+// to, with a switch for whether the Expansion delegation may act there and an
+// "Open now" / "Grow now" button: the COO opens the city's sales office with
+// their usual pick, or grows the one there a size (C2a), at once.
 import { CITIES } from '../../data/cities';
 import * as cmd from '../../sim/commands';
 import { canGrowIn, expansionPlan } from '../../sim/execDelegationsGrowth';
 import type { GameState } from '../../sim/state';
 import { Toggle } from '../components';
 import { money } from '../format/format';
+import { officeInCity, sizeName } from '../../sim/branch/officeSize';
 import { act, toast } from '../store';
 
-/** Your branches in a city, open or being built (closed ones don't count). */
-function branchCount(s: GameState, cityId: string): number {
-  return Object.values(s.branches).filter((b) => b.cityId === cityId && b.status !== 'closed')
-    .length;
+/** What you have in a city: "No office yet" or "Standard office". */
+function officeLine(s: GameState, cityId: string): string {
+  const office = officeInCity(s, cityId);
+  return office ? `${sizeName(office.size)} office` : 'No office yet';
 }
 
 export function GrowthCities(p: { s: GameState }) {
@@ -29,24 +31,22 @@ export function GrowthCities(p: { s: GameState }) {
     <div class="growth">
       <h4 class="growth-title">Growth cities</h4>
       <p class="muted small exec-note">
-        Where the COO may open branches: any city you have visited. Open now builds their usual pick
-        straight away.
+        Where the COO may open a sales office, or grow the one there when it gets busy: any city you
+        have visited. The button acts straight away.
       </p>
       <ul class="growth-list">
         {cities.map((id) => {
           const plan = expansionPlan(s, id, false);
-          const ready = !plan.blocker && plan.lot;
-          const count = branchCount(s, id);
-          const have = `${count} ${count === 1 ? 'branch' : 'branches'}`;
+          const ready = !plan.blocker && (plan.lot || plan.growId);
+          const have = officeLine(s, id);
+          const next = plan.growId
+            ? `grow a size, ${money(plan.total, sym)}`
+            : `${plan.lot?.address ?? ''}, ${money(plan.total, sym)}`;
           return (
             <li key={id} class="growth-row">
               <Toggle
                 label={`${CITIES[id]?.name ?? id}${id === home ? ' (home)' : ''}`}
-                hint={
-                  ready
-                    ? `${have}. Next: ${plan.lot!.address}, ${money(plan.total, sym)}`
-                    : `${have}. ${plan.blocker}`
-                }
+                hint={ready ? `${have}. Next: ${next}` : `${have}. ${plan.blocker}`}
                 checked={!!s.executives.growthCities[id]}
                 onChange={(v) => act(cmd.setGrowthCity, id, v)}
               />
@@ -56,10 +56,16 @@ export function GrowthCities(p: { s: GameState }) {
                 disabled={!ready}
                 onClick={() => {
                   const r = act(cmd.cooOpenBranch, id);
-                  if (r.ok) toast(`Your COO is opening a branch in ${CITIES[id]?.name ?? id}.`);
+                  const city = CITIES[id]?.name ?? id;
+                  if (r.ok)
+                    toast(
+                      plan.growId
+                        ? `Your COO grew the ${city} office.`
+                        : `Your COO is opening a sales office in ${city}.`,
+                    );
                 }}
               >
-                Open now
+                {plan.growId ? 'Grow now' : 'Open now'}
               </button>
             </li>
           );

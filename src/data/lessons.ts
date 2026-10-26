@@ -150,11 +150,11 @@ export const CHAPTERS: Record<ChapterId, ChapterText> = {
     title: 'A second city',
     steps: [
       {
-        idle: 'This city is well covered. Tap the city name at the top to travel.',
+        idle: 'Our sales office covers this city. Tap the city name at the top to travel.',
         lines: {
           'travel-airport': 'Go to the airport to see where we can fly.',
           'hud-travel':
-            'This city is well covered: more branches here would mostly split our own customers. Tap the city name to travel.',
+            'One sales office covers a city, and we have ours here: grow it from its Finance tab. Tap the city name to travel.',
           'panel-close': CLOSE_FIRST,
         },
       },

@@ -10,6 +10,7 @@ import { Badge, Medallion, Segmented } from '../components';
 import { count, money, pct } from '../format/format';
 import { openPanel, useGame } from '../store';
 import { average, cityCoverage, cityLots } from './lotInfo';
+import { sizeName } from '../../sim/branch/officeSize';
 import { RivalSheet } from './RivalSheet';
 import './city.css';
 
@@ -58,8 +59,10 @@ export function CityList(p: { hideTitle?: boolean } = {}) {
           {count(rivals)} rivals
         </p>
         <p class="muted small">
-          Market reached {pct(cover.reach, 0)} · {count(cover.ours)} of about {count(cover.guide)}{' '}
-          branches
+          Market reached {pct(cover.reach, 0)} ·{' '}
+          {cover.office
+            ? `${sizeName(cover.office.size ?? 0)} sales office`
+            : 'No sales office yet'}
         </p>
         <Segmented label="Show storefronts" options={FILTERS} value={filter} onChange={setFilter} />
       </header>

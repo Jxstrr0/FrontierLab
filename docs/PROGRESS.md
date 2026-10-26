@@ -3,13 +3,32 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C1 done (v0.1.4, save schema 1): floors, executives, segments, campaigns, benefits, conferences, incidents, stock sector, map layers, rival labs, "the lab" wording and the newspaper. Next is C2 (main offices, sales offices and data centers). The owner's decisions are in the design brief and CONVERSION_PLAN §5.
+**Current stage:** C2a done (v0.1.5, save schema 2): one sales office per city, grown in place through four sizes. Before that, C1 (v0.1.4): floors, executives, segments, campaigns, benefits, conferences, incidents, stock sector, map layers, rival labs, "the lab" wording and the newspaper. Next is C2b, the rest of C2 (main offices and data centers). The owner's decisions are in the design brief and CONVERSION_PLAN §5.
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `0d03bb5a89221d` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `192038a7c018ae` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-26 — Stage C2a: one sales office per city (v0.1.5)
+
+**What you asked for:** "C2 is a go". C2 is big, so I split it into four parts (C2a–C2d, see CONVERSION_PLAN). This is the first.
+
+**What changed.**
+- **One sales office per city.** You can no longer put several branches in one city. You open one office there and **grow it**: Starter → Standard → Large → Flagship. The new "Office size" card on a branch's Finance tab shows the next size, what it costs (fit-out plus lease deposit) and the new weekly rent, with a **Grow office** button.
+- **Bigger office, bigger reach.** Each size reaches more of the city's customers, up to how big the city is. A small city gets nothing from a Flagship, and the game tells you so.
+- **HQ load counts office size.** A Standard office counts as two Starters when the game works out how many HQ staff you need.
+- **Taking over a rival** folds their branches into your office in that city, which grows it to hold them.
+- **Closing an office** moves its customers to your nearest other office: same city first, then the closest city.
+- **Milestones** are now First sales office, First Flagship and Five Flagships. The City list says "Large sales office" or "No sales office yet".
+- **Saves:** schema 1 → 2. Old saves load with every branch as a Starter office.
+
+**Balance.** Steady on seed 42: 20 cities and an IPO in week 235, with every target met. The median of seeds 1–20 is inside every checkpoint. Aggressive, turtle, nohq, stress and idle all pass. The turtle strategy (deposits only) went into the red once it could grow, so it now stops at a Standard office.
+
+**Checks.** `npm run lint`, all 862 tests and `npm run build` pass. The **determinism snapshot** moved from `0d03bb5a89221d` to `192038a7c018ae`. That change is intended: the scripted test game now grows its office instead of opening a second branch in the same city.
+
+**Next:** C2b.
 
 ### 2026-10-26 — The CREO becomes the CIO (v0.1.4)
 

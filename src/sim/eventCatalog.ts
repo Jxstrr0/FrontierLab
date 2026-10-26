@@ -12,6 +12,8 @@ export interface EventPayloads {
   /** Fit-out finished; the branch opened (engine.ts). */
   BRANCH_OPENED: { branchId: Id; name: string };
   BRANCH_CLOSED: { branchId: Id; name: string; movedTo?: string };
+  /** A sales office grew one size (commands/branches.ts, C2a). */
+  OFFICE_GROWN: { branchId: Id; city: Id; size: string };
   LOAN_BOOKED: { branchId: Id; business: string; amount: Money; rate: Rate };
   /** A Loan Desk loan of any size defaulted at or above the BIG_DEFAULT line. */
   BIG_DEFAULT: { business: string; sector: string; amount: Money; branchId?: Id };

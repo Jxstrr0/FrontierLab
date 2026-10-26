@@ -16,6 +16,7 @@ import { clamp, ema } from '../math';
 import { nominalIndex } from '../nominal';
 import type { Branch, GameState } from '../state';
 import { dpow, dtanh } from '../detmath';
+import { sizeMult } from './officeSize';
 
 /** The market teller wage in a city: base × wageIndex × the nominal index (§6, §4.6). */
 export function marketWage(state: GameState, cityId: string): number {
@@ -26,11 +27,11 @@ export function managerOf(state: GameState, branch: Branch) {
   return branch.managerId ? state.people.managers[branch.managerId] : undefined;
 }
 
-/** Teller stations plus advisor offices (§6.4). */
+/** (Teller stations plus advisor offices) × the office's size (§6.4). */
 export function staffNeeded(branch: Branch): number {
   const teller = EQUIPMENT[branch.build.teller];
   const lobby = EQUIPMENT[branch.build.lobby];
-  return (teller?.stations ?? 0) + (lobby?.advisorOffices ?? 0);
+  return Math.round(((teller?.stations ?? 0) + (lobby?.advisorOffices ?? 0)) * sizeMult(branch));
 }
 
 /** Skill target S* (§6.3). */
@@ -94,7 +95,8 @@ export function capacity(branch: Branch, campaignCapacity: number): number {
   const needed = staffNeeded(branch);
   const staffing = needed > 0 ? Math.min(1, branch.staff.count / needed) : 1;
   const base =
-    (teller?.stations ?? 0) * (teller?.perStation ?? 0) * staffing + (atm?.atmProductivity ?? 0);
+    ((teller?.stations ?? 0) * (teller?.perStation ?? 0) * staffing + (atm?.atmProductivity ?? 0)) *
+    sizeMult(branch);
   return (
     base *
     (CAPACITY_SKILL.base + (CAPACITY_SKILL.slope * branch.staff.skill) / 100) *

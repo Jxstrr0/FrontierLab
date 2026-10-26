@@ -112,6 +112,7 @@ export interface FixedAsset { id: Id; kind: 'fitout'|'equipment'|'officeFitout';
 
 export interface Branch {
   id: Id; cityId: Id; lotId: Id; name: string; openedWeek: Week; status: 'fitout'|'open'|'closed';
+  size: number;                       // C2a: 0 Starter, 1 Standard, 2 Large, 3 Flagship (OFFICE_SIZES)
   build: { exterior: Id; lobby: Id; teller: Id; vault: Id; atm: Id; ages: Record<string, number> };
   lease: { weeklyRent: Money; deposit: Money };
   staff: { count: number; target: number; wage: number; skill: Score; morale: Score; quitAccumulator: number };
@@ -318,7 +319,7 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 | Area | Commands |
 |---|---|
 | Game | `newGame`, `travelTo` (speed is UI clock state, `setSpeed` in `src/app/loop.ts`) |
-| Branches | `buildBranch` (leases and builds in one step), `renameBranch`, `closeBranch` |
+| Branches | `buildBranch` (leases and builds in one step; one office per city since C2a), `upgradeOffice` (grow a size), `renameBranch`, `closeBranch` |
 | Products and pricing | `setOffered`, `setPrice`, `setApplyRatesToAll`, `setCompanyPrice` |
 | Branch staff and marketing | `setStaffTarget`, `setWage`, `hireManager`, `fireManager`, `setManagerSalary`, `setDelegation`, `setCampaignLevel` |
 | Loan Desk | `decideApplication(id, 'approve', rate)`, `declineApplication` |
@@ -336,11 +337,13 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 | Personal | `offerHome`, `rebuildHome`, `sellHome`, `buyCar`, `sellCar`, `placeBid`, `clearBid`, `appraiseCollectible`, `consignCollectible`, `withdrawConsignment`, `buyJet`, `sellJet`, `buyClub`, `sellClub`, `setKit`, `setKitSponsor`, `signPlayer`, `releasePlayer` |
 | Settings and saves | `setSettings`, `setFounderAvatar`, `moveHqTab`, `resetHqTabOrder`; saves are not commands: `saveToSlot`, `loadFromSlot` (`src/sim/save/storage.ts`), `exportCode`, `importCode` (`serialize.ts`) |
 
-## 12. Implemented so far (schema v1)
+## 12. Implemented so far (schema v2)
 
 `src/sim/state.ts` is the source of truth; this section records how it differs from the guide above. Later stages add the rest with a schema bump and a migration.
 
 **Frontier Lab renumbering (stage C0, 2026-10-26):** the state below is Vault Street's final shape (its schema v38), renumbered as Frontier Lab schema 1. Vault Street's 37 migration steps were dropped, so the schema numbers and migrations mentioned in the entries below are history only.
+
+**Frontier Lab schema 2 (stage C2a, sales offices):** `Branch.size` (0–3: Starter, Standard, Large, Flagship; SIMULATION §6.4). Migration 1 → 2 sets `size = 0` on every branch. A save from before C2a may hold several branches in one city; they keep running, and the one-per-city rule only stops new builds. Event `OFFICE_GROWN { branchId, city, size }`.
 
 - **Present (Stages 1–3):** `meta`, `clock`, `rng`, `settings`, `world` (one country and one city in Stage 1), `company`, `branches`, `people` (managers only), `products.catalog`, `underwriting`, `treasury`, `loanDesk`, `rivals`, `reo`, `events` (`log`, `scheduled`), `history`, `milestones`, `flags`.
 - **Stage 4 (schema v5) adds:** `offices`, `departments`, `hq` (`ramp` and per-department `coverage`: `required`, `k`, `kPrime`, `eff`), `people.benefits`, `products.developments` and developed catalog entries, `underwriting.switching`, `treasury.lots`/`offers`/`offersRefreshWeek`, `marketing` (brand `campaigns`, agency `packages`, prestige `cityBonus`), `risk` (13 weeks of `losses` by product, regulator `reviews`), `world.officeListings` (office buildings for lease) and `world.sites` (credit bureaus and marketing agencies on the map). New P&L lines: `hqStaff`, `benefits`, `development`. Migration 4 → 5 adds them all and generates each city's listings and sites from the `sites:{cityId}` stream, so storefront lots don't move.

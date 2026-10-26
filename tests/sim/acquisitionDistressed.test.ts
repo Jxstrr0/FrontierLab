@@ -58,7 +58,8 @@ describe('distressed sales', () => {
     expect(seen.some((e) => e.type === 'ACQUISITION_CLOSED' && e.payload.distressed)).toBe(true);
     expect(seen.some((e) => e.type === 'RIVAL_NETWORK_SPLIT')).toBe(false);
     expect(s.mergers.deals[0]!.distressed).toBe(true);
-    for (const id of lots) expect(s.world.lots[id]!.occupant!.type).toBe('player');
+    // C2a: folded into your office (lot freed) or kept as your office in its city.
+    for (const id of lots) expect(s.world.lots[id]!.occupant?.type ?? 'player').toBe('player');
     // Bought below book: the bargain shows as a gain rather than goodwill.
     expect(s.company.goodwill).toBe(s.mergers.deals[0]!.goodwill);
   });

@@ -4,7 +4,8 @@ import { RIVAL_RADIUS } from '../../config/balance';
 import { DISTRICT_SPECS } from '../../data/districts';
 import { SEGMENT_SPECS } from '../../data/segments';
 import { SEGMENTS, type SegmentId } from '../../data/types';
-import { cityBranchGuide, cityReach } from '../../sim/branch/cityMarket';
+import { cityReach } from '../../sim/branch/cityMarket';
+import { officeInCity } from '../../sim/branch/officeSize';
 import { tileDistance } from '../../sim/citygen';
 import type { GameState, Lot } from '../../sim/state';
 
@@ -14,8 +15,6 @@ const HEAVY_ABOVE = 1.2;
 const LIGHT_BELOW = 0.8;
 const STEEP_ABOVE = 1.2;
 const CHEAP_BELOW = 0.8;
-/** Market reach at which the city reads as well covered. */
-const WELL_COVERED_REACH = 0.8;
 /** A segment must hold at least this share of the lot's mix to get a hint. */
 const HINT_MIN_SHARE = 0.3;
 /** Income index bands for the Low / Mid / High label. */
@@ -114,15 +113,13 @@ export function nearbyCompetition(s: GameState, lot: Lot) {
 }
 
 /**
- * How well your bank covers a city (SIMULATION §9.2): your branches against
- * the advice for a city its size, and the share of the city-wide customer pool
- * you already bank.
+ * How well your lab covers a city (SIMULATION §9.1–9.2): your sales office
+ * there, if any (one per city since C2a), and the share of the city-wide
+ * customer pool you already serve. `full` means a new office here is refused.
  */
 export function cityCoverage(s: GameState, cityId: string) {
-  const ours = Object.values(s.branches).filter(
-    (b) => b.cityId === cityId && b.status !== 'closed',
-  ).length;
-  const guide = cityBranchGuide(cityId);
+  const office = officeInCity(s, cityId);
+  const ours = office ? 1 : 0;
   const reach = cityReach(s, cityId);
-  return { ours, guide, reach, full: ours >= guide || reach >= WELL_COVERED_REACH };
+  return { office, ours, reach, full: ours > 0 };
 }

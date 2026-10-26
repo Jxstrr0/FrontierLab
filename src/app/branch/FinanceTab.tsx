@@ -10,6 +10,7 @@ import { BarChart, Card, Row, SectionTitle, Segmented, Sheet } from '../componen
 import { count, delta, figure, money, shortDate } from '../format/format';
 import { act, useGame } from '../store';
 import { CloseBranch } from './CloseBranch';
+import { GrowOffice } from './GrowOffice';
 import {
   branchBalances,
   dayOfWeek,
@@ -67,6 +68,8 @@ export function FinanceTab({ branch }: { branch: Branch }) {
         {bal.aum > 0 && <Row label="Assets under management" value={money(bal.aum, sym)} />}
         <Row label="Customers" value={count(bal.customers)} />
       </Card>
+
+      <GrowOffice branch={branch} />
 
       <div class="grid-2 br-footer">
         <button type="button" class="btn btn-secondary btn-block" onClick={() => setRenaming(true)}>

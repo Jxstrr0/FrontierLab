@@ -175,9 +175,11 @@ The §25 checkpoints are in start-of-game money: `npm run balance` deflates them
 - **Hiring:** `openPositions = targetStaff − staff`. Hires per week = `min(open, HIRE_BASE (1) + floor(2 × hrCoverage' × attraction))`, where `attraction = clamp(wage/marketWage, 0.7, 1.3) × benefitsAttraction`.
 
 ### 6.4 Capacity and waits
-- `staffNeeded = teller.stations + lobby.advisorOffices`
+**Office size (stage C2a).** Each city holds one sales office of yours, grown in place: `OFFICE_SIZES` = Starter ×1, Standard ×2.5, Large ×5, Flagship ×9 (`size` 0–3 on the branch, `src/sim/branch/officeSize.ts`). The size multiplier `sizeMult` scales seats (stations, advisor offices), staff needed, ATM throughput, safe deposit boxes, rent, lease deposit, overhead, and the cost and upkeep of every interior slot; the exterior is one piece at every size. `upgradeOffice` grows an open office one size: it pays the interior parts × (new mult − old mult) plus the extra lease deposit, multiplies the weekly rent by the ratio and raises the staff target.
+
+- `staffNeeded = round((teller.stations + lobby.advisorOffices) × sizeMult)`
 - `staffing = min(1, staff / staffNeeded)`
-- `C = (teller.stations × teller.productivity × staffing + atm.productivity) × (0.7 + 0.3 × skill/100) × (0.85 + 0.15 × morale/100) × campaignCapacity`. `C` is customer interactions per week.
+- `C = (teller.stations × teller.productivity × staffing + atm.productivity) × sizeMult × (0.7 + 0.3 × skill/100) × (0.85 + 0.15 × morale/100) × campaignCapacity`. `C` is customer interactions per week.
 - `visitRate = SERVICE_VISIT_RATE (0.03) × (1.2 − 0.1 × appRating)`. A better app means fewer branch visits.
 - `L = captured + visitRate × customers` (load)
 - `W = L / C` (wait index). Label it Short below 0.8, Busy from 0.8 to 1.1, and Long above 1.1.
@@ -242,7 +244,8 @@ Targets are computed each week. Displayed ratings follow them with `ema(rating, 
 ## 9. Demand and competition
 
 ### 9.1 Catchment
-- `population = footTraffic × CATCHMENT_MULT (1.0)` (tuned from 2.5 in Stage 1 so branches mature within about two years)
+- **Office reach (stage C2a):** `traffic = median storefront traffic in the city × min(sizeMult, CITY_BRANCH_GUIDE[size]) × density × OFFICE_TRAFFIC_MULT (1.5)` (`officeTraffic`). The office draws on the whole city, not its own lot: a Starter reaches about one and a half storefronts' worth, and each size reaches more until it matches the branch network the city used to support (a Flagship in a small city reaches no more than a Large: `nextSizeAddsReach`). Prospects (§9.2) and population read this `traffic` in place of `footTraffic`.
+- `population = traffic × CATCHMENT_MULT (1.0)` (tuned from 2.5 in Stage 1 so branches mature within about two years)
 - `penetration = customers / population`
 
 ### 9.2 Prospects
@@ -254,7 +257,7 @@ Targets are computed each week. Displayed ratings follow them with `ema(rating, 
 
 ### 9.3 Share
 - `A = (Overall/5)^2.2` for this branch.
-- **Competitors** are every branch (rival or your own) within RIVAL_RADIUS (12 tiles). Each gets weight `w_j = 1 / (1 + d_j/6)` and `A_j` computed from its own overall rating.
+- **Competitors (stage C2a):** with a city-wide reach there is no distance. Each active rival lab with branches in the city counts once, at weight 1 and `A_j` from the average overall rating of its branches there. (Before C2a: every branch within RIVAL_RADIUS, weighted `1 / (1 + d_j/6)`.)
 - **Incumbent baseline:** `A0 = city.incumbentStrength` (0.25–0.45). This stands for the city's big banks not drawn on the map.
 - `share = A / (A + Σ w_j A_j + A0)`
 
@@ -622,7 +625,8 @@ If Finance coverage' < 0.9, the newest `ceil((0.9 − k') × 10)` weeks show as 
 
 ### 16.3 Requirements
 - Per-department formulas are in CONTENT (Floors).
-- **Founder-mode ramp:** `ramp = (totalAssets ≥ $250M) ? 1 : clamp((branches − 2)/4, 0, 1)`.
+- **Founder-mode ramp:** `ramp = (totalAssets ≥ $250M) ? 1 : clamp((officeUnits − 3)/5, 0, 1)` (FOUNDER_RAMP).
+- **Office units (stage C2a):** every per-branch requirement and the ramp count office units, not offices: each office counts its size's `hqUnits` (Starter 1, Standard 2, Large 3, Flagship 4). A Flagship does far more business than a Starter but shares its back office, so it weighs on HQ like four Starters rather than nine.
 
 ### 16.4 Coverage
 - `staffEff = staff × (0.6 + 0.4 × skill/100) × (0.85 + 0.15 × morale/100) × execMult`
@@ -1033,6 +1037,8 @@ Run `npm run balance` with seed 42 and the start city Calgary, unless noted. Bra
 
 **Updated 2026-10-25 (cross-seed calibration):** the first-branch checkpoints describe a typical city, so they are judged on the median of 20 cities: `npm run balance -- --years 5 --seeds 1-20` runs steady once per seed, prints each seed's key numbers and checks every band against the median (`scripts/branchCheckpoints.ts`). One city's "average lot" can sit 30–40% above or below the median (seeds 7, 8 and 16 below; 14 and 17 above), which is the map doing its job, not drift. A single-seed run still prints its own first-branch checks for reference. The median city meets every band; its revenue and income keep climbing with deposits through years 2–3 ($101k/$40k at week 104, $112k/$46k at week 208). Since the city-wide pool (§9.2) the home city fills at about 7 branches, so the first branch levels off at about $100–105k revenue and $40–43k income, and one band ($95k+ / $38k+) applies from week 104.
 
+**Updated 2026-10-26 (stage C2a, sales offices):** a city now holds one office of yours, grown in place (§6.4), with reach that grows with its size (§9.1). The steady script grows its busiest office a size whenever the next size reaches more of the city, the city still has 20% room and cash is over 2× the cost, and opens an office in the next city otherwise. The first-office checkpoints therefore follow the home office as it grows rather than a single storefront that levels off: week 26 and its build and payback bands are unchanged, and the later bands were re-set from the 20-city median (week 52 $57.9M / 5,597 customers / $43k income; week 104 $128M / $268k / $96k; week 156 $194M / $395k / $134k; weeks 208–260 $244–269M / $517–520k / $180–191k; loans 68–71% of deposits, as an office's deposits outgrow its loan demand). Branch counts gave way to offices and cities: seed 42 reads 2 offices at year 2, 20 cities at year 10 with $26B nominal ($11.9B real) of assets, and lists in week 235. Aggressive grows its office down to a 7.5% capital ratio (its own opening bar stays 8.5%), so it runs at Restricted from year 3, as its row expects.
+
 **Note (Stage 5):** the branch checkpoints are a seed-42 reference and assume Expansion. With every country simulated, seed 42's path has a recession at weeks 97–134 and policy cuts to 1.5%, so week 156 reads about $90k revenue / $41k income (below band) before recovering inside it by week 208. Other seeds (e.g. 7, 99) already missed the first-branch checkpoints in Stage 4 because their median Midtown lot is weaker; a cross-seed calibration is open.
 
 **Note (Stage 6):** steady takes one private placement when capital binds and lists as soon as it's eligible: seed 42 lists in week 222, seed 7 in week 248, seed 99 in week 261 (years 5–6), with the founder keeping 60%. The IPO money lifts steady from 7 to about 44 branches in year 5. Acceptance test: `tests/sim/ipoAcceptance.test.ts`.
@@ -1044,13 +1050,14 @@ Run `npm run balance` with seed 42 and the start city Calgary, unless noted. Bra
 | First branch build + lease deposit (mid build, average lot) | $300k–$450k, leaving room for at most one more basic branch from the $900k start |
 | First branch weekly income turns positive | week 6–16 |
 | Branch at week 26 | deposits $15–30M; income positive |
-| Branch at week 52 | deposits $30–50M; loans 75–90% of deposits; customers 3,000–5,000; income +$20k–$40k/week [was $15k–$30k] |
+| Office at week 52 | deposits $35–80M; loans 65–90% of deposits; customers 3,500–8,000; income +$25k–$60k/week [was $30–50M, 75–90%, 3,000–5,000 and $20–40k before C2a] |
 | Mature branch (week 104+) | deposits $38–70M (organic chequing growth keeps it creeping up; in start-of-game money) [was $40–65M, then $40–70M until 2026-10-26]; loans 70–90% of deposits [was 75–90%]; revenue $85k–$150k/week from week 156, $80k+ at week 104 [was $110k+ from week 208, then $95k+ from week 156 until 2026-10-26, and $85k+ at week 104 until the price-list change of 2026-10-26, when the 20-city median read $84k there on main as well]; income +$32k–$70k/week from week 156, +$31k+ at week 104 [was +$45k+ from week 208, then +$38k+, then +$35k (+$33k at week 104) until the rival-competition change of 2026-10-26: chartered banks replace the rivals that fail in recessions, rivals advertise in your cities, and rivals ride out downturns instead of closing branches (§18.4), so the 20-city median first branch reads $32.6–35k from week 156 and $32.8k at week 104]. Since rivals learn (§18.3), a first branch the steady script never upgrades gives up about 1.5% of its deposits a year to them, which is where the 2026-10-26 lower edges come from (seed 42 reads $40.3M, $88k and $38k real at week 260 against $43.6M, $97k and a one-week default loss before). With fewer storefronts per city (CONTENT §3, 2026-10-25) rival branches stand closer to yours, so year 2 ramps a little slower. Since the city-wide customer pool (§9.2, 2026-10-25) the home city fills at about 7 branches by year 4, so the first branch levels off instead of climbing through years 4–5. Loan-ratio, revenue and income checkpoints in a recession or the 26 weeks after it read n/a |
+| Growing home office (C2a, from week 104) | week 104: deposits $70–180M, revenue $160–380k/week, income $55–140k/week; week 156: $110–260M, $250–520k, $85–190k; weeks 208–260: $140–360M, $320–720k, $110–260k; loans 65–90% of deposits. Replaces the mature-branch row above, kept for the record |
 | Payback of a mid build on an average lot | ≤ 40 weeks from opening |
-| Year 2 (steady) | 3–8 branches [was 4–8 until 2026-10-26: a balance sheet that grows with the economy (§4.6) binds capital a little sooner, and seed 42 reads 3]; HQ required; cash never < 0 |
+| Year 2 (steady) | 1–4 sales offices [3–8 branches before C2a; 4–8 before 2026-10-26]; HQ required; cash never < 0 |
 | Capital first binds (no raises) | years 1–3; private placements and the IPO are the intended growth fuel |
 | IPO eligible (steady) | years 3–6 |
-| Year 10 (steady) | 60–250 branches; total assets $6–40B [was 60–200; $8–40B] |
+| Year 10 (steady) | offices in 10–25 cities [60–250 branches before C2a]; total assets $6–40B [was 60–200; $8–40B] |
 | Year 15 (steady) | weekly revenue $20–80M; founder net worth $2–40B |
 | Annual loan loss rate | 0.4–1.0% of loans in Expansion; 1.2–2.5% in Recession |
 | Net interest margin | 3.0–5.0% [was 2.0–3.5%; even §12.1's own figures give about 4.7%] |
@@ -1068,9 +1075,9 @@ Run `npm run balance` with seed 42 and the start city Calgary, unless noted. Bra
 
 **Strategies** (`scripts/strategies/*.ts`):
 - `idle`: one branch, no further actions
-- `steady`: open a branch when cash > 2× build cost and CR > 12%; HQ floors staffed to 100%; appetite 3; default prices
+- `steady`: grow the busiest office a size, or else open an office in the next city, when cash > 2× the cost and CR > 12% (C2a); HQ floors staffed to 100%; appetite 3; default prices
 - `aggressive`
-- `turtle`: lending products off
+- `turtle`: lending products off; grows its one office to Standard at most (C2a: a bigger office needs an HQ team its deposit-only income can't pay)
 - `stress`: steady plus `forceRecessionAtWeek = 156`
 
 **Output:** a yearly table (branches, deposits, loans, equity, CR, NIM, loss rate, ROE, cash, net worth) plus a warning list for every out-of-range target.

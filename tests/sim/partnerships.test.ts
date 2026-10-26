@@ -194,21 +194,21 @@ describe('payroll partnerships', () => {
     expect(identity(s)).toBeLessThan(1);
   });
 
-  it('releases on request and moves to another branch when the host closes', () => {
+  it('releases on request and runs off when the host office closes', () => {
     const { s, branchId, employer, university } = setup();
-    // Any free lot: rivals often hold every downtown corner.
-    const other = openScriptedBranch(s);
+    // C2a: one office per city, so the other office is in Saskatoon and can't host Calgary sites.
+    expect(cmd.travelTo(s, 'sas').ok).toBe(true);
+    openScriptedBranch(s);
     advanceWeeks(s, 2);
     const p = sign(s, employer, branchId);
     const q = sign(s, university, branchId, 'student');
     advanceWeeks(s, 10);
-    expect(cmd.closeBranch(s, branchId).ok).toBe(true);
-    advanceWeeks(s, 1);
-    expect(p.hostBranchId).toBe(other);
-    expect(p.status).toBe('active');
     expect(cmd.releasePartnership(s, q.id).ok).toBe(true);
     expect(q.status).toBe('runoff');
     expect(cmd.releasePartnership(s, q.id).ok).toBe(false);
+    expect(cmd.closeBranch(s, branchId).ok).toBe(true);
+    advanceWeeks(s, 1);
+    expect(p.status).toBe('runoff');
     advanceWeeks(s, 2);
     expect(identity(s)).toBeLessThan(1);
   });

@@ -8,7 +8,15 @@ import { SCHEMA_VERSION } from '../state';
 
 type RawSave = Record<string, unknown> & { schemaVersion: number };
 
-export const migrations: Record<number, (s: RawSave) => RawSave> = {};
+export const migrations: Record<number, (s: RawSave) => RawSave> = {
+  // 1 → 2 (stage C2a): branches become sales offices with a size; every
+  // existing one starts at Starter. A second branch in a city keeps running.
+  1: (s) => {
+    const branches = (s.branches ?? {}) as Record<string, Record<string, unknown>>;
+    for (const b of Object.values(branches)) if (b.size === undefined) b.size = 0;
+    return s;
+  },
+};
 
 /** Upgrades a raw save to the current schema, or throws if it can't. */
 export function migrate(raw: RawSave): RawSave {
