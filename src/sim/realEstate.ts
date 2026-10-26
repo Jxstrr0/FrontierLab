@@ -1,16 +1,27 @@
 // Owned buildings and listings, tick step 8 (SIMULATION §21.1–21.2, §21.4).
 // Each week: values follow the country's cre (company revaluations post to
-// propertyGains through withAssetMarks), occupancy eases toward the level the
-// rent supports, rent revenue, maintenance and vacancy cost are booked (company
-// buildings in the P&L, private ones in personal cash), For Sale buildings that
-// reach their sale week are sold, and due cities refresh their listings.
+// propertyGains through withAssetMarks), each building's market rent eases
+// toward today's (base × cre/100), occupancy eases toward the level the rent
+// supports (a managing CREO's pricing power counted), rent revenue, maintenance
+// and vacancy cost are booked (company buildings in the P&L, private ones in
+// personal cash), For Sale buildings that reach their sale week are sold, and
+// due cities refresh their listings.
 import { REAL_ESTATE } from '../config/balance';
 import { pushEvent } from './events';
+import { rentPricingPower } from './execSeats';
 import { earn, postCash, postPnl, spend } from './ledger';
-import { ema } from './math';
+import { clamp, ema } from './math';
 import { withAssetMarks } from './portfolio';
 import { markListings, refreshListings } from './propertyListings';
-import { cityCre, estimateValue, occupancyTarget, propertyWeek } from './propertyMath';
+import {
+  baseRentFor,
+  cityCre,
+  estimateValue,
+  marketRentNow,
+  occupancyTarget,
+  propertyWeek,
+  rentBounds,
+} from './propertyMath';
 import { stream } from './rng';
 import type { GameState, Property } from './state';
 
@@ -21,7 +32,9 @@ const byId = (state: GameState): Property[] =>
 export function runRealEstate(state: GameState): void {
   withAssetMarks(state, () => {
     for (const p of byId(state)) {
-      p.value = estimateValue(p.sqm, p.marketRent, cityCre(state, p.cityId));
+      const site = state.world.sites[p.id];
+      const base = site ? baseRentFor(site) : p.marketRent;
+      p.value = estimateValue(p.sqm, base, cityCre(state, p.cityId));
     }
   });
   for (const p of byId(state)) runProperty(state, p);
@@ -35,9 +48,18 @@ export function runRealEstate(state: GameState): void {
   markListings(state);
 }
 
-/** §21.2: occupancy EMA, then this week's rent, maintenance and vacancy cost. */
+/**
+ * §21.2: market rent eases toward today's, the owner's rent stays inside its
+ * range of the new market, occupancy eases toward what the rent supports, then
+ * this week's rent, maintenance and vacancy cost.
+ */
 function runProperty(state: GameState, p: Property): void {
-  p.occupancy = ema(p.occupancy, occupancyTarget(p.rent, p.marketRent), REAL_ESTATE.occEma);
+  const site = state.world.sites[p.id];
+  if (site) p.marketRent = ema(p.marketRent, marketRentNow(state, site), REAL_ESTATE.rentEma);
+  const { min, max } = rentBounds(p.marketRent);
+  p.rent = clamp(p.rent, min, max);
+  const target = occupancyTarget(p.rent, p.marketRent, rentPricingPower(state, p.owner));
+  p.occupancy = ema(p.occupancy, target, REAL_ESTATE.occEma);
   const wk = propertyWeek(p);
   if (p.owner === 'company') {
     earn(state, 'rentalIncome', wk.revenue);

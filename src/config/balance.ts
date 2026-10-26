@@ -1415,7 +1415,11 @@ export const EXEC_PAY = {
  * brand awareness near brandTarget (± brandSlack) within brandBudgetShare of
  * revenue. CRO: every croEveryWeeks weeks, lowers appetite when CR < croMinCr or
  * the loss rate > croMaxLoss, raises it when CR ≥ croRaiseCr and the loss rate ≤
- * croRaiseLoss, up to croMaxAppetite.
+ * croRaiseLoss, up to croMaxAppetite. CREO (Chief Real Estate Officer):
+ * every rentEveryWeeks weeks, Rents sets each managed building's rent to the
+ * highest level that still fills it (propertyMath.bestRent); tenants of a
+ * managed building accept rent up to × (1 + rentPricingPower × expertise/100)
+ * over market with no loss of occupancy (§21.2).
  */
 export const EXEC_DELEGATION = {
   cooDelegation: { staffing: true, products: true, marketing: true, troubles: true, loans: true },
@@ -1466,6 +1470,9 @@ export const EXEC_DELEGATION = {
   expansionSpacing: 12,
   /** COO Company troubles: option error shrinks with the COO's expertise like a manager's skills. */
   troublesError: 0.5,
+  /** CREO Rents (§21.2): review cadence and the pricing power a 100-expertise chief brings. */
+  rentEveryWeeks: 4,
+  rentPricingPower: 0.1,
 } as const;
 
 /**
@@ -1858,6 +1865,12 @@ export const REAL_ESTATE = {
   occMin: 0.3,
   occMax: 0.98,
   occEma: 0.06,
+  /**
+   * §21.2: an owned building's market rent eases toward the district rent ×
+   * city rentIndex × cre/100 by rentEma a week (half-life about 14 weeks), so
+   * values move with the property cycle first and rents follow months later.
+   */
+  rentEma: 0.05,
   /** Maintenance = size × marketRent × maintenance / 52; vacancy cost = size × (1 − occ) × vacancyPerSqm / 52. */
   maintenance: 0.55,
   vacancyPerSqm: 2,

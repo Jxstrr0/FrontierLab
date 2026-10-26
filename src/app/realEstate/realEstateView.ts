@@ -3,7 +3,7 @@
 // panel's list of company buildings and each city's foreclosed homes.
 import { REAL_ESTATE } from '../../config/balance';
 import { CITIES } from '../../data/cities';
-import { marketRentFor, propertyWeek } from '../../sim/propertyMath';
+import { marketRentNow, propertyWeek } from '../../sim/propertyMath';
 import { reoWeek } from '../../sim/reo';
 import type { GameState, Property, PropertyListing, ReoPool, Site } from '../../sim/state';
 
@@ -25,7 +25,8 @@ export function propertyView(s: GameState, siteId: string): PropertyView | undef
   if (property) return { kind: 'owned', site, property };
   const listing = s.realEstate.listings[siteId];
   const refreshIn = weeksToRefresh(s, site.cityId);
-  if (listing) return { kind: 'listed', site, listing, marketRent: marketRentFor(site), refreshIn };
+  if (listing)
+    return { kind: 'listed', site, listing, marketRent: marketRentNow(s, site), refreshIn };
   return { kind: 'none', site, refreshIn };
 }
 

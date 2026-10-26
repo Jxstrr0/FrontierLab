@@ -1,13 +1,14 @@
 // Read-only views of the executive seats (SIMULATION §17.2) that other systems
 // consult: who sits where, whether a delegation is on, the department
-// multiplier execMult, the CTO's expertise, the executive market salary and the
-// weekly resignation chance. No mutation here, and no imports of the systems
-// that read it (HQ, incidents, the app rating), so there are no import cycles.
-import { EXECUTIVES } from '../config/balance';
+// multiplier execMult, the CTO's expertise, the CREO's rent management and
+// pricing power, the executive market salary and the weekly resignation chance.
+// No mutation here, and no imports of the systems that read it (HQ, incidents,
+// the app rating), so there are no import cycles.
+import { EXEC_DELEGATION, EXECUTIVES } from '../config/balance';
 import { CITIES } from '../data/cities';
 import { EXEC_SEATS, EXEC_SEAT_ORDER } from '../data/executives';
 import type { DeptId } from '../data/types';
-import type { EquityGrant, ExecSeat, Executive, GameState } from './state';
+import type { EquityGrant, ExecSeat, Executive, GameState, Property } from './state';
 
 /** True when the company has an Executive floor (hiring and the board need one). */
 export function hasExecFloor(state: GameState): boolean {
@@ -47,6 +48,25 @@ export function execMult(state: GameState, dept: DeptId): number {
 /** The CTO's expertise, or EXECUTIVES.vacantCtoExpertise while the seat is empty. */
 export function ctoExpertise(state: GameState): number {
   return state.executives.seats.cto?.expertise ?? EXECUTIVES.vacantCtoExpertise;
+}
+
+/** The CREO's Rents switch that covers buildings of this owner. */
+export const rentsSwitch = (owner: Property['owner']): string =>
+  owner === 'company' ? 'bankRents' : 'privateRents';
+
+/** True when a seated CREO manages the rents of this owner's buildings. */
+export function rentsManaged(state: GameState, owner: Property['owner']): boolean {
+  return delegationOn(state, 'creo', rentsSwitch(owner));
+}
+
+/**
+ * §21.2: the premium over market rent tenants of a managed building accept,
+ * rentPricingPower × the CREO's expertise/100; 0 when nobody manages them.
+ */
+export function rentPricingPower(state: GameState, owner: Property['owner']): number {
+  if (!rentsManaged(state, owner)) return 0;
+  const exec = state.executives.seats.creo!;
+  return (EXEC_DELEGATION.rentPricingPower * exec.expertise) / 100;
 }
 
 /** Total assets at the last weekly close. */
