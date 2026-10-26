@@ -55,7 +55,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState, DealerDeal } from './personalTypes';
 
-export const SCHEMA_VERSION = 22;
+export const SCHEMA_VERSION = 23;
 
 export interface GameState {
   schemaVersion: number;
@@ -191,6 +191,11 @@ export interface AvatarSpec {
   attire: number;
   tone: number;
   shade: number;
+  /** Face detail (schema v21): eye shape, brows, mouth and age lines. */
+  eyes: number;
+  brows: number;
+  mouth: number;
+  age: number;
 }
 
 // ─── World ────────────────────────────────────────────────────────────────────

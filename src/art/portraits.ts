@@ -1,13 +1,16 @@
 // Portrait generator (ART_DIRECTION §4): banknote-style engraved portraits in
-// an oval guilloche frame, built from parts (src/art/portraitParts.ts) and
-// fully determined by an AvatarSpec. Returns the SVG markup for a 100 × 125
-// plate; "__ID__" marks ids the caller replaces per instance. Skin tone is a
-// tinted fill under the hatching (never line density alone); shading density
-// (spec.shade) sets how close the hatching sits. Pure and memoised.
+// an oval guilloche frame, built from parts (portraitParts, portraitFace,
+// portraitTrim, portraitAttire) and fully determined by an AvatarSpec. Returns
+// the SVG markup for a 100 × 125 plate; "__ID__" marks ids the caller replaces
+// per instance. Skin tone is a tinted fill under the hatching (never line
+// density alone); shading density (spec.shade) sets how close the hatching
+// sits. Pure and memoised.
 import type { AvatarSpec } from '../sim/state';
 import { ellipsePts, hatch, poly, stipple, waveOval, type Pt } from './engrave';
 import { attire, neckline } from './portraitAttire';
+import { ageLines, brows, eyes, faceGeom, lipLine, mouth, nose } from './portraitFace';
 import { arc, facialParts, hairParts, headArc, headGeom, type HeadGeom } from './portraitParts';
+import { ears, glasses } from './portraitTrim';
 import { hashString, artRng } from './prng';
 
 export const PORTRAIT_W = 100;
@@ -26,16 +29,25 @@ const COARSE = 1.6;
 /** The figure is drawn at this scale so the head fills the oval like a banknote portrait. */
 const FIGURE_SCALE = 1.3;
 const FIGURE = `matrix(${FIGURE_SCALE} 0 0 ${FIGURE_SCALE} ${50 - 50 * FIGURE_SCALE} ${52 - 56 * FIGURE_SCALE})`;
+/** Background: fine ruled lines everywhere, denser in a band at the rim (a vignette fade). */
+const GROUND = { spacing: 2.4, rimSpacing: 1.2, rimInner: 0.8 } as const;
+/** Veteran hair is silver: a fainter fill and wider hatching. */
+const GREY_SPACING = 1.6;
+const VETERAN = 2;
 
 /** Part counts (ART_DIRECTION §4), matching src/data/avatarParts.ts. */
 export const PART_COUNTS = {
   head: 4,
   hair: 12,
   facial: 4,
-  glasses: 3,
+  glasses: 4,
   attire: 4,
   tone: 6,
   shade: 3,
+  eyes: 4,
+  brows: 3,
+  mouth: 3,
+  age: 3,
 };
 
 const PI = Math.PI;
@@ -46,7 +58,7 @@ const path = (d: string, cls: string, extra = '') =>
 const fill = (pts: readonly Pt[], cls: string, extra = '') => path(poly(pts), cls, extra);
 
 function clampSpec(a: AvatarSpec): AvatarSpec {
-  const m = (v: number, n: number) => (((Math.round(v) || 0) % n) + n) % n;
+  const m = (v: number | undefined, n: number) => (((Math.round(v ?? 0) || 0) % n) + n) % n;
   return {
     head: m(a.head, PART_COUNTS.head),
     hair: m(a.hair, PART_COUNTS.hair),
@@ -55,6 +67,10 @@ function clampSpec(a: AvatarSpec): AvatarSpec {
     attire: m(a.attire, PART_COUNTS.attire),
     tone: m(a.tone, PART_COUNTS.tone),
     shade: m(a.shade ?? 1, PART_COUNTS.shade),
+    eyes: m(a.eyes, PART_COUNTS.eyes),
+    brows: m(a.brows, PART_COUNTS.brows),
+    mouth: m(a.mouth, PART_COUNTS.mouth),
+    age: m(a.age, PART_COUNTS.age),
   };
 }
 
@@ -69,6 +85,10 @@ export function avatarFromSeed(seed: number | string): AvatarSpec {
     attire: rng.int(0, PART_COUNTS.attire - 1),
     tone: rng.int(0, PART_COUNTS.tone - 1),
     shade: rng.int(0, PART_COUNTS.shade - 1),
+    eyes: rng.int(0, PART_COUNTS.eyes - 1),
+    brows: rng.int(0, PART_COUNTS.brows - 1),
+    mouth: rng.int(0, PART_COUNTS.mouth - 1),
+    age: rng.int(0, PART_COUNTS.age - 1),
   };
 }
 
@@ -87,14 +107,28 @@ function frame(coarse: boolean): string {
   return out.join('');
 }
 
-function head(h: HeadGeom, skin: string, sp: number): string {
+/** Ruled paper behind the figure, with a denser band toward the rim. */
+function ground(): string {
+  const { rx, ry, inner } = FRAME;
+  const outer = ellipsePts(CX, CY, rx - inner, ry - inner, 48);
+  const hole = ellipsePts(
+    CX,
+    CY,
+    (rx - inner) * GROUND.rimInner,
+    (ry - inner) * GROUND.rimInner,
+    48,
+  );
+  // Outer loop then the inner loop reversed: even-odd hatching leaves the middle clear.
+  const ring = [...outer, ...hole.reverse()];
+  return (
+    path(hatch(outer, GROUND.spacing, 0), 'pt-ground') +
+    path(hatch(ring, GROUND.rimSpacing, 0), 'pt-ground')
+  );
+}
+
+function head(h: HeadGeom, skin: string, sp: number, fine: boolean): string {
   const pts = headArc(h, 0, 2 * PI, 48);
-  const out: string[] = [];
-  // Ears, then the head over them.
-  for (const side of [-1, 1]) {
-    const ear = ellipsePts(h.cx + side * (h.rx - 0.5), h.cy + 2, 3, 5, 16);
-    out.push(fill(ear, 'pt-skin', ` style="fill:${skin}"`), fill(ear, 'pt-line pt-fine'));
-  }
+  const out: string[] = [ears(h, skin, sp, fine)];
   out.push(fill(pts, 'pt-skin', ` style="fill:${skin}"`));
   // Light from the upper left: a crescent of hatching on the right cheek and jaw.
   const shadow: Pt[] = [
@@ -102,52 +136,35 @@ function head(h: HeadGeom, skin: string, sp: number): string {
     ...arc(h.cx - h.rx * 0.05, h.cy + 1, h.rx * 0.78, h.ry * 0.95, 1.75, -0.95, 20),
   ];
   out.push(path(hatch(shadow, sp, 45), 'pt-hatch'));
+  if (fine) {
+    // The jaw's underside and the temple on the shadow side, a touch denser.
+    const jaw: Pt[] = [
+      ...headArc(h, 0.55, 1.45, 12),
+      ...arc(h.cx, h.cy, h.rx * 0.82, h.ry * 0.86, 1.4, 0.6, 12),
+    ];
+    out.push(path(hatch(jaw, sp * 0.7, 45), 'pt-hatch'));
+    const temple: Pt[] = [
+      ...headArc(h, -0.9, -0.3, 8),
+      ...arc(h.cx, h.cy, h.rx * 0.8, h.ry * 0.8, -0.3, -0.9, 8),
+    ];
+    out.push(path(hatch(temple, sp * 0.8, 45), 'pt-hatch'));
+  }
   out.push(fill(pts, 'pt-line'));
   return out.join('');
 }
 
-function features(h: HeadGeom, sp: number): { svg: string; mouthY: number } {
-  const { cx, cy, rx, ry } = h;
-  const ey = cy - 1;
-  const ex = rx * 0.4;
-  const mouthY = cy + ry * 0.55;
-  const eyes = [-1, 1]
-    .map((s) => {
-      const x = cx + s * ex;
-      return `M${x - 3} ${ey}Q${x} ${ey - 2.2} ${x + 3} ${ey}Q${x} ${ey + 1.4} ${x - 3} ${ey}Z`;
-    })
-    .join('');
-  const pupils = [-1, 1]
-    .map((s) => `<circle cx="${cx + s * ex}" cy="${ey - 0.2}" r="0.95" class="pt-solid"/>`)
-    .join('');
-  const brows = [-1, 1]
-    .map((s) => {
-      const x = cx + s * ex;
-      return `M${x - 3.4} ${ey - 3.6}Q${x} ${ey - 5.4} ${x + 3.4} ${ey - 3.8}`;
-    })
-    .join('');
-  const nose = `M${cx - 0.6} ${ey + 1.5}L${cx - 2.2} ${cy + ry * 0.33}Q${cx} ${cy + ry * 0.4} ${cx + 2.4} ${cy + ry * 0.33}`;
-  const noseShade: Pt[] = [
-    [cx + 0.2, ey + 2],
-    [cx + 2.4, cy + ry * 0.33],
-    [cx + 0.4, cy + ry * 0.36],
-  ];
-  const mouth = `M${cx - 4.2} ${mouthY}Q${cx} ${mouthY + 1.8} ${cx + 4.2} ${mouthY}`;
-  return {
-    mouthY,
-    svg:
-      path(eyes, 'pt-line pt-fine') +
-      pupils +
-      path(brows, 'pt-line pt-brow') +
-      path(hatch(noseShade, sp * 0.8, 45), 'pt-hatch') +
-      path(nose, 'pt-line pt-fine') +
-      path(mouth, 'pt-line pt-fine'),
-  };
-}
-
-function hairShape(pts: readonly Pt[], angle: number, sp: number, stippled: boolean): string {
+/** A hair region: tinted fill, engraved texture, strand lines and an outline. */
+function hairShape(
+  pts: readonly Pt[],
+  angle: number,
+  sp: number,
+  stippled: boolean,
+  grey: boolean,
+  fine: boolean,
+): string {
   const ys = pts.map((p) => p[1]);
   const xs = pts.map((p) => p[0]);
+  const space = sp * 0.75 * (grey ? GREY_SPACING : 1);
   const texture = stippled
     ? path(
         stipple(
@@ -155,47 +172,39 @@ function hairShape(pts: readonly Pt[], angle: number, sp: number, stippled: bool
           Math.min(...ys),
           Math.max(...xs) - Math.min(...xs),
           Math.max(...ys) - Math.min(...ys),
-          70,
+          grey ? 40 : 70,
           7,
         ),
         'pt-dots',
       )
-    : path(hatch(pts, sp * 0.75, angle), 'pt-hatch');
-  return fill(pts, 'pt-hair') + texture + fill(pts, 'pt-line pt-fine');
-}
-
-function glasses(kind: number, h: HeadGeom): string {
-  if (kind === 0) return '';
-  const ey = h.cy - 1;
-  const ex = h.rx * 0.4;
-  const lens = [-1, 1]
-    .map((s) => {
-      const x = h.cx + s * ex;
-      return kind === 1
-        ? `M${x + 4.3} ${ey}a4.3 4.3 0 1 0 -8.6 0a4.3 4.3 0 1 0 8.6 0Z`
-        : `M${x - 4.6} ${ey - 3.2}h9.2v6.6h-9.2Z`;
-    })
-    .join('');
-  const bridge = `M${h.cx - ex + 4.3} ${ey - 0.6}Q${h.cx} ${ey - 2.4} ${h.cx + ex - 4.3} ${ey - 0.6}`;
-  const temples = `M${h.cx - ex - 4.4} ${ey - 0.8}L${h.cx - h.rx + 0.5} ${ey - 1.2}M${h.cx + ex + 4.4} ${ey - 0.8}L${h.cx + h.rx - 0.5} ${ey - 1.2}`;
-  return path(lens + bridge + temples, 'pt-line pt-glass');
+    : path(hatch(pts, space, angle), 'pt-hatch');
+  const strands = fine && !stippled ? path(hatch(pts, space * 3.2, angle + 9), 'pt-strand') : '';
+  return (
+    fill(pts, grey ? 'pt-hair pt-grey' : 'pt-hair') +
+    texture +
+    strands +
+    fill(pts, 'pt-line pt-fine')
+  );
 }
 
 /**
  * Markup for one portrait. `coarse` draws a simpler plate for tiny sizes
- * (advisor bar, review cards): wider hatching and a plain double ring.
+ * (advisor bar, review cards): wider hatching, a plain double ring and none of
+ * the fine detail.
  */
 export function portraitMarkup(spec: AvatarSpec, coarse = false): string {
   const a = clampSpec(spec);
-  const key = `${a.head}.${a.hair}.${a.facial}.${a.glasses}.${a.attire}.${a.tone}.${a.shade}.${coarse ? 1 : 0}`;
+  const key = `${a.head}.${a.hair}.${a.facial}.${a.glasses}.${a.attire}.${a.tone}.${a.shade}.${a.eyes}.${a.brows}.${a.mouth}.${a.age}.${coarse ? 1 : 0}`;
   const hit = cache.get(key);
   if (hit) return hit;
 
+  const fine = !coarse;
   const h = headGeom(a.head);
+  const g = faceGeom(h);
   const sp = (SHADE_SPACING[a.shade]! * (coarse ? COARSE : 1)) / FIGURE_SCALE;
   const skin = SKIN_TONES[a.tone]!;
+  const grey = a.age === VETERAN;
   const hair = hairParts(a.hair, h);
-  const face = features(h, sp);
   const neck: Pt[] = [
     [h.cx - 7, h.cy + h.ry - 8],
     [h.cx + 7, h.cy + h.ry - 8],
@@ -208,41 +217,49 @@ export function portraitMarkup(spec: AvatarSpec, coarse = false): string {
     [h.cx + 8, h.cy + h.ry + 1],
     [h.cx - 8, h.cy + h.ry + 1],
   ];
+  const neckLines = fine
+    ? path(
+        `M${h.cx + 3.4} ${h.cy + h.ry + 1}Q${h.cx + 4.6} ${h.cy + h.ry + 5} ${h.cx + 5.2} ${h.cy + h.ry + 9}` +
+          (grey
+            ? `M${h.cx - 4} ${h.cy + h.ry + 3}q4 1.2 8 0M${h.cx - 3.4} ${h.cy + h.ry + 5.4}q3.4 1 6.8 0`
+            : ''),
+        'pt-wrinkle',
+      )
+    : '';
   const { rx, ry, inner } = FRAME;
   const clip = `<clipPath id="__ID__"><ellipse cx="${CX}" cy="${CY}" rx="${rx - inner}" ry="${ry - inner}"/></clipPath>`;
-  const ground = coarse
-    ? ''
-    : path(hatch(ellipsePts(CX, CY, rx - inner, ry - inner, 40), 2.4, 0), 'pt-ground');
-  const beard = facialParts(a.facial, h, face.mouthY)
-    .map((pts) => hairShape(pts, 75, sp, false))
+  const beard = facialParts(a.facial, h, g.mouthY)
+    .map((pts) => hairShape(pts, 75, sp, false, grey, fine))
     .join('');
   const lips =
     a.facial === 3
-      ? `<ellipse cx="${h.cx}" cy="${face.mouthY + 0.5}" rx="4.6" ry="1.9" class="pt-skin" style="fill:${skin}"/>` +
-        path(
-          `M${h.cx - 4.2} ${face.mouthY}Q${h.cx} ${face.mouthY + 1.8} ${h.cx + 4.2} ${face.mouthY}`,
-          'pt-line pt-fine',
-        )
+      ? `<ellipse cx="${h.cx}" cy="${g.mouthY + 0.5}" rx="4.6" ry="1.9" class="pt-skin" style="fill:${skin}"/>` +
+        path(lipLine(h, g, a.mouth), 'pt-line pt-fine')
       : '';
 
   const svg = [
     `<defs>${clip}</defs>`,
     `<ellipse cx="${CX}" cy="${CY}" rx="${rx}" ry="${ry}" class="pt-paper"/>`,
     `<g clip-path="url(#__ID__)">`,
-    ground,
+    fine ? ground() : '',
     `<g transform="${FIGURE}">`,
-    hair.back.map((pts) => hairShape(pts, hair.angle, sp, false)).join(''),
+    hair.back.map((pts) => hairShape(pts, hair.angle, sp, false, grey, fine)).join(''),
     fill(neck, 'pt-skin', ` style="fill:${skin}"`),
     path(hatch(neckShade, sp * 0.8, 45), 'pt-hatch'),
     fill(neck, 'pt-line pt-fine'),
-    attire(a.attire, h, sp),
-    neckline(a.attire),
-    head(h, skin, sp),
-    face.svg,
+    neckLines,
+    attire(a.attire, h, sp, fine),
+    neckline(a.attire, fine),
+    head(h, skin, sp, fine),
+    ageLines(h, g, a.age, sp, fine),
+    eyes(h, g, a.eyes, sp, fine),
+    brows(h, g, a.brows, sp, fine),
+    nose(h, g, sp, fine),
+    mouth(h, g, a.mouth, sp, fine),
     beard,
     lips,
-    hair.front.map((pts) => hairShape(pts, hair.angle, sp, !!hair.stipple)).join(''),
-    glasses(a.glasses, h),
+    hair.front.map((pts) => hairShape(pts, hair.angle, sp, !!hair.stipple, grey, fine)).join(''),
+    glasses(a.glasses, h, g, fine),
     `</g></g>`,
     frame(coarse),
   ].join('');

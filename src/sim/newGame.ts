@@ -43,7 +43,7 @@ import { packagedModel } from './underwriting';
 import { generateCity } from './worldGen';
 import { emptyEmpire, initPersonalEmpire } from './personalInit';
 import type { Difficulty, HouseStyle, LogoShape } from '../data/types';
-import { HOUSE_STYLE_IDS } from '../data/houseStyles';
+import { SEEDED_HOUSE_STYLE_IDS } from '../data/houseStyles';
 import { DEFAULT_LOGO_SHAPE } from '../data/logoShapes';
 
 export interface NewGameOptions {
@@ -93,6 +93,10 @@ const DEFAULT_AVATAR: AvatarSpec = {
   attire: 0,
   tone: 0,
   shade: 1,
+  eyes: 0,
+  brows: 0,
+  mouth: 0,
+  age: 0,
 };
 
 export function newGame(opts: NewGameOptions): GameState {
@@ -124,7 +128,8 @@ export function newGame(opts: NewGameOptions): GameState {
       competitors,
       startCash,
       homeCityId: city.id,
-      houseStyle: opts.houseStyle ?? HOUSE_STYLE_IDS[opts.seed % HOUSE_STYLE_IDS.length]!,
+      houseStyle:
+        opts.houseStyle ?? SEEDED_HOUSE_STYLE_IDS[opts.seed % SEEDED_HOUSE_STYLE_IDS.length]!,
       logoShape: opts.logoShape ?? DEFAULT_LOGO_SHAPE,
     },
     clock: { day: 0, week: 0, speed: 0 },

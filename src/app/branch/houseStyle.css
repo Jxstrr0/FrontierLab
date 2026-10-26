@@ -1,6 +1,28 @@
 /* House style dressing on the branch fronts (ART_DIRECTION §3): gilt and
-   lamp light in brass, the sign lettering for each style, and a flag that
-   stirs in the breeze (stopped with reduced motion, see interior.css). */
+   lamp light in brass, the sign lettering for each style, a flag that stirs
+   in the breeze and, for Quant Noir, graphite slabs and light strips that
+   pulse (all stopped with reduced motion, see interior.css). */
+.vignette .hs-noir {
+  fill: var(--ledger-ink);
+}
+.vignette .hs-mono {
+  font-family: var(--font-ui);
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  fill: var(--ivory);
+}
+.in-alive .hs-pulse {
+  animation: hs-pulse 2.6s ease-in-out infinite;
+}
+@keyframes hs-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
 .vignette .hs-gilt {
   fill: var(--brass);
 }

@@ -1,8 +1,25 @@
-/* Founder avatar picker: the portrait stage, part rows and tone swatches. */
+/* Founder avatar picker: the portrait stage with Shuffle, the Face and Style
+   groups of part rows, and the tone swatches. */
 .avatar-picker {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
+}
+.part-group-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-16);
+  color: var(--brass);
+  margin: 0 0 var(--space-1);
+  padding-bottom: var(--space-1);
+  border-bottom: 1px solid var(--hairline);
+}
+.part-count {
+  display: block;
+  font-weight: 400;
+  font-size: 11px;
+  color: var(--ivory-dim);
+  letter-spacing: 0.04em;
 }
 .avatar-stage {
   display: flex;

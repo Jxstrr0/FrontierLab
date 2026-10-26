@@ -10,6 +10,7 @@ import { hatch, rect } from '../../art/engrave';
 import { EQUIPMENT } from '../../data/equipment';
 import { Vignette } from '../components/Vignette';
 import type { Brand, Facade } from './facadeParts';
+import { Lattice } from './facadesFuture';
 import { Columns, Deco } from './facadesGrand';
 import { Brick, GlassFront, Storefront } from './facadesLow';
 import { grow, Lamp, NameSign, Planter, StyleDoor, StyleFlag } from './houseStyleArt';
@@ -100,6 +101,22 @@ const FACADES: Record<string, Facade> = {
       },
       planters: { xs: [126, 194], y: 132 },
       door: { x: 147, y: 105, w: 26, h: 27 },
+    },
+  },
+  ext_lattice: {
+    draw: Lattice,
+    flag: [226, 30],
+    box: [78, 30, 172, 102],
+    anchors: {
+      sign: { x: 100, y: 48, w: 120, h: 12 },
+      lamps: {
+        pts: [
+          [132, 98],
+          [196, 98],
+        ],
+      },
+      planters: { xs: [112, 214], y: 132 },
+      door: { x: 146, y: 104, w: 24, h: 28 },
     },
   },
 };
@@ -230,10 +247,10 @@ export const BranchArt = memo(function BranchArt(p: {
       <StyleDoor style={p.style} a={a.door} ink={p.brandInk} />
       {a.lamps.pts.map((pt, n) =>
         a.lamps.post ? (
-          <Lamp style={p.style} at={pt} ground={POST_GROUND} n={n} />
+          <Lamp style={p.style} at={pt} ground={POST_GROUND} n={n} ink={p.brandInk} />
         ) : (
           <g transform={grow(pt[0], pt[1])}>
-            <Lamp style={p.style} at={pt} n={n} />
+            <Lamp style={p.style} at={pt} n={n} ink={p.brandInk} />
           </g>
         ),
       )}

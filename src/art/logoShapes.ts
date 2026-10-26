@@ -68,6 +68,33 @@ export function logoPath(shape: LogoShape, cx: number, cy: number, r: number): s
     }
     case 'rosette':
       return rosette(cx, cy, r);
+    case 'tile': {
+      const h = r * 0.86;
+      return polygon([
+        [cx - h, cy - h],
+        [cx + h, cy - h],
+        [cx + h, cy + h],
+        [cx - h, cy + h],
+      ]);
+    }
+    case 'pebble': {
+      // A rounded square: straight sides joined by quarter arcs.
+      const h = r * 0.9;
+      const c = r * 0.42;
+      const a = `A${f(c)} ${f(c)} 0 0 1`;
+      return (
+        `M${f(cx - h + c)} ${f(cy - h)}H${f(cx + h - c)}${a} ${f(cx + h)} ${f(cy - h + c)}` +
+        `V${f(cy + h - c)}${a} ${f(cx + h - c)} ${f(cy + h)}H${f(cx - h + c)}` +
+        `${a} ${f(cx - h)} ${f(cy + h - c)}V${f(cy - h + c)}${a} ${f(cx - h + c)} ${f(cy - h)}Z`
+      );
+    }
+    case 'octagon':
+      return polygon(
+        Array.from({ length: 8 }, (_, k) => {
+          const a = (Math.PI / 4) * k + Math.PI / 8;
+          return [cx + r * Math.cos(a), cy + r * Math.sin(a)];
+        }),
+      );
     default:
       return `M${f(cx - r)} ${f(cy)}a${f(r)} ${f(r)} 0 1 0 ${f(2 * r)} 0a${f(r)} ${f(r)} 0 1 0 ${f(-2 * r)} 0Z`;
   }

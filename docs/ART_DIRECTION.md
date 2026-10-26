@@ -40,7 +40,7 @@ Spend the boldness on the map and the illustrations, the way a banknote's engrav
 | Seattle | Evergreen #355E45 | Hong Kong | Jade Harbour #2F7A6A |
 | Moscow | Brick Crimson #8C2F2F | St Petersburg | Neva Blue #3E6A8A |
 
-**Brand inks.** The player picks one of 8: Vault Blue #2C4A7A, Emerald #2F7D5B, Garnet #8E2F3E, Royal Purple #5A3E7A, Copper #A8643A, Slate #4A5568, Gold #A88A2E, Teal #2A7A80. Rival brand inks are in CONTENT.
+**Brand inks.** The player picks one of 12: eight banknote colours (Vault Blue #2C4A7A, Emerald #2F7D5B, Garnet #8E2F3E, Royal Purple #5A3E7A, Copper #A8643A, Slate #4A5568, Gold #A88A2E, Teal #2A7A80) and four sharper modern ones (Graphite #22262D, Circuit Blue #1E5BD6, Ultraviolet #4B2DB5, Magenta #B0176B). All carry ivory text at ≥ 4.5:1. Rival brand inks are in CONTENT.
 
 **Material washes.** A second, pale printing under the hatching on the branch fronts (§3), the way a banknote's underprint sits under its engraving. Each is laid at about a third strength, so a front still reads as a line drawing with a little colour in it.
 
@@ -144,9 +144,10 @@ Every city has its own look (`src/data/cityLooks.ts`), so no two maps read alike
   - Modern Glass: mullion grid
   - Classic Columns: pediment and four columns
   - Deco Tower Front: stepped crown and sunburst over the door
+  - Lattice Pavilion: a thin roof slab floating over a box of smoked glass crossed by a diagrid, the seal hanging in the glazing, and a light wall in the brand ink beside the door with a ticker of dashes running down it
   - **Colour** (§1.1 material washes): each front is engraved over pale material colour, with the hatching kept on top: terracotta brick, warm limestone, cool glass, slate roofs and fascias, verdigris on the Deco setbacks, leaf green in the planters, and the brand ink on the awning stripes, pediment, canopy and spandrels. The Deco sunburst is brass.
-  - **Logo shape** (CONTENT §7b), chosen on New Game: the bank's mark is one outline everywhere (`art/logoShapes.ts`), so the medallion in the top bar, the seal on the front, the plaque over the counter and the mark on an owned building all match. Round, shield, lozenge, hexagon, cut-corner plaque or a twelve-scallop rosette; rivals stay round.
-  - **House style** (CONTENT §7a), chosen on New Game, dresses whichever option you built: the name sign (with the bank's full name), the door, the lamps, the planters and the roof flag. Each composition marks where they go (`FacadeAnchors` in `branch/houseStyleArt.tsx`), so a style reads the same on every front and no two banks on a street look alike.
+  - **Logo shape** (CONTENT §7b), chosen on New Game: the bank's mark is one outline everywhere (`art/logoShapes.ts`), so the medallion in the top bar, the seal on the front, the plaque over the counter and the mark on an owned building all match. Round, shield, lozenge, hexagon, cut-corner plaque, a twelve-scallop rosette, a sharp tile, a rounded pebble or an octagon; rivals stay round.
+  - **House style** (CONTENT §7a), chosen on New Game, dresses whichever option you built: the name sign (with the bank's full name), the door, the lamps, the planters and the roof flag. **Quant Noir** is the modern one: a graphite sign with the name in lower-case, widely spaced sans and a light strip in the brand ink, recessed light bars with a soft cone of light, graphite cube planters with clipped spheres, a frameless glass door with a glowing seam, and a slim light blade on the roof that pulses instead of a cloth flag (`branch/houseStyleQuant.tsx`). Each composition marks where they go (`FacadeAnchors` in `branch/houseStyleArt.tsx`), so a style reads the same on every front and no two banks on a street look alike.
   - Street life: two passers-by stroll the pavement, the flag stirs and garden lanterns and plants sway; all of it stops with reduced motion.
 - **HQ floors:** an isometric cut-away office. **Desks and people reflect actual staffing** (filled desks vs empty), so understaffing is visible at a glance.
   - The room: plank floor (carpet for the Executive suite), walls with skirting and cornice, cut tops inked solid like an architect's section, mullioned windows throwing pale daylight across the floor, a clock and a door.
@@ -165,13 +166,19 @@ Every city has its own look (`src/data/cityLooks.ts`), so no two maps read alike
 ## 4. Portraits
 
 - **Frame:** an oval vignette with a guilloche border, like a banknote portrait.
-- **Generator** (`src/art/portraits.ts`), drawn in fine hatch lines from parts:
-  - head shapes 4, hair 12, facial hair 4, glasses 3
+- **Generator** (`src/art/portraits.ts`, with `portraitParts`, `portraitFace`, `portraitTrim` and `portraitAttire`), drawn in fine hatch lines from parts:
+  - head shapes 4, hair 12, facial hair 4, glasses 4 (none, round, square, half-rim)
+  - eyes 4 (almond, round, hooded, upturned), brows 3 (soft arch, straight, bold), mouth 3 (smile, composed, grin), age 3 (fresh, seasoned, veteran)
   - attire: suit, blouse, sweater, turtleneck
   - shading density 3
+- **Face detail (v0.10.18):** eyes are paper whites with an ink iris, a pupil and a catchlight, a heavier upper lid with a lash flick and a faint lower lid; brows are tapered strips of hair strokes; the nose has a bridge shadow on the shadow side, wings and nostrils; lips have a cupid's bow and a hatched lower lip with a chin shadow beneath. Age adds smile lines, crow's feet and forehead lines, and veterans get pouches, hollow cheeks, neck lines and silver hair (a fainter fill, wider hatching). Ears show an inner helix. Light comes from the upper left: the right cheek, jaw, temple, eye socket and shoulder carry the shade.
+- **Hair:** tinted fill, engraved hatching in the style's direction, and sparser strand lines over it; close crops are stippled.
+- **Attire detail:** the suit has a knotted tie with cross-hatching, a shaded right lapel, buttons, a pocket square and sleeve seams; the blouse has shoulder folds and a pendant; the sweater a cross-knit texture and a shirt collar under the crew band; the turtleneck fold lines and a band of shade under the collar.
+- **Background:** ruled horizontal lines behind the figure, denser in a band at the rim, so the plate fades toward the frame like a banknote vignette.
+- **Tiny plates (under 44 px):** the coarse plate keeps the whites, iris, pupil, lids, brows, nose, mouth and attire shapes and drops the catchlight, strands, age lines, seams, glints and the ruled ground, with heavier strokes.
 - **Skin tone:** a subtle ink-tinted fill under the hatching. Offer 6 tones; never render tone by line density alone.
-- **Diversity:** the name pools and portrait parts are diverse. Pick parts deterministically from `people` RNG plus the person id.
-- **Founder avatar:** the player chooses the parts in the wizard.
+- **Diversity:** the name pools and portrait parts are diverse. Pick parts deterministically from `people` RNG plus the person id; eyes, brows, mouth and age hash from the other parts (`people.ts` faceDetail) so the stream stays as it was.
+- **Founder avatar:** the player chooses the parts in the wizard, in two groups (Face: head, eyes, brows, mouth, age, skin tone; Style: hair, facial hair, glasses, attire), with a Shuffle button for a random face.
 
 ## 5. Data visuals
 
