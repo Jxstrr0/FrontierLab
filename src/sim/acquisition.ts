@@ -4,13 +4,15 @@
 //   assets      −C (cash) −V (holding given up) +G (goodwill) +L′ (loans)
 //               +R (reserves) +LD (lease deposits)
 //   liabilities +D (deposits) −X (corporate debt you owed the target)
-//   equity      +gain (bargain purchase, non-cash P&L), since G − gain = C + V − net assets.
+//   equity      +S (new shares in a share-for-share deal) +gain (bargain purchase,
+//               non-cash P&L), since G − gain = C + S + V − net assets.
 // Then the target's branches become yours (acquisitionBranch.ts), converting
 // over MERGERS.conversionWeeks, and the rival leaves the market.
 import { MERGERS } from '../config/balance';
 import type { DealPlan } from './acquisitionPlan';
 import { convertRivalBranch } from './acquisitionBranch';
 import { pushEvent } from './events';
+import { issueDealShares } from './shareDeals';
 import { postCash, postPnl } from './ledger';
 import type { Rng } from './rng';
 import type { GameState, RivalBank } from './state';
@@ -26,8 +28,10 @@ function settleDebt(state: GameState, rivalId: string): void {
 /** Pays out every holder of the target's shares and books the price, goodwill or gain. */
 function payForShares(state: GameState, bank: RivalBank, plan: DealPlan): void {
   postCash(state, -plan.cash, 'investing');
-  // Your own shares in the target are bought like everyone else's, into your personal account.
-  state.personal.cash += plan.personalShares * plan.pricePerShare;
+  // Your own shares in the target are bought like everyone else's, into your personal account
+  // (in the deal's mix of cash and new shares).
+  state.personal.cash += plan.personalCash;
+  issueDealShares(state, plan.split);
   delete state.market.holdings.personal[bank.id];
   // The company's holding is given up at market instead of being paid for again.
   delete state.market.holdings.company[bank.id];
@@ -73,7 +77,7 @@ export function closeAcquisition(
     startWeek: state.clock.week,
     weeksLeft: MERGERS.conversionWeeks,
   });
-  const price = plan.cash + plan.holdingValue;
+  const price = plan.cash + plan.split.stockValue + plan.holdingValue;
   state.mergers.deals.push({
     rivalId: bank.id,
     name: bank.name,
@@ -82,6 +86,7 @@ export function closeAcquisition(
     goodwill: plan.goodwill,
     branches: n,
     distressed,
+    ...(plan.split.stockValue > 0 ? { stockValue: plan.split.stockValue } : {}),
   });
   pushEvent(
     state,
@@ -94,6 +99,7 @@ export function closeAcquisition(
       branches: n,
       goodwill: plan.goodwill,
       distressed,
+      stockPct: plan.split.stockPct,
     },
     9,
   );

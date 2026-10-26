@@ -1931,6 +1931,23 @@ export const SECONDARY = {
 } as const;
 export const SECONDARY_DISCOUNT = SECONDARY.discount;
 /**
+ * Share buybacks (§19.6a): a listed bank buys its own shares back from the
+ * public at the market price plus a small premium, pays a broker's fee, and
+ * retires them. One programme a quarter, up to maxPct of the shares; the public
+ * keeps at least minFloat of the bank, and capital must stay Adequate or better.
+ */
+export const BUYBACK = {
+  maxPct: 0.1,
+  premium: 0.02,
+  fee: 0.01,
+  /** Price lift +1% to +4%, scaled by size up to maxPct. */
+  impact: [0.01, 0.04] as [number, number],
+  minFloat: 0.1,
+  gapWeeks: 13,
+  /** Buyback history kept on the stock record. */
+  kept: 12,
+} as const;
+/**
  * Listed companies (§19.1). Earnings weeks add normal(0, earningsSurprise) plus
  * a tilt of earningsTilt × the sector's annual μ for the phase (assumption: a
  * tenth of the year's drift, so recessions bring misses). A surprise of at
@@ -2028,6 +2045,19 @@ export const MERGERS = {
   offerStep: 0.1,
   /** An acquired branch's awareness = perStar × the rival branch's overall stars, clamped. */
   acquiredAwareness: { perStar: 0.12, min: 0.2, max: 0.6 },
+} as const;
+/**
+ * Share-for-share deals (§19.8): a listed bank may pay part of a takeover in
+ * new shares, valued at its market price. The target's board counts each
+ * share-paid dollar at (1 − boardDiscount), one deal may add at most
+ * maxNewSharePct new shares, and the issue moves your price like a secondary
+ * of the same size. The offer sheet steps the share part in stockStep.
+ */
+export const SHARE_DEALS = {
+  boardDiscount: 0.05,
+  maxNewSharePct: 0.5,
+  stockStep: 0.25,
+  impact: [0.02, 0.06] as [number, number],
 } as const;
 export const REBRAND_COST = 60_000;
 

@@ -1,9 +1,11 @@
 // Raising equity through an investment bank (SIMULATION §19.3, §19.4, §19.6):
 // private placements to a fund while private, launching the IPO (it lists at
 // the next quarter-end tick), and secondary offerings once listed. Each raise
-// brings cash in as financing and adds the net to paid-in capital.
+// brings cash in as financing and adds the net to paid-in capital. A listed
+// bank can also buy shares back (§19.6a, buybacks.ts).
 import { IPO, PLACEMENT, SECONDARY } from '../../config/balance';
 import { INVESTMENT_BANKS } from '../../data/investmentBanks';
+import { bookBuyback, buybackBlocker, buybackQuote } from '../buybacks';
 import { bookRaise, PUBLIC_HOLDER } from '../equityIpo';
 import {
   ipoChecklist,
@@ -124,4 +126,17 @@ export function secondaryOffering(
     4,
   );
   return ok({ raised: q.net });
+}
+
+/** §19.6a: buys back pct of outstanding from the public at market plus a premium, and retires it. */
+export function buyBackShares(
+  state: GameState,
+  pct: number,
+): CommandResult<{ shares: number; cost: number }> {
+  if (!validPct(pct)) return fail('Choose how much of the bank to buy back.');
+  const q = buybackQuote(state, pct);
+  const blocker = buybackBlocker(state, q);
+  if (blocker) return fail(blocker);
+  bookBuyback(state, q);
+  return ok({ shares: q.shares, cost: q.cost });
 }

@@ -372,12 +372,20 @@ Tabs: Overview · Loans · Credit.
   - Underwriting fee (x.xx%)
   - Capital raised
   - Issue new shares
+- **While public:** Share buyback card (SIMULATION §19.6a):
+  - shares stepper (% of outstanding, up to 10%)
+  - shares retired, price per share (with the 2% premium), broker's fee, total cost
+  - your stake after, capital ratio after
+  - a note when the minimum public float caps the size, and the date of the next allowed buyback
+  - Buy back for $X (disabled with the reason when blocked)
 
 **M&A:**
 - rival bank cards: like Market cards, plus branches, cities and deposits; distressed sales get a special badge
 - **Offer M&A sheet:**
-  - offer price per share stepper and premium %
-  - shares outstanding and total cost
+  - offer price per share stepper and premium % (as the board sees it, after any share-part discount)
+  - shares outstanding
+  - once listed, "Paid in your shares": Cash · 25% · 50% · 75% · All; with a share part, rows for paid in new shares, new shares issued (% of outstanding) and your stake after
+  - paid in cash (total cost when all cash)
   - available cash
   - regulator pre-check (✓/✗ with reasons)
   - Offer merger
