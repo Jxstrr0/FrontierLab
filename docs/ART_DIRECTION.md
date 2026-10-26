@@ -42,6 +42,19 @@ Spend the boldness on the map and the illustrations, the way a banknote's engrav
 
 **Brand inks.** The player picks one of 8: Vault Blue #2C4A7A, Emerald #2F7D5B, Garnet #8E2F3E, Royal Purple #5A3E7A, Copper #A8643A, Slate #4A5568, Gold #A88A2E, Teal #2A7A80. Rival brand inks are in CONTENT.
 
+**Material washes.** A second, pale printing under the hatching on the branch fronts (§3), the way a banknote's underprint sits under its engraving. Each is laid at about a third strength, so a front still reads as a line drawing with a little colour in it.
+
+| Token | Hex | Use |
+|---|---|---|
+| `--wash-brick` | #B8694A | Heritage Brick walls |
+| `--wash-stone` | #C9AB7A | limestone: columns, cornices, string courses, the Deco tower |
+| `--wash-glass` | #6F9BC4 | glazing, with the ink's own tint over it |
+| `--wash-slate` | #5F7083 | roof slabs, fascias, the Modern Glass spandrels |
+| `--wash-copper` | #5F9A86 | verdigris on the Deco setbacks |
+| `--wash-leaf` | #5F8A46 | the planting in every house style's planters |
+
+The brand ink is the sixth wash: awning stripes, the tympanum of the Classic Columns pediment, the canopy of the Modern Glass front and the spandrels and crown of the Deco tower take it, so your colour shows on the building itself and not only on the flag and the door.
+
 **Contrast:** text on `--vault` must reach WCAG AA. `--ivory` on `--vault` ≈ 12:1. `--ivory-dim` is for ≥ 14 px text only.
 
 ### 1.2 Type
@@ -131,6 +144,7 @@ Every city has its own look (`src/data/cityLooks.ts`), so no two maps read alike
   - Modern Glass: mullion grid
   - Classic Columns: pediment and four columns
   - Deco Tower Front: stepped crown and sunburst over the door
+  - **Colour** (§1.1 material washes): each front is engraved over pale material colour, with the hatching kept on top: terracotta brick, warm limestone, cool glass, slate roofs and fascias, verdigris on the Deco setbacks, leaf green in the planters, and the brand ink on the awning stripes, pediment, canopy and spandrels. The Deco sunburst is brass.
   - **Logo shape** (CONTENT §7b), chosen on New Game: the bank's mark is one outline everywhere (`art/logoShapes.ts`), so the medallion in the top bar, the seal on the front, the plaque over the counter and the mark on an owned building all match. Round, shield, lozenge, hexagon, cut-corner plaque or a twelve-scallop rosette; rivals stay round.
   - **House style** (CONTENT §7a), chosen on New Game, dresses whichever option you built: the name sign (with the bank's full name), the door, the lamps, the planters and the roof flag. Each composition marks where they go (`FacadeAnchors` in `branch/houseStyleArt.tsx`), so a style reads the same on every front and no two banks on a street look alike.
   - Street life: two passers-by stroll the pavement, the flag stirs and garden lanterns and plants sway; all of it stops with reduced motion.

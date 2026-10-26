@@ -9,7 +9,7 @@ export { Chips } from './Chips';
 export { Donut, type DonutSlice } from './Donut';
 export { Icon } from './Icon';
 export { Portrait } from './Portrait';
-export { Face, Hatch, Vignette, cityInk } from './Vignette';
+export { Face, Hatch, Vignette, Wash, cityInk } from './Vignette';
 export { Segmented, StepSlider, Stepper, Toggle } from './Controls';
 export { AdvisorBar, Confirm, Modal, Panel, Sheet, type Tab } from './Panel';
 export { LineChart, type LineSeries } from './LineChart';

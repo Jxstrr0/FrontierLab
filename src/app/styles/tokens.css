@@ -41,6 +41,17 @@
   --type-real-estate: #a04f10;
   --type-vacation-home: #176f8e;
 
+  /* Material washes for the engraved branch fronts (ART_DIRECTION §1.1,
+     §3): a second, pale printing under the hatching, as a banknote's
+     underprint. Each is laid at about a third strength (.art-wash), so the
+     fronts still read as line engravings with a little colour in them. */
+  --wash-brick: #b8694a;
+  --wash-stone: #c9ab7a;
+  --wash-glass: #6f9bc4;
+  --wash-slate: #5f7083;
+  --wash-copper: #5f9a86;
+  --wash-leaf: #5f8a46;
+
   /* Hairlines are brass at 40% (§1.3) */
   --hairline: rgb(184 145 61 / 40%);
 

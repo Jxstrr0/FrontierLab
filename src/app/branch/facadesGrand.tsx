@@ -1,9 +1,11 @@
 // Branch exteriors, part 2 (ART_DIRECTION §3, CONTENT §7): Classic Columns
 // (pediment and four columns) and Deco Tower Front (stepped crown with a
-// sunburst over the door), in the same 320 × 150 vignette box.
+// sunburst over the door), in the same 320 × 150 vignette box, on pale
+// limestone with a brand-ink tympanum and spandrels, verdigris setbacks and
+// a brass sunburst.
 import { hatch, poly, rect, type Pt } from '../../art/engrave';
-import { Face, Hatch } from '../components/Vignette';
-import { arch, Seal, type Brand } from './facadeParts';
+import { Face, Hatch, Wash } from '../components/Vignette';
+import { arch, Seal, WASH, type Brand } from './facadeParts';
 
 // ─── Classic Columns ────────────────────────────────────────────────────
 const COLUMNS = [104, 136, 184, 216];
@@ -11,7 +13,7 @@ const COLUMNS = [104, 136, 184, 216];
 export function Columns(b: Brand) {
   return (
     <g>
-      <Face pts={rect(96, 64, 128, 50)} density="dense" angle={90} />
+      <Face pts={rect(96, 64, 128, 50)} wash={WASH.stone} density="dense" angle={90} />
       <Face pts={rect(148, 80, 24, 33)} />
       <path
         d="M152 84h7v12h-7zM161 84h7v12h-7zM152 100h7v10h-7zM161 100h7v10h-7z"
@@ -19,14 +21,14 @@ export function Columns(b: Brand) {
       />
       {COLUMNS.map((x) => (
         <g>
-          <Face pts={rect(x - 6, 68, 12, 43)} outline="fine" />
+          <Face pts={rect(x - 6, 68, 12, 43)} wash={WASH.stone} outline="fine" />
           <Hatch pts={rect(x + 2, 68, 4, 43)} density="medium" angle={90} />
           <path d={`M${x - 3} 69v41M${x} 69v41`} class="art-line art-fine" />
-          <Face pts={rect(x - 8, 63, 16, 5)} density="light" angle={0} />
-          <Face pts={rect(x - 7, 111, 14, 2)} />
+          <Face pts={rect(x - 8, 63, 16, 5)} wash={WASH.stone} density="light" angle={0} />
+          <Face pts={rect(x - 7, 111, 14, 2)} wash={WASH.stone} />
         </g>
       ))}
-      <Face pts={rect(86, 54, 148, 9)} />
+      <Face pts={rect(86, 54, 148, 9)} wash={WASH.stone} />
       <path d="M86 58h148" class="art-line art-fine" />
       <Face
         pts={[
@@ -34,6 +36,15 @@ export function Columns(b: Brand) {
           [160, 26],
           [238, 54],
         ]}
+        wash={WASH.stone}
+      />
+      <Wash
+        pts={[
+          [98, 51],
+          [160, 31],
+          [222, 51],
+        ]}
+        fill={b.ink}
       />
       <Hatch
         pts={[
@@ -52,8 +63,8 @@ export function Columns(b: Brand) {
         class="art-line art-fine"
       />
       <Seal x={160} y={43} r={6} brand={b} />
-      <Face pts={rect(88, 113, 144, 5)} />
-      <Face pts={rect(82, 118, 156, 6)} />
+      <Face pts={rect(88, 113, 144, 5)} wash={WASH.stone} />
+      <Face pts={rect(82, 118, 156, 6)} wash={WASH.stone} />
       <Face pts={rect(76, 124, 168, 8)} />
       <Hatch pts={rect(220, 118, 18, 14)} density="medium" angle={0} />
     </g>
@@ -91,30 +102,40 @@ export function Deco(b: Brand) {
     <g>
       {[70, 212].map((x) => (
         <g>
-          <Face pts={rect(x, 84, 38, 48)} />
+          <Face pts={rect(x, 84, 38, 48)} wash={WASH.stone} />
           <path d={hatch(rect(x, 84, 38, 48), 6, 0)} class="art-hatch" style={{ opacity: 0.5 }} />
         </g>
       ))}
-      <Face pts={TOWER} />
+      <Face pts={TOWER} wash={WASH.stone} />
       {[
         rect(202, 46, 10, 86),
         rect(192, 34, 10, 12),
         rect(180, 22, 12, 12),
         rect(170, 10, 10, 12),
       ].map((r) => (
-        <Hatch pts={r} density="medium" />
+        <g>
+          <Wash pts={r} fill={WASH.copper} />
+          <Hatch pts={r} density="medium" />
+        </g>
       ))}
+      <Wash pts={rect(140, 10, 30, 12)} fill={b.ink} />
       {PIERS.slice(0, -1).map((x, i) => {
         const w = (PIERS[i + 1] ?? x) - x - 4;
         return w > 4 ? (
-          <Face pts={rect(x + 2, 52, w, 30)} density="dense" angle={90} outline="fine" />
+          <Face
+            pts={rect(x + 2, 52, w, 30)}
+            wash={b.ink}
+            density="dense"
+            angle={90}
+            outline="fine"
+          />
         ) : null;
       })}
       <path d="M118 62h84M118 72h84" class="art-line art-fine" />
       <path d={CHEVRONS} class="art-line art-fine" />
       <path d="M118 40h84M128 28h64" class="art-line art-fine" />
       <path d={poly(arch(140, 104, 40, 20))} class="art-line art-fine" />
-      <path d={RAYS} class="art-line art-fine" />
+      <path d={RAYS} class="hs-gilt-line" style={{ strokeWidth: 1 }} />
       <Seal x={160} y={98} r={5} brand={b} />
       <Face pts={rect(146, 104, 28, 28)} density="dense" angle={90} />
       <path d="M160 104v28M144 104h32" class="art-line" />
