@@ -21,6 +21,8 @@ import { useEffect } from 'preact/hooks';
 import { FEATURES } from '../../config/balance';
 import { BranchPanel } from '../branch/BranchPanel';
 import { BuildPanel } from '../build/BuildPanel';
+import { BuildDataCenterPanel } from '../dataCenter/BuildDataCenterPanel';
+import { DataCenterPanel } from '../dataCenter/DataCenterPanel';
 import { CityList } from '../city/CityList';
 import { BranchesPanel } from '../company/BranchesPanel';
 import { CompanyPanel } from '../company/CompanyPanel';
@@ -96,6 +98,10 @@ function PanelHost() {
       return <StorefrontPanel key={p.lotId} lotId={p.lotId} />;
     case 'build':
       return <BuildPanel key={p.lotId} lotId={p.lotId} />;
+    case 'buildDataCenter':
+      return <BuildDataCenterPanel key={p.lotId ?? p.siteId} lotId={p.lotId} siteId={p.siteId} />;
+    case 'dataCenter':
+      return <DataCenterPanel key={p.dataCenterId} dataCenterId={p.dataCenterId} />;
     case 'branch':
       return <BranchPanel key={p.branchId} branchId={p.branchId} tab={p.tab ?? 'service'} />;
     // Stage 4 (FEATURES.hq): offices, HQ and the bureau and agency sites.

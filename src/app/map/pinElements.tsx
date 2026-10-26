@@ -206,8 +206,10 @@ export function clusterLabel(group: string, members: PinSpec[]): string {
   if (group === 'lot') what = `${n} open branch locations`;
   else if (group === 'yours') {
     const hq = members.some((m) => m.kind === 'hq');
-    const branches = members.filter((m) => m.kind === 'mine').length;
-    const places = members.filter((m) => m.kind !== 'mine' && m.kind !== 'hq').length;
+    const branches = members.filter((m) => m.kind === 'mine' && !m.dataCenterId).length;
+    const places = members.filter(
+      (m) => (m.kind !== 'mine' && m.kind !== 'hq') || m.dataCenterId,
+    ).length;
     const parts = [
       branches ? `${branches} branch${branches === 1 ? '' : 'es'}` : '',
       hq ? 'HQ' : '',

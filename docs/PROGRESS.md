@@ -3,13 +3,36 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C2b done (v0.1.6, save schema 3): rival labs also hold one sizable sales office per city. C2a (v0.1.5): one sales office per city, grown in place through four sizes. Before that, C1 (v0.1.4): floors, executives, segments, campaigns, benefits, conferences, incidents, stock sector, map layers, rival labs, "the lab" wording and the newspaper. Next is C2c (data centers), then C2d (main offices and the screens). The owner's decisions are in the design brief and CONVERSION_PLAN §5.
+**Current stage:** C2c done (v0.1.7, save schema 4): data centers, on a storefront or at a regional energy site. C2b (v0.1.6): rival labs also hold one sizable sales office per city. C2a (v0.1.5): one sales office per city, grown in place through four sizes. Before that, C1 (v0.1.4): floors, executives, segments, campaigns, benefits, conferences, incidents, stock sector, map layers, rival labs, "the lab" wording and the newspaper. Next is C2d (main offices and the screens), waiting on the owner's go-ahead. The owner's decisions are in the design brief and CONVERSION_PLAN §5.
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `0130bc2385365b` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `0024151388b688` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-26 — Stage C2c: data centers (v0.1.7)
+
+**What you asked for:** "go on next then", the third part of C2.
+
+**What changed.** You can now build **data centers**, a second kind of building beside your sales offices.
+- **Where:** on any free storefront (tap it: there's a new **Build data center** button under Build branch), or at a regional energy site such as Athabasca Sands Camp (open the employer: there's a new **Energy site** section). Energy sites have cheap land and half-price power, and room for 3 data centers each. You build in the city you're in, like branches.
+- **Three parts:** a **GPU hall** (how many GPUs it holds, and an 8–16 week fit-out), a **power feed** (how many of those GPUs it can actually run) and **cooling** (how efficient it is, which sets the power bill). The cheapest build is about $5.3M.
+- **Running costs:** rent every week, plus a power bill once it's running (about $34k a week for the cheapest one in Calgary).
+- **What it does for you now:** your sales office in the same city gets **+0.25 Service stars** (faster answers for customers), and offices within 1,200 km get +0.1. In stage C4 its GPUs will also power your models.
+- **Its own screen:** status, GPUs running, PUE, an **Upgrade** button for each part (a bigger hall takes it offline for half its fit-out) and **Close**. It shows on the map with your crest, on the city list, and in a new Data centers list under Branches.
+- **Two new milestones:** first data center and three data centers.
+- **Saves:** schema 3 → 4. Old saves just start with no data centers.
+
+**Why some choices.** Power is only charged once the hall is running, so you don't pay for idle machines during fit-out. Data centers reuse storefront lots, so they sit on the map just like offices.
+
+**Balance.** The test players (steady, aggressive and stress) now build one data center once they're well off (from year 5). Every strategy target passes and the 20-city median is inside every checkpoint. Seed 42 steady still shows its old single-seed payback warning (42 weeks); the median is 36.5.
+
+**Checked in the browser** at iPhone size: storefront button, build screen, part picker, data-center panel, the map pin and the energy-site section, with no console errors.
+
+**Checks.** `npm run lint`, all tests (9 new for data centers) and `npm run build` pass. The **determinism snapshot** moved from `0130bc2385365b` to `0024151388b688` (intended: saves now carry the data-center table).
+
+**Next:** C2d (main offices, "sales office" on screen, map layers), when you say go.
 
 ### 2026-10-26 — Stage C2b: rival sales offices (v0.1.6)
 

@@ -14,6 +14,13 @@ export interface EventPayloads {
   BRANCH_CLOSED: { branchId: Id; name: string; movedTo?: string };
   /** A sales office grew one size (commands/branches.ts, C2a). */
   OFFICE_GROWN: { branchId: Id; city: Id; size: string };
+  /** You started a data center (commands/dataCenters.ts, C2c); `site` is the lot address or energy site. */
+  DATA_CENTER_STARTED: { dataCenterId: Id; name: string; city: Id; site: string; weeks: number };
+  /** A data center's fit-out (or a hall refit) finished (dataCenters.ts). */
+  DATA_CENTER_OPENED: { dataCenterId: Id; name: string; city: Id; gpus: number; refit: boolean };
+  /** A data center part was upgraded; `part` is the new part's name. */
+  DATA_CENTER_UPGRADED: { dataCenterId: Id; name: string; slot: string; part: string };
+  DATA_CENTER_CLOSED: { dataCenterId: Id; name: string; city: Id };
   LOAN_BOOKED: { branchId: Id; business: string; amount: Money; rate: Rate };
   /** A Loan Desk loan of any size defaulted at or above the BIG_DEFAULT line. */
   BIG_DEFAULT: { business: string; sector: string; amount: Money; branchId?: Id };

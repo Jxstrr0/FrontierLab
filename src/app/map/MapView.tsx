@@ -65,7 +65,8 @@ export function MapView() {
       reducedMotion: () => reduced.current,
       onCamera: (cam) => rememberCamera(keys.current.scene, cam),
       onPin: (pin) => {
-        if (pin.kind === 'mine' && pin.branchId)
+        if (pin.dataCenterId) openPanel({ type: 'dataCenter', dataCenterId: pin.dataCenterId });
+        else if (pin.kind === 'mine' && pin.branchId)
           openPanel({ type: 'branch', branchId: pin.branchId });
         else if (pin.kind === 'rival') {
           if (FEATURES.competition) openPanel({ type: 'rivalBranch', lotId: pin.id });

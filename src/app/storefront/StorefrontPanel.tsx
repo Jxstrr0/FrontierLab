@@ -2,6 +2,7 @@
 // and works nearby, the competition, an area map) and a Build branch button.
 import { sizeName } from '../../sim/branch/officeSize';
 import { CITIES } from '../../data/cities';
+import { DEFAULT_DC_BUILD } from '../../data/dataCenters';
 import { SEGMENTS } from '../../data/types';
 import * as cmd from '../../sim/commands';
 import { cheapestBuild } from '../build/builds';
@@ -42,6 +43,8 @@ export function StorefrontPanel(p: { lotId: string }) {
       : '');
   // The cheapest build tells us whether any build is possible here right now.
   const blocker = cmd.buildBlocker(s, p.lotId, cheapestBuild());
+  // Cash is checked on the build screen, where the parts are picked (C2c).
+  const dcBlocker = cmd.dataCenterBlocker(s, { lotId: p.lotId }, DEFAULT_DC_BUILD);
 
   return (
     <Panel
@@ -53,6 +56,9 @@ export function StorefrontPanel(p: { lotId: string }) {
       footer={
         <div class="stack">
           {blocker && <p class="storefront-blocker small">{blocker}</p>}
+          {dcBlocker && dcBlocker !== blocker && (
+            <p class="storefront-blocker small">Data center: {dcBlocker}</p>
+          )}
           <button
             type="button"
             class="btn btn-primary btn-block"
@@ -61,6 +67,14 @@ export function StorefrontPanel(p: { lotId: string }) {
             data-tutorial="build-branch"
           >
             Build branch
+          </button>
+          <button
+            type="button"
+            class="btn btn-block"
+            disabled={!!dcBlocker}
+            onClick={() => openPanel({ type: 'buildDataCenter', lotId: lot.id })}
+          >
+            Build data center
           </button>
         </div>
       }

@@ -55,7 +55,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState } from './personalTypes';
 
-export const SCHEMA_VERSION = 3;
+export const SCHEMA_VERSION = 4;
 
 export interface GameState {
   schemaVersion: number;
@@ -67,6 +67,8 @@ export interface GameState {
   world: World;
   company: Company;
   branches: Record<Id, Branch>;
+  /** Your data centers (stage C2c, SIMULATION §9.9; schema 4). */
+  dataCenters: Record<Id, DataCenter>;
   /** Leased HQ offices (Stage 4, SIMULATION §16.1). */
   offices: Record<Id, Office>;
   /** HQ departments that have at least one floor (§16.2). */
@@ -458,6 +460,26 @@ export interface Branch {
   desk: DeskWeek;
   /** An acquired branch still converting to your brand (Stage 6). */
   converting?: BranchConversion;
+}
+
+/**
+ * A data center (stage C2c): on a storefront lot in a city (`lotId`) or at a
+ * regional energy site (`siteId`). `build` names its parts in DC_PARTS.
+ */
+export interface DataCenter {
+  id: Id;
+  cityId: Id;
+  lotId?: Id;
+  siteId?: Id;
+  name: string;
+  status: 'fitout' | 'open';
+  /** Weeks of fit-out left (0 once open). */
+  weeksLeft: number;
+  builtWeek: Week;
+  openedWeek?: Week;
+  build: { hall: string; power: string; cooling: string };
+  /** On a lot: the lease, as for a sales office. At an energy site: the land lease (no deposit). */
+  lease: { weeklyRent: Money; deposit: Money };
 }
 
 export interface BranchStaff {

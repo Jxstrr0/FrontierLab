@@ -42,6 +42,13 @@ export const MILESTONES: MilestoneSpec[] = [
     news: true,
   },
   {
+    id: 'first_data_center',
+    title: 'First data center',
+    goal: 'Build a data center and switch it on.',
+    line: '{bank} runs its own GPUs now.',
+    news: false,
+  },
+  {
     id: 'hq_staffed',
     title: 'HQ fully staffed',
     goal: 'Staff all seven operating departments to full coverage.',
@@ -67,6 +74,13 @@ export const MILESTONES: MilestoneSpec[] = [
     title: 'Five Flagships',
     goal: 'Run five Flagship sales offices.',
     line: '{bank} now runs five Flagship sales offices.',
+    news: true,
+  },
+  {
+    id: 'three_data_centers',
+    title: 'Three data centers',
+    goal: 'Run three data centers.',
+    line: '{bank} now runs three data centers.',
     news: true,
   },
   {
