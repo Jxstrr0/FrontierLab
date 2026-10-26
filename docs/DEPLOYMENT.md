@@ -2,10 +2,10 @@
 
 Changes reach `main` through pull requests that Claude opens and merges itself once the checks pass and there is no conflict (CLAUDE.md, "Branches and pull requests"); every merge to `main` deploys.
 
-The game is a static Vite build served from `https://jxstrr0.github.io/VaultStreet/`.
+The game is a static Vite build served from `https://jxstrr0.github.io/FrontierLab/`.
 
 ## One-time setup (owner, on phone or desktop)
-1. Create a repository named `VaultStreet` on GitHub (account `Jxstrr0`).
+1. Create a repository named `FrontierLab` on GitHub (account `Jxstrr0`).
    - The site is public even if the repo is private.
    - GitHub Pro allows Pages from private repos.
 2. Add these docs to the repo:
@@ -15,7 +15,7 @@ The game is a static Vite build served from `https://jxstrr0.github.io/VaultStre
 4. Start a Claude Code session on the repo with the first-session prompt in ROADMAP.md. It creates the workflow below as part of Stage 0.
 
 ## Vite config
-Use a relative base so the build works under `/VaultStreet/`:
+Use a relative base so the build works under `/FrontierLab/`:
 
 ```ts
 // vite.config.ts
@@ -76,12 +76,12 @@ jobs:
 - A hard refresh still works.
 
 ## PWA (built in Stage 10)
-- `public/manifest.webmanifest` with `start_url: "./"` and `scope: "./"`, so it works under `/VaultStreet/`. Icons at 192, 512 and maskable are drawn by `scripts/icons.ts`.
+- `public/manifest.webmanifest` with `start_url: "./"` and `scope: "./"`, so it works under `/FrontierLab/`. Icons at 192, 512 and maskable are drawn by `scripts/icons.ts`.
 - A service worker (`src/app/pwa/sw.js`) is written to `dist/sw.js` at build time by `src/app/pwa/swPlugin.ts`. It precaches every file of that build under a build-versioned cache name. A new deploy downloads in the background (also checked whenever the app comes back to the foreground). If the player is on the title screen with no game loaded, the page switches to it and reloads straight away; mid-game, it waits until they quit to the title, or the next launch.
 - The title screen's **Check for updates** button asks for a new deploy on demand. If one is found it downloads and the page reloads into it; otherwise a toast says you have the latest version (or that the site couldn't be reached).
 - Add `?nosw` to the URL to run without the service worker (and unregister an old one) when testing.
 - Still to test on a real iPhone: Share → Add to Home Screen, then launch offline.
 
 ## Later
-- **Hub:** add a Vault Street card in the Longlight hub repo (`Jxstrr0/Kelbo.Website`) in a separate session.
+- **Hub:** add a Frontier Lab card in the Longlight hub repo (`Jxstrr0/Kelbo.Website`) in a separate session.
 - **Custom domain (optional):** add a CNAME in Pages settings.

@@ -1,6 +1,8 @@
-# CLAUDE.md — Build brief for Vault Street
+# CLAUDE.md — Build brief for Frontier Lab
 
-You are building **Vault Street**, a browser tycoon game where the player founds a bank and grows it into a global financial empire. It is a faithful, system-for-system remake of the mobile tycoon *Coffee Inc 2*, re-themed from coffee shops to bank branches, with an original "Banknote Deco" art direction.
+You are building **Frontier Lab**, a browser tycoon game where the player founds an AI lab and grows it into a global company. It is a conversion of our bank tycoon *Vault Street* (itself a faithful, system-for-system remake of the mobile tycoon *Coffee Inc 2*), reusing as much of its code as possible: the same original "Banknote Deco" art direction, the same core mechanics and the same feel. All names stay fictional: no real AI companies, models or people.
+
+**Conversion in progress.** The code and most docs still describe the bank game. `docs/CONVERSION_PLAN.md` holds the proposed mapping and the staged plan. Until a conversion stage lands, treat bank terms in the docs as the current truth for the code.
 
 The owner (Kelbo, Longlight Interactive) mostly plays and tests on an iPhone and has beginner-level coding experience. You do the engineering. Explain decisions in plain language in PROGRESS.md.
 
@@ -21,7 +23,7 @@ When docs disagree, DESIGN wins for intent, SIMULATION for numbers and formulas,
 
 ## Non-negotiables
 1. **Faithful systems, original surface.** Mirror the original's system structure (DESIGN §3.1 mapping table). Never copy its names, writing, art, icons, logos, sounds or company names. Every name in CONTENT.md is original: use those or invent new ones.
-2. **Static site on GitHub Pages.** No backend, accounts, analytics, ads or runtime network calls. Bundle all assets, with fonts via @fontsource. It must work when served from a sub-path (`/VaultStreet/`).
+2. **Static site on GitHub Pages.** No backend, accounts, analytics, ads or runtime network calls. Bundle all assets, with fonts via @fontsource. It must work when served from a sub-path (`/FrontierLab/`).
 3. **Phone-first.** Build and check at 390×844 portrait first, then scale up.
    - Tap targets ≥ 44 px, no hover-only interactions.
    - Respect `env(safe-area-inset-*)`.
@@ -144,5 +146,12 @@ Never commit straight to `main`. Several sessions often work at once, and direct
 - Commit screenshots or recordings of the original game.
 - Leave a stage half-wired on `main`. Use feature flags in `balance.ts` (`FEATURES`) if a system is partly built.
 
+## Reference repo
+This game is a fork of Vault Street (remote: upstream).
+- Treat upstream as read-only. Never push to it.
+- To see how Vault Street handled something, use
+  git show upstream/main:<path> or git diff main upstream/main -- <path>.
+- Only bring over upstream changes when asked, and log them in PROGRESS.md.
+
 ## Studio context
-Vault Street is a Longlight Interactive game. The studio hub site is a separate repo (`Jxstrr0/Kelbo.Website`). At launch (ROADMAP Stage 10), a card linking to this game gets added there in a separate session. Never edit that repo from here.
+Frontier Lab is a Longlight Interactive game. The studio hub site is a separate repo (`Jxstrr0/Kelbo.Website`). At launch (ROADMAP Stage 10), a card linking to this game gets added there in a separate session. Never edit that repo from here.
