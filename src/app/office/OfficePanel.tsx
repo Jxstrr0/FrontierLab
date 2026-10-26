@@ -16,6 +16,9 @@ import { act, closePanel, openPanel, useGame } from '../store';
 import { OfficeArt } from './OfficeArt';
 import './office.css';
 
+/** The teams the tutorial suggests moving in first (SCREENS §27.2). */
+const STARTER_DEPTS: readonly DeptId[] = ['finance', 'hr'];
+
 export function OfficePanel(p: { listingId: string }) {
   const s = useGame();
   const listing = s.world.officeListings[p.listingId];
@@ -73,6 +76,7 @@ function Listing({ listing }: { listing: OfficeListing }) {
             type="button"
             class="btn btn-primary btn-block"
             disabled={!!blocker}
+            data-tutorial={blocker ? undefined : 'office-rent'}
             onClick={rent}
           >
             Rent office · {money(quote.total, sym)}
@@ -98,7 +102,10 @@ function Listing({ listing }: { listing: OfficeListing }) {
             const spec = DEPARTMENTS[d];
             const on = picked.includes(d);
             return (
-              <div class="office-dept">
+              <div
+                class="office-dept"
+                data-tutorial={!on && STARTER_DEPTS.includes(d) ? 'office-dept' : undefined}
+              >
                 <Toggle
                   label={`Add ${spec.name}`}
                   hint={`${spec.description} ${floorDesks(listing, d)} desks.`}

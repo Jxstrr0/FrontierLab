@@ -26,6 +26,7 @@ export function Hud() {
         <button
           type="button"
           class="hud-chip hud-bank"
+          data-tutorial="hud-bank"
           onClick={() => openPanel({ type: 'company' })}
         >
           <Medallion
@@ -95,6 +96,7 @@ export function Hud() {
             type="button"
             class="hud-chip hud-city is-tappable"
             aria-label={`${city?.name ?? ''}. Travel`}
+            data-tutorial="hud-travel"
             onClick={() => (sheet.value = 'travel')}
           >
             <PlaneIcon size={16} filled />
@@ -103,7 +105,12 @@ export function Hud() {
         ) : (
           <div class="hud-chip hud-city">{city?.name ?? ''}</div>
         )}
-        <button type="button" class="hud-chip hud-menu" onClick={() => (sheet.value = 'menu')}>
+        <button
+          type="button"
+          class="hud-chip hud-menu"
+          data-tutorial="hud-menu"
+          onClick={() => (sheet.value = 'menu')}
+        >
           <Icon name="menu" size={20} />
           <span>Menu</span>
         </button>

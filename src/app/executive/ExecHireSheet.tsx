@@ -44,6 +44,7 @@ export function ExecHireSheet(p: { seat: ExecSeat; onClose: () => void }) {
               <button
                 type="button"
                 class="btn btn-primary btn-block"
+                data-tutorial="exec-pick"
                 onClick={() => {
                   if (act(cmd.hireExec, p.seat, c.id).ok) {
                     toast(`${c.name} is your new ${spec.short}.`, 'good');

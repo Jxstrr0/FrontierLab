@@ -31,7 +31,12 @@ export function TravelSheet() {
       <Row label="Flown this week" value={allowance.flown} />
       <Row label="Free mileage left" value={allowance.remaining} />
       <nav class="menu-list travel-actions">
-        <button type="button" class="menu-item travel-item" onClick={toAirport}>
+        <button
+          type="button"
+          class="menu-item travel-item"
+          data-tutorial="travel-airport"
+          onClick={toAirport}
+        >
           <PlaneIcon size={20} />
           Go to the airport
           <span class="travel-item-note">{city.airport.code}</span>
