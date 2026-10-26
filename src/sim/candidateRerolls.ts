@@ -2,9 +2,9 @@
 // list of branch manager or executive candidates for a fee. The fee starts at
 // CANDIDATE_REROLL.feeShare of the role's market salary and doubles with each
 // reroll until the pool's free refresh resets it.
-import { CANDIDATE_REROLL, MANAGER_BASE_SALARY } from '../config/balance';
-import { CITIES } from '../data/cities';
+import { CANDIDATE_REROLL } from '../config/balance';
 import { execMarketSalary } from './execSeats';
+import { managerBaseSalary } from './payReviews';
 import { dpow } from './detmath';
 import type { ExecSeat, GameState } from './state';
 
@@ -15,8 +15,7 @@ function fee(market: number, rerolls: number): number {
 
 /** What the next manager reroll in a city costs. */
 export function managerRerollFee(state: GameState, cityId: string): number {
-  const market = MANAGER_BASE_SALARY * (CITIES[cityId]?.wageIndex ?? 1);
-  return fee(market, state.people.rerolls[cityId] ?? 0);
+  return fee(managerBaseSalary(state, cityId), state.people.rerolls[cityId] ?? 0);
 }
 
 /** What the next reroll of an executive seat's candidates costs. */

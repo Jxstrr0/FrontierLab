@@ -115,7 +115,7 @@ export function buildBranch(
     staff: {
       count: 0,
       target: 0,
-      wage: roundToStep(marketWage(lot.cityId), WAGE_STEP),
+      wage: roundToStep(marketWage(state, lot.cityId), WAGE_STEP),
       skill: START_STAFF_SKILL,
       morale: START_STAFF_MORALE,
       quitAccumulator: 0,

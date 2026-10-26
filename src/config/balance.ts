@@ -146,6 +146,15 @@ export const GDP_FORECAST_SIGMA = 0.2;
 export const CREDIT_CYCLE = { floor: 0.8, slope: 0.35, base: 5.0 } as const;
 export const LOAN_DEMAND = { gdpSlope: 0.05, rateSlope: 0.12, min: 0.6, max: 1.3 } as const;
 export const DEPOSIT_GROWTH_SLOPE = 0.01;
+/**
+ * The nominal index (§4.6): each country's price-and-wealth level, 1 at the
+ * start, compounding weekly at (gdp + inflation + trend) % a year. Balances per
+ * account, market wages and rival books all scale with it, so a world whose
+ * cities are full keeps growing about 8–9% a year in an expansion and the late
+ * game runs into the hundreds of billions and beyond (DESIGN §5.9, decision log
+ * 2026-10-26). `trend` (percentage points) is the one dial for how fast.
+ */
+export const NOMINAL_INDEX = { trend: 4.0 } as const;
 export const MORTGAGE_LGD_SLOPE = 3;
 export const EQUITY_MARKET_DRIFT: Record<Phase, number> = {
   expansion: 0.08,
@@ -852,18 +861,35 @@ export const RIVAL_BASE_LOSS_RATE = 0.006;
 export const RIVAL_EXPANSION = {
   everyWeeks: 4,
   minCr: 0.11,
-  /** Chance per monthly check that an eligible rival opens a branch. */
+  /** Chance per monthly check, in each city it serves, that an eligible rival opens a branch there. */
   chance: 0.06,
   /** Trailing profit needs this many reported quarters (so no openings in year one). */
   minQuarters: 4,
   /** Rivals stop opening once they hold this share of a city's lots… */
-  maxRivalLotShare: 0.3,
+  maxRivalLotShare: 0.4,
   /** …or once fewer than this share of lots is free. */
-  minFreeLotShare: 0.3,
-  /** Build cost taken from equity, × city cost index. */
+  minFreeLotShare: 0.2,
+  /** Build cost taken from equity, × city cost index × the nominal index. */
   buildCost: 450_000,
   reviews: [20, 120] as [number, number],
+  /**
+   * Entering a new city (§18.4): an eligible rival with at least entryMinBranches
+   * branches rolls entryChance each monthly check to open its first branch in a
+   * generated city it doesn't serve, in a home country, or anywhere once it
+   * serves abroadMinCities cities. The city with the most free lots wins.
+   */
+  entryChance: 0.05,
+  entryMinBranches: 6,
+  abroadMinCities: 3,
 } as const;
+/**
+ * Rivals learn (§18.3): at each year end, every rival branch in a city where you
+ * run branches moves each quality coin `step` toward your average overall rating
+ * there when it's behind, up to `maxQuality`; a rival's app rating does the same
+ * toward yours. So a rival you out-serve closes the gap over the years instead
+ * of standing still.
+ */
+export const RIVAL_LEARNING = { step: 0.1, maxQuality: 4.6 } as const;
 /** Close a branch after this many negative weeks, ignoring its first graceWeeks (§18.4). */
 export const RIVAL_CLOSURE = { negativeWeeks: 26, graceWeeks: 52 } as const;
 /** Review cards shown on a rival branch panel (derived, not stored). */
@@ -1316,13 +1342,15 @@ export const FRANCHISE = {
   riskWeight: 2.5,
 } as const;
 /**
- * The rich list (§22): 50 fortunes drawn log-uniform in `fortune`, growing 4–8% a
- * year. Sized to the game world (the biggest rival bank is about $1B of assets), so
- * a founder can enter the list in the first decade and a long, strong game can top it.
+ * The rich list (§22): 50 fortunes drawn log-uniform in `fortune`, each growing
+ * with the home country's nominal index (§4.6) plus its own real `growth` a year
+ * (−2% to +5%: some fortunes outrun the economy, some fall behind). Sized to the
+ * game world, so a founder can enter the list in the first decade and a long,
+ * strong game can top it.
  */
 export const RICH_LIST = {
   size: 50,
-  growth: [0.04, 0.08],
+  growth: [-0.02, 0.05],
   fortune: [0.15e9, 2e9],
   /** Fortunes are rounded to this. */
   roundTo: 1e6,
@@ -1764,10 +1792,13 @@ export const MERGERS = {
   /** Rival CR below this counts as Watch tier for the premium it requires. */
   watchCr: 0.105,
   sigmoidScale: 0.06,
-  retryWeeks: 4,
-  minProFormaCr: 0.105,
-  maxCityShare: 0.35,
-  fastTrackShare: 0.45,
+  retryWeeks: 2,
+  /** Pro-forma capital after the deal may sit in the Watch tier (DESIGN decision log 2026-10-26). */
+  minProFormaCr: 0.09,
+  maxCityShare: 0.5,
+  fastTrackShare: 0.65,
+  /** A distressed sale skips the city share test: the regulator wants the network rescued. */
+  distressedShareExempt: true,
   conversionWeeks: 8,
   moraleHit: 10,
   /** A distressed network's asking price as P/B (§18.5). */
@@ -2011,6 +2042,12 @@ export const MILESTONE_GOALS = {
   assets: 10_000_000_000,
   acquisitions: 5,
   founderWorth: 1_000_000_000,
+  allCities: 20,
+  allCountries: 10,
+  manyAcquisitions: 10,
+  bigAssets: 100_000_000_000,
+  richFounder: 10_000_000_000,
+  hugeAssets: 1_000_000_000_000,
 } as const;
 /** Departments that must all be fully staffed (coverage k′ ≥ 1) for "HQ fully staffed". */
 export const MILESTONE_HQ_DEPTS = [

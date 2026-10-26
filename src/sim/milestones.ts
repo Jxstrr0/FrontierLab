@@ -12,6 +12,9 @@ import { netWorth } from './netWorth';
 import type { GameState } from './state';
 
 const openBranches = (s: GameState) => Object.values(s.branches).filter((b) => b.status === 'open');
+const cityCount = (s: GameState) => new Set(openBranches(s).map((b) => b.cityId)).size;
+const countryCount = (s: GameState) =>
+  new Set(openBranches(s).map((b) => CITIES[b.cityId]?.country)).size;
 
 const REACHED: Record<string, (s: GameState) => boolean> = {
   first_branch: (s) => openBranches(s).length > 0,
@@ -23,17 +26,21 @@ const REACHED: Record<string, (s: GameState) => boolean> = {
   ipo: (s) => s.stock.status === 'public',
   first_acquisition: (s) => s.mergers.deals.length > 0,
   hundred_branches: (s) => openBranches(s).length >= MILESTONE_GOALS.manyBranches,
-  ten_cities: (s) => new Set(openBranches(s).map((b) => b.cityId)).size >= MILESTONE_GOALS.cities,
+  ten_cities: (s) => cityCount(s) >= MILESTONE_GOALS.cities,
   deposits_1b: (s) => totalDeposits(s) >= MILESTONE_GOALS.deposits,
-  five_countries: (s) =>
-    new Set(openBranches(s).map((b) => CITIES[b.cityId]?.country)).size >=
-    MILESTONE_GOALS.countries,
+  five_countries: (s) => countryCount(s) >= MILESTONE_GOALS.countries,
   assets_10b: (s) => balanceSheet(s).assets >= MILESTONE_GOALS.assets,
   five_acquisitions: (s) => s.mergers.deals.length >= MILESTONE_GOALS.acquisitions,
   club_owner: (s) => yourClubs(s).length > 0,
+  twenty_cities: (s) => cityCount(s) >= MILESTONE_GOALS.allCities,
+  ten_countries: (s) => countryCount(s) >= MILESTONE_GOALS.allCountries,
   billionaire: (s) => netWorth(s).total >= MILESTONE_GOALS.founderWorth,
   rich_list: (s) => s.personal.empire.richList.rank !== undefined,
+  ten_acquisitions: (s) => s.mergers.deals.length >= MILESTONE_GOALS.manyAcquisitions,
+  assets_100b: (s) => balanceSheet(s).assets >= MILESTONE_GOALS.bigAssets,
   rich_list_1: (s) => s.personal.empire.richList.rank === 1,
+  worth_10b: (s) => netWorth(s).total >= MILESTONE_GOALS.richFounder,
+  assets_1t: (s) => balanceSheet(s).assets >= MILESTONE_GOALS.hugeAssets,
 };
 
 /** Records newly reached milestones. `quiet` skips the events (catching up an old save). */

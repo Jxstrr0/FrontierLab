@@ -155,7 +155,7 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
       if (spec?.ticker) bank.ticker = spec.ticker;
       for (const b of bank.branches) {
         Object.assign(b, { deposits: 0, loans: 0, contribution: 0, negativeWeeks: 0 });
-        seedMatureBooks(b);
+        seedMatureBooks(state, b);
       }
     }
     for (const id of Object.keys(state.rivals).sort())
@@ -552,6 +552,14 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
         RICH_LIST.roundTo;
     }
     list.fortunes.sort((a, b) => b.worth - a.worth || a.id.localeCompare(b.id));
+    return s;
+  },
+  32: (s) => {
+    // The nominal index (§4.6) starts at today's level: balances, wages and rival
+    // books begin growing with each country's economy from this save onward.
+    for (const c of Object.values((s as unknown as GameState).world.countries)) {
+      if (c) c.nominal ??= 1;
+    }
     return s;
   },
 };

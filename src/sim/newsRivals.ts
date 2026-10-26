@@ -57,6 +57,23 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
         },
       };
     }
+    case 'RIVAL_CITY_ENTRY': {
+      const here = ctx.yourCities.has(str(p.city));
+      return {
+        key: 'RIVAL_CITY_ENTRY',
+        subject: rivalId,
+        tab: 'banking',
+        icon: 'facade',
+        priority: here ? P.rivalLocal + 5 : P.rivalAbroad + 5,
+        tokens: {
+          bank: str(p.bank, 'A rival'),
+          city: cityName(str(p.city)),
+          district: districtName(str(p.district)),
+          address: str(p.address, 'a new storefront'),
+          cities: String(num(p.cities)),
+        },
+      };
+    }
     case 'PRICE_WAR':
       return {
         key: 'PRICE_WAR',

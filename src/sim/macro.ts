@@ -18,6 +18,7 @@ import {
   MACRO_TRANSITIONS,
   MARKET_SHOCK_SIGMA,
   MORTGAGE_LGD_SLOPE,
+  NOMINAL_INDEX,
   POLICY_BIG_GAP,
   POLICY_BIG_STEP,
   POLICY_CAP,
@@ -61,6 +62,7 @@ export function initCountry(id: CountryId, rng: Rng): CountryState {
     startPolicy: spec.startPolicy,
     feeIndex: 1,
     marketReturn: 0,
+    nominal: 1,
   };
 }
 
@@ -95,6 +97,7 @@ export function updateMacro(state: GameState): void {
     c.cre *= 1 + t.creDrift / WEEKS_PER_YEAR + rng.normal(0, MACRO_INDEX_SIGMA);
     c.termPremium = ema(c.termPremium, t.termPremium, TERM_PREMIUM_EMA);
     c.marketReturn = rng.normal(EQUITY_MARKET_DRIFT[c.phase] / WEEKS_PER_YEAR, MARKET_SHOCK_SIGMA);
+    c.nominal *= 1 + nominalWeeklyGrowth(c);
     pushHistory(c.gdpHistory, c.gdp, GDP_HISTORY_WEEKS);
     pushHistory(c.hpiHistory, c.hpi, HPI_HISTORY_WEEKS);
   }
@@ -182,6 +185,14 @@ export function loanDemand(c: CountryState): number {
     LOAN_DEMAND.min,
     LOAN_DEMAND.max,
   );
+}
+
+/**
+ * §4.6: the nominal index's growth this week, (gdp + inflation + trend) % a year
+ * over 52 weeks. Deposit balances drift up by the same amount, as incomes rise.
+ */
+export function nominalWeeklyGrowth(c: CountryState): number {
+  return (c.gdp + c.inflation + NOMINAL_INDEX.trend) / 100 / WEEKS_PER_YEAR;
 }
 
 export function depositGrowth(c: CountryState): number {

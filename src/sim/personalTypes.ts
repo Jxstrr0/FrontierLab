@@ -140,7 +140,13 @@ export interface PersonalEmpire {
   homes: OwnedHome[];
   cars: OwnedCar[];
   collectibles: OwnedCollectible[];
-  richList: { fortunes: RichFortune[]; rank?: number; lastRankWeek?: Week };
+  richList: {
+    fortunes: RichFortune[];
+    rank?: number;
+    lastRankWeek?: Week;
+    /** The home country's nominal index at the last year end (§22): fortunes grow with it. */
+    nominalRef?: number;
+  };
   insider: { pending: InsiderCase[] };
   /** Home id → week until which its seller won't hear another offer (a refusal). */
   offerLocks?: Record<string, Week>;

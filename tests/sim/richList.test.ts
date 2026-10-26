@@ -26,12 +26,22 @@ describe('rich list', () => {
     expect(game().personal.empire.richList.fortunes).toEqual(f);
   });
 
-  it('grows every fortune 4–8% at year end', () => {
+  it('grows every fortune with the economy plus its own real growth at year end', () => {
     const s = game();
     const before = new Map(s.personal.empire.richList.fortunes.map((x) => [x.id, x.worth]));
-    richListYear(s);
+    richListYear(s); // the first ranking only sets the economy's reference level
     for (const x of s.personal.empire.richList.fortunes) {
       const g = x.worth / before.get(x.id)! - 1;
+      expect(g).toBeGreaterThan(RICH_LIST.growth[0] - 0.01);
+      expect(g).toBeLessThan(RICH_LIST.growth[1] + 0.01);
+    }
+    expect(s.personal.empire.richList.nominalRef).toBe(s.world.countries.CA!.nominal);
+    // A doubled economy doubles every fortune on top of its own growth.
+    const mid = new Map(s.personal.empire.richList.fortunes.map((x) => [x.id, x.worth]));
+    s.world.countries.CA!.nominal *= 2;
+    richListYear(s);
+    for (const x of s.personal.empire.richList.fortunes) {
+      const g = x.worth / mid.get(x.id)! / 2 - 1;
       expect(g).toBeGreaterThan(RICH_LIST.growth[0] - 0.01);
       expect(g).toBeLessThan(RICH_LIST.growth[1] + 0.01);
     }

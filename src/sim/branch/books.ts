@@ -27,7 +27,8 @@ import {
 import { CITIES } from '../../data/cities';
 import { needsApproval, PRODUCTS, type ProductSpec } from '../../data/products';
 import { SEGMENTS } from '../../data/types';
-import { creditCycle, depositGrowth, mortgageLgdMult } from '../macro';
+import { creditCycle, depositGrowth, mortgageLgdMult, nominalWeeklyGrowth } from '../macro';
+import { nominalIndex } from '../nominal';
 import { clamp } from '../math';
 import { countryOfCity, ftpFor, marketRef } from '../rates';
 import type { Book, Branch, CountryState, GameState } from '../state';
@@ -146,8 +147,11 @@ function runDeposit(ctx: Ctx, spec: ProductSpec, book: Book, orig: Origination):
   moveReserves(ctx, orig.newVolume);
   book.bookRate = spec.priceType === 'rate' ? price : (spec.payRate ?? 0);
 
+  // Organic growth (chequing) plus the drift of every balance with incomes (§4.6).
   const organic =
-    (book.balance * (spec.organic ?? 0) * depositGrowth(ctx.country)) / WEEKS_PER_YEAR;
+    book.balance *
+    (((spec.organic ?? 0) * depositGrowth(ctx.country)) / WEEKS_PER_YEAR +
+      nominalWeeklyGrowth(ctx.country));
   book.balance += organic;
   moveReserves(ctx, organic);
 
@@ -288,6 +292,11 @@ function runAmortizing(ctx: Ctx, spec: ProductSpec, book: Book, orig: Originatio
     wk.originationFees += orig.newVolume * (spec.originationFee ?? 0);
   }
   book.lgd = spec.lgd ?? 0;
+  // Loan balances drift with incomes like deposits (§4.6): borrowers refinance and
+  // top up as the price level rises, so the loan-to-deposit ratio holds.
+  const drift = book.balance * nominalWeeklyGrowth(ctx.country);
+  book.balance += drift;
+  moveReserves(ctx, -drift);
 
   if (book.balance > 0) {
     const principal = book.balance / (spec.termWeeks ?? WEEKS_PER_YEAR);
@@ -323,10 +332,12 @@ function runRevolving(ctx: Ctx, spec: ProductSpec, book: Book, orig: Origination
   book.accounts -= book.last.churned;
   defaults(ctx, spec, book);
 
+  const level = nominalIndex(state, branch.cityId);
   const target =
     book.accounts *
     spec.ticket *
     (lot?.incomeIndex ?? 1) *
+    level *
     (ctx.country.phase === 'recession' ? RECESSION_DRAW_MULT : 1);
   const next = book.balance + REVOLVING_EMA * (target - book.balance);
   moveReserves(ctx, -(next - book.balance));
@@ -335,15 +346,17 @@ function runRevolving(ctx: Ctx, spec: ProductSpec, book: Book, orig: Origination
 
   wk.loanInterest += perWeek(book.balance * price);
   wk.fundingCharge += perWeek(book.balance * ftpFor(spec, ctx.country));
+  // Card spend and annual fees are quoted at today's price level too (§4.6).
   if (spec.spendPerMonth) {
     wk.cardFees +=
       (book.accounts *
         spec.spendPerMonth *
+        level *
         INTEREST_PERIODS.monthsPerYear *
         (spec.interchange ?? INTERCHANGE)) /
       WEEKS_PER_YEAR;
   }
-  if (spec.annualFee) wk.cardFees += perWeek(book.accounts * spec.annualFee);
+  if (spec.annualFee) wk.cardFees += perWeek(book.accounts * spec.annualFee * level);
 }
 
 // ─── Wealth and services (§10.4, §10.5) ───────────────────────────────────────

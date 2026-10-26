@@ -32,6 +32,8 @@ export interface RunLog {
   branches: number[];
   tier: Tier[];
   recession: boolean[];
+  /** The home country's nominal index (§4.6), to read targets in start-of-game money. */
+  nominal: number[];
 }
 
 export const emptyLog = (): RunLog => ({
@@ -41,6 +43,7 @@ export const emptyLog = (): RunLog => ({
   branches: [0],
   tier: ['strong'],
   recession: [false],
+  nominal: [1],
 });
 
 export function logWeek(log: RunLog, state: GameState, netIncome: number): void {
@@ -51,6 +54,7 @@ export function logWeek(log: RunLog, state: GameState, netIncome: number): void 
   log.branches.push(Object.keys(state.branches).length);
   log.tier.push(state.company.tier);
   log.recession.push(homeCountry(state).phase === 'recession');
+  log.nominal.push(homeCountry(state).nominal);
 }
 
 /** Whether the home country was in recession within `window` weeks before `week`. */
@@ -98,13 +102,15 @@ export function strategyChecks(name: string, opts: NewGameOptions, log: RunLog):
       checks.push({
         label: 'Year 2 branches',
         value: String(n),
-        ok: n >= 4 && n <= 8,
-        target: '4–8',
+        // 3–8 since the nominal index (§4.6): a balance sheet that grows with the economy binds capital a little sooner.
+        ok: n >= 3 && n <= 8,
+        target: '3–8',
       });
     }
     if (weeks >= 520) {
       const n = log.branches[520]!;
-      const a = log.assets[520]!;
+      // §25 bands are in start-of-game money: deflate by the nominal index.
+      const a = log.assets[520]! / log.nominal[520]!;
       checks.push({
         label: 'Year 10 branches',
         value: String(n),
@@ -112,7 +118,7 @@ export function strategyChecks(name: string, opts: NewGameOptions, log: RunLog):
         target: '60–250',
       });
       checks.push({
-        label: 'Year 10 total assets',
+        label: 'Year 10 total assets (real)',
         value: B(a),
         ok: a >= 6e9 && a <= 40e9,
         target: '$6–40B',

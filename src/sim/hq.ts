@@ -34,6 +34,7 @@ import { totalWholesale } from './fundingLots';
 import { riskCoverageBonus } from './incident/effects';
 import { spend } from './ledger';
 import { clamp, ema } from './math';
+import { nominalIndex } from './nominal';
 import type { Coverage, Department, DeptId, GameState, HqDeptId } from './state';
 
 // ─── Size and requirements ────────────────────────────────────────────────────
@@ -132,8 +133,12 @@ export function hqCityId(state: GameState): string {
   return Object.values(state.offices)[0]?.cityId ?? state.meta.homeCityId;
 }
 
+/** Market pay for a department: base × the HQ city's wageIndex × its nominal index (§4.6). */
 export function deptMarketSalary(state: GameState, id: DeptId): number {
-  return DEPARTMENTS[id].marketSalary * (CITIES[hqCityId(state)]?.wageIndex ?? 1);
+  const cityId = hqCityId(state);
+  return (
+    DEPARTMENTS[id].marketSalary * (CITIES[cityId]?.wageIndex ?? 1) * nominalIndex(state, cityId)
+  );
 }
 
 // ─── Coverage (§16.4) ─────────────────────────────────────────────────────────

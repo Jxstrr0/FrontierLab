@@ -5,6 +5,7 @@
 // country, so a rival in several countries prices off each country's own
 // central bank and one country's moves never reach another.
 import {
+  WEEKS_PER_YEAR,
   CARD_REPRICE_GAP,
   DEPOSIT_BETA_DOWN,
   DEPOSIT_BETA_UP,
@@ -18,6 +19,7 @@ import { isDeposit, PRODUCTS, type ProductSpec } from '../data/products';
 import { STRATEGY_PROFILES, type Strategy } from '../data/rivals';
 import type { CountryId } from '../data/types';
 import { difficultyOf } from './difficulty';
+import { nominalWeeklyGrowth } from './macro';
 import { clamp } from './math';
 import { defaultPrice, ftpLong, ftpShort } from './rates';
 import { stream, type Rng } from './rng';
@@ -165,7 +167,11 @@ export function repriceRivalFees(state: GameState): void {
       if (spec.priceType === 'feeMonthly' || spec.priceType === 'feeAnnual') {
         const p = rival.prices[spec.id];
         if (p !== undefined)
-          rival.prices[spec.id] = clamp(p * (1 + c.inflation / 100), spec.min, spec.max);
+          rival.prices[spec.id] = clamp(
+            p * (1 + nominalWeeklyGrowth(c) * WEEKS_PER_YEAR),
+            spec.min,
+            spec.max,
+          );
       }
     }
   }
