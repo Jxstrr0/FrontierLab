@@ -1,6 +1,6 @@
 /// <reference types="vitest/config" />
 // Vite build config. `base: './'` keeps every asset path relative so the
-// site works under the GitHub Pages sub-path (/VaultStreet/). See docs/DEPLOYMENT.md.
+// site works under the GitHub Pages sub-path (/FrontierLab/). See docs/DEPLOYMENT.md.
 // The service worker plugin writes dist/sw.js for offline play (src/app/pwa/).
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';

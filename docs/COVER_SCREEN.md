@@ -1,6 +1,6 @@
 # Cover screen: "Living skyline" — handoff and design doc
 
-**For:** a Claude Code session working the `Jxstrr0/VaultStreet` repo
+**For:** a Claude Code session working the `Jxstrr0/VaultStreet` repo (now forked as `Jxstrr0/FrontierLab`)
 **From:** Kelbo (owner), via a design session on 26 Oct 2026
 **Status:** design approved (pitch 3 of 6). Build it.
 

@@ -2,13 +2,56 @@
 
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
-**Current stage:** 10 — Art pass, onboarding, polish, launch (built and live; awaiting the owner's iPhone check). All ten roadmap stages are built. Still open: the owner's testing and tuning pass, an Add to Home Screen test on a real iPhone, and the Vault Street card on Kelbo.Website (in a separate session in that repo).
-**Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
+**Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
+**Current stage:** C0 not started. The conversion plan (`docs/CONVERSION_PLAN.md`) is waiting for the owner's approval. The code is still the finished Vault Street bank game (v0.13.3, schema v38).
+**Live URL:** https://jxstrr0.github.io/FrontierLab/ (once Pages is switched on for this repo; see the 2026-10-26 entry)
 **Determinism snapshot:** `1d353966f53ba6` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-26 — Frontier Lab setup and conversion plan (docs only)
+
+**What you asked for:**
+- set the repo up as a fork of Vault Street
+- rename the docs to Frontier Lab
+- propose how to turn the bank game into an AI-lab game
+
+You asked for no game code changes.
+
+**Setup.**
+- Added the `upstream` remote pointing at `Jxstrr0/VaultStreet`. Right now it is identical to our `main`.
+- New **Reference repo** section in CLAUDE.md, in your wording: upstream is read-only, and we only bring changes over when asked.
+- **Renamed to Frontier Lab** in CLAUDE.md, README, DESIGN, ROADMAP, DEPLOYMENT and COVER_SCREEN, with the live link `/FrontierLab/`.
+  - Two code comments that named the old sub-path were updated too (comments only, nothing that runs).
+  - The game itself, its title tag and its text are untouched.
+- CLAUDE.md, README, DESIGN and ROADMAP each say a conversion is under way and point to the plan. DESIGN keeps describing the bank game until a stage changes it, so the docs still match the code.
+
+**The plan: new file `docs/CONVERSION_PLAN.md`.** It has the four things you asked for:
+1. A new mapping table: every row of the old one, plus the bank-only systems it left out (liquidity, bank runs, bonds, deposit beta, adverse selection, foreclosed homes and others).
+2. Every `src/sim` and `src/data` file sorted into: relabel only, constant changes, formula changes, or remove. Most files are relabel only. The real work is in about 30 files, all in the money and treasury layer.
+3. Where your plan rubs against the code, each with a fix.
+4. Nine conversion stages, C0–C8. The game stays playable after each one.
+
+**The decisions, in plain language.**
+- **Saves need their own place first.** Both games live on `jxstrr0.github.io`, and a browser keeps one storage box per site. Today both games use the same save names, so on your iPhone they would see and overwrite each other's slots. Stage C0 is a small fix that gives Frontier Lab its own names. Until then, don't play both on the same phone.
+- **The one big mismatch is money.** A bank holds customers' money and lends it out, and half of Vault Street's engine (liquidity, capital ratio, bonds) exists because of that. An AI lab just earns subscription revenue. So that layer turns into a **compute** layer: GPU capacity, GPU lots, waitlists and outages instead of liquidity, funding lots and bank runs. The capital ratio becomes a **safety** ratio. It is the riskiest stage, so it comes after the easy renames.
+- **Whole-city catchment needs very little new code.** The existing share formula already counts your own other branches as competitors. With distance switched off, two campuses in one city split one market instead of doubling it.
+- **Named businesses go on the spare storefront lots** (about 20–60 per city once campuses need only a few). Rival-coloured awnings already work on those lots. Showing your colours needs one small art change.
+- **Your churn question.** I recommend both, timed by each contract's own renewal date rather than one quarterly renewal season:
+  - At renewal, rivals bid and the business may leave.
+  - Mid-term, a contract only ends if the business fails, more often in recessions, or after a big outage.
+  - Four weeks before each renewal you get a "Renewals due" list, so you can offer a discount.
+  - Spreading renewals out keeps every week a bit interesting instead of dumping dozens of decisions into one week four times a year.
+
+**Open questions:** listed at the end of the plan (A1–A6). The main ones: the five customer segments, how rival labs are named, and whether bonds and venture debt are removed or reused.
+
+**Checks.** `npm run lint`, all tests and `npm run build` pass. The game code is unchanged, so balance and the determinism snapshot are untouched.
+
+**GitHub Pages.** This repo had no workflow runs yet. If the live link doesn't load after this merges, open the repo's **Settings → Pages** and set **Source: GitHub Actions**. Only you can change that setting.
+
+**Next:** your answers on the plan, then stage C0 (separate saves).
 
 ### 2026-10-26 — Procedural startup and rival names (v0.13.3)
 
