@@ -1,5 +1,7 @@
 # Roadmap
 
+> Stages 0–10 below are the Vault Street build, all done and inherited by this fork. The Frontier Lab conversion has its own stages (C0–C8) in `CONVERSION_PLAN.md`.
+
 Eleven stages. Each one ends playable and deployed. A stage usually takes several sessions: split it into numbered steps (1a, 1b…) in PROGRESS.md and finish each step with green CI and a working live site. Turn later systems on with `FEATURES` flags in `balance.ts`.
 
 ---
@@ -196,7 +198,7 @@ Eleven stages. Each one ends playable and deployed. A stage usually takes severa
 - Balance pass across every strategy
 - PWA: manifest, icons, offline cache, respecting the sub-path base
 - Credits screen
-- In a separate session in the hub repo, add a Vault Street card to Kelbo.Website
+- In a separate session in the hub repo, add a Frontier Lab card to Kelbo.Website
 
 **Accept:**
 - Lighthouse mobile ≥ 90.
