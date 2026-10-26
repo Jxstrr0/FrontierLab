@@ -47,16 +47,16 @@ describe('save slots', () => {
 
   it('refuses a slot whose data no longer matches its checksum', async () => {
     await saveToSlot('1', runScript(5));
-    const key = 'vaultstreet.save.1';
+    const key = 'frontierlab.save.1';
     ls.items.set(key, ls.items.get(key)!.slice(0, -3) + 'abc');
     await expect(loadFromSlot('1')).rejects.toThrow(SAVE_DAMAGED);
   });
 
   it('still loads older slots written without a checksum', async () => {
     await saveToSlot('2', runScript(5));
-    const meta = JSON.parse(ls.items.get('vaultstreet.meta.2')!);
+    const meta = JSON.parse(ls.items.get('frontierlab.meta.2')!);
     delete meta.checksum;
-    ls.items.set('vaultstreet.meta.2', JSON.stringify(meta));
+    ls.items.set('frontierlab.meta.2', JSON.stringify(meta));
     await expect(loadFromSlot('2')).resolves.toBeDefined();
   });
 
@@ -88,9 +88,9 @@ describe('save cards for the title cover', () => {
 
   it('still lists older cards written without a cover', async () => {
     await saveToSlot('2', runScript(5));
-    const meta = JSON.parse(ls.items.get('vaultstreet.meta.2')!);
+    const meta = JSON.parse(ls.items.get('frontierlab.meta.2')!);
     delete meta.cover;
-    ls.items.set('vaultstreet.meta.2', JSON.stringify(meta));
+    ls.items.set('frontierlab.meta.2', JSON.stringify(meta));
     expect(allSlotMeta()['2']?.bankName).toBe(meta.bankName);
     expect(latestSlot()?.cover).toBeUndefined();
     await expect(loadFromSlot('2')).resolves.toBeDefined();
@@ -100,7 +100,7 @@ describe('save cards for the title cover', () => {
     expect(loadCoverIndex()).toBe(0);
     saveCoverIndex(7);
     expect(loadCoverIndex()).toBe(7);
-    ls.items.set('vaultstreet.coverCityIndex', 'nonsense');
+    ls.items.set('frontierlab.coverCityIndex', 'nonsense');
     expect(loadCoverIndex()).toBe(0);
     vi.stubGlobal('window', {});
     expect(loadCoverIndex()).toBe(0);

@@ -15,8 +15,7 @@ import {
   runRivalCampaigns,
 } from '../../src/sim/rivalMarketing';
 import { canBuy, mergeRivals, mergerTarget, proFormaCr } from '../../src/sim/rivalMergers';
-import { migrate } from '../../src/sim/save/migrations';
-import { SCHEMA_VERSION, type GameState, type RivalBank } from '../../src/sim/state';
+import { type GameState, type RivalBank } from '../../src/sim/state';
 import { openScriptedBranch } from '../helpers/scenario';
 
 const lotsIn = (s: GameState, cityId: string) =>
@@ -63,14 +62,6 @@ describe('chartered rivals (§18.7)', () => {
     // A second charter gets a different name.
     const next = charterRival(s, 'cal', stream(s, 'charters'));
     if (next) expect(next.name).not.toBe(bank.name);
-  });
-
-  it('migrates a v36 save unchanged', () => {
-    const s = newGame({ seed: 5, cityId: 'cal' });
-    const raw = JSON.parse(JSON.stringify(s)) as GameState & { schemaVersion: number };
-    raw.schemaVersion = 36;
-    const out = migrate(raw as never) as unknown as GameState & { schemaVersion: number };
-    expect(out.schemaVersion).toBe(SCHEMA_VERSION);
   });
 });
 

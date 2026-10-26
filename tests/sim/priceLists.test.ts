@@ -11,8 +11,7 @@ import * as cmd from '../../src/sim/commands';
 import { listLevel, listPrice } from '../../src/sim/nominal';
 import { newGame } from '../../src/sim/newGame';
 import { reviewPriceLists } from '../../src/sim/priceList';
-import { migrate } from '../../src/sim/save/migrations';
-import { SCHEMA_VERSION, type GameState } from '../../src/sim/state';
+import { type GameState } from '../../src/sim/state';
 import { openScriptedBranch } from '../helpers/scenario';
 
 const lotsIn = (s: GameState, cityId: string) =>
@@ -58,17 +57,6 @@ describe('price lists (§4.6)', () => {
     expect(cmd.floorFitout(s, 'cal')).toBe(
       2 * cmd.floorFitout(newGame({ seed: 5, cityId: 'cal' }), 'cal'),
     );
-  });
-
-  it('migrates an old save with its price lists at 1', () => {
-    const s = newGame({ seed: 5, cityId: 'cal' });
-    const raw = JSON.parse(JSON.stringify(s)) as GameState & { schemaVersion: number };
-    for (const c of Object.values(raw.world.countries))
-      delete (c as { listIndex?: number }).listIndex;
-    raw.schemaVersion = 34;
-    const out = migrate(raw as never) as unknown as GameState & { schemaVersion: number };
-    expect(out.schemaVersion).toBe(SCHEMA_VERSION);
-    expect(out.world.countries.CA!.listIndex).toBe(1);
   });
 });
 

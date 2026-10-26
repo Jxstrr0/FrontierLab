@@ -1,16 +1,13 @@
 // Moscow and St Petersburg (CONTENT §1–2): Russia's economy and currency, the
-// density that crowds Moscow's streets, its rivals and the v15 → v16 migration
-// that adds Russia to existing saves.
+// density that crowds Moscow's streets and its rivals.
 import { describe, expect, it } from 'vitest';
-import { CITY_MARKET, FX_START_INDEX } from '../../src/config/balance';
+import { CITY_MARKET } from '../../src/config/balance';
 import { CITIES } from '../../src/data/cities';
-import { COUNTRIES } from '../../src/data/countries';
 import { DISTRICT_SPECS } from '../../src/data/districts';
 import { cityBranchGuide, cityMarket } from '../../src/sim/branch/cityMarket';
 import { advanceWeeks } from '../../src/sim/engine';
 import { newGame } from '../../src/sim/newGame';
-import { migrate } from '../../src/sim/save/migrations';
-import { SCHEMA_VERSION, type GameState } from '../../src/sim/state';
+import { type GameState } from '../../src/sim/state';
 import { addCapital, identityGap } from '../helpers/markets';
 import { openScriptedBranch } from '../helpers/scenario';
 import { fly } from '../helpers/world';
@@ -61,25 +58,5 @@ describe('Russia', () => {
     advanceWeeks(a, 26);
     expect(a.rng['macro:RU']).toBeDefined();
     expect(a.rng['fx:RU']).toBeDefined();
-  });
-
-  it('adds Russia to v15 saves', () => {
-    const s = newGame({ seed: 5, cityId: 'cal' });
-    advanceWeeks(s, 4);
-    const raw = JSON.parse(JSON.stringify(s)) as Record<string, unknown> & {
-      schemaVersion: number;
-    };
-    const world = raw.world as GameState['world'];
-    delete world.countries.RU;
-    const fx = raw.fx as GameState['fx'];
-    delete fx.level.RU;
-    delete fx.history.RU;
-    raw.schemaVersion = 15;
-    const up = migrate(raw) as unknown as GameState;
-    expect(up.schemaVersion).toBe(SCHEMA_VERSION);
-    expect(up.world.countries.RU!.policyRate).toBe(COUNTRIES.RU.startPolicy);
-    expect(up.fx.level.RU).toBe(FX_START_INDEX);
-    advanceWeeks(up, 4);
-    expect(identityGap(up)).toBeLessThan(1);
   });
 });

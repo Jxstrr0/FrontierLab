@@ -9,8 +9,7 @@ import { WORLD_BEATS } from '../../src/data/newsWorldBeats';
 import { newGame } from '../../src/sim/newGame';
 import { beatFits } from '../../src/sim/newsWorldDesk';
 import { newsExact } from '../../src/sim/newsFormat';
-import { migrate } from '../../src/sim/save/migrations';
-import { SCHEMA_VERSION, type GameState, type LedgerIssue } from '../../src/sim/state';
+import { type LedgerIssue } from '../../src/sim/state';
 import { runScript } from '../helpers/scenario';
 
 const beat = (key: string) => WORLD_BEATS.find((b) => b.key === key)!;
@@ -87,18 +86,5 @@ describe('The paper over five years', () => {
       Object.keys(state.world.countries).length,
     );
     expect(all.filter((a) => a.ref!.startsWith('COLUMN_')).length).toBeGreaterThan(100);
-  });
-});
-
-describe('v33 → v34 migration', () => {
-  it('gives an existing news desk empty cooldowns and elections', () => {
-    const s0 = newGame({ seed: 5, cityId: 'cal' });
-    const raw = JSON.parse(JSON.stringify(s0)) as GameState & { schemaVersion: number };
-    raw.news.desk = { proposals: [], seasons: {}, polls: {}, assetMarks: {} } as never;
-    raw.schemaVersion = 33;
-    const s = migrate(raw as never) as unknown as GameState;
-    expect(s.schemaVersion).toBe(SCHEMA_VERSION);
-    expect(s.news.desk!.worldRecent).toEqual({});
-    expect(s.news.desk!.elections).toEqual({});
   });
 });

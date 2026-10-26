@@ -19,8 +19,8 @@
  */
 const VERSION = '__VS_VERSION__';
 const PRECACHE = ['__VS_PRECACHE__'];
-const CACHE = `vaultstreet-${VERSION}`;
-const PREFIX = 'vaultstreet-';
+const CACHE = `frontierlab-${VERSION}`;
+const PREFIX = 'frontierlab-';
 const scope = self.registration.scope;
 const INDEX = new URL('./index.html', scope).href;
 

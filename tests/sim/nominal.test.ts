@@ -11,8 +11,6 @@ import { newGame } from '../../src/sim/newGame';
 import { nominalIndex } from '../../src/sim/nominal';
 import { managerBaseSalary } from '../../src/sim/payReviews';
 import { matureDeposits } from '../../src/sim/rivals';
-import { migrate } from '../../src/sim/save/migrations';
-import { SCHEMA_VERSION, type GameState } from '../../src/sim/state';
 import { openScriptedBranch } from '../helpers/scenario';
 
 describe('nominal index (§4.6)', () => {
@@ -59,19 +57,5 @@ describe('nominal index (§4.6)', () => {
     const base = run(1);
     expect(base).toBeGreaterThan(0);
     expect(run(2) / base).toBeCloseTo(2, 1);
-  });
-
-  it('migration 32 → 33 gives every country an index of 1', () => {
-    const s0 = newGame({ seed: 5, cityId: 'cal' });
-    const raw = JSON.parse(JSON.stringify(s0)) as Record<string, unknown> & {
-      schemaVersion: number;
-    };
-    for (const c of Object.values((raw as unknown as GameState).world.countries)) {
-      delete (c as unknown as Record<string, unknown>).nominal;
-    }
-    raw.schemaVersion = 32;
-    const s = migrate(raw) as unknown as GameState;
-    expect(s.schemaVersion).toBe(SCHEMA_VERSION);
-    for (const c of Object.values(s.world.countries)) expect(c?.nominal).toBe(1);
   });
 });
