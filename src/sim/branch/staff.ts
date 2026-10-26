@@ -13,11 +13,13 @@ import { CITIES } from '../../data/cities';
 import { EQUIPMENT } from '../../data/equipment';
 import { hiresPerWeek, staffMods } from '../hq';
 import { clamp, ema } from '../math';
+import { nominalIndex } from '../nominal';
 import type { Branch, GameState } from '../state';
 import { dpow, dtanh } from '../detmath';
 
-export function marketWage(cityId: string): number {
-  return BASE_TELLER_WAGE * (CITIES[cityId]?.wageIndex ?? 1);
+/** The market teller wage in a city: base × wageIndex × the nominal index (§6, §4.6). */
+export function marketWage(state: GameState, cityId: string): number {
+  return BASE_TELLER_WAGE * (CITIES[cityId]?.wageIndex ?? 1) * nominalIndex(state, cityId);
 }
 
 export function managerOf(state: GameState, branch: Branch) {
@@ -33,7 +35,7 @@ export function staffNeeded(branch: Branch): number {
 
 /** Skill target S* (§6.3). */
 export function skillTarget(state: GameState, branch: Branch): number {
-  const ratio = branch.staff.wage / marketWage(branch.cityId);
+  const ratio = branch.staff.wage / marketWage(state, branch.cityId);
   const people = managerOf(state, branch)?.skills.people ?? 0;
   return (
     SKILL.base +
@@ -46,7 +48,7 @@ export function skillTarget(state: GameState, branch: Branch): number {
 export function updateStaff(state: GameState, branch: Branch): void {
   const s = branch.staff;
   const mgr = managerOf(state, branch);
-  const ratio = s.wage / marketWage(branch.cityId);
+  const ratio = s.wage / marketWage(state, branch.cityId);
   const people = mgr?.skills.people ?? 50;
   const mods = staffMods(state);
 

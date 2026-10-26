@@ -45,7 +45,7 @@ describe('late-game milestones', () => {
     const s = newGame({ seed: 3, cityId: 'cal' });
     checkMilestones(s);
     expect(new Set(MILESTONES.map((m) => m.id)).size).toBe(MILESTONES.length);
-    expect(MILESTONES.length).toBe(17);
+    expect(MILESTONES.length).toBe(23);
     expect(Object.keys(s.milestones)).toEqual([]);
   });
 
@@ -61,6 +61,25 @@ describe('late-game milestones', () => {
     s.personal.empire.richList.rank = 1;
     checkMilestones(s);
     expect(s.milestones.rich_list_1).toBe(s.clock.week);
+  });
+
+  it('reaches the trillion-range goals from assets, net worth, deals, cities and countries', () => {
+    const s = newGame({ seed: 3, cityId: 'cal' });
+    const deal = {} as (typeof s.mergers.deals)[number];
+    s.mergers.deals = Array.from({ length: 10 }, () => deal);
+    // Treasury reserves are an asset with no liability, so they lift total assets alone.
+    s.treasury.reserves += 100e9;
+    s.personal.cash += 10e9;
+    checkMilestones(s);
+    expect(s.milestones.ten_acquisitions).toBe(s.clock.week);
+    expect(s.milestones.assets_100b).toBe(s.clock.week);
+    expect(s.milestones.assets_1t).toBeUndefined();
+    expect(s.milestones.worth_10b).toBe(s.clock.week);
+    expect(s.milestones.twenty_cities).toBeUndefined();
+    expect(s.milestones.ten_countries).toBeUndefined();
+    s.treasury.reserves += 900e9;
+    checkMilestones(s);
+    expect(s.milestones.assets_1t).toBe(s.clock.week);
   });
 
   it('counts five closed deals for the fifth acquisition', () => {

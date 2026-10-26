@@ -29,6 +29,7 @@ import { clamp } from './math';
 import { countryOfCity } from './rates';
 import { rivalTargetPrice } from './rivalPrices';
 import { initRivalShares } from './marketInit';
+import { nominalIndex } from './nominal';
 import { stream, type Rng } from './rng';
 import type { CountryState, GameState, Lot, RivalBank, RivalBranch } from './state';
 import { dpow } from './detmath';
@@ -77,8 +78,13 @@ export function seedRivals(state: GameState, cityId: string, lots: Lot[]): void 
   const rng = stream(state, cityId === state.meta.homeCityId ? 'rivals' : `rivals:${cityId}`);
   const country = countryOfCity(state, cityId);
 
+  // A bank you've bought or the regulator has seized is gone from every city.
+  const gone = (id: string) => {
+    const status = state.rivals[id]?.status;
+    return status === 'acquired' || status === 'seized';
+  };
   const candidates = shuffle(
-    Object.values(RIVALS).filter((r) => r.home.includes(city.country)),
+    Object.values(RIVALS).filter((r) => r.home.includes(city.country) && !gone(r.id)),
     rng,
   ).sort((a, b) => STRATEGY_ORDER.indexOf(a.strategy) - STRATEGY_ORDER.indexOf(b.strategy));
   const chosen = candidates.slice(0, competitorsFor(state, cityId));
@@ -117,7 +123,7 @@ export function seedRivals(state: GameState, cityId: string, lots: Lot[]): void 
         contribution: 0,
         negativeWeeks: 0,
       };
-      seedMatureBooks(branch);
+      seedMatureBooks(state, branch);
       bank.branches.push(branch);
     }
   });
@@ -138,15 +144,23 @@ function seedBranchId(bank: RivalBank): string {
   return `rb_${bank.id}_${n}`;
 }
 
-/** A rival branch's mature deposit size (§18.1): city size × quality. */
-export function matureDeposits(branch: Pick<RivalBranch, 'cityId' | 'overall'>): number {
+/** A rival branch's mature deposit size (§18.1): city size × quality × the nominal index (§4.6). */
+export function matureDeposits(
+  state: GameState,
+  branch: Pick<RivalBranch, 'cityId' | 'overall'>,
+): number {
   const income = CITIES[branch.cityId]?.incomeIndex ?? 1;
-  return RIVAL_MATURE_DEPOSITS * income * (branch.overall / RIVAL_QUALITY_REF);
+  return (
+    RIVAL_MATURE_DEPOSITS *
+    income *
+    (branch.overall / RIVAL_QUALITY_REF) *
+    nominalIndex(state, branch.cityId)
+  );
 }
 
 /** Branches present at the start are already mature. */
-export function seedMatureBooks(branch: RivalBranch): void {
-  branch.deposits = matureDeposits(branch);
+export function seedMatureBooks(state: GameState, branch: RivalBranch): void {
+  branch.deposits = matureDeposits(state, branch);
   branch.loans = branch.deposits * RIVAL_LDR;
 }
 

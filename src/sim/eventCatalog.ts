@@ -47,6 +47,15 @@ export interface EventPayloads {
     address: string;
   };
   RIVAL_BRANCH_CLOSED: { rivalId: Id; bank: string; city: Id; district: string; address: string };
+  /** A rival opens its first branch in a new city (§18.4); `cities` is its count afterwards. */
+  RIVAL_CITY_ENTRY: {
+    rivalId: Id;
+    bank: string;
+    city: Id;
+    district: string;
+    address: string;
+    cities: number;
+  };
   /** Quarter-end report. `pct` is the change in revenue from the previous quarter. */
   RIVAL_EARNINGS: {
     rivalId: Id;

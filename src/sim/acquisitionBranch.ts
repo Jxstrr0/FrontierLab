@@ -89,7 +89,7 @@ export function convertRivalBranch(
     staff: {
       count: 0,
       target: 0,
-      wage: roundToStep(marketWage(rb.cityId), WAGE_STEP),
+      wage: roundToStep(marketWage(state, rb.cityId), WAGE_STEP),
       skill: 0,
       morale: Math.max(0, START_STAFF_MORALE - MERGERS.moraleHit),
       quitAccumulator: 0,

@@ -7,6 +7,7 @@
 import { EXEC_DELEGATION, EXECUTIVES } from '../config/balance';
 import { CITIES } from '../data/cities';
 import { EXEC_SEATS, EXEC_SEAT_ORDER } from '../data/executives';
+import { nominalIndex } from './nominal';
 import type { DeptId } from '../data/types';
 import type { EquityGrant, ExecSeat, Executive, GameState, Property } from './state';
 
@@ -80,7 +81,7 @@ export function lastAssets(state: GameState): number {
  */
 export function execMarketSalary(state: GameState): number {
   const cityId = Object.values(state.offices)[0]?.cityId ?? state.meta.homeCityId;
-  const wage = CITIES[cityId]?.wageIndex ?? 1;
+  const wage = (CITIES[cityId]?.wageIndex ?? 1) * nominalIndex(state, cityId);
   const e = EXECUTIVES;
   const raw = (e.salaryBase + (e.salaryPerBillion * Math.max(0, lastAssets(state))) / 1e9) * wage;
   return Math.min(e.salaryMax, raw);

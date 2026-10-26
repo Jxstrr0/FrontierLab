@@ -85,7 +85,7 @@ export function updateBranchBooks(state: GameState, branch: RivalBranch): void {
   const c = countryOfCity(state, branch.cityId);
   const age = state.clock.week - branch.openedWeek;
   const ramp = branch.openedWeek > 0 ? rampShare(age) : 1;
-  const target = matureDeposits(branch) * competitionFactor(state, branch) * ramp;
+  const target = matureDeposits(state, branch) * competitionFactor(state, branch) * ramp;
   branch.deposits += RIVAL_BOOK_EMA * (target - branch.deposits);
   const ldr = RIVAL_LDR * (1 + RIVAL_LDR_DEMAND_SLOPE * (loanDemand(c) - 1));
   branch.loans = branch.deposits * ldr;

@@ -55,7 +55,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState } from './personalTypes';
 
-export const SCHEMA_VERSION = 32;
+export const SCHEMA_VERSION = 33;
 
 export interface GameState {
   schemaVersion: number;
@@ -306,10 +306,12 @@ export interface CountryState {
   /** FTP when card APRs last re-priced (§5). */
   cardAnchor: Rate;
   startPolicy: Rate;
-  /** Fee products re-price yearly by inflation: price = base × feeIndex. */
+  /** Fee products re-price yearly with the economy's nominal growth (§4.6): price = base × feeIndex. */
   feeIndex: number;
   /** Equity market return this week (feeds wealth AUM until markets arrive). */
   marketReturn: number;
+  /** The nominal index (§4.6): price-and-wealth level, 1 at the start, compounding with growth. */
+  nominal: number;
   /** Extra capital buffer from a passed policy (§24 Politics): tier thresholds rise by pp. */
   capitalBuffer?: { pp: number; untilWeek: Week };
   /** Week a forced recession should start (balance-script option, §4.1). */

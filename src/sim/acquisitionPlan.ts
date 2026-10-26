@@ -184,7 +184,11 @@ export interface RegulatorCheck {
   detail: string;
 }
 
-/** The regulator's two tests (§19.8): pro-forma CR and deposit share in every affected city. */
+/**
+ * The regulator's two tests (§19.8): pro-forma CR and deposit share in every
+ * affected city. A distressed sale skips the share test (the regulator wants
+ * the failed network rescued), which the one row says.
+ */
 export function regulatorChecks(
   plan: DealPlan,
   cityName: (id: string) => string,
@@ -197,6 +201,14 @@ export function regulatorChecks(
       detail: `Pro-forma capital ratio ${pct(plan.proFormaCr)} (needs ${pct(MERGERS.minProFormaCr)})`,
     },
   ];
+  if (plan.distressed && MERGERS.distressedShareExempt) {
+    checks.push({
+      label: 'Deposit share',
+      ok: true,
+      detail: 'Not tested for a distressed sale: the regulator wants the network rescued',
+    });
+    return checks;
+  }
   for (const c of plan.cityShares) {
     checks.push({
       label: `Deposit share in ${cityName(c.cityId)}`,

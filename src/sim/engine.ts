@@ -2,7 +2,7 @@
 // scheduled events; every 7th day runs `weeklyTick`, which calls each system in
 // the documented order.
 import { checkMilestones } from './milestones';
-import { DAYS_PER_WEEK } from '../config/balance';
+import { DAYS_PER_WEEK, WEEKS_PER_YEAR } from '../config/balance';
 import { CITIES } from '../data/cities';
 import { runBooks } from './branch/books';
 import { addBranchCosts, closeBranchWeek } from './branch/branchPnl';
@@ -39,12 +39,12 @@ import { refreshFundingOffers } from './fundingMarket';
 import { runDevelopments } from './development';
 import { runHq } from './hq';
 import { runBrandMarketing } from './hqMarketing';
-import { updateMacro } from './macro';
+import { nominalWeeklyGrowth, updateMacro } from './macro';
 import { runCorporateDebt } from './corporateDebt';
 import { runIncidents } from './incidents';
 import { composeNews } from './news';
 import { runPartnerships } from './partnerships';
-import { rivalsQuarter, runRivals } from './rivalAi';
+import { rivalsQuarter, rivalsYear, runRivals } from './rivalAi';
 import { refreshManagerPool } from './people';
 import { runManagerPoaching } from './payReviews';
 import { ftpLong, ftpShort, updateMarketRefs } from './rates';
@@ -186,7 +186,9 @@ function yearEnd(state: GameState): void {
   conventionsYear(state); // next year's conventions calendar
   richListYear(state); // rich list ranking (§22)
   for (const c of Object.values(state.world.countries)) {
-    if (c) c.feeIndex *= 1 + c.inflation / 100;
+    // Fee products re-price yearly with the economy (§4.6; was inflation alone).
+    if (c) c.feeIndex *= 1 + nominalWeeklyGrowth(c) * WEEKS_PER_YEAR;
   }
   repriceRivalFees(state);
+  rivalsYear(state); // rivals learn from the cities you share (§18.3)
 }

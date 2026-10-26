@@ -17,6 +17,7 @@ import type { Branch, GameState } from '../src/sim/state';
 import { hqStaff } from '../src/sim/hq';
 import { summarize } from '../src/sim/ledger';
 import { founderStake } from '../src/sim/shares';
+import { nominalIndex } from '../src/sim/nominal';
 import { branchCheckpoints, medianMetrics, type BranchMetrics } from './branchCheckpoints';
 import { STRATEGIES } from './strategies';
 import { emptyLog, logWeek, nearRecession, strategyChecks, type Check } from './strategyTargets';
@@ -146,12 +147,14 @@ function simulate(args: Args) {
         const recent = first.pnl.slice(-4);
         const avg = (f: (r: (typeof recent)[number]) => number) =>
           recent.reduce((t, r) => t + f(r), 0) / recent.length;
+        // §25: checkpoints are in start-of-game money, so deflate by the nominal index (§4.6).
+        const level = nominalIndex(state, first.cityId);
         at[w] = {
-          dep: branchDeposits(first),
-          loans: branchLoans(state, first),
+          dep: branchDeposits(first) / level,
+          loans: branchLoans(state, first) / level,
           cust: first.customers,
-          rev: avg((r) => r.revenue),
-          inc: avg((r) => r.income),
+          rev: avg((r) => r.revenue) / level,
+          inc: avg((r) => r.income) / level,
         };
       }
     }
@@ -175,6 +178,7 @@ function simulate(args: Args) {
           `${(country.policyRate * 100).toFixed(2)}% ${country.phase}`.padStart(18),
           String(hqStaff(state)).padStart(6),
           P(minCoverage(state)).padStart(7),
+          country.nominal.toFixed(2).padStart(6),
         ].join(' '),
       );
       Object.assign(yearly, { ni: 0, nii: 0, losses: 0, loans: 0, earning: 0, equity: 0, n: 0 });
@@ -208,7 +212,7 @@ function run(): void {
       `${args.difficulty}, ${state.meta.competitors} competitors, ${args.years} years\n`,
   );
   console.log(
-    'Year Branches  Deposits     Loans   Equity      CR    NIM   Loss     ROE     Cash       Tier       Policy HQ ppl  Min k′',
+    'Year Branches  Deposits     Loans   Equity      CR    NIM   Loss     ROE     Cash       Tier       Policy HQ ppl  Min k′  Index',
   );
   for (const r of rows) console.log(r);
 

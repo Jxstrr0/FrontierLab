@@ -114,8 +114,8 @@ export function staffBounds(branch: Branch) {
 }
 
 /** Wage stepper bounds, snapped inside the allowed range so every value is valid (setWage). */
-export function wageBounds(cityId: string) {
-  const mkt = marketWage(cityId);
+export function wageBounds(s: GameState, cityId: string) {
+  const mkt = marketWage(s, cityId);
   return {
     market: mkt,
     min: Math.ceil((mkt * WAGE_RANGE[0]) / WAGE_STEP) * WAGE_STEP,

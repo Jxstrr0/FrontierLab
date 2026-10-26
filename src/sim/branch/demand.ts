@@ -24,6 +24,7 @@ import { BUSINESS_ACCT_BIZ_TICKET_MULT, SEGMENT_SPECS } from '../../data/segment
 import { SEGMENTS, type SegmentId } from '../../data/types';
 import { tileDistance } from '../citygen';
 import { loanDemand } from '../macro';
+import { nominalIndex } from '../nominal';
 import { clamp, noise } from '../math';
 import { countryOfCity, marketRef } from '../rates';
 import { stream } from '../rng';
@@ -171,7 +172,8 @@ export function runDemand(state: GameState, branch: Branch, fx: CampaignEffects)
   const newBySeg = {} as Record<SegmentId, number>;
   SEGMENTS.forEach((s, i) => (newBySeg[s] = (served * boosted[i]!) / boostSum));
 
-  // §9.6 take-up per offered product
+  // §9.6 take-up per offered product; tickets are quoted at today's price level (§4.6)
+  const nominal = nominalIndex(state, branch.cityId);
   const byProduct: Record<string, Origination> = {};
   for (const spec of allProducts(state)) {
     if (spec.kind === 'sbl' || spec.kind === 'fx' || !isOffered(branch, spec.id)) continue;
@@ -204,7 +206,7 @@ export function runDemand(state: GameState, branch: Branch, fx: CampaignEffects)
           ? BUSINESS_ACCT_BIZ_TICKET_MULT
           : SEGMENT_SPECS[s].ticketMult[spec.category];
       accounts += n;
-      volume += n * spec.ticket * lot.incomeIndex * ticketMult;
+      volume += n * spec.ticket * lot.incomeIndex * ticketMult * nominal;
     }
     byProduct[spec.id] = {
       newAccounts: accounts,

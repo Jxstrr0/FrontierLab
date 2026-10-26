@@ -18,6 +18,7 @@ import { pushEvent } from './events';
 import { delegationOn, execMarketSalary, seatedExecs } from './execSeats';
 import { clamp, roundToStep } from './math';
 import { stream } from './rng';
+import { nominalIndex } from './nominal';
 import type { Branch, GameState, Manager } from './state';
 
 const avgSkill = (m: Manager) =>
@@ -28,9 +29,17 @@ function cityOf(state: GameState, m: Manager): string {
   return (m.branchId && state.branches[m.branchId]?.cityId) || state.meta.homeCityId;
 }
 
+/** The base manager salary in a city: MANAGER_BASE_SALARY × wageIndex × the nominal index (§4.6). */
+export function managerBaseSalary(state: GameState, cityId: string): number {
+  return MANAGER_BASE_SALARY * (CITIES[cityId]?.wageIndex ?? 1) * nominalIndex(state, cityId);
+}
+
 /** Salary bounds for a manager in a city (MANAGER_SALARY_RANGE × the base salary there). */
-export function managerSalaryBounds(cityId: string): { min: number; max: number } {
-  const ref = (CITIES[cityId]?.wageIndex ?? 1) * MANAGER_BASE_SALARY;
+export function managerSalaryBounds(
+  state: GameState,
+  cityId: string,
+): { min: number; max: number } {
+  const ref = managerBaseSalary(state, cityId);
   const step = MANAGER_PAY.salaryStep;
   return {
     min: Math.ceil((ref * MANAGER_SALARY_RANGE[0]) / step) * step,
@@ -40,10 +49,8 @@ export function managerSalaryBounds(cityId: string): { min: number; max: number 
 
 /** §17.1: what rivals would pay this manager now (the hiring ask, rising with tenure). */
 export function managerMarketSalary(state: GameState, m: Manager): number {
-  const wage = CITIES[cityOf(state, m)]?.wageIndex ?? 1;
   const ask =
-    MANAGER_BASE_SALARY *
-    wage *
+    managerBaseSalary(state, cityOf(state, m)) *
     (MANAGER_SALARY_SPREAD.base + (MANAGER_SALARY_SPREAD.slope * avgSkill(m)) / 100);
   const years = Math.max(0, state.clock.week - m.sinceWeek) / WEEKS_PER_YEAR;
   return ask * (1 + MANAGER_PAY.tenureGrowth * years);
@@ -107,7 +114,7 @@ export function reviewedExecSalary(state: GameState): number {
 }
 
 export function reviewedManagerSalary(state: GameState, m: Manager): number {
-  const b = managerSalaryBounds(cityOf(state, m));
+  const b = managerSalaryBounds(state, cityOf(state, m));
   const target = managerMarketSalary(state, m) * (1 + state.executives.payPremium);
   return clamp(roundToStep(target, MANAGER_PAY.salaryStep), b.min, b.max);
 }
