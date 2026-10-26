@@ -127,6 +127,34 @@ function LotRow(p: {
   const facts = `${money(lot.weeklyRent, sym)}/wk · ${count(lot.footTraffic)} foot traffic`;
   const occ = lot.occupant;
 
+  const dc = occ?.type === 'player' ? s.dataCenters[occ.id] : undefined;
+  if (dc) {
+    return (
+      <button
+        type="button"
+        class="lot-row"
+        onClick={() => openPanel({ type: 'dataCenter', dataCenterId: dc.id })}
+        data-lot-id={lot.id}
+      >
+        <Medallion
+          ink={s.meta.brandInk}
+          monogram={s.meta.monogram}
+          shape={s.meta.logoShape}
+          size={32}
+        />
+        <span class="lot-main">
+          <span class="lot-address">{lot.address}</span>
+          <span class="lot-occupant">{dc.name}</span>
+          <span class="muted small">{facts}</span>
+        </span>
+        <span class="lot-tag">
+          <Badge tone={dc.status === 'open' ? 'good' : 'warn'}>
+            {dc.status === 'open' ? 'Data center' : 'Building'}
+          </Badge>
+        </span>
+      </button>
+    );
+  }
   if (occ?.type === 'player') {
     const branch = s.branches[occ.id];
     const waiting = p.pending[occ.id] ?? 0;

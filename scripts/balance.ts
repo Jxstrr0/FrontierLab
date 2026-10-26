@@ -249,6 +249,12 @@ function run(): void {
     `Branches by city: ${[...byCity].map(([id, n]) => `${id} ${n}`).join(', ')}; ` +
       `${state.world.travel.flights} flight(s); total assets ${M(balanceSheet(state).assets)}`,
   );
+  const dcs = Object.values(state.dataCenters);
+  if (dcs.length > 0) {
+    console.log(
+      `Data centers: ${dcs.map((d) => `${d.name} (${d.status}, from week ${d.builtWeek})`).join(', ')}`,
+    );
+  }
   checks.push({
     label: 'Balance identity gap',
     value: maxIdentityGap.toFixed(4),

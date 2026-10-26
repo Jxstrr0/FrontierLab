@@ -15,6 +15,7 @@ import { updateStaff } from './branch/staff';
 import { emptyWeek } from './branch/week';
 import { isQuarterStart, isYearStart } from './calendar';
 import { evaluateCapital } from './capital';
+import { runDataCenters } from './dataCenters';
 import { runExecutives } from './executives';
 import { hrFillVacancies } from './hrHiring';
 import { governanceQuarter, runGovernance } from './governance';
@@ -93,6 +94,7 @@ export function weeklyTick(state: GameState): void {
   updateRivalPrices(state); // 3 (before references so m(p) is this week's)
   updateMarketRefs(state); // 2
   runRivals(state); // 3 (books, financials, expansion, price wars)
+  runDataCenters(state); // 4 (data centers, C2c: before the offices they lift)
   const deskLoans = loansByBranch(state);
   for (const branch of Object.values(state.branches)) {
     if (branch.status === 'open') runBranch(state, branch, deskLoans.get(branch.id) ?? []); // 4

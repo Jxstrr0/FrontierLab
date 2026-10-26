@@ -311,6 +311,29 @@ export const OFFICE_SIZES = [
  * OFFICE_TRAFFIC_MULT, so a Flagship draws on what a full branch network used to.
  */
 export const OFFICE_TRAFFIC_MULT = 1.5;
+/**
+ * Data centers (stage C2c, SIMULATION §9.9): a second building kind, built on a
+ * free storefront lot or at a regional energy site. Its parts (GPU hall, power,
+ * cooling) are in src/data/dataCenters.ts. Until compute arrives (C4) it lifts
+ * Service where latency is low and costs power and rent each week.
+ */
+export const DATA_CENTER = {
+  /** Weekly power bill per running GPU at PUE 1 and a power index of 1. */
+  powerPerGpuWeek: 12,
+  /** Power index at a regional energy site; a city's index is its costIndex. */
+  energySitePower: 0.5,
+  /** Weekly land lease at an energy site, × the site's costIndex. */
+  energySiteRent: 3_000,
+  /** Data centers one energy site can hold. */
+  perEnergySite: 3,
+  /** A hall upgrade refits for this share of the new hall's build weeks. */
+  upgradeWeeksShare: 0.5,
+  /** Service lift (stars) for sales offices in the data center's city … */
+  liftSameCity: 0.25,
+  /** … and in cities within `nearKm` of it. */
+  liftNear: 0.1,
+  nearKm: 1_200,
+} as const;
 export const TAKEUP_CAP = 0.95;
 export const STARS_TAKEUP = { base: 0.6, slope: 0.2 } as const;
 export const MORTGAGE_SPECIAL = {
@@ -2321,6 +2344,8 @@ export const FX_START_INDEX = 100;
 export const MILESTONE_GOALS = {
   /** Flagship sales offices for 'Five Flagships' (C2a). */
   flagships: 5,
+  /** Data centers open for 'Three data centers' (C2c). */
+  dataCenters: 3,
   cities: 10,
   deposits: 1_000_000_000,
   countries: 5,

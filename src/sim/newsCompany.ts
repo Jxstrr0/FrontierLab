@@ -85,6 +85,43 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
         },
       });
     }
+    case 'DATA_CENTER_STARTED':
+      return business({
+        key: 'DATA_CENTER_STARTED',
+        subject: str(p.dataCenterId),
+        icon: 'facade',
+        priority: P.company,
+        tokens: {
+          bank,
+          name: str(p.name, 'a data center'),
+          city: cityName(str(p.city)),
+          site: str(p.site, 'a new site'),
+          weeks: String(num(p.weeks)),
+        },
+      });
+    case 'DATA_CENTER_OPENED':
+      // A refit reopening isn't news; the toast covers it.
+      if (p.refit) return undefined;
+      return business({
+        key: 'DATA_CENTER_OPENED',
+        subject: str(p.dataCenterId),
+        icon: 'facade',
+        priority: P.company,
+        tokens: {
+          bank,
+          name: str(p.name, 'the data center'),
+          city: cityName(str(p.city)),
+          gpus: grouped(num(p.gpus)),
+        },
+      });
+    case 'DATA_CENTER_CLOSED':
+      return business({
+        key: 'DATA_CENTER_CLOSED',
+        subject: str(p.dataCenterId),
+        icon: 'facade',
+        priority: P.company,
+        tokens: { bank, name: str(p.name, 'a data center'), city: cityName(str(p.city)) },
+      });
     case 'BIG_DEFAULT': {
       const sector = LOAN_SECTORS.find((x) => x.id === str(p.sector))?.name.toLowerCase();
       return business({

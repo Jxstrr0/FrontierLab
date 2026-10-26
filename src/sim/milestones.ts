@@ -21,6 +21,10 @@ const countryCount = (s: GameState) =>
 
 const REACHED: Record<string, (s: GameState) => boolean> = {
   first_branch: (s) => openBranches(s).length > 0,
+  first_data_center: (s) => Object.values(s.dataCenters).some((d) => d.openedWeek !== undefined),
+  three_data_centers: (s) =>
+    Object.values(s.dataCenters).filter((d) => d.openedWeek !== undefined).length >=
+    MILESTONE_GOALS.dataCenters,
   first_loan: (s) => s.underwriting.loansBooked > 0,
   first_profit: (s) => s.history.quarterly.some((q) => q.netIncome > 0),
   // C2a: ids kept for saves; one office per city, so these now count Flagships.

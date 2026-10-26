@@ -1,7 +1,9 @@
 // Employer panel (SCREENS §14): header with the employer's name and type, the
 // advisor's line, an engraved vignette, stats (employees, average income, who
 // banks their payroll today) and the payroll deal, or your partnership.
+import { isRegional } from '../../data/cities';
 import { DISTRICT_SPECS } from '../../data/districts';
+import { EnergySiteCard } from '../dataCenter/EnergySiteCard';
 import * as cmd from '../../sim/commands';
 import { Card, Panel, Row, SectionTitle } from '../components';
 import { count, money } from '../format/format';
@@ -47,6 +49,7 @@ export function EmployerPanel(p: { siteId: string }) {
         </Card>
         <SectionTitle>{mine ? 'Yours' : 'Payroll deal'}</SectionTitle>
         <DealCard site={site} kind="payroll" people={e.employees} />
+        {isRegional(site.cityId) && <EnergySiteCard siteId={site.id} />}
       </div>
     </Panel>
   );
