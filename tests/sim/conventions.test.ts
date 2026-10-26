@@ -2,6 +2,7 @@
 // Founders Fair acceptance run in Calgary (announced four weeks out, open for
 // four weeks, then closed) and the rule that its ventures can only be bought there,
 // while it is open.
+import { isPrivate } from '../../src/sim/ventureGen';
 import { describe, expect, it } from 'vitest';
 import { conventionPinInfo } from '../../src/app/convention/conventionPin';
 import * as cmd from '../../src/sim/commands';
@@ -110,7 +111,9 @@ describe('Foothills Founders Fair (acceptance)', () => {
     track();
     expect(s.clock.week).toBe(31);
     expect(conventionPinInfo(s, venue(s)).visible).toBe(false);
-    const after = cmd.buyStartupLot(s, second, 0, 'company');
+    // A fair startup can fail during the fair; ask about one still private that you do not hold.
+    const later = ids.find((id) => id !== first && isPrivate(s.ventures.startups[id]!)) ?? second;
+    const after = cmd.buyStartupLot(s, later, 0, 'company');
     expect(after).toEqual({ ok: false, reason: 'The convention is over.' });
     for (const id of ids) {
       const st = s.ventures.startups[id]!;

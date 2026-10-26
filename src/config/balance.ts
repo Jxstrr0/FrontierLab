@@ -2110,6 +2110,20 @@ export const VENTURE_DEBT = { maxShare: 0.1, spread: 0.08, termWeeks: 156, lgd: 
  */
 export const VENTURE_MARGIN = { gap: 4, matureAt: 8 } as const;
 /** Startup creation (§20.1): price per share, cap table, cash runway, history and the generator. */
+/**
+ * Generated names (CONTENT §15, §18; src/sim/nameGen.ts): coined brands keep
+ * brandLength letters; startup names pick a pattern by weight; a description
+ * uses the sector's handwritten lines with chance handwrittenBlurb, else a
+ * template. A chartered bank uses a listed stem or brand with chance listedName,
+ * else a generated one. tries bounds every retry loop.
+ */
+export const NAME_GEN = {
+  brandLength: [4, 8] as [number, number],
+  startupPatterns: { word: 0.5, coined: 0.25, coinedSuffix: 0.25 },
+  handwrittenBlurb: 0.15,
+  listedName: 0.4,
+  tries: 40,
+} as const;
 export const VENTURE_GEN = {
   sharePrice: {
     seed: [0.4, 1.2],
