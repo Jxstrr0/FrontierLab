@@ -59,8 +59,8 @@ export function ItFloor() {
         )}
         <AppTrend />
         <p class="muted small hq-note">
-          A better app lifts every branch's Products rating and means fewer trips to the counter.
-          The IT team's skill and coverage set where it heads.
+          A better app lifts every sales office's Products rating and means fewer trips to the
+          counter. The IT team's skill and coverage set where it heads.
         </p>
       </Card>
 

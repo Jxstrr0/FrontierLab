@@ -37,7 +37,7 @@ export interface AttentionItem {
 const openBranches = (state: GameState): Branch[] =>
   Object.values(state.branches).filter((b) => b.status === 'open');
 
-const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 'es'}`;
+const offices = (n: number) => `${n} sales office${n === 1 ? '' : 's'}`;
 
 /** Every current issue, worst first; empty when the bank looks healthy. */
 export function attentionItems(state: GameState): AttentionItem[] {
@@ -110,7 +110,7 @@ export function attentionItems(state: GameState): AttentionItem[] {
       weight: 85,
       title: 'Lending frozen',
       detail:
-        'Liquid assets are under the minimum and auto-funding is off, so branches cannot make new loans.',
+        'Liquid assets are under the minimum and auto-funding is off, so sales offices cannot make new loans.',
       route: liqRoute,
     });
   } else if (liq !== null && liq < LIQ_MIN) {
@@ -150,7 +150,7 @@ export function attentionItems(state: GameState): AttentionItem[] {
       tone: 'warn',
       weight: 65,
       title: `${expiring.length} loan application${expiring.length === 1 ? '' : 's'} expiring`,
-      detail: `Undecided applications lapse at the weekly close. Most at ${state.branches[worst[0]]?.name ?? 'a branch'}.`,
+      detail: `Undecided applications lapse at the weekly close. Most at ${state.branches[worst[0]]?.name ?? 'a sales office'}.`,
       route: { kind: 'branch', branchId: worst[0] },
     });
   }
@@ -173,7 +173,7 @@ export function attentionItems(state: GameState): AttentionItem[] {
       id: 'losses',
       tone: 'warn',
       weight: 55,
-      title: `${plural(losing.length, 'branch')} losing money`,
+      title: `${offices(losing.length)} losing money`,
       detail: `${ATTENTION.lossWeeks} weeks in the red. Worst: ${worst.name}.`,
       route: losing.length === 1 ? { kind: 'branch', branchId: worst.id } : { kind: 'branches' },
     });
@@ -187,7 +187,7 @@ export function attentionItems(state: GameState): AttentionItem[] {
       id: 'ratings',
       tone: 'warn',
       weight: 50,
-      title: `${plural(poor.length, 'branch')} rated under ${ATTENTION.lowRating}`,
+      title: `${offices(poor.length)} rated under ${ATTENTION.lowRating}`,
       detail: `Customers are leaving. Lowest: ${worst.name} at ${worst.ratings.overall.toFixed(1)}.`,
       route: poor.length === 1 ? { kind: 'branch', branchId: worst.id } : { kind: 'branches' },
     });
@@ -200,7 +200,7 @@ export function attentionItems(state: GameState): AttentionItem[] {
       id: 'staffing',
       tone: 'warn',
       weight: 45,
-      title: `${plural(short.length, 'branch')} understaffed`,
+      title: `${offices(short.length)} understaffed`,
       detail:
         'Queues grow and the service rating slips. A manager with Staffing delegated fixes this.',
       route: short.length === 1 ? { kind: 'branch', branchId: short[0]!.id } : { kind: 'branches' },
@@ -240,7 +240,7 @@ export function attentionItems(state: GameState): AttentionItem[] {
       id: 'managers',
       tone: 'info',
       weight: 30,
-      title: `${plural(unmanaged.length, 'branch')} without a manager`,
+      title: `${offices(unmanaged.length)} without a manager`,
       detail: 'Every decision there is yours until one is hired.',
       route:
         unmanaged.length === 1

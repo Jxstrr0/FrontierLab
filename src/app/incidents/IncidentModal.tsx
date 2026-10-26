@@ -148,7 +148,7 @@ function Pager(p: { i: number; n: number; onPage: (i: number) => void }) {
 }
 
 function scopeLabel(s: GameState, inc: Incident): string {
-  if (inc.scopeKind === 'branch') return s.branches[inc.scope]?.name ?? 'A branch';
+  if (inc.scopeKind === 'branch') return s.branches[inc.scope]?.name ?? 'A sales office';
   if (inc.scopeKind === 'city') return String(inc.data.city ?? inc.scope);
   return s.meta.bankName;
 }
@@ -158,7 +158,7 @@ function tellerName(s: GameState, inc: Incident): string {
   const b = s.branches[inc.scope];
   const mgr = b?.managerId ? s.people.managers[b.managerId] : undefined;
   if (!mgr) return 'Head teller';
-  return troublesDelegated(s, inc.scope) ? `${mgr.name}, branch manager` : mgr.name;
+  return troublesDelegated(s, inc.scope) ? `${mgr.name}, office manager` : mgr.name;
 }
 
 /** The speaker's portrait: the branch manager's own, otherwise one drawn from the role. */

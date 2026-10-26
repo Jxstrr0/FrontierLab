@@ -35,7 +35,7 @@ export function StepOptions(p: { draft: Draft; patch: (d: Partial<Draft>) => voi
           max={COMPETITORS.max}
           step={1}
           onChange={(competitors) => patch({ competitors })}
-          hint={`${city.name} usually has ${usualCompetitors(draft.cityId)}. Fewer rivals means fewer rival branches.`}
+          hint={`${city.name} usually has ${usualCompetitors(draft.cityId)}. Fewer rivals means fewer rival sales offices.`}
         />
       </section>
 

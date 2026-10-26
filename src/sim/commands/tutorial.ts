@@ -31,7 +31,7 @@ export function requestTutorialApplication(
 ): CommandResult<{ appId: string }> {
   if (state.flags.tutorialStep !== TUTORIAL.loan) return fail('The tutorial is not at that step.');
   const branch = state.branches[branchId];
-  if (!branch || branch.status === 'closed') return fail('That branch is not open.');
+  if (!branch || branch.status === 'closed') return fail('That sales office is not open.');
   if (state.treasury.freeze) return fail('Lending is frozen until liquidity recovers.');
   const ownBranches = new Set(Object.keys(state.branches));
   const waiting = Object.values(state.loanDesk.applications).some((a) =>

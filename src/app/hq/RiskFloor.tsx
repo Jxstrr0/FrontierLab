@@ -177,7 +177,7 @@ function RegulatorCard() {
         />
       </div>
       <p class="muted small hq-note">
-        A fully staffed Risk team and ethical branch managers keep reviews clean. Failures bring a
+        A fully staffed Risk team and ethical office managers keep reviews clean. Failures bring a
         fine of up to {pct(REGULATOR_REVIEW.fineRange[1], 1)} of a year's revenue.
       </p>
     </Card>

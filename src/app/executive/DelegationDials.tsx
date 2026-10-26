@@ -77,7 +77,7 @@ export function BrandDial(p: { s: GameState }) {
   const hint = !e.active
     ? 'Needs a Marketing floor at HQ.'
     : e.cities === 0
-      ? 'No open branches yet.'
+      ? 'No open sales offices yet.'
       : `Campaigns ${weeklyDelta(e.deltaCost, sym)} (${pct(e.revenueShare, 1)} of revenue, budget ${budget}%) · pushes ${e.pushed} of ${e.cities} ${e.cities === 1 ? 'city' : 'cities'} · ${Math.abs(e.prospects) < 0.005 ? 'no change in' : signedPct(e.prospects, 0)} new customers` +
         (e.capped ? ' · held back by the budget' : '');
   return (

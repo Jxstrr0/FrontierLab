@@ -23,13 +23,13 @@ export function CloseBranch({ branch }: { branch: Branch }) {
         disabled={!!quote.blocker}
         onClick={() => setOpen(true)}
       >
-        Close branch
+        Close sales office
       </button>
       {quote.blocker && <p class="muted small br-close-blocker">{quote.blocker}</p>}
       {open && (
         <Confirm
           title={`Close ${branch.name}?`}
-          confirmLabel="Close branch"
+          confirmLabel="Close sales office"
           danger
           body={
             <div class="stack">

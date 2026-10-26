@@ -37,6 +37,10 @@ export const ICON_PATHS = {
   gavel: 'M5.5 9.5l5-5 3.5 3.5-5 5zM8 7l3.5 3.5M12.2 11.2 19.5 18.5M3.5 21h10M5 21v-2.5h7V21',
   university: 'M2.5 9 12 5l9.5 4L12 13zM6.5 11v4.5c3 2 8 2 11 0V11M21.5 9v5',
   employer: 'M4 8h16v11H4zM9 8V5.5h6V8M4 12.5h16M11 12v2h2v-2',
+  // A server rack (data centers, C2d) and a lightning bolt (energy sites).
+  server:
+    'M5 3.5h14v5H5zM5 9.5h14v5H5zM5 15.5h14v5H5zM8 6h.01M8 12h.01M8 18h.01M11 6h5M11 12h5M11 18h5',
+  bolt: 'M13 3 5 13.5h6L10 21l8-10.5h-6z',
   airport: 'M4 20h16M6 20v-8h12v8M9 12V8h6v4M12 8V4M10 4h4M8.5 15.5h2M13.5 15.5h2',
   plane:
     'M21 12c0-.8-.7-1.3-1.5-1.3H14.6L10.4 4H8.6l2.2 6.7H6.1L4.4 8.6H3l1 3.4-1 3.4h1.4l1.7-2.1h4.7L8.6 20h1.8l4.2-6.7h4.9c.8 0 1.5-.5 1.5-1.3z',

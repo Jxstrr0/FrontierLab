@@ -27,8 +27,8 @@ export function StepCity(p: { draft: Draft; patch: (d: Partial<Draft>) => void }
   return (
     <div class="stack">
       <p class="muted step-intro">
-        Where will your first branch open? Its country becomes your lab's home: the central bank you
-        borrow from, the taxes you pay and the exchange you list on.
+        Where will your first sales office open? Its country becomes your lab's home: the central
+        bank you borrow from, the taxes you pay and the exchange you list on.
       </p>
       <Segmented label="Region" options={REGION_OPTIONS} value={region} onChange={setRegion} />
       <div class="stack" role="radiogroup" aria-label="Start city">

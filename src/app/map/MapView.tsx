@@ -74,7 +74,8 @@ export function MapView() {
         } else if (pin.kind === 'rivalHq') openPanel({ type: 'rivalHq', siteId: pin.id });
         else if (pin.kind === 'centralBank' && pin.countryId)
           openPanel({ type: 'centralBank', countryId: pin.countryId });
-        else if (pin.kind === 'employer') openPanel({ type: 'employer', siteId: pin.id });
+        else if (pin.kind === 'employer' || pin.kind === 'energySite')
+          openPanel({ type: 'employer', siteId: pin.id });
         else if (pin.kind === 'university') openPanel({ type: 'university', siteId: pin.id });
         else if (pin.kind === 'hq') openPanel({ type: 'hq', officeId: pin.officeId });
         else if (pin.kind === 'office') openPanel({ type: 'office', listingId: pin.id });

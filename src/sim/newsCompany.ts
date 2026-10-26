@@ -53,7 +53,11 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
         subject: str(p.branchId),
         icon: 'facade',
         priority: P.company,
-        tokens: { bank, name: str(p.name, 'the new branch'), address: address ?? 'Main Street' },
+        tokens: {
+          bank,
+          name: str(p.name, 'the new sales office'),
+          address: address ?? 'Main Street',
+        },
       });
     }
     case 'OFFICE_GROWN': {
@@ -80,7 +84,7 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
         priority: P.company,
         tokens: {
           bank,
-          name: str(p.name, 'a branch'),
+          name: str(p.name, 'a sales office'),
           moved: moved ? ` Customers move to ${moved}.` : '',
         },
       });
@@ -196,7 +200,7 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
           bank,
           employer: str(p.employer),
           kind: p.kind === 'student' ? 'student accounts' : 'payroll accounts',
-          branch: str(p.branchName, 'its local branch'),
+          branch: str(p.branchName, 'its local sales office'),
           fee: m(p.fee),
         },
       });
@@ -246,7 +250,7 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
         icon: 'alert',
         priority: P.companyRoutine,
         group: 'incident',
-        tokens: { bank, scope: str(p.scopeName, 'a branch') },
+        tokens: { bank, scope: str(p.scopeName, 'a sales office') },
       });
     }
     case 'INCIDENT_NEWS': {
@@ -258,7 +262,7 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
         icon: 'alert',
         priority: P.company,
         group: 'incident',
-        tokens: { bank, scope: str(p.branchName, 'a branch') },
+        tokens: { bank, scope: str(p.branchName, 'a sales office') },
       });
     }
     default:

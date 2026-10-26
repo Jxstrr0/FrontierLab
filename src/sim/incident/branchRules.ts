@@ -205,7 +205,11 @@ const MIS_SELLING: IncidentRule = {
       pushEvent(
         state,
         'REG_FINE',
-        { bank: state.meta.bankName, amount: fine, reason: `mis-selling at its ${b.name} branch` },
+        {
+          bank: state.meta.bankName,
+          amount: fine,
+          reason: `mis-selling at its ${b.name} sales office`,
+        },
         2,
         b.id,
       );

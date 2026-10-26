@@ -65,15 +65,15 @@ export function BranchesPanel() {
 
   return (
     <Panel
-      title="Branches"
-      subtitle={all.length === 1 ? '1 branch' : `${all.length} branches`}
+      title="Sales offices"
+      subtitle={all.length === 1 ? '1 sales office' : `${all.length} sales offices`}
       onClose={closePanel}
     >
       {all.length === 0 ? (
         <Card>
           <p class="branches-empty">
-            You have no branches yet. Pick a storefront on the city list, build it out and your
-            first branch will appear here.
+            You have no sales offices yet. Pick a storefront on the city list, build it out and your
+            first sales office will appear here.
           </p>
         </Card>
       ) : (
@@ -94,7 +94,12 @@ export function BranchesPanel() {
             />
           )}
           <div class="sort-seg">
-            <Segmented label="Sort branches" value={sort} onChange={choose} options={sortOptions} />
+            <Segmented
+              label="Sort sales offices"
+              value={sort}
+              onChange={choose}
+              options={sortOptions}
+            />
           </div>
           {groups.map((g) => (
             <Fragment key={g.country ?? 'all'}>
@@ -108,7 +113,7 @@ export function BranchesPanel() {
               ))}
             </Fragment>
           ))}
-          {rows.length === 0 && <p class="muted">No branches in this city.</p>}
+          {rows.length === 0 && <p class="muted">No sales offices in this city.</p>}
         </div>
       )}
       <DataCenterList />

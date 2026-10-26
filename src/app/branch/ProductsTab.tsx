@@ -72,7 +72,7 @@ export function ProductsTab(p: { branch: Branch; onLoanDesk: () => void }) {
 
 /** Where this branch's prices come from while HQ sets them: the list for its own country. */
 function hqPriceNotice(s: GameState, branch: Branch): string {
-  if (priceCountries(s).length < 2) return 'Prices are set at HQ for every branch.';
+  if (priceCountries(s).length < 2) return 'Prices are set at HQ for every sales office.';
   const country = CITIES[branch.cityId]?.country;
   return country
     ? `Prices follow HQ's list for ${theCountryName(country)}.`

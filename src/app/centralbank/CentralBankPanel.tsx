@@ -130,8 +130,9 @@ export function CentralBankPanel(p: { countryId: CountryId }) {
           <Row label="Inflation target" value={pctPlain(spec.inflationTarget || 0)} tone="dim" />
           {licensed && (
             <p class="muted small">
-              Your {yours === 1 ? 'branch' : `${yours} branches`} in {theCountryName(p.countryId)}{' '}
-              {yours === 1 ? 'prices' : 'price'} deposits and loans off this rate.
+              Your {yours === 1 ? 'sales office' : `${yours} sales offices`} in{' '}
+              {theCountryName(p.countryId)} {yours === 1 ? 'prices' : 'price'} deposits and loans
+              off this rate.
             </p>
           )}
         </Card>

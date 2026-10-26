@@ -16,10 +16,10 @@ export const STRATEGY_LABEL: Record<RivalBank['strategy'], string> = {
 };
 
 export const STRATEGY_BLURB: Record<RivalBank['strategy'], string> = {
-  incumbent: 'Big, steady and pricey. Branches everywhere and fees to match.',
-  disruptor: 'App-first, thin on branches, generous on savings. Runs on thin capital.',
+  incumbent: 'Big, steady and pricey. Sales offices everywhere and fees to match.',
+  disruptor: 'App-first, thin on sales offices, generous on savings. Runs on thin capital.',
   premium: 'Marble lobbies for wealthy clients. Low savings rates, high service.',
-  community: 'Local and friendly. Fair rates, modest branches.',
+  community: 'Local and friendly. Fair rates, modest sales offices.',
 };
 
 export const TIER_LABEL: Record<Tier, string> = {
@@ -114,14 +114,14 @@ export function rivalHqSite(s: GameState, rivalId: string, cityId: string): stri
 export function failedText(s: GameState, bank: RivalBank): string | undefined {
   if (bank.status === 'distressed') {
     const weeks = Math.max(0, (bank.distressedUntil ?? s.clock.week) - s.clock.week);
-    return `Regulators seized ${bank.name}. Its network is for sale at any investment bank's M&A desk for ${weeks} more week${weeks === 1 ? '' : 's'}; then other labs take its branches.`;
+    return `Regulators seized ${bank.name}. Its network is for sale at any investment bank's M&A desk for ${weeks} more week${weeks === 1 ? '' : 's'}; then other labs take its sales offices.`;
   }
   if (bank.status === 'seized')
-    return `${bank.name} failed. Its branches now belong to other labs.`;
+    return `${bank.name} failed. Its sales offices now belong to other labs.`;
   if (bank.status === 'acquired') return `${bank.name} has been acquired.`;
   if (bank.status === 'merged') {
     const buyer = bank.mergedInto ? s.rivals[bank.mergedInto]?.name : undefined;
-    return `${bank.name} was bought by ${buyer ?? 'another bank'}. Its branches now carry the buyer's name.`;
+    return `${bank.name} was bought by ${buyer ?? 'another bank'}. Its sales offices now carry the buyer's name.`;
   }
   return undefined;
 }

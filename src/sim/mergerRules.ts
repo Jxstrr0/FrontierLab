@@ -29,7 +29,7 @@ export function targetBlocker(state: GameState, rivalId: string): string | undef
   if (!bank) return 'That lab no longer exists.';
   if (bank.status !== 'active' && bank.status !== 'distressed')
     return `${bank.name} is no longer for sale.`;
-  if (bank.branches.length === 0) return `${bank.name} has no branches left to buy.`;
+  if (bank.branches.length === 0) return `${bank.name} has no sales offices left to buy.`;
   const tier = state.company.tier;
   if (tier === 'restricted' || tier === 'critical')
     return `The regulator won't allow acquisitions at the ${tier} capital tier.`;

@@ -27,7 +27,7 @@ const BANK_TEMPLATES = {
   // ─── Your bank ──────────────────────────────────────────────────────────────
   NEW_BRANCH: [
     {
-      h: 'New branch: {bank} opens in {district}, {city}',
+      h: 'New sales office: {bank} opens in {district}, {city}',
       b: '{bank} signed for {address} this week. Fitters are in and the doors open within days.',
     },
     {
@@ -36,7 +36,7 @@ const BANK_TEMPLATES = {
     },
     {
       h: '{bank} plants its flag in {district}',
-      b: 'Scaffolding went up at {address} as {bank} readies a branch in {city}.',
+      b: 'Scaffolding went up at {address} as {bank} readies a sales office in {city}.',
     },
   ],
   OFFICE_GROWN: [
@@ -70,7 +70,7 @@ const BANK_TEMPLATES = {
     },
     {
       h: 'Last day at {name}',
-      b: '{bank} has closed the branch after a review of its network.{moved}',
+      b: '{bank} has closed the sales office after a review of its network.{moved}',
     },
   ],
   DATA_CENTER_STARTED: [
@@ -186,7 +186,7 @@ const BANK_TEMPLATES = {
     },
     {
       h: 'Run on {bank} as savers take fright',
-      b: 'Withdrawals surged at branches across the network. Regulators are watching closely.',
+      b: 'Withdrawals surged at sales offices across the network. Regulators are watching closely.',
     },
   ],
   BANK_RUN_ENDED: [
@@ -232,11 +232,11 @@ const BANK_TEMPLATES = {
   PARTNERSHIP_SIGNED: [
     {
       h: '{employer} picks {bank} for {kind}',
-      b: 'The deal, worth a {fee} signing fee, is run from {branch}.',
+      b: 'The deal, worth a {fee} signing fee, is run from {sales office}.',
     },
     {
       h: '{bank} wins {employer} {kind}',
-      b: 'Staff at {employer} will be offered accounts through {branch}. The lab paid {fee} to sign.',
+      b: 'Staff at {employer} will be offered accounts through {sales office}. The lab paid {fee} to sign.',
     },
   ],
   PARTNERSHIP_RENEWED: [
@@ -298,7 +298,7 @@ const BANK_TEMPLATES = {
     },
     {
       h: 'Growing pains at {bank}',
-      b: 'A loss of {loss} on revenue of {revenue} this week. Young branches take time to pay their way.',
+      b: 'A loss of {loss} on revenue of {revenue} this week. Young sales offices take time to pay their way.',
     },
   ],
   BANK_QUARTER: [
@@ -338,11 +338,11 @@ const BANK_TEMPLATES = {
   INCIDENT_ROBBERY: [
     {
       h: 'Server-room break-in at {scope}',
-      b: 'Thieves made off with hardware from the {bank} branch this week. No one was hurt.',
+      b: 'Thieves made off with hardware from the {bank} sales office this week. No one was hurt.',
     },
     {
       h: 'Raiders hit {scope}',
-      b: 'Police are appealing for witnesses after servers were taken from the {bank} branch.',
+      b: 'Police are appealing for witnesses after servers were taken from the {bank} sales office.',
     },
   ],
   MILESTONE: [
@@ -355,21 +355,21 @@ const BANK_TEMPLATES = {
   INCIDENT_BRANCH_FLOOD: [
     {
       h: 'Heatwave shuts {scope}',
-      b: 'Fans and ice buckets could not save the servers when the cooling failed at the {bank} branch.',
+      b: 'Fans and ice buckets could not save the servers when the cooling failed at the {bank} sales office.',
     },
     {
       h: '{scope} overheats',
-      b: 'A scorching week left the {bank} branch dark and counting the cost.',
+      b: 'A scorching week left the {bank} sales office dark and counting the cost.',
     },
   ],
   INCIDENT_STAFF_WALKOUT: [
     {
       h: 'Staff walk out at {scope}',
-      b: 'Staff at the {bank} branch downed laptops over pay and conditions.',
+      b: 'Staff at the {bank} sales office downed laptops over pay and conditions.',
     },
     {
       h: 'Pickets outside {scope}',
-      b: 'Unhappy staff at the {bank} branch say they will not return until things change.',
+      b: 'Unhappy staff at the {bank} sales office say they will not return until things change.',
     },
   ],
   // Press angles from incident choices (INCIDENT_NEWS): a denied key-leak claim, an ignored complaint.
@@ -386,11 +386,11 @@ const BANK_TEMPLATES = {
   INCIDENT_NEWS_VIRAL_COMPLAINT: [
     {
       h: 'Complaint about {scope} goes viral',
-      b: 'A customer video about long waits at the {bank} branch has been shared thousands of times. The lab has not responded.',
+      b: 'A customer video about long waits at the {bank} sales office has been shared thousands of times. The lab has not responded.',
     },
     {
       h: '{bank} stays silent as {scope} complaint spreads',
-      b: 'Online, customers are swapping stories of slow service at the branch.',
+      b: 'Online, customers are swapping stories of slow service at the sales office.',
     },
   ],
 } satisfies Record<string, LedgerTemplate[]>;

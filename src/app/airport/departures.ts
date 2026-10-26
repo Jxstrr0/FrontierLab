@@ -112,7 +112,7 @@ export function fareLabel(q: FlightQuote, symbol: string): string {
 export function rowNote(r: DepartureRow): string {
   const parts = [r.countryName];
   if (r.regional) parts.push('regional site');
-  if (r.branches > 0) parts.push(`${r.branches} branch${r.branches === 1 ? '' : 'es'}`);
+  if (r.branches > 0) parts.push(`${r.branches} sales office${r.branches === 1 ? '' : 's'}`);
   return parts.join(' · ');
 }
 
