@@ -39,6 +39,12 @@ export function newsExact(x: number, symbol: string): string {
   return `${v < 0 ? '−' : ''}${symbol}${v.toFixed(digits)}`;
 }
 
+/** A quoted price: cents below a thousand, whole units with separators above ("$2,099", "$6.20"). */
+export function newsPrice(x: number, symbol: string): string {
+  const v = toCurrency(x, symbol);
+  return v >= 1000 ? `${symbol}${grouped(v)}` : newsExact(x, symbol);
+}
+
 /** A decimal rate as a percentage: 0.0325 → "3.25%". */
 export function newsRate(rate: number, digits = 2): string {
   return `${(rate * 100).toFixed(digits)}%`;
@@ -71,4 +77,25 @@ export function ordinal(n: number): string {
 /** Fills {tokens} in a template; unknown tokens are left visible so tests catch them. */
 export function fillTemplate(text: string, tokens: Record<string, string>): string {
   return text.replace(/\{(\w+)\}/g, (whole, key: string) => tokens[key] ?? whole);
+}
+
+export const MONTH_NAMES = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+];
+
+/** An ISO date as the paper prints it: "2028-03-18" → "18 March 2028". */
+export function newsDate(iso: string): string {
+  const [y, m, d] = iso.split('-').map(Number);
+  return `${d} ${MONTH_NAMES[(m ?? 1) - 1]} ${y}`;
 }

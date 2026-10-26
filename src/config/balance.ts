@@ -1137,6 +1137,8 @@ export const NEWS_GROUP_CAPS: Record<string, number> = {
   world: 4,
   movers: 2,
   corporate: 1,
+  commodities: 2,
+  calendar: 2,
   sportsAbroad: 1,
   elections: 2,
 };
@@ -1178,6 +1180,17 @@ export const NEWS_PRIORITY = {
   sportsAbroad: 22,
   electionLocal: 60,
   electionAbroad: 42,
+  /** Commodities (§24.4): a sharp week, a one-year high or low, the monthly wrap. */
+  commodityMove: 40,
+  commodityRecord: 38,
+  commodityWrap: 37,
+  /** From the archive (§24.5). */
+  archive: 31,
+  /** World calendar (§24.6): announcements and rounds, then finals and closing days. */
+  calendar: 46,
+  calendarFinal: 52,
+  /** Annual fixtures (prizes, awards, fireworks, the sale weekend). */
+  annual: 38,
 };
 /**
  * The world desk (§24.1): stories drawn from every country each week, chosen by
@@ -1205,6 +1218,64 @@ export const NEWS_COMPANY_DESK = {
   corporateChance: 0.35,
   /** Jobs at a company's new site. */
   siteJobs: [150, 1200] as [number, number],
+};
+/**
+ * Commodities (§24.4): each week a commodity's log price moves by its own noise,
+ * plus driftPerWeek × its lean × the world mood (expansion 1 … recession −1),
+ * plus a pull of `revert` back toward its base price grown with the world's
+ * average nominal index. A week of at least `newsMove` (%) or a one-year high
+ * or low is news; a wrap of all five runs on the first issue of each month.
+ */
+export const NEWS_COMMODITIES = {
+  driftPerWeek: 0.004,
+  revert: 0.03,
+  newsMove: 8,
+  /** Weeks a commodity goes without a one-year high (low) before the next one is news again. */
+  recordGapWeeks: 8,
+  historyWeeks: 53,
+  /** The monthly wrap quotes each price's change over this many weeks. */
+  wrapWeeks: 4,
+  mood: { expansion: 1, recovery: 0.5, slowdown: -0.5, recession: -1 },
+};
+/**
+ * From the archive (§24.5): every `everyWeeks` issue's lead story is kept for
+ * good, and on those weeks the paper reprints the one from the furthest of
+ * `yearsBack` that exists.
+ */
+export const NEWS_ARCHIVE = {
+  everyWeeks: 4,
+  yearsBack: [10, 5, 3, 2, 1],
+  /** One-year-old stories are reprinted only on every n-th archive week, so others age to 2, 3, 5 or 10 years. */
+  oneYearEvery: 2,
+};
+/**
+ * World calendar (§24.6). Nations Cup goals per side ~ Poisson(goalBase +
+ * goalEdge × (own − other strength), at least goalMin); the host plays with
+ * +hostEdge strength; a level knockout game goes to penalties, won with
+ * 0.5 + penaltyEdge × the strength gap. World Games golds per nation ~
+ * Poisson(goldBase + goldPerStrength × strength, + hostGolds for the host);
+ * silver and bronze the same.
+ */
+export const NEWS_CALENDAR = {
+  goalBase: 1.3,
+  goalEdge: 1.5,
+  goalMin: 0.2,
+  hostEdge: 0.1,
+  penaltyEdge: 0.5,
+  goldBase: 3,
+  goldPerStrength: 30,
+  hostGolds: 8,
+  athletes: [8000, 12000] as [number, number],
+  /** Golds won by the Games' star athlete. */
+  starGolds: [3, 5] as [number, number],
+  pavilions: [120, 200] as [number, number],
+  /** Expo visitors, millions. */
+  visitors: [18, 40] as [number, number],
+  /** Sale-weekend spending (start-of-game home money): a good year, a weak one. */
+  saleBoom: [6e9, 9e9] as [number, number],
+  saleQuiet: [2e9, 4e9] as [number, number],
+  /** Shoppers (millions) out over the sale weekend. */
+  saleShoppers: [18, 34] as [number, number],
 };
 /** The Money Column (§24.3) runs every n weeks; a rate move within rateWindowWeeks sets its topic. */
 export const NEWS_COLUMN = { everyWeeks: 2, rateWindowWeeks: 13 };

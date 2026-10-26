@@ -4,6 +4,7 @@
 // paper gives for a listed company's big share move. All invented.
 import type { CountryId, Phase } from './types';
 import type { SectorId } from './stocks';
+import { MORE_BEATS, type TitlePool } from './newsWorldBeatsMore';
 
 /** A condition read from the country's economy (SIMULATION §24.1). */
 export type BeatCondition = 'highInflation' | 'lowUnemployment' | 'housingUp' | 'housingDown';
@@ -29,6 +30,8 @@ export interface WorldBeat {
   money?: [number, number];
   /** Relative chance among eligible beats (default 1). */
   weight?: number;
+  /** Where {title} comes from (newsWorldBeatsMore.ts). */
+  pool?: TitlePool;
 }
 
 /** Countries whose seasons run six months off the north's. */
@@ -123,6 +126,7 @@ export const WORLD_BEATS: WorldBeat[] = [
   { key: 'WORLD_ZOO', icon: 'leaf', n: [20, 50] },
   { key: 'WORLD_GOOD_NEWS', icon: 'person', n: [22, 61] },
   { key: 'WORLD_CHESS', icon: 'person', n: [13, 15] },
+  ...MORE_BEATS,
 ];
 
 /** Who won the lottery ("a {city} {job}"). */
