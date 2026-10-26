@@ -60,7 +60,7 @@ export function OwnedProperty(p: { property: Property; site: Site }) {
         />
         {managed && chief && (
           <p class="muted small">
-            {chief.name} (CREO) reviews this rent every {EXEC_DELEGATION.rentEveryWeeks} weeks;
+            {chief.name} (CIO) reviews this rent every {EXEC_DELEGATION.rentEveryWeeks} weeks;
             tenants here pay up to {pct(power, 0)} over market.
           </p>
         )}

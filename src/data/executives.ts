@@ -1,7 +1,7 @@
 // Executive seats (SIMULATION §17.2, SCREENS §10): titles, the HQ departments
 // each executive lifts with execMult, and the delegation toggles on their
 // profile (some with a dial under them: DelegationDials.tsx). The CEO seat is
-// you and isn't listed. The CREO lifts no department: its expertise is pricing
+// you and isn't listed. The CIO (seat id 'creo', Vault Street's CREO) lifts no department: its expertise is pricing
 // power on the buildings it manages (§21.2). Numbers live in balance.ts.
 import type { ExecSeat } from '../sim/marketsTypes';
 import type { HqDeptId } from './types';
@@ -207,8 +207,8 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
   },
   creo: {
     seat: 'creo',
-    title: 'Chief Real Estate Officer',
-    short: 'CREO',
+    title: 'Chief Infrastructure Officer',
+    short: 'CIO',
     depts: [],
     delegations: [
       {
