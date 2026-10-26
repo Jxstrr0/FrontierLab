@@ -1,7 +1,7 @@
 {
-  "name": "Vault Street",
-  "short_name": "Vault Street",
-  "description": "Found a bank and grow it into a global financial empire.",
+  "name": "Frontier Lab",
+  "short_name": "Frontier Lab",
+  "description": "Found an AI lab and grow it into a global company.",
   "id": "./",
   "start_url": "./",
   "scope": "./",

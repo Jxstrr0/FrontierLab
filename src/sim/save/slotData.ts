@@ -8,11 +8,11 @@
 // order through one queue, so a slow write never lands after a newer one.
 // Only src/sim/save may touch browser storage (CLAUDE.md).
 
-const PREFIX = 'vaultstreet.';
+const PREFIX = 'frontierlab.';
 /** The localStorage key of a slot's data (older versions, and the fallback). */
 export const dataKey = (slot: string) => `${PREFIX}save.${slot}`;
 
-const DB_NAME = 'vaultstreet';
+const DB_NAME = 'frontierlab';
 const DB_STORE = 'saves';
 const DB_VERSION = 1;
 

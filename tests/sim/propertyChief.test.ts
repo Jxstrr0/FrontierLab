@@ -3,17 +3,15 @@
 // building's market rent eases toward base × cre/100 while its value tracks
 // cre at once; a managing CREO's expertise is pricing power; the Rents
 // switches set the best rent for the bank's and your own buildings, at once
-// when switched on and every 4 weeks after; migration 28 → 29 seeds the seat's
-// candidates.
+// when switched on and every 4 weeks after.
 import { describe, expect, it } from 'vitest';
-import { EXEC_DELEGATION, EXECUTIVES, REAL_ESTATE } from '../../src/config/balance';
+import { EXEC_DELEGATION, REAL_ESTATE } from '../../src/config/balance';
 import { CITIES } from '../../src/data/cities';
 import * as cmd from '../../src/sim/commands';
 import { advanceWeeks } from '../../src/sim/engine';
 import { refreshExecCandidates } from '../../src/sim/execCandidates';
 import { rentPricingPower } from '../../src/sim/execSeats';
 import { postCash } from '../../src/sim/ledger';
-import { migrate } from '../../src/sim/save/migrations';
 import {
   baseRentFor,
   bestRent,
@@ -22,10 +20,8 @@ import {
   marketRentNow,
   occupancyTarget,
 } from '../../src/sim/propertyMath';
-import { SCHEMA_VERSION, type GameState, type Property } from '../../src/sim/state';
+import { type GameState, type Property } from '../../src/sim/state';
 import { execGame } from '../helpers/executives';
-
-type Raw = Record<string, unknown> & { schemaVersion: number };
 
 function fund(s: GameState, amount: number) {
   postCash(s, amount, 'financing');
@@ -132,21 +128,5 @@ describe('the Chief Real Estate Officer', () => {
     expect(Math.abs(mine.rent / mine.marketRent - 0.8)).toBeLessThan(0.02);
     // Managed tenants fill the building at that premium rent.
     expect(occupancyTarget(bank.rent, bank.marketRent, power)).toBe(REAL_ESTATE.occMax);
-  });
-
-  it('seeds the seat’s candidates for a v28 save with an Executive floor (28 → 29)', () => {
-    const s0 = execGame();
-    refreshExecCandidates(s0, true);
-    const raw = JSON.parse(JSON.stringify(s0)) as Raw;
-    const ex = (raw as unknown as GameState).executives;
-    delete ex.candidates.creo;
-    raw.schemaVersion = 28;
-    const s = migrate(raw) as unknown as GameState;
-    expect(s.schemaVersion).toBe(SCHEMA_VERSION);
-    expect(s.executives.candidates.creo).toHaveLength(EXECUTIVES.candidatesPerSeat);
-    for (const c of s.executives.candidates.creo!) expect(c.seat).toBe('creo');
-    expect(s.executives.candidates.coo).toEqual(s0.executives.candidates.coo);
-    advanceWeeks(s, 4);
-    expect(s.flags.gameOver).toBeUndefined();
   });
 });

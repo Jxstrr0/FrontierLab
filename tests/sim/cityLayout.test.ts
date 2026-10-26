@@ -37,21 +37,3 @@ describe('city layout 1 (the original shared grid)', () => {
     }
   });
 });
-
-describe('3 → 4 migration', () => {
-  it('moves off-street lots onto free frontage and leaves good ones alone', async () => {
-    const { migrate } = await import('../../src/sim/save/migrations');
-    const s = newGame({ seed: 5, cityId: 'cal', layout: 1 });
-    const lots = Object.values(s.world.lots);
-    const keep = { ...lots[0]!.tile };
-    lots[1]!.tile = { x: 0, y: 0 }; // a street corner
-    const raw = JSON.parse(JSON.stringify(s));
-    raw.schemaVersion = 3;
-    const up = migrate(raw) as unknown as typeof s;
-    const geo = cityGeometry(CITIES.cal!, 1);
-    const moved = Object.values(up.world.lots);
-    expect(moved[0]!.tile).toEqual(keep);
-    for (const lot of moved) expect(isFrontage(geo, lot.tile.x, lot.tile.y)).toBe(true);
-    expect(new Set(moved.map((l) => `${l.tile.x},${l.tile.y}`)).size).toBe(moved.length);
-  });
-});

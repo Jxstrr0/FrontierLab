@@ -1,6 +1,7 @@
 // Save serialization (DATA_MODEL §10): plain JSON in and out, migrations on
 // load, a required-keys check, a checksum for corruption, and export codes of
-// the form "VS{version}:{lz-string}" for moving a game between devices.
+// the form "FL{version}:{lz-string}" for moving a game between devices.
+// Vault Street codes ("VS…") are turned away: the two games' saves don't mix.
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
 import { SCHEMA_VERSION, type GameState } from '../state';
 import { migrate } from './migrations';
@@ -35,7 +36,7 @@ export function deserialize(json: string): GameState {
     typeof raw !== 'object' ||
     typeof (raw as { schemaVersion?: unknown }).schemaVersion !== 'number'
   ) {
-    throw new Error("That doesn't look like a Vault Street save.");
+    throw new Error("That doesn't look like a Frontier Lab save.");
   }
   const state = migrate(raw as Record<string, unknown> & { schemaVersion: number });
   for (const key of REQUIRED_KEYS) {
@@ -59,16 +60,20 @@ export function checksum(text: string, seed = 0): string {
 }
 
 export function exportCode(state: GameState): string {
-  return `VS${SCHEMA_VERSION}:${compressToEncodedURIComponent(serialize(state))}`;
+  return `FL${SCHEMA_VERSION}:${compressToEncodedURIComponent(serialize(state))}`;
 }
 
 export function importCode(code: string): GameState {
-  const match = /^VS(\d+):(.+)$/s.exec(code.trim());
-  if (!match) throw new Error('Save codes start with "VS" and a version number.');
+  const trimmed = code.trim();
+  if (/^VS\d+:/.test(trimmed)) {
+    throw new Error('That is a Vault Street save code. Frontier Lab can only load its own saves.');
+  }
+  const match = /^FL(\d+):(.+)$/s.exec(trimmed);
+  if (!match) throw new Error('Save codes start with "FL" and a version number.');
   const version = Number(match[1]);
   if (version > SCHEMA_VERSION) {
     throw new Error(
-      'This save code comes from a newer version of Vault Street. Update the game to load it.',
+      'This save code comes from a newer version of Frontier Lab. Update the game to load it.',
     );
   }
   const json = decompressFromEncodedURIComponent(match[2]!);

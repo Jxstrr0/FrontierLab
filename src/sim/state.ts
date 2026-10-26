@@ -55,7 +55,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState } from './personalTypes';
 
-export const SCHEMA_VERSION = 38;
+export const SCHEMA_VERSION = 1;
 
 export interface GameState {
   schemaVersion: number;

@@ -1,6 +1,6 @@
 // Tutorial Part 2 (src/app/tutorial/lessons.ts, SCREENS §27.2): when each
 // guide starts, how its steps move on, the first-look tips, the commands that
-// store them, and the v23 → v24 migration (Part 1 renumbered, guides on).
+// store them.
 import { describe, expect, it } from 'vitest';
 import {
   activeChapter,
@@ -20,10 +20,8 @@ import { CHAPTERS, CHAPTER_COVERS, TIP_IDS, tipText } from '../../src/data/lesso
 import { TUTORIAL } from '../../src/data/tutorial';
 import * as cmd from '../../src/sim/commands';
 import { newGame } from '../../src/sim/newGame';
-import { migrate } from '../../src/sim/save/migrations';
 import { deserialize, serialize } from '../../src/sim/save/serialize';
-import { SCHEMA_VERSION, type GameState } from '../../src/sim/state';
-import { execGame, hire } from '../helpers/executives';
+import { execGame } from '../helpers/executives';
 
 /** A bank on the map after Part 1, with nothing due. */
 const base = (o: Partial<LessonObs> = {}): LessonObs => ({
@@ -203,41 +201,5 @@ describe('guide commands and saves', () => {
     expect(s.flags.lessonsDone).toEqual([]);
     expect(cmd.setSettings(s, { guides: false }).ok).toBe(true);
     expect(cmd.setSettings(s, { guides: 'no' as unknown as boolean }).ok).toBe(false);
-  });
-
-  const asV23 = (s: GameState) => {
-    const raw = JSON.parse(JSON.stringify(s)) as Record<string, unknown> & {
-      schemaVersion: number;
-    };
-    delete (raw.settings as Partial<GameState['settings']>).guides;
-    delete (raw.flags as Partial<GameState['flags']>).lessonsDone;
-    raw.schemaVersion = 23;
-    return migrate(raw) as unknown as GameState;
-  };
-
-  it('moves an old closing card and "finished" to their new numbers', () => {
-    for (const [from, to] of [
-      [8, TUTORIAL.finale],
-      [9, TUTORIAL.done],
-      [4, 4],
-    ] as const) {
-      const s = newGame({ seed: 7, cityId: 'cal' });
-      s.flags.tutorialStep = from;
-      const up = asV23(s);
-      expect(up.schemaVersion).toBe(SCHEMA_VERSION);
-      expect(up.flags.tutorialStep).toBe(to);
-      expect(up.settings.guides).toBe(true);
-    }
-  });
-
-  it('marks guides an older bank has no need for', () => {
-    expect(asV23(newGame({ seed: 7, cityId: 'cal' })).flags.lessonsDone).toEqual([]);
-    const s = execGame(['finance']);
-    hire(s, 'coo');
-    const up = asV23(s);
-    expect(up.flags.lessonsDone).toEqual(
-      expect.arrayContaining(['hq', 'exec', 'floor-executive', 'floor-finance']),
-    );
-    expect(up.flags.lessonsDone).not.toContain('ipo');
   });
 });

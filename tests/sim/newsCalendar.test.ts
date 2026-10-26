@@ -8,11 +8,9 @@ import { NEWS_COMMODITIES } from '../../src/config/balance';
 import { COMMODITIES } from '../../src/data/commodities';
 import { WORLD_BEATS } from '../../src/data/newsWorldBeats';
 import { LEDGER_TEMPLATES } from '../../src/data/ledgerTemplates';
-import { newGame } from '../../src/sim/newGame';
 import { cupScript, gamesScript } from '../../src/sim/newsTournaments';
 import { rngFromState } from '../../src/sim/rng';
-import { migrate } from '../../src/sim/save/migrations';
-import { SCHEMA_VERSION, type GameState, type LedgerIssue } from '../../src/sim/state';
+import { type LedgerIssue } from '../../src/sim/state';
 import { runScript } from '../helpers/scenario';
 
 const refKey = (ref: string) => ref.split(':')[0]!;
@@ -93,26 +91,5 @@ describe('the paper over six years', () => {
       expect(archive.some((a) => r.headline.includes(a.headline))).toBe(true);
     // Each reprint flags its original, so the count matches: none ran twice.
     expect(archive.filter((a) => a.reprinted).length).toBe(reprints.length);
-  });
-});
-
-describe('v35 → v36 migration', () => {
-  it('gives an existing news desk an empty calendar, commodities and archive', () => {
-    const s0 = newGame({ seed: 5, cityId: 'cal' });
-    const raw = JSON.parse(JSON.stringify(s0)) as GameState & { schemaVersion: number };
-    raw.news.desk = {
-      proposals: [],
-      seasons: {},
-      polls: {},
-      assetMarks: {},
-      worldRecent: {},
-      elections: {},
-    } as never;
-    raw.schemaVersion = 35;
-    const s = migrate(raw as never) as unknown as GameState;
-    expect(s.schemaVersion).toBe(SCHEMA_VERSION);
-    expect(s.news.desk!.scheduled).toEqual([]);
-    expect(s.news.desk!.commodities).toEqual({});
-    expect(s.news.desk!.archive).toEqual([]);
   });
 });

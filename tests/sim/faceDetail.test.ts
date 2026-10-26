@@ -1,26 +1,13 @@
 // Face detail (ART_DIRECTION §4, DATA_MODEL §12): every portrait carries eyes,
-// brows, mouth and age; new faces derive them from their other parts, and v22
-// saves gain the same values on load while the founder keeps the look they chose.
+// brows, mouth and age; new faces derive them from their other parts.
 import { describe, expect, it } from 'vitest';
 import { PART_COUNTS } from '../../src/art/portraits';
 import { newGame } from '../../src/sim/newGame';
 import { faceDetail, randomAvatar } from '../../src/sim/people';
 import { stream } from '../../src/sim/rng';
-import { migrate } from '../../src/sim/save/migrations';
-import { SCHEMA_VERSION, type AvatarSpec, type GameState } from '../../src/sim/state';
+import { type AvatarSpec } from '../../src/sim/state';
 
 const FACE_KEYS = ['eyes', 'brows', 'mouth', 'age'] as const;
-
-function stripFaces(node: unknown): void {
-  if (!node || typeof node !== 'object') return;
-  if (Array.isArray(node)) return node.forEach(stripFaces);
-  const o = node as Record<string, unknown>;
-  if ('head' in o && 'hair' in o && 'eyes' in o) {
-    for (const k of FACE_KEYS) delete o[k];
-    return;
-  }
-  Object.values(o).forEach(stripFaces);
-}
 
 function faces(node: unknown, out: AvatarSpec[] = []): AvatarSpec[] {
   if (!node || typeof node !== 'object') return out;
@@ -65,37 +52,4 @@ describe('face detail', () => {
       expect(new Set(all.map((a) => a[k])).size).toBeGreaterThan(1);
     }
   });
-
-  it('upgrades v22 saves: founder unchanged, everyone else gets their face', () => {
-    const s = newGame({ seed: 7, cityId: 'cal', founderAvatar: { ...s0Avatar(), hair: 5 } });
-    const raw = JSON.parse(JSON.stringify(s)) as Record<string, unknown> & {
-      schemaVersion: number;
-    };
-    stripFaces(raw);
-    raw.schemaVersion = 22;
-    expect(faces(raw).every((a) => a.eyes === undefined)).toBe(true);
-    const up = migrate(raw) as unknown as GameState;
-    expect(up.schemaVersion).toBe(SCHEMA_VERSION);
-    expect(up.meta.founderAvatar).toMatchObject({ hair: 5, eyes: 0, brows: 0, mouth: 0, age: 0 });
-    const before = faces(s).filter((a) => a !== s.meta.founderAvatar);
-    const after = faces(up).filter((a) => a !== up.meta.founderAvatar);
-    expect(after.length).toBe(before.length);
-    after.forEach((a, i) => expect(a).toEqual(before[i]));
-  });
 });
-
-function s0Avatar(): AvatarSpec {
-  return {
-    head: 0,
-    hair: 0,
-    facial: 0,
-    glasses: 0,
-    attire: 0,
-    tone: 0,
-    shade: 1,
-    eyes: 0,
-    brows: 0,
-    mouth: 0,
-    age: 0,
-  };
-}
