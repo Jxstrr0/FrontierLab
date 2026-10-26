@@ -4,11 +4,20 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 **Current stage:** 10 — Art pass, onboarding, polish, launch (built and live; awaiting the owner's iPhone check). All ten roadmap stages are built. Still open: the owner's testing and tuning pass, an Add to Home Screen test on a real iPhone, and the Vault Street card on Kelbo.Website (in a separate session in that repo).
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `12f03e8e195ddc` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `1a41be4f7a56d1` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-26 — Market rents follow the cycle, and a Chief Real Estate Officer (v0.11.6, schema v29)
+- **Owner's ask:** make market rent track the city, and add a C-suite member who manages property rents, for the bank's buildings and your own. The formulas were agreed first: rents lag the cycle, expertise is pricing power, exact reviews every 4 weeks, rents only (foreclosed homes and buying stay yours).
+- **What changes.** A building's market rent used to be fixed at purchase. Now it eases toward **base rent × the country's commercial property index** by 5% a week (half-life about 14 weeks): in a boom the value jumps first and rents catch up over months, so a rent you set last year drifts off market. The stepper's hint says where market rent is heading. A newly bought building starts at today's market rent; your rent is kept inside its 50–160% range as the market moves.
+- **The eighth seat: Chief Real Estate Officer (CREO).** Two switches, **Rents: the bank's buildings** and **Rents: your own buildings**, set every covered building to the highest rent that still fills it, at once when switched on and every 4 weeks after. The chief's Expertise is **pricing power**: tenants of a managed building pay up to 10% × expertise/100 over market with no loss of occupancy (a 90-expertise chief gets 9%). The profile shows what they manage and when the next review falls; a managed building says so under its rent stepper. The Executive suite now has 8 desks.
+- **Your save (schema v29):** if you have an Executive suite, the CREO's candidates are waiting on the floor. Your buildings keep their current market rent and start drifting toward today's from the next week; nothing jumps.
+- **Code:** `REAL_ESTATE.rentEma`, `EXEC_DELEGATION.rentEveryWeeks` / `rentPricingPower` in `balance.ts`; `baseRentFor`, `marketRentNow`, `occupancyTarget(…, pricingPower)`, `bestRent` in `propertyMath.ts`; `rentsManaged` / `rentPricingPower` in `execSeats.ts`; `execDelegationsProperty.ts`; the `creo` seat in `data/executives.ts`; `PropertyNote.tsx`; migration 28 → 29.
+- **Checked:** lint, full test suite (new `tests/sim/propertyChief.test.ts`; the occupancy test now reads the eased market rent) and build clean. Determinism snapshot `12f03e8e195ddc` → `1a41be4f7a56d1` (intended: market rents now move with cre). Balance run (10 years, seed 42, steady) unchanged from main: the same single pre-existing warning (week 260 income per week), nothing new. Phone check at 390×844: the eight-seat grid, the CREO's profile and a managed building.
+- **Docs:** SIMULATION §17.2 and §21.2, SCREENS §10, §10.1 and §16, CONTENT §9, DATA_MODEL §12, DESIGN §3.1, §5.8.8 and decision log.
 
 ### 2026-10-26 — Monthly results, and conventions that last the month (v0.11.5, schema v28)
 - **Owner's ask:** a monthly option for the results report, so 2× and 4× play isn't interrupted every week; conventions and the like need to last the month so a monthly reader doesn't miss them.

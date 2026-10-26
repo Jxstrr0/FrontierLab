@@ -275,7 +275,7 @@ Content trim (2026-10-25): each campaign now has its own job. Free Lobby Coffee 
 | marketing | 24 | 72,000 | 1 + 0.15 × branches + 2 per active brand campaign | all campaign effects ×(0.5 + 0.5k′) |
 | it | 24 | 98,000 | 2 + 0.25 × branches + 1 per $5B assets | app rating target ×k′; breach and outage odds ×(1 + 2(1 − k′)) |
 | risk | 24 | 88,000 | 2 + 0.15 × branches + 1 per $750M loans | PD ×(1 + 1.5(1 − k′)); fine odds ×(1 + 3(1 − k′)); weaker loan estimates |
-| executive | 7 (suite) | (per exec) | — | enables executives: COO, CFO, CPO, CMO, CTO, CRO |
+| executive | 8 (suite) | (per exec) | — | enables executives: COO, CFO, CPO, CMO, CTO, CRO, CREO |
 | investment | 32 | 120,000 | optional | ventures shown = 1 + floor(staff / 4), max 8 |
 
 Stage 4 tuning (2026-10-24): per-branch requirements were cut by about 40% and the Risk PD penalty raised from 0.4 to 1.5 so that a bank without an HQ ends a 6-year steady run clearly behind one with a staffed HQ (balance strategy `nohq`), instead of ahead of it. Shortfall effects read effect(k′) = k′^0.7.

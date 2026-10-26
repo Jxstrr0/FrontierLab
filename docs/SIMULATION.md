@@ -696,7 +696,7 @@ Levels 1–5 (Very conservative to Very aggressive):
 ### 17.2 Executives
 - **Skills:** Leadership, Expertise and Loyalty, each 0–100.
 - **Department multiplier:** `execMult = 0.9 + 0.25 × expertise/100` on the departments in their domain.
-- **Seats:** CEO (you), COO, CFO, CPO, CMO and CTO as in the original, plus CRO as a seventh. The Executive suite has 7 desks.
+- **Seats:** CEO (you), COO, CFO, CPO, CMO and CTO as in the original, plus CRO as a seventh and a Chief Real Estate Officer (CREO) as an eighth (2026-10-26). The Executive suite has 8 desks. The CREO lifts no department: its Expertise is pricing power on the buildings it manages (§21.2).
 
 **Delegations:**
 
@@ -707,6 +707,7 @@ Levels 1–5 (Very conservative to Very aggressive):
 | CPO | Products | **Pricing:** keeps the company lineup priced like a delegated manager (§17.1) when Apply-to-all is on. **Developments:** starts one when none is running, within a budget cap of 1% of revenue. **Models:** switches to the bureau package with the best defaults saved per dollar. **Branch guidance (lineup):** see below. |
 | CTO | IT | App rating bonus (§16.9); runs digital projects. An empty seat applies the vacancy penalty. |
 | CRO | Risk | Tunes risk appetite to hold CR ≥ 12% and the annualized loss rate ≤ 1.2% (expansion target); Loan Desk policy. **Branch guidance (lending),** with the CFO: see below. |
+| CREO | Owned buildings (the bank's and yours) | **Rents: the bank's buildings** and **Rents: your own buildings** (two switches, so your private buildings can stay yours to price): every `EXEC_DELEGATION.rentEveryWeeks` (4) weeks, and at once when a switch goes on, each covered building's rent is set to `bestRent` (§21.2): the highest rent that still fills it, counting the chief's pricing power, rounded down to the $5 step and kept inside the 50–160% range. Tenants of a covered building accept rent up to `marketRent × (1 + 0.10 × expertise/100)` with no loss of occupancy. The bank pays the chief either way. No branch guidance. |
 | CMO | Marketing | Runs brand campaigns to hold `b` near the **awareness target** you dial (`executives.brandTarget`, one of `EXEC_DELEGATION.brandTargets` 40–70%, default 50%) in active cities within a budget cap of 3% of revenue. **Branch guidance (marketing):** see below. |
 
 **Branch guidance** (`src/sim/branchGuidance.ts`, 2026-10-25): the C-suite steers the branch managers you delegate to, so managers still decide with their own skills but aim where HQ points them. The CFO and CRO steer managers who handle products or loan approvals (and the CPO's company pricing, which uses the same rule); the COO, CMO and CPO (schema v18) steer managers who handle staffing, marketing and products. `company.guidance` holds five whole steps in `GUIDANCE.min..max` (−1..+3), moved one step every `GUIDANCE.everyWeeks` (4):
@@ -904,13 +905,15 @@ A deliberately simple "country up or down" investment (DESIGN §5.12a). Your boo
   - asking price = estimate × U(0.95, 1.10)
   - Offers below asking: acceptance = `clamp((offer/asking − 0.85)/0.15, 0, 1)`.
 - **21.2 Owned property:**
-  - `occTarget = clamp(0.97 − 1.6 × (rent/marketRent − 1), 0.30, 0.98)` and `occ = ema(occ, occTarget, 0.06)`
+  - **Market rent follows the cycle** (2026-10-26): a building's base rent is `district × city.rentIndex` (§21.1) and today's market rent is `base × cre/100`. An owned building's `marketRent` eases toward today's by `REAL_ESTATE.rentEma` (0.05) a week (half-life about 14 weeks), so values move with the cycle at once and rents follow months later; a newly bought building starts at today's market rent. The owner's rent is clamped into its 50–160% range of the new market each week.
+  - `occTarget = clamp(0.97 − 1.6 × (rent/(marketRent × (1 + pricingPower)) − 1), 0.30, 0.98)` and `occ = ema(occ, occTarget, 0.06)`. `pricingPower` is `EXEC_DELEGATION.rentPricingPower (0.10) × the CREO's expertise/100` while the CREO's Rents switch covers the building's owner (§17.2), else 0.
+  - `bestRentRatio = 1 − (0.98 − 0.97)/1.6 = 0.99375`: the highest rent/market that still fills the building; `bestRent = floor(marketRent × (1 + pricingPower) × 0.99375 / 5) × 5`, inside the rent range. This is what the CREO sets.
   - weekly revenue = `size × rent × occ / 52`
   - maintenance = `size × marketRent × 0.55 / 52` (fixed)
   - vacancy cost = `size × (1 − occ) × 2 / 52`
   - net = revenue − maintenance − vacancy
   - ROI = annualized net / purchase price
-  - Value tracks `cre`.
+  - Value tracks `cre`: `size × baseRent × 3.2 × cre/100`, i.e. size × today's market rent × 3.2, whatever the building's own `marketRent` has caught up to.
   - **For Sale** toggle: sells within 2–8 weeks at value × normal(1, 0.04).
   - Reference: the original showed about 8.7% ROI at 85% occupancy.
 - **21.3 REO** (foreclosed homes, aggregated per city):
