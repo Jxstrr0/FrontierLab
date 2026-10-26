@@ -294,7 +294,7 @@ Tabs: Overview · Loans · Credit.
   - regulator status and last review result
 - **Executive:**
   - Board meeting card: explanation, last meeting date, Hold meeting (enabled once per quarter)
-  - Senior executives grid: eight seats (CEO, COO, CFO, CPO, CMO, CTO, CSO, CREO) with portrait, name and title; empty seats show Hire, which opens a sheet of the seat's candidates with a paid "New candidates · $fee" button at the bottom (as for branch managers)
+  - Senior executives grid: eight seats (CEO, COO, CFO, CPO, CMO, CTO, CSO, CIO) with portrait, name and title; empty seats show Hire, which opens a sheet of the seat's candidates with a paid "New candidates · $fee" button at the bottom (as for branch managers)
 - **Investment:**
   - portfolio value with weekly change, a donut (Stocks, Ventures, Real estate, Venture debt, Currencies) and List portfolio
   - Ventures carousel (vignette, name, sector, short description, founded, Details)
@@ -310,7 +310,7 @@ Tabs: Overview · Loans · Credit.
 - CFO: under the switches, for each Investing switch that is on, two lines: "For the bank: next stock, Cobalt AI for $5.44M, in 2 weeks." and "For the bank: next startup, 13% of Brightloom (scores 7.4) for $1.20M, in 2 weeks.", or what holds it back ("Waiting for spare cash: …", "The bank's stocks are at 5% of its assets.", "The bank's startup stakes would pass 3% of its assets.", "The capital ratio would fall under 12%.", the regulator at a restricted tier, "No startup on the floor's list scores 6 or more right now.", "Startups come from the Investment floor: add one at HQ.")
 - CFO and CRO: **Branch guidance now**: the deposit and loan rate offsets and how much stricter or looser approvals are, noting which switch is off
 - COO, CMO and CPO: **Branch guidance now**: the COO's wage and headcount change, the CMO's campaign push, or the CPO's fee change and whether the lineup is wider or narrower, noting when the switch is off
-- CREO: four switches. **Rents: the bank's buildings** and **Rents: your own buildings**, each with an **Occupancy** dial under it (80% / 85% / 90% / 95% / 100%; tagline: "Rent +5% per m² · net rent $2.53M/yr, $177K less than at 100%", "As full as tenants allow · net rent $1.15M/yr across 2 buildings", or with no buildings "No buildings yet: …"); then **Buying: the bank's buildings** and **Buying: your own buildings**. Then a note: "Managing 3 buildings of the bank's and 1 of yours: tenants pay up to 8% over market, and rents are reviewed every 4 weeks (next in 2 weeks)." (or, with both off, how many buildings wait on the switches), and for each Buying switch that is on: "For the bank: next, 803 Copper Lane in Calgary for $3.27M (13.8% a year), in 3 weeks." or what holds it back ("Waiting for spare cash: …", "The bank's buildings would pass 5% of its assets.", "The capital ratio would fall under 12%.", the regulator at a restricted tier, "No building for sale earns its keep right now.")
+- CIO (Chief Infrastructure Officer, seat id `creo`): four switches. **Rents: the bank's buildings** and **Rents: your own buildings**, each with an **Occupancy** dial under it (80% / 85% / 90% / 95% / 100%; tagline: "Rent +5% per m² · net rent $2.53M/yr, $177K less than at 100%", "As full as tenants allow · net rent $1.15M/yr across 2 buildings", or with no buildings "No buildings yet: …"); then **Buying: the bank's buildings** and **Buying: your own buildings**. Then a note: "Managing 3 buildings of the bank's and 1 of yours: tenants pay up to 8% over market, and rents are reviewed every 4 weeks (next in 2 weeks)." (or, with both off, how many buildings wait on the switches), and for each Buying switch that is on: "For the bank: next, 803 Copper Lane in Calgary for $3.27M (13.8% a year), in 3 weeks." or what holds it back ("Waiting for spare cash: …", "The bank's buildings would pass 5% of its assets.", "The capital ratio would fall under 12%.", the regulator at a restricted tier, "No building for sale earns its keep right now.")
 - COO only: **Growth cities**: every city you have visited, home first, each with a switch (may the Expansion delegation build here) and an **Open now** button that has the COO build their usual pick at once; the hint under each city shows how many branches you already have there (open or being built), then the next storefront and its cost, or why nothing can be built there
 - annual salary stepper
 - grants list: type, shares, strike, vesting progress
@@ -439,7 +439,7 @@ Tabs: Overview · Loans · Credit.
   - address, space, estimated value, purchase price
   - **Real estate income:**
     - annual rent per m² stepper, hint "Market rent $1,205 /m²/yr" plus ", heading to $1,260" while market rent is still catching up with the cycle (SIMULATION §21.2)
-    - when the CREO's switch covers this owner: "{Name} (CREO) reviews this rent every 4 weeks; tenants here pay up to 8% over market."
+    - when the CREO's switch covers this owner: "{Name} (CIO) reviews this rent every 4 weeks; tenants here pay up to 8% over market."
     - occupancy % (and "Heading toward" while it is still moving)
     - weekly rent revenue, weekly maintenance and weekly vacancy cost
     - weekly net rent income

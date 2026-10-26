@@ -3,13 +3,20 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C1 done (v0.1.3, save schema 1): floors, executives, segments, campaigns, benefits, conferences, incidents, stock sector, map layers, rival labs, "the lab" wording and the newspaper. Next is C2 (main offices, sales offices and data centers). The owner's decisions are in the design brief and CONVERSION_PLAN §5.
+**Current stage:** C1 done (v0.1.4, save schema 1): floors, executives, segments, campaigns, benefits, conferences, incidents, stock sector, map layers, rival labs, "the lab" wording and the newspaper. Next is C2 (main offices, sales offices and data centers). The owner's decisions are in the design brief and CONVERSION_PLAN §5.
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
 **Determinism snapshot:** `0d03bb5a89221d` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-26 — The CREO becomes the CIO (v0.1.4)
+
+**What you asked for:** settle the CREO question with a pop-up. You chose "rename, same job" and asked me to look at a new AI-specific executive too.
+- **What changed:** the eighth executive is now the **Chief Infrastructure Officer (CIO)**. Same job as before: setting rents and buying buildings. I didn't use "Chief Facilities Officer" because its short form would be CFO, which the finance chief already uses. Behind the scenes the seat keeps its old id, so your saves are untouched.
+- **The new AI role:** a **Chief Scientist** as a ninth seat is now in the plan for stage C6. It needs training runs to exist before it has anything to improve, so it can't usefully come earlier.
+- **Checked:** lint, tests and build. The determinism snapshot is unchanged (only the title on screen changed).
 
 ### 2026-10-26 — Stage C1c: The Weekly Inference (v0.1.3)
 
