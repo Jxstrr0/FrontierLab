@@ -293,9 +293,12 @@ Brand awareness by city, brand campaigns (TV, billboards, podcasts, creators, ar
 ### 5.9 Rivals
 - **Who they are.** Each city has rival banks with a strategy (Incumbent, Disruptor, Premium or Community). Each has branches on the map, published rate sheets, reviews, quarterly earnings, dividends and executives, plus share prices if listed.
 - **How they behave:**
-  - expand into strong neighbourhoods and close losing branches
+  - expand into strong neighbourhoods in every city they serve, and enter new cities once they have a network: their home country first, then anywhere once they serve a few cities (SIMULATION §18.4)
+  - learn from you: in a city you share, a rival you out-serve lifts its branch quality and app rating a step each year (§18.3)
+  - close losing branches
   - react to price wars
   - pass rate hikes to savers slowly (deposit beta)
+- **They grow with the economy.** Every country's price-and-wealth level (the nominal index, SIMULATION §4.6) rises with its growth and inflation plus a trend, about 8–9% a year. Balances per account, market wages and rival books are all quoted at that level, so a world whose cities are full keeps growing, rivals become real acquisition targets, and a long game runs into the hundreds of billions and beyond.
 - **Failures.** Weak rivals can fail in recessions; their branch networks go up for distressed sale.
 - **Corporate lending.** Rival bank HQs (Banks layer) lend to your company: business loans and a line of credit. This is corporate cash, never deposits.
 
@@ -312,7 +315,7 @@ Investment banks on the map, with tabs Market / Equity / M&A:
 - **M&A:**
   - Buy rival banks with an offer price and premium.
   - Acceptance depends on the premium and the target's health.
-  - The regulator checks your post-deal capital and local market share.
+  - The regulator checks your post-deal capital (at least 9%, so a deal may leave you in the Watch tier) and local market share (at most half a city's deposits; two-thirds after a fast-track lobbying win; not tested at all for a distressed sale). Rejected offers can be raised after two weeks.
   - Acquired branches convert to your brand over eight weeks.
 - After the IPO, your share price tracks book value × (ROE ÷ cost of equity), moved by news, earnings and sentiment.
 
@@ -382,7 +385,7 @@ Investment banks on the map, with tabs Market / Equity / M&A:
 - **Private jet:** bought with personal cash (Corvid 600, 6,000 km range; Albatross 8000, global). Adds a "Fly now" option from any map, and its flights never cost a ticket (assumption); a hop beyond the jet's range flies by the normal rules.
 
 ### 5.18 Goals, milestones, failure
-- **Milestones:** first branch, first loan, first profitable quarter, 10 branches, HQ fully staffed, IPO, first acquisition, 100 branches, ten cities, $1B in deposits, five countries, $10B in assets, five acquisitions, club owner, billionaire founder, on the rich list, rich list #1.
+- **Milestones:** first branch, first loan, first profitable quarter, 10 branches, HQ fully staffed, IPO, first acquisition, 100 branches, ten cities, $1B in deposits, five countries, $10B in assets, five acquisitions, club owner, twenty cities, ten countries, billionaire founder, on the rich list, ten acquisitions, $100B in assets, rich list #1, ten-billion founder, $1T in assets.
 - **Failure:**
   - **Regulatory takeover:** Critical capital for too long, after an emergency recapitalisation offer is declined or fails.
   - **Insolvency:** corporate cash below zero for four weeks with no credit available.
@@ -605,3 +608,4 @@ Add one dated line per decision. Never delete entries; supersede them.
 - 2026-10-26 (owner's report): **Monthly results showed one week.** The report opened on the first tick after the month changed, but by then the week just closed already ended in the new month, so it showed that one week as the new month ("January · 1 week") with a meaningless change on last month. It now opens on the tick that closes the month's (or quarter's) last week and covers every week of it. The results date now shows the last day covered (it showed the next day). The quarter-end report uses the same rule: a week ending the day before a quarter starts counts for the old quarter (it fell into the new one).
 - 2026-10-25: Line of Credit stays as it is. In the content audit it looked like a third unsecured consumer loan, but it is the only revolving credit business customers take, so it isn't a duplicate.
 - 2026-10-26 (owner's ask: content past the few-billion stage): **Late-game goals.** A 20-year headless run fills every city by year 11 (179 branches, ~$12B of deposits) and then only creeps, and the rich list's top fortune ($120B growing 6% a year) was out of any founder's reach, so the final milestone could never land. The rich list now spans $150M–$2B (old saves rescale in place, keeping each fortune's rank), and six milestones fill the gap between the first acquisition and the top of the list: 100 branches, ten cities, $10B in assets, five acquisitions, a sports club, and entering the rich list. Compact money gains a trillions tier. Still open (bigger design calls, noted in PROGRESS): rivals stay small (the biggest has about $70M of equity), and after year 11 retained earnings pile up as cash with nothing in the bank's world to buy.
+- 2026-10-26 (owner's ask: rivals that grow and stay competitive, lighter M&A regulation, six more milestones, a save that lives into the trillions): **A growing world.** Each country gets a nominal index (SIMULATION §4.6) that compounds at growth + inflation + a 4-point trend, about 9% a year in an expansion; balances per account, every deposit and loan balance, market wages, rival books and the rich list all scale with it, so a full world keeps growing and the late game reaches the hundreds of billions (seed 42 aggressive: about $38B of assets by year 14 against $13B before, with rivals holding $41B across 312 branches instead of $7B across 165). Fixed catalogue prices are not indexed; the §25 bands are read in start-of-game money. **Rivals grow:** an expansion roll in every city served (lot caps 40%/20%, were 30%/30%), entry into new generated cities (home country first, anywhere after three cities), yearly learning toward your rating and app rating in shared cities, and a bought or seized bank is never seeded into a later city. **Lighter M&A:** pro-forma capital 9% (was 10.5%), city share 50% (was 35%), fast-track 65% (was 45%), retry after 2 weeks (was 4), and no share test on a distressed sale. **Six milestones:** twenty cities, ten countries, ten acquisitions, $100B in assets, a ten-billion founder, $1T in assets (23 in all). Schema v33.

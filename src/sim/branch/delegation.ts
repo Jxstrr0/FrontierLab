@@ -54,7 +54,7 @@ export function runDelegation(state: GameState, branch: Branch): void {
       staffNeeded(branch) * clamp(branch.waitIndex, lo, hi) * coo.staff,
     );
     branch.staff.wage = roundToStep(
-      marketWage(branch.cityId) *
+      marketWage(state, branch.cityId) *
         (DELEGATE.wageBase + (DELEGATE.wageSlope * mgr.skills.people) / 100) *
         coo.wage,
       WAGE_STEP,

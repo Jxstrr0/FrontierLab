@@ -1,18 +1,17 @@
 // Branch manager candidates and portraits (SIMULATION §6.5). Pools are per city
 // and refresh every 4 weeks; skills come from the `people` stream.
 import {
-  MANAGER_BASE_SALARY,
   MANAGER_POOL_REFRESH_WEEKS,
   MANAGER_POOL_SIZE,
   MANAGER_SALARY_SPREAD,
   MANAGER_SKILL,
 } from '../config/balance';
-import { CITIES } from '../data/cities';
 import { FIRST_NAMES, LAST_NAMES } from '../data/names';
 import { newId } from './ids';
 import { clamp } from './math';
 import { gradSkillBonus } from './partnerships';
 import { stream, type Rng } from './rng';
+import { managerBaseSalary } from './payReviews';
 import type { AvatarSpec, GameState, Manager } from './state';
 
 /** Portrait part counts (ART_DIRECTION §4). */
@@ -78,7 +77,6 @@ export function generateManager(
   cityId: string,
   rng: Rng = stream(state, 'people'),
 ): Manager {
-  const city = CITIES[cityId];
   const bonus = gradSkillBonus(state);
   const skills = {
     people: skill(rng, bonus),
@@ -88,8 +86,7 @@ export function generateManager(
   };
   const avg = (skills.people + skills.product + skills.marketing + skills.ethics) / 4;
   const salary =
-    MANAGER_BASE_SALARY *
-    (city?.wageIndex ?? 1) *
+    managerBaseSalary(state, cityId) *
     (MANAGER_SALARY_SPREAD.base + (MANAGER_SALARY_SPREAD.slope * avg) / 100);
   return {
     id: newId(state, 'mgr'),

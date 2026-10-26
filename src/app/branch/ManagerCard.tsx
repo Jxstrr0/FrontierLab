@@ -70,7 +70,7 @@ export function ManagerCard({ branch }: { branch: Branch }) {
     );
   }
 
-  const salary = salaryBounds(branch.cityId);
+  const salary = salaryBounds(s, branch.cityId);
   const pay = managerPayView(s, mgr);
   const reviews = !!s.executives.seats.coo?.delegations.payReviews;
   return (

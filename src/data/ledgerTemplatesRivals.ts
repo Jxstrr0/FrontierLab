@@ -18,6 +18,20 @@ export const RIVAL_TEMPLATES = {
       b: '{bank} is the latest to open on the street, at {address}.',
     },
   ],
+  RIVAL_CITY_ENTRY: [
+    {
+      h: '{bank} arrives in {city}',
+      b: 'Its first branch in the city opened at {address} in {district}. {bank} now serves {cities} cities.',
+    },
+    {
+      h: '{bank} enters the {city} market',
+      b: 'The newcomer has taken a storefront at {address}, its {cities}th city.',
+    },
+    {
+      h: 'New name on {city} high streets: {bank}',
+      b: '{bank} opened its first {city} branch at {address} this week.',
+    },
+  ],
   RIVAL_BRANCH_CLOSED: [
     {
       h: '{bank} shuts {district} branch',

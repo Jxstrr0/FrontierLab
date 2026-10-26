@@ -100,7 +100,7 @@ describe('offer validation', () => {
     expect(s.mergers.offers).toHaveLength(0);
   });
 
-  it('turns down a lowball offer and holds a retry for 4 weeks', () => {
+  it('turns down a lowball offer and holds a retry for MERGERS.retryWeeks', () => {
     const s = capitalisedBank();
     const bank = smallestRival(s);
     expect(cmd.offerMerger(s, bank.id, referencePrice(bank) * 0.6).ok).toBe(true);
@@ -134,12 +134,15 @@ describe('regulator checks', () => {
     expect(regulatorBlock(plan, cityName)).toBeUndefined();
   });
 
-  it('blocks a deal that would give you over 35% of a city’s deposits', () => {
+  it('blocks a deal that would give you over half of a city’s deposits', () => {
     const s = newGame({ seed: 42, cityId: 'cal', bankName: 'Test Bank', competitors: 2 });
     openScriptedBranch(s, 'midtown');
     advanceWeeks(s, 4);
-    addCapital(s, 200_000_000);
-    const bank = smallestRival(s);
+    addCapital(s, 400_000_000);
+    // The bigger of the two rivals holds most of the city's deposits.
+    const bank = Object.values(s.rivals)
+      .filter((r) => r.status === 'active')
+      .sort((a, b) => b.equity - a.equity)[0]!;
     const plan = planDeal(s, bank, referencePrice(bank) * 1.5);
     expect(plan.cityShares[0]!.share).toBeGreaterThan(MERGERS.maxCityShare);
     expect(cmd.offerMerger(s, bank.id, referencePrice(bank) * 1.5).ok).toBe(true);
@@ -150,6 +153,25 @@ describe('regulator checks', () => {
     expect(s.events.log.some((e) => e.type === 'MERGER_BLOCKED')).toBe(true);
     expect(bank.status).toBe('active');
     expect(identityGap(s)).toBeLessThan(1);
+  });
+
+  it('skips the share test for a distressed sale', () => {
+    const s = newGame({ seed: 42, cityId: 'cal', bankName: 'Test Bank', competitors: 2 });
+    openScriptedBranch(s, 'midtown');
+    advanceWeeks(s, 4);
+    const bank = Object.values(s.rivals)
+      .filter((r) => r.status === 'active')
+      .sort((a, b) => b.equity - a.equity)[0]!;
+    bank.status = 'distressed';
+    bank.distressedAsk = rivalBvps(bank) * 0.5;
+    const plan = planDeal(s, bank, bank.distressedAsk);
+    expect(plan.cityShares[0]!.share).toBeGreaterThan(MERGERS.maxCityShare);
+    const checks = regulatorChecks(plan, cityName);
+    expect(checks).toHaveLength(2);
+    expect(checks[1]!.ok).toBe(true);
+    expect(checks[1]!.detail).toMatch(/distressed sale/);
+    const active = regulatorChecks({ ...plan, distressed: false }, cityName);
+    expect(active.some((c) => !c.ok)).toBe(true);
   });
 });
 
