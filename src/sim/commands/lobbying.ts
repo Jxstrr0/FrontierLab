@@ -8,7 +8,7 @@ import { COUNTRIES } from '../../data/countries';
 import { LOBBY_FIRMS } from '../../data/lobbying';
 import { pushEvent } from '../events';
 import { spend } from '../ledger';
-import { campaignSpec, pendingBufferBill } from '../lobbying';
+import { campaignSpec, lobbyingPrice, pendingBufferBill } from '../lobbying';
 import { stream } from '../rng';
 import type { GameState } from '../state';
 import { fail, money, ok, type CommandResult } from './result';
@@ -36,7 +36,8 @@ export function lobbyBlock(
     return 'There is no capital buffer bill before lawmakers here right now.';
   if (campaignId === 'fastTrack' && state.lobbying.fastTrack)
     return 'Your next merger review is already fast-tracked.';
-  if (spec.cost > state.company.cash) return `You need ${money(spec.cost)} in corporate cash.`;
+  const price = lobbyingPrice(state, spec, site.cityId);
+  if (price > state.company.cash) return `You need ${money(price)} in corporate cash.`;
   return undefined;
 }
 
@@ -60,14 +61,15 @@ export function startLobbying(
     const bill = pendingBufferBill(state, country)!;
     resolveWeek = Math.max(week + 1, Math.min(resolveWeek, bill.voteWeek));
   }
-  spend(state, 'lobbying', spec.cost);
+  const price = lobbyingPrice(state, spec, site.cityId);
+  spend(state, 'lobbying', price);
   const id = `lobby_${state.lobbying.campaigns.length + 1}`;
   state.lobbying.campaigns.push({
     id,
     firmId: firm.id,
     campaignId,
     country,
-    cost: spec.cost,
+    cost: price,
     startWeek: week,
     resolveWeek,
     status: 'pending',
@@ -75,7 +77,7 @@ export function startLobbying(
   pushEvent(
     state,
     'LOBBY_STARTED',
-    { campaignId, title: spec.title, firm: firm.name, cost: spec.cost },
+    { campaignId, title: spec.title, firm: firm.name, cost: price },
     6,
     id,
   );

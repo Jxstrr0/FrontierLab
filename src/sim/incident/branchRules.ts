@@ -7,6 +7,7 @@ import { INCIDENT_PARAMS, INCIDENT_SPECS } from '../../data/incidents';
 import { isDeposit } from '../../data/products';
 import { pushEvent } from '../events';
 import { newId } from '../ids';
+import { listPrice } from '../nominal';
 import { spend } from '../ledger';
 import { roundToStep } from '../math';
 import { productSpec } from '../products';
@@ -68,7 +69,9 @@ const ROBBERY: IncidentRule = {
     const b = branchOf(state, scope);
     const next = b && nextVault(b);
     return {
-      upgrade: next ? (EQUIPMENT[next]?.cost ?? 0) * P.ROBBERY.upgradeShare : 0,
+      upgrade: next
+        ? listPrice(state, (EQUIPMENT[next]?.cost ?? 0) * P.ROBBERY.upgradeShare, b.cityId)
+        : 0,
       leave: num(data, 'leave'),
       usual: 0,
     };
@@ -217,7 +220,10 @@ const VIRAL_COMPLAINT: IncidentRule = {
     if (!b || b.ratings.service >= P.VIRAL_COMPLAINT.maxService) return 0;
     return baseP('VIRAL_COMPLAINT') * incidentPMult(state, 'VIRAL_COMPLAINT', scope);
   },
-  costs: () => ({ apology: P.VIRAL_COMPLAINT.apologyCost, ignore: 0 }),
+  costs: (state, scope) => ({
+    apology: listPrice(state, P.VIRAL_COMPLAINT.apologyCost, branchOf(state, scope)?.cityId),
+    ignore: 0,
+  }),
   apply(state, inc, optionId, rng) {
     const b = branchOf(state, inc.scope);
     if (!b) return;
@@ -243,7 +249,13 @@ const BRANCH_FLOOD: IncidentRule = {
       incidentPMult(state, 'BRANCH_FLOOD', scope)
     );
   },
-  costs: () => ({ fast: P.BRANCH_FLOOD.fastCost, slow: P.BRANCH_FLOOD.slowCost }),
+  costs: (state, scope) => {
+    const cityId = branchOf(state, scope)?.cityId;
+    return {
+      fast: listPrice(state, P.BRANCH_FLOOD.fastCost, cityId),
+      slow: listPrice(state, P.BRANCH_FLOOD.slowCost, cityId),
+    };
+  },
   apply(state, inc, optionId) {
     const weeks = optionId === 'fast' ? P.BRANCH_FLOOD.fastWeeks : P.BRANCH_FLOOD.slowWeeks;
     addEffect(state, 'closed', inc.scope, 1, weeks);

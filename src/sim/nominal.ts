@@ -10,3 +10,20 @@ export function nominalIndex(state: GameState, cityId: string): number {
   const country = CITIES[cityId]?.country;
   return (country && state.world.countries[country]?.nominal) || 1;
 }
+
+/**
+ * The price-list level of a city's country, or of your home country when no
+ * city is given (SIMULATION §4.6): catalogue prices (builds, campaigns, cars,
+ * jets, lobbying, office fit-outs, flights) are written in start-of-game money
+ * and charged × this level. It steps to the nominal index once a year, at the
+ * year end, so a price list holds still for the year like a real one.
+ */
+export function listLevel(state: GameState, cityId?: string): number {
+  const country = CITIES[cityId ?? state.meta.homeCityId]?.country;
+  return (country && state.world.countries[country]?.listIndex) || 1;
+}
+
+/** A catalogue price at today's list level, in whole money. */
+export function listPrice(state: GameState, amount: number, cityId?: string): number {
+  return Math.round(amount * listLevel(state, cityId));
+}

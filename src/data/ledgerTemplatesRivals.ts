@@ -32,6 +32,16 @@ export const RIVAL_TEMPLATES = {
       b: '{bank} opened its first {city} branch at {address} this week.',
     },
   ],
+  CITY_GROWTH: [
+    {
+      h: '{city} grows: {lots} new storefronts',
+      b: 'Developers finished {lots} street-level units across {city} this year. Banks are already eyeing the best corners.',
+    },
+    {
+      h: 'New corners for {city} banks',
+      b: 'With {lots} storefronts newly open to lease, {city} has room for more branches.',
+    },
+  ],
   RIVAL_BRANCH_CLOSED: [
     {
       h: '{bank} shuts {district} branch',

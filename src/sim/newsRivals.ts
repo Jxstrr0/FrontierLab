@@ -1,5 +1,5 @@
 // Rival banks in The Weekly Ledger (SIMULATION §24, priorities 3 and 4):
-// branch openings and closures, price wars, failures and network carve-ups
+// branch openings and closures, new storefronts as cities grow, price wars, failures and network carve-ups
 // (rivals in your cities first), quarterly earnings, dividends and executive
 // exits, plus the weekly "rate watch" on the best savings rate in your city.
 import { NEWS_PRIORITY as P } from '../config/balance';
@@ -72,6 +72,17 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
           address: str(p.address, 'a new storefront'),
           cities: String(num(p.cities)),
         },
+      };
+    }
+    case 'CITY_GROWTH': {
+      const here = ctx.yourCities.has(str(p.city));
+      return {
+        key: 'CITY_GROWTH',
+        subject: str(p.city),
+        tab: 'banking',
+        icon: 'facade',
+        priority: here ? P.rivalLocal : P.rivalAbroad,
+        tokens: { city: cityName(str(p.city)), lots: String(num(p.lots)) },
       };
     }
     case 'PRICE_WAR':

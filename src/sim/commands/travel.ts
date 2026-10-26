@@ -4,6 +4,7 @@ import { CITIES } from '../../data/cities';
 import { JETS } from '../../data/jets';
 import { pushEvent } from '../events';
 import { spend } from '../ledger';
+import { listPrice } from '../nominal';
 import type { GameState } from '../state';
 import { flightQuote, jetResale } from '../travel';
 import { generateCity, isGenerated } from '../worldGen';
@@ -55,15 +56,16 @@ export function buyJet(state: GameState, jetId: string): CommandResult {
   const spec = JETS[jetId];
   if (!spec) return fail('Unknown jet.');
   if (state.personal.jet) return fail('You already own a jet. Sell it first.');
-  if (state.personal.cash < spec.price) return fail('Not enough personal cash.');
-  state.personal.cash -= spec.price;
+  const price = listPrice(state, spec.price);
+  if (state.personal.cash < price) return fail('Not enough personal cash.');
+  state.personal.cash -= price;
   state.personal.jet = {
     model: spec.id,
-    value: spec.price,
-    price: spec.price,
+    value: price,
+    price,
     boughtWeek: state.clock.week,
   };
-  pushEvent(state, 'JET_BOUGHT', { model: spec.name, price: spec.price });
+  pushEvent(state, 'JET_BOUGHT', { model: spec.name, price });
   return ok();
 }
 

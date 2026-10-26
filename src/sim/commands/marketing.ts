@@ -6,7 +6,12 @@ import { AGENCIES, BRAND_CAMPAIGNS } from '../../data/brandCampaigns';
 import { CITIES } from '../../data/cities';
 import { pushEvent } from '../events';
 import { clubIn, ownsClubIn } from '../franchise';
-import { agenciesInCity, campaignTargetBlock, hasMarketingFloor } from '../hqMarketing';
+import {
+  agenciesInCity,
+  agencyPackagePrice,
+  campaignTargetBlock,
+  hasMarketingFloor,
+} from '../hqMarketing';
 import { newId } from '../ids';
 import { spend } from '../ledger';
 import type { GameState } from '../state';
@@ -80,9 +85,10 @@ export function buyAgencyPackage(
     return fail(
       `You need to be in ${CITIES[order.cityId]?.name ?? 'that city'} to visit the agency.`,
     );
-  if (pkg.cost > state.company.cash)
-    return fail(`${pkg.name} costs ${money(pkg.cost)}; you have ${money(state.company.cash)}.`);
-  spend(state, 'marketing', pkg.cost);
+  const price = agencyPackagePrice(state, pkg);
+  if (price > state.company.cash)
+    return fail(`${pkg.name} costs ${money(price)}; you have ${money(state.company.cash)}.`);
+  spend(state, 'marketing', price);
   const id = newId(state, 'ap');
   state.marketing.packages.push({
     id,

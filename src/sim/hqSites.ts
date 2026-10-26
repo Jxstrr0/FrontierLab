@@ -14,12 +14,17 @@ import { CITIES } from '../data/cities';
 import { STREET_KINDS, STREET_NAMES } from '../data/names';
 import type { DistrictId } from '../data/types';
 import { geometryFor, placeNear } from './cityPlacement';
+import { listPrice } from './nominal';
 import { stream, type Rng } from './rng';
 import type { GameState, OfficeListing, Site, SiteKind } from './state';
 
-/** Weekly rent of a whole office building (§16.1). */
-export function officeRent(floors: number, cityId: string): number {
-  return Math.round(floors * OFFICE_RENT_PER_FLOOR * (CITIES[cityId]?.rentIndex ?? 1));
+/** Weekly rent of a whole office building (§16.1), at today's price list (§4.6). */
+export function officeRent(state: GameState, floors: number, cityId: string): number {
+  return listPrice(
+    state,
+    floors * OFFICE_RENT_PER_FLOOR * (CITIES[cityId]?.rentIndex ?? 1),
+    cityId,
+  );
 }
 
 /** Adds the city's office listings and sites to the world. Safe to call once per city. */
@@ -40,7 +45,7 @@ export function generateSites(state: GameState, cityId: string): void {
       const tile = place(district);
       const floors = rng.int(...OFFICE_LISTINGS.floors);
       const desksPerFloor = rng.chance(OFFICE_LISTINGS.wideFloorChance) ? 32 : 24;
-      const weeklyRent = officeRent(floors, cityId);
+      const weeklyRent = officeRent(state, floors, cityId);
       index += 1;
       const listing: OfficeListing = {
         id: `office_${cityId}_${String(index).padStart(2, '0')}`,

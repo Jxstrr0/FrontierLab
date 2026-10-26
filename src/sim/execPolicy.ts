@@ -111,7 +111,7 @@ export function brandEstimate(state: GameState, target: number): BrandEstimate {
   const cities = [...new Set(open.map((b) => b.cityId))].sort();
   const cheapest = Object.values(BRAND_CAMPAIGNS)
     .filter((c) => c.scopes.includes('city') && !c.needsFranchise)
-    .sort((a, b) => brandCampaignCost(a, 'city') - brandCampaignCost(b, 'city'));
+    .sort((a, b) => brandCampaignCost(state, a, 'city') - brandCampaignCost(state, b, 'city'));
   const current = brandCampaignsWeeklyCost(state);
   const revenue = weeklyRevenue(state);
   const budget = X.brandBudgetShare * revenue;
@@ -128,13 +128,13 @@ export function brandEstimate(state: GameState, target: number): BrandEstimate {
     if (b > target + X.brandSlack) {
       for (const c of running) {
         const spec = BRAND_CAMPAIGNS[c.campaignId];
-        if (spec) cost -= brandCampaignCost(spec, 'city');
+        if (spec) cost -= brandCampaignCost(state, spec, 'city');
       }
       held[cityId] = target;
     } else if (b < target - X.brandSlack) {
       // As the routine: a campaign starts only while the budget covers it.
       const next = cheapest.find((spec) => !running.some((c) => c.campaignId === spec.id));
-      const add = next ? brandCampaignCost(next, 'city') : 0;
+      const add = next ? brandCampaignCost(state, next, 'city') : 0;
       if (next && cost + add > budget) {
         capped = true;
         continue;

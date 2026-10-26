@@ -9,6 +9,7 @@ import { planDeal, regulatorBlock } from './acquisitionPlan';
 import { cityLabel } from './mergerRules';
 import { pushEvent } from './events';
 import { spend } from './ledger';
+import { listPrice } from './nominal';
 import { acceptChance, offerPremium, requiredPremium } from './mergerPricing';
 import { stream } from './rng';
 import type { GameState, Integration, MergerOffer } from './state';
@@ -23,7 +24,7 @@ export function runMergers(state: GameState): void {
 
 /** One week of each conversion: the rebrand bill, the countdown, and the reveal at zero. */
 function runIntegrations(state: GameState): void {
-  const weekly = REBRAND_COST / MERGERS.conversionWeeks;
+  const weekly = listPrice(state, REBRAND_COST) / MERGERS.conversionWeeks;
   const done: Integration[] = [];
   for (const integ of state.mergers.integrations) {
     integ.weeksLeft = Math.max(0, integ.weeksLeft - 1);

@@ -55,7 +55,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState } from './personalTypes';
 
-export const SCHEMA_VERSION = 34;
+export const SCHEMA_VERSION = 35;
 
 export interface GameState {
   schemaVersion: number;
@@ -312,6 +312,11 @@ export interface CountryState {
   marketReturn: number;
   /** The nominal index (§4.6): price-and-wealth level, 1 at the start, compounding with growth. */
   nominal: number;
+  /**
+   * The price-list level (§4.6): catalogue prices × this. Set to `nominal` at
+   * each year end, when rents are reviewed by the same step.
+   */
+  listIndex: number;
   /** Extra capital buffer from a passed policy (§24 Politics): tier thresholds rise by pp. */
   capitalBuffer?: { pp: number; untilWeek: Week };
   /** Week a forced recession should start (balance-script option, §4.1). */
@@ -330,6 +335,8 @@ export interface CityState {
   brandAwareness: Pct;
   /** Market reference price m(p, city) per product (§5). */
   marketRef: Record<string, number>;
+  /** Storefronts added since the city was generated (city growth, CONTENT §3). */
+  grownLots?: number;
 }
 
 export interface Lot {
