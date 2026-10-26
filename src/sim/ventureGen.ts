@@ -6,14 +6,13 @@
 // few quarters of burn and a funding history.
 import { DAYS_PER_WEEK, QUARTERS_PER_YEAR, VENTURE_GEN } from '../config/balance';
 import { FUND_NAMES } from '../data/names';
+import { NAME_GEN } from '../config/balance';
 import {
   GENERATED_POST_MONEY,
   ROUND_NAMES,
   SEED_ROUND_NAME,
   SEED_STARTUPS,
   STAGE_ORDER,
-  STARTUP_NAME_PREFIXES,
-  STARTUP_NAME_SUFFIXES,
   STARTUP_SECTORS,
   type SeedStartup,
   type StartupStageId,
@@ -22,6 +21,7 @@ import type { Pentagon } from '../data/types';
 import { dateOf } from './calendar';
 import { dpow } from './detmath';
 import { newId } from './ids';
+import { startupBlurb, startupName } from './nameGen';
 import { personName, randomAvatar } from './people';
 import { stream, type Rng } from './rng';
 import type { GameState, Startup, StartupHolder } from './state';
@@ -148,16 +148,31 @@ function nameTaken(state: GameState, name: string): boolean {
   return Object.values(state.market.companies).some((c) => c.name === name);
 }
 
-/** A fresh prefix + suffix name ("Cobalt Labs") not used by any startup or listed company. */
-export function uniqueStartupName(state: GameState, rng: Rng): string {
+/** A fresh generated name ("Cobalt Grid", "Quinly") not used by any startup or listed company. */
+export function uniqueStartupName(state: GameState, rng: Rng, sectorId: string): string {
   let name = '';
   for (let i = 0; i < VENTURE_GEN.nameTries; i++) {
-    name = `${rng.pick(STARTUP_NAME_PREFIXES)} ${rng.pick(STARTUP_NAME_SUFFIXES)}`;
+    name = startupName(rng, sectorId);
     if (!nameTaken(state, name)) return name;
   }
   let n = 2;
   while (nameTaken(state, `${name} ${n}`)) n++;
   return `${name} ${n}`;
+}
+
+/** A description no startup still in the pipeline uses, when one can be found. */
+function freshBlurb(state: GameState, rng: Rng, sectorId: string, handwritten: string[]): string {
+  const used = new Set(
+    Object.values(state.ventures.startups)
+      .filter(isPrivate)
+      .map((s) => s.description),
+  );
+  let blurb = '';
+  for (let i = 0; i < NAME_GEN.tries; i++) {
+    blurb = startupBlurb(rng, sectorId, handwritten);
+    if (!used.has(blurb)) return blurb;
+  }
+  return blurb;
 }
 
 /** A generated startup profile: weighted stage, random sector, post-money in the stage's range. */
@@ -171,13 +186,13 @@ export function generateProfile(state: GameState, rng: Rng): SeedStartup {
   const pentagon = Array.from({ length: 5 }, () => rng.int(plo, phi)) as Pentagon;
   const [alo, ahi] = VENTURE_GEN.ageYears[stage];
   return {
-    name: uniqueStartupName(state, rng),
+    name: uniqueStartupName(state, rng, sector.id),
     sector: sector.id,
     founded: gameYear(state) - rng.int(alo, ahi),
     stage,
     pentagon,
     postMoney: rng.range(lo, hi),
-    description: rng.pick(sector.blurbs),
+    description: freshBlurb(state, rng, sector.id, sector.blurbs),
   };
 }
 

@@ -1,6 +1,7 @@
 // Startups (docs/CONTENT.md §18): the 20 seed startups, sector growth and
-// margins, and name and description pools for startups generated later
-// (SIMULATION §20). All names are original.
+// margins, and handwritten descriptions for startups generated later
+// (SIMULATION §20; generated names and descriptions are in nameParts.ts and
+// startupBlurbs.ts). All names are original.
 import type { Pentagon } from './types';
 import type { SectorId } from './stocks';
 
@@ -407,49 +408,3 @@ export const GENERATED_POST_MONEY: Record<StartupStageId, [number, number]> = {
   C: [150e6, 500e6],
   D: [400e6, 1200e6],
 };
-
-/** Name pools for generated startups: prefix + suffix ("Cobalt Labs"). */
-export const STARTUP_NAME_PREFIXES = [
-  'Alder',
-  'Beacon',
-  'Bright',
-  'Cinder',
-  'Cobalt',
-  'Delta',
-  'Ember',
-  'Fable',
-  'Granite',
-  'Harbor',
-  'Juniper',
-  'Kestrel',
-  'Lumen',
-  'Meadow',
-  'North',
-  'Otter',
-  'Pine',
-  'Quartz',
-  'Rivet',
-  'Slate',
-  'Tandem',
-  'Umber',
-  'Vela',
-  'Willow',
-  'Yarrow',
-  'Zephyr',
-];
-export const STARTUP_NAME_SUFFIXES = [
-  'Labs',
-  'Works',
-  'AI',
-  'Systems',
-  'Bio',
-  'Grid',
-  'Robotics',
-  'Health',
-  'Pay',
-  'Logic',
-  'Dynamics',
-  'Foundry',
-  'Motion',
-  'Field',
-];
