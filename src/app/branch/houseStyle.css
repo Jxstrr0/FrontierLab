@@ -28,6 +28,13 @@
   font-weight: 600;
   letter-spacing: 0.16em;
 }
+.vignette .hs-leaf {
+  fill: var(--wash-leaf);
+  opacity: 0.55;
+}
+.vignette .hs-leaf-line {
+  stroke: var(--wash-leaf);
+}
 .vignette .hs-glow {
   fill: var(--brass);
   opacity: 0.55;

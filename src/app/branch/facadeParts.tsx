@@ -48,12 +48,21 @@ export function Seal(p: { x: number; y: number; r: number; brand: Brand }) {
   );
 }
 
-/** A window pane: paper, a wash of glass and the outline. */
+/** Material colours for the fronts (tokens.css --wash-*; ART_DIRECTION §3). */
+export const WASH = {
+  brick: 'var(--wash-brick)',
+  stone: 'var(--wash-stone)',
+  slate: 'var(--wash-slate)',
+  copper: 'var(--wash-copper)',
+} as const;
+
+/** A window pane: paper, a cool wash of glass with the ink's tint, and the outline. */
 export function Glass(p: { pts: readonly Pt[]; fine?: boolean }) {
   const d = poly(p.pts);
   return (
     <g>
       <path d={d} class="art-paper" />
+      <path d={d} class="art-glass" />
       <path d={d} class="art-tint" />
       <path d={d} class={p.fine ? 'art-line art-fine' : 'art-line'} />
     </g>

@@ -67,6 +67,21 @@
   opacity: 0.1;
   stroke: none;
 }
+/* A material wash (ART_DIRECTION §3): a pale second printing under the
+   hatching, the fill set inline to a --wash-* token or the brand ink. */
+.vignette .art-wash {
+  stroke: none;
+  opacity: 0.32;
+}
+.vignette .art-wash-strong {
+  opacity: 0.5;
+}
+/* Glazing: a cool wash with the ink's own tint over it. */
+.vignette .art-glass {
+  fill: var(--wash-glass);
+  opacity: 0.3;
+  stroke: none;
+}
 .vignette .art-solid {
   fill: var(--art-ink);
   stroke: none;

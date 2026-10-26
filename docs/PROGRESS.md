@@ -10,6 +10,12 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-10-26 — Colour on the branch fronts (v0.10.17)
+- **Owner's ask:** make the exterior of the branches incorporate a little more colour.
+- **Material washes.** Every branch front (the hero on the branch panel, the Build branch preview and the New Game style picker) now has a pale second printing under its hatching, the way the map's tint underprint works: terracotta on the Heritage Brick walls, warm limestone on the Classic Columns, the Deco tower and the stone dressings, a cool wash on all the glazing, slate on roof slabs, fascias and the Modern Glass spandrels, verdigris on the Deco setbacks, and leaf green on the planting in every house style's planters. The brand ink joins in on the building itself: the awning stripes of the Plain Storefront, the pediment of the Classic Columns, the canopy of the Modern Glass front and the spandrels and crown of the Deco tower. The Deco sunburst over the door is brass now.
+- **Kept it an engraving.** Washes sit at about a third strength (`.art-wash`, 32%; the awning stripes at 50%), always under the ink hatching and outlines, so the fronts still read as banknote plates and the city ink still rules the linework. The six colours are tokens (`--wash-*` in `tokens.css`, listed in ART_DIRECTION §1.1); `Face` takes an optional `wash` and a small `Wash` component lays colour on its own.
+- **No sim or save change.** Determinism snapshot unchanged (`12dd4c303e05ab`).
+- **Checked** all 25 house style × exterior pairs at 390×844 with no console errors; 753 tests, lint and build clean.
 ### 2026-10-26 — No double-tap zoom or text selection on buttons (v0.10.16)
 - **Owner's ask:** on the iPhone home-screen app, stop double-tap zooming and stop button text getting highlighted while holding a button down.
 - `base.css` now sets `touch-action: manipulation` on the page (this turns off double-tap zoom but keeps pinch zoom for accessibility) plus `user-select: none` and `-webkit-touch-callout: none`, so a long press no longer selects text or opens the iOS copy/look-up menu. Text boxes (names, amounts, save codes) stay selectable so you can still edit and copy them. CSS only.

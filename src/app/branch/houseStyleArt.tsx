@@ -1,8 +1,9 @@
 // House style dressing for the branch fronts (ART_DIRECTION §3, CONTENT §7a):
 // the name sign with the bank's name, the lamps by the door, the planters at
 // the foot of the building and the roof flag, each drawn in the bank's chosen
-// style. Every exterior composition says where these go (FacadeAnchors), so
-// one style reads the same on a plain storefront and a deco tower.
+// style, with the planting in leaf green. Every exterior composition says
+// where these go (FacadeAnchors), so one style reads the same on a plain
+// storefront and a deco tower.
 import { poly, type Pt } from '../../art/engrave';
 import type { HouseStyle } from '../../data/types';
 import { arch, type Brand } from './facadeParts';
@@ -239,7 +240,7 @@ export function Planter(p: {
         <g>
           <path d={`M${x - 3.5} ${g}v-6h7v6z`} class="art-paper art-line art-fine" />
           <path d={`M${x} ${g - 6}v-2`} class="art-line art-fine" />
-          <circle cx={x} cy={g - 11.5} r="4" class="art-tint" />
+          <circle cx={x} cy={g - 11.5} r="4" class="hs-leaf" />
           <circle cx={x} cy={g - 11.5} r="4" class="art-line art-fine" />
           <path
             d={`M${x - 2.2} ${g - 12.6}q1-1 2 0M${x + 0.2} ${g - 10.4}q1-1 2 0`}
@@ -253,7 +254,7 @@ export function Planter(p: {
           <path d={`M${x - 2.5} ${g}h5l1.5-8h-8z`} class="art-paper art-line art-fine" />
           <path
             d={`M${x} ${g - 8}l-3.5-7M${x} ${g - 8}l-1-9M${x} ${g - 8}l1.5-8.5M${x} ${g - 8}l3.5-6.5`}
-            class="art-line art-fine in-sway"
+            class="art-line art-fine hs-leaf-line in-sway"
           />
         </g>
       );
@@ -268,7 +269,7 @@ export function Planter(p: {
               (_, k) =>
                 `M${x - w / 2 + 2 + k * 2.4} ${g - 4}q${k % 2 ? 1 : -1} -3 ${k % 2 ? 0.5 : -0.5} -6`,
             ).join('')}
-            class="art-line art-fine in-sway"
+            class="art-line art-fine hs-leaf-line in-sway"
           />
         </g>
       );
@@ -277,7 +278,8 @@ export function Planter(p: {
       return (
         <g>
           <path d={`M${x - 3.5} ${g - 6}l1 6h5l1-6z`} class="art-paper art-line art-fine" />
-          <path d={`M${x - 4} ${g - 6}q4-6 8 0`} class="art-tint art-line art-fine" />
+          <path d={`M${x - 4} ${g - 6}q4-6 8 0`} class="hs-leaf" />
+          <path d={`M${x - 4} ${g - 6}q4-6 8 0`} class="art-line art-fine" />
           {[-2.4, 0, 2.4].map((dx, k) => (
             <circle
               cx={x + dx}
@@ -299,7 +301,7 @@ export function Planter(p: {
           <path d={`M${x - 4.2} ${g - 8.4}h8.4`} class="art-line art-fine" />
           <path
             d={`M${x - 2.4} ${g - 8.4}q-1-2.4 0.6-3.6M${x + 0.4} ${g - 8.4}q0.4-2.8 2.4-3.2`}
-            class="art-line art-fine in-sway"
+            class="art-line art-fine hs-leaf-line in-sway"
           />
         </g>
       );
@@ -386,6 +388,7 @@ export function StyleDoor(p: { style: HouseStyle; a: FacadeAnchors['door']; ink:
       return (
         <g>
           <path d={outline} class="art-paper" />
+          <path d={outline} class="art-glass" />
           <path d={outline} class="art-tint" />
           <path d={outline} class="art-line art-fine" />
           <path
@@ -402,6 +405,7 @@ export function StyleDoor(p: { style: HouseStyle; a: FacadeAnchors['door']; ink:
       return (
         <g>
           <path d={outline} class="art-paper" />
+          <path d={outline} class="art-glass" />
           <path d={outline} class="art-tint" />
           <path d={outline} class="art-line art-fine" />
           <path
