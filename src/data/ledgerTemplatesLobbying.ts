@@ -7,15 +7,15 @@ export const LOBBYING_TEMPLATES = {
   LOBBY_EXPOSED: [
     {
       h: 'Exposed: {bank} paid {firm} to {campaign}',
-      b: 'Ledger reporters traced the money. The bank pays a {fine} fine and customers are not impressed.',
+      b: 'Inference reporters traced the money. The lab pays a {fine} fine and customers are not impressed.',
     },
     {
       h: 'Lobbying row engulfs {bank}',
-      b: 'Papers show {firm} was hired to {campaign}. Regulators fined the bank {fine}.',
+      b: 'Papers show {firm} was hired to {campaign}. Regulators fined the lab {fine}.',
     },
     {
       h: '{bank} caught lobbying in {theCountry}',
-      b: 'The campaign, run by {firm}, has cost the bank a {fine} fine and some goodwill.',
+      b: 'The campaign, run by {firm}, has cost the lab a {fine} fine and some goodwill.',
     },
   ],
   LOBBY_WON: [

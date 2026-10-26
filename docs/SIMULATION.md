@@ -794,7 +794,7 @@ Levels 1–5 (Very conservative to Very aggressive):
 - Dividends are paid quarterly at the stated yield to company and personal holders.
 - The equity market index = cap-weighted average of all listed companies (used by Wealth AUM).
 
-- **Details (Stage 6):** beta comes from the sector; returns use the phase of the home country (a listed rival: its first city's country). The earnings tilt is 10% of the sector's annual μ; EPS grows by growth/4 plus the surprise each quarter. Dividends pay a quarter of the yield on the current price at quarter-end. The index ("Ledger Composite", 1000 at the start) is chain-linked over non-bank companies and trading listed rivals; your bank isn't in it. History keeps 104 weeks.
+- **Details (Stage 6):** beta comes from the sector; returns use the phase of the home country (a listed rival: its first city's country). The earnings tilt is 10% of the sector's annual μ; EPS grows by growth/4 plus the surprise each quarter. Dividends pay a quarter of the yield on the current price at quarter-end. The index ("Inference Composite", 1000 at the start) is chain-linked over non-bank companies and trading listed rivals; your bank isn't in it. History keeps 104 weeks.
 - **Listed rivals** follow the §19.5 model (with the banking sector's shock folded into their sentiment); before their first report they're priced at book. Private rivals trade at book value; a seized rival's shares go to 0.
 - **Company holdings** are marked to market every week through the non-cash P&L line `investmentGains`; they carry the 2.5× risk weight. You and your company together may own at most 30% of a listed company or rival.
 
@@ -1003,7 +1003,7 @@ A deliberately simple "country up or down" investment (DESIGN §5.12a). Your boo
 - **Branch incidents:** auto-resolved when "Branch troubles" is delegated (§17.1), with a toast. Otherwise they queue and pause the game.
 - Unresolved incidents choose the worst option after 4 weeks.
 
-## 24. News (The Weekly Ledger)
+## 24. News (The Weekly Inference)
 
 - **Each week**, compose 6–14 articles from `events.log`, macro state and the world desks below, by priority (the World desk keeps `NEWS_WORLD.minPerIssue` (2) stories first, however busy the week):
   1. your company's events

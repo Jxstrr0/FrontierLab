@@ -350,7 +350,7 @@ Tabs: Overview · Loans · Credit.
 - **Tabs:** Market · Equity · M&A.
 
 **Market:**
-- the Ledger Composite index card (value, weekly change, sparkline)
+- the Inference Composite index card (value, weekly change, sparkline)
 - sector Segmented: Banking, Technology, Energy, Auto, Retail, Real estate, Currencies
 - **Currencies** (SIMULATION §19.10): one card per foreign currency with flag-free country medallion, name, index vs home with weekly change and sparkline, a one-line "why it's moving" (growth, rates, cycle), your position (company / personal) and Buy / Sell with an amount stepper and Company | Private toggle
 - company card carousel:
@@ -490,7 +490,7 @@ Tabs: Overview · Loans · Credit.
 - **Date line:** "Week N · ending {date}", or for a roll-up "{October 2027 | Q4 2027} · N weeks, ending {date}" (a snapshot week belongs to the month or quarter its last day falls in, so a month is 4 or 5 weeks).
 - **Headline figures:** revenue and net income for the period, each with the change on the last week / month / quarter ("First month of trading" when there is none).
 - **Cash flow:** Cash from operations, Investing, Financing, Net cash flow, summed over the period.
-- **The Weekly Ledger card** (the period's latest issue):
+- **The Weekly Inference card** (the period's latest issue):
   - masthead and date
   - tabs: Top | World | Banking | Business | Markets | Politics | Sports (they scroll sideways on a phone)
   - two-column article grid (icon vignette, headline, 1–2 sentence body)

@@ -18,7 +18,7 @@ export function LedgerArchivePanel(p: { week?: number }) {
 
   if (open) {
     return (
-      <Panel title="The Weekly Ledger" subtitle={`No. ${open.week}`} onClose={closePanel}>
+      <Panel title="The Weekly Inference" subtitle={`No. ${open.week}`} onClose={closePanel}>
         <div class="stack">
           <button
             type="button"
@@ -42,7 +42,7 @@ export function LedgerArchivePanel(p: { week?: number }) {
   const newest = [...issues].reverse();
   return (
     <Panel
-      title="The Weekly Ledger"
+      title="The Weekly Inference"
       subtitle={`${issues.length} ${issues.length === 1 ? 'issue' : 'issues'} on file`}
       onClose={closePanel}
     >

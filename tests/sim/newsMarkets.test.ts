@@ -52,6 +52,6 @@ describe('markets news', () => {
     const wraps = issue(s).filter((x) => /^MARKET_(UP|DOWN):/.test(x.ref ?? ''));
     expect(wraps).toHaveLength(1);
     expect(wraps[0]!.ref).toMatch(/^MARKET_DOWN:/);
-    expect(`${wraps[0]!.headline} ${wraps[0]!.body}`).toContain('Ledger Composite');
+    expect(`${wraps[0]!.headline} ${wraps[0]!.body}`).toContain('Inference Composite');
   });
 });

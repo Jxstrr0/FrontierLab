@@ -32,7 +32,7 @@ export function MenuSheet() {
       ? [{ label: 'Portfolio', onClick: () => openPanel({ type: 'portfolio' }) }]
       : []),
     ...(FEATURES.competition
-      ? [{ label: 'The Ledger', onClick: () => openPanel({ type: 'ledger' }) }]
+      ? [{ label: 'The Inference', onClick: () => openPanel({ type: 'ledger' }) }]
       : []),
     { label: 'Milestones', onClick: () => openPanel({ type: 'milestones' }) },
     { label: 'Settings', onClick: () => openPanel({ type: 'settings' }) },

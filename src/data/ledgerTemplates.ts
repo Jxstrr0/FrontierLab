@@ -42,7 +42,7 @@ const BANK_TEMPLATES = {
   BRANCH_OPENED: [
     {
       h: '{bank} opens {name}',
-      b: '{address} has a new bank on the block. Tellers are at their stations and the savings board is up.',
+      b: '{address} has a new lab on the block. Tellers are at their stations and the savings board is up.',
     },
     {
       h: 'Doors open at {name}',
@@ -98,13 +98,13 @@ const BANK_TEMPLATES = {
     },
     {
       h: 'Collapse of {business} leaves {bank} out of pocket',
-      b: 'The {sector} borrower missed its payments on a {amount} loan. The bank is working with receivers.',
+      b: 'The {sector} borrower missed its payments on a {amount} loan. The lab is working with receivers.',
     },
   ],
   WINDOW_USE: [
     {
       h: '{bank} taps emergency central bank funding',
-      b: "The bank borrowed {amount} from the {cb}'s standing facility this week.",
+      b: "The lab borrowed {amount} from the {cb}'s standing facility this week.",
     },
     {
       h: '{bank} turns to the lender of last resort',
@@ -129,20 +129,20 @@ const BANK_TEMPLATES = {
     { h: 'Regulator fines {bank} {amount}', b: 'The penalty follows {reason}.' },
     {
       h: '{bank} pays {amount} penalty',
-      b: 'Supervisors acted after {reason}. The bank says it has tightened its controls.',
+      b: 'Supervisors acted after {reason}. The lab says it has tightened its controls.',
     },
   ],
   BREACH: [
     { h: '{bank} discloses data breach', b: 'About {n} customers may be affected.' },
     {
       h: 'Hackers reach {bank} customer files',
-      b: 'The bank is writing to roughly {n} customers and says no money has moved.',
+      b: 'The lab is writing to roughly {n} customers and says no money has moved.',
     },
   ],
   BANK_RUN: [
     {
       h: 'Queues form outside {bank}',
-      b: 'Depositors are pulling savings after a week of worrying headlines. The bank says it has ample cash.',
+      b: 'Depositors are pulling savings after a week of worrying headlines. The lab says it has ample cash.',
     },
     {
       h: 'Run on {bank} as savers take fright',
@@ -196,7 +196,7 @@ const BANK_TEMPLATES = {
     },
     {
       h: '{bank} wins {employer} {kind}',
-      b: 'Staff at {employer} will be offered accounts through {branch}. The bank paid {fee} to sign.',
+      b: 'Staff at {employer} will be offered accounts through {branch}. The lab paid {fee} to sign.',
     },
   ],
   PARTNERSHIP_RENEWED: [
@@ -216,11 +216,11 @@ const BANK_TEMPLATES = {
   GRAD_PROGRAM: [
     {
       h: '{bank} opens graduate program at {university}',
-      b: 'The bank will pay {cost} a year to recruit the brightest leavers.',
+      b: 'The lab will pay {cost} a year to recruit the brightest leavers.',
     },
     {
       h: '{university} graduates head for {bank}',
-      b: 'A new {cost}-a-year program brings fresh talent into the bank.',
+      b: 'A new {cost}-a-year program brings fresh talent into the lab.',
     },
   ],
   CORPORATE_LOAN: [
@@ -230,7 +230,7 @@ const BANK_TEMPLATES = {
     },
     {
       h: '{lender} lends {amount} to {bank}',
-      b: "The facility, at {rate}, funds the bank's growth plans.",
+      b: "The facility, at {rate}, funds the lab's growth plans.",
     },
   ],
   BANK_WEEK_PROFIT: [
@@ -240,7 +240,7 @@ const BANK_TEMPLATES = {
     },
     {
       h: '{bank} in the black',
-      b: 'The bank booked {revenue} of revenue and kept {net} as profit.',
+      b: 'The lab booked {revenue} of revenue and kept {net} as profit.',
     },
     {
       h: 'Steady week for {bank}',
@@ -254,7 +254,7 @@ const BANK_TEMPLATES = {
     },
     {
       h: '{bank} posts a weekly loss',
-      b: 'Costs outran revenue of {revenue}; the bank lost {loss}. Directors are said to be studying the numbers.',
+      b: 'Costs outran revenue of {revenue}; the lab lost {loss}. Directors are said to be studying the numbers.',
     },
     {
       h: 'Growing pains at {bank}',
@@ -268,7 +268,7 @@ const BANK_TEMPLATES = {
     },
     {
       h: '{bank} closes the books on {quarter}',
-      b: 'The bank made {net} on revenue of {revenue} over the quarter.',
+      b: 'The lab made {net} on revenue of {revenue} over the quarter.',
     },
     {
       h: 'Profitable {quarter} for {bank}',
@@ -282,27 +282,27 @@ const BANK_TEMPLATES = {
     },
     {
       h: '{bank} in the red for {quarter}',
-      b: 'The bank lost {loss} on revenue of {revenue} over the quarter as it builds its network.',
+      b: 'The lab lost {loss} on revenue of {revenue} over the quarter as it builds its network.',
     },
   ],
   CAPITAL_WEAK: [
     {
       h: 'Regulator puts {bank} on watch',
-      b: 'With a capital ratio of {cr}, the bank shows {tier}. To recover, it can {fix}.',
+      b: 'With a capital ratio of {cr}, the lab shows {tier}. To recover, it can {fix}.',
     },
     {
       h: 'Thin cushion at {bank}',
-      b: 'A capital ratio of {cr} leaves {tier}. Analysts say the bank should {fix}.',
+      b: 'A capital ratio of {cr} leaves {tier}. Analysts say the lab should {fix}.',
     },
   ],
   INCIDENT_ROBBERY: [
     {
-      h: 'Robbery at {scope}',
-      b: 'Thieves struck at the {bank} branch this week. No one was hurt.',
+      h: 'Server-room break-in at {scope}',
+      b: 'Thieves made off with hardware from the {bank} branch this week. No one was hurt.',
     },
     {
       h: 'Raiders hit {scope}',
-      b: 'Police are appealing for witnesses after the {bank} branch was robbed.',
+      b: 'Police are appealing for witnesses after servers were taken from the {bank} branch.',
     },
   ],
   MILESTONE: [
@@ -314,39 +314,39 @@ const BANK_TEMPLATES = {
   ],
   INCIDENT_BRANCH_FLOOD: [
     {
-      h: 'Floodwater closes {scope}',
-      b: 'Staff waded in to save the files after water reached the {bank} branch.',
+      h: 'Heatwave shuts {scope}',
+      b: 'Fans and ice buckets could not save the servers when the cooling failed at the {bank} branch.',
     },
     {
-      h: '{scope} under water',
-      b: 'A burst of high water left the {bank} branch counting the cost.',
+      h: '{scope} overheats',
+      b: 'A scorching week left the {bank} branch dark and counting the cost.',
     },
   ],
   INCIDENT_STAFF_WALKOUT: [
     {
       h: 'Staff walk out at {scope}',
-      b: 'Tellers at the {bank} branch downed pens over pay and conditions.',
+      b: 'Staff at the {bank} branch downed laptops over pay and conditions.',
     },
     {
       h: 'Pickets outside {scope}',
       b: 'Unhappy staff at the {bank} branch say they will not return until things change.',
     },
   ],
-  // Press angles from incident choices (INCIDENT_NEWS): a denied skimming claim, an ignored complaint.
+  // Press angles from incident choices (INCIDENT_NEWS): a denied key-leak claim, an ignored complaint.
   INCIDENT_NEWS_ATM_SKIM: [
     {
-      h: '{bank} denies liability for ATM skimming at {scope}',
-      b: 'Customers who lost money at the cash machine say the bank is refusing refunds.',
+      h: '{bank} denies liability for API key leak at {scope}',
+      b: 'Customers billed for strangers’ usage say the lab is refusing refunds.',
     },
     {
-      h: 'Skimming victims left out of pocket by {bank}',
-      b: 'A device fitted to the ATM at {scope} emptied accounts. The bank says it is not to blame.',
+      h: 'Key-leak victims left out of pocket by {bank}',
+      b: 'Keys issued at {scope} were posted online and run up overnight. The lab says it is not to blame.',
     },
   ],
   INCIDENT_NEWS_VIRAL_COMPLAINT: [
     {
       h: 'Complaint about {scope} goes viral',
-      b: 'A customer video about long waits at the {bank} branch has been shared thousands of times. The bank has not responded.',
+      b: 'A customer video about long waits at the {bank} branch has been shared thousands of times. The lab has not responded.',
     },
     {
       h: '{bank} stays silent as {scope} complaint spreads',
