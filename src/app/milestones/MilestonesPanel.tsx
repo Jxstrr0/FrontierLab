@@ -1,4 +1,4 @@
-// Menu → Milestones (DESIGN §5.18, SCREENS §0.3): the eleven goals, reached
+// Menu → Milestones (DESIGN §5.18, SCREENS §28): every goal in data order, reached
 // ones stamped with their date in brass, the rest showing how to get there.
 import { Card, Panel } from '../components';
 import { closePanel, useGame } from '../store';

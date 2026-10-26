@@ -1315,11 +1315,15 @@ export const FRANCHISE = {
   saleFee: 0.03,
   riskWeight: 2.5,
 } as const;
-/** Rich list (§22): 50 generated fortunes growing 4–8% a year; ranked at year end. */
+/**
+ * The rich list (§22): 50 fortunes drawn log-uniform in `fortune`, growing 4–8% a
+ * year. Sized to the game world (the biggest rival bank is about $1B of assets), so
+ * a founder can enter the list in the first decade and a long, strong game can top it.
+ */
 export const RICH_LIST = {
   size: 50,
   growth: [0.04, 0.08],
-  fortune: [1.5e9, 120e9],
+  fortune: [0.15e9, 2e9],
   /** Fortunes are rounded to this. */
   roundTo: 1e6,
 } as const;
@@ -2000,8 +2004,12 @@ export const FX_START_INDEX = 100;
 // ─── MILESTONES (DESIGN §5.18) ────────────────────────────────────────────────
 export const MILESTONE_GOALS = {
   branches: 10,
+  manyBranches: 100,
+  cities: 10,
   deposits: 1_000_000_000,
   countries: 5,
+  assets: 10_000_000_000,
+  acquisitions: 5,
   founderWorth: 1_000_000_000,
 } as const;
 /** Departments that must all be fully staffed (coverage k′ ≥ 1) for "HQ fully staffed". */
