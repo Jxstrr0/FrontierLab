@@ -17,6 +17,7 @@ import { assetBookValue } from '../balanceSheet';
 import { refreshExecCandidates } from '../execCandidates';
 import { deptDesks, deptMarketSalary, newDepartment } from '../hq';
 import { newId } from '../ids';
+import { listPrice } from '../nominal';
 import { postCash, postPnl, spend } from '../ledger';
 import { roundToStep } from '../math';
 import type { GameState, Office } from '../state';
@@ -27,9 +28,9 @@ import { fail, money, ok, type CommandResult } from './result';
 export const DEPT_SALARY_STEP = 1_000;
 export const DEPT_SALARY_RANGE: [number, number] = [0.5, 3];
 
-/** Fit-out of one floor in a city (§16.1). */
-export function floorFitout(cityId: string): number {
-  return Math.round(FLOOR_FITOUT * (CITIES[cityId]?.costIndex ?? 1));
+/** Fit-out of one floor in a city (§16.1), at today's price list there (§4.6). */
+export function floorFitout(state: GameState, cityId: string): number {
+  return listPrice(state, FLOOR_FITOUT * (CITIES[cityId]?.costIndex ?? 1), cityId);
 }
 
 /**
@@ -47,13 +48,13 @@ export function officeQuote(state: GameState, listingId: string, depts: number) 
   const l = state.world.officeListings[listingId];
   const deposit = l?.deposit ?? 0;
   const rent = l?.weeklyRent ?? 0;
-  const fitout = l ? depts * floorFitout(l.cityId) : 0;
+  const fitout = l ? depts * floorFitout(state, l.cityId) : 0;
   return { deposit, rent, fitout, total: deposit + rent + fitout };
 }
 
 function fitFloor(state: GameState, office: Office, floor: number, dept: DeptId): void {
   office.floors[floor] = dept;
-  const cost = floorFitout(office.cityId);
+  const cost = floorFitout(state, office.cityId);
   state.company.fixedAssets.push({
     id: newId(state, 'fa'),
     kind: 'fitout',
@@ -115,7 +116,7 @@ export function addFloor(state: GameState, officeId: string, dept: DeptId): Comm
   const floor = office.floors.indexOf(null);
   if (floor < 0)
     return fail('Every floor in this office is in use. Release one or lease another office.');
-  const cost = floorFitout(office.cityId);
+  const cost = floorFitout(state, office.cityId);
   if (state.company.cash < cost) return fail(`Not enough cash: fit-out costs ${money(cost)}.`);
   fitFloor(state, office, floor, dept);
   return ok();

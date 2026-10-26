@@ -39,7 +39,7 @@ function Deal(p: { site: Site; kind: PartnershipKind; people: number }) {
   const options = host ? packageOptions(s, host) : [];
   const [pkgPick, setPkg] = useState<string | undefined>(undefined);
   const pkg = pkgPick && options.includes(pkgPick) ? pkgPick : defaultPackage(s, hostId, kind);
-  const fee = signingFee(site, kind);
+  const fee = signingFee(s, site, kind);
   const curve = expectedCurve(site, kind);
   const regional = CITIES[site.cityId]?.regional ? CITIES[site.cityId]!.country : undefined;
   const blocker =

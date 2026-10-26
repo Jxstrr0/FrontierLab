@@ -63,6 +63,7 @@ export function initCountry(id: CountryId, rng: Rng): CountryState {
     feeIndex: 1,
     marketReturn: 0,
     nominal: 1,
+    listIndex: 1,
   };
 }
 

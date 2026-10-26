@@ -15,11 +15,17 @@ import type { CountryId } from '../data/types';
 import { pushEvent } from './events';
 import { spend } from './ledger';
 import { clamp } from './math';
+import { listPrice } from './nominal';
 import { stream } from './rng';
 import type { GameState, LobbyCampaign } from './state';
 
 export const campaignSpec = (id: string): LobbyCampaignSpec | undefined =>
   LOBBY_CAMPAIGNS.find((c) => c.id === id);
+
+/** A campaign's fee at today's price list in the firm's country (§4.6). */
+export function lobbyingPrice(state: GameState, spec: LobbyCampaignSpec, cityId: string): number {
+  return listPrice(state, spec.cost, cityId);
+}
 
 /** The capital buffer bill waiting for a vote in a country, if any (newsPolitics.ts proposals). */
 export function pendingBufferBill(state: GameState, country: CountryId) {

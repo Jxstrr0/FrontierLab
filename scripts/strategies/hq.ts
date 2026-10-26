@@ -86,7 +86,7 @@ function addFloorFor(state: GameState, id: HqDeptId): void {
       cmd.leaseOffice(state, listing.id, [id]);
     return;
   }
-  if (state.company.cash < cmd.floorFitout(office.cityId) * CASH_BUFFER) return;
+  if (state.company.cash < cmd.floorFitout(state, office.cityId) * CASH_BUFFER) return;
   cmd.addFloor(state, office.id, id);
 }
 

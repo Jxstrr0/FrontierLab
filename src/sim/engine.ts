@@ -39,7 +39,9 @@ import { refreshFundingOffers } from './fundingMarket';
 import { runDevelopments } from './development';
 import { runHq } from './hq';
 import { runBrandMarketing } from './hqMarketing';
+import { growCities } from './cityGrowth';
 import { nominalWeeklyGrowth, updateMacro } from './macro';
+import { reviewPriceLists } from './priceList';
 import { runCorporateDebt } from './corporateDebt';
 import { runIncidents } from './incidents';
 import { composeNews } from './news';
@@ -158,7 +160,7 @@ export function weeklyTick(state: GameState): void {
 function runBranch(state: GameState, branch: Branch, loans: BusinessLoan[]): void {
   runDelegation(state, branch);
   updateStaff(state, branch); // 4.1
-  const fx = campaignEffects(branch);
+  const fx = campaignEffects(state, branch);
   updateAwareness(state, branch, fx); // 4.3
   updateRatings(state, branch, fx); // 4.4
   const demand = runDemand(state, branch, fx); // 4.2 capacity + 4.5 demand
@@ -190,5 +192,7 @@ function yearEnd(state: GameState): void {
     if (c) c.feeIndex *= 1 + nominalWeeklyGrowth(c) * WEEKS_PER_YEAR;
   }
   repriceRivalFees(state);
+  reviewPriceLists(state); // price lists step to the nominal index; rents follow (§4.6)
+  growCities(state); // cities open new storefronts every few years (CONTENT §3)
   rivalsYear(state); // rivals learn from the cities you share (§18.3)
 }

@@ -643,6 +643,13 @@ export const LOT_COUNT_BY_SIZE = { S: 36, M: 56, L: 80, XL: 110 } as const;
  */
 export const LOTS_BASE = { S: 12, M: 18, L: 24, XL: 32 } as const;
 export const LOTS_PER_RIVAL = { S: 4, M: 4.5, L: 5, XL: 6 } as const;
+/**
+ * Cities grow (CONTENT §3): every `everyYears` at the year end, each generated
+ * city (not a regional site) adds `share` × the storefronts it started with,
+ * placed by district like the originals, until it has added `maxGrowth` × that
+ * count. Gives both you and the rivals room to keep building in a long game.
+ */
+export const CITY_GROWTH = { everyYears: 2, share: 0.1, maxGrowth: 1.5 } as const;
 export const LOT_TRAFFIC_NOISE: [number, number] = [0.65, 1.35];
 export const LOT_RENT_NOISE: [number, number] = [0.9, 1.1];
 export const LOT_INCOME_NOISE: [number, number] = [0.9, 1.1];
