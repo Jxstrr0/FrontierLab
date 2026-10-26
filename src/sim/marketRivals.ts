@@ -55,7 +55,8 @@ const sortedRivals = (state: GameState) =>
 /** Weekly: prices every rival's shares. */
 export function priceRivalShares(state: GameState, rng: Rng, phase: Phase, shock: number): void {
   for (const bank of sortedRivals(state)) {
-    if (bank.status === 'acquired') continue;
+    // Bought out (by you or a rival): the last price stands.
+    if (bank.status === 'acquired' || bank.status === 'merged') continue;
     if (bank.status === 'seized') {
       if (bank.price !== 0) {
         bank.price = 0;

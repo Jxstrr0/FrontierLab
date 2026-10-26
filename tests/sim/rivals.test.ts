@@ -64,8 +64,9 @@ describe('rival books', () => {
 describe('rival expansion and closures', () => {
   it('opens branches over five years without overflowing the city', () => {
     const s = game();
-    const lots = Object.values(s.world.lots);
     const events = run(s, 260);
+    // The city grows new storefronts every two years (CONTENT §3): count them all.
+    const lots = Object.values(s.world.lots);
     const opened = events.filter((e) => e.type === 'RIVAL_BRANCH_OPENED');
     expect(opened.length).toBeGreaterThan(0);
     const newBranches = Object.values(s.rivals).flatMap((r) =>
@@ -122,10 +123,12 @@ describe('rival failures', () => {
         n.capitalRatio = 0.04;
       }
     });
-    const failure = events.find((e) => e.type === 'BANK_FAILURE');
+    // Ten years of recession can topple another rival too; this test follows Nimbus.
+    const failure = events.find((e) => e.type === 'BANK_FAILURE' && e.payload.rivalId === 'nimbus');
     expect(failure).toBeDefined();
-    expect(failure!.payload.rivalId).toBe('nimbus');
-    const split = events.find((e) => e.type === 'RIVAL_NETWORK_SPLIT');
+    const split = events.find(
+      (e) => e.type === 'RIVAL_NETWORK_SPLIT' && e.payload.rivalId === 'nimbus',
+    );
     expect(split).toBeDefined();
     expect(split!.week - failure!.week).toBe(RIVAL_FAILURE.distressWeeks);
     expect(nimbus.status).toBe('seized');

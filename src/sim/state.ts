@@ -55,7 +55,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState } from './personalTypes';
 
-export const SCHEMA_VERSION = 36;
+export const SCHEMA_VERSION = 37;
 
 export interface GameState {
   schemaVersion: number;
@@ -825,7 +825,15 @@ export interface RivalBank {
   /** Pending deposit-beta / loan pass-through moves (§5). */
   priceLags: Record<string, { target: number; weeksLeft: number }>;
   appRating: Stars;
-  status: 'active' | 'distressed' | 'seized' | 'acquired';
+  /** 'merged' is bought by another rival (§18.8); 'acquired' is bought by you. */
+  status: 'active' | 'distressed' | 'seized' | 'acquired' | 'merged';
+  /** A chartered bank (§18.7): its home countries and the week it opened. */
+  home?: CountryId[];
+  charteredWeek?: Week;
+  /** When merged: the rival that bought it (§18.8). */
+  mergedInto?: Id;
+  /** Running ad campaigns by city (§18.9): overall-rating boost and weeks left. */
+  campaigns?: Record<Id, { boost: number; weeksLeft: number }>;
   /** Stage 5 (§18.5): simplified financials. */
   equity: Money;
   capitalRatio: number;

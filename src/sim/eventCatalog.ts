@@ -56,6 +56,24 @@ export interface EventPayloads {
     address: string;
     cities: number;
   };
+  /** A new bank is chartered in a city (§18.7). */
+  RIVAL_CHARTERED: { rivalId: Id; bank: string; city: Id; strategy: string; branches: number };
+  /** A rival buys another (§18.8); `price` is the whole deal, `cities` the buyer's count after. */
+  RIVAL_MERGER: {
+    buyerId: Id;
+    buyer: string;
+    rivalId: Id;
+    bank: string;
+    price: number;
+    branches: number;
+    cities: number;
+  };
+  /** A rival starts an ad campaign in one of your cities (§18.9). */
+  RIVAL_CAMPAIGN: { rivalId: Id; bank: string; city: Id; weeks: number; branches: number };
+  /** A rival's app crosses a half star after its yearly tech spend (§18.9). */
+  RIVAL_APP_LAUNCH: { rivalId: Id; bank: string; app: number; spend: number };
+  /** A disruptor big enough to behave like an incumbent (§18.9). */
+  RIVAL_GROWS_UP: { rivalId: Id; bank: string; branches: number };
   /** A city opened new storefronts (city growth, CONTENT §3). */
   CITY_GROWTH: { city: Id; lots: number };
   /** Quarter-end report. `pct` is the change in revenue from the previous quarter. */
