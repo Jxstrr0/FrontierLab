@@ -17,6 +17,7 @@ import {
 import { canBuy, mergeRivals, mergerTarget, proFormaCr } from '../../src/sim/rivalMergers';
 import { type GameState, type RivalBank } from '../../src/sim/state';
 import { openScriptedBranch } from '../helpers/scenario';
+import { nearestSize, rivalUnits } from '../../src/sim/rivalOffices';
 
 const lotsIn = (s: GameState, cityId: string) =>
   Object.values(s.world.lots).filter((l) => l.cityId === cityId);
@@ -51,8 +52,9 @@ describe('chartered rivals (§18.7)', () => {
     expect(bank).toBeDefined();
     expect(bank.home).toEqual(['CA']);
     expect(bank.listed).toBe(false);
-    expect(bank.branches.length).toBeGreaterThanOrEqual(RIVAL_CHARTER.branches[0]);
-    expect(bank.branches.length).toBeLessThanOrEqual(RIVAL_CHARTER.branches[1]);
+    // One office sized for the 2–3 branches a charter opens (C2b): a Standard.
+    expect(bank.branches).toHaveLength(1);
+    expect(bank.branches[0]!.size).toBe(nearestSize(RIVAL_CHARTER.branches[0]));
     expect(bank.equity).toBeGreaterThan(0);
     expect(bank.capitalRatio).toBeGreaterThan(0.5); // no loans yet
     expect(bank.ceo).not.toBe('');
@@ -82,14 +84,17 @@ describe('rivals buy each other (§18.8)', () => {
     // You hold some of the target: you are paid out at the deal price.
     s.market.holdings.personal[target.id] = { shares: 1000, avgCost: target.price };
     const cash = s.personal.cash;
-    const branches = buyer.branches.length + target.branches.length;
+    // Offices in a shared city fold into one (C2b): one per city afterwards.
+    const cities = new Set([...buyer.branches, ...target.branches].map((x) => x.cityId));
+    const units = rivalUnits(buyer) + rivalUnits(target);
     const equity = buyer.equity;
     const book = target.equity;
     mergeRivals(s, buyer, target, 0.2);
     expect(target.status).toBe('merged');
     expect(target.mergedInto).toBe(buyer.id);
     expect(target.branches).toHaveLength(0);
-    expect(buyer.branches).toHaveLength(branches);
+    expect(buyer.branches).toHaveLength(cities.size);
+    expect(rivalUnits(buyer)).toBeGreaterThanOrEqual(units - 1.5);
     expect(buyer.equity).toBeCloseTo(equity - 0.2 * book, 0);
     for (const br of buyer.branches) expect(s.world.lots[br.lotId]!.occupant?.id).toBe(buyer.id);
     expect(s.personal.cash).toBeCloseTo(cash + 1000 * (book / target.shares) * 1.2, 0);

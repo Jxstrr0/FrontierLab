@@ -1,5 +1,5 @@
 // Rival bank head office panel (SCREENS §7): tabs Overview · Loans · Credit.
-// Overview is who they are (strategy, branches, cities, listing, capital band,
+// Overview is who they are (strategy, sales offices, cities, listing, capital band,
 // CEO, recent quarters); Loans and Credit (RivalLending.tsx) are the business
 // loans and line of credit they offer your company (SIMULATION §19.9).
 import { CITIES } from '../../data/cities';
@@ -101,7 +101,7 @@ function Overview(p: { s: GameState; bank: RivalBank }) {
             <div class="muted small">{STRATEGY_BLURB[bank.strategy]}</div>
           </div>
         </div>
-        <Row label="Branches" value={count(bank.branches.length)} />
+        <Row label="Sales offices" value={count(bank.branches.length)} />
         <Row label="Cities" value={cities || '—'} />
         <Row label="Shares" value={bank.listed ? `Listed · ${bank.ticker ?? ''}` : 'Private'} />
         {bank.listed && active && (

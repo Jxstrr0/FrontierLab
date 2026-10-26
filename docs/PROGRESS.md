@@ -3,13 +3,31 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C2a done (v0.1.5, save schema 2): one sales office per city, grown in place through four sizes. Before that, C1 (v0.1.4): floors, executives, segments, campaigns, benefits, conferences, incidents, stock sector, map layers, rival labs, "the lab" wording and the newspaper. Next is C2b, the rest of C2 (main offices and data centers). The owner's decisions are in the design brief and CONVERSION_PLAN §5.
+**Current stage:** C2b done (v0.1.6, save schema 3): rival labs also hold one sizable sales office per city. C2a (v0.1.5): one sales office per city, grown in place through four sizes. Before that, C1 (v0.1.4): floors, executives, segments, campaigns, benefits, conferences, incidents, stock sector, map layers, rival labs, "the lab" wording and the newspaper. Next is C2c (data centers), then C2d (main offices and the screens). The owner's decisions are in the design brief and CONVERSION_PLAN §5.
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `192038a7c018ae` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `0130bc2385365b` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-26 — Stage C2b: rival sales offices (v0.1.6)
+
+**What changed.** Rival labs now play by the same map rule as you: **one sales office per lab per city**, each with a size (Starter to Flagship).
+- **On the map** you'll see one pin per rival per city instead of a cluster of branches. Tapping it shows "a large sales office", for example.
+- **Same strength as before.** A rival's Standard office does the business of the two or three branches it replaced. Its deposits, costs, prices and pull on customers all count by size. At the start of a game the rivals have exactly the same quality as before.
+- **Rivals grow offices** a size at a time instead of opening branches, and shrink an office after months of losses before they ever close one. The Inference reports both.
+- **Mergers and failures:** when one lab buys another, or a failed lab's network is shared out, offices in the same city merge into one bigger office.
+- **Buying a rival** gives you their office at its size, with a lease to match.
+- **Saves:** schema 2 → 3. Old saves fold each rival's branches in a city into one office.
+
+**Bug caught on the way.** When a new city was generated, rivals were placed before the city's lots were registered. It didn't matter before, but folding branches into one office needs to free the spare lots, so the lots are now registered first.
+
+**Balance.** Every strategy target passes (steady, aggressive, turtle, nohq, stress, idle) and the 20-city median is inside every checkpoint. Seed 42's own first-office payback reads 42 weeks against the 40 target. That is a single-seed reference figure (the target is judged on the median, which is 36.5), caused by rival price weights rounding to four sizes.
+
+**Checks.** `npm run lint`, all 868 tests and `npm run build` pass. The **determinism snapshot** moved from `192038a7c018ae` to `0130bc2385365b` (intended: rivals are now offices).
+
+**Next:** C2c, data centers.
 
 ### 2026-10-26 — Stage C2a: one sales office per city (v0.1.5)
 
