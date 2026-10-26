@@ -21,7 +21,7 @@ export const SEGMENT_SPECS: Record<SegmentId, SegmentSpec> = {
   },
   YP: {
     id: 'YP',
-    name: 'Young professionals',
+    name: 'Developers',
     sensDep: 0.6,
     sensLoan: 0.7,
     sensFee: 0.8,
@@ -29,7 +29,7 @@ export const SEGMENT_SPECS: Record<SegmentId, SegmentSpec> = {
   },
   FAM: {
     id: 'FAM',
-    name: 'Families',
+    name: 'Consumers',
     sensDep: 0.5,
     sensLoan: 0.9,
     sensFee: 0.7,
@@ -37,7 +37,7 @@ export const SEGMENT_SPECS: Record<SegmentId, SegmentSpec> = {
   },
   RET: {
     id: 'RET',
-    name: 'Retirees',
+    name: 'Researchers',
     sensDep: 1.0,
     sensLoan: 0.4,
     sensFee: 0.5,
@@ -45,7 +45,7 @@ export const SEGMENT_SPECS: Record<SegmentId, SegmentSpec> = {
   },
   BIZ: {
     id: 'BIZ',
-    name: 'Businesses',
+    name: 'Small shops',
     sensDep: 0.4,
     sensLoan: 0.7,
     sensFee: 0.5,

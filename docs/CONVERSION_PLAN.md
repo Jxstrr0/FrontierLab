@@ -249,6 +249,7 @@ The same rules as ROADMAP: each stage ends playable and deployed, with green CI,
 - **Accept:** on the iPhone, Vault Street and Frontier Lab show separate save slots. The game plays exactly as before. The determinism snapshot changes only because the save's schema number is now 1.
 
 ### C1 — Words and pictures that already fit
+- **Status:** C1a (floors, executives, segments, campaigns, benefits, conferences, incidents, stock sector, map layers) done in v0.1.1. C1b (rival lab names, "the bank" wording) and C1c (newspaper) next.
 - **Build:** relabel the systems whose math already fits:
   - HQ floor names, executives (CRO → CSO), departments, campaigns and benefits
   - incidents, the Ledger (AI tab), conventions, lobbying, stock sectors

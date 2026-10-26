@@ -39,7 +39,7 @@ function line(s: GameState, seat: ExecSeat): string {
         `Branch guidance now: deposit rates ${pp(g.deposits)}${needs('cfo', 'CFO')}; ` +
         `loan rates ${pp(g.loans)}` +
         (g.loans !== 0 ? `, approvals ${approvals}% ${g.loans > 0 ? 'stricter' : 'looser'}` : '') +
-        `${needs('cro', 'CRO')}. It applies to managers you let handle products or loan approvals, and to the CPO’s company pricing.`
+        `${needs('cro', 'CSO')}. It applies to managers you let handle products or loan approvals, and to the CPO’s company pricing.`
       );
     }
   }

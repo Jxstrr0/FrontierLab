@@ -85,7 +85,7 @@ export const BENEFITS: Record<string, BenefitSpec> = {
   lunch: {
     id: 'lunch',
     name: 'Free Lunch & Snacks',
-    description: 'A stocked kitchen at every branch and floor.',
+    description: 'A stocked kitchen at every office and floor.',
     control: 'perWeek',
     min: 0,
     max: 100,
@@ -106,8 +106,8 @@ export const BENEFITS: Record<string, BenefitSpec> = {
   },
   mortgage_disc: {
     id: 'mortgage_disc',
-    name: 'Staff Mortgage Discount',
-    description: 'Cheaper home loans for your own people.',
+    name: 'Compute Allowance',
+    description: 'Discounted compute for your own people’s side projects.',
     control: 'discount',
     min: 0,
     max: 0.02,

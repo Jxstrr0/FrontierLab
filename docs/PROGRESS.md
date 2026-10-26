@@ -3,13 +3,41 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C0 done (v0.1.0, save schema 1). Next is C1 (words and pictures that already fit). The owner's decisions are in the design brief and CONVERSION_PLAN §5. The game still plays as the bank version.
+**Current stage:** C1 in progress (v0.1.1, save schema 1). C1a (floors, executives, segments, campaigns, benefits, conferences, incidents, stock sector, map layers) is done; C1b (rival lab names and "the bank" wording) and C1c (the newspaper) are next. The owner's decisions are in the design brief and CONVERSION_PLAN §5.
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `1d6d768b9d6ed3` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `1064ce4d8fffde` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-26 — Stage C1a: the first AI words (v0.1.1)
+
+**What you asked for:** start C1, relabelling the systems whose maths already fits.
+
+**I split C1 into three small pull requests** so each one is easy to check on your phone:
+- **C1a (this one):** floors, executives, segments, campaigns, benefits, conferences, incidents, the stock sector and map layers.
+- **C1b:** fictional rival lab names, and "the bank" becoming "the lab" in everyday text.
+- **C1c:** the newspaper's new name and its AI tab.
+
+**What C1a changed.** Only names and text; ids, numbers and save shape are untouched.
+- **HQ floors:** IT & Security → **Platform & Security**; Risk & Compliance → **Safety & Alignment**. Products and Treasury keep their names until C3/C4, as the brief says.
+- **Executives:** the Chief Risk Officer is now the **Chief Safety Officer (CSO)**, on your team and on rival HQ panels.
+- **Segments:** Students, **Developers**, **Consumers**, **Researchers**, **Small shops** (were Students, Young professionals, Families, Retirees, Businesses). Storefront tips and campaign hints match.
+- **Campaigns:** Coffee & Live Demos, Hack Nights, Weekend Support, Sign-Up Credits, Green Compute Pledge, Research Newsletter and AI Workshops (Community Sponsors, Social Media and Local Paid Search keep their names).
+- **Benefits:** Staff Mortgage Discount → **Compute Allowance**.
+- **Conventions → conferences:** every event got an AI or developer name (for example Alpine Inference Forum, Thameside Alignment Summit, Bay Builders Week). The map layer, pin, panel title and tips say Conference.
+- **Venture debt → compute credits** in every label (C4 links them to real compute).
+- **Incidents:** server-room break-in, API key leak, capability over-claim, safety audit, heatwave, outage rumour and abuse ring replace robbery, ATM skimming, mis-selling, regulator audit, flood, bank run and card fraud. Their effects are unchanged.
+- **Stock market:** the Banking sector is now **AI labs**.
+- **Map layers:** Banks → **Rival Labs**, Conventions → **Conferences**. Branches, Credit Bureaus and Employers wait for the stages that rebuild them (C2, C4/C6 and C3).
+- CONTENT.md and SCREENS.md use the new names.
+
+**Left as bank words on purpose:** money terms (deposits, loans, rates), branches, Loan Desk, Treasury and Products. They change with the stages that rebuild those systems.
+
+**Checks.**
+- `npm run lint`, all 856 tests and `npm run build` pass.
+- **Determinism snapshot** moved from `1d6d768b9d6ed3` to `1064ce4d8fffde`. Only names changed: with the renamed data files put back, the old hash comes back exactly.
 
 ### 2026-10-26 — Stage C0: Frontier Lab gets its own saves (v0.1.0)
 

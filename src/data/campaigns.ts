@@ -32,7 +32,7 @@ const weekly = (amount: number): CampaignCost => ({ type: 'weekly', amount });
 export const CAMPAIGNS: Record<string, CampaignSpec> = {
   lobby_coffee: {
     id: 'lobby_coffee',
-    name: 'Free Lobby Coffee',
+    name: 'Coffee & Live Demos',
     effectHint: 'Branch rating + · Awareness +',
     levels: [
       { label: 'Drip', cost: weekly(120), bumps: { branch: 0.2 }, awareness: 0.004 },
@@ -41,13 +41,13 @@ export const CAMPAIGNS: Record<string, CampaignSpec> = {
   },
   charging: {
     id: 'charging',
-    name: 'Charging Station',
-    effectHint: 'Branch rating + · Young professionals +',
+    name: 'Hack Nights',
+    effectHint: 'Branch rating + · Developers +',
     levels: [{ label: 'On', cost: weekly(80), bumps: { branch: 0.1 }, segments: { YP: 1.05 } }],
   },
   saturday: {
     id: 'saturday',
-    name: 'Saturday Hours',
+    name: 'Weekend Support',
     effectHint: 'Capacity + · Service +',
     levels: [
       {
@@ -68,7 +68,7 @@ export const CAMPAIGNS: Record<string, CampaignSpec> = {
   },
   signup_bonus: {
     id: 'signup_bonus',
-    name: 'Sign-Up Bonus',
+    name: 'Sign-Up Credits',
     effectHint: 'New deposits ++ · Churn +',
     levels: [
       {
@@ -96,8 +96,8 @@ export const CAMPAIGNS: Record<string, CampaignSpec> = {
   },
   paperless: {
     id: 'paperless',
-    name: 'Paperless Pledge',
-    effectHint: 'Products rating + · Students and young professionals +',
+    name: 'Green Compute Pledge',
+    effectHint: 'Products rating + · Students and developers +',
     levels: [
       {
         label: 'Half',
@@ -115,8 +115,8 @@ export const CAMPAIGNS: Record<string, CampaignSpec> = {
   },
   direct_mail: {
     id: 'direct_mail',
-    name: 'Direct Mail',
-    effectHint: 'Awareness + · Retirees and families +',
+    name: 'Research Newsletter',
+    effectHint: 'Awareness + · Researchers and consumers +',
     levels: [
       { label: 'Light', cost: weekly(300), awareness: 0.01, segments: { RET: 1.08, FAM: 1.08 } },
       { label: 'Heavy', cost: weekly(700), awareness: 0.02, segments: { RET: 1.15, FAM: 1.15 } },
@@ -124,7 +124,7 @@ export const CAMPAIGNS: Record<string, CampaignSpec> = {
   },
   workshops: {
     id: 'workshops',
-    name: 'Money Workshops',
+    name: 'AI Workshops',
     effectHint: 'Awareness + · Service +',
     levels: [
       {
@@ -146,7 +146,7 @@ export const CAMPAIGNS: Record<string, CampaignSpec> = {
   sponsors: {
     id: 'sponsors',
     name: 'Community Sponsors',
-    effectHint: 'Awareness ++ · Branch rating + · Families and businesses +',
+    effectHint: 'Awareness ++ · Branch rating + · Consumers and small shops +',
     levels: [
       {
         label: 'Modest',
@@ -167,7 +167,7 @@ export const CAMPAIGNS: Record<string, CampaignSpec> = {
   social: {
     id: 'social',
     name: 'Social Media',
-    effectHint: 'Awareness ++ · Students and young professionals +',
+    effectHint: 'Awareness ++ · Students and developers +',
     levels: [
       { label: 'Steady', cost: weekly(400), awareness: 0.012, segments: { STU: 1.1, YP: 1.1 } },
       { label: 'Viral push', cost: weekly(900), awareness: 0.026, segments: { STU: 1.2, YP: 1.2 } },

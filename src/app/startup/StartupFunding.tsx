@@ -80,7 +80,7 @@ function VentureDebtCard(p: { startup: Startup; account: Account; block?: string
   if (st.stage === 'failed' || st.stage === 'acquired' || st.stage === 'public') return null;
   return (
     <>
-      <SectionTitle>Venture debt</SectionTitle>
+      <SectionTitle>Compute credits</SectionTitle>
       <Card>
         {d ? (
           <>
