@@ -1,4 +1,6 @@
-# Vault Street — Game Design
+# Frontier Lab — Game Design
+
+> **Conversion in progress.** Frontier Lab is a fork of Vault Street being converted into an AI-lab tycoon. This document still describes the bank game that the code implements today; the proposed AI-lab mapping is in `CONVERSION_PLAN.md` and replaces §3.1 here once approved.
 
 Source of truth for intent. Formulas and numbers live in `SIMULATION.md`, screens in `SCREENS.md`, data in `CONTENT.md`. Last updated 2026-10-23.
 
@@ -8,8 +10,8 @@ Source of truth for intent. Formulas and numbers live in `SIMULATION.md`, screen
 
 You found a bank with a fresh charter: $2,000,000 of charter capital locked in the treasury and $900,000 to spend. Lease a storefront, build your first branch, set your rates and fees, hire tellers and a branch manager, and start gathering deposits. Lend them out, carefully. Ride the interest-rate cycle, build a headquarters, take the bank public, buy your rivals, and expand into the world's financial capitals. Your personal fortune grows alongside: homes, cars, collectibles, a jet, a sports franchise, and a climb up the rich list.
 
-- **Working title:** Vault Street. Alternatives on file: Basis Point, Prime Rate.
-- **Repo:** `VaultStreet`.
+- **Title:** Frontier Lab (forked from Vault Street; working title on file there: Vault Street, alternatives Basis Point, Prime Rate).
+- **Repo:** `FrontierLab`; reference fork `VaultStreet` (remote `upstream`, read-only).
 - **Audience:** players of mobile tycoon and management sims who like numbers they can act on. Built for short phone sessions or long desktop sessions.
 
 ## 2. Pillars
@@ -22,7 +24,7 @@ You found a bank with a fresh charter: $2,000,000 of charter capital locked in t
 
 ## 3. Faithfulness contract
 
-- **Keep identical in structure.** Everything in the mapping table (§3.1). Where the original has a screen, field, toggle or flow, Vault Street has its banking equivalent in the same place in the hierarchy, using the same kind of control.
+- **Keep identical in structure.** Everything in the mapping table (§3.1). Where the original has a screen, field, toggle or flow, the game has its banking equivalent in the same place in the hierarchy, using the same kind of control.
 - **Change.** The industry, all names and writing, all art and iconography, and the default currency ($, switchable in settings).
 - **Add (bank twists).** Each must be explainable in one sentence and shown with existing UI patterns:
   - Balance sheet and **capital ratio** with regulator tiers (§5.6)
@@ -616,3 +618,5 @@ Add one dated line per decision. Never delete entries; supersede them.
 - 2026-10-26 (same ask, second of three changes): **A field that stays full.** New banks are chartered at the year end where a city has lost rivals (35% a year) or has many empty storefronts (8%), up to three a year, with invented names, private, starting small. Rivals buy each other at quarter-ends (4% per eligible buyer, one deal a quarter) at book plus 15–40%, under the same 9% pro-forma capital rule as your deals; holders are paid in cash. Rivals run 12-week ad campaigns in your cities (+0.15 overall) and spend 5% of profit on technology each year (app and Products coin); a disruptor with 20 branches becomes an incumbent. Found while testing: once rival costs followed the price list, whole networks of healthy branches closed in the first long recession and rivals shrank by half over 25 years, so a rival's loss streak now pauses while its country is in recession or recovery. With that, seed 42 aggressive ends year 25 with 54 active rivals holding 332 branches and $122B of deposits (main: 27 rivals, 128 branches, $49B). The first-branch income floors moved to $31k (week 104) and $32k (week 156+), with the reason in SIMULATION §25. Schema v37.
 - 2026-10-26 (same ask, third of three changes): **Buybacks and share-for-share deals.** A listed bank can buy back up to 10% of its shares a quarter at the market price plus 2% and a 1% fee, paid from cash and retained earnings like a dividend, while the public keeps 10% of the bank and capital stays Adequate. Takeover offers can be paid 25–100% in new shares at your market price; the target's board counts the share part at 95%, one deal may add at most 50% new shares, and the issue dents your price like a secondary. Schema v38. Chose retained earnings over a treasury-stock account so the balance sheet keeps its lines; chose a fixed value (shares counted on closing day) over a fixed exchange ratio so the offer sheet's cash and share figures don't drift with the price before the answer.
 - 2026-10-26 (owner's ask, second list: procedural startups and rival names, a top tier of personal purchases, late-game products, incidents and news that scale with size, scenario starts; any order): **Procedural names.** Generated startups take sector-fitting names (word + suffix, coined brands) and "{offer} for {customer}" descriptions, and chartered banks mix the listed names with generated place stems and coined brands, so pipelines and new rivals keep feeling new. Chose word-part templates over a longer hand-written list because they never run out and stay original; awkward coined brands are filtered by pattern.
+- 2026-10-26: Forked as **Frontier Lab** (repo `FrontierLab`, Pages sub-path `/FrontierLab/`), an AI-lab tycoon converted from Vault Street; Vault Street stays as the read-only `upstream` remote. Proposed mapping and stages in `CONVERSION_PLAN.md`, pending owner approval.
+- 2026-10-26 (proposed): enterprise contracts churn at their own renewal dates (rivals bid then), plus rare mid-term loss when the business fails or after outages; no single quarterly renewal season.

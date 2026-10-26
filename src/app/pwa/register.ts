@@ -1,7 +1,7 @@
 // Registers the offline service worker (sw.js, written next to index.html by
 // swPlugin.ts) in production builds only, so `npm run dev` and tests never run
 // it. The URL and scope are relative, so it works under the GitHub Pages
-// sub-path /VaultStreet/. Opening the game with `?nosw` removes the worker
+// sub-path /FrontierLab/. Opening the game with `?nosw` removes the worker
 // (an escape hatch if a cached build ever needs clearing).
 //
 // Updates: a new deploy's worker installs in the background and waits. When
