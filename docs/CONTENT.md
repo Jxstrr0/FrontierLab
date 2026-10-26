@@ -430,7 +430,7 @@ Counterparty names: Harbor Clearing Bank · Meridian Treasury · Atlas Money Mar
 Branch counts at start, by city size: S 3–5, M 6–10, L 10–16, XL 16–24 in total across that city's rivals. Disruptors get 1–2 each.
 
 ### Chartered banks (2026-10-26)
-New banks chartered during a game (SIMULATION §18.7) take an invented name from `src/data/rivalCharters.ts`: a place-style stem (Ashcombe, Copperleaf, Glenhaven, Lanternhill, Wrenfield and others) with a suffix by strategy (incumbent: Bank, Banking Group, Financial; premium: Private, & Partners, Trust; community: Mutual, Savings, Community Bank), or for a disruptor a one-word brand (Zephly, Pocketwell, Quillo, Lumio, Nuvra, Sprigly, Taffel, Glimmr, Vantlo, Ottery, Brisko, Pennyloop). Names never repeat in a save. Inks come from a ten-colour palette. Their ids are `charter1`, `charter2`, …; they have no head-office building on the map.
+New banks chartered during a game (SIMULATION §18.7) take an invented name from `src/data/rivalCharters.ts`: a place-style stem (Ashcombe, Copperleaf, Glenhaven, Lanternhill, Wrenfield and others) with a suffix by strategy (incumbent: Bank, Banking Group, Financial; premium: Private, & Partners, Trust; community: Mutual, Savings, Community Bank), or for a disruptor a one-word brand (Zephly, Pocketwell, Quillo, Lumio, Nuvra, Sprigly, Taffel, Glimmr, Vantlo, Ottery, Brisko, Pennyloop). Since 2026-10-26 (procedural names), 40% of charters (`NAME_GEN.listedName`) use these listed stems and brands; the rest get a generated one from `src/data/nameParts.ts`: a stem from a head and a tail (Ash + combe, Raven + sford, Maple + water: 40 × 30 combinations), or a coined brand from an onset, vowel, coda and ending (Quinly, Naloop, Polwell), 4–8 letters, with awkward clusters redrawn. Names never repeat in a save. Inks come from a ten-colour palette. Their ids are `charter1`, `charter2`, …; they have no head-office building on the map.
 
 ## 16. Other map buildings
 
@@ -526,6 +526,11 @@ Pentagon order: Management, Product maturity, Market size, Competitiveness, Fina
 
 **Sector growth μ** (quarterly mean; mature margin, P/S multiple and listed sector are in `src/data/startups.ts`): Energy storage 0.06, Agtech/Fintech 0.065, Fintech 0.08, Energy 0.06, Space 0.07, Biotech 0.05, Robotics 0.07, Healthtech 0.06, Agtech 0.05, Quantum 0.06, Proptech 0.05, Consumer 0.06, Materials 0.05, Gaming 0.05, Logistics 0.05, Mobility 0.04, Cybersecurity 0.07.
 
+
+### Generated startups (2026-10-26)
+Startups generated during a game (conventions and the Investment floor pipeline, SIMULATION §20.1) take names and descriptions from templates, so a pipeline keeps showing new companies:
+- **Names** (`src/data/nameParts.ts`, `NAME_GEN.startupPatterns`): half are a word and a suffix that fits the sector (Cobalt Grid, Mosaic Arcade, Echo Volt); a quarter are coined brands (Quindra, Zandwell); a quarter a coined brand with a sector suffix (Tremio Shield). 50 words; 6 suffixes for each of the 17 sectors. A name already used by a startup or listed company is drawn again.
+- **Descriptions** (`src/data/startupBlurbs.ts`): "{offer} for {customer}" from six offers and six customers per sector (36 per sector), e.g. "Cold-chain trucking for pharmacies"; 15% of the time one of the sector's handwritten lines instead. A description already used by a startup still in the pipeline is drawn again.
 ## 19. Conventions (yearly calendar)
 
 | Event | City | Week |

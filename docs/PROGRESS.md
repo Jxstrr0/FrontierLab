@@ -4,11 +4,35 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 **Current stage:** 10 — Art pass, onboarding, polish, launch (built and live; awaiting the owner's iPhone check). All ten roadmap stages are built. Still open: the owner's testing and tuning pass, an Add to Home Screen test on a real iPhone, and the Vault Street card on Kelbo.Website (in a separate session in that repo).
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `03f5cbec77b72b` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `1d353966f53ba6` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-26 — Procedural startup and rival names (v0.13.3)
+
+**What you asked for:** the first of five new items: startups and rival names from sector and name templates, so pipelines never repeat.
+
+**What changed.**
+- **Startup names fit their sector.** A new startup is a word plus a sector suffix (Cobalt Grid, Mosaic Arcade, Umber Space), a coined brand (Quindra, Zandwell) or both (Tremio Shield). Before, any sector could get "Bio" or "Pay".
+- **Startup descriptions come from templates.** "{offer} for {customer}", with six of each per sector: "Cold-chain trucking for pharmacies", "Secure backups for local councils". That is 36 per sector, plus the old handwritten lines now and then. A description already showing in your pipeline is drawn again.
+- **New banks get new names.** A chartered bank now often gets a generated name: a place-style stem (Ravensford, Maplewater, Fernhaven) with its suffix, or for an app-only bank a coined brand (Naloop, Polwell). Awkward coinages are filtered out.
+- Names are still never reused in a save, and none are real companies.
+
+**Your save:** loads as is; nothing in the save format changed. Startups already in a save keep their names.
+
+**Checks.**
+- `npm run lint`, all tests and `npm run build` pass. The new `tests/sim/nameGen.test.ts` checks brand length and cleanliness, sector suffixes, variety, and that 150 generated startups never share a name.
+- One test needed updating: the convention test now asks about a startup that is still private, since a fair startup can now fail during the fair.
+- **Balance:** the 20-seed median is inside every band.
+- **Determinism snapshot** updated to `1d353966f53ba6` (intended: generated startups draw names differently).
+
+**Code map.** `src/sim/nameGen.ts`, parts in `src/data/nameParts.ts`, descriptions in `src/data/startupBlurbs.ts`, constants `NAME_GEN` in `src/config/balance.ts`. Used by `src/sim/ventureGen.ts` and `src/sim/rivalCharters.ts`.
+
+**Docs:** CONTENT §15 and §18, DESIGN decision log.
+
+**Next:** the top tier of personal purchases.
 
 ### 2026-10-26 — Buybacks and share-for-share deals (v0.13.2, schema v38)
 
