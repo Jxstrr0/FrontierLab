@@ -24,7 +24,10 @@ const PROPERTY_DISTRICTS: DistrictId[] = [
   'waterfront',
 ];
 
-/** Adds the city's property buildings, convention centre and lobbying firm. Safe to call once per city. */
+/** Districts where a property building can be a tower (REAL_ESTATE.lowRiseMaxSqm caps the rest). */
+const TALL_DISTRICTS: DistrictId[] = ['financial', 'downtown', 'waterfront'];
+
+/** Adds the city's property buildings, convention centre and lobbying firm. Safe to call again to top a city up. */
 export function generateInvestmentSites(state: GameState, cityId: string): void {
   const city = CITIES[cityId];
   if (!city) throw new Error(`Unknown city ${cityId}`);
@@ -53,14 +56,20 @@ export function generateInvestmentSites(state: GameState, cityId: string): void 
     return site;
   };
 
+  // Bigger cities get more and taller buildings; the towers stand in the tall
+  // districts, and a building elsewhere stays low-rise. Keys skip buildings
+  // that already exist, so a save that predates a larger count is topped up.
   const count = REAL_ESTATE.buildingsPerCity[city.size];
-  const [lo, hi] = REAL_ESTATE.sqmRange;
+  const [lo, hi] = REAL_ESTATE.sqmRangeBySize[city.size];
   for (let i = 0; i < count; i++) {
     const key = `p${i + 1}`;
     if (state.world.sites[`site_${cityId}_property_${key}`]) continue;
     const site = add('property', key, '', rng.pick(PROPERTY_DISTRICTS));
     site.refId = site.id;
-    const sqm = Math.round(rng.range(lo, hi) / 100) * 100;
+    const top = TALL_DISTRICTS.includes(site.district)
+      ? hi
+      : Math.min(hi, REAL_ESTATE.lowRiseMaxSqm);
+    const sqm = Math.round(rng.range(lo, Math.max(lo, top)) / 100) * 100;
     site.property = { sqm, floors: Math.max(1, Math.round(sqm / REAL_ESTATE.sqmPerFloor)) };
   }
 
