@@ -26,7 +26,7 @@ function parseRef(ref: string): [string, number] {
   return [ref.slice(0, at), Number(ref.slice(at + 1))];
 }
 
-describe('The Weekly Ledger over three years', () => {
+describe('The Weekly Inference over three years', () => {
   const issues: LedgerIssue[] = [];
   const cbChecks: { headline: string; rate: string }[] = [];
   const revenueChecks: { body: string; headline: string; revenue: string }[] = [];

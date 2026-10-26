@@ -484,7 +484,7 @@ New labs founded during a game (SIMULATION §18.7) take an invented name from `s
 
 The Banking sector lists the rivals marked "Listed" in §15, and your bank once it lists.
 
-Implemented in `src/data/stocks.ts`, with a home exchange per company and beta by sector (Technology 1.3, Auto 1.2, Banking 1.1, Energy 0.9, Retail 0.8, Real estate 0.7). **Exchanges** (fictional, one per country): CA Maple Exchange · US Union Exchange · UK Thames Exchange · EA Rhine Bourse · CH Alpine Exchange · JP Sakura Exchange · AU Coral Exchange · SG Lion City Exchange · HK Pearl Exchange · RU Neva Exchange. **Index:** the Ledger Composite.
+Implemented in `src/data/stocks.ts`, with a home exchange per company and beta by sector (Technology 1.3, Auto 1.2, Banking 1.1, Energy 0.9, Retail 0.8, Real estate 0.7). **Exchanges** (fictional, one per country): CA Maple Exchange · US Union Exchange · UK Thames Exchange · EA Rhine Bourse · CH Alpine Exchange · JP Sakura Exchange · AU Coral Exchange · SG Lion City Exchange · HK Pearl Exchange · RU Neva Exchange. **Index:** the Inference Composite.
 
 **Sector μ by phase** (annual, Expansion / Slowdown / Recession / Recovery):
 

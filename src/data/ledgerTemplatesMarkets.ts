@@ -9,7 +9,7 @@ export const MARKETS_TEMPLATES = {
   PLACEMENT: [
     {
       h: '{investor} takes a stake in {bank}',
-      b: 'The fund paid {price} a share for {shares} new shares, putting {raised} of fresh capital into the bank.',
+      b: 'The fund paid {price} a share for {shares} new shares, putting {raised} of fresh capital into the lab.',
     },
     {
       h: '{bank} raises {raised} from {investor}',
@@ -23,11 +23,11 @@ export const MARKETS_TEMPLATES = {
   IPO_LAUNCHED: [
     {
       h: '{bank} files to go public',
-      b: '{adviser} will offer {shares} shares at {price}, {float} of the bank. Trading starts at the end of the quarter.',
+      b: '{adviser} will offer {shares} shares at {price}, {float} of the lab. Trading starts at the end of the quarter.',
     },
     {
       h: 'IPO watch: {bank} sets its price at {price}',
-      b: 'The bank plans to float {float} of its shares with {adviser} running the books. Listing is due at quarter-end.',
+      b: 'The lab plans to float {float} of its shares with {adviser} running the books. Listing is due at quarter-end.',
     },
   ],
   IPO_LISTED: [
@@ -37,7 +37,7 @@ export const MARKETS_TEMPLATES = {
     },
     {
       h: 'Bell rings for {bank}',
-      b: '{ticker} made its debut on the {exchange} at {open} after an offer price of {price}. The bank netted {raised}.',
+      b: '{ticker} made its debut on the {exchange} at {open} after an offer price of {price}. The lab netted {raised}.',
     },
     {
       h: '{ticker} debuts on the {exchange}',
@@ -51,7 +51,7 @@ export const MARKETS_TEMPLATES = {
     },
     {
       h: 'No listing for {bank} this quarter',
-      b: 'The share sale was withdrawn because the bank no longer met the rules. {reason}',
+      b: 'The share sale was withdrawn because the lab no longer met the rules. {reason}',
     },
   ],
   SECONDARY_OFFERING: [
@@ -67,7 +67,7 @@ export const MARKETS_TEMPLATES = {
   SHARE_BUYBACK: [
     {
       h: '{bank} buys back {shares} shares',
-      b: 'The bank spent {cost} on its own stock at {price} a share and retired it.',
+      b: 'The lab spent {cost} on its own stock at {price} a share and retired it.',
     },
     {
       h: '{bank} returns {cost} to shareholders',
@@ -101,7 +101,7 @@ export const MARKETS_TEMPLATES = {
     },
     {
       h: 'A big week for {ticker}',
-      b: '{bank} stock rose {pct} to {price}. Traders pointed to stronger sentiment around the bank.',
+      b: '{bank} stock rose {pct} to {price}. Traders pointed to stronger sentiment around the lab.',
     },
   ],
   SHARE_PRICE_DOWN: [
@@ -111,7 +111,7 @@ export const MARKETS_TEMPLATES = {
     },
     {
       h: 'Rough week for {ticker}',
-      b: '{bank} stock fell {pct} to {price}. Investors are waiting for the bank to steady the ship.',
+      b: '{bank} stock fell {pct} to {price}. Investors are waiting for the lab to steady the ship.',
     },
   ],
   COMPANY_EARNINGS_BEAT: [

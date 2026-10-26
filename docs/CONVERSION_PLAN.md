@@ -69,7 +69,7 @@ Columns: the original game → Vault Street (today) → Frontier Lab (proposed).
 | Secondary offering, stock card | Same | Same | |
 | Coffee companies M&A | Rival bank M&A, regulator approval | **Rival lab M&A**, regulator approval (safety and market share) | |
 | Competitor store | Rival branch: reviews, rate sheet | **Rival campus**: reviews, price sheet, model card | |
-| Weekly results + newspaper | The Weekly Ledger (Banking tab) | Same paper, **AI** tab replaces Banking | Paper renamed in C1 |
+| Weekly results + newspaper | The Weekly Ledger (Banking tab) | The Weekly Inference, **AI** tab replaces Banking | Done in C1c |
 | Incidents | Robbery, breach, fraud ring, mis-selling, audit, walkout, flood, run… | Server-room break-in, key leak, abuse ring, capability over-claim, safety audit, walkout, data-centre heatwave, outage… | |
 | Executive floor | 6 seats + CRO + CREO | 6 seats + **CSO** + CREO | |
 | Investment floor, ventures | + venture debt | + **compute credits** (same mechanics as venture debt) | |
@@ -249,7 +249,7 @@ The same rules as ROADMAP: each stage ends playable and deployed, with green CI,
 - **Accept:** on the iPhone, Vault Street and Frontier Lab show separate save slots. The game plays exactly as before. The determinism snapshot changes only because the save's schema number is now 1.
 
 ### C1 — Words and pictures that already fit
-- **Status:** C1a (floors, executives, segments, campaigns, benefits, conferences, incidents, stock sector, map layers) done in v0.1.1; C1b (rival lab names, "the lab" wording) done in v0.1.2. C1c (newspaper) next.
+- **Status:** C1a (floors, executives, segments, campaigns, benefits, conferences, incidents, stock sector, map layers) done in v0.1.1; C1b (rival lab names, "the lab" wording) done in v0.1.2; C1c (The Weekly Inference, AI tab) done in v0.1.3. **C1 done.**
 - **Build:** relabel the systems whose math already fits:
   - HQ floor names, executives (CRO → CSO), departments, campaigns and benefits
   - incidents, the Ledger (AI tab), conventions, lobbying, stock sectors

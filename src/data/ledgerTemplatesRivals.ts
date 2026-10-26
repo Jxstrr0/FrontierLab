@@ -34,7 +34,7 @@ export const RIVAL_TEMPLATES = {
   ],
   RIVAL_CHARTERED: [
     {
-      h: 'New bank on the block: {bank} opens in {city}',
+      h: 'New lab on the block: {bank} opens in {city}',
       b: 'Regulators granted {bank} a charter this year. The new {kind} opened {n} branches in {city} and says more will follow.',
     },
     {
@@ -59,7 +59,7 @@ export const RIVAL_TEMPLATES = {
     },
     {
       h: 'Ad push from {bank} in {city}',
-      b: '{bank} has launched a {weeks}-week marketing drive in {city}, aimed at winning customers from other banks.',
+      b: '{bank} has launched a {weeks}-week marketing drive in {city}, aimed at winning customers from other labs.',
     },
   ],
   RIVAL_APP_LAUNCH: [
