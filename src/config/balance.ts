@@ -1938,3 +1938,14 @@ export const MILESTONE_HQ_DEPTS = [
   'it',
   'risk',
 ] as const;
+
+// ─── TUTORIAL PART 2 (SCREENS §27.2) ──────────────────────────────────────────
+/**
+ * When the "Your own fortune" guide starts: personal cash at or above
+ * wealthCash (a year or so of CEO salary). The other guides start on game
+ * conditions the sim already has (founder ramp, capital tier, IPO checklist,
+ * city coverage).
+ */
+export const GUIDES = {
+  wealthCash: 250_000,
+} as const;

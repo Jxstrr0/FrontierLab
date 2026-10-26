@@ -57,7 +57,8 @@ export interface GameState {
   news: { issues: LedgerIssue[] };   // last 52
   history: { weekly: WeeklySnapshot[]; quarterly: QuarterReport[] };   // weekly: keep 260
   milestones: Record<string, Week>;  // id → week achieved
-  flags: { tutorialStep?: number; gameOver?: 'takeover'|'insolvency' };
+  flags: { tutorialStep?: number; gameOver?: 'takeover'|'insolvency';
+           lesson?: { id: string; step: number }; lessonsDone: string[] };  // SCREENS §27
 }
 ```
 
@@ -275,6 +276,7 @@ export interface Settings {
   defaultSpeed: 1|2|4; autoPauseIncidents: boolean; autoPauseApplications: boolean;
   sound: boolean; reducedMotion: boolean; textScale: 1|1.15|1.3; layers: Record<string, boolean>;
   hqTabOrder: DeptId[];   // HQ tabs as you arranged them; [] = DEPT_ORDER (schema v22)
+  guides: boolean;        // tutorial Part 2 on or off (schema v24)
 }
 export interface AvatarSpec { head: number; hair: number; facial: number; glasses: number; attire: number; tone: number; shade: number; eyes: number; brows: number; mouth: number; age: number }
 ```
@@ -326,7 +328,7 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 | Personal | `offerHome`, `rebuildHome`, `sellHome`, `buyCar`, `sellCar`, `placeBid`, `clearBid`, `appraiseCollectible`, `consignCollectible`, `withdrawConsignment`, `buyJet`, `sellJet`, `buyClub`, `sellClub`, `setKit`, `setKitSponsor`, `signPlayer`, `releasePlayer` |
 | Settings and saves | `setSettings`, `setFounderAvatar`, `moveHqTab`, `resetHqTabOrder`; saves are not commands: `saveToSlot`, `loadFromSlot` (`src/sim/save/storage.ts`), `exportCode`, `importCode` (`serialize.ts`) |
 
-## 12. Implemented so far (schema v23)
+## 12. Implemented so far (schema v24)
 
 `src/sim/state.ts` is the source of truth; this section records how it differs from the guide above. Later stages add the rest with a schema bump and a migration.
 
@@ -347,6 +349,7 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 - **Schema v18 adds** `company.guidance.staffing`, `.marketing` and `.products` (the COO's, CMO's and CPO's branch guidance steps) and a `guidance` delegation on those three seats. Migration 17 → 18 starts the steps at 0 and the switches off for seated executives and remembered toggles (on for waiting candidates).
 - **Schema v19 adds** `meta.houseStyle` (`HouseStyle`: `'heritage' | 'deco' | 'modern' | 'garden' | 'civic'`, later also `'quant'`, the branch fronts' house style chosen at New Game; a game started without one gets `SEEDED_HOUSE_STYLE_IDS[seed % 5]`, always one of the first five). Migration 18 → 19 picks one from the seed the same way.
 - **Schema v23 adds** `eyes`, `brows`, `mouth` and `age` to every `AvatarSpec` (founder, managers and candidates, executives, startup and venture CEOs), and a fourth glasses option. New people get the four from `faceDetail()` in `people.ts`, a hash of their other parts, so the people RNG stream is unchanged. Migration 22 → 23 walks the whole save and applies the same hash to every face; the founder's gets zeros (almond eyes, soft arch, smile, fresh), which is exactly how it drew before.
+- **Schema v24 adds** tutorial Part 2 (SCREENS §27.2): `settings.guides` (boolean), `flags.lesson` (the guide in progress and its step, optional) and `flags.lessonsDone` (ids of guides and first-look tips already seen). Part 1 grew from 7 to 9 steps, so `flags.tutorialStep` now runs 1–9 with 10 = closing card and 11 = finished. Migration 23 → 24 moves 8 → 10 and 9 → 11, switches guides on, and pre-marks the guides an older bank has no need for (`hq` with an office, `exec` with an executive, `ipo` once listed, `travel` and `place-airport` after a flight, `floor-{dept}` for each floor it has).
 - **Schema v22 adds** `settings.hqTabOrder` (`DeptId[]`, the HQ tabs in the order you arranged them; departments not listed follow in `DEPT_ORDER`). Migration 21 → 22 sets `[]`.
 - **Schema v21 adds** `executives.payReviewCadence` (`'quarterly' | 'annual'`), `executives.moraleTarget` (70 / 80 / 90) and `executives.brandTarget` (0.4–0.7): the delegation dials. Migration 20 → 21 sets quarterly, 70 and 0.5, what the switches always did.
 - **Schema v20 adds** `meta.logoShape` (`'round' | 'shield' | 'lozenge' | 'hex' | 'plaque' | 'rosette'`, the outline of the bank's mark chosen at New Game; `'round'` when none is chosen). Migration 19 → 20 sets `'round'`, so older banks keep the medallion they have always worn. The slot card record (`SaveMeta`) carries it too, optional for cards written before.

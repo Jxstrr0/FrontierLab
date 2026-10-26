@@ -63,6 +63,7 @@ function CampaignCard({ branch, spec }: { branch: Branch; spec: CampaignSpec }) 
             aria-checked={i === level}
             class={`br-level${i === level ? ' is-active' : ''}`}
             disabled={locked}
+            data-tutorial={i > 0 && !locked ? 'campaign-level' : undefined}
             onClick={() => act(cmd.setCampaignLevel, branch.id, spec.id, i)}
           >
             {label}

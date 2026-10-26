@@ -1,7 +1,7 @@
 {
   "name": "vault-street",
   "private": true,
-  "version": "0.10.20",
+  "version": "0.10.21",
   "description": "A banking-empire tycoon for the browser, by Longlight Interactive.",
   "type": "module",
   "engines": {

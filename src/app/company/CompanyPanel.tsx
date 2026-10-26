@@ -77,7 +77,7 @@ export function CompanyPanel() {
       <div class="stack co-stack">
         <WhereToLook s={s} />
         <Card>
-          <div class="cap-head">
+          <div class="cap-head" data-tutorial="capital-meter">
             <div>
               <div class="muted small">Capital ratio</div>
               <div class="hero-number">{capitalRatioText(cap.capitalRatio)}</div>

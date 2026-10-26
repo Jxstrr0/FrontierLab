@@ -385,6 +385,17 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     addFaceDetail(s);
     return s;
   },
+  // v24: tutorial Part 2. Part 1 gained two steps, so the closing card moved
+  // from 8 to 10 and "finished" from 9 to 11. Guides start switched on, minus
+  // the ones for things the bank has already done (learnedLessons).
+  23: (s) => {
+    const state = s as unknown as GameState;
+    const step = state.flags.tutorialStep;
+    if (step === 8 || step === 9) state.flags.tutorialStep = step + 2;
+    state.settings.guides ??= true;
+    state.flags.lessonsDone ??= learnedLessons(state);
+    return s;
+  },
 };
 
 /** The v22 portrait fields; an object with all of them and no `eyes` is a face. */
@@ -411,6 +422,17 @@ function addFaceDetail(node: unknown): void {
     }
     addFaceDetail(v);
   }
+}
+
+/** Guides an older bank has no need for: it already has an HQ, floors, executives, a listing or flights. */
+function learnedLessons(state: GameState): string[] {
+  const done: string[] = [];
+  if (Object.keys(state.offices).length > 0) done.push('hq');
+  if (Object.values(state.executives.seats).some(Boolean)) done.push('exec');
+  if (state.stock.status !== 'private') done.push('ipo');
+  if (state.world.travel.flights > 0) done.push('travel', 'place-airport');
+  for (const dept of Object.keys(state.departments)) done.push(`floor-${dept}`);
+  return done;
 }
 
 const STAGE9_PNL_LINES = ['franchiseRevenue', 'franchiseCosts', 'dealerFees'] as const;

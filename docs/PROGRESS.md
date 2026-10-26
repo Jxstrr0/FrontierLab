@@ -4,11 +4,30 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 **Current stage:** 10 — Art pass, onboarding, polish, launch (built and live; awaiting the owner's iPhone check). All ten roadmap stages are built. Still open: the owner's testing and tuning pass, an Add to Home Screen test on a real iPhone, and the Vault Street card on Kelbo.Website (in a separate session in that repo).
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `000acf5c010cae` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `00e970fac92bfd` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-26 — Tutorial Part 2: guides for the rest of the game (v0.10.21)
+- **Owner's ask:** make sure the tutorial covers everything it needs to, even if it has a second part later in the game for new mechanics.
+- **What was missing.** The 7-step tutorial taught the first branch well but never touched branch marketing or the bank layer (corporate cash versus deposits, capital), and nothing after opening week was explained at all: HQ, executives, capital trouble, going public, travel, personal wealth, or any of the map places and HQ floors.
+- **Part 1 is now 9 steps.** Two new steps after the business loan: **Run a campaign** (Marketing tab, pick any level; skipped if the manager runs marketing) and **Meet the bank** (tap your cash, top left: the guide explains that deposits aren't spendable, corporate cash pays the bills, and capital limits lending; done when you close the Company summary). The closing card now says the guide will be back as the bank grows.
+- **Part 2: guides.** The same manager returns, in the same bar with the brass ring, when a mechanic opens up. One at a time, only while you're on the map, and the clock pauses so you can read:
+  - **Headquarters** at the third branch (when HQ requirements start): find an office for lease, move in Finance and HR, then what Coverage means.
+  - **The executive suite** once you have one: open HQ, hire into an empty seat, then choose the jobs they run.
+  - **Capital is slipping** if the capital tier falls to Watch or worse: the Company summary's list of fixes. Ends early if capital recovers.
+  - **Going public** when every IPO rule is met: an investment bank's Equity tab and the IPO card. No pressure to list; ends early if you do.
+  - **A second city** when the city you're in is well covered and you've never flown: the travel sheet and the departures board.
+  - **Your own fortune** once personal cash reaches $250,000 (`GUIDES.wealthCash` in balance.ts): Menu → Personal wealth.
+- **Part 2: first-look tips.** The first time you open each HQ floor (9), each map place (rival branch and HQ, central bank, bureau, agency, employer, university, investment bank, startup, property, convention, lobbying firm, airport, vacation home, car dealer, auction house, sports club), Personal wealth, the Ledger, a branch's Finance tab, the M&A tab, a board meeting or an incident, the guide gives one short explanation with a **Got it** button. Moving on also counts as seen. Popup tips sit at the top so they never cover the choices. A finished guide marks the tips it already said (e.g. the executive guide covers the Executive suite tip).
+- **Settings → Tutorial** now has Replay tutorial, a **Guides** switch, and **Show the guides again**.
+- **Fix while there:** when the guide bar moved to the top of the screen it covered an open panel's Close button. It now sits just under the panel header.
+- **How it's built.** Same pieces as Part 1: the words in `src/data/lessons.ts`, a pure step machine in `src/app/tutorial/lessons.ts` (unit-tested), and `lessonController.ts` to run it. The ring finds targets by `data-tutorial` names; map pins now carry `pin-{kind}` (e.g. `pin-office`). Commands `setLesson`, `finishLesson`, `resetLessons`.
+- **Saves:** schema v24. Migration 23 → 24 renumbers an old save's tutorial closing card and "finished" (8 → 10, 9 → 11), switches guides on, and skips the guides an older bank has no need for (it already has an HQ, an executive, a listing, a flight, or that floor). So your current game won't be walked through things you've already done; you'll only see a tip the first time you open a place you hadn't opened since this update.
+- **Determinism:** the snapshot moved `000acf5c010cae` → `00e970fac92bfd` only for the new save fields (with `settings.guides`, `flags.lessonsDone` and the version number stripped, the old hash comes back exactly). No sim or balance change.
+- **Checked** in Chrome at 390×844: Part 1 steps 8–9 and every guide (HQ, executives, IPO, travel, wealth) played through by tapping the ringed targets, plus floor and incident tips; no console errors. 25 tutorial tests (new: steps 8–9, guide triggers and steps, tips, commands, migration); full suite, lint and build clean.
 
 ### 2026-10-26 — Changes now reach `main` through pull requests (workflow rule, docs only)
 - **Owner's ask:** go back to creating pull requests and auto-merging them when there is no conflict, as a standing rule.

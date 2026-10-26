@@ -76,7 +76,7 @@ function CoverageMeter(p: { dept: Parameters<typeof coverageView>[1] }) {
   const max = HQ_COVERAGE.kMax;
   const tone = c.status === 'short' ? 'bad' : c.status === 'ok' ? 'good' : 'flat';
   return (
-    <Card class="hq-coverage">
+    <Card class="hq-coverage" tutorial="hq-coverage">
       <div class="hq-coverage-head">
         <span class="hq-coverage-title">Coverage</span>
         <span class={`hq-coverage-text tone-${tone}`}>{c.text}</span>
