@@ -127,7 +127,7 @@ describe('conventions in cities not yet visited', () => {
     const [first] = run.startupIds as [string];
     expect(cmd.buyStartupLot(s, first, 0, 'company')).toEqual({
       ok: false,
-      reason: 'You need to be at the convention.',
+      reason: 'You need to be at the conference.',
     });
     fly(s, 'nyc');
     const venue = siteOf(s, 'conventionCenter', 'nyc');

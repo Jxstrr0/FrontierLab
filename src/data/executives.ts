@@ -85,7 +85,7 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
         id: 'capital',
         label: 'Capital',
         description:
-          'Keeps the capital ratio safe without selling shares: below 10.5% sells company stocks and trims risk appetite, alongside a CRO if you have one.',
+          'Keeps the capital ratio safe without selling shares: below 10.5% sells company stocks and trims risk appetite, alongside a CSO if you have one.',
       },
       {
         id: 'shares',
@@ -114,7 +114,7 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
         id: 'guidance',
         label: 'Branch guidance: funding',
         description:
-          'With the CRO, steers delegated managers: every 4 weeks raises their deposit rates while liquidity is under target and trims them when it is well above.',
+          'With the CSO, steers delegated managers: every 4 weeks raises their deposit rates while liquidity is under target and trims them when it is well above.',
       },
     ],
   },
@@ -182,8 +182,8 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
   },
   cro: {
     seat: 'cro',
-    title: 'Chief Risk Officer',
-    short: 'CRO',
+    title: 'Chief Safety Officer',
+    short: 'CSO',
     depts: ['risk'],
     delegations: [
       {

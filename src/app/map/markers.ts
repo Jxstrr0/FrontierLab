@@ -75,7 +75,7 @@ export const MARKERS: Record<MarkerId, MarkerStyle> = {
   conventions: {
     icon: 'convention',
     ink: 'var(--type-convention)',
-    caption: 'Convention',
+    caption: 'Conference',
     shape: 'medallion',
   },
   lobbyingFirms: {

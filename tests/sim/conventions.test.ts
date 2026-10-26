@@ -96,7 +96,7 @@ describe('Foothills Founders Fair (acceptance)', () => {
     expect(conventionPinInfo(s, venue(s))).toMatchObject({ visible: true, tag: 'Open now' });
     s.world.currentCityId = 'tor';
     const away = cmd.buyStartupLot(s, first, 0, 'company');
-    expect(away).toEqual({ ok: false, reason: 'You need to be at the convention.' });
+    expect(away).toEqual({ ok: false, reason: 'You need to be at the conference.' });
     s.world.currentCityId = 'cal';
     const cash = s.company.cash;
     const price = s.ventures.startups[first]!.round!.lots[0]!.price;
@@ -114,7 +114,7 @@ describe('Foothills Founders Fair (acceptance)', () => {
     // A fair startup can fail during the fair; ask about one still private that you do not hold.
     const later = ids.find((id) => id !== first && isPrivate(s.ventures.startups[id]!)) ?? second;
     const after = cmd.buyStartupLot(s, later, 0, 'company');
-    expect(after).toEqual({ ok: false, reason: 'The convention is over.' });
+    expect(after).toEqual({ ok: false, reason: 'The conference is over.' });
     for (const id of ids) {
       const st = s.ventures.startups[id]!;
       expect(st.round).toBeUndefined();

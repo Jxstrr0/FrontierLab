@@ -41,7 +41,7 @@ export function PortfolioPanel() {
         <PortfolioList account={account} />
         <p class="muted small">
           Buy shares at an investment bank and ventures from the HQ Investment floor or a
-          convention.
+          conference.
         </p>
       </div>
     </Panel>

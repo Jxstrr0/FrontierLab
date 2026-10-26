@@ -118,7 +118,7 @@ After the wizard, the map opens with the tutorial (§27).
 - **Fields:**
   - weekly rent (/week) and security deposit (upfront)
   - foot traffic (/week)
-  - **Demographics:** five bars (Students, Young professionals, Families, Retirees, Businesses), plus income level (Low / Mid / High, with the index in small type) and homeowners %
+  - **Demographics:** five bars (Students, Developers, Families, Researchers, Businesses), plus income level (Low / Mid / High, with the index in small type) and homeowners %
   - **Your bank in {city}:** your branches here against the advice for a city this size ("4 of about 5") and a Market reached bar (SIMULATION §9.2). When the city is well covered (at the advised count, or 80% reached) the advisor adds that another branch would mostly split customers with your own.
   - **Nearby competition:** rival branch count within the radius and their average coins
   - **Area map:** a mini district map with this lot highlighted
@@ -286,15 +286,15 @@ Tabs: Overview · Loans · Credit.
   - **Central bank:** the standing facility from §8 (window rate, window and overnight usage, Borrow / Repay with the stigma warning)
   - **Partnerships:** cards with employer, employees, "Year 3 of 7", deposits and a health bar. Tap to open the partnership view (§14).
 - **Marketing:** brand awareness by city (bars), brand campaign cards (scope: city or country; level; cost), active agency packages.
-- **IT & Security:** app rating coins with a 26-week trend, a security posture summary, digital projects (developments of type Digital).
-- **Risk & Compliance:**
+- **Platform & Security:** app rating coins with a 26-week trend, a security posture summary, digital projects (developments of type Digital).
+- **Safety & Alignment:**
   - loss-rate table by product (annualized, 13-week)
   - delinquency
   - model performance: predicted vs actual default rate
   - regulator status and last review result
 - **Executive:**
   - Board meeting card: explanation, last meeting date, Hold meeting (enabled once per quarter)
-  - Senior executives grid: eight seats (CEO, COO, CFO, CPO, CMO, CTO, CRO, CREO) with portrait, name and title; empty seats show Hire, which opens a sheet of the seat's candidates with a paid "New candidates · $fee" button at the bottom (as for branch managers)
+  - Senior executives grid: eight seats (CEO, COO, CFO, CPO, CMO, CTO, CSO, CREO) with portrait, name and title; empty seats show Hire, which opens a sheet of the seat's candidates with a paid "New candidates · $fee" button at the bottom (as for branch managers)
 - **Investment:**
   - portfolio value with weekly change, a donut (Stocks, Ventures, Real estate, Venture debt, Currencies) and List portfolio
   - Ventures carousel (vignette, name, sector, short description, founded, Details)

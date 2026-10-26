@@ -51,7 +51,7 @@ export function MarketTab(_p: { bankId: string }) {
         <Card>
           <p class="muted small">
             {sector === 'banking'
-              ? 'No banks are listed here yet. Your own bank joins this list once it goes public.'
+              ? 'No labs are listed here yet. Your own lab joins this list once it goes public.'
               : 'Nothing is listed in this sector.'}
           </p>
         </Card>

@@ -52,17 +52,17 @@ const OK: IncidentOptionSpec[] = [{ id: 'ok', label: 'OK', effect: 'Noted.' }];
 export const INCIDENT_SPECS: Record<string, IncidentSpec> = {
   ROBBERY: {
     id: 'ROBBERY',
-    title: 'Robbery',
+    title: 'Server-room break-in',
     scope: 'branch',
     trigger: 'rolled',
     baseP: 0.0015,
-    text: 'Robbers hit {branch} this morning and got away with {loss}. Insurance covers {insured}, leaving {net} for us to absorb. The team is shaken.',
+    text: 'Thieves broke into the server room at {branch} this morning and got away with {loss} of hardware. Insurance covers {insured}, leaving {net} for us to absorb. The team is shaken.',
     money: ['loss', 'net', 'leave'],
     pct: ['insured'],
     options: [
       {
         id: 'upgrade',
-        label: 'Upgrade the vault',
+        label: 'Upgrade the secure room',
         effect: 'A {nextVault} at half price. Morale +5.',
         line: 'capex',
       },
@@ -78,18 +78,18 @@ export const INCIDENT_SPECS: Record<string, IncidentSpec> = {
   },
   ATM_SKIM: {
     id: 'ATM_SKIM',
-    title: 'ATM skimming',
+    title: 'API key leak',
     scope: 'branch',
     trigger: 'rolled',
     baseP: 0.002,
-    text: 'Someone fitted a card skimmer to the ATM at {branch}. Customers lost about {refund} before we spotted it.',
+    text: 'API keys issued at {branch} leaked online, and strangers ran up about {refund} on customers’ accounts before we spotted it.',
     money: ['refund'],
     options: [
       { id: 'refund', label: 'Refund customers', effect: 'Pay back every customer.' },
       {
         id: 'firmware',
-        label: 'Replace the firmware',
-        effect: 'Skimming risk halved for 26 weeks.',
+        label: 'Rotate every key',
+        effect: 'Leak risk halved for 26 weeks.',
         penaltyWeeks: 1,
       },
       {
@@ -132,11 +132,11 @@ export const INCIDENT_SPECS: Record<string, IncidentSpec> = {
   },
   MIS_SELLING: {
     id: 'MIS_SELLING',
-    title: 'Mis-selling',
+    title: 'Capability over-claim',
     scope: 'branch',
     trigger: 'rolled',
     baseP: 0.001,
-    text: 'Staff at {branch} pushed sign-up bonus accounts on people who didn’t need them. Complaints are piling up; putting it right costs about {comp}.',
+    text: 'Staff at {branch} promised customers things our model can’t do. Complaints are piling up; putting it right costs about {comp}.',
     money: ['comp', 'fine'],
     options: [
       {
@@ -157,10 +157,10 @@ export const INCIDENT_SPECS: Record<string, IncidentSpec> = {
   },
   REGULATOR_AUDIT: {
     id: 'REGULATOR_AUDIT',
-    title: 'Regulator audit',
+    title: 'Safety audit',
     scope: 'company',
     trigger: 'triggered',
-    text: 'The regulator’s quarterly review found gaps in our controls. They propose a fine of {fine}.',
+    text: 'The regulator’s quarterly safety review found gaps in our controls. They propose a fine of {fine}.',
     money: ['fine', 'appealFine', 'consultants'],
     options: [
       { id: 'pay', label: 'Pay the fine', effect: 'Settled.', line: 'fines' },
@@ -213,11 +213,11 @@ export const INCIDENT_SPECS: Record<string, IncidentSpec> = {
   },
   BRANCH_FLOOD: {
     id: 'BRANCH_FLOOD',
-    title: 'Flood',
+    title: 'Heatwave',
     scope: 'branch',
     trigger: 'rolled',
     baseP: 0.0005,
-    text: 'A burst water main flooded the lobby at {branch}. We can’t open until it’s repaired.',
+    text: 'A heatwave knocked out the cooling at {branch} and the servers shut down. We can’t open until it’s repaired.',
     options: [
       { id: 'fast', label: 'Fast repair', effect: 'Closed for 1 week.', penaltyWeeks: 1 },
       { id: 'slow', label: 'Slow repair', effect: 'Closed for 4 weeks.', penaltyWeeks: 4 },
@@ -226,11 +226,11 @@ export const INCIDENT_SPECS: Record<string, IncidentSpec> = {
   },
   BANK_RUN: {
     id: 'BANK_RUN',
-    title: 'Bank run',
+    title: 'Outage rumour',
     scope: 'company',
     trigger: 'triggered',
     yours: true,
-    text: 'Rumours about our health are spreading, and depositors are queueing to take their money out.',
+    text: 'Rumours that we are about to go dark are spreading, and depositors are queueing to take their money out.',
     money: ['window'],
     pct: ['odds'],
     options: [
@@ -254,11 +254,11 @@ export const INCIDENT_SPECS: Record<string, IncidentSpec> = {
   },
   CARD_FRAUD: {
     id: 'CARD_FRAUD',
-    title: 'Card fraud ring',
+    title: 'Abuse ring',
     scope: 'company',
     trigger: 'rolled',
     baseP: 0.0015,
-    text: 'A fraud ring is running stolen numbers through our credit cards. Losses so far: about {loss}.',
+    text: 'An abuse ring is running stolen card numbers through our accounts. Losses so far: about {loss}.',
     money: ['loss'],
     options: [
       { id: 'absorb', label: 'Absorb the losses', effect: 'We eat the fraud.' },

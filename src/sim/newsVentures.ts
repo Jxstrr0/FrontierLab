@@ -37,7 +37,7 @@ function conventionStory(ctx: NewsContext, e: GameEvent): Story {
     icon: 'spark',
     priority,
     tokens: {
-      event: str(p.name, 'A founders convention'),
+      event: str(p.name, 'A developer conference'),
       city: str(p.city, 'town'),
       weeks: weeks === 1 ? 'next week' : `in ${weeks} weeks`,
     },
