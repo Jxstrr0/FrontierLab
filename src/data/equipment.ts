@@ -66,6 +66,14 @@ export const EQUIPMENT: Record<string, EquipmentSpec> = {
     quality: 5.0,
     cost: 340000,
   }),
+  ext_lattice: e({
+    id: 'ext_lattice',
+    slot: 'exterior',
+    name: 'Lattice Pavilion',
+    description: 'A floating roof over a diagrid of glass, with a light wall by the door.',
+    quality: 5.0,
+    cost: 340000,
+  }),
 
   lob_basic: e({
     id: 'lob_basic',

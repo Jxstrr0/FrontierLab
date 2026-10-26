@@ -3,10 +3,13 @@
 // the foot of the building and the roof flag, each drawn in the bank's chosen
 // style, with the planting in leaf green. Every exterior composition says
 // where these go (FacadeAnchors), so one style reads the same on a plain
-// storefront and a deco tower.
+// storefront and a deco tower. The Quant Noir style lives in
+// houseStyleQuant.tsx and is dispatched from here.
 import { poly, type Pt } from '../../art/engrave';
 import type { HouseStyle } from '../../data/types';
 import { arch, type Brand } from './facadeParts';
+import { QuantDoor, QuantFlag, QuantLamp, QuantPlanter, QuantSign } from './houseStyleQuant';
+import { attrs, fit } from './signFit';
 
 export interface FacadeAnchors {
   /** The name sign's box. */
@@ -24,15 +27,6 @@ export const PROP_SCALE = 1.35;
 export const grow = (x: number, y: number) =>
   `translate(${x} ${y}) scale(${PROP_SCALE}) translate(${-x} ${-y})`;
 
-/** Font size that fits `text` in `w`, and a squeeze for names that won't fit. */
-function fit(text: string, w: number, h: number, widthPerEm: number) {
-  const size = Math.min(h * 0.72, w / Math.max(1, text.length * widthPerEm));
-  const min = 4.2;
-  return size >= min
-    ? { fontSize: `${size.toFixed(2)}px` }
-    : { fontSize: `${min}px`, textLength: w, lengthAdjust: 'spacingAndGlyphs' as const };
-}
-
 /** The bank's name sign in the house style. */
 export function NameSign(p: {
   style: HouseStyle;
@@ -45,6 +39,8 @@ export function NameSign(p: {
   const base = y + h * 0.7;
   const box = `M${x} ${y}h${w}v${h}h${-w}z`;
   switch (p.style) {
+    case 'quant':
+      return <QuantSign a={p.a} name={p.name} brand={p.brand} />;
     case 'heritage': {
       const t = fit(p.name, w - 8, h, 0.55);
       return (
@@ -148,14 +144,10 @@ export function NameSign(p: {
   }
 }
 
-const attrs = (t: ReturnType<typeof fit>, w: number, fill?: string) => {
-  const style = fill ? { fontSize: t.fontSize, fill } : { fontSize: t.fontSize };
-  return 'textLength' in t ? { style, textLength: w, lengthAdjust: t.lengthAdjust } : { style };
-};
-
 /** One lamp in the house style at (x, y); on a post from `ground` when given. */
-export function Lamp(p: { style: HouseStyle; at: Pt; ground?: number; n: number }) {
+export function Lamp(p: { style: HouseStyle; at: Pt; ground?: number; n: number; ink: string }) {
   const [x, y] = p.at;
+  if (p.style === 'quant') return <QuantLamp at={p.at} ground={p.ground} ink={p.ink} />;
   const post =
     p.ground !== undefined ? (
       <path d={`M${x} ${p.ground}V${y + 3}M${x - 2.5} ${p.ground}h5`} class="art-line" />
@@ -235,6 +227,8 @@ export function Planter(p: {
   const { x } = p;
   const g = p.ground;
   switch (p.style) {
+    case 'quant':
+      return <QuantPlanter x={x} ground={g} n={p.n} />;
     case 'heritage':
       return (
         <g>
@@ -314,6 +308,8 @@ export function StyleFlag(p: { style: HouseStyle; x: number; y: number; ink: str
   const top = y - 17;
   let cloth: string;
   switch (p.style) {
+    case 'quant':
+      return <QuantFlag x={x} y={y} ink={p.ink} />;
     case 'heritage':
       cloth = `M${x} ${top}h15v9h-15z`;
       break;
@@ -363,6 +359,8 @@ export function StyleDoor(p: { style: HouseStyle; a: FacadeAnchors['door']; ink:
     `M${x + dx} ${y0}h${w / 2 - dx - 1.5}v${y1 - y0}h${-(w / 2 - dx - 1.5)}zM${mid + 1.5} ${y0}h${w / 2 - dx - 1.5}v${y1 - y0}h${-(w / 2 - dx - 1.5)}z`;
   const ivory = { stroke: 'var(--ivory)' };
   switch (p.style) {
+    case 'quant':
+      return <QuantDoor a={p.a} ink={p.ink} />;
     case 'heritage':
       return (
         <g>

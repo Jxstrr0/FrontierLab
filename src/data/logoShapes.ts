@@ -16,6 +16,9 @@ export const LOGO_SHAPES: readonly LogoShapeSpec[] = [
   { id: 'hex', name: 'Hexagon', description: 'Six sides, flat top and bottom.' },
   { id: 'plaque', name: 'Plaque', description: 'A square with cut corners.' },
   { id: 'rosette', name: 'Rosette', description: 'A scalloped wax seal.' },
+  { id: 'tile', name: 'Tile', description: 'A sharp square, flat on.' },
+  { id: 'pebble', name: 'Pebble', description: 'A softly rounded square.' },
+  { id: 'octagon', name: 'Octagon', description: 'Eight sides, flat top and bottom.' },
 ];
 
 export const LOGO_SHAPE_IDS: readonly LogoShape[] = LOGO_SHAPES.map((l) => l.id);

@@ -13,9 +13,10 @@ export type Score = number;
 /** 0–1 */
 export type Pct = number;
 /** The look every branch front shares (houseStyles.ts), chosen at New Game. */
-export type HouseStyle = 'heritage' | 'deco' | 'modern' | 'garden' | 'civic';
+export type HouseStyle = 'heritage' | 'deco' | 'modern' | 'garden' | 'civic' | 'quant';
 /** The outline of the bank's mark (logoShapes.ts), chosen at New Game. */
-export type LogoShape = 'round' | 'shield' | 'lozenge' | 'hex' | 'plaque' | 'rosette';
+export type LogoShape =
+  'round' | 'shield' | 'lozenge' | 'hex' | 'plaque' | 'rosette' | 'tile' | 'pebble' | 'octagon';
 export type CountryId = 'CA' | 'US' | 'UK' | 'EA' | 'CH' | 'JP' | 'AU' | 'SG' | 'HK' | 'RU';
 export type SegmentId = 'STU' | 'YP' | 'FAM' | 'RET' | 'BIZ';
 export type SegmentMix = Record<SegmentId, number>;
