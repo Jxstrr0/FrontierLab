@@ -4,7 +4,6 @@
 // roll-up also lists the lead story of each earlier issue in the period. When
 // the Finance team is short the figures read "Delayed" (SIMULATION §14.6); the
 // Ledger still runs. Closing resumes the game.
-import { DAYS_PER_WEEK } from '../../config/balance';
 import { dateOf, quarterOf } from '../../sim/calendar';
 import { statementDelayWeeks } from '../../sim/hq';
 import type { LedgerIssue } from '../../sim/competitionTypes';
@@ -50,7 +49,7 @@ export function WeeklyResults(p: { week: number; period?: ResultsPeriod }) {
   const { now, prev } = periodSnapshots(s, period, week);
   const totals = periodTotals(now);
   const before = periodTotals(prev);
-  const date = gameDate(s.meta.startDate, week * DAYS_PER_WEEK);
+  const date = gameDate(s.meta.startDate, snapshotEndDay(week));
   const issues = period === 'weekly' ? [] : periodIssues(s, period, week);
   const issue = s.news.issues.find((i) => i.week === week);
   const delay = statementDelayWeeks(s);

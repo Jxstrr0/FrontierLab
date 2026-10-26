@@ -12,7 +12,7 @@
 import { CAPITAL_BUFFER_PP, DAY_MS, DAYS_PER_WEEK, FEATURES } from '../config/balance';
 import { CITIES } from '../data/cities';
 import { INCIDENT_SPECS } from '../data/incidents';
-import { isMonthStart, isQuarterStart } from '../sim/calendar';
+import { isQuarterStart } from '../sim/calendar';
 import { advanceDay } from '../sim/engine';
 import { boardDue, quarterLabel } from '../sim/governance';
 import type { GameEvent, GameState } from '../sim/state';
@@ -23,6 +23,7 @@ import { play } from './sound/sound';
 import { autosave } from './saves/autosave';
 import { reportSaveError } from './saves/saveError';
 import { bump, clockHeld, modal, peekGame, toast } from './store';
+import { periodKey } from './weekly/resultsPeriod';
 import { MNA_BAD_EVENTS, MNA_EVENT_TEXT } from './investmentBank/mnaToasts';
 import { VENTURE_BAD_EVENTS, VENTURE_EVENT_TEXT } from './startup/ventureToasts';
 import { AUCTION_BAD_EVENTS, AUCTION_EVENT_TEXT } from './auction/auctionToasts';
@@ -166,7 +167,9 @@ function afterWeek(s: GameState): void {
 
 /**
  * Which results the tick that began `day` should show (SCREENS §21, §26): every
- * week, the first tick after a month or quarter ends, or none.
+ * week, or the tick that closes the last week of a month or quarter (a week
+ * belongs to the period its last day falls in, resultsPeriod.ts), so the
+ * report covers the whole period that just ended; else none.
  */
 export function resultsDue(
   freq: GameState['settings']['weeklyResults'],
@@ -174,9 +177,11 @@ export function resultsDue(
   day: number,
 ): 'weekly' | 'monthly' | 'quarterly' | null {
   if (freq === 'weekly') return 'weekly';
-  if (freq === 'monthly' && isMonthStart(startDate, day)) return 'monthly';
-  if (freq === 'quarterly' && isQuarterStart(startDate, day)) return 'quarterly';
-  return null;
+  if (freq !== 'monthly' && freq !== 'quarterly') return null;
+  const week = Math.floor(day / DAYS_PER_WEEK);
+  if (week < 1) return null;
+  const closes = periodKey(freq, startDate, week) !== periodKey(freq, startDate, week + 1);
+  return closes ? freq : null;
 }
 
 /**
