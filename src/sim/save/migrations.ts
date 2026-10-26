@@ -601,6 +601,10 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     // optional fields: stock.buybacks, and stockPct/stockValue on offers and deals.
     return s;
   },
+  38: (s) => {
+    // Trophy assets (§22a): personal.empire.trophies is optional; nobody owns one yet.
+    return s;
+  },
 };
 
 /** The rich list's fortune range up to schema v31. */

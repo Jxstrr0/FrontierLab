@@ -23,6 +23,7 @@ export * from './lobbying';
 export * from './fx';
 export * from './travel';
 export * from './personal';
+export * from './trophies';
 export * from './auctions';
 export * from './franchise';
 export * from './tutorial';

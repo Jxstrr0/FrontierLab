@@ -513,6 +513,7 @@ Tabs: Overview · Loans · Credit.
 - **Stocks:** cards with shares, cost basis, current value and gain/loss, plus Trade.
 - **Real estate:** cards with ROI, value and gain.
 - **Other assets:** homes, cars, collectibles, jet, franchise.
+- **Trophy assets** (SIMULATION §22a): one card per catalogue item, cheapest first, with name, kind and blurb. Owned: paid, value, upkeep a year, Sell for $X. Not owned: price, upkeep a year, Buy for $X (disabled with the reason). Buy and sell each ask to confirm.
 - **Rich list:** rank chip ("#38 on the Rich List").
 
 ## 24. Company summary (menu → Company)

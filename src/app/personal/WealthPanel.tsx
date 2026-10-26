@@ -1,7 +1,8 @@
 // SCREENS §23 Personal Wealth (Menu → Personal wealth): your profile (portrait,
 // name, "CEO, {Bank}", salary) with the rich list chip, total net worth with
 // its weekly change and the Cash / Stocks / Real estate / Others donut, then
-// the Stocks, Real estate and Other assets sections (WealthSections.tsx).
+// the Stocks, Real estate and Other assets sections (WealthSections.tsx) and
+// the Trophy assets catalogue (TrophiesSection.tsx).
 import { useState } from 'preact/hooks';
 import { netWorthWeeklyChange } from '../../sim/personalAssets';
 import { Card, Donut, Panel, Portrait, Row } from '../components';
@@ -9,6 +10,7 @@ import { delta, money } from '../format/format';
 import { closePanel, useGame } from '../store';
 import { RichListSheet } from './RichListSheet';
 import { wealthSlices } from './wealthView';
+import { TrophiesSection } from './TrophiesSection';
 import { OtherAssets, RealEstateSection, StocksSection } from './WealthSections';
 import '../investment/investment.css';
 import './personal.css';
@@ -65,6 +67,7 @@ export function WealthPanel() {
         <StocksSection />
         <RealEstateSection />
         <OtherAssets />
+        <TrophiesSection />
       </div>
       {richList && <RichListSheet onClose={() => setRichList(false)} />}
     </Panel>

@@ -1,6 +1,6 @@
 // The founder's net worth (SIMULATION §22): personal cash + stocks at market
 // (your own bank's founder stake included) + private investments + real estate
-// + other assets (homes, cars, collectibles, the jet, a club you own
+// + other assets (homes, cars, collectibles, trophies, the jet, a club you own
 // personally). The Personal Wealth screen and the rich list both read this, so
 // the total always ties out to its parts.
 import { franchiseValue, portfolioBreakdown } from './portfolio';
@@ -21,6 +21,8 @@ export interface NetWorth {
   homes: number;
   cars: number;
   collectibles: number;
+  /** Trophy assets (§22a). */
+  trophies: number;
   jet: number;
   franchise: number;
   total: number;
@@ -41,6 +43,7 @@ export function netWorth(state: GameState): NetWorth {
     homes: sum(e?.homes),
     cars: sum(e?.cars),
     collectibles: sum(e?.collectibles),
+    trophies: sum(e?.trophies),
     jet: state.personal.jet?.value ?? 0,
     franchise: franchiseValue(state, 'personal'),
   };

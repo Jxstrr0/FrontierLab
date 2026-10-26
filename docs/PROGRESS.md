@@ -4,11 +4,36 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 **Current stage:** 10 — Art pass, onboarding, polish, launch (built and live; awaiting the owner's iPhone check). All ten roadmap stages are built. Still open: the owner's testing and tuning pass, an Add to Home Screen test on a real iPhone, and the Vault Street card on Kelbo.Website (in a separate session in that repo).
 **Live URL:** https://jxstrr0.github.io/VaultStreet/ (first deployed 2026-10-24)
-**Determinism snapshot:** `1d353966f53ba6` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `0dd67deac3abc0` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-26 — Trophy assets (v0.13.4, schema v39)
+
+**What you asked for:** the second new item: a top tier of personal purchases priced in billions, with prices that follow the index.
+
+**What changed.**
+- A **Trophy assets** section at the bottom of Personal wealth, with eight items from a $1B wine estate to a $12B space station module. The list is in CONTENT §20.
+- Prices follow your home country's price list, so they rise with the economy each year.
+- An owned trophy's value follows the same list plus its own trend. Paintings and islands gain a little, and yachts lose value fast. Each charges upkeep from your personal cash every week.
+- Selling returns the value less a 5% fee. Owning **Skylark Airways** makes every flight free. Buying or selling one makes the paper.
+- Trophies count toward your net worth and the rich list.
+
+**Your save (schema v39):** loads as is.
+
+**Checks.**
+- `npm run lint`, all tests and `npm run build` pass. The new `tests/sim/trophies.test.ts` covers price, buying, value tracking, upkeep, selling and free flights.
+- Checked at 390×844 in Chromium with no console errors.
+- Balance is unchanged; nothing buys trophies unless you do.
+- **Determinism snapshot** updated to `0dd67deac3abc0`. Only the schema number changed it.
+
+**Code map.** `src/sim/trophies.ts`, commands in `src/sim/commands/trophies.ts`, the catalogue in `src/data/trophies.ts`, and the screen section in `src/app/personal/TrophiesSection.tsx`.
+
+**Docs:** SIMULATION §22a, CONTENT §20, SCREENS §23, DATA_MODEL §12 (v39), DESIGN decision log.
+
+**Next:** incidents and news that scale with your size.
 
 ### 2026-10-26 — Procedural startup and rival names (v0.13.3)
 
