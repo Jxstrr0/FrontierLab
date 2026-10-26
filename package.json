@@ -1,8 +1,8 @@
 {
-  "name": "vault-street",
+  "name": "frontier-lab",
   "private": true,
-  "version": "0.13.3",
-  "description": "A banking-empire tycoon for the browser, by Longlight Interactive.",
+  "version": "0.1.0",
+  "description": "An AI-lab tycoon for the browser, by Longlight Interactive.",
   "type": "module",
   "engines": {
     "node": ">=22"

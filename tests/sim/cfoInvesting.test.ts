@@ -2,7 +2,7 @@
 // 2026-10-26): every 4 weeks each switch trims stocks 25% under cost, buys
 // one stock toward a market-cap weighting and backs the best-scoring
 // Investment floor startup, within the bank's caps and capital floor or your
-// spare cash; migration 30 → 31 adds the switches (off for a seated CFO).
+// spare cash.
 import { describe, expect, it } from 'vitest';
 import { EXEC_DELEGATION as X } from '../../src/config/balance';
 import { balanceSheet } from '../../src/sim/balanceSheet';
@@ -18,13 +18,10 @@ import {
 } from '../../src/sim/execInvesting';
 import { postCash } from '../../src/sim/ledger';
 import { startupShares } from '../../src/sim/portfolio';
-import { migrate } from '../../src/sim/save/migrations';
 import { holdingsValue, withMarks } from '../../src/sim/securities';
-import { SCHEMA_VERSION, type GameState } from '../../src/sim/state';
+import { type GameState } from '../../src/sim/state';
 import { refreshPipeline } from '../../src/sim/ventures';
 import { execGame, hire, identityGap } from '../helpers/executives';
-
-type Raw = Record<string, unknown> & { schemaVersion: number };
 
 function fund(s: GameState, amount: number) {
   postCash(s, amount, 'financing');
@@ -143,24 +140,5 @@ describe('investing your money', () => {
     expect(plan.pick!.cost).toBeLessThanOrEqual(10_000_000);
     expect(s.personal.cash).toBeLessThan(cash);
     expect(s.personal.cash).toBeGreaterThanOrEqual(cash - 2 * 10_000_000 - 1);
-  });
-});
-
-describe('save migration', () => {
-  it('adds the Investing switches, off for a seated CFO (30 → 31)', () => {
-    const s0 = cfoGame({ bankInvests: true });
-    const raw = JSON.parse(JSON.stringify(s0)) as Raw;
-    const ex = (raw as unknown as GameState).executives;
-    delete (ex as Partial<typeof ex>).trimmedStocks;
-    delete ex.seats.cfo!.delegations.bankInvests;
-    delete ex.seats.cfo!.delegations.privateInvests;
-    raw.schemaVersion = 30;
-    const s = migrate(raw) as unknown as GameState;
-    expect(s.schemaVersion).toBe(SCHEMA_VERSION);
-    expect(s.executives.trimmedStocks).toEqual({ company: {}, personal: {} });
-    expect(s.executives.seats.cfo!.delegations).toMatchObject({
-      bankInvests: false,
-      privateInvests: false,
-    });
   });
 });

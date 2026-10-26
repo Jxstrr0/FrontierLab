@@ -1,7 +1,7 @@
 // Delegation dials (SIMULATION §17.2, SCREENS §10.1): the COO's morale target
 // and review cadence and the CMO's awareness target are settings the routines
-// read, the commands only accept the dial's stops, v20 saves keep the old
-// fixed values, and the tagline estimates are pure and move the right way.
+// read, the commands only accept the dial's stops, and the tagline estimates
+// are pure and move the right way.
 import { describe, expect, it } from 'vitest';
 import { EXEC_DELEGATION, PAY_REVIEW } from '../../src/config/balance';
 import * as cmd from '../../src/sim/commands';
@@ -9,8 +9,7 @@ import { averageMorale, cmoBrand, cooBenefits } from '../../src/sim/execDelegati
 import { brandEstimate, cadenceEstimate, moraleEstimate } from '../../src/sim/execPolicy';
 import { newGame } from '../../src/sim/newGame';
 import { cooPayReviews } from '../../src/sim/payReviews';
-import { migrate } from '../../src/sim/save/migrations';
-import { SCHEMA_VERSION, type GameState } from '../../src/sim/state';
+import { type GameState } from '../../src/sim/state';
 import { execGame } from '../helpers/executives';
 
 const openFirst = (s: GameState) => {
@@ -132,24 +131,5 @@ describe('estimates', () => {
     expect(q.reviewsPerYear).toBe(4);
     expect(a.reviewsPerYear).toBe(1);
     expect(a.maxDrift).toBeGreaterThan(q.maxDrift);
-  });
-});
-
-describe('migration 20 → 21', () => {
-  it('keeps the old fixed targets and quarterly reviews', () => {
-    const s = newGame({ seed: 7, cityId: 'cal' });
-    const raw = JSON.parse(JSON.stringify(s)) as Record<string, unknown> & {
-      schemaVersion: number;
-    };
-    const ex = raw.executives as Partial<GameState['executives']>;
-    delete ex.moraleTarget;
-    delete ex.brandTarget;
-    delete ex.payReviewCadence;
-    raw.schemaVersion = 20;
-    const up = migrate(raw) as unknown as GameState;
-    expect(up.schemaVersion).toBe(SCHEMA_VERSION);
-    expect(up.executives.moraleTarget).toBe(70);
-    expect(up.executives.brandTarget).toBe(0.5);
-    expect(up.executives.payReviewCadence).toBe('quarterly');
   });
 });

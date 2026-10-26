@@ -2,7 +2,7 @@
 // switch on, each week an open branch without a manager gets the strongest
 // candidate in its city; delegations stay as they were; nothing happens
 // without the floor, with the switch off, or while the branch is still being
-// built; the COO's Branch operations hires first; v24 saves start switched on.
+// built; the COO's Branch operations hires first.
 import { describe, expect, it } from 'vitest';
 import { EXEC_DELEGATION } from '../../src/config/balance';
 import * as cmd from '../../src/sim/commands';
@@ -10,8 +10,7 @@ import { weeklyTick } from '../../src/sim/engine';
 import { hrFillVacancies, strongestCandidate } from '../../src/sim/hrHiring';
 import { newGame } from '../../src/sim/newGame';
 import { refreshManagerPool } from '../../src/sim/people';
-import { migrate } from '../../src/sim/save/migrations';
-import { SCHEMA_VERSION, type GameState, type Manager } from '../../src/sim/state';
+import { type GameState, type Manager } from '../../src/sim/state';
 import { execGame, hire } from '../helpers/executives';
 
 const score = (m: Manager) =>
@@ -82,18 +81,5 @@ describe('HR hiring branch managers', () => {
     for (const m of pool) m.skills = { people: 50, product: 50, marketing: 50, ethics: 50 };
     expect(strongestCandidate(pool)).toBe(pool[0]);
     expect(strongestCandidate([])).toBeUndefined();
-  });
-
-  it('switches it on for v24 saves', () => {
-    const s = newGame({ seed: 5, cityId: 'cal' });
-    const raw = JSON.parse(JSON.stringify(s)) as Record<string, unknown> & {
-      schemaVersion: number;
-      people: Record<string, unknown>;
-    };
-    delete raw.people.hrHiring;
-    raw.schemaVersion = 24;
-    const up = migrate(raw) as unknown as GameState;
-    expect(up.schemaVersion).toBe(SCHEMA_VERSION);
-    expect(up.people.hrHiring).toBe(true);
   });
 });

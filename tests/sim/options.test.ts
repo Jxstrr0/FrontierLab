@@ -1,11 +1,9 @@
-import { SCHEMA_VERSION } from '../../src/sim/state';
 import { describe, expect, it } from 'vitest';
 import { CHARTER_CAPITAL } from '../../src/config/balance';
 import { advanceWeeks } from '../../src/sim/engine';
 import { totalDeposits } from '../../src/sim/balanceSheet';
 import { creditAvailable, lendersNearYou } from '../../src/sim/corporateDebt';
 import { newGame, type NewGameOptions } from '../../src/sim/newGame';
-import { migrate } from '../../src/sim/save/migrations';
 import { openScriptedBranch } from '../helpers/scenario';
 
 const base: NewGameOptions = { seed: 7, cityId: 'cal' };
@@ -45,18 +43,6 @@ describe('new game options', () => {
     expect(easy).toBeGreaterThan(normal);
     expect(normal).toBeGreaterThan(expert);
   }, 30_000);
-
-  it('migrates a v1 save to the default options', () => {
-    const s = newGame(base) as unknown as Record<string, unknown>;
-    const meta = s.meta as Record<string, unknown>;
-    delete meta.difficulty;
-    delete meta.competitors;
-    delete meta.startCash;
-    s.schemaVersion = 1;
-    const up = migrate(s as Record<string, unknown> & { schemaVersion: number });
-    expect(up.schemaVersion).toBe(SCHEMA_VERSION);
-    expect(up.meta).toMatchObject({ difficulty: 'normal', competitors: 3, startCash: 750_000 });
-  });
 });
 
 describe('game over', () => {

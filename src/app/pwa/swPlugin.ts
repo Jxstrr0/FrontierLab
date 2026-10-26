@@ -19,7 +19,7 @@ function walk(dir: string, root: string, out: string[]): string[] {
 export function serviceWorkerPlugin(): Plugin {
   let config: ResolvedConfig;
   return {
-    name: 'vaultstreet-service-worker',
+    name: 'frontierlab-service-worker',
     apply: 'build',
     configResolved(c) {
       config = c;

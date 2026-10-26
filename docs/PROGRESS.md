@@ -3,13 +3,39 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C0 not started. The conversion plan (`docs/CONVERSION_PLAN.md`) is waiting for the owner's approval. The code is still the finished Vault Street bank game (v0.13.3, schema v38).
-**Live URL:** https://jxstrr0.github.io/FrontierLab/ (once Pages is switched on for this repo; see the 2026-10-26 entry)
-**Determinism snapshot:** `1d353966f53ba6` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Current stage:** C0 done (v0.1.0, save schema 1). Next is C1 (words and pictures that already fit). The owner's decisions are in the design brief and CONVERSION_PLAN §5. The game still plays as the bank version.
+**Live URL:** https://jxstrr0.github.io/FrontierLab/
+**Determinism snapshot:** `1d6d768b9d6ed3` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-26 — Stage C0: Frontier Lab gets its own saves (v0.1.0)
+
+**What you asked for:** confirm the design brief's new decisions, then start building.
+
+**The brief.** Your "Decisions locked" section answers all twelve questions. It also replaces campuses with:
+- 1–2 main offices worldwide
+- one sales office per city (the only way to open a city)
+- data centers anywhere
+
+It adds safety upside, aging models and the talent war. I copied the short version into CONVERSION_PLAN §5 and the DESIGN decision log. Where the plan still says "campus", the brief wins. One thing is still open: "CREO" in the brief's section 4.7 is never defined.
+
+**What C0 changed.**
+- **Separate saves.** Both games live on `jxstrr0.github.io`, and the browser keeps one storage box per site. Frontier Lab now stores its slots, settings and tutorial flag under its own `frontierlab` names. Vault Street's slots on your iPhone are left alone and won't show up here.
+- **Separate offline files.** Each game's service worker deleted every cache named `vaultstreet-…` except its own. With both games on one site, every update of one wiped the other's offline copy. Frontier Lab's caches are now named `frontierlab-…`.
+- **Save codes.** Exported codes now start with `FL`. A Vault Street code (`VS…`) gets a clear "that is a Vault Street save code" message instead of loading a bank game.
+- **Name.** The browser tab, Home Screen name, app manifest, title-screen and credits wordmarks and the share sheet now say Frontier Lab.
+- **Version and saves restart** (your decision A6). The version is v0.1.0 and the save format is schema 1. Vault Street's 37 save-upgrade steps were removed, along with their tests and old save fixtures; no Frontier Lab save could ever need them. The next shape change adds migration 1 → 2.
+
+**Unchanged:** the game itself (still the bank game until C1), and its balance.
+
+**Checks.**
+- `npm run lint`, all tests and `npm run build` pass.
+- **Determinism snapshot** moved from `1d353966f53ba6` to `1d6d768b9d6ed3`. Only the schema number inside the save changed: putting it back to 38 gives the old hash exactly.
+
+**Next:** stage C1, relabelling the systems whose maths already fits (floors, executives, incidents, the newspaper and so on).
 
 ### 2026-10-26 — Frontier Lab setup and conversion plan (docs only)
 

@@ -65,7 +65,7 @@ function Export(p: { sources: Source[] }) {
     }
   };
   const share = () => {
-    navigator.share({ title: 'Vault Street save code', text: code }).catch(() => {
+    navigator.share({ title: 'Frontier Lab save code', text: code }).catch(() => {
       // Dismissing the share sheet rejects; nothing to report.
     });
   };

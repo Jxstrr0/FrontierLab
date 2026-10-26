@@ -7,8 +7,6 @@ import { DEPT_ORDER } from '../../src/data/departments';
 import * as cmd from '../../src/sim/commands';
 import { hqTabOrder, visibleHqTabs } from '../../src/sim/hqTabs';
 import { newGame } from '../../src/sim/newGame';
-import { migrate } from '../../src/sim/save/migrations';
-import { SCHEMA_VERSION, type GameState } from '../../src/sim/state';
 import { execGame } from '../helpers/executives';
 
 describe('HQ tab order', () => {
@@ -62,17 +60,5 @@ describe('HQ tab order', () => {
     expect(cmd.setSettings(s, { hqTabOrder: ['risk', 'finance'] }).ok).toBe(true);
     expect(cmd.setSettings(s, { hqTabOrder: ['risk', 'risk'] }).ok).toBe(false);
     expect(cmd.setSettings(s, { hqTabOrder: ['lobby'] as never }).ok).toBe(false);
-  });
-
-  it('gives v21 saves the usual order', () => {
-    const s = newGame({ seed: 7, cityId: 'cal' });
-    const raw = JSON.parse(JSON.stringify(s)) as Record<string, unknown> & {
-      schemaVersion: number;
-    };
-    delete (raw.settings as Partial<GameState['settings']>).hqTabOrder;
-    raw.schemaVersion = 21;
-    const up = migrate(raw) as unknown as GameState;
-    expect(up.schemaVersion).toBe(SCHEMA_VERSION);
-    expect(up.settings.hqTabOrder).toEqual([]);
   });
 });

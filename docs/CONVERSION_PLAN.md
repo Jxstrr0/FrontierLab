@@ -1,6 +1,6 @@
 # Frontier Lab — Conversion Plan (Vault Street → AI lab)
 
-**Status:** proposal, 2026-10-26. Nothing here is built yet. Once the owner approves it, §1 replaces DESIGN §3.1, §4 becomes the working roadmap, and each stage updates SIMULATION, SCREENS, CONTENT and DATA_MODEL as it lands.
+**Status:** approved with changes, 2026-10-26. The owner's decisions and the revised map are in the full design brief ([Frontier Lab — Full Design Brief](https://claude.ai/artifact/XtCq5XYg2YaxkP5eSZ34KF), section "Decisions locked"). Where this plan and the brief differ, the brief wins. The biggest change: instead of 1–3 campuses per city there are 1–2 main offices worldwide, one sales office per city (the only way to open a city) and data centers anywhere, including remote energy sites. Read "campus" below as "sales office" (sales) or "data center" (compute). §4 is the working roadmap, and each stage updates SIMULATION, SCREENS, CONTENT and DATA_MODEL as it lands. **C0 is done** (v0.1.0, 2026-10-26).
 
 **Goal:** turn the bank tycoon into an AI-lab tycoon. The player founds an AI lab and grows it into a global company. Keep the same art style, mechanics and feel, and reuse as much code as possible. Every name stays fictional: no real AI companies, models, products or people.
 
@@ -229,7 +229,7 @@ The plan was "Employers layer plus spare lots". The problem: employers are `Site
   - Owned compute (GPU halls) plus rented compute (GPU lots) together form the compute pool from §3.6.
 
 ### 3.11 Saves during the conversion
-- Every stage that changes state shape bumps `schemaVersion` with a migration, as now. Saves from earlier Frontier Lab stages keep loading. Where a bank concept is removed (REO, bonds), the migration sells or zeroes it with a news note.
+- Frontier Lab's save chain starts at `schemaVersion` 1 (decision A6; done in C0, which dropped Vault Street's 37 migration steps). Every stage that changes state shape bumps it with a migration. Saves from earlier Frontier Lab stages keep loading. Where a bank concept is removed (REO, bonds), the migration sells or zeroes it with a news note.
 - Vault Street saves are not carried over: §3.1 separates them.
 
 ---
@@ -243,9 +243,10 @@ The same rules as ROADMAP: each stage ends playable and deployed, with green CI,
   - Own save keys and database name (§3.1)
   - Game tag on export codes
   - Service worker, manifest, `<title>` and title-screen wordmark become "Frontier Lab"
-  - Version `0.14.0`
+  - Version `0.1.0` and save schema 1, starting Frontier Lab's own migration chain (A6)
+  - Service worker caches named `frontierlab-*`, so neither game's worker deletes the other's offline files
   - Confirm Pages is set to GitHub Actions for this repo
-- **Accept:** on the iPhone, Vault Street and Frontier Lab show separate save slots. The game plays exactly as before. The determinism snapshot is unchanged.
+- **Accept:** on the iPhone, Vault Street and Frontier Lab show separate save slots. The game plays exactly as before. The determinism snapshot changes only because the save's schema number is now 1.
 
 ### C1 — Words and pictures that already fit
 - **Build:** relabel the systems whose math already fits:
@@ -333,11 +334,20 @@ The same rules as ROADMAP: each stage ends playable and deployed, with green CI,
 
 ---
 
-## 5. Open questions for the owner
+## 5. Owner decisions (2026-10-26)
 
-- **A1 — Segments:** OK to use Students, Developers, Consumers, Creators and Small shops (five slots kept, §3.8)?
-- **A2 — Rival names:** procedurally generated fictional lab names (like the new rival bank names), or a hand-written list?
-- **A3 — Personal layer:** leave homes, cars, jets, auctions and the franchise as they are? (Proposed: yes.)
-- **A4 — Bonds:** remove, or keep as GPU lots marked to the spot compute price (§1 table)?
-- **A5 — Venture debt:** rename to compute credits (same mechanics), or remove?
-- **A6 — Version and schema numbering:** carry on from Vault Street (v0.13.3, schema 38). Proposed: yes, so migrations stay one chain.
+All open questions were answered on 2026-10-26; the full list (A1–A12) and the reasoning are in the design brief linked at the top. In short:
+- **A1 Segments:** Students, Developers, Consumers, Researchers, Small shops.
+- **A2 Rival names:** a hand-written list of about 25–30 labs, checked against real companies.
+- **A3 Personal layer:** mostly unchanged; a few items re-themed for tech-founder flavour.
+- **A4 Bonds:** removed.
+- **A5 Venture debt:** compute credits that draw on real compute capacity (renamed in C1, linked in C4).
+- **A6 Versions and saves:** separate from Vault Street: v0.1.0, save schema 1, its own migration chain (done in C0).
+- **A7 Churn:** a quarterly renewal season with a "Renewals due" list four weeks ahead; mid-term loss only from business failure or an outage.
+- **A8 Free tier:** a $0 product that converts users to paid plans.
+- **A9 Art:** the same Banknote Deco engraving, with a new palette for the AI theme.
+- **A10 Newspaper:** the planning session invents a fictional name.
+- **A11 Licence revoked:** not game over; a long mandated pause, then a restart under strict watch, keeping the personal fortune.
+- **A12 Starting money:** a $10–15M seed round, all spendable.
+- **Added:** safety has upside (data-sensitive businesses prefer safe labs; a high tier fast-tracks approvals), models age against a rising frontier bar with a weekly benchmark leaderboard, and a talent war over named researchers (both in C6).
+- **Still open:** what "CREO" means in the brief's section 4.7 (probably the property executive from Vault Street).
