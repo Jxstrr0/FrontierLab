@@ -260,6 +260,7 @@ Tabs: Overview · Loans · Credit.
   - capital ratio (tier badge + meter with thresholds) and liquidity ratio; at Watch or worse, a "How to fix this" checklist under the meter (as §24)
   - "Delayed" placeholders when short-staffed
 - **HR:**
+  - **Branch managers** card: a "Hire managers for empty branches" toggle (on by default; hint "Each week, the strongest candidate in the city"; SIMULATION §16.11), a "Branches without a manager" count, and, when the COO's Branch operations is on, a note that the COO hires first and also turns on the branch's delegation
   - Employee benefits carousel (vignette, name, description, control stepper, estimated weekly cost, effect badge like "+3 morale")
   - "Close HR floor" (release the floor)
 - **Products:**

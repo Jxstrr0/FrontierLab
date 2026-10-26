@@ -55,7 +55,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState, DealerDeal } from './personalTypes';
 
-export const SCHEMA_VERSION = 24;
+export const SCHEMA_VERSION = 25;
 
 export interface GameState {
   schemaVersion: number;
@@ -651,6 +651,8 @@ export interface People {
   rerolls: Record<Id, number>;
   /** HR benefit control values by benefit id (§16.5). */
   benefits: Record<string, number>;
+  /** With an HR floor, HR hires a manager for every open branch without one (§16.11, schema v25). */
+  hrHiring: boolean;
 }
 
 export interface Manager {

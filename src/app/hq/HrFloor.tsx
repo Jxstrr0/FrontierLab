@@ -1,10 +1,12 @@
-// HR floor content (SCREENS §10, DESIGN §5.8.2): the employee benefits
-// carousel (vignette, name, description, a control in the benefit's own unit,
+// HR floor content (SCREENS §10, DESIGN §5.8.2): the switch for HR hiring
+// branch managers (SIMULATION §16.11), then the employee benefits carousel (vignette, name, description, a control in the benefit's own unit,
 // estimated weekly cost and an effect badge) and the totals: weekly benefits
 // cost and employees covered. The Employee Stock Plan waits for a listing.
 import { BENEFIT_ORDER, BENEFITS, type BenefitSpec } from '../../data/benefits';
 import * as cmd from '../../sim/commands';
+import { delegationOn } from '../../sim/execSeats';
 import { benefitsWeeklyCost, benefitWeeklyCost, employeeCount, hqStaff } from '../../sim/hq';
+import { unstaffedBranches } from '../../sim/hrHiring';
 import { Badge, Card, Carousel, Row, SectionTitle, Stepper, Toggle } from '../components';
 import { count, money } from '../format/format';
 import { act, useGame } from '../store';
@@ -22,6 +24,7 @@ export function HrFloor() {
   const sym = s.settings.currency;
   return (
     <div class="stack">
+      <ManagerHiring />
       <SectionTitle>Employee benefits</SectionTitle>
       <Card>
         <Row label="Benefits cost" value={`${money(benefitsWeeklyCost(s), sym)} /week`} strong />
@@ -37,6 +40,36 @@ export function HrFloor() {
         Benefits apply to everyone on the payroll, branches included, unless a card says HQ only.
       </p>
     </div>
+  );
+}
+
+/** HR hires a manager for every open branch without one, each week (§16.11). */
+function ManagerHiring() {
+  const s = useGame();
+  const empty = unstaffedBranches(s).length;
+  const coo = delegationOn(s, 'coo', 'branchOps');
+  return (
+    <>
+      <SectionTitle>Branch managers</SectionTitle>
+      <Card>
+        <Toggle
+          label="Hire managers for empty branches"
+          hint="Each week, the strongest candidate in the city"
+          checked={s.people.hrHiring}
+          onChange={(on) => act(cmd.setHrHiring, on)}
+        />
+        <Row
+          label="Branches without a manager"
+          value={count(empty)}
+          tone={empty > 0 ? undefined : 'dim'}
+        />
+        {coo && (
+          <p class="muted small">
+            Your COO’s Branch operations hires first and also turns on the branch’s delegation.
+          </p>
+        )}
+      </Card>
+    </>
   );
 }
 
