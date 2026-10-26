@@ -132,7 +132,7 @@ Author commits as the owner so they count on their GitHub profile. At the start 
 Never commit straight to `main`. Several sessions often work at once, and direct pushes collide on the version number and PROGRESS.md.
 1. Put each change on its own short branch from the latest `main` (for example `feat/quant-noir`), and push it with `git push -u origin <branch>`.
 2. Open a pull request to `main` (ready for review, not a draft) with a short body: what changed, what was checked. The Deploy workflow builds and tests every pull request.
-3. **Merge it yourself, without asking, as soon as it is mergeable:** no conflicts and the checks green. Use a merge commit (the repo's history is merge commits), then delete the branch. Merging to `main` deploys the site.
+3. **Turn on GitHub auto-merge (merge commit) as soon as the pull request is open**, so it lands by itself when the checks pass, with the branch deleted. The repo allows auto-merge. If enabling it fails, merge it yourself, without asking, as soon as it has no conflicts and the checks are green. Merging to `main` deploys the site.
 4. If `main` moved and the pull request conflicts, merge `main` into the branch, resolve, bump the version past whatever landed, re-run `npm run lint`, `npm test -- --run` and `npm run build`, push, and merge. Ask the owner only when both sides changed the same logic and picking either would lose behaviour.
 5. If a check fails, fix it on the branch and push again; never merge red.
 
