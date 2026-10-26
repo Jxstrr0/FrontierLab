@@ -75,7 +75,7 @@ Wealth · Company · Branches · Portfolio · The Ledger (archive) · Milestones
    - brand ink (8 swatches)
    - live medallion preview (in the chosen shape; the top bar, panel icons, the branch seal and the plaque over the counter all use it)
    - **house style** (5 chips: Old Exchange, Jazz Age, Clean Line, Market Street, Civic Stone) under a live storefront wearing your name, ink and the style, with the style's one-line description; the confirm step lists it
-2. **Founder:** name and the avatar builder (portrait parts, §ART).
+2. **Founder:** name and the avatar builder (portrait parts, §ART): the live portrait with a one-line summary and a Shuffle button, then the parts in two groups, **Face** (head shape, eyes, brows, mouth, age, skin tone swatches) and **Style** (hair, facial hair, glasses, attire), each a row with ‹ › steppers showing the option name and its position (e.g. 3/4). The same picker opens from Settings → Edit founder avatar.
 3. **Start city:** a Segmented row of regions (Canada / U.S. / Europe / Asia-Pacific), opening on the chosen city's region, then a card for each city in that region (all 20 cities with storefronts), each with:
    - the country (euro-area cities show their own country)
    - average rent, usual rival count, market size, policy rate

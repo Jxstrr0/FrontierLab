@@ -26,8 +26,12 @@ describe('settings commands', () => {
     const s = newGame({ seed: 1, cityId: 'cal' });
     expect(setFounderAvatar(s, { hair: 11, tone: 5 }).ok).toBe(true);
     expect(s.meta.founderAvatar).toMatchObject({ hair: 11, tone: 5 });
+    expect(setFounderAvatar(s, { eyes: 3, brows: 2, mouth: 2, age: 2, glasses: 3 }).ok).toBe(true);
+    expect(s.meta.founderAvatar).toMatchObject({ eyes: 3, brows: 2, mouth: 2, age: 2, glasses: 3 });
     expect(setFounderAvatar(s, { head: 4 }).ok).toBe(false);
     expect(setFounderAvatar(s, { glasses: -1 }).ok).toBe(false);
+    expect(setFounderAvatar(s, { eyes: 4 }).ok).toBe(false);
+    expect(setFounderAvatar(s, { shade: 2 } as never).ok).toBe(false);
     expect(s.meta.founderAvatar.head).toBe(0);
   });
 });

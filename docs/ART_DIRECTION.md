@@ -165,13 +165,19 @@ Every city has its own look (`src/data/cityLooks.ts`), so no two maps read alike
 ## 4. Portraits
 
 - **Frame:** an oval vignette with a guilloche border, like a banknote portrait.
-- **Generator** (`src/art/portraits.ts`), drawn in fine hatch lines from parts:
-  - head shapes 4, hair 12, facial hair 4, glasses 3
+- **Generator** (`src/art/portraits.ts`, with `portraitParts`, `portraitFace`, `portraitTrim` and `portraitAttire`), drawn in fine hatch lines from parts:
+  - head shapes 4, hair 12, facial hair 4, glasses 4 (none, round, square, half-rim)
+  - eyes 4 (almond, round, hooded, upturned), brows 3 (soft arch, straight, bold), mouth 3 (smile, composed, grin), age 3 (fresh, seasoned, veteran)
   - attire: suit, blouse, sweater, turtleneck
   - shading density 3
+- **Face detail (v0.10.18):** eyes are paper whites with an ink iris, a pupil and a catchlight, a heavier upper lid with a lash flick and a faint lower lid; brows are tapered strips of hair strokes; the nose has a bridge shadow on the shadow side, wings and nostrils; lips have a cupid's bow and a hatched lower lip with a chin shadow beneath. Age adds smile lines, crow's feet and forehead lines, and veterans get pouches, hollow cheeks, neck lines and silver hair (a fainter fill, wider hatching). Ears show an inner helix. Light comes from the upper left: the right cheek, jaw, temple, eye socket and shoulder carry the shade.
+- **Hair:** tinted fill, engraved hatching in the style's direction, and sparser strand lines over it; close crops are stippled.
+- **Attire detail:** the suit has a knotted tie with cross-hatching, a shaded right lapel, buttons, a pocket square and sleeve seams; the blouse has shoulder folds and a pendant; the sweater a cross-knit texture and a shirt collar under the crew band; the turtleneck fold lines and a band of shade under the collar.
+- **Background:** ruled horizontal lines behind the figure, denser in a band at the rim, so the plate fades toward the frame like a banknote vignette.
+- **Tiny plates (under 44 px):** the coarse plate keeps the whites, iris, pupil, lids, brows, nose, mouth and attire shapes and drops the catchlight, strands, age lines, seams, glints and the ruled ground, with heavier strokes.
 - **Skin tone:** a subtle ink-tinted fill under the hatching. Offer 6 tones; never render tone by line density alone.
-- **Diversity:** the name pools and portrait parts are diverse. Pick parts deterministically from `people` RNG plus the person id.
-- **Founder avatar:** the player chooses the parts in the wizard.
+- **Diversity:** the name pools and portrait parts are diverse. Pick parts deterministically from `people` RNG plus the person id; eyes, brows, mouth and age hash from the other parts (`people.ts` faceDetail) so the stream stays as it was.
+- **Founder avatar:** the player chooses the parts in the wizard, in two groups (Face: head, eyes, brows, mouth, age, skin tone; Style: hair, facial hair, glasses, attire), with a Shuffle button for a random face.
 
 ## 5. Data visuals
 
