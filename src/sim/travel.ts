@@ -2,6 +2,7 @@
 // fares past it, and the private jet. Flights are instant in the simulation;
 // the plane animation is cosmetic. Travel is never blocked: a fare the founder
 // can't cover from personal cash is paid by the bank as a travel expense.
+import { hasTrophyPerk } from './trophies';
 import { FLIGHT_FARE, JET, TRAVEL_KM_PER_WEEK, WEEKS_PER_YEAR } from '../config/balance';
 import { CITIES } from '../data/cities';
 import { JETS } from '../data/jets';
@@ -26,6 +27,8 @@ export function kmRemaining(state: GameState): number {
 
 /** One-way fare to a destination past the allowance: FLIGHT_FARE × its costIndex × today's price list. */
 export function fareTo(state: GameState, cityId: string): number {
+  // Owning the airline trophy (§22a) makes every flight free.
+  if (hasTrophyPerk(state, 'freeFlights')) return 0;
   return listPrice(state, FLIGHT_FARE * (CITIES[cityId]?.costIndex ?? 1), cityId);
 }
 

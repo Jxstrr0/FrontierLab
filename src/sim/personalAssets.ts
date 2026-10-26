@@ -1,7 +1,8 @@
 // The founder's homes and cars over time (SIMULATION §22), tick step 11: home
 // values follow their country's hpi, rebuilds finish (+HOMES_CFG.rebuildGain),
 // cars lose CARS_CFG.depreciation a year (classics gain classicGain), and
-// upkeep for both comes out of personal cash. Also keeps the weekly net worth
+// upkeep for both comes out of personal cash; trophy assets follow the price
+// list and drift (trophies.ts). Also keeps the weekly net worth
 // log the Personal Wealth screen reads. Collectibles'
 // drift and insurance live with the auctions (auctions.ts); insider cases
 // resolve at quarter-end (insider.ts).
@@ -11,6 +12,7 @@ import { pushEvent } from './events';
 import { netWorth } from './netWorth';
 import { carUpkeepWeekly, carYearlyChange, homeHpi, homeUpkeepWeekly } from './personalValues';
 import type { GameState } from './state';
+import { runTrophies } from './trophies';
 
 export { insiderQuarter } from './insider';
 
@@ -19,6 +21,7 @@ export function runPersonalAssets(state: GameState): void {
   if (state.flags.gameOver) return;
   runHomes(state);
   runCars(state);
+  runTrophies(state);
 }
 
 function runHomes(state: GameState): void {

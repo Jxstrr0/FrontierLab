@@ -58,4 +58,24 @@ export const PERSONAL_TEMPLATES = {
       b: 'The buyer, property records show, is {bank} founder {founder}.',
     },
   ],
+  TROPHY_BOUGHT: [
+    {
+      h: '{bank} founder buys {trophy} for {price}',
+      b: '{founder} added the {kind} to a growing private collection this week.',
+    },
+    {
+      h: '{trophy} changes hands at {price}',
+      b: 'The buyer of the {kind}, people close to the deal say, is {bank} founder {founder}.',
+    },
+  ],
+  TROPHY_SOLD: [
+    {
+      h: '{founder} parts with {trophy}',
+      b: 'The {bank} founder sold the {kind} for {price}.',
+    },
+    {
+      h: '{trophy} is back on the market, and sold',
+      b: '{founder} let the {kind} go this week, raising {price}.',
+    },
+  ],
 } satisfies Record<string, LedgerTemplate[]>;

@@ -624,6 +624,19 @@ Announced in the Ledger 4 weeks before. Active for 4 weeks (was 2 and 1 until 20
 | Tokyo Tide | Tokyo | Baseball | 1.4B |
 | Sydney Breakers | Sydney | Rugby | 480M |
 
+
+**Trophy assets (2026-10-26, `src/data/trophies.ts`):** all names invented.
+
+| Item | Kind | Start price | Drift / yr | Upkeep / yr | Note |
+|---|---|---|---|---|---|
+| Château Belmaret | Wine estate | $1.0B | +2.5% | 2% | |
+| “The Harbour at Dusk” | Old master painting | $1.1B | +3% | 0.2% | |
+| Seraphine | Superyacht | $1.4B | −6% | 8% | |
+| Isla Corvina | Private island | $2.2B | +2% | 1% | |
+| Copperfield Arena | Stadium | $3.5B | +1% | 3% | |
+| Skylark Airways | Airline | $5.5B | 0% | 4% | Free flights |
+| Lanternspire | Skyscraper | $7.0B | +1.5% | 1.5% | |
+| Halcyon Orbital | Space station module | $12B | −2% | 5% | |
 ## 21. Loan Desk sectors
 
 Pentagon order: Management, Track record, Market, Competitiveness, Financial health.
