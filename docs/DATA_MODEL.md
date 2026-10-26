@@ -332,7 +332,7 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 | Personal | `offerHome`, `rebuildHome`, `sellHome`, `buyCar`, `sellCar`, `placeBid`, `clearBid`, `appraiseCollectible`, `consignCollectible`, `withdrawConsignment`, `buyJet`, `sellJet`, `buyClub`, `sellClub`, `setKit`, `setKitSponsor`, `signPlayer`, `releasePlayer` |
 | Settings and saves | `setSettings`, `setFounderAvatar`, `moveHqTab`, `resetHqTabOrder`; saves are not commands: `saveToSlot`, `loadFromSlot` (`src/sim/save/storage.ts`), `exportCode`, `importCode` (`serialize.ts`) |
 
-## 12. Implemented so far (schema v31)
+## 12. Implemented so far (schema v32)
 
 `src/sim/state.ts` is the source of truth; this section records how it differs from the guide above. Later stages add the rest with a schema bump and a migration.
 
@@ -363,6 +363,7 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 - **Schema v28** (monthly results, longer conventions): `settings.weeklyResults` gains `'monthly'`; no new fields. Migration 27 → 28 stretches every convention run not yet over to `startWeek + CONVENTIONS.activeWeeks` and moves its exclusive startups' `round.closesWeek` with it.
 - **Schema v30** (the CREO's occupancy dials and Buying): `ExecutivesState.occTargets: { company, personal }`, each one of `EXEC_DELEGATION.occTargets` (default 1); the CREO seat gains delegations `bankBuys` and `privateBuys`. Migration 29 → 30 sets both dials to 100% and adds the two switches off for a seated chief and the seat's remembered switches (on for candidates, like any new hire), so nothing is bought until you switch it on.
 - **Schema v31** (the CFO's Investing): `ExecutivesState.trimmedStocks: { company, personal }`, each a map of listed company id → week the chief sold it at a loss (not bought back for `EXEC_DELEGATION.investCooldownWeeks`); the CFO seat gains delegations `bankInvests` and `privateInvests`. Migration 30 → 31 adds empty maps and the two switches off for a seated CFO and the seat's remembered switches (on for candidates).
+- **Schema v32** (late-game goals): no new fields. Migration 31 → 32 rescales every rich-list fortune from the old $1.5B–$120B span to `RICH_LIST.fortune` ($150M–$2B), keeping each fortune's place and the list sorted; `rank` is left for the next year end. Six new milestone ids (`hundred_branches`, `ten_cities`, `assets_10b`, `five_acquisitions`, `club_owner`, `rich_list`) fill in through the usual quiet catch-up on load.
 - **Schema v29** (market rents follow the cycle, the CREO): `ExecSeat` gains `'creo'` (delegations `bankRents`, `privateRents`); `Property.marketRent` now moves weekly toward base × cre/100 rather than staying fixed; no new fields. Migration 28 → 29 seeds the new seat's candidate pool from the `execs` stream when the save has an Executive floor with pools; buildings are left as they are and drift from the first tick.
 - **Not yet present:** nothing from the v1 plan.
 - **Added fields:**

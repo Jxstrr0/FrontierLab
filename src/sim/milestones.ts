@@ -4,8 +4,9 @@
 import { MILESTONE_GOALS, MILESTONE_HQ_DEPTS } from '../config/balance';
 import { CITIES } from '../data/cities';
 import { MILESTONES } from '../data/milestones';
-import { totalDeposits } from './balanceSheet';
+import { balanceSheet, totalDeposits } from './balanceSheet';
 import { pushEvent } from './events';
+import { yourClubs } from './franchise';
 import { deptDesks } from './hq';
 import { netWorth } from './netWorth';
 import type { GameState } from './state';
@@ -21,11 +22,17 @@ const REACHED: Record<string, (s: GameState) => boolean> = {
     MILESTONE_HQ_DEPTS.every((d) => deptDesks(s, d) > 0 && (s.hq.coverage[d]?.kPrime ?? 0) >= 1),
   ipo: (s) => s.stock.status === 'public',
   first_acquisition: (s) => s.mergers.deals.length > 0,
+  hundred_branches: (s) => openBranches(s).length >= MILESTONE_GOALS.manyBranches,
+  ten_cities: (s) => new Set(openBranches(s).map((b) => b.cityId)).size >= MILESTONE_GOALS.cities,
   deposits_1b: (s) => totalDeposits(s) >= MILESTONE_GOALS.deposits,
   five_countries: (s) =>
     new Set(openBranches(s).map((b) => CITIES[b.cityId]?.country)).size >=
     MILESTONE_GOALS.countries,
+  assets_10b: (s) => balanceSheet(s).assets >= MILESTONE_GOALS.assets,
+  five_acquisitions: (s) => s.mergers.deals.length >= MILESTONE_GOALS.acquisitions,
+  club_owner: (s) => yourClubs(s).length > 0,
   billionaire: (s) => netWorth(s).total >= MILESTONE_GOALS.founderWorth,
+  rich_list: (s) => s.personal.empire.richList.rank !== undefined,
   rich_list_1: (s) => s.personal.empire.richList.rank === 1,
 };
 

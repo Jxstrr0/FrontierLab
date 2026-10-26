@@ -16,6 +16,7 @@ import { generateInvestmentSites } from '../investmentSites';
 import { initInvestments } from '../investmentsInit';
 import { initCapitalMarkets, initRivalShares } from '../marketInit';
 import { emptyCorporateDebt } from '../corporateDebt';
+import { dexp, dlog } from '../detmath';
 import { generateExecutive } from '../execCandidates';
 import { hasExecFloor } from '../execSeats';
 import { initCountries } from '../macro';
@@ -29,6 +30,7 @@ import {
   FX_START_INDEX,
   OFFICE_LISTINGS,
   PAY_REVIEW,
+  RICH_LIST,
 } from '../../config/balance';
 import { COUNTRIES } from '../../data/countries';
 import { SEEDED_HOUSE_STYLE_IDS } from '../../data/houseStyles';
@@ -537,7 +539,25 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     }
     return s;
   },
+  31: (s) => {
+    // The rich list shrank to the game world's scale (DESIGN decision log 2026-10-26):
+    // each fortune keeps its place in the range, mapped from the old span to the new.
+    const list = (s as unknown as GameState).personal.empire.richList;
+    const [lo, hi] = V31_RICH_FORTUNE;
+    const [lo2, hi2] = RICH_LIST.fortune;
+    for (const f of list.fortunes) {
+      const t = (dlog(Math.max(lo, Math.min(hi, f.worth))) - dlog(lo)) / (dlog(hi) - dlog(lo));
+      f.worth =
+        Math.round(dexp(dlog(lo2) + t * (dlog(hi2) - dlog(lo2))) / RICH_LIST.roundTo) *
+        RICH_LIST.roundTo;
+    }
+    list.fortunes.sort((a, b) => b.worth - a.worth || a.id.localeCompare(b.id));
+    return s;
+  },
 };
+
+/** The rich list's fortune range up to schema v31. */
+const V31_RICH_FORTUNE: [number, number] = [1.5e9, 120e9];
 
 /** Funding types merged away in schema 26, and the type each became. */
 const MERGED_FUNDING: Record<string, string> = {
