@@ -49,7 +49,7 @@ export function AreaMiniMap(p: { lot: Lot }) {
         class="area-map-svg"
         viewBox={`0 0 ${AREA_BOX.w} ${AREA_BOX.h}`}
         role="img"
-        aria-label={`Map of the blocks around ${p.lot.address}, with nearby branches`}
+        aria-label={`Map of the blocks around ${p.lot.address}, with nearby sales offices`}
         style={{ '--am-ink': city.ink, '--am-tint': cityLook(city.id).tint }}
       >
         <defs>
@@ -97,13 +97,13 @@ export function AreaMiniMap(p: { lot: Lot }) {
               style={{ '--dot-ink': s.meta.brandInk }}
               aria-hidden="true"
             />
-            Your branches
+            Your sales offices
           </span>
         )}
         {rival && (
           <span>
             <i class="am-key am-key-rival" aria-hidden="true" />
-            Rival branches
+            Rival sales offices
           </span>
         )}
         <span>

@@ -45,8 +45,8 @@ export function HouseModelCard() {
       {u.switching && (
         <p class="muted small hq-note" role="status">
           Switching from {from?.name ?? 'the old model'}: {u.switching.weeksLeft}{' '}
-          {u.switching.weeksLeft === 1 ? 'week' : 'weeks'} left. Branches feel a blend of both until
-          then.
+          {u.switching.weeksLeft === 1 ? 'week' : 'weeks'} left. Sales offices feel a blend of both
+          until then.
         </p>
       )}
       <button

@@ -37,7 +37,8 @@ export function HrFloor() {
         ))}
       </Carousel>
       <p class="muted small">
-        Benefits apply to everyone on the payroll, branches included, unless a card says HQ only.
+        Benefits apply to everyone on the payroll, sales offices included, unless a card says HQ
+        only.
       </p>
     </div>
   );
@@ -50,22 +51,23 @@ function ManagerHiring() {
   const coo = delegationOn(s, 'coo', 'branchOps');
   return (
     <>
-      <SectionTitle>Branch managers</SectionTitle>
+      <SectionTitle>Office managers</SectionTitle>
       <Card>
         <Toggle
-          label="Hire managers for empty branches"
+          label="Hire managers for empty sales offices"
           hint="Each week, the strongest candidate in the city"
           checked={s.people.hrHiring}
           onChange={(on) => act(cmd.setHrHiring, on)}
         />
         <Row
-          label="Branches without a manager"
+          label="Sales offices without a manager"
           value={count(empty)}
           tone={empty > 0 ? undefined : 'dim'}
         />
         {coo && (
           <p class="muted small">
-            Your COO’s Branch operations hires first and also turns on the branch’s delegation.
+            Your COO’s Sales office operations hires first and also turns on the sales office’s
+            delegation.
           </p>
         )}
       </Card>

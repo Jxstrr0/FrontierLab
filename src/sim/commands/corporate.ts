@@ -66,7 +66,9 @@ export function drawCredit(state: GameState, lenderId: string, amount: number): 
   const lender = state.rivals[lenderId];
   if (!lender || lender.status !== 'active') return fail('That lab is no longer lending.');
   if (!lendersNearYou(state).some((r) => r.id === lenderId))
-    return fail(`${lender.name} lends to banks with a branch in one of its head office cities.`);
+    return fail(
+      `${lender.name} lends to banks with a sales office in one of its head office cities.`,
+    );
   const line = state.corporateDebt.lines[lenderId];
   const drawn = line?.drawn ?? 0;
   const available = Math.max(0, creditLimit(state) - drawn);

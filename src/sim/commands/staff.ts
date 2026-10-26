@@ -19,7 +19,7 @@ import { clearManager, managerBaseSalary } from '../payReviews';
 
 export function setStaffTarget(state: GameState, branchId: string, target: number): CommandResult {
   const branch = state.branches[branchId];
-  if (!branch) return fail('That branch no longer exists.');
+  if (!branch) return fail('That sales office no longer exists.');
   if (branch.delegation.staffing) return fail('Your manager handles staffing here.');
   const max = staffNeeded(branch) * MAX_STAFF_MULT;
   if (!Number.isInteger(target) || target < 0 || target > max)
@@ -30,7 +30,7 @@ export function setStaffTarget(state: GameState, branchId: string, target: numbe
 
 export function setWage(state: GameState, branchId: string, wage: number): CommandResult {
   const branch = state.branches[branchId];
-  if (!branch) return fail('That branch no longer exists.');
+  if (!branch) return fail('That sales office no longer exists.');
   if (branch.delegation.staffing) return fail('Your manager handles wages here.');
   const mkt = marketWage(state, branch.cityId);
   const [lo, hi] = WAGE_RANGE;
@@ -51,7 +51,7 @@ export function setCampaignLevel(
 ): CommandResult {
   const branch = state.branches[branchId];
   const spec = CAMPAIGNS[campaignId];
-  if (!branch) return fail('That branch no longer exists.');
+  if (!branch) return fail('That sales office no longer exists.');
   if (!spec) return fail('Unknown campaign.');
   if (branch.delegation.marketing) return fail('Your manager runs marketing here.');
   if (!Number.isInteger(level) || level < 0 || level > spec.levels.length)
@@ -66,8 +66,8 @@ export function hireManager(
   candidateId: string,
 ): CommandResult {
   const branch = state.branches[branchId];
-  if (!branch) return fail('That branch no longer exists.');
-  if (branch.managerId) return fail('This branch already has a manager.');
+  if (!branch) return fail('That sales office no longer exists.');
+  if (branch.managerId) return fail('This sales office already has a manager.');
   const pool = state.people.managerCandidates[branch.cityId] ?? [];
   const idx = pool.findIndex((m) => m.id === candidateId);
   if (idx < 0) return fail('That candidate has taken another job.');
@@ -107,8 +107,8 @@ export function rerollManagerCandidates(
 
 export function fireManager(state: GameState, branchId: string): CommandResult {
   const branch = state.branches[branchId];
-  if (!branch) return fail('That branch no longer exists.');
-  if (!branch.managerId) return fail('This branch has no manager.');
+  if (!branch) return fail('That sales office no longer exists.');
+  if (!branch.managerId) return fail('This sales office has no manager.');
   clearManager(state, branch);
   return ok();
 }
@@ -120,7 +120,7 @@ export function setManagerSalary(
 ): CommandResult {
   const branch = state.branches[branchId];
   const mgr = branch?.managerId ? state.people.managers[branch.managerId] : undefined;
-  if (!branch || !mgr) return fail('This branch has no manager.');
+  if (!branch || !mgr) return fail('This sales office has no manager.');
   const ref = managerBaseSalary(state, branch.cityId);
   const [lo, hi] = MANAGER_SALARY_RANGE;
   if (!(salary >= ref * lo && salary <= ref * hi))
@@ -136,7 +136,7 @@ export function setDelegation(
   on: boolean,
 ): CommandResult {
   const branch = state.branches[branchId];
-  if (!branch) return fail('That branch no longer exists.');
+  if (!branch) return fail('That sales office no longer exists.');
   if (!branch.managerId) return fail('Hire a manager first.');
   if (!(key in branch.delegation)) return fail('Unknown delegation.');
   branch.delegation[key] = on;

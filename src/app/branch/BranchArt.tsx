@@ -233,11 +233,11 @@ export const BranchArt = memo(function BranchArt(p: {
     monogram: p.monogram,
     shape: p.logoShape ?? DEFAULT_LOGO_SHAPE,
   };
-  const name = EQUIPMENT[p.exterior]?.name ?? 'Branch';
+  const name = EQUIPMENT[p.exterior]?.name ?? 'Sales office';
   const a = facade.anchors;
   return (
     <Vignette
-      label={`${name} branch front${p.fitout ? ', under fit-out' : ''}`}
+      label={`${name} sales office front${p.fitout ? ', under fit-out' : ''}`}
       ink={p.ink}
       class="in-alive"
     >

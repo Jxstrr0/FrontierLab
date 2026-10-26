@@ -203,7 +203,7 @@ export function clusterLabel(group: string, members: PinSpec[]): string {
   const n = members.length;
   const names = distinct(members, captionOf, Infinity).map(captionOf).filter(Boolean).join(', ');
   let what: string;
-  if (group === 'lot') what = `${n} open branch locations`;
+  if (group === 'lot') what = `${n} open sales office locations`;
   else if (group === 'yours') {
     const hq = members.some((m) => m.kind === 'hq');
     const branches = members.filter((m) => m.kind === 'mine' && !m.dataCenterId).length;
@@ -211,7 +211,7 @@ export function clusterLabel(group: string, members: PinSpec[]): string {
       (m) => (m.kind !== 'mine' && m.kind !== 'hq') || m.dataCenterId,
     ).length;
     const parts = [
-      branches ? `${branches} branch${branches === 1 ? '' : 'es'}` : '',
+      branches ? `${branches} sales office${branches === 1 ? '' : 's'}` : '',
       hq ? 'HQ' : '',
       places ? `${places} other place${places === 1 ? '' : 's'}` : '',
     ].filter(Boolean);

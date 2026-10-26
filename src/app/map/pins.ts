@@ -10,7 +10,7 @@ import { roofAnchor } from '../../art/iso';
 import type { LotOccupant } from '../../art/mapRenderer';
 import { FEATURES, MERGERS, type FeatureId } from '../../config/balance';
 import { AGENCIES } from '../../data/brandCampaigns';
-import { CITIES } from '../../data/cities';
+import { CITIES, isRegional } from '../../data/cities';
 import { AUCTION_HOUSES } from '../../data/collectibles';
 import { HOMES } from '../../data/homes';
 import { CONVENTIONS_CALENDAR, DEFAULT_VENUE } from '../../data/conventions';
@@ -38,6 +38,7 @@ export type PinKind =
   | 'centralBank'
   | 'rivalHq'
   | 'employer'
+  | 'energySite'
   | 'university'
   | 'investmentBank'
   | 'property'
@@ -100,6 +101,7 @@ const KIND_ORDER: Record<PinKind, number> = {
   centralBank: 6,
   rivalHq: 7,
   employer: 8,
+  energySite: 8,
   university: 9,
   investmentBank: 10,
   property: 11,
@@ -153,7 +155,7 @@ function lotPin(s: GameState, map: CityMap, lot: Lot, pending: Record<string, nu
     const pin: PinSpec = {
       ...base,
       kind: 'mine',
-      label: `Your branch, ${name}${conv ? `, converting from ${conv.name}, ${weeks}` : ''}${alert ? ', open incident' : ''}${waiting ? `, ${waiting} loan applications waiting` : ''}`,
+      label: `Your sales office, ${name}${conv ? `, converting from ${conv.name}, ${weeks}` : ''}${alert ? ', open incident' : ''}${waiting ? `, ${waiting} loan applications waiting` : ''}`,
       // An acquired branch keeps the old bank's colours until its conversion finishes.
       ink: conv?.ink ?? s.meta.brandInk,
       monogram: conv?.monogram ?? s.meta.monogram,
@@ -176,7 +178,7 @@ function lotPin(s: GameState, map: CityMap, lot: Lot, pending: Record<string, nu
     return {
       ...base,
       kind: 'rival',
-      label: `${bank?.name ?? 'Rival lab'} branch, ${lot.address}`,
+      label: `${bank?.name ?? 'Rival lab'} sales office, ${lot.address}`,
       ink: bank?.ink ?? '#5a5a5a',
       monogram: bank?.monogram ?? '?',
       badge: false,
@@ -186,7 +188,7 @@ function lotPin(s: GameState, map: CityMap, lot: Lot, pending: Record<string, nu
   return {
     ...base,
     kind: 'lot',
-    label: `Available branch location, ${lot.address}`,
+    label: `Available sales office location, ${lot.address}`,
     ink: '',
     monogram: '',
     badge: false,
@@ -261,7 +263,11 @@ const SITE_ICON: Record<Site['kind'], MapLayerId> = {
   vacationHome: 'realEstate',
 };
 
-const SITE_LAYER: Record<Site['kind'], MapLayerId> = SITE_ICON;
+/** A regional site's employer is an energy site (C2d): data centers can go there. */
+const isEnergySite = (site: Site): boolean => site.kind === 'employer' && isRegional(site.cityId);
+
+const siteLayer = (site: Site): MapLayerId =>
+  isEnergySite(site) ? 'energySites' : SITE_ICON[site.kind];
 
 /** You hold a partnership (or the graduate program) at this employer or university. */
 export function isPartnerSite(s: GameState, site: Site): boolean {
@@ -290,24 +296,26 @@ function sitePin(s: GameState, map: CityMap, site: Site, info?: SitePinInfo): Pi
       ? info.suffix
       : site.kind === 'agency'
         ? ', marketing agency'
-        : site.kind === 'employer'
-          ? ', employer'
-          : site.kind === 'investmentBank'
-            ? ', investment bank'
-            : site.kind === 'rivalHq' && s.rivals[site.refId]?.status === 'distressed'
-              ? ', seized by regulators'
-              : '') + (partner && !info?.owned ? ', your partner' : '');
+        : isEnergySite(site)
+          ? ', energy site'
+          : site.kind === 'employer'
+            ? ', employer'
+            : site.kind === 'investmentBank'
+              ? ', investment bank'
+              : site.kind === 'rivalHq' && s.rivals[site.refId]?.status === 'distressed'
+                ? ', seized by regulators'
+                : '') + (partner && !info?.owned ? ', your partner' : '');
   const rival = site.kind === 'rivalHq' ? s.rivals[site.refId] : undefined;
   const pin: PinSpec = {
     id: site.id,
-    kind: site.kind,
+    kind: isEnergySite(site) ? 'energySite' : site.kind,
     x: at.x,
     y: at.y,
     label: `${siteName(s, site)}${suffix}, ${site.address}`,
     ink: rival?.ink ?? (partner || owned ? s.meta.brandInk : ''),
     monogram: rival?.monogram ?? '',
     badge: false,
-    icon: SITE_ICON[site.kind],
+    icon: siteLayer(site),
     ...(rival && rival.status !== 'active' ? { muted: true } : {}),
     ...(rival ? { caption: `${rivalShortName(rival.name)} HQ` } : {}),
   };
@@ -340,12 +348,17 @@ export function buildPins(
 ): PinSpec[] {
   const layers = s.settings.layers;
   const pins: PinSpec[] = [];
-  if (layerOn(layers, 'branches')) {
+  const offices = layerOn(layers, 'branches');
+  const dataCenters = layerOn(layers, 'dataCenters');
+  if (offices || dataCenters) {
     const leaseOnly = layers[LEASE_ONLY_KEY] === true;
     const pending = pendingByBranch(s);
     for (const lot of lots) {
       if (lot.cityId !== map.cityId) continue;
-      if (leaseOnly && lot.occupant) continue;
+      // Your data centers have their own layer (C2d); every other lot is a sales office or storefront.
+      const dc = lot.occupant?.type === 'player' && !!s.dataCenters[lot.occupant.id];
+      if (!(dc ? dataCenters : offices)) continue;
+      if (leaseOnly && lot.occupant && !dc) continue;
       pins.push(lotPin(s, map, lot, pending));
     }
   }
@@ -360,7 +373,7 @@ export function buildPins(
       // A seized, acquired or merged rival's head office leaves the map; a distressed one stays, faded.
       const status = site.kind === 'rivalHq' ? s.rivals[site.refId]?.status : undefined;
       if (status === 'seized' || status === 'acquired' || status === 'merged') continue;
-      if (!layerOn(layers, SITE_LAYER[site.kind])) continue;
+      if (!layerOn(layers, siteLayer(site))) continue;
       const info = stage7Info(s, site);
       if (info && !info.visible) continue;
       pins.push(sitePin(s, map, site, info));

@@ -50,7 +50,7 @@ export interface TutorialStepText {
   lines: Partial<Record<TutorialTarget, string>>;
 }
 
-const OPEN_BRANCH = 'Tap your branch on the map to open it.';
+const OPEN_BRANCH = 'Tap your sales office on the map to open it.';
 
 export const TUTORIAL_STEPS: Record<number, TutorialStepText> = {
   1: {
@@ -58,17 +58,17 @@ export const TUTORIAL_STEPS: Record<number, TutorialStepText> = {
     idle: 'Drag or pinch the map to find a $ storefront, or open Layers and choose List view.',
     lines: {
       'open-lot':
-        "Hi, I'm {guide}. I'd love to run your first branch. We need a storefront first: tap any $ on the map.",
+        "Hi, I'm {guide}. I'd love to run your first sales office. We need a storefront first: tap any $ on the map.",
     },
   },
   2: {
-    title: 'Build a branch',
+    title: 'Build a sales office',
     idle: 'Pick a storefront to build on: tap a $ on the map.',
     lines: {
       'build-confirm':
         'These five parts set our quality, capacity and security. The starter kit is fine for now: tap Build.',
       'build-branch':
-        'Rent, foot traffic and who lives nearby all matter. This spot will do: tap Build branch.',
+        'Rent, foot traffic and who lives nearby all matter. This spot will do: tap Build sales office.',
       'open-lot': 'Pick a storefront to build on: tap a $ on the map.',
     },
   },
@@ -89,7 +89,8 @@ export const TUTORIAL_STEPS: Record<number, TutorialStepText> = {
     lines: {
       'hire-pick':
         'People and Product skills matter most. I’m on the list too, but no pressure: tap Hire on whoever you like.',
-      'hire-manager': 'A branch runs better with a manager, and they can take jobs off your hands.',
+      'hire-manager':
+        'A sales office runs better with a manager, and they can take jobs off your hands.',
       'tab-service': 'Staff and the manager are on the Service tab. Tap it.',
       'my-branch': OPEN_BRANCH,
     },
@@ -117,12 +118,12 @@ export const TUTORIAL_STEPS: Record<number, TutorialStepText> = {
   },
   7: {
     title: 'Approve a business loan',
-    idle: 'A local business has applied for a loan. Tap your branch on the map.',
+    idle: 'A local business has applied for a loan. Tap your sales office on the map.',
     lines: {
       'loan-approve':
         'The rosette scores the business. Offer a rate at or below what they’ll pay, then tap Approve.',
       'tab-loandesk': 'A local business has applied. Open the Loan Desk tab.',
-      'my-branch': 'A local business has applied for a loan. Tap your branch to see it.',
+      'my-branch': 'A local business has applied for a loan. Tap your sales office to see it.',
     },
   },
   8: {
@@ -140,7 +141,7 @@ export const TUTORIAL_STEPS: Record<number, TutorialStepText> = {
     idle: 'Tap your lab’s cash, top left, to open the Company summary.',
     lines: {
       'capital-meter':
-        'This is the lab behind the branches. Deposits aren’t ours to spend: corporate cash, top left, pays the bills. Capital limits how much we can lend, so keep this ratio out of the red. Close this when you’re done.',
+        'This is the lab behind the sales offices. Deposits aren’t ours to spend: corporate cash, top left, pays the bills. Capital limits how much we can lend, so keep this ratio out of the red. Close this when you’re done.',
       'hud-bank': 'Tap your lab’s cash, top left, to open the Company summary.',
       'panel-close': 'Close this panel first.',
     },
@@ -160,5 +161,5 @@ export const TUTORIAL_TEXT = {
   weeklyAside: 'Have a read, then tap Continue.',
   skip: 'Skip tutorial',
   skipped: 'Tutorial skipped. Replay it, or switch off the guides, in Settings.',
-  fallbackGuide: 'Your branch manager',
+  fallbackGuide: 'Your office manager',
 } as const;

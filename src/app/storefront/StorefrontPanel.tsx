@@ -66,7 +66,7 @@ export function StorefrontPanel(p: { lotId: string }) {
             onClick={() => openPanel({ type: 'build', lotId: lot.id })}
             data-tutorial="build-branch"
           >
-            Build branch
+            Build sales office
           </button>
           <button
             type="button"
@@ -122,14 +122,14 @@ export function StorefrontPanel(p: { lotId: string }) {
         <SectionTitle>Nearby competition</SectionTitle>
         <Card>
           <Row
-            label={`Rival branches within ${near.radius} tiles`}
+            label={`Rival sales offices within ${near.radius} tiles`}
             value={near.rivalCount === 0 ? 'None' : count(near.rivalCount)}
           />
           {near.rivalCount > 0 && (
             <Row label="Their average rating" value={<CoinRating value={near.rivalAverage} />} />
           )}
           <Row
-            label="Your other branches nearby"
+            label="Your other sales offices nearby"
             value={near.ownCount === 0 ? 'None' : count(near.ownCount)}
           />
           {near.ownCount > 0 && (

@@ -47,45 +47,45 @@ export const MERGERS_TEMPLATES = {
   ACQUISITION_CLOSED: [
     {
       h: '{bank} buys {target} for {price}',
-      b: "{target}'s {n} branches join {bank}. Signs come down over the next eight weeks.",
+      b: "{target}'s {n} sales offices join {bank}. Signs come down over the next eight weeks.",
     },
     {
       h: 'Deal done: {target} is now part of {bank}',
-      b: 'The {price} takeover closed this week, bringing {n} branches under the {bank} name.',
+      b: 'The {price} takeover closed this week, bringing {n} sales offices under the {bank} name.',
     },
     {
       h: '{bank} swallows {target}',
-      b: 'Shareholders take the cash, {price} in all. {n} branches start rebranding on Monday.',
+      b: 'Shareholders take the cash, {price} in all. {n} sales offices start rebranding on Monday.',
     },
   ],
   ACQUISITION_CLOSED_STOCK: [
     {
       h: '{bank} buys {target} in a {price} share deal',
-      b: "{target}'s shareholders take {bank} stock for part of the price. Its {n} branches rebrand over eight weeks.",
+      b: "{target}'s shareholders take {bank} stock for part of the price. Its {n} sales offices rebrand over eight weeks.",
     },
     {
       h: '{target} holders swap into {bank}',
-      b: 'The {price} takeover was paid partly in new {bank} shares, bringing {n} branches under one name.',
+      b: 'The {price} takeover was paid partly in new {bank} shares, bringing {n} sales offices under one name.',
     },
   ],
   ACQUISITION_CLOSED_DISTRESSED: [
     {
       h: '{bank} rescues {target} network',
-      b: 'Paying {price} for the failed bank, {bank} keeps its {n} branches open and its depositors whole.',
+      b: 'Paying {price} for the failed bank, {bank} keeps its {n} sales offices open and its depositors whole.',
     },
     {
       h: 'Failed {target} finds a buyer in {bank}',
-      b: 'Regulators accepted {price} for the seized bank. Its {n} branches reopen under new management.',
+      b: 'Regulators accepted {price} for the seized bank. Its {n} sales offices reopen under new management.',
     },
   ],
   CONVERSION_DONE: [
     {
       h: 'The last {target} sign comes down',
-      b: '{n} former {target} branches now open as {bank}.',
+      b: '{n} former {target} sales offices now open as {bank}.',
     },
     {
       h: '{bank} completes {target} rebrand',
-      b: 'Fresh paint and new signs: {n} branches have finished the switch to {bank}.',
+      b: 'Fresh paint and new signs: {n} sales offices have finished the switch to {bank}.',
     },
   ],
   DISTRESSED_SALE: [

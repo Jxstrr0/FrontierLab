@@ -143,7 +143,7 @@ function special(state: GameState, branch: Branch, spec: ProductSpec): number {
 
 export function runDemand(state: GameState, branch: Branch, fx: CampaignEffects): DemandResult {
   const lot = state.world.lots[branch.lotId];
-  if (!lot) throw new Error(`Branch ${branch.id} has no lot`);
+  if (!lot) throw new Error(`Sales office ${branch.id} has no lot`);
   const rng = stream(state, 'demand');
   const country = countryOfCity(state, branch.cityId);
 

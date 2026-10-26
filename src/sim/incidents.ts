@@ -71,7 +71,7 @@ export function raiseIncident(
   const week = state.clock.week;
   const sym = state.settings.currency;
   const d = { ...data };
-  if (scopeKind === 'branch') d.branch = state.branches[scope]?.name ?? 'the branch';
+  if (scopeKind === 'branch') d.branch = state.branches[scope]?.name ?? 'the sales office';
   rule.prepare?.(state, scope, d);
   const costs = rule.costs(state, scope, d);
   d.text = fillTemplate(spec.text, spec, d, sym);

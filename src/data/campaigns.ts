@@ -33,7 +33,7 @@ export const CAMPAIGNS: Record<string, CampaignSpec> = {
   lobby_coffee: {
     id: 'lobby_coffee',
     name: 'Coffee & Live Demos',
-    effectHint: 'Branch rating + · Awareness +',
+    effectHint: 'Sales office rating + · Awareness +',
     levels: [
       { label: 'Drip', cost: weekly(120), bumps: { branch: 0.2 }, awareness: 0.004 },
       { label: 'Espresso bar', cost: weekly(260), bumps: { branch: 0.4 }, awareness: 0.008 },
@@ -42,7 +42,7 @@ export const CAMPAIGNS: Record<string, CampaignSpec> = {
   charging: {
     id: 'charging',
     name: 'Hack Nights',
-    effectHint: 'Branch rating + · Developers +',
+    effectHint: 'Sales office rating + · Developers +',
     levels: [{ label: 'On', cost: weekly(80), bumps: { branch: 0.1 }, segments: { YP: 1.05 } }],
   },
   saturday: {
@@ -146,7 +146,7 @@ export const CAMPAIGNS: Record<string, CampaignSpec> = {
   sponsors: {
     id: 'sponsors',
     name: 'Community Sponsors',
-    effectHint: 'Awareness ++ · Branch rating + · Consumers and small shops +',
+    effectHint: 'Awareness ++ · Sales office rating + · Consumers and small shops +',
     levels: [
       {
         label: 'Modest',

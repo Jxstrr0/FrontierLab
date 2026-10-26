@@ -7,7 +7,7 @@ import { Face, Hatch, Vignette } from '../components';
 
 export function RivalBranchArt(p: { bank: RivalBank }) {
   return (
-    <Vignette label={`${p.bank.name} branch`}>
+    <Vignette label={`${p.bank.name} sales office`}>
       <path d="M0 132h320" class="art-line" />
       {/* Building, cornice and steps */}
       <Face

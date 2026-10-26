@@ -74,7 +74,7 @@ export function ManageModelsSheet(p: { onClose: () => void }) {
           })}
         </ul>
         <p class="muted small">
-          Switching takes two weeks: branches feel a blend of the old and new model meanwhile.
+          Switching takes two weeks: sales offices feel a blend of the old and new model meanwhile.
           Credit bureaus sell packaged models and host custom ones.
         </p>
 

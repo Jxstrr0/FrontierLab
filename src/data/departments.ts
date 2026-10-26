@@ -28,7 +28,7 @@ export const DEPARTMENTS: Record<DeptId, DepartmentSpec> = {
   hr: {
     id: 'hr',
     name: 'HR',
-    description: 'Hiring speed and morale for every branch and floor; staff benefits.',
+    description: 'Hiring speed and morale for every sales office and floor; staff benefits.',
     marketSalary: 68_000,
     feature: 'hq',
   },

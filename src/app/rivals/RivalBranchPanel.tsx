@@ -31,7 +31,7 @@ const CATEGORY_ROWS = [
   { label: 'Rates', i: 0 },
   { label: 'Products', i: 1 },
   { label: 'Service', i: 2 },
-  { label: 'Branch', i: 3 },
+  { label: 'Sales office', i: 3 },
 ] as const;
 
 export function RivalBranchPanel(p: { lotId: string }) {
@@ -40,8 +40,8 @@ export function RivalBranchPanel(p: { lotId: string }) {
   const lot = s.world.lots[p.lotId];
   if (!found || !lot) {
     return (
-      <Panel title="Rival branch" onClose={closePanel}>
-        <p class="muted">This branch has closed. The storefront is free to lease.</p>
+      <Panel title="Rival sales office" onClose={closePanel}>
+        <p class="muted">This sales office has closed. The storefront is free to lease.</p>
       </Panel>
     );
   }
@@ -52,10 +52,10 @@ export function RivalBranchPanel(p: { lotId: string }) {
   const ours = ourPrice(s, mine, 'savings');
   const advice =
     theirs !== undefined && ours !== undefined
-      ? `This is ${bank.name}'s branch. Their savings rate is ${pct(theirs)}; ours is ${pct(ours)}.`
+      ? `This is ${bank.name}'s sales office. Their savings rate is ${pct(theirs)}; ours is ${pct(ours)}.`
       : theirs !== undefined
-        ? `This is ${bank.name}'s branch. Their savings rate is ${pct(theirs)}.`
-        : `This is ${bank.name}'s branch.`;
+        ? `This is ${bank.name}'s sales office. Their savings rate is ${pct(theirs)}.`
+        : `This is ${bank.name}'s sales office.`;
   const hqSite = rivalHqSite(s, bank.id, branch.cityId);
   const failed = failedText(s, bank);
 
@@ -132,7 +132,7 @@ function RateSheet(p: { s: GameState; bank: RivalBank; branch: RivalBranch }) {
   return (
     <section>
       <SectionTitle>Rate sheet</SectionTitle>
-      {mine && <p class="muted small">Compared with our {mine.name} branch.</p>}
+      {mine && <p class="muted small">Compared with our {mine.name} sales office.</p>}
       <Card>
         {RATE_SHEET.map((group) => (
           <div class="rv-sheet">

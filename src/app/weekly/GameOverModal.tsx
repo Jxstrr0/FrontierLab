@@ -58,11 +58,12 @@ export function GameOverModal() {
           <p>
             {bank} stopped trading on {date}, {weeks} weeks after its first day of business.{' '}
             {takeover
-              ? `The regulator took control of the lab and its ${branches === 1 ? 'branch' : 'branches'}.`
+              ? `The regulator took control of the lab and its ${branches === 1 ? 'sales office' : 'sales offices'}.`
               : 'The lab could not pay its way and has no credit left to draw on.'}
           </p>
           <p>
-            At the end {bank} ran {branches} open {branches === 1 ? 'branch' : 'branches'}
+            At the end {bank} ran {branches} open{' '}
+            {branches === 1 ? 'sales office' : 'sales offices'}
             {last
               ? `, held ${money(last.totals.deposits, sym)} in deposits and had lent ${money(last.totals.loans, sym)}.`
               : '.'}

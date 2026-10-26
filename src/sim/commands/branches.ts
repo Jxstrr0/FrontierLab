@@ -80,7 +80,7 @@ export function buildBlocker(
   if (officeInCity(state, lot.cityId)) return 'You already have a sales office in this city.';
   if (size < 0 || size > MAX_OFFICE_SIZE) return 'Pick a valid office size.';
   if (via === 'coo') {
-    if (!state.executives.seats.coo) return 'You need a COO to open branches for you.';
+    if (!state.executives.seats.coo) return 'You need a COO to open sales offices for you.';
   } else if (lot.cityId !== state.world.currentCityId) {
     return "You can only build in the city you're in.";
   }
@@ -90,7 +90,7 @@ export function buildBlocker(
   }
   const tier = state.company.tier;
   if (tier === 'restricted' || tier === 'critical') {
-    return `The regulator won't allow new branches at the ${tier} capital tier.`;
+    return `The regulator won't allow new sales offices at the ${tier} capital tier.`;
   }
   const quote = buildQuote(state, lotId, build, size);
   if (state.company.cash < quote.total) return `Not enough cash: you need ${money(quote.total)}.`;
@@ -99,7 +99,7 @@ export function buildBlocker(
 
 /** The district's name (led by the city's away from home), numbered when one of your branches already has it. */
 export function defaultName(state: GameState, district: string, cityId?: string): string {
-  const area = DISTRICT_SPECS[district as keyof typeof DISTRICT_SPECS]?.name ?? 'Branch';
+  const area = DISTRICT_SPECS[district as keyof typeof DISTRICT_SPECS]?.name ?? 'Sales office';
   // Away from home the city leads the name ("New York Midtown"), so lists and news stay clear.
   const away = cityId && cityId !== state.meta.homeCityId ? CITIES[cityId]?.name : undefined;
   const base = away ? `${away} ${area}` : area;
@@ -317,9 +317,9 @@ export function upgradeOffice(state: GameState, branchId: string): CommandResult
 
 export function renameBranch(state: GameState, branchId: string, name: string): CommandResult {
   const branch = state.branches[branchId];
-  if (!branch) return fail('That branch no longer exists.');
+  if (!branch) return fail('That sales office no longer exists.');
   const trimmed = name.trim();
-  if (!trimmed) return fail('Give the branch a name.');
+  if (!trimmed) return fail('Give the sales office a name.');
   branch.name = trimmed.slice(0, BRANCH_NAME_MAX);
   return ok();
 }
@@ -413,7 +413,7 @@ export function closeBranch(
 ): CommandResult<{ movedTo?: string }> {
   const branch = state.branches[branchId];
   const quote = closeQuote(state, branchId);
-  if (!branch || !quote) return fail('That branch no longer exists.');
+  if (!branch || !quote) return fail('That sales office no longer exists.');
   if (quote.blocker) return fail(quote.blocker);
   const target = quote.targetId ? state.branches[quote.targetId] : undefined;
 

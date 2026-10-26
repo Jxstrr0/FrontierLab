@@ -95,8 +95,8 @@ function AwarenessCard() {
         ))}
       </ul>
       <p class="muted small hq-note">
-        Brand awareness helps every branch in the city win new customers. Branches add a little each
-        week; without campaigns it slowly fades.
+        Brand awareness helps every sales office in the city win new customers. Sales offices add a
+        little each week; without campaigns it slowly fades.
       </p>
     </Card>
   );
@@ -142,7 +142,7 @@ function AgencyRunsCard() {
       </ul>
       {bonuses.map((id) => (
         <Row
-          label={`Branch rating bonus, ${awarenessRows(s).find((r) => r.cityId === id)?.name ?? id}`}
+          label={`Sales office rating bonus, ${awarenessRows(s).find((r) => r.cityId === id)?.name ?? id}`}
           value={`+${cityBrandBonus(s, id).toFixed(2)} · ${s.marketing.cityBonus[id]!.weeksLeft} wk`}
           tone="good"
         />

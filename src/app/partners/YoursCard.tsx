@@ -60,7 +60,7 @@ export function YoursCard(p: { site: Site; partnership: Partnership }) {
       <Row label="Deposits" value={money(ps.balance, sym)} strong />
       <Row label="Accounts" value={count(ps.accounts)} />
       <Row
-        label="Host branch"
+        label="Host sales office"
         value={
           !host
             ? 'None'

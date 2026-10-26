@@ -15,7 +15,7 @@ import './loandesk/loandesk.css';
 export function LoanDeskTab({ branchId }: { branchId: string }) {
   const s = useGame();
   const branch = s.branches[branchId];
-  if (!branch) return <p class="muted">This branch no longer exists.</p>;
+  if (!branch) return <p class="muted">This sales office no longer exists.</p>;
 
   const sym = s.settings.currency;
   const week = s.clock.week;

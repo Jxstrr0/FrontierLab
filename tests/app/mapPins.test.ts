@@ -99,13 +99,13 @@ describe('map pins', () => {
     const mine = pins[0]!;
     expect(mine.kind).toBe('mine');
     expect(mine.branchId).toBe(branchId);
-    expect(mine.label).toMatch(/^Your branch, /);
+    expect(mine.label).toMatch(/^Your sales office, /);
     const lot = s.world.lots[mine.id]!;
     const floors = map.floors[lot.tile.y * map.tiles + lot.tile.x]!;
     expect({ x: mine.x, y: mine.y }).toEqual(roofAnchor(map.tiles, lot.tile.x, lot.tile.y, floors));
     expect(pins.some((p) => p.kind === 'rival')).toBe(true);
     const open = pins.find((p) => p.kind === 'lot')!;
-    expect(open.label).toBe(`Available branch location, ${s.world.lots[open.id]!.address}`);
+    expect(open.label).toBe(`Available sales office location, ${s.world.lots[open.id]!.address}`);
   });
 
   it('follows the layer settings', () => {
@@ -246,9 +246,9 @@ describe('Stage 5 pins', () => {
 });
 
 describe('map layers', () => {
-  it('lists the 14 layer types and only offers those whose stage is on', () => {
-    expect(MAP_LAYERS).toHaveLength(14);
-    expect(new Set(MAP_LAYERS.map((l) => l.id)).size).toBe(14);
+  it('lists the 16 layer types and only offers those whose stage is on', () => {
+    expect(MAP_LAYERS).toHaveLength(16);
+    expect(new Set(MAP_LAYERS.map((l) => l.id)).size).toBe(16);
     for (const l of availableLayers()) expect(FEATURES[l.feature]).toBe(true);
     const mapOnly = { ...FEATURES, cityMap: true, hq: false };
     expect(availableLayers(mapOnly).map((l) => l.id)).toContain('branches');
