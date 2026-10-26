@@ -5,7 +5,7 @@
 // or three branches in that city, and grows like any rival once it has a year
 // of profits. Draws come from the `charters` stream so other rival draws never
 // shift.
-import { RIVAL_CHARTER, RIVAL_EXPANSION } from '../config/balance';
+import { NAME_GEN, RIVAL_CHARTER, RIVAL_EXPANSION } from '../config/balance';
 import { CITIES } from '../data/cities';
 import {
   CHARTER_BRANDS,
@@ -16,6 +16,7 @@ import {
 import type { Strategy } from '../data/rivals';
 import { FIRST_NAMES, LAST_NAMES } from '../data/names';
 import { pushEvent } from './events';
+import { coinedBrand, placeStem } from './nameGen';
 import { initRivalShares } from './marketInit';
 import { nominalIndex } from './nominal';
 import { countryOfCity } from './rates';
@@ -47,11 +48,15 @@ export function charterChance(state: GameState, cityId: string, lots: Lot[]): nu
 /** A name no rival has used: stem + strategy suffix, or a one-word brand for disruptors. */
 function charterName(state: GameState, strategy: Strategy, rng: Rng): string {
   const taken = new Set(Object.values(state.rivals).map((r) => r.name));
-  for (let i = 0; i < 40; i++) {
+  for (let i = 0; i < NAME_GEN.tries; i++) {
+    // A listed stem or brand some of the time, else a generated one (NAME_GEN.listedName).
+    const listed = rng.chance(NAME_GEN.listedName);
     const name =
       strategy === 'disruptor'
-        ? rng.pick(CHARTER_BRANDS)
-        : `${rng.pick(CHARTER_STEMS)} ${rng.pick(CHARTER_SUFFIXES[strategy])}`;
+        ? listed
+          ? rng.pick(CHARTER_BRANDS)
+          : coinedBrand(rng)
+        : `${listed ? rng.pick(CHARTER_STEMS) : placeStem(rng)} ${rng.pick(CHARTER_SUFFIXES[strategy])}`;
     if (!taken.has(name)) return name;
   }
   // Every short name is used: number the next one.
