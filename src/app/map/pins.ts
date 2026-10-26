@@ -341,9 +341,9 @@ export function buildPins(
     for (const site of Object.values(s.world.sites)) {
       if (site.cityId !== map.cityId) continue;
       if (!siteEnabled(site.kind, features)) continue;
-      // A seized or acquired rival's head office leaves the map; a distressed one stays, faded.
+      // A seized, acquired or merged rival's head office leaves the map; a distressed one stays, faded.
       const status = site.kind === 'rivalHq' ? s.rivals[site.refId]?.status : undefined;
-      if (status === 'seized' || status === 'acquired') continue;
+      if (status === 'seized' || status === 'acquired' || status === 'merged') continue;
       if (!layerOn(layers, SITE_LAYER[site.kind])) continue;
       const info = stage7Info(s, site);
       if (info && !info.visible) continue;

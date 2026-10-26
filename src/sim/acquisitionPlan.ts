@@ -87,11 +87,11 @@ export function yourDepositsIn(state: GameState, cityId: string): number {
   return total;
 }
 
-/** Deposits of rivals still holding branches (not seized or acquired) in a city. */
+/** Deposits of rivals still holding branches (not seized, acquired or merged) in a city. */
 function rivalDepositsIn(state: GameState, cityId: string): number {
   let total = 0;
   for (const r of Object.values(state.rivals)) {
-    if (r.status === 'seized' || r.status === 'acquired') continue;
+    if (r.status === 'seized' || r.status === 'acquired' || r.status === 'merged') continue;
     for (const b of r.branches) if (b.cityId === cityId) total += b.deposits;
   }
   return total;
