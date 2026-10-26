@@ -4,9 +4,11 @@
 // loan applications and new incidents (the incident modal opens once the weekly
 // results are closed), and once a quarter for the board meeting reminder when
 // there is an Executive floor (after any other modal). Hidden tabs hold time,
-// and so does any open panel, sheet or modal: the clock runs only on the map.
-// stepWeek() runs the rest of the current week at once and leaves the game
-// paused, for week-by-week play.
+// and so does any open panel, sheet or modal: the clock runs only on the map,
+// and real time that passes while it is held is dropped, not banked, so closing
+// the weekly results never spends the seconds they were open. stepWeek() runs
+// the rest of the current week at once and leaves the game paused, for
+// week-by-week play.
 import { CAPITAL_BUFFER_PP, DAY_MS, DAYS_PER_WEEK, FEATURES } from '../config/balance';
 import { CITIES } from '../data/cities';
 import { INCIDENT_SPECS } from '../data/incidents';
@@ -26,6 +28,8 @@ import { VENTURE_BAD_EVENTS, VENTURE_EVENT_TEXT } from './startup/ventureToasts'
 import { AUCTION_BAD_EVENTS, AUCTION_EVENT_TEXT } from './auction/auctionToasts';
 
 const FRAME_MS = 50;
+/** A frame longer than this (a stall, a throttled background tab) counts as this much. */
+const MAX_FRAME_MS = 250;
 let timer: ReturnType<typeof setInterval> | undefined;
 let last = 0;
 let acc = 0;
@@ -91,6 +95,23 @@ function frame(): void {
   const now = performance.now();
   const dt = now - last;
   last = now;
+  elapse(dt);
+}
+
+/** True in a browser whose tab is in the background; false where there is no document (tests). */
+function pageHidden(): boolean {
+  return typeof document !== 'undefined' && document.hidden;
+}
+
+/**
+ * Moves the game on by `dt` ms of real time (one frame's worth from the loop;
+ * tests call it directly). Nothing moves while the game is paused, the clock is
+ * held (a panel, sheet or modal such as the weekly results is open) or the page
+ * is hidden, and the fraction of a day banked so far is dropped, so play resumes
+ * from a clean slate rather than jumping. The hold is checked again before every
+ * day inside a frame, because a day's tick can itself open a modal.
+ */
+export function elapse(dt: number): void {
   const s = peekGame();
   if (!s) return;
   // Hand over from the weekly results to the incident modal, never stacking
@@ -103,17 +124,21 @@ function frame(): void {
     boardWaiting = false;
     if (boardDue(s)) modal.value = { type: 'boardMeeting', reminder: true };
   }
-  if (s.clock.speed === 0 || clockHeld() || document.hidden) return;
-  acc += Math.min(dt, 250) * s.clock.speed;
+  if (s.clock.speed === 0 || clockHeld() || pageHidden()) {
+    acc = 0;
+    return;
+  }
+  acc += Math.min(dt, MAX_FRAME_MS) * s.clock.speed;
   let changed = false;
-  while (acc >= DAY_MS && s.clock.speed > 0) {
+  while (acc >= DAY_MS && s.clock.speed > 0 && !clockHeld()) {
     acc -= DAY_MS;
     const week = s.clock.week;
     advanceDay(s);
     changed = true;
     if (s.clock.week !== week) afterWeek(s);
-    if (modal.value) break;
   }
+  // A modal opened (or afterWeek paused the game) mid-frame: drop what was banked.
+  if (clockHeld() || !(s.clock.speed > 0)) acc = 0;
   if (changed) bump();
 }
 
@@ -203,6 +228,14 @@ const EVENT_TEXT: Record<string, (p: Record<string, unknown>) => string> = {
     return '';
   },
   MILESTONE: (p) => `Milestone reached: ${String(p.title)}.`,
+  MANAGER_POACHED: (p) =>
+    `${String(p.rival)} poached ${String(p.name)}, the manager of ${String(p.branch)}. Its delegations are back with you.`,
+  PAY_REVIEW: (p) => {
+    const changed = Number(p.raised) + Number(p.cut);
+    return changed > 0
+      ? `Your COO's pay review moved ${changed} ${changed === 1 ? 'salary' : 'salaries'} to market${Number(p.premium) ? ` ${Number(p.premium) > 0 ? '+' : '−'}${Math.round(Math.abs(Number(p.premium)) * 100)}%` : ''}.`
+      : '';
+  },
   BANK_RUN: () => 'Depositors are queueing to withdraw: a bank run has started.',
   BANK_RUN_ENDED: () => 'The bank run is over.',
 };
@@ -211,6 +244,7 @@ const EVENT_TEXT: Record<string, (p: Record<string, unknown>) => string> = {
 const HOME_ONLY = new Set(['CB_DECISION', 'POLICY_PASSED']);
 const BAD_EVENTS = new Set([
   'WINDOW_USE',
+  'MANAGER_POACHED',
   'BANK_RUN',
   ...MNA_BAD_EVENTS,
   ...VENTURE_BAD_EVENTS,

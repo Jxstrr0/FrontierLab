@@ -1,5 +1,7 @@
 # Deployment — GitHub Pages
 
+Changes reach `main` through pull requests that Claude opens and merges itself once the checks pass and there is no conflict (CLAUDE.md, "Branches and pull requests"); every merge to `main` deploys.
+
 The game is a static Vite build served from `https://jxstrr0.github.io/VaultStreet/`.
 
 ## One-time setup (owner, on phone or desktop)

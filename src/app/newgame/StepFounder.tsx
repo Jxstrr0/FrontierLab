@@ -1,12 +1,11 @@
 // Wizard step 2: the founder's name and portrait parts.
-import type { AvatarPart } from '../../data/avatarParts';
+import type { AvatarSpec } from '../../sim/state';
 import { AvatarPicker } from './AvatarPicker';
 import { NAME_MAX, type Draft } from './draft';
 
 export function StepFounder(p: { draft: Draft; patch: (d: Partial<Draft>) => void }) {
   const { draft, patch } = p;
-  const setPart = (part: AvatarPart, index: number) =>
-    patch({ avatar: { ...draft.avatar, [part]: index } });
+  const setParts = (parts: Partial<AvatarSpec>) => patch({ avatar: { ...draft.avatar, ...parts } });
   return (
     <div class="stack">
       <label class="field">
@@ -22,7 +21,7 @@ export function StepFounder(p: { draft: Draft; patch: (d: Partial<Draft>) => voi
           onInput={(e) => patch({ founderName: (e.target as HTMLInputElement).value })}
         />
       </label>
-      <AvatarPicker value={draft.avatar} onChange={setPart} />
+      <AvatarPicker value={draft.avatar} onChange={setParts} />
     </div>
   );
 }

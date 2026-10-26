@@ -237,8 +237,11 @@ export function scaledEffect(value: number, ref: number, effect: number): number
   return effect * Math.min(BENEFIT_CAP, 1 + (BENEFIT_FLATTEN * (value - ref)) / ref);
 }
 
-export function staffMods(state: GameState): StaffMods {
-  const b = state.people.benefits;
+export function staffMods(
+  state: GameState,
+  benefits: Record<string, number> = state.people.benefits,
+): StaffMods {
+  const b = benefits;
   const mods: StaffMods = {
     morale: 0,
     hqMorale: 0,

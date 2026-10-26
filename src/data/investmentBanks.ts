@@ -33,7 +33,7 @@ export const INVESTMENT_BANKS: Record<string, InvestmentBankSpec> = {
   meridian: {
     id: 'meridian',
     name: 'Meridian Partners',
-    cities: ['lon', 'par', 'fra', 'ams'],
+    cities: ['lon', 'par', 'fra', 'ams', 'mos', 'spb'],
     fee: 0.048,
     pop: [0, 0.15],
   },

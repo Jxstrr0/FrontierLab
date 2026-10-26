@@ -4,12 +4,14 @@
 import { QUARTERS_PER_YEAR, STOCK_MARKET } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { EXCHANGES, type SectorId } from '../../data/stocks';
+import type { LogoShape } from '../../data/types';
 import { topHolders, type HolderRow } from '../../sim/marketHolders';
 import { priceEarnings } from '../../sim/marketStocks';
 import { rivalNetIncomeTtm } from '../../sim/marketRivals';
 import { SELF_ID } from '../../sim/securities';
 import type { GameState, RivalBank } from '../../sim/state';
 import { netIncomeTtm } from '../../sim/valuation';
+import { exactMoney } from '../format/format';
 
 export interface SecurityView {
   id: string;
@@ -18,6 +20,8 @@ export interface SecurityView {
   exchange: string;
   monogram: string;
   ink: string;
+  /** Your bank's logo shape; rivals are drawn round. */
+  shape?: LogoShape;
   price: number;
   history: number[];
   marketCap: number;
@@ -90,6 +94,7 @@ function bankingSecurities(state: GameState): SecurityView[] {
       exchange: st.exchange ?? '',
       monogram: state.meta.monogram,
       ink: state.meta.brandInk,
+      shape: state.meta.logoShape,
       price: st.price,
       history: st.history,
       marketCap: st.price * state.company.sharesOutstanding,
@@ -150,5 +155,5 @@ export function priceChange(
 
 /** A share price for cards: "$12.34" (prices stay exact to the cent). */
 export function sharePrice(x: number, sym: string): string {
-  return `${sym}${x.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  return exactMoney(x, sym);
 }

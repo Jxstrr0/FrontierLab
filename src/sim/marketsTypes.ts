@@ -51,6 +51,8 @@ export interface ExecutivesState {
   /** Candidates per seat; the pool refreshes every few weeks (§17.2). */
   candidates: Partial<Record<ExecSeat, Executive[]>>;
   candidatesRefreshWeek: Week;
+  /** Paid rerolls per seat since the pools last refreshed for free (schema v17). */
+  rerolls: Partial<Record<ExecSeat, number>>;
   /** True once a CTO has been hired: an empty CTO seat then drags the app rating (§16.9). */
   hadCto: boolean;
   /**
@@ -63,7 +65,19 @@ export interface ExecutivesState {
   growthCities: Record<Id, boolean>;
   /** Week of the COO's last branch build (Expansion cadence); -1 before the first. */
   lastExpansionWeek: Week;
+  /** Pay premium over market the COO's Pay reviews aim for (schema v15), e.g. 0.05 = +5%. */
+  payPremium: number;
+  /** Week of the last pay review; -1 before the first. */
+  lastPayReviewWeek: Week;
+  /** How often Pay reviews run (schema v21): a key of PAY_REVIEW.cadences. */
+  payReviewCadence: PayReviewCadence;
+  /** Average morale the COO's HR benefits holds (schema v21), one of EXEC_DELEGATION.moraleTargets. */
+  moraleTarget: number;
+  /** City brand awareness the CMO's Brand campaigns hold (schema v21), one of EXEC_DELEGATION.brandTargets. */
+  brandTarget: number;
 }
+
+export type PayReviewCadence = 'quarterly' | 'annual';
 
 // ─── Board and dividends (DESIGN §5.13, SCREENS §10.2) ────────────────────────
 

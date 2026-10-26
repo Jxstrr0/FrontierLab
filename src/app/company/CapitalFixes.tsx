@@ -14,7 +14,7 @@ export function CapitalFixes(p: { tier: Tier; listing: ListingStatus }) {
   const title = CAPITAL_FIX_TITLE[p.tier];
   if (!title) return null;
   return (
-    <div class={`cap-fixes is-${p.tier}`}>
+    <div class={`cap-fixes is-${p.tier}`} data-tutorial="capital-fixes">
       <div class="cap-fixes-title">{title}</div>
       <ol class="cap-fixes-list">
         {[RAISE_FIX[p.listing], ...OTHER_FIXES].map((f) => (

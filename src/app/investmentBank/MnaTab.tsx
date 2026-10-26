@@ -7,7 +7,7 @@ import { useState } from 'preact/hooks';
 import { targetBlocker } from '../../sim/mergerRules';
 import type { GameState, RivalBank } from '../../sim/state';
 import { Badge, Card, Medallion, Row, SectionTitle } from '../components';
-import { capitalRatioText, count, money } from '../format/format';
+import { capitalRatioText, count, exactMoney, money } from '../format/format';
 import { rivalTier, TIER_LABEL, TIER_TONE } from '../rivals/rivalSelectors';
 import { useGame } from '../store';
 import { sharePrice } from './marketView';
@@ -105,9 +105,7 @@ function RivalCard(p: { s: GameState; bank: RivalBank; onOffer: () => void }) {
       {facts.market && <StockHolders view={facts.market} />}
       {offer && (
         <p class="ma-status small" role="status">
-          <Badge tone={offerTone(offer)}>
-            Your offer {`${sym}${offer.pricePerShare.toFixed(2)}`}
-          </Badge>{' '}
+          <Badge tone={offerTone(offer)}>Your offer {exactMoney(offer.pricePerShare, sym)}</Badge>{' '}
           {offerStatusText(offer)}
         </p>
       )}

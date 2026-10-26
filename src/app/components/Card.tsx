@@ -3,16 +3,26 @@
 // rule with its centred diamond, section titles, rows and badges.
 import type { ComponentChildren } from 'preact';
 
-export function Card(props: { children: ComponentChildren; class?: string; onClick?: () => void }) {
+export function Card(props: {
+  children: ComponentChildren;
+  class?: string;
+  onClick?: () => void;
+  /** The tutorial ring's target name (data-tutorial). */
+  tutorial?: string;
+}) {
   const cls = `card${props.onClick ? ' card-tap' : ''}${props.class ? ` ${props.class}` : ''}`;
   if (props.onClick) {
     return (
-      <button type="button" class={cls} onClick={props.onClick}>
+      <button type="button" class={cls} onClick={props.onClick} data-tutorial={props.tutorial}>
         {props.children}
       </button>
     );
   }
-  return <div class={cls}>{props.children}</div>;
+  return (
+    <div class={cls} data-tutorial={props.tutorial}>
+      {props.children}
+    </div>
+  );
 }
 
 /** Thin brass rule with a centred diamond, for section breaks only. */

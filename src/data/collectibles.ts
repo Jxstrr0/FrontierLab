@@ -123,6 +123,7 @@ export const AUCTION_HOUSES: Record<string, AuctionHouseSpec> = {
     fakeOdds: 0.08,
   },
   kanazawa: { id: 'kanazawa', name: 'Kanazawa Auctions', cities: ['tyo', 'hkg'], fakeOdds: 0.06 },
+  sokolov: { id: 'sokolov', name: 'Sokolov & Lind', cities: ['mos', 'spb'], fakeOdds: 0.09 },
 };
 
 export const auctionHouseIn = (cityId: string): AuctionHouseSpec | undefined =>

@@ -62,9 +62,10 @@ export function makePinElement(p: PinSpec): HTMLButtonElement {
   el.type = 'button';
   el.className = `map-pin pin-${p.kind} shape-${shape}${p.muted ? ' is-muted' : ''}`;
   el.dataset.lotId = p.id;
-  // The tutorial's brass ring finds storefronts and your branches by these (SCREENS §27).
-  if (p.kind === 'lot' || p.kind === 'mine')
-    el.dataset.tutorial = p.kind === 'lot' ? 'open-lot' : 'my-branch';
+  // The tutorial's brass ring finds pins by these (SCREENS §27): storefronts,
+  // your branches, and pin-{kind} for everything else (pin-office, pin-airport…).
+  el.dataset.tutorial =
+    p.kind === 'lot' ? 'open-lot' : p.kind === 'mine' ? 'my-branch' : `pin-${p.kind}`;
   el.setAttribute('aria-label', p.label);
   el.style.display = 'none';
   // Captions are printed in the place type's ink; rivals' and light inks' in plain ink.

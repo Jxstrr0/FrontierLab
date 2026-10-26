@@ -3,7 +3,6 @@
 // which upgrades a save from oldVersion to oldVersion + 1.
 import { initPersonalEmpire } from '../personalInit';
 import { generatePersonalSites } from '../personalSites';
-import { START_CASH } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { FUNDING_TYPES } from '../../data/fundingTypes';
 import { cityGeometry } from '../cityGeo';
@@ -19,10 +18,19 @@ import { initCapitalMarkets, initRivalShares } from '../marketInit';
 import { emptyCorporateDebt } from '../corporateDebt';
 import { initCountries } from '../macro';
 import { checkMilestones } from '../milestones';
+import { faceDetail, type BaseAvatar } from '../people';
 import { initRivalBench, initRivalFinancials, seedMatureBooks } from '../rivals';
-import { SCHEMA_VERSION, type GameState } from '../state';
+import { EXEC_DELEGATION, FX_START_INDEX, PAY_REVIEW } from '../../config/balance';
+import { COUNTRIES } from '../../data/countries';
+import { SEEDED_HOUSE_STYLE_IDS } from '../../data/houseStyles';
+import { DEFAULT_LOGO_SHAPE } from '../../data/logoShapes';
+import type { CountryId } from '../../data/types';
+import { SCHEMA_VERSION, type BranchGuidance, type ExecSeat, type GameState } from '../state';
 
 type RawSave = Record<string, unknown> & { schemaVersion: number };
+
+/** Every v1 game started with this much; START_CASH has since moved (v0.10.4). */
+const V1_START_CASH = 750_000;
 
 export const migrations: Record<number, (s: RawSave) => RawSave> = {
   // 1 → 2: New Game options (difficulty, competitor count, starting cash).
@@ -31,7 +39,7 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     const world = s.world as { currentCityId: string };
     meta.difficulty = 'normal';
     meta.competitors = CITIES[world.currentCityId]?.rivals ?? 3;
-    meta.startCash = START_CASH;
+    meta.startCash = V1_START_CASH;
     const company = s.company as Record<string, unknown>;
     company.negativeCashWeeks = 0;
     company.lowCapitalWeeks = 0;
@@ -274,14 +282,138 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     if (newest && !state.company.lastBuild) state.company.lastBuild = { ...newest.build };
     return s;
   },
-
-  // 14 → 15: content trim (DESIGN decision log 2026-10-25). Foreclosed homes
+  // v15: CFO + CRO branch guidance and the COO's pay reviews. Seated executives
+  // (and the toggles a seat remembers) start with the new switches off, so
+  // nothing changes until you flip one; waiting candidates get them on, the
+  // default for hires.
+  14: (s) => {
+    const state = s as unknown as GameState;
+    state.company.guidance ??= { deposits: 0, loans: 0 } as BranchGuidance;
+    const ex = state.executives;
+    ex.payPremium ??= PAY_REVIEW.defaultPremium;
+    ex.lastPayReviewWeek ??= -1;
+    const added: [ExecSeat, string][] = [
+      ['cfo', 'guidance'],
+      ['cro', 'guidance'],
+      ['coo', 'payReviews'],
+    ];
+    for (const [seat, id] of added) {
+      const exec = ex.seats[seat];
+      if (exec) exec.delegations[id] ??= false;
+      const mem = ex.remembered[seat];
+      if (mem) mem[id] ??= false;
+      for (const c of ex.candidates[seat] ?? []) c.delegations[id] ??= true;
+    }
+    return s;
+  },
+  // v16: Russia joins the world (Moscow and St Petersburg). Its economy starts
+  // fresh from the macro stream, as initCountries does for a new game, and its
+  // currency starts level with where the others began.
+  15: (s) => {
+    const state = s as unknown as GameState;
+    const home = CITIES[Object.values(state.branches)[0]?.cityId ?? state.world.currentCityId];
+    if (home) initCountries(state, home.country);
+    for (const c of Object.keys(COUNTRIES) as CountryId[]) {
+      if (state.fx.level[c] !== undefined) continue;
+      state.fx.level[c] = FX_START_INDEX;
+      state.fx.history[c] = [FX_START_INDEX];
+    }
+    return s;
+  },
+  // v17: paid candidate rerolls. Counts start at zero for every pool.
+  16: (s) => {
+    const state = s as unknown as GameState;
+    state.people.rerolls ??= {};
+    state.executives.rerolls ??= {};
+    return s;
+  },
+  // v18: branch guidance from the COO (staffing), CMO (marketing) and CPO
+  // (products). Like v15, seated executives start with the switches off and
+  // waiting candidates with them on.
+  17: (s) => {
+    const state = s as unknown as GameState;
+    const g = (state.company.guidance ??= { deposits: 0, loans: 0 } as BranchGuidance);
+    g.staffing ??= 0;
+    g.marketing ??= 0;
+    g.products ??= 0;
+    const ex = state.executives;
+    for (const seat of ['coo', 'cmo', 'cpo'] as ExecSeat[]) {
+      const exec = ex.seats[seat];
+      if (exec) exec.delegations.guidance ??= false;
+      const mem = ex.remembered[seat];
+      if (mem) mem.guidance ??= false;
+      for (const c of ex.candidates[seat] ?? []) c.delegations.guidance ??= true;
+    }
+    return s;
+  },
+  // v19: the house style of your branch fronts. Older banks get one picked
+  // from their seed, so existing saves still differ from one another.
+  18: (s) => {
+    const state = s as unknown as GameState;
+    state.meta.houseStyle ??=
+      SEEDED_HOUSE_STYLE_IDS[state.meta.seed % SEEDED_HOUSE_STYLE_IDS.length]!;
+    return s;
+  },
+  // v20: the outline of the bank's mark. Older banks keep the round medallion
+  // they have always worn.
+  19: (s) => {
+    const state = s as unknown as GameState;
+    state.meta.logoShape ??= DEFAULT_LOGO_SHAPE;
+    return s;
+  },
+  // v21: the delegation dials. Older banks keep what the switches always did:
+  // morale held at 70, awareness at 50%, pay reviewed once a quarter.
+  20: (s) => {
+    const state = s as unknown as GameState;
+    const ex = state.executives;
+    ex.payReviewCadence ??= PAY_REVIEW.defaultCadence;
+    ex.moraleTarget ??= EXEC_DELEGATION.moraleTarget;
+    ex.brandTarget ??= EXEC_DELEGATION.brandTarget;
+    return s;
+  },
+  // v22: the HQ tabs can be arranged. An empty order is the usual DEPT_ORDER.
+  21: (s) => {
+    const state = s as unknown as GameState;
+    state.settings.hqTabOrder ??= [];
+    return s;
+  },
+  // v23: portraits gained eyes, brows, mouth and age. Every face in the save
+  // (founder, managers, candidates, executives, startup and venture CEOs) gets
+  // them. The founder keeps the look they chose; everyone else gets the face
+  // a new game would give the same parts (people.ts faceDetail).
+  22: (s) => {
+    const meta = s.meta as { founderAvatar?: Record<string, unknown> };
+    if (meta.founderAvatar) {
+      Object.assign(meta.founderAvatar, { eyes: 0, brows: 0, mouth: 0, age: 0 });
+    }
+    addFaceDetail(s);
+    return s;
+  },
+  // v24: tutorial Part 2. Part 1 gained two steps, so the closing card moved
+  // from 8 to 10 and "finished" from 9 to 11. Guides start switched on, minus
+  // the ones for things the bank has already done (learnedLessons).
+  23: (s) => {
+    const state = s as unknown as GameState;
+    const step = state.flags.tutorialStep;
+    if (step === 8 || step === 9) state.flags.tutorialStep = step + 2;
+    state.settings.guides ??= true;
+    state.flags.lessonsDone ??= learnedLessons(state);
+    return s;
+  },
+  // v25: an HR floor can fill branch manager vacancies (§16.11). On by default,
+  // as in new games.
+  24: (s) => {
+    const state = s as unknown as GameState;
+    state.people.hrHiring ??= true;
+    return s;
+  },
+  // v26: content trim (DESIGN decision log 2026-10-25). Foreclosed homes
   // lose Hold (Rent always beat it), so held pools start renting. Dealer
   // financing is gone: running deals end, and the dealerFees P&L line folds
   // into marketing (what the referral fee was). Brokered deposits and senior
   // bonds merge into term interbank and covered bonds, lots and offers alike.
   // The agency's Grand Opening Week package is now Street Team.
-  14: (s) => {
+  25: (s) => {
     const state = s as unknown as GameState;
     for (const pool of Object.values(state.reo)) {
       if ((pool.mode as string) === 'hold') pool.mode = 'rent';
@@ -310,11 +442,48 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
   },
 };
 
-/** Funding types merged away in schema 15, and the type each became. */
+/** Funding types merged away in schema 26, and the type each became. */
 const MERGED_FUNDING: Record<string, string> = {
   brokered: 'term_interbank',
   senior_bond: 'covered_bond',
 };
+
+/** The v22 portrait fields; an object with all of them and no `eyes` is a face. */
+const V22_FACE_KEYS = ['head', 'hair', 'facial', 'glasses', 'attire', 'tone', 'shade'] as const;
+
+function addFaceDetail(node: unknown): void {
+  if (!node || typeof node !== 'object') return;
+  if (Array.isArray(node)) {
+    for (const item of node) addFaceDetail(item);
+    return;
+  }
+  const o = node as Record<string, unknown>;
+  for (const key of Object.keys(o)) {
+    const v = o[key];
+    if (!v || typeof v !== 'object') continue;
+    if (Array.isArray(v)) {
+      addFaceDetail(v);
+      continue;
+    }
+    const face = v as Record<string, unknown>;
+    if (V22_FACE_KEYS.every((k) => typeof face[k] === 'number') && face.eyes === undefined) {
+      Object.assign(face, faceDetail(face as unknown as BaseAvatar));
+      continue;
+    }
+    addFaceDetail(v);
+  }
+}
+
+/** Guides an older bank has no need for: it already has an HQ, floors, executives, a listing or flights. */
+function learnedLessons(state: GameState): string[] {
+  const done: string[] = [];
+  if (Object.keys(state.offices).length > 0) done.push('hq');
+  if (Object.values(state.executives.seats).some(Boolean)) done.push('exec');
+  if (state.stock.status !== 'private') done.push('ipo');
+  if (state.world.travel.flights > 0) done.push('travel', 'place-airport');
+  for (const dept of Object.keys(state.departments)) done.push(`floor-${dept}`);
+  return done;
+}
 
 const STAGE9_PNL_LINES = ['franchiseRevenue', 'franchiseCosts', 'dealerFees'] as const;
 

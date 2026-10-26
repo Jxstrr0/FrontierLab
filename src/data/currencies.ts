@@ -23,4 +23,5 @@ export const CURRENCIES: Record<CountryId, CurrencySpec> = {
   AU: { country: 'AU', code: 'AUD', name: 'Australian dollar', vol: 0.009 },
   SG: { country: 'SG', code: 'SGD', name: 'Singapore dollar', vol: 0.004 },
   HK: { country: 'HK', code: 'HKD', name: 'Hong Kong dollar', vol: 0.005, peggedTo: 'US' },
+  RU: { country: 'RU', code: 'RUB', name: 'Russian ruble', vol: 0.012 },
 };

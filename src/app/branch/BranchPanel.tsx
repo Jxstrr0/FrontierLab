@@ -4,6 +4,7 @@
 import { MERGERS } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { DISTRICT_SPECS } from '../../data/districts';
+import { DEFAULT_LOGO_SHAPE } from '../../data/logoShapes';
 import { managerOf } from '../../sim/branch/staff';
 import { Medallion, Panel, type Tab } from '../components';
 import { gameDate } from '../format/format';
@@ -12,7 +13,7 @@ import { FinanceTab } from './FinanceTab';
 import { LoanDeskTab } from './LoanDeskTab';
 import { MarketingTab } from './MarketingTab';
 import { ProductsTab } from './ProductsTab';
-import { BranchArt } from './BranchArt';
+import { BranchHero } from './BranchHero';
 import { advisorLines, businessLoans, openingDay } from './selectors';
 import { ServiceTab } from './ServiceTab';
 import './branch.css';
@@ -47,6 +48,7 @@ export function BranchPanel(p: { branchId: string; tab: BranchTab }) {
         <Medallion
           ink={conv?.ink ?? s.meta.brandInk}
           monogram={conv?.monogram ?? s.meta.monogram}
+          shape={conv ? DEFAULT_LOGO_SHAPE : s.meta.logoShape}
           size={32}
         />
       }
@@ -57,12 +59,20 @@ export function BranchPanel(p: { branchId: string; tab: BranchTab }) {
         avatar: mgr?.portrait,
       }}
       hero={
-        <BranchArt
-          exterior={branch.build.exterior}
+        <BranchHero
+          build={branch.build}
+          bankName={conv?.name ?? s.meta.bankName}
+          style={s.meta.houseStyle}
           brandInk={conv?.ink ?? s.meta.brandInk}
           monogram={conv?.monogram ?? s.meta.monogram}
-          fitout={branch.status === 'fitout'}
+          logoShape={conv ? DEFAULT_LOGO_SHAPE : s.meta.logoShape}
           ink={CITIES[branch.cityId]?.ink}
+          live={{
+            status: branch.status,
+            staff: branch.staff.count,
+            morale: branch.staff.morale,
+            waitIndex: branch.waitIndex,
+          }}
         />
       }
       tabs={tabs}

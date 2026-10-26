@@ -63,14 +63,21 @@ export function CompanyPanel() {
     <Panel
       title="Company"
       subtitle={s.meta.bankName}
-      icon={<Medallion ink={s.meta.brandInk} monogram={s.meta.monogram} size={30} />}
+      icon={
+        <Medallion
+          ink={s.meta.brandInk}
+          monogram={s.meta.monogram}
+          shape={s.meta.logoShape}
+          size={30}
+        />
+      }
       onClose={closePanel}
       advisor={{ text: 'Deposits fund loans; capital limits growth.' }}
     >
       <div class="stack co-stack">
         <WhereToLook s={s} />
         <Card>
-          <div class="cap-head">
+          <div class="cap-head" data-tutorial="capital-meter">
             <div>
               <div class="muted small">Capital ratio</div>
               <div class="hero-number">{capitalRatioText(cap.capitalRatio)}</div>

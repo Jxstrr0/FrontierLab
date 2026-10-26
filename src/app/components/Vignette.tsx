@@ -6,7 +6,8 @@
 //   art-line / art-fine / art-faint   outlines in the ink
 //   art-hatch                          45° hatching (see src/art/engrave.ts)
 //   art-paper                          an ivory fill that hides what is behind
-//   art-tint                           a pale wash of the ink (glass, water)
+//   art-tint                           a pale wash of the ink (water, shade)
+//   art-wash / art-glass               a pale material colour under the hatching
 //   art-solid / art-text / art-sign    solid ink, lettering
 import type { ComponentChildren } from 'preact';
 import { CITIES } from '../../data/cities';
@@ -55,11 +56,13 @@ export function Vignette(p: {
 }
 
 /**
- * A solid face of a building: an ivory fill (hiding what is behind), optional
- * hatching at a density, and the ink outline.
+ * A solid face of a building: an ivory fill (hiding what is behind), an
+ * optional material wash (a CSS colour, laid pale under the hatching),
+ * optional hatching at a density, and the ink outline.
  */
 export function Face(p: {
   pts: readonly Pt[];
+  wash?: string;
   density?: HatchDensity;
   angle?: number;
   outline?: 'line' | 'fine' | 'none';
@@ -69,11 +72,23 @@ export function Face(p: {
   return (
     <g>
       <path d={d} class="art-paper" />
+      {p.wash && <Wash pts={p.pts} fill={p.wash} />}
       {p.density && <path d={shade(p.pts, p.density, p.angle)} class="art-hatch" />}
       {outline !== 'none' && (
         <path d={d} class={outline === 'fine' ? 'art-line art-fine' : 'art-line'} />
       )}
     </g>
+  );
+}
+
+/** A material wash only (ART_DIRECTION §3), over whatever is already drawn. */
+export function Wash(p: { pts: readonly Pt[]; fill: string; strong?: boolean }) {
+  return (
+    <path
+      d={poly(p.pts)}
+      class={p.strong ? 'art-wash art-wash-strong' : 'art-wash'}
+      style={{ fill: p.fill }}
+    />
   );
 }
 

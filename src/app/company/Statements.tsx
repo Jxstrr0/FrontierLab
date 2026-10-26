@@ -17,13 +17,13 @@ import {
   type StatementLine,
 } from './statementData';
 
-function Lines(p: { lines: StatementLine[] }) {
+function Lines(p: { lines: StatementLine[]; sym: string }) {
   return (
     <div class="stmt">
       {p.lines.map((l) => (
         <div class={`stmt-row stmt-${l.kind ?? 'line'}`} key={l.label}>
           <span>{l.label}</span>
-          <span class={l.value < 0 ? 'tone-bad' : undefined}>{figure(l.value)}</span>
+          <span class={l.value < 0 ? 'tone-bad' : undefined}>{figure(l.value, p.sym)}</span>
         </div>
       ))}
     </div>
@@ -65,11 +65,11 @@ export function Statements(p: { state: GameState; delayWeeks?: number }) {
         <>
           <Card>
             <h4 class="stmt-title">Income statement</h4>
-            <Lines lines={incomeStatement(snaps)} />
+            <Lines lines={incomeStatement(snaps)} sym={p.state.settings.currency} />
           </Card>
           <Card>
             <h4 class="stmt-title">Cash flow</h4>
-            <Lines lines={cashFlowStatement(snaps)} />
+            <Lines lines={cashFlowStatement(snaps)} sym={p.state.settings.currency} />
           </Card>
           <p class="muted small stmt-note">
             {snaps.length < wanted
@@ -81,7 +81,7 @@ export function Statements(p: { state: GameState; delayWeeks?: number }) {
       )}
       <Card>
         <h4 class="stmt-title">Balance sheet</h4>
-        <Lines lines={balanceSheetLines(p.state)} />
+        <Lines lines={balanceSheetLines(p.state)} sym={p.state.settings.currency} />
       </Card>
     </div>
   );

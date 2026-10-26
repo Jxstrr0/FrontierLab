@@ -69,18 +69,22 @@ export function initCountry(id: CountryId, rng: Rng): CountryState {
  * the rest in CONTENT order, so a migrated save and a new game iterate alike.
  */
 export function initCountries(state: GameState, home: CountryId): void {
-  const rng = stream(state, 'macro');
   const ids = [home, ...(Object.keys(COUNTRIES) as CountryId[]).filter((id) => id !== home)];
-  for (const id of ids) state.world.countries[id] ??= initCountry(id, rng);
+  for (const id of ids) state.world.countries[id] ??= initCountry(id, macroRng(state, id));
+}
+
+/** The shared `macro` stream, or a country's own (CountrySpec.ownStream). */
+function macroRng(state: GameState, id: CountryId): Rng {
+  return stream(state, COUNTRIES[id].ownStream ? `macro:${id}` : 'macro');
 }
 
 /** Weekly macro update for every simulated country (tick step 1). */
 export function updateMacro(state: GameState): void {
-  const rng = stream(state, 'macro');
   const date = dateOf(state.meta.startDate, state.clock.day);
   const woy = weekOfYear(date);
   for (const c of Object.values(state.world.countries)) {
     if (!c) continue;
+    const rng = macroRng(state, c.id);
     stepPhase(c, state.clock.week, rng);
     const t = MACRO_TARGETS[c.phase];
     c.gdp = ema(c.gdp, t.gdp, MACRO_EMA) + rng.normal(0, MACRO_SIGMA.gdp);
@@ -103,7 +107,7 @@ export function updateMacro(state: GameState): void {
       if (anchor) c.policyRate = anchor.policyRate + (spec.pegSpread ?? 0);
       continue;
     }
-    if (spec.meetingWeeks.includes(woy)) decidePolicy(state, c, rng);
+    if (spec.meetingWeeks.includes(woy)) decidePolicy(state, c, macroRng(state, c.id));
   }
 }
 

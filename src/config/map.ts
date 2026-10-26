@@ -126,6 +126,8 @@ export const SIGNATURE_HEIGHT_PX: Record<Signature, number> = {
   shellHall: 80,
   skyDeck: 206,
   prismTower: 252,
+  steppedSpire: 258,
+  onionDomes: 140,
   none: LANDMARK_MAX_PX,
 };
 /** Signature art may reach this many tiles past its block's sides (the bridge deck). */

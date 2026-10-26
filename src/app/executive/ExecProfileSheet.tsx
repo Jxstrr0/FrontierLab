@@ -1,9 +1,12 @@
 // Executive profile sheet (SCREENS §10.1): portrait, name, title and hire date;
 // Leadership, Expertise and Loyalty bars; the seat's delegation toggles with
-// what each does; the salary stepper with the market hint; the grants list
-// with vesting progress, Add grant, and Fire with a confirm showing severance.
-// The COO's sheet adds the growth cities their Expansion delegation may build
-// in, each with an "Open a branch now" button (GrowthCities.tsx).
+// what each does, some with a dial under them (DelegationDials.tsx: the COO's
+// morale target and review cadence with the pay premium, the CMO's awareness
+// target); the salary stepper with the market hint; the grants list with
+// vesting progress, Add grant, and Fire with a confirm showing severance. The
+// COO's sheet adds the growth cities their Expansion delegation may build in,
+// each with an "Open a branch now" button (GrowthCities.tsx). Seats that give
+// branch guidance show what they are telling managers (GuidanceNote.tsx).
 import { useState } from 'preact/hooks';
 import * as cmd from '../../sim/commands';
 import type { ExecSeat } from '../../sim/state';
@@ -17,10 +20,12 @@ import {
   Toggle,
   Portrait,
 } from '../components';
-import { count, gameDate, moneyFull } from '../format/format';
+import { count, exactMoney, gameDate, moneyFull, moneyStepper } from '../format/format';
 import { act, toast, useGame } from '../store';
+import { DelegationDial } from './DelegationDials';
 import { ExecGrantForm } from './ExecGrantForm';
 import { GrowthCities } from './GrowthCities';
+import { GUIDANCE_SEATS, GuidanceNote } from './GuidanceNote';
 import { dayOf, execSalaryStepper, seatSpec, vestProgress } from './execSelectors';
 
 export function ExecProfileSheet(p: { seat: ExecSeat; onClose: () => void }) {
@@ -56,14 +61,18 @@ export function ExecProfileSheet(p: { seat: ExecSeat; onClose: () => void }) {
             <SectionTitle>Delegations</SectionTitle>
             <Card>
               {spec.delegations.map((d) => (
-                <Toggle
-                  label={d.label}
-                  hint={d.description}
-                  checked={!!exec.delegations[d.id]}
-                  onChange={(v) => act(cmd.setExecDelegation, p.seat, d.id, v)}
-                />
+                <>
+                  <Toggle
+                    label={d.label}
+                    hint={d.description}
+                    checked={!!exec.delegations[d.id]}
+                    onChange={(v) => act(cmd.setExecDelegation, p.seat, d.id, v)}
+                  />
+                  <DelegationDial s={s} seat={p.seat} id={d.id} />
+                </>
               ))}
               {p.seat === 'coo' && <GrowthCities s={s} />}
+              {GUIDANCE_SEATS.includes(p.seat) && <GuidanceNote s={s} seat={p.seat} />}
               {p.seat === 'cfo' && (
                 <p class="muted small exec-note">
                   Statement delays are halved while a CFO is seated.
@@ -81,7 +90,7 @@ export function ExecProfileSheet(p: { seat: ExecSeat; onClose: () => void }) {
             min={pay.min}
             max={pay.max}
             step={pay.step}
-            format={(v) => moneyFull(v, sym)}
+            {...moneyStepper(sym)}
             onChange={(v) => act(cmd.setExecSalary, p.seat, v)}
             hint={`Market ${moneyFull(pay.market, sym)}. Underpaid executives are easier to poach.`}
           />
@@ -105,10 +114,7 @@ export function ExecProfileSheet(p: { seat: ExecSeat; onClose: () => void }) {
                           {g.type === 'rsu' ? 'RSU' : 'Stock option'} · {count(g.shares)} shares
                         </span>
                         {g.type === 'option' && (
-                          <span class="muted small">
-                            Strike {sym}
-                            {g.strike.toFixed(2)}
-                          </span>
+                          <span class="muted small">Strike {exactMoney(g.strike, sym)}</span>
                         )}
                       </div>
                       <div

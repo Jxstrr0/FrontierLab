@@ -1,10 +1,12 @@
 // Branch exteriors, part 1 (ART_DIRECTION §3, CONTENT §7): Plain Storefront
 // (awning and big window), Heritage Brick (arched windows) and Modern Glass
 // (mullion grid), drawn in the vignette's 320 × 150 box with the ground at
-// y = 132 and the bank's seal on each.
+// y = 132, with pale material washes under the hatching (brand-ink awning
+// stripes, terracotta brick, stone dressings, slate and glass). The name
+// sign, lamps and planters come from the house style.
 import { hatch, poly, rect, type Pt } from '../../art/engrave';
-import { Face, Hatch } from '../components/Vignette';
-import { arch, Glass, Seal, type Brand } from './facadeParts';
+import { Face, Hatch, Wash } from '../components/Vignette';
+import { arch, Glass, Seal, WASH, type Brand } from './facadeParts';
 
 // ─── Plain Storefront ───────────────────────────────────────────────────
 const AWNING_STRIPES = Array.from({ length: 8 }, (_, k) => [
@@ -28,10 +30,7 @@ export function Storefront(b: Brand) {
         density="medium"
       />
       <Face pts={rect(92, 56, 136, 76)} />
-      <Face pts={rect(88, 50, 144, 6)} density="medium" />
-      <path d="M100 60h120v14H100z" class="art-line art-fine" />
-      <path d="M106 67h40M174 67h40" class="art-line art-fine" />
-      <Seal x={160} y={67} r={6} brand={b} />
+      <Face pts={rect(88, 50, 144, 6)} wash={WASH.slate} density="medium" />
       <Face
         pts={[
           [96, 78],
@@ -41,7 +40,7 @@ export function Storefront(b: Brand) {
         ]}
       />
       {AWNING_STRIPES.filter((_, k) => k % 2 === 0).map((s) => (
-        <Hatch pts={s} density="dense" angle={-60} />
+        <Wash pts={s} fill={b.ink} strong />
       ))}
       <path d={SCALLOPS} class="art-line art-fine" />
       <Hatch pts={rect(92, 98, 136, 4)} density="dense" />
@@ -96,13 +95,14 @@ export function Brick(b: Brand) {
           [246, 132],
           [236, 132],
         ]}
+        wash={WASH.brick}
         density="dense"
       />
-      <Face pts={BRICK_WALL} />
+      <Face pts={BRICK_WALL} wash={WASH.brick} />
       <path d={BRICK_COURSES + BRICK_JOINTS} class="art-hatch" style={{ opacity: 0.45 }} />
-      <Face pts={rect(80, 36, 160, 8)} density="medium" angle={0} />
+      <Face pts={rect(80, 36, 160, 8)} wash={WASH.stone} density="medium" angle={0} />
       <path d={DENTILS} class="art-line art-fine" />
-      <Face pts={rect(84, 84, 152, 4)} />
+      <Face pts={rect(84, 84, 152, 4)} wash={WASH.stone} />
       {UPPER.map((x) => (
         <g>
           <path d={poly(arch(x - 11, 79, 22, 30))} class="art-paper" />
@@ -117,11 +117,11 @@ export function Brick(b: Brand) {
           <path d={`M${x} 94v34M${x - 17} 112h34M${x - 19} 128h38`} class="art-line art-fine" />
         </g>
       ))}
-      <Face pts={arch(147, 132, 26, 36)} density="dense" angle={90} />
-      <path d="M151 130v-16h7v16M162 130v-16h7v16M160 102l0 4" class="art-line art-fine" />
+      <Face pts={arch(147, 132, 26, 30)} density="dense" angle={90} />
+      <path d="M151 130v-14h7v14M162 130v-14h7v14M160 102.5v3" class="art-line art-fine" />
       <path d="M236 62h18M250 62v3" class="art-line" />
       <Seal x={250} y={72} r={7} brand={b} />
-      <Face pts={rect(142, 128, 36, 4)} />
+      <Face pts={rect(142, 128, 36, 4)} wash={WASH.stone} />
     </g>
   );
 }
@@ -141,6 +141,7 @@ export function GlassFront(b: Brand) {
           [238, 132],
           [224, 132],
         ]}
+        wash={WASH.slate}
         density="medium"
       />
       <path d="M231 25v107" class="art-line art-fine" />
@@ -151,10 +152,14 @@ export function GlassFront(b: Brand) {
           [242, 16],
           [228, 22],
         ]}
+        wash={WASH.slate}
         density="light"
       />
-      <Face pts={rect(92, 22, 136, 6)} density="dense" angle={0} />
+      <Face pts={rect(92, 22, 136, 6)} wash={WASH.slate} density="dense" angle={0} />
       <Glass pts={rect(96, 28, 128, 104)} />
+      {[45, 65, 85].map((y) => (
+        <Wash pts={rect(96, y, 128, 6)} fill={WASH.slate} />
+      ))}
       <Hatch
         pts={[
           [100, 96],
@@ -178,7 +183,7 @@ export function GlassFront(b: Brand) {
       <path d={MULLIONS} class="art-line art-fine" />
       <path d="M96 48H224M96 68H224M96 88H224" class="art-line" />
       <Seal x={160} y={58} r={8} brand={b} />
-      <Face pts={rect(124, 96, 72, 4)} density="dense" angle={0} />
+      <Face pts={rect(124, 96, 72, 4)} wash={b.ink} density="dense" angle={0} />
       <Hatch pts={rect(124, 100, 72, 4)} density="medium" />
       <path d="M148 132v-26h24v26M160 106v26M152 116c4 6 12 6 16 0" class="art-line art-fine" />
       <path d="M62 132v-14M62 104a9 9 0 1 0 .1 0M62 108a5 5 0 1 0 .1 0" class="art-line art-fine" />

@@ -7,7 +7,7 @@ import * as cmd from '../../sim/commands';
 import { occupancyTarget, propertyRoi, propertyWeek, rentBounds } from '../../sim/propertyMath';
 import type { Property, Site } from '../../sim/state';
 import { Card, Row, SectionTitle, Stepper, Toggle } from '../components';
-import { count, money, moneyFull, pct } from '../format/format';
+import { count, money, moneyFull, moneyStepper, pct } from '../format/format';
 import { act, useGame } from '../store';
 
 export function OwnedProperty(p: { property: Property; site: Site }) {
@@ -39,7 +39,7 @@ export function OwnedProperty(p: { property: Property; site: Site }) {
           max={bounds.max}
           step={REAL_ESTATE.rentStep}
           onChange={(v) => act(cmd.setPropertyRent, prop.id, v)}
-          format={(v) => money(v, sym)}
+          {...moneyStepper(sym, money)}
           hint={`Market rent ${money(prop.marketRent, sym)} /m²/yr`}
         />
         <Row label="Occupancy" value={pct(prop.occupancy, 1)} />

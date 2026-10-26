@@ -71,4 +71,5 @@ export function refreshExecCandidates(state: GameState, force = false): void {
     ex.candidates[seat] = pool;
   }
   ex.candidatesRefreshWeek = state.clock.week;
+  ex.rerolls = {};
 }

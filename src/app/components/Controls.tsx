@@ -1,4 +1,4 @@
-// Input controls (SCREENS §0.5): Stepper, Toggle and Segmented.
+// Input controls (SCREENS §0.5): Stepper, Toggle, Segmented and StepSlider.
 import { useEffect, useRef, useState } from 'preact/hooks';
 
 interface StepperProps {
@@ -156,6 +156,52 @@ export function Segmented<T extends string>(p: {
           {o.label}
         </button>
       ))}
+    </div>
+  );
+}
+
+/**
+ * A stepped slider: a rail with a few named stops, one lit. For settings with
+ * a handful of sensible values (a morale target of 70, 80 or 90; quarterly or
+ * annual reviews). Each stop is a 44 px tap target; the hint under the rail
+ * says what the chosen stop means.
+ */
+export function StepSlider<T extends string | number>(p: {
+  label: string;
+  options: { value: T; label: string }[];
+  value: T;
+  onChange: (v: T) => void;
+  hint?: string;
+  disabled?: boolean;
+}) {
+  const n = Math.max(1, p.options.length - 1);
+  const at = Math.max(
+    0,
+    p.options.findIndex((o) => o.value === p.value),
+  );
+  const frac = (i: number) => `${((i / n) * 100).toFixed(2)}%`;
+  return (
+    <div class={`dial${p.disabled ? ' is-disabled' : ''}`}>
+      <div class="dial-label">{p.label}</div>
+      <div class="dial-track" role="radiogroup" aria-label={p.label}>
+        <span class="dial-rail" aria-hidden="true" />
+        <span class="dial-fill" aria-hidden="true" style={{ '--frac': frac(at) }} />
+        {p.options.map((o, i) => (
+          <button
+            type="button"
+            role="radio"
+            aria-checked={i === at}
+            disabled={p.disabled}
+            class={`dial-stop${i === at ? ' is-active' : i < at ? ' is-passed' : ''}`}
+            style={{ '--frac': frac(i) }}
+            onClick={() => p.onChange(o.value)}
+          >
+            <span class="dial-dot" aria-hidden="true" />
+            <span class="dial-name">{o.label}</span>
+          </button>
+        ))}
+      </div>
+      {p.hint && <div class="dial-hint">{p.hint}</div>}
     </div>
   );
 }

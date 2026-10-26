@@ -119,7 +119,7 @@ export function IpoCard(p: { bankId: string }) {
       toast('IPO launched. Your shares list at the end of the quarter.', 'good');
   };
   return (
-    <Card class="ib-card">
+    <Card class="ib-card" tutorial="ipo-card">
       <h3 class="ib-card-name">Initial public offering</h3>
       {pending ? (
         <>

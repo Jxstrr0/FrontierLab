@@ -17,7 +17,7 @@ import * as cmd from '../../../sim/commands';
 import { devOdds, devSpeed } from '../../../sim/development';
 import type { DevTier } from '../../../sim/state';
 import { Badge, CoinRating, Row, Segmented, Sheet, Stepper } from '../../components';
-import { moneyFull } from '../../format/format';
+import { moneyFull, moneyStepper } from '../../format/format';
 import { act, toast, useGame } from '../../store';
 import { NameField } from './NameField';
 import {
@@ -149,7 +149,7 @@ export function NewProductSheet(p: { initialTemplate?: string; onClose: () => vo
             min={DEV_MIN_WEEKLY}
             max={DEV_MAX_BUDGET_SCORE_AT}
             step={DEV_BUDGET_STEP}
-            format={(v) => moneyFull(v, sym)}
+            {...moneyStepper(sym)}
             onChange={setBudget}
           />
           <Row label="Total cost" value={moneyFull(budget * weeks, sym)} strong />

@@ -1,4 +1,8 @@
 import { describe, expect, it } from 'vitest';
+import { CANDIDATE_REROLL, MANAGER_BASE_SALARY, START_CASH } from '../../src/config/balance';
+import { CITIES } from '../../src/data/cities';
+import { managerRerollFee } from '../../src/sim/candidateRerolls';
+import { refreshManagerPool } from '../../src/sim/people';
 import { REFERENCE_BUILDS } from '../../src/data/equipment';
 import * as cmd from '../../src/sim/commands';
 import { newGame } from '../../src/sim/newGame';
@@ -14,7 +18,7 @@ describe('commands', () => {
     expect(quote.parts).toBe(332_000);
     const r = cmd.buildBranch(s, { lotId: lot.id, build: REFERENCE_BUILDS.mid });
     expect(r.ok).toBe(true);
-    expect(s.company.cash).toBeCloseTo(750_000 - quote.total);
+    expect(s.company.cash).toBeCloseTo(START_CASH - quote.total);
     expect(s.company.leaseDeposits).toBe(lot.deposit);
     expect(lot.occupant?.type).toBe('player');
     expect(s.events.scheduled).toHaveLength(1);
@@ -60,7 +64,7 @@ describe('commands', () => {
     const reserves = s.treasury.reserves;
     expect(cmd.transferToTreasury(s, 50_000).ok).toBe(true);
     expect(s.treasury.reserves).toBe(reserves + 50_000);
-    expect(s.company.cash).toBe(700_000);
+    expect(s.company.cash).toBe(START_CASH - 50_000);
     expect(cmd.transferToTreasury(s, 10_000_000).ok).toBe(false);
   });
 
@@ -75,20 +79,36 @@ describe('commands', () => {
     expect(s.people.managerCandidates.cal).toHaveLength(2);
   });
 
-  it('deals new manager candidates on demand, keeping the guide until a first hire', () => {
+  it('deals paid manager candidates, keeping the guide until a first hire', () => {
     const s = newGame({ seed: 42, cityId: 'cal' });
     const r = cmd.buildBranch(s, { lotId: freeLot(s).id, build: REFERENCE_BUILDS.basic });
     if (!r.ok) throw new Error(r.reason);
     const ids = () => s.people.managerCandidates.cal!.map((m) => m.id);
     const before = ids();
-    expect(cmd.rerollManagerCandidates(s, 'cal').ok).toBe(true);
+    const fee = managerRerollFee(s, 'cal');
+    expect(fee).toBe(
+      Math.round((MANAGER_BASE_SALARY * CITIES.cal!.wageIndex * CANDIDATE_REROLL.feeShare) / 100) *
+        100,
+    );
+    const cash = s.company.cash;
+    const first = cmd.rerollManagerCandidates(s, 'cal');
+    expect(first.ok && first.fee).toBe(fee);
+    expect(s.company.cash).toBeCloseTo(cash - fee);
     const after = ids();
     expect(after).toHaveLength(3);
     expect(after[0]).toBe(before[0]); // the tutorial guide stays on the list
     expect(after.slice(1).some((id) => before.includes(id))).toBe(false);
+    // The next one costs double, until the pool's free refresh.
+    expect(
+      Math.abs(managerRerollFee(s, 'cal') - fee * CANDIDATE_REROLL.growth),
+    ).toBeLessThanOrEqual(100);
     expect(cmd.hireManager(s, r.branchId, after[1]!).ok).toBe(true);
     cmd.rerollManagerCandidates(s, 'cal');
     expect(ids().some((id) => after.includes(id))).toBe(false);
+    refreshManagerPool(s, 'cal', true);
+    expect(managerRerollFee(s, 'cal')).toBe(fee);
+    s.company.cash = fee - 1;
+    expect(cmd.rerollManagerCandidates(s, 'cal').ok).toBe(false);
     expect(cmd.rerollManagerCandidates(s, 'nowhere').ok).toBe(false);
   });
 });

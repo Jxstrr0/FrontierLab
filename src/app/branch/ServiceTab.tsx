@@ -4,7 +4,7 @@ import { avatarFromSeed } from '../../art/portraits';
 import * as cmd from '../../sim/commands';
 import type { Branch, ReviewCard } from '../../sim/state';
 import { Badge, Card, CoinRating, SectionTitle, StatBar, Stepper, Portrait } from '../components';
-import { count, shortDate } from '../format/format';
+import { count, exactMoney, moneyStepper, shortDate } from '../format/format';
 import { act, useGame } from '../store';
 import { ManagerCard } from './ManagerCard';
 import { dayOfWeek, moodTone, staffBounds, wageBounds, waitLabel } from './selectors';
@@ -121,9 +121,9 @@ function Staff({ branch }: { branch: Branch }) {
               min={wage.min}
               max={wage.max}
               step={wage.step}
-              format={(v) => `${sym}${v.toFixed(2)}`}
+              {...moneyStepper(sym, exactMoney)}
               onChange={(v) => act(cmd.setWage, branch.id, v)}
-              hint={locked ? lockHint : `Market ${sym}${wage.market.toFixed(2)}`}
+              hint={locked ? lockHint : `Market ${exactMoney(wage.market, sym)}`}
               disabled={locked}
             />
           </div>

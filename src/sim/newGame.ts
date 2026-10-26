@@ -42,7 +42,9 @@ import { SCHEMA_VERSION, type AvatarSpec, type GameState, type Settings } from '
 import { packagedModel } from './underwriting';
 import { generateCity } from './worldGen';
 import { emptyEmpire, initPersonalEmpire } from './personalInit';
-import type { Difficulty } from '../data/types';
+import type { Difficulty, HouseStyle, LogoShape } from '../data/types';
+import { SEEDED_HOUSE_STYLE_IDS } from '../data/houseStyles';
+import { DEFAULT_LOGO_SHAPE } from '../data/logoShapes';
 
 export interface NewGameOptions {
   seed: number;
@@ -50,6 +52,10 @@ export interface NewGameOptions {
   bankName?: string;
   monogram?: string;
   brandInk?: string;
+  /** The branch fronts' house style; defaults to one picked from the seed. */
+  houseStyle?: HouseStyle;
+  /** The outline of the bank's mark; defaults to the round medallion. */
+  logoShape?: LogoShape;
   founderName?: string;
   founderAvatar?: AvatarSpec;
   startDate?: string;
@@ -76,6 +82,8 @@ export const DEFAULT_SETTINGS: Settings = {
   reducedMotion: false,
   textScale: 1,
   layers: {},
+  hqTabOrder: [],
+  guides: true,
 };
 
 const DEFAULT_AVATAR: AvatarSpec = {
@@ -86,6 +94,10 @@ const DEFAULT_AVATAR: AvatarSpec = {
   attire: 0,
   tone: 0,
   shade: 1,
+  eyes: 0,
+  brows: 0,
+  mouth: 0,
+  age: 0,
 };
 
 export function newGame(opts: NewGameOptions): GameState {
@@ -117,6 +129,9 @@ export function newGame(opts: NewGameOptions): GameState {
       competitors,
       startCash,
       homeCityId: city.id,
+      houseStyle:
+        opts.houseStyle ?? SEEDED_HOUSE_STYLE_IDS[opts.seed % SEEDED_HOUSE_STYLE_IDS.length]!,
+      logoShape: opts.logoShape ?? DEFAULT_LOGO_SHAPE,
     },
     clock: { day: 0, week: 0, speed: 0 },
     rng: {},
@@ -153,12 +168,20 @@ export function newGame(opts: NewGameOptions): GameState {
       riskAppetite: DEFAULT_RISK_APPETITE,
       applyRatesToAll: false,
       companyPrices: {},
+      guidance: { deposits: 0, loans: 0, staffing: 0, marketing: 0, products: 0 },
     },
     branches: {},
     offices: {},
     departments: {},
     hq: { ramp: 0, coverage: fullCoverage() },
-    people: { managers: {}, managerCandidates: {}, candidatesRefreshWeek: {}, benefits: {} },
+    people: {
+      managers: {},
+      managerCandidates: {},
+      candidatesRefreshWeek: {},
+      rerolls: {},
+      benefits: {},
+      hrHiring: true,
+    },
     products: { catalog: {}, developments: [] },
     underwriting: { activeModelId: model.id, models: { [model.id]: model }, loansBooked: 0 },
     treasury: {
@@ -213,7 +236,7 @@ export function newGame(opts: NewGameOptions): GameState {
     events: { log: [], scheduled: [] },
     history: { weekly: [], quarterly: [] },
     milestones: {},
-    flags: {},
+    flags: { lessonsDone: [] },
     nextId: 0,
   };
 

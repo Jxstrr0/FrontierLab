@@ -7,7 +7,7 @@ import * as cmd from '../../sim/commands';
 import { deptDesks } from '../../sim/hq';
 import type { DeptId } from '../../sim/state';
 import { Badge, Card, SectionTitle, StatBar, Stepper } from '../components';
-import { moneyFull } from '../format/format';
+import { moneyFull, moneyStepper } from '../format/format';
 import { act, useGame } from '../store';
 import { coverageView, isHqDept, salaryBounds } from './deptSelectors';
 import { TeamFigures } from './TeamFigures';
@@ -52,7 +52,7 @@ export function DeptStaffing(p: { dept: DeptId }) {
               min={pay.min}
               max={pay.max}
               step={pay.step}
-              format={(v) => moneyFull(v, sym)}
+              {...moneyStepper(sym)}
               onChange={(v) => act(cmd.setDeptSalary, p.dept, v)}
               hint={`Market ${moneyFull(pay.market, sym)}`}
             />
@@ -76,7 +76,7 @@ function CoverageMeter(p: { dept: Parameters<typeof coverageView>[1] }) {
   const max = HQ_COVERAGE.kMax;
   const tone = c.status === 'short' ? 'bad' : c.status === 'ok' ? 'good' : 'flat';
   return (
-    <Card class="hq-coverage">
+    <Card class="hq-coverage" tutorial="hq-coverage">
       <div class="hq-coverage-head">
         <span class="hq-coverage-title">Coverage</span>
         <span class={`hq-coverage-text tone-${tone}`}>{c.text}</span>

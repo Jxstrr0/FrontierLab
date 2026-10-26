@@ -211,6 +211,16 @@ button.exec-seat:active {
   gap: var(--space-1);
 }
 
+/* A delegation's dial, nested under its switch (SCREENS §10.1). */
+.exec-dial {
+  margin: var(--space-1) 0 var(--space-3);
+  padding-left: var(--space-3);
+  border-left: 2px solid var(--hairline);
+}
+.exec-dial .pay-policy {
+  margin-top: var(--space-3);
+}
+
 /* Growth cities on the COO's profile (SCREENS §10.1). */
 .growth {
   margin-top: var(--space-3);

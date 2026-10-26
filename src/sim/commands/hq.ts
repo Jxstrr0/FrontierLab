@@ -201,6 +201,13 @@ export function setDeptSalary(state: GameState, dept: DeptId, salary: number): C
   return ok();
 }
 
+/** Switches HR's hiring of branch managers on or off (§16.11). */
+export function setHrHiring(state: GameState, on: boolean): CommandResult {
+  if (!state.departments.hr) return fail('Manager hiring is run from the HR floor.');
+  state.people.hrHiring = on;
+  return ok();
+}
+
 export function setBenefit(state: GameState, id: string, value: number): CommandResult {
   const spec = BENEFITS[id];
   if (!spec) return fail('Unknown benefit.');

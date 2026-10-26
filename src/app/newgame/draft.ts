@@ -2,7 +2,9 @@
 // before it becomes NewGameOptions on the last step.
 import { BRAND_INKS } from '../../data/brandInks';
 import { CITIES } from '../../data/cities';
-import type { Difficulty } from '../../data/types';
+import type { Difficulty, HouseStyle, LogoShape } from '../../data/types';
+import { HOUSE_STYLE_IDS } from '../../data/houseStyles';
+import { DEFAULT_LOGO_SHAPE } from '../../data/logoShapes';
 import { COMPETITORS, START_CASH } from '../../config/balance';
 import type { AvatarSpec, Settings } from '../../sim/state';
 import { loadPrefs } from '../saves';
@@ -13,6 +15,10 @@ export interface Draft {
   /** Once the player types their own monogram we stop auto-filling it. */
   monogramEdited: boolean;
   brandInk: string;
+  /** The outline of the bank's mark. */
+  logoShape: LogoShape;
+  /** The look every branch front shares. */
+  houseStyle: HouseStyle;
   founderName: string;
   avatar: AvatarSpec;
   cityId: string;
@@ -44,8 +50,22 @@ export function initialDraft(): Draft {
     monogram: '',
     monogramEdited: false,
     brandInk: BRAND_INKS[0]!.hex,
+    logoShape: DEFAULT_LOGO_SHAPE,
+    houseStyle: HOUSE_STYLE_IDS[0]!,
     founderName: '',
-    avatar: { head: 0, hair: 0, facial: 0, glasses: 0, attire: 0, tone: 0, shade: 1 },
+    avatar: {
+      head: 0,
+      hair: 0,
+      facial: 0,
+      glasses: 0,
+      attire: 0,
+      tone: 0,
+      shade: 1,
+      eyes: 0,
+      brows: 0,
+      mouth: 0,
+      age: 0,
+    },
     cityId,
     difficulty: 'normal',
     competitors: usualCompetitors(cityId),

@@ -21,6 +21,7 @@ import { deptDesks, riskPdMult, shortfall } from '../hq';
 import { recordLoss } from '../riskFloor';
 import { appCost } from '../underwriting';
 import { delegationOn } from '../execSeats';
+import { guidanceRateOffset, guidanceThresholdMult } from '../branchGuidance';
 import { newId } from '../ids';
 import { creditCycle, loanDemand } from '../macro';
 import { clamp, roundToStep } from '../math';
@@ -317,7 +318,8 @@ function decideDelegated(
   if (lendingBlocked(state)) return undefined;
   const threshold =
     (LOANDESK.delegatedThresholds[state.company.riskAppetite - 1] ?? 0) *
-    ethicsStretch(state, branch);
+    ethicsStretch(state, branch) *
+    guidanceThresholdMult(state);
   if (app.estPd > threshold) {
     delete state.loanDesk.applications[app.id];
     recordDesk(state, branch.id, 'declined');
@@ -328,7 +330,10 @@ function decideDelegated(
   const rate = roundToStep(
     Math.max(
       branchPrice(state, branch, 'sbl'),
-      ftpShort(country) + app.estPd * app.lgd + LOANDESK.delegatedMargin,
+      ftpShort(country) +
+        app.estPd * app.lgd +
+        LOANDESK.delegatedMargin +
+        guidanceRateOffset(state, 'loans'),
     ),
     spec.step,
   );

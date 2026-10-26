@@ -13,6 +13,8 @@ import type {
   Pct,
   Pentagon,
   HqDeptId,
+  HouseStyle,
+  LogoShape,
   Phase,
   Rate,
   RatingCategory,
@@ -53,7 +55,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState } from './personalTypes';
 
-export const SCHEMA_VERSION = 15;
+export const SCHEMA_VERSION = 26;
 
 export interface GameState {
   schemaVersion: number;
@@ -125,11 +127,18 @@ export interface GameState {
   history: { weekly: WeeklySnapshot[]; quarterly: QuarterReport[] };
   milestones: Record<string, Week>;
   /**
-   * `tutorialStep` (Stage 10, optional so older saves load as-is): undefined =
-   * never offered, 0 = offer prompt, 1–7 = the SCREENS §27 steps, 8 = closing
-   * card, 9 = finished or skipped (src/app/tutorial/steps.ts).
+   * `tutorialStep` (Stage 10): undefined = never offered, 0 = offer prompt,
+   * 1–9 = the SCREENS §27.1 steps, 10 = closing card, 11 = finished or skipped
+   * (src/data/tutorial.ts; 1–7, 8 and 9 before schema v24).
+   * `lesson`: the Part 2 guide in progress (SCREENS §27.2) and its step.
+   * `lessonsDone`: guides and first-look tips already seen (schema v24).
    */
-  flags: { gameOver?: 'takeover' | 'insolvency'; tutorialStep?: number };
+  flags: {
+    gameOver?: 'takeover' | 'insolvency';
+    tutorialStep?: number;
+    lesson?: { id: string; step: number };
+    lessonsDone: string[];
+  };
   /** Monotonic counter for generated ids. */
   nextId: number;
 }
@@ -151,6 +160,10 @@ export interface Meta {
   startCash: number;
   /** The start city (schema v9): the bank's domicile — home central bank, tax, exchange. */
   homeCityId: Id;
+  /** The look every branch front shares (schema v19), chosen at New Game. */
+  houseStyle: HouseStyle;
+  /** The outline of the bank's mark (schema v20), chosen at New Game. */
+  logoShape: LogoShape;
 }
 
 export interface Clock {
@@ -171,6 +184,10 @@ export interface Settings {
   reducedMotion: boolean;
   textScale: 1 | 1.15 | 1.3;
   layers: Record<string, boolean>;
+  /** The HQ bottom tabs in the order you arranged them (schema v22); departments not listed follow in DEPT_ORDER. */
+  hqTabOrder: DeptId[];
+  /** Part 2 of the tutorial: guides for new mechanics and first-look tips (schema v24). */
+  guides: boolean;
 }
 
 export interface AvatarSpec {
@@ -181,6 +198,11 @@ export interface AvatarSpec {
   attire: number;
   tone: number;
   shade: number;
+  /** Face detail (schema v21): eye shape, brows, mouth and age lines. */
+  eyes: number;
+  brows: number;
+  mouth: number;
+  age: number;
 }
 
 // ─── World ────────────────────────────────────────────────────────────────────
@@ -362,6 +384,25 @@ export interface Company {
   gradProgram?: GradProgram;
   /** The fit-out you last built with (schema v14): the build sheet and the COO start from it. */
   lastBuild?: BuildSpec;
+  /**
+   * Branch guidance from the C-suite (schema v15, §17.2): whole steps that move
+   * delegated managers' pricing, Loan Desk approvals, wages, marketing and
+   * lineup. Staffing, marketing and products joined in schema v18.
+   */
+  guidance: BranchGuidance;
+}
+
+/**
+ * Positive deposits pays savers more; positive loans charges borrowers more and
+ * approves less; positive staffing pays and staffs more; positive marketing
+ * spends more on campaigns; positive products offers more and charges less.
+ */
+export interface BranchGuidance {
+  deposits: number;
+  loans: number;
+  staffing: number;
+  marketing: number;
+  products: number;
 }
 
 export interface FixedAsset {
@@ -604,8 +645,12 @@ export interface People {
   /** Candidate pool per city; refreshes every 4 weeks (SIMULATION §6.5). */
   managerCandidates: Record<Id, Manager[]>;
   candidatesRefreshWeek: Record<Id, Week>;
+  /** Paid rerolls per city since its pool last refreshed for free (schema v17). */
+  rerolls: Record<Id, number>;
   /** HR benefit control values by benefit id (§16.5). */
   benefits: Record<string, number>;
+  /** With an HR floor, HR hires a manager for every open branch without one (§16.11, schema v25). */
+  hrHiring: boolean;
 }
 
 export interface Manager {

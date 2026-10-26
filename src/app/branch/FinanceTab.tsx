@@ -58,7 +58,7 @@ export function FinanceTab({ branch }: { branch: Branch }) {
 
       <SectionTitle>Income statement</SectionTitle>
       <Segmented label="Statement period" options={PERIODS} value={period} onChange={setPeriod} />
-      <Statement branch={branch} period={period} />
+      <Statement branch={branch} period={period} sym={sym} />
 
       <SectionTitle>Balances</SectionTitle>
       <Card>
@@ -90,10 +90,10 @@ function Headline(p: { label: string; now: number; prev?: number; sym: string })
   );
 }
 
-function Statement({ branch, period }: { branch: Branch; period: Period }) {
+function Statement({ branch, period, sym }: { branch: Branch; period: Period; sym: string }) {
   const want = PERIOD_WEEKS[period];
   const t = sumPnl(branch.pnl, want);
-  const line = (v: number | undefined) => figure(v ?? 0);
+  const line = (v: number | undefined) => figure(v ?? 0, sym);
   return (
     <Card class="br-statement">
       <div class="br-statement-head muted small">
@@ -111,15 +111,15 @@ function Statement({ branch, period }: { branch: Branch; period: Period }) {
       {REVENUE_LINES.map(([k, label]) => (
         <Row label={label} value={line(t.lines[k])} />
       ))}
-      <Row label="Total revenue" value={figure(t.revenue)} strong />
+      <Row label="Total revenue" value={figure(t.revenue, sym)} strong />
       <div class="br-statement-group">Expenses</div>
       {EXPENSE_LINES.map(([k, label]) => (
         <Row label={label} value={line(t.lines[k])} />
       ))}
-      <Row label="Total expenses" value={figure(t.expenses)} strong />
+      <Row label="Total expenses" value={figure(t.expenses, sym)} strong />
       <Row
         label="Branch income"
-        value={figure(t.income)}
+        value={figure(t.income, sym)}
         tone={t.income < 0 ? 'bad' : undefined}
         strong
       />

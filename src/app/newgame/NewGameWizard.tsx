@@ -56,6 +56,8 @@ export function NewGameWizard() {
       bankName: draft.bankName.trim(),
       monogram: draft.monogram,
       brandInk: draft.brandInk,
+      logoShape: draft.logoShape,
+      houseStyle: draft.houseStyle,
       founderName: draft.founderName.trim(),
       founderAvatar: draft.avatar,
       difficulty: draft.difficulty,

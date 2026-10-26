@@ -56,6 +56,8 @@ export type Signature =
   | 'shellHall' // a harbour hall roofed with white shells
   | 'skyDeck' // three towers joined by a deck on top
   | 'prismTower' // an angular tower of stacked triangles
+  | 'steppedSpire' // a stepped stone tower with low wings and a needle spire
+  | 'onionDomes' // a church crowned with onion domes beside a bell tower
   | 'none';
 
 export interface CityLook {
@@ -223,6 +225,23 @@ export const CITY_LOOKS: Record<string, CityLook> = {
     signature: 'prismTower',
     tint: '#8FC7B8',
     skyline: 1.45,
+  }),
+  mos: look({
+    water: 'river',
+    arrange: { turn: 3, mirror: false },
+    style: 'mansard',
+    signature: 'steppedSpire',
+    tint: '#D19A8C',
+    skyline: 1.3,
+    bigPark: true,
+  }),
+  spb: look({
+    water: 'canals',
+    arrange: { turn: 1, mirror: true },
+    style: 'mansard',
+    signature: 'onionDomes',
+    tint: '#9CB8CC',
+    skyline: 0.95,
   }),
   fmm: look({
     water: 'none',

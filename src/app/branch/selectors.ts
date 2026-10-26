@@ -5,8 +5,7 @@ import {
   DAYS_PER_WEEK,
   FITOUT_DAYS,
   INTEREST_PERIODS,
-  MANAGER_BASE_SALARY,
-  MANAGER_SALARY_RANGE,
+  MANAGER_PAY,
   MAX_STAFF_MULT,
   WAGE_RANGE,
   WAGE_STEP,
@@ -14,12 +13,21 @@ import {
   WEEKS_PER_YEAR,
 } from '../../config/balance';
 import type { CampaignCost } from '../../data/campaigns';
-import { CITIES } from '../../data/cities';
 import { isDeposit, isLoan, type ProductSpec } from '../../data/products';
 import { deskWeek } from '../../sim/branch/loanDesk';
 import { marketWage, staffNeeded } from '../../sim/branch/staff';
-import type { Book, Branch, BranchPnl, BranchPnlLine, GameState } from '../../sim/state';
-import { delta, money, pct, percentText } from '../format/format';
+import { managerMarketSalary, managerSalaryBounds } from '../../sim/payReviews';
+export { managerRerollFee } from '../../sim/candidateRerolls';
+import type { Book, Branch, BranchPnl, BranchPnlLine, GameState, Manager } from '../../sim/state';
+import {
+  delta,
+  exactMoney,
+  fromCurrency,
+  money,
+  pct,
+  percentText,
+  toCurrency,
+} from '../format/format';
 
 /** UI-only thresholds for the advisor's contextual line (not simulation tuning). */
 const ADVISOR = {
@@ -32,8 +40,8 @@ const ADVISOR = {
 /** UI-only morale bands for the staff mood figures (jade / brass / oxblood). */
 const MOOD_BANDS = { good: 60, warn: 40 } as const;
 
-/** Manager salary stepper step, in currency units. */
-export const SALARY_STEP = 1000;
+/** Manager salary stepper step (MANAGER_PAY.salaryStep). */
+export const SALARY_STEP = MANAGER_PAY.salaryStep;
 
 const MONTHS_PER_YEAR = INTEREST_PERIODS.monthsPerYear;
 
@@ -117,12 +125,25 @@ export function wageBounds(cityId: string) {
 }
 
 /** Manager salary stepper bounds (setManagerSalary). */
-export function salaryBounds(cityId: string) {
-  const ref = (CITIES[cityId]?.wageIndex ?? 1) * MANAGER_BASE_SALARY;
-  return {
-    min: Math.ceil((ref * MANAGER_SALARY_RANGE[0]) / SALARY_STEP) * SALARY_STEP,
-    max: Math.floor((ref * MANAGER_SALARY_RANGE[1]) / SALARY_STEP) * SALARY_STEP,
-  };
+export const salaryBounds = managerSalaryBounds;
+
+export interface ManagerPayView {
+  market: number;
+  /** How pay compares with market for poaching (§17.1). */
+  standing: 'underpaid' | 'fair' | 'wellPaid';
+}
+
+/** A manager's market pay and where their salary stands against it. */
+export function managerPayView(s: GameState, mgr: Manager): ManagerPayView {
+  const market = managerMarketSalary(s, mgr);
+  const ratio = mgr.salary / Math.max(1, market);
+  const standing =
+    ratio < MANAGER_PAY.underpaidRatio
+      ? 'underpaid'
+      : ratio >= MANAGER_PAY.wellPaidRatio
+        ? 'wellPaid'
+        : 'fair';
+  return { market, standing };
 }
 
 /** Formats a product price: a rate, a monthly or annual fee, or a % fee. */
@@ -132,9 +153,9 @@ export function priceText(spec: ProductSpec, v: number, sym: string): string {
     case 'pctFee':
       return pct(v);
     case 'feeMonthly':
-      return `${sym}${Math.round(v)}/mo`;
+      return `${sym}${Math.round(toCurrency(v, sym)).toLocaleString('en-US')}/mo`;
     case 'feeAnnual':
-      return `${sym}${Math.round(v)}/yr`;
+      return `${sym}${Math.round(toCurrency(v, sym)).toLocaleString('en-US')}/yr`;
   }
 }
 
@@ -143,7 +164,8 @@ export function rangeText(spec: ProductSpec, sym: string): string {
   if (spec.priceType === 'rate' || spec.priceType === 'pctFee') {
     return `${(spec.min * 100).toFixed(2)}–${pct(spec.max)}`;
   }
-  return `${sym}${spec.min}–${sym}${spec.max}`;
+  const whole = (v: number) => Math.round(toCurrency(v, sym)).toLocaleString('en-US');
+  return `${sym}${whole(spec.min)}–${sym}${whole(spec.max)}`;
 }
 
 /**
@@ -151,16 +173,17 @@ export function rangeText(spec: ProductSpec, sym: string): string {
  * a value already inside the product's range (e.g. 0.0325) is taken as is.
  */
 /** Reads a typed price: rates and % fees are typed as percents ("3.25"), fees as whole money. */
-export function parsePrice(spec: ProductSpec, s: string): number {
-  const n = Number(s.replace(/[%$\s,]|\/mo|\/yr/g, ''));
-  if (spec.priceType === 'feeMonthly' || spec.priceType === 'feeAnnual') return n;
+export function parsePrice(spec: ProductSpec, s: string, sym = '$'): number {
+  const n = Number(s.replace(/[^0-9.]/g, ''));
+  if (spec.priceType === 'feeMonthly' || spec.priceType === 'feeAnnual')
+    return fromCurrency(n, sym);
   return n / 100;
 }
 
 /** The editable text for a price, in the units parsePrice expects. */
-export function editPrice(spec: ProductSpec, v: number): string {
+export function editPrice(spec: ProductSpec, v: number, sym = '$'): string {
   if (spec.priceType === 'feeMonthly' || spec.priceType === 'feeAnnual')
-    return String(Math.round(v));
+    return String(Math.round(toCurrency(v, sym)));
   return percentText(v);
 }
 
@@ -215,7 +238,7 @@ export function unitView(
       margin: ratio(keep, rev),
       caption: `Spread ${signed(ftp - pay)}`,
       costLabel: 'Unit cost',
-      costText: `${sym}${(perYear / MONTHS_PER_YEAR).toFixed(2)}/mo`,
+      costText: `${exactMoney(perYear / MONTHS_PER_YEAR, sym)}/mo`,
     };
   }
   if (spec.kind === 'wealth') {
@@ -224,7 +247,7 @@ export function unitView(
       margin: ratio(rev - perYear, rev),
       caption: `Fee ${pct(price)} of assets`,
       costLabel: 'Unit cost',
-      costText: `${sym}${(perYear / MONTHS_PER_YEAR).toFixed(2)}/mo`,
+      costText: `${exactMoney(perYear / MONTHS_PER_YEAR, sym)}/mo`,
     };
   }
   if (spec.kind === 'fx') {
@@ -235,7 +258,7 @@ export function unitView(
     margin: ratio(rev - perYear, rev),
     caption: `Fee ${priceText(spec, price, sym)}`,
     costLabel: 'Unit cost',
-    costText: `${sym}${perYear.toFixed(2)}/yr`,
+    costText: `${exactMoney(perYear, sym)}/yr`,
   };
 }
 
@@ -355,7 +378,7 @@ export function campaignCostText(cost: CampaignCost, costIndex: number, sym: str
   if (cost.type === 'perNewDepositAccount') {
     return `${money(cost.amount, sym)} per new deposit account`;
   }
-  return `${sym}${cost.amount.toFixed(2)} per account a week`;
+  return `${exactMoney(cost.amount, sym)} per account a week`;
 }
 
 /** Game day at the close of a sim week, for dates on week-indexed records. */

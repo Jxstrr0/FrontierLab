@@ -3,7 +3,19 @@ import { avatarFromSeed, PART_COUNTS, portraitMarkup, SKIN_TONES } from '../../s
 import { AVATAR_PARTS } from '../../src/data/avatarParts';
 import type { AvatarSpec } from '../../src/sim/state';
 
-const BASE: AvatarSpec = { head: 0, hair: 0, facial: 0, glasses: 0, attire: 0, tone: 0, shade: 1 };
+const BASE: AvatarSpec = {
+  head: 0,
+  hair: 0,
+  facial: 0,
+  glasses: 0,
+  attire: 0,
+  tone: 0,
+  shade: 1,
+  eyes: 0,
+  brows: 0,
+  mouth: 0,
+  age: 0,
+};
 
 describe('portrait generator', () => {
   it('matches the avatar part counts the picker offers', () => {
