@@ -69,7 +69,7 @@ export function repayCorporateLoan(state: GameState, loanId: string): CommandRes
   return ok();
 }
 
-/** Draws on an investment bank's credit line, up to the live limit (20% of equity). */
+/** Draws on an investment bank's credit line, up to the live limit (a share of equity, §19.9). */
 export function drawCredit(state: GameState, lenderId: string, amount: number): CommandResult {
   if (!validAmount(amount)) return fail('Enter an amount above zero.');
   if (state.world.sites[lenderId]?.kind !== 'investmentBank')
