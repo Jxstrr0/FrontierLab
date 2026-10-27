@@ -73,7 +73,7 @@ describe('lobbying firm views', () => {
     const firm = 'site_cal_lobbyingFirm_parliamentRow';
     const cards = campaignCards(s, firm);
     expect(cards.map((c) => c.spec.id)).toEqual(['easeBuffer', 'fastTrack', 'stallBuffer']);
-    expect(cards.find((c) => c.spec.id === 'stallBuffer')!.blocked).toMatch(/no capital buffer/);
+    expect(cards.find((c) => c.spec.id === 'stallBuffer')!.blocked).toMatch(/no AI safety bill/);
     expect(cards.find((c) => c.spec.id === 'easeBuffer')!.blocked).toBeUndefined();
     cmd.startLobbying(s, firm, 'fastTrack');
     expect(pendingCampaigns(s)).toHaveLength(1);

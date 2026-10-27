@@ -3,13 +3,47 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C7a done (v0.1.21, save schema 17): the safety ratio, the AI regulator's tiers, safety audits, the mandated pause and a revoked licence. Next: C7b (revenue-multiple valuation, IPO rules, AI policy lobbying).
+**Current stage:** C7 done (v0.1.21–v0.1.22, save schema 17): the safety ratio and AI regulator (C7a), then revenue-multiple valuation, IPO rules on ARR and AI policy lobbying (C7b). Next: C8 (polish and relaunch).
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `1c51dcb74fc7e0` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `1a7af941900270` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-27 — Stage C7b: valuing the lab on revenue (v0.1.22)
+
+**What you asked for:** finish C6, then C7. This is the second and last part of C7.
+
+**What changed.**
+- **The lab is valued on its revenue, not its book.** Valuing an AI lab on book value and return on equity made a fast-growing lab almost worthless. The value now comes from your ARR times a multiple.
+  - The multiple starts at 3×. Revenue growth adds up to 12 more: doubling revenue in a year adds 6. A model ahead of the market adds 2 per point of quality. The multiple stays between 1.5× and 16×.
+  - Book value is the floor. A lab is never worth less than its net assets.
+  - While private, investors take 20% off. The IPO offer takes 10% off. Once listed, sentiment and investor relations move the price, as before.
+  - The Company screen's share card explains the multiple.
+- **IPO rules on ARR.** You need $100M of ARR to list, instead of $25M of equity. The other rules stay: four profitable quarters, Finance cover, a safety tier of Adequate or better, and no recession at home unless the credit ratio is 14% or more.
+- **Lobbying becomes AI policy.**
+  - "Ease the AI safety rules" lowers every safety tier line by 5 points for a year.
+  - "Stall the AI safety bill" makes a pending safety bill fail its vote.
+  - "Fast-track a merger review" now reads in market share.
+  - The politics bill that raises the lines is now an AI safety buffer.
+
+**Balance.**
+- Seed 42 steady still lists in week 209 (year 5). The IPO now raises far more: equity at the end of year 5 is $582M, up from $162M.
+- Aggressive and turtle pass every check. The 20-city panel passes every check.
+- Rival labs still use the bank-style price for now. They get revenue numbers in the C8 balance pass.
+
+**Checks.**
+- New tests cover:
+  - the valuation worked examples: flat growth, doubled revenue, the growth cap, a young lab's growth scaled to a year, the book floor and the quality lift;
+  - the public target;
+  - the ARR rule on the IPO checklist.
+- The IPO acceptance test still passes.
+- No save changes: v0.1.21 saves load as they are.
+- I checked the Company panel at iPhone size with a pause under way: the pause banner, safety meter, credit row and the new valuation note all show, with no console errors. That also covers the phone check C7a left open.
+- The determinism snapshot changed as intended.
+
+**Next:** C8, polish and relaunch.
 
 ### 2026-10-27 — Stage C7a: the safety ratio and the AI regulator (v0.1.21)
 

@@ -1,11 +1,11 @@
-// Your bank's share price (SIMULATION §19.2, §19.5). While private it is the
-// private valuation per share. Once public, a target of book value per share ×
-// clamp(ROE_ttm / COE) × sentiment × the investor-relations penalty, eased in
+// Your lab's share price (SIMULATION §19.2, §19.5). While private it is the
+// private valuation per share. Once public, a target of the revenue-multiple
+// value per share (book value as the floor, C7b) × sentiment × the
+// investor-relations penalty, eased in
 // with an EMA plus noise. Sentiment walks (stream `ownStock`) and takes shocks
 // from this week's incidents and dividend decisions, and from earnings growth
 // at quarter-end. Big weekly moves make the paper.
 import { OWN_STOCK, PUBLIC_PRICE } from '../config/balance';
-import { balanceSheet } from './balanceSheet';
 import {
   clampSentiment,
   dividendShock,
@@ -18,9 +18,8 @@ import { pushEvent } from './events';
 import { ema } from './math';
 import { recordClose } from './marketStocks';
 import { stream } from './rng';
-import { bookValuePerShare } from './shares';
 import type { GameEvent, GameState } from './state';
-import { privateValuation, roeTtm } from './valuation';
+import { fundamentalPerShare, privateValuation } from './valuation';
 
 const num = (v: unknown): number => (typeof v === 'number' && Number.isFinite(v) ? v : 0);
 
@@ -59,12 +58,10 @@ export function eventShock(events: GameEvent[]): number {
   return factor - 1;
 }
 
-/** The target price of your listed bank this week (§19.5). */
+/** The target price of your listed lab this week (§19.5). */
 export function ownTargetPrice(state: GameState): number {
-  const equity = balanceSheet(state).equity;
   return publicTarget(
-    bookValuePerShare(state, equity),
-    roeTtm(state, equity),
+    fundamentalPerShare(state),
     state.stock.sentiment,
     state.hq.coverage.finance?.kPrime ?? 1,
   );

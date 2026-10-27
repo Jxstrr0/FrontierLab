@@ -201,9 +201,9 @@ export const CAPITAL_BUFFER_POLICY = 'capital_buffer';
 export const POLICIES: PolicySpec[] = [
   {
     id: CAPITAL_BUFFER_POLICY,
-    name: 'a temporary capital buffer for banks',
-    effect: 'raise capital requirements for banks by one percentage point for a year',
-    impact: ' Banks must hold more capital from today.',
+    name: 'a temporary AI safety buffer',
+    effect: 'raise safety requirements for AI labs for a year',
+    impact: ' AI labs must show stronger safety cover from today.',
   },
   {
     id: 'infrastructure',
