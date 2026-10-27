@@ -27,6 +27,7 @@ html.reduced-motion *::after {
 }
 #app .sheet {
   max-height: calc(88vh / var(--ui-zoom, 1));
+  max-height: calc(88dvh / var(--ui-zoom, 1));
 }
 
 /* Larger text on a phone (115%, 130%; Stage 10 accessibility pass). The top

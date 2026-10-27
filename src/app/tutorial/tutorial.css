@@ -18,7 +18,11 @@
   animation: tut-in var(--dur-panel) var(--ease-out);
 }
 .tut-bar.is-bottom {
-  bottom: calc(var(--safe-bottom) + var(--space-2));
+  /* --tut-bottom: how far an open panel's tab bar or footer reaches up, in screen px (ring.ts). */
+  bottom: max(
+    calc(var(--safe-bottom) + var(--space-2)),
+    calc(var(--tut-bottom, 0px) / var(--ui-zoom, 1) + var(--space-2))
+  );
 }
 .tut-bar.is-top {
   /* --tut-top: the bottom of an open panel's header, in screen px (ring.ts). */
@@ -154,4 +158,15 @@
    divided by the text-size zoom because the modal sits inside #app). */
 #app:has(.tut-bar.is-top) .modal .modal-content {
   padding-top: calc(var(--tut-modal-pad, 0px) / var(--ui-zoom, 1));
+}
+
+/* ring.ts measures how far the bottom bar covers an open panel's or sheet's
+   content, so their last cards can scroll up out from under it. */
+#app:has(.tut-bar.is-bottom) .panel-content {
+  padding-bottom: calc(
+    var(--space-6) + var(--safe-bottom) + var(--tut-panel-pad, 0px) / var(--ui-zoom, 1)
+  );
+}
+#app:has(.tut-bar.is-bottom) .sheet-content {
+  padding-bottom: calc(var(--space-4) + var(--tut-sheet-pad, 0px) / var(--ui-zoom, 1));
 }

@@ -32,9 +32,9 @@ export function regionOf(cityId: string): StartRegion {
 
 /** Euro-area cities read as their own country, not "Eurozone". */
 const EURO_NATION: Record<string, string> = {
-  par: 'Elegant boulevards and a proud research tradition: customers value a trusted name and careful safety.',
-  fra: 'Europe’s enterprise hub: orderly, competitive and fair, with big banks and carmakers as customers.',
-  ams: 'Canals, cyclists and fast fibre, with a market that rewards good service.',
+  par: 'France',
+  fra: 'Germany',
+  ams: 'Netherlands',
 };
 
 /** "Canada", "United Kingdom", "France" for a city's card. */
@@ -74,9 +74,9 @@ export const CITY_FLAVOUR: Record<string, string> = {
   sfo: 'The heart of the AI scene: top talent and eager customers, at the highest rents and wages.',
   sea: 'A cloud-computing port town where new labs are still finding their footing and customers pay well.',
   lon: 'An old finance capital with every big enterprise in reach, and a rival lab on every corner.',
-  par: 'Elegant boulevards and careful savers who value a good name.',
-  fra: 'The continent’s banking desk: orderly, competitive and fair.',
-  ams: 'Canals, cyclists and a market that rewards good service.',
+  par: 'Elegant boulevards and a proud research tradition: customers value a trusted name and careful safety.',
+  fra: 'Europe’s enterprise hub: orderly, competitive and fair, with big banks and carmakers as customers.',
+  ams: 'Canals, cyclists and fast fibre, with a market that rewards good service.',
   zur: 'Rich clients and the highest wages on the map: a small market with big contracts for careful labs.',
   tyo: 'A vast market of patient enterprise buyers and robotics know-how, where margins run thin.',
   syd: 'Sun, surf and a lively startup scene that keeps the Deal Desk busy.',

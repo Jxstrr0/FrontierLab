@@ -13,12 +13,14 @@ function fee(market: number, rerolls: number): number {
   return Math.round(f / 100) * 100;
 }
 
-/** What the next manager reroll in a city costs. */
+/** What the next manager reroll in a city costs (nothing with the developer tools' free rerolls). */
 export function managerRerollFee(state: GameState, cityId: string): number {
+  if (state.flags.devRerolls) return 0;
   return fee(managerBaseSalary(state, cityId), state.people.rerolls[cityId] ?? 0);
 }
 
-/** What the next reroll of an executive seat's candidates costs. */
+/** What the next reroll of an executive seat's candidates costs (nothing with free rerolls). */
 export function execRerollFee(state: GameState, seat: ExecSeat): number {
+  if (state.flags.devRerolls) return 0;
   return fee(execMarketSalary(state), state.executives.rerolls[seat] ?? 0);
 }

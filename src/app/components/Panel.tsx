@@ -3,7 +3,7 @@
 // at ≥ 900px. Also the bottom Sheet and centred Modal shells, which render into
 // the overlay layer (Overlays.tsx) rather than where they are declared.
 import type { ComponentChildren } from 'preact';
-import { useRef, useState } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import { Overlay } from './Overlays';
 import { avatarFromSeed } from '../../art/portraits';
 import type { AvatarSpec } from '../../sim/state';
@@ -30,7 +30,15 @@ export function Panel<T extends string>(p: {
   children: ComponentChildren;
 }) {
   const ref = useRef<HTMLElement>(null);
+  const content = useRef<HTMLDivElement>(null);
   useDialog(ref, p.onClose);
+  // A new tab starts at its top, not wherever the last tab was scrolled to.
+  const lastTab = useRef(p.tab);
+  useEffect(() => {
+    if (lastTab.current === p.tab) return;
+    lastTab.current = p.tab;
+    if (content.current) content.current.scrollTop = 0;
+  }, [p.tab]);
   return (
     <section class="panel" role="dialog" aria-label={p.title} tabIndex={-1} ref={ref}>
       <header class="panel-header">
@@ -53,7 +61,7 @@ export function Panel<T extends string>(p: {
       {p.advisor && (
         <AdvisorBar text={p.advisor.text} name={p.advisor.name} avatar={p.advisor.avatar} />
       )}
-      <div class="panel-content" tabIndex={0}>
+      <div class="panel-content" tabIndex={0} ref={content}>
         {p.hero && <div class="panel-hero">{p.hero}</div>}
         {p.children}
       </div>
