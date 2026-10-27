@@ -46,6 +46,16 @@ export interface EventPayloads {
   BRAND_CAMPAIGN_ENDED: { campaignId: string; reason: string };
   DIGITAL_PROJECT_DONE: { templateId: string; name: string };
   PRODUCT_DEVELOPED: { productId: string; name: string; stars: number };
+  /** A training run finished: a new model generation (training.ts, C6b). */
+  MODEL_TRAINED: { modelId: Id; name: string; stars: number; quality: number; leads: boolean };
+  /** A rival lab shipped a new model; `leads` when it tops every rival model (rivalModels.ts, C6b). */
+  RIVAL_MODEL_RELEASED: {
+    rivalId: Id;
+    rival: string;
+    model: string;
+    quality: number;
+    leads: boolean;
+  };
   GAME_OVER: { reason: 'takeover' | 'insolvency' };
   /** A milestone reached this week (DESIGN §5.18; src/data/milestones.ts). */
   MILESTONE: { id: string; title: string };

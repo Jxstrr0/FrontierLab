@@ -116,6 +116,19 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
         },
       };
     }
+    case 'RIVAL_MODEL_RELEASED':
+      return {
+        key: p.leads ? 'RIVAL_MODEL_LEADS' : 'RIVAL_MODEL_RELEASED',
+        subject: rivalId,
+        tab: 'banking',
+        icon: 'spark',
+        priority: p.leads ? P.rivalAbroad + 8 : P.rivalAbroad,
+        tokens: {
+          bank: str(p.rival, 'A rival lab'),
+          model: str(p.model, 'a new model'),
+          score: num(p.quality).toFixed(1),
+        },
+      };
     case 'RIVAL_MERGER': {
       const buyerLocal = isLocal(ctx, str(p.buyerId));
       return {

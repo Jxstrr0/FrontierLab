@@ -39,22 +39,31 @@ export function devTeamScore(state: GameState): number {
   return (productsK(state) * skill) / 100;
 }
 
-/** B = clamp(log10(budget / 5000) / log10(100), 0, 1). */
-export function budgetScore(weeklyBudget: number): number {
+/**
+ * B = clamp(log10(budget / min) / log10(maxAt / min), 0, 1): $5k → 0 and
+ * $500k → 1 for products; training runs pass their own scale (C6b).
+ */
+export function budgetScore(
+  weeklyBudget: number,
+  min: number = DEV_MIN_WEEKLY,
+  maxAt: number = DEV_MAX_BUDGET_SCORE_AT,
+): number {
   if (!(weeklyBudget > 0)) return 0;
-  return clamp(
-    dlog(weeklyBudget / DEV_MIN_WEEKLY) / dlog(DEV_MAX_BUDGET_SCORE_AT / DEV_MIN_WEEKLY),
-    0,
-    1,
-  );
+  return clamp(dlog(weeklyBudget / min) / dlog(maxAt / min), 0, 1);
 }
 
-/** D = 0.40 T + 0.40 B + 0.20 team (§16.6). */
-export function devScore(state: GameState, weeks: number, weeklyBudget: number): number {
+/** D = 0.40 T + 0.40 B + 0.20 team (§16.6), B on the given budget scale. */
+export function devScore(
+  state: GameState,
+  weeks: number,
+  weeklyBudget: number,
+  min?: number,
+  maxAt?: number,
+): number {
   const t = DEV_TERM_SCORE[weeks as DevTerm] ?? 0;
   return (
     DEV_WEIGHTS.term * t +
-    DEV_WEIGHTS.budget * budgetScore(weeklyBudget) +
+    DEV_WEIGHTS.budget * budgetScore(weeklyBudget, min, maxAt) +
     DEV_WEIGHTS.team * devTeamScore(state)
   );
 }
@@ -80,7 +89,7 @@ export function devOdds(state: GameState, weeks: number, weeklyBudget: number): 
   return starOdds(devScore(state, weeks, weeklyBudget));
 }
 
-/** Nominal weeks of progress per calendar week: max(0.3, k′). */
+/** Nominal weeks of progress per calendar week: max(0.3, k′). Training runs share it (C6b). */
 export function devSpeed(state: GameState): number {
   return Math.max(HQ_EFFECTS.devSpeedFloor, productsK(state));
 }
