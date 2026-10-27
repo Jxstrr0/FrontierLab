@@ -2,7 +2,13 @@
 // last week's new accounts, balance, funding or unit cost, the margin ring and
 // the price stepper. The small business loan card points to the Loan Desk.
 import type { ProductSpec } from '../../data/products';
-import { basePrice, branchPrice, incidentBoost, isOffered } from '../../sim/branch/pricing';
+import {
+  basePrice,
+  branchPrice,
+  followsHq,
+  incidentBoost,
+  isOffered,
+} from '../../sim/branch/pricing';
 import * as cmd from '../../sim/commands';
 import { countryOfCity, ftpFor, marketRef } from '../../sim/rates';
 import type { Branch } from '../../sim/state';
@@ -27,7 +33,7 @@ export function ProductCard(p: { branch: Branch; spec: ProductSpec; onLoanDesk: 
   const book = branch.books[spec.id];
   const unit = unitView(spec, price, ftp, book, sym);
   const delegated = branch.delegation.products;
-  const atHq = s.company.applyRatesToAll;
+  const atHq = followsHq(s, branch);
   const fmt = (v: number) => priceText(spec, v, sym);
   const baseHint = atHq
     ? 'Set at HQ'

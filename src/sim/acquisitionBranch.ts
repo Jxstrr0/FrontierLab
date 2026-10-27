@@ -114,6 +114,7 @@ export function convertRivalBranch(
     },
     reviewCards: [],
     offered: {},
+    ownPrices: false,
     books: {},
     campaigns: {},
     signupChurn: { mult: 1, weeksLeft: 0, weeksTotal: 0 },

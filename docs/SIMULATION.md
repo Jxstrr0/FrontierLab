@@ -629,6 +629,8 @@ If Finance coverage' < 0.9, the newest `ceil((0.9 − k') × 10)` weeks show as 
 - **Floors:** each floor slot holds one department. Fit-out = FLOOR_FITOUT ($120,000) × city.costIndex, a fixed asset.
 - **Desks per floor:** set by the building, 24 or 32 (the original showed both). Investment floors always have 32. The Executive suite always has 7 desks (you plus six executives).
 - **Releasing:** you can release a floor or a whole office. Staff above the remaining desks are let go, with 4 weeks' salary as severance.
+- **Main offices (C2d2):** at most MAIN_OFFICES_MAX (2) office buildings. The second must be in a different country from the first; it adds floors (and desks) to the same departments. Saves from before the cap keep any extra offices they hold, but can't lease more until they're under it.
+- **Company-wide prices (C2d2):** with "Apply rates to all sales offices" on, every office charges its country's HQ price list and follows the HQ lineup, except an office switched to **Set prices here** (`Branch.ownPrices`). That office starts from the HQ prices and lineup, then keeps its own rate sheet (its manager can price it under Products & rates delegation); HQ price and lineup changes skip it until it follows HQ again, which re-applies the HQ lineup. Marketing already works the same way: brand campaigns at HQ (§16.10) cover cities and countries, and each office can run its own campaigns on top.
 
 ### 16.2 Department state
 - `staff`, `desks` (sum across offices), `salary`, `skill`, `morale`, `targetStaff`, `openPositions`.

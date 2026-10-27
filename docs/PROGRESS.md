@@ -3,13 +3,25 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C2d1 done (v0.1.8, save schema 4): "sales office" everywhere on screen, and Sales Offices / Data Centers / Energy Sites map layers. C2c (v0.1.7): data centers, on a storefront or at a regional energy site. C2b (v0.1.6): rival labs also hold one sizable sales office per city. C2a (v0.1.5): one sales office per city, grown in place through four sizes. Before that, C1 (v0.1.4): floors, executives, segments, campaigns, benefits, conferences, incidents, stock sector, map layers, rival labs, "the lab" wording and the newspaper. Next is C2d2 (main offices, company-wide prices with per-office overrides). The owner's decisions are in the design brief and CONVERSION_PLAN §5.
+**Current stage:** C2 done. C2d2 (v0.1.9, save schema 5): at most two main offices (the second abroad) and a per-office "Set prices here" override. C2d1 (v0.1.8): "sales office" everywhere on screen, and Sales Offices / Data Centers / Energy Sites map layers. C2c (v0.1.7): data centers, on a storefront or at a regional energy site. C2b (v0.1.6): rival labs also hold one sizable sales office per city. C2a (v0.1.5): one sales office per city, grown in place through four sizes. Before that, C1 (v0.1.4): floors, executives, segments, campaigns, benefits, conferences, incidents, stock sector, map layers, rival labs, "the lab" wording and the newspaper. Next is C3 (see CONVERSION_PLAN), waiting on the owner's go-ahead. The owner's decisions are in the design brief and CONVERSION_PLAN §5.
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `0024151388b688` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `08cc5af209932f` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-26 — Stage C2d2: main offices and per-office prices (v0.1.9)
+
+**What changed.** This finishes C2.
+- **Main offices:** you can now lease at most **two** HQ buildings, and the second has to be in **another country** from the first. It adds floors (and desks) for your HQ teams. The Office for lease screen says why when you can't lease one. If an older save already has more offices, it keeps them.
+- **Company-wide prices with overrides:** when "Apply rates to all sales offices" is on at HQ, every office uses HQ's prices and lineup, as before. New: each office's Products tab has a **Set prices here** switch. Turn it on and that office keeps its own prices and lineup (it starts from HQ's, so nothing jumps); HQ changes skip it. Turn it off and it follows HQ again.
+- **Marketing** already worked this way (brand campaigns at HQ for whole cities or countries, plus each office's own campaigns), so it didn't need changes.
+- **Saves:** schema 4 → 5. Old saves have every office following HQ, same as before.
+
+**Checks.** `npm run lint`, all tests (3 new) and `npm run build` pass. Balance results are unchanged (seed 42 steady still shows its old single-seed payback warning). The **determinism snapshot** moved from `0024151388b688` to `08cc5af209932f` (intended: saves now carry the new per-office switch).
+
+**Next:** C3, when you say go.
 
 ### 2026-10-26 — Stage C2d1: "sales office" on screen, new map layers (v0.1.8)
 

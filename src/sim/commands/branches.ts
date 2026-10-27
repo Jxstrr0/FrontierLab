@@ -156,6 +156,7 @@ export function buildBranch(
     ratings: { rates: 3, products: 3, service: 3, branch: 3, overall: 3, reviewCount: 0 },
     reviewCards: [],
     offered: {},
+    ownPrices: false,
     books: {},
     campaigns: {},
     signupChurn: { mult: 1, weeksLeft: 0, weeksTotal: 0 },
