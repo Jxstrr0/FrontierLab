@@ -1,5 +1,5 @@
 // A small sheet about a rival's branch: who they are, how their branch is rated
-// and their rate sheet next to ours (SCREENS §2, CONTENT §25 "Rival branch").
+// and their price sheet next to ours (SCREENS §2, CONTENT §25 "Rival branch").
 import { CITIES } from '../../data/cities';
 import { PRODUCTS } from '../../data/products';
 import { branchPrice } from '../../sim/branch/pricing';
@@ -7,18 +7,13 @@ import { DAYS_PER_WEEK, RIVAL_MARKETING } from '../../config/balance';
 import { dateOf } from '../../sim/calendar';
 import { campaignWeeksLeft, rivalOverall } from '../../sim/rivalMarketing';
 import { rivalPriceInCity } from '../../sim/rivalPrices';
-import type { GameState, RivalBank } from '../../sim/state';
+import type { GameState } from '../../sim/state';
 import { AdvisorBar, Badge, CoinRating, Medallion, Sheet } from '../components';
 import { count } from '../format/format';
 import { priceText } from '../branch/selectors';
 import { sizeName } from '../../sim/branch/officeSize';
 
-const STRATEGY_LABEL: Record<RivalBank['strategy'], string> = {
-  incumbent: 'Incumbent bank',
-  disruptor: 'Disruptor',
-  premium: 'Premium bank',
-  community: 'Community bank',
-};
+import { STATUS_LABEL, STRATEGY_LABEL } from '../rivals/rivalSelectors';
 
 /** Products shown on the price sheet, in order. */
 const RATE_PRODUCTS = ['plus', 'pro', 'team', 'api'] as const;
@@ -72,7 +67,7 @@ export function RivalSheet(p: { s: GameState; lotId: string; onClose: () => void
             <div>{STRATEGY_LABEL[bank.strategy]}</div>
             <div class="muted small">{lot.address}</div>
           </div>
-          {bank.status !== 'active' && <Badge tone="warn">{bank.status}</Badge>}
+          {bank.status !== 'active' && <Badge tone="warn">{STATUS_LABEL[bank.status]}</Badge>}
         </div>
         <AdvisorBar text={advice} />
         {branch && (

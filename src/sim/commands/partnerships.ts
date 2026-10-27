@@ -47,7 +47,7 @@ export function signBlocker(
   if (!site || (site.kind !== 'employer' && site.kind !== 'university') || !site.employer)
     return 'That employer is no longer on the map.';
   if (site.kind === 'employer' && CITIES[site.cityId]?.regional)
-    return 'Energy sites sign data-centre and power deals, not payroll partnerships.';
+    return 'Energy sites sign data-centre and power deals, not staff plan deals.';
   if (kind === 'student' && site.kind !== 'university')
     return 'Only universities offer student partnerships.';
   if (activePartnership(state, siteId, kind)) return 'You already have this partnership.';
@@ -55,8 +55,8 @@ export function signBlocker(
   // A regional site has no storefronts: any open branch in its country can host (hostCandidates).
   if (!host || !hostCandidates(state, site.cityId).some((b) => b.id === host.id))
     return CITIES[site.cityId]?.regional
-      ? `Pick an open sales office of yours in ${COUNTRIES[CITIES[site.cityId]!.country].name} to host the accounts.`
-      : 'Pick an open sales office of yours in this city to host the accounts.';
+      ? `Pick an open sales office of yours in ${COUNTRIES[CITIES[site.cityId]!.country].name} to host the plans.`
+      : 'Pick an open sales office of yours in this city to host the plans.';
   const spec = productSpec(state, productId);
   if (!spec || !isPackage(state, productId) || !isOffered(host, productId))
     return 'Pick a plan the host sales office offers as the package.';

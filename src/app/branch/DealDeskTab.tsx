@@ -36,7 +36,7 @@ export function DealDeskTab({ branchId }: { branchId: string }) {
       {deskDelegated(s, branch) && (
         <Card>
           <p class="dealdesk-note">
-            Your {branch.managerId && branch.delegation.loans ? 'manager' : 'CRO'} is bidding on
+            Your {branch.managerId && branch.delegation.loans ? 'manager' : 'CSO'} is bidding on
             proposal requests for you, within the discount limit below, so most are settled during
             the weekly close. You can still step in on any that remain.
           </p>

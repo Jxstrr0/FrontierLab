@@ -63,7 +63,7 @@ function charterName(state: GameState, strategy: Strategy, rng: Rng): string {
     if (!taken.has(name)) return name;
   }
   // Every short name is used: number the next one.
-  const base = `${rng.pick(CHARTER_STEMS)} Bank`;
+  const base = `${rng.pick(CHARTER_STEMS)} Labs`;
   let n = 2;
   while (taken.has(`${base} ${n}`)) n += 1;
   return `${base} ${n}`;

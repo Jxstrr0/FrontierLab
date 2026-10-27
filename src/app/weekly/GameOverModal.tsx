@@ -1,7 +1,7 @@
 // Game over (DESIGN §5.18): a Ledger front page announcing insolvency (or, in
 // old saves only, a regulator takeover), with the lab's final numbers.
 import { Medallion, Modal } from '../components';
-import { gameDate, money } from '../format/format';
+import { count, gameDate, money } from '../format/format';
 import { Masthead } from './LedgerCard';
 import { screen, setGame, useGame } from '../store';
 import './weekly.css';
@@ -15,11 +15,12 @@ export function GameOverModal() {
   const last = s.history.weekly.at(-1);
   const branches = Object.values(s.branches).filter((b) => b.status === 'open').length;
   const weeks = s.clock.week;
+  const customers = Object.values(s.branches).reduce((n, b) => n + b.customers, 0);
 
   const headline = takeover ? `Regulator takes over ${bank}` : `${bank} fails as the cash runs out`;
   const standfirst = takeover
-    ? 'The lab stayed below the safety line for too long, and supervisors stepped in.'
-    : 'Depositors are told to expect delays as the doors close for good.';
+    ? 'The lab stayed below the safety line for too long, and administrators stepped in.'
+    : 'Customers are told their service ends tonight.';
 
   const leave = (to: 'saves' | 'title') => {
     setGame(null);
@@ -63,8 +64,9 @@ export function GameOverModal() {
           <p>
             At the end {bank} ran {branches} open{' '}
             {branches === 1 ? 'sales office' : 'sales offices'}
-            {last
-              ? `, held ${money(last.totals.deposits, sym)} in deposits and had lent ${money(last.totals.loans, sym)}.`
+            {`, served ${count(customers)} customers`}
+            {last?.totals.arr !== undefined
+              ? ` and booked ${money(last.totals.arr, sym)} in annual recurring revenue.`
               : '.'}
           </p>
           <p>

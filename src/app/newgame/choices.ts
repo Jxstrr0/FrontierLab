@@ -87,10 +87,10 @@ export const CITY_FLAVOUR: Record<string, string> = {
 };
 
 export const DIFFICULTY_BLURB: Record<Difficulty, string> = {
-  easy: 'More prospects walk in, rivals are gentler and fewer loans go bad.',
+  easy: 'More prospects walk in, rivals are gentler and fewer customers fail to pay.',
   normal: 'The intended balance. A fair fight.',
-  hard: 'Fewer prospects, sharper rivals and a few more defaults.',
-  expert: 'Lean demand, rivals at their best and real credit losses.',
+  hard: 'Fewer prospects, sharper rivals and a few more unpaid invoices.',
+  expert: 'Lean demand, rivals at their best and real bad debts.',
 };
 
 export const DIFFICULTY_LABEL: Record<Difficulty, string> = {

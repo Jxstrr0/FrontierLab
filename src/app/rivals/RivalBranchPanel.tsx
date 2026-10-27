@@ -28,7 +28,7 @@ import '../branch/branch.css';
 import './rivals.css';
 
 const CATEGORY_ROWS = [
-  { label: 'Rates', i: 0 },
+  { label: 'Price', i: 0 },
   { label: 'Products', i: 1 },
   { label: 'Service', i: 2 },
   { label: 'Sales office', i: 3 },

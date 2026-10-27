@@ -78,8 +78,8 @@ function RivalCard(p: { s: GameState; bank: RivalBank; onOffer: () => void }) {
       )}
       {distressed && (
         <p class="ma-sale small">
-          Seized by regulators. On sale for {weeks} more week{weeks === 1 ? '' : 's'}, then split
-          among other labs.
+          In administration. On sale for {weeks} more week{weeks === 1 ? '' : 's'}, then split among
+          other labs.
         </p>
       )}
       {facts.market ? (

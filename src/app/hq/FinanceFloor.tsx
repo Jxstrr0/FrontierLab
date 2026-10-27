@@ -61,7 +61,7 @@ export function FinanceFloor() {
         </Card>
       )}
 
-      <SectionTitle>Credit and liquidity</SectionTitle>
+      <SectionTitle>Credit</SectionTitle>
       <Card>
         <div class="cap-head">
           <div>

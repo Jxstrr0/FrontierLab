@@ -55,7 +55,7 @@ export const LIQUIDITY_STATUS: Record<
   LiquidityStatus,
   { label: string; tone: 'good' | 'warn' | 'bad' | 'info' }
 > = {
-  none: { label: 'No deposits yet', tone: 'info' },
+  none: { label: 'Nothing to measure', tone: 'info' },
   below: { label: 'Below minimum', tone: 'bad' },
   low: { label: 'Under target', tone: 'warn' },
   ok: { label: 'On target', tone: 'good' },

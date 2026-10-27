@@ -88,8 +88,8 @@ const LINES: Record<HqDeptId, [ok: string, short: string]> = {
     "We're short on engineers. The app rating will slide.",
   ],
   risk: [
-    'Losses are tracked and the regulator is calm.',
-    "We're missing bad loans. Defaults and fines are creeping up.",
+    'Incidents are tracked and the regulator is calm.',
+    "We're missing model risks. Incidents and fines are creeping up.",
   ],
 };
 
@@ -100,7 +100,7 @@ export function deptAdvisor(s: GameState, dept: DeptId): string[] {
   const name = DEPARTMENTS[dept].name;
   const lines: string[] = [];
   if (dept === 'treasury' && s.treasury.freeze) {
-    lines.push('Funding freeze: new lending is stopped until liquidity recovers.');
+    lines.push('Cash freeze: new spending is stopped until liquidity recovers.');
   }
   // C4c: a compute outage or crunch outranks the staffing line.
   const computeAlarm =

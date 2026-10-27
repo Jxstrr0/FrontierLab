@@ -229,7 +229,7 @@ const EVENT_TEXT: Record<string, (p: Record<string, unknown>) => string> = {
     const verb = change > 0 ? 'raised' : change < 0 ? 'cut' : 'held';
     return `${String(p.cb)} ${verb} its policy rate${change ? ' to' : ' at'} ${(Number(p.rate) * 100).toFixed(2)}%.`;
   },
-  WINDOW_USE: () => 'Treasury borrowed from the central bank window.',
+  WINDOW_USE: () => 'Finance drew on the emergency credit line.',
   POLICY_PASSED: (p) =>
     p.policyId === CAPITAL_BUFFER_POLICY
       ? `Lawmakers passed an AI safety buffer: every safety tier line rises by ${Math.round(CAPITAL_BUFFER_PP * SAFETY.bufferPerPp * 100)} points for a year.`
@@ -258,8 +258,8 @@ const EVENT_TEXT: Record<string, (p: Record<string, unknown>) => string> = {
       ? `Your COO's pay review moved ${changed} ${changed === 1 ? 'salary' : 'salaries'} to market${Number(p.premium) ? ` ${Number(p.premium) > 0 ? '+' : '−'}${Math.round(Math.abs(Number(p.premium)) * 100)}%` : ''}.`
       : '';
   },
-  BANK_RUN: () => 'Depositors are queueing to withdraw: a bank run has started.',
-  BANK_RUN_ENDED: () => 'The bank run is over.',
+  BANK_RUN: () => 'Outage rumours are spreading: customers are cancelling.',
+  BANK_RUN_ENDED: () => 'The outage rumour has died down.',
   COMPUTE_BURST: () => 'Spot ran out, so we bought emergency burst GPUs at a premium.',
   COMPUTE_CRUNCH: () => 'Capacity crunch: new customers are on a waitlist until we add GPUs.',
   COMPUTE_CRUNCH_ENDED: () => 'The waitlist has cleared.',

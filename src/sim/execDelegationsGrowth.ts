@@ -108,7 +108,7 @@ export function expansionPlan(state: GameState, cityId: string, keepReserve = tr
   if (keepReserve && cityRoom(state, cityId) < X.expansionMinRoom)
     return {
       ...plan,
-      blocker: 'Little room left to grow here: most of the market already banks with you.',
+      blocker: 'Little room left to grow here: most of the market already uses you.',
     };
   const lot = bestLot(state, cityId);
   if (!lot) return { ...plan, blocker: 'No free storefront in this city.' };
