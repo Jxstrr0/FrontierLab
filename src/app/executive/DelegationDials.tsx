@@ -115,7 +115,9 @@ export function ComputeCoverDial(p: { s: GameState }) {
         ? `${now} · would reserve ${gpus.toLocaleString()} GPUs now, ${money(bill, sym)}/wk`
         : plan.capacity >= plan.target
           ? `${now} · nothing to reserve`
-          : `${now} · no offer under spot fits; checks again next week`;
+          : plan.target - plan.capacity < CTO_COMPUTE.slack * plan.demand
+            ? `${now} · within ${pct(CTO_COMPUTE.slack, 0)} of target, nothing to reserve`
+            : `${now} · no offer under spot fits; checks again next week`;
   return (
     <div class="exec-dial">
       <StepSlider

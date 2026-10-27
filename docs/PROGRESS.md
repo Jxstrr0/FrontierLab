@@ -3,13 +3,19 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.38, save schema 26). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
+**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.39, save schema 26). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
 **Determinism snapshot:** `133b7b9121d061` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-27 — Compute cover tagline wording (v0.1.39)
+
+The owner's CTO Compute dial read "Covered now 74% · no offer under spot fits" at a 75% target. The real reason nothing was reserved: the CTO only acts when the gap is at least 5% of demand (`CTO_COMPUTE.slack`). The tagline now says "within 5% of target, nothing to reserve" in that case and keeps "no offer under spot fits" for when offers really are the problem. Wording only; no sim change.
+
+**Checked.** `npm run lint`, typecheck, `npx vitest run` and `npm run build` pass.
 
 ### 2026-10-27 — Hiring in big offices, and a CPO training style dial (v0.1.38, schema 26)
 
