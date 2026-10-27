@@ -1,17 +1,14 @@
 // Liquidity gauge (SCREENS §10 Treasury, SIMULATION §13.3–13.5): the
 // liquidity ratio against the 10% minimum and your target, a funding-freeze
-// banner while lending is frozen, what liquid assets are made of, and the
-// one-way transfer of corporate cash into Treasury reserves.
-import { useState } from 'preact/hooks';
+// banner while lending is frozen, and what liquid assets are made of. C3c:
+// the cash transfer moved to the Loan Desk's lending fund card.
 import { FREEZE_RELEASE, LIQ_MIN, LIQ_REPAY_BUFFER } from '../../../config/balance';
 import { totalDeposits } from '../../../sim/balanceSheet';
-import * as cmd from '../../../sim/commands';
 import { totalWholesale } from '../../../sim/fundingLots';
 import { liquidAssets } from '../../../sim/treasury';
 import { Badge, Card, Row } from '../../components';
 import { money, pct } from '../../format/format';
-import { act, toast, useGame } from '../../store';
-import { AmountSlider } from './AmountSlider';
+import { useGame } from '../../store';
 import { GAUGE_MAX, LIQUIDITY_STATUS, liquidityGauge } from './treasuryView';
 
 export function LiquidityCard() {
@@ -72,43 +69,11 @@ export function LiquidityCard() {
         )}
         <div class="tr-rows">
           <Row label="Reserves" value={money(t.reserves, sym)} />
-          <Row label="Government bonds" value={money(t.bondsMarket, sym)} />
           <Row label="Liquid assets" value={money(liquidAssets(s), sym)} strong />
           <Row label="Deposits" value={money(totalDeposits(s), sym)} tone="dim" />
           <Row label="Wholesale funding" value={money(totalWholesale(s), sym)} tone="dim" />
         </div>
       </Card>
-      <TransferCard />
     </>
-  );
-}
-
-/** Corporate cash → reserves. One way only (§13.2), so it asks first. */
-function TransferCard() {
-  const s = useGame();
-  const sym = s.settings.currency;
-  const cash = Math.max(0, s.company.cash);
-  const [amount, setAmount] = useState(0);
-  const value = Math.min(amount, cash);
-  const go = () => {
-    const r = act(cmd.transferToTreasury, value);
-    if (r.ok) {
-      toast(`Moved ${money(value, sym)} into Treasury reserves.`, 'good');
-      setAmount(0);
-    }
-  };
-  return (
-    <Card>
-      <div class="tr-card-title">Transfer cash to Treasury</div>
-      <p class="muted small hq-note">
-        Corporate cash can top up reserves, but it can't come back out: deposits and reserves belong
-        to the lab's balance sheet.
-      </p>
-      <AmountSlider label="Amount" value={value} max={cash} onChange={setAmount} sym={sym} />
-      <button type="button" class="btn btn-primary btn-block" disabled={value <= 0} onClick={go}>
-        Transfer {value > 0 ? money(value, sym) : ''}
-      </button>
-      <p class="muted small tr-under">Corporate cash {money(s.company.cash, sym)}</p>
-    </Card>
   );
 }

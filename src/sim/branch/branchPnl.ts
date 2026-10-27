@@ -45,15 +45,10 @@ export function addBranchCosts(
     (EQUIPMENT[branch.build.atm]?.atmProductivity ?? 0) * mult * ATM_FEE.usage * ATM_FEE.fee;
 }
 
-/**
- * Records the office P&L row (C3b: revenue by product line, then the compute
- * bill) and posts company lines. The legacy bank books' funding credit and
- * charge were internal transfers and stay out of the row; any deposit interest
- * they still pay is shown with servicing until C3c removes them.
- */
+/** Records the office P&L row (C3b: revenue by product line, then the compute bill) and posts company lines. */
 export function closeBranchWeek(state: GameState, branch: Branch, wk: BranchWeek): BranchPnl {
-  const otherIncome = wk.originationFees + wk.atmFees + wk.wealthFees;
-  const servicing = wk.servicing + wk.underwriting + wk.depositInterest;
+  const otherIncome = wk.atmFees;
+  const servicing = wk.servicing + wk.underwriting;
   const lines = {
     plans: wk.accountFees,
     api: wk.serviceFees,
@@ -94,11 +89,8 @@ export function closeBranchWeek(state: GameState, branch: Branch, wk: BranchWeek
   earn(state, 'loanInterest', wk.loanInterest);
   earn(state, 'accountFees', wk.accountFees);
   earn(state, 'cardFees', wk.cardFees);
-  earn(state, 'originationFees', wk.originationFees);
   earn(state, 'atmFees', wk.atmFees);
-  earn(state, 'wealthFees', wk.wealthFees);
   earn(state, 'serviceFees', wk.serviceFees);
-  spend(state, 'depositInterest', wk.depositInterest);
   spend(state, 'branchStaff', wk.staff);
   spend(state, 'managers', wk.manager);
   spend(state, 'rent', wk.rent);

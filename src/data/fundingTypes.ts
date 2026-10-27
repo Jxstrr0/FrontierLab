@@ -1,5 +1,6 @@
 // Wholesale funding types for the Treasury funding market (docs/CONTENT.md §12).
-// Overnight and the central bank window are automatic; the market offers the other two.
+// Overnight and the central bank window are automatic; the market offers Term
+// Interbank. Covered bonds (which needed mortgage cover) were removed in C3c.
 // Radar order: Cost, Term, Stability, Flexibility, Discretion (1–10).
 import type { Pentagon } from './types';
 
@@ -16,8 +17,6 @@ export interface FundingTypeSpec {
   radar: Pentagon;
   /** Weight when generating market offers; 0 = never offered (automatic only). */
   weight: number;
-  /** Covered bonds need mortgages ≥ this × covered bonds outstanding (§13.6). */
-  mortgageCover?: number;
   /** Can be repaid before maturity (flexibility ≥ 5). */
   earlyRepay: boolean;
 }
@@ -33,9 +32,6 @@ export const FUNDING_TYPES: Record<string, FundingTypeSpec> = {
     weight: 0,
     earlyRepay: true,
   },
-  // Term Interbank took in Brokered Deposits, and Covered Bond took in Senior
-  // Bond (schema 15): two short-to-medium and long-term choices instead of four
-  // near-twins. Each keeps the combined offer weight of the pair it replaced.
   term_interbank: {
     id: 'term_interbank',
     name: 'Term Interbank',
@@ -46,18 +42,6 @@ export const FUNDING_TYPES: Record<string, FundingTypeSpec> = {
     radar: [7, 5, 5, 5, 7],
     weight: 8,
     earlyRepay: true,
-  },
-  covered_bond: {
-    id: 'covered_bond',
-    name: 'Covered Bond',
-    basis: 'ftpLong',
-    spread: 0.0085,
-    term: [156, 520],
-    size: [25e6, 500e6],
-    radar: [5, 9, 9, 2, 9],
-    weight: 4,
-    mortgageCover: 1.25,
-    earlyRepay: false,
   },
   cb_window: {
     id: 'cb_window',

@@ -99,7 +99,7 @@ describe('benefit words', () => {
     expect(benefitValueText(BENEFITS.pension!, 0.04)).toBe('4.0%');
     expect(benefitValueText(BENEFITS.remote_fri!, 1)).toBe('On');
     expect(benefitUnit(BENEFITS.remote_fri!)).toBe('HQ staff only');
-    expect(benefitUnit(BENEFITS.mortgage_disc!)).toBe('discount on the mortgage rate');
+    expect(benefitUnit(BENEFITS.mortgage_disc!)).toBe('discount on compute');
   });
 
   it('shows tuition skill growth at the value, capped', () => {

@@ -2,13 +2,12 @@
 // building as the company or privately, set an owned building's rent, put it
 // up for sale or take it off, and choose Rent / Sell all for a city's
 // foreclosed homes. Accepted offers complete in propertyBuy.ts.
-import { REAL_ESTATE, REO } from '../../config/balance';
-import { CITIES } from '../../data/cities';
+import { REAL_ESTATE } from '../../config/balance';
 import { pushEvent } from '../events';
 import { completePurchase } from '../propertyBuy';
 import { offerAcceptance, rentBounds } from '../propertyMath';
 import { stream } from '../rng';
-import type { GameState, ReoPool } from '../state';
+import type { GameState } from '../state';
 import { fail, money, ok, type CommandResult } from './result';
 import { ventureTierBlock } from './ventures';
 
@@ -85,24 +84,6 @@ export function setPropertyForSale(state: GameState, siteId: string, on: boolean
     p.saleWeek = state.clock.week + stream(state, 'realEstate').int(lo, hi);
   } else {
     delete p.saleWeek;
-  }
-  return ok();
-}
-
-/**
- * Rent or Sell all for a city's foreclosed homes (§21.3). Sell all settles in
- * 1–4 weeks and can't be called off once started.
- */
-export function setReoMode(state: GameState, cityId: string, mode: ReoPool['mode']): CommandResult {
-  const pool = state.reo[cityId];
-  if (!pool || pool.value <= 0)
-    return fail(`No foreclosed homes in ${CITIES[cityId]?.name ?? 'this city'}.`);
-  if (pool.mode === 'selling') return fail('The sale is already under way.');
-  if (mode === pool.mode) return ok();
-  pool.mode = mode;
-  if (mode === 'selling') {
-    const [lo, hi] = REO.sellWeeks;
-    pool.sellWeek = state.clock.week + stream(state, 'reo').int(lo, hi);
   }
   return ok();
 }

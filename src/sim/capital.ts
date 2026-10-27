@@ -1,13 +1,11 @@
 // Capital and the regulator (SIMULATION §15): CET1, risk-weighted assets, the
 // capital ratio and its tier.
 import {
-  CHARTER_MIN_EQUITY,
   FIXED_ASSET_RISK_WEIGHT,
   FRANCHISE,
   FX_RISK_WEIGHT,
   OP_RISK_MULT,
   PROPERTY_RISK_WEIGHT,
-  REO_RISK_WEIGHT,
   STOCK_RISK_WEIGHT,
   TIER_THRESHOLDS,
   VENTURE_DEBT_RISK_WEIGHT,
@@ -58,7 +56,6 @@ export function capitalSnapshot(state: GameState): CapitalSnapshot {
   const cet1 = bs.equity - bs.intangibles - bs.goodwill;
   const rwa =
     loanTotals(state).rwa +
-    bs.reo * REO_RISK_WEIGHT +
     bs.fixedAssets * FIXED_ASSET_RISK_WEIGHT +
     bs.investments * STOCK_RISK_WEIGHT +
     bs.ventures * VENTURE_RISK_WEIGHT +
@@ -68,8 +65,7 @@ export function capitalSnapshot(state: GameState): CapitalSnapshot {
     bs.franchise * FRANCHISE.riskWeight +
     OP_RISK_MULT * Math.max(0, trailingNetRevenue(state));
   const capitalRatio = cet1 / Math.max(rwa, 1);
-  const tier =
-    bs.equity < CHARTER_MIN_EQUITY ? 'critical' : tierFor(capitalRatio, capitalBufferPp(state));
+  const tier = tierFor(capitalRatio, capitalBufferPp(state));
   return { cet1, rwa, capitalRatio, tier, equity: bs.equity };
 }
 

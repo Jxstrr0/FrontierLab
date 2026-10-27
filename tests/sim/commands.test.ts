@@ -62,10 +62,10 @@ describe('commands', () => {
   it('moves corporate cash into treasury reserves one way only', () => {
     const s = newGame({ seed: 42, cityId: 'cal' });
     const reserves = s.treasury.reserves;
-    expect(cmd.transferToTreasury(s, 50_000).ok).toBe(true);
+    expect(cmd.topUpLendingFund(s, 50_000).ok).toBe(true);
     expect(s.treasury.reserves).toBe(reserves + 50_000);
     expect(s.company.cash).toBe(START_CASH - 50_000);
-    expect(cmd.transferToTreasury(s, 10_000_000).ok).toBe(false);
+    expect(cmd.topUpLendingFund(s, 10_000_000).ok).toBe(false);
   });
 
   it('requires a manager before delegating', () => {

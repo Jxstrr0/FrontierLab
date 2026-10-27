@@ -342,10 +342,9 @@ Benefit effects scale linearly up to the stated amount, then flatten (capped at 
 |---|---|---|---|---|---|---|---|---|---|---|
 | overnight | Overnight Interbank | policy | +0.20% | 1 (auto-roll) | — | 8 | 1 | 3 | 10 | 8 |
 | term_interbank | Term Interbank | policy | +0.50% | 26–104 | 2–50M | 7 | 5 | 5 | 5 | 7 |
-| covered_bond | Covered Bond | FTP_long | +0.85% | 156–520 | 25–500M | 5 | 9 | 9 | 2 | 9 |
 | cb_window | Central Bank Window | policy | +1.00% | 1 | unlimited | 5 | 1 | 10 | 10 | 1 |
 
-Content trim (2026-10-25): Brokered Deposits merged into Term Interbank and Senior Bond into Covered Bond, each new type keeping the pair's combined offer weight (8 and 4). Covered bonds still need mortgage cover (SIMULATION §13.6).
+Content trim (2026-10-25): Brokered Deposits merged into Term Interbank and Senior Bond into Covered Bond, each new type keeping the pair's combined offer weight (8 and 4). Covered Bond was removed in C3c (it needed mortgage cover, and an AI lab holds no mortgages); old covered bond lots became Term Interbank lots.
 
 Counterparty names: Harbor Clearing Bank · Meridian Treasury · Atlas Money Markets · Pinecrest Capital · Northwind Securities · Bellwether Funding · Granite Bay Trust · Cobalt Street Markets · Ironbridge Capital · Silverpine Partners.
 

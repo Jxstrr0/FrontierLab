@@ -45,20 +45,6 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
         },
       };
     }
-    case 'REO_SOLD':
-      return {
-        key: 'REO_SOLD',
-        subject: str(p.cityId),
-        tab: 'banking',
-        icon: 'house',
-        priority: P.companyRoutine,
-        tokens: {
-          bank: ctx.bank,
-          city: str(p.city, 'town'),
-          units: Math.max(1, Math.round(num(p.units))).toLocaleString('en-US'),
-          price: m(p.price),
-        },
-      };
     default:
       return undefined;
   }
