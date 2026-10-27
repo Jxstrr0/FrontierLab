@@ -5,8 +5,10 @@
 //   COO · Pay reviews   quarterly or annual, with the pay premium (PayPolicy.tsx)
 //   CMO · Brand campaigns   awareness target 40–70%
 //   CREO · Rents (bank, yours)   occupancy 80–100% (OccupancyDial.tsx)
-import { EXEC_DELEGATION } from '../../config/balance';
+//   CTO · Compute   share of GPU demand covered outside spot 60 / 75 / 90%
+import { CTO_COMPUTE, EXEC_DELEGATION } from '../../config/balance';
 import * as cmd from '../../sim/commands';
+import { computeCoverPlan } from '../../sim/execDelegationsCompute';
 import { brandEstimate, cadenceEstimate, moraleEstimate } from '../../sim/execPolicy';
 import type { ExecSeat, PayReviewCadence } from '../../sim/marketsTypes';
 import type { GameState } from '../../sim/state';
@@ -96,11 +98,44 @@ export function BrandDial(p: { s: GameState }) {
   );
 }
 
+export function ComputeCoverDial(p: { s: GameState }) {
+  const sym = p.s.settings.currency;
+  const plan = computeCoverPlan(p.s, p.s.executives.computeCover);
+  const gpus = plan.takes.reduce((n, t) => n + t.gpus, 0);
+  const bill = plan.takes.reduce((n, t) => n + t.gpus * t.price, 0);
+  const now =
+    plan.demand > 0 ? `Covered now ${pct(Math.min(1, plan.capacity / plan.demand), 0)}` : '';
+  const hint = !plan.active
+    ? 'Needs a Compute floor at HQ.'
+    : plan.demand <= 0
+      ? 'No GPU demand yet.'
+      : gpus > 0
+        ? `${now} · would reserve ${gpus.toLocaleString()} GPUs now, ${money(bill, sym)}/wk`
+        : plan.capacity >= plan.target
+          ? `${now} · nothing to reserve`
+          : `${now} · no offer under spot fits; checks again next week`;
+  return (
+    <div class="exec-dial">
+      <StepSlider
+        label="Cover target"
+        options={CTO_COMPUTE.coverTargets.map((t) => ({
+          value: t,
+          label: `${Math.round(t * 100)}%`,
+        }))}
+        value={p.s.executives.computeCover}
+        onChange={(v) => act(cmd.setComputeCover, v)}
+        hint={hint}
+      />
+    </div>
+  );
+}
+
 /** The dial that belongs under a seat's delegation switch, if it has one. */
 export function DelegationDial(p: { s: GameState; seat: ExecSeat; id: string }) {
   if (p.seat === 'coo' && p.id === 'hrBenefits') return <MoraleDial s={p.s} />;
   if (p.seat === 'coo' && p.id === 'payReviews') return <CadenceDial s={p.s} />;
   if (p.seat === 'cmo' && p.id === 'brand') return <BrandDial s={p.s} />;
+  if (p.seat === 'cto' && p.id === 'compute') return <ComputeCoverDial s={p.s} />;
   if (p.seat === 'creo' && p.id === 'bankRents') return <OccupancyDial s={p.s} owner="company" />;
   if (p.seat === 'creo' && p.id === 'privateRents')
     return <OccupancyDial s={p.s} owner="personal" />;
