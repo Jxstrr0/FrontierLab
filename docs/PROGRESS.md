@@ -3,13 +3,34 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.26, save schema 19). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
+**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.27, save schema 20). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `15c9b9a3361bdb` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `0bf7d7abb55509` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-27 — The CTO manages compute (v0.1.27)
+
+**What changed.**
+- **New CTO delegation: Compute.** Until now nobody managed compute for you: auto spot-buy filled gaps at the spot price, and GPU reservations, data centers and power deals were all up to you. A seated CTO now has a **Compute** switch. Each week, with a Compute floor at HQ, they reserve GPUs from the floor's market until your own and reserved GPUs cover a share of last week's demand. Auto spot-buy still covers the rest.
+- **Cover target dial** under the switch: 60%, 75% (default) or 90%. Below 100% on purpose: if customers leave, you aren't stuck paying for idle reservations. The line under the dial says how much is covered now and what the CTO would reserve this week and for how much a week.
+- **How the CTO picks.**
+  - Only offers cheaper than spot.
+  - In a chip glut (spot cheap), they lock in long 3-year terms.
+  - In a shortage (spot expensive), they take short 6-month terms so the high price doesn't stick.
+  - In a normal market, the cheapest price per GPU.
+  - Data centers still being fitted out count as covered, so the CTO doesn't double up.
+  - Small gaps (under 5% of demand) are left to spot.
+- **The Compute floor now belongs to the CTO, not the CFO.** A strong CTO makes that team work better, which brings more and cheaper GPU offers. The CFO keeps the Finance floor.
+- **Older saves.** A CTO you already hired starts with the new switch off, so nothing changes until you turn it on. Newly hired CTOs come with it on, like every delegation. Save schema 19 → 20 adds the dial (set to 75%).
+
+**What you chose (pitched as questions).** GPUs only, no data center building; a dial rather than a fixed target; terms follow the chip cycle; the CTO takes over the Compute floor.
+
+**Checked.** `npm run lint`, `npx vitest run` (158 files, 1,005 tests, including 8 new ones for the delegation) and `npm run build` pass. The determinism snapshot changed from `15c9b9a3361bdb` to `0bf7d7abb55509`. That is only the new save field and schema number: with both removed, the run hashes to the old value, so the game plays out the same. No balance strategy hires executives, so the balance runs are unaffected. The CTO's profile with the dial was checked in Chromium at 390×844 with no console errors.
+
+**Dependencies:** none added.
 
 ### 2026-10-27 — Post-C8 polish: the four open items (v0.1.26)
 

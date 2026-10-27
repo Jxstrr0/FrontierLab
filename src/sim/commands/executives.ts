@@ -4,6 +4,7 @@
 // floor at HQ. Also the COO's growth cities and "Open a branch now" (§17.2),
 // and the delegation dials: pay review cadence, morale target, brand target.
 import {
+  CTO_COMPUTE,
   EXEC_DELEGATION,
   EXEC_PAY,
   EXECUTIVES,
@@ -145,6 +146,16 @@ export function setMoraleTarget(state: GameState, target: number): CommandResult
   if (!EXEC_DELEGATION.moraleTargets.includes(target))
     return fail(`Pick a morale target of ${EXEC_DELEGATION.moraleTargets.join(', ')}.`);
   state.executives.moraleTarget = target;
+  return ok();
+}
+
+/** The share of GPU demand the CTO's Compute delegation covers outside spot (one of CTO_COMPUTE.coverTargets). */
+export function setComputeCover(state: GameState, cover: number): CommandResult {
+  const stops = CTO_COMPUTE.coverTargets;
+  const match = stops.find((t) => Math.abs(t - cover) < 1e-9);
+  if (match === undefined)
+    return fail(`Pick a cover of ${stops.map((t) => `${Math.round(t * 100)}%`).join(', ')}.`);
+  state.executives.computeCover = match;
   return ok();
 }
 

@@ -74,7 +74,7 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
     seat: 'cfo',
     title: 'Chief Financial Officer',
     short: 'CFO',
-    depts: ['finance', 'treasury'],
+    depts: ['finance'],
     delegations: [
       {
         id: 'treasury',
@@ -172,12 +172,18 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
     seat: 'cto',
     title: 'Chief Technology Officer',
     short: 'CTO',
-    depts: ['it'],
+    depts: ['it', 'treasury'],
     delegations: [
       {
         id: 'digital',
         label: 'Digital projects',
         description: 'Starts the next digital project when the Products team is free.',
+      },
+      {
+        id: 'compute',
+        label: 'Compute',
+        description:
+          'Reserves GPUs on the Compute floor until your own and reserved GPUs cover the share of demand you set; long terms in a chip glut, short in a shortage, never above spot.',
       },
     ],
   },
