@@ -1,8 +1,8 @@
 // Manage models sheet (SCREENS §10 Products floor): every model you hold, with
-// "Use" to make it the house model (a two-week blend), and a new custom model
+// "Use" to make it the AI model (a two-week blend), and a new custom model
 // built from the data input sliders with a live rosette and cost. Save keeps
 // it for later; Save & use switches to it straight away. Custom models need a
-// Products floor; bureau packages and hosted models come from credit bureaus.
+// Products floor; vendor packages and hosted models come from data vendors.
 import { useState } from 'preact/hooks';
 import { MODEL_NAME_MAX } from '../../../config/balance';
 import * as cmd from '../../../sim/commands';
@@ -54,7 +54,8 @@ export function ManageModelsSheet(p: { onClose: () => void }) {
                   <span class="muted small">{modelSourceText(m)}</span>
                   <span class="small">
                     {sym}
-                    {m.costPerApp.toFixed(2)} per application · quality {radarText(modelQuality(m))}
+                    {m.costPerCustomer.toFixed(2)} per customer a year · quality{' '}
+                    {radarText(modelQuality(m))}
                   </span>
                 </div>
                 {active ? (
@@ -63,7 +64,7 @@ export function ManageModelsSheet(p: { onClose: () => void }) {
                   <button
                     type="button"
                     class="btn btn-secondary pf-item-btn"
-                    aria-label={`Use ${m.name} as the house model`}
+                    aria-label={`Use ${m.name} as the lab's AI model`}
                     onClick={() => act(cmd.activateModel, m.id)}
                   >
                     Use
@@ -75,7 +76,7 @@ export function ManageModelsSheet(p: { onClose: () => void }) {
         </ul>
         <p class="muted small">
           Switching takes two weeks: sales offices feel a blend of the old and new model meanwhile.
-          Credit bureaus sell packaged models and host custom ones.
+          Data vendors sell packaged models and host custom ones.
         </p>
 
         <h3 class="section-title">New custom model</h3>

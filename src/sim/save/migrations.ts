@@ -10,6 +10,7 @@ import { migrateBankCleanup } from './migrateBankCleanup';
 import { migrateCompute } from './migrateCompute';
 import { migrateGpuLots } from './migrateGpuLots';
 import { migrateBusinesses } from './migrateBusinesses';
+import { migrateModel } from './migrateModel';
 import { migrateDealDesk } from './migrateDealDesk';
 import { migrateSpotLimits } from './migrateSpotLimits';
 import { migrateMoney } from './migrateMoney';
@@ -88,6 +89,11 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
   },
   12: (s) => {
     migrateDealDesk(s as unknown as GameState);
+    return s;
+  },
+  // 13 → 14 (stage C6a): the AI model, licence cost per customer.
+  13: (s) => {
+    migrateModel(s as unknown as GameState);
     return s;
   },
 };

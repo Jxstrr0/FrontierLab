@@ -187,7 +187,7 @@
   font: 600 10px/15px var(--font-ui);
   white-space: nowrap;
 }
-/* Close zoom only: the type ("Credit bureau") or a rival's short name, in the type's ink. */
+/* Close zoom only: the type ("Data vendor") or a rival's short name, in the type's ink. */
 .pin-caption {
   display: none;
   padding: 1px 6px;

@@ -25,7 +25,7 @@ import { clamp, noise } from '../math';
 import { countryOfCity, marketRef } from '../rates';
 import { stream } from '../rng';
 import type { Branch, GameState } from '../state';
-import { activeModel, RADAR } from '../underwriting';
+import { activeModel, priceHeadroom, RADAR } from '../underwriting';
 import { effectiveAwareness, type CampaignEffects } from './marketing';
 import { branchPrice, isOffered, priceFactor } from './pricing';
 import { capacity, visitRate } from './staff';
@@ -114,7 +114,7 @@ export function approvalOf(state: GameState, spec: ProductSpec): number {
   return (
     (spec.baseApproval ?? 0) *
     (RISK_APPETITE.volumeMult[appetite] ?? 1) *
-    (APPROVAL_INCLUSION.base + APPROVAL_INCLUSION.slope * model.radar[RADAR.inclusion]) *
+    (APPROVAL_INCLUSION.base + APPROVAL_INCLUSION.slope * model.radar[RADAR.breadth]) *
     fundingGate *
     CAPITAL_GATE[state.company.tier]
   );
@@ -163,10 +163,14 @@ export function runDemand(state: GameState, branch: Branch, fx: CampaignEffects)
   const byProduct: Record<string, Origination> = {};
   // §13.0 (C4c): in a capacity crunch, new plan and API sign-ups join a waitlist.
   const waitlist = waitlisted(state);
+  // §16.7 (C6a): a better model lets plan and usage prices sit above market.
+  const headroom = priceHeadroom(state);
   for (const spec of allProducts(state)) {
     if (spec.kind === 'sbl' || spec.kind === 'fx' || !isOffered(branch, spec.id)) continue;
     const price = branchPrice(state, branch, spec.id);
-    const m = marketRef(state, branch.cityId, spec.id);
+    const m =
+      marketRef(state, branch.cityId, spec.id) *
+      (spec.kind === 'plan' || spec.kind === 'usage' ? headroom : 1);
     const stars = starsOf(state, spec);
     const affinity = affinityOf(spec);
     const approval = approvalOf(state, spec);

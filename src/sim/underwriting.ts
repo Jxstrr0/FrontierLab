@@ -1,11 +1,15 @@
-// Underwriting models (SIMULATION §16.7): packaged bureau models, custom models
-// built on the Products floor or hosted by a bureau, the house model's radar
-// and cost per application, and the two-week linear blend while switching.
+// The AI model (SIMULATION §16.7, stage C6a; the file keeps its bank-era name):
+// packaged data-vendor models, custom data mixes built on the Products floor or
+// hosted by a vendor, the house model's radar (Reasoning, Speed, Breadth,
+// Safety, Efficiency) and data licence per customer, the two-week blend while
+// switching, and what the model does: Efficiency sets the compute behind each
+// customer, and quality sets price headroom and helps win contracts.
 import {
   BUREAU_HOSTED,
   HQ_EFFECTS,
   INTERNAL_HISTORY,
   MODEL_MIX_TOLERANCE,
+  MODEL_EFFECTS,
   MODEL_QUALITY,
   MODEL_RADAR_MAX,
   MODEL_SWITCH_WEEKS,
@@ -14,12 +18,12 @@ import { BUREAU_PACKAGES, DATA_INPUTS } from '../data/bureaus';
 import type { Pentagon } from '../data/types';
 import { shortfall } from './hq';
 import { digitalBonus } from './products';
-import type { GameState, UnderwritingModel } from './state';
+import type { Business, GameState, UnderwritingModel } from './state';
 
-/** Radar index constants: Accuracy, Speed, Inclusion, FraudShield, Fairness. */
-export const RADAR = { accuracy: 0, speed: 1, inclusion: 2, fraudShield: 3, fairness: 4 } as const;
+/** Radar index constants: Reasoning, Speed, Breadth, Safety, Efficiency. */
+export const RADAR = { reasoning: 0, speed: 1, breadth: 2, safety: 3, efficiency: 4 } as const;
 
-/** Where a custom mix is built: the Products floor, or hosted by a credit bureau. */
+/** Where a custom mix is built: the Products floor, or hosted by a data vendor. */
 export type ModelSource = 'custom' | 'hosted';
 
 /** Radar of a mix of data inputs at their table profiles: Σ weight × profile × qualityMult. */
@@ -42,27 +46,34 @@ export function packagedModel(packageId: string): UnderwritingModel {
     source: 'bureau',
     mix: { ...pkg.mix },
     radar: mixRadar(pkg.mix),
-    costPerApp: pkg.costPerApp,
+    costPerCustomer: pkg.costPerCustomer,
   };
 }
 
 // ─── Custom models ────────────────────────────────────────────────────────────
 
-/** An input's profile now: Internal History accuracy = 4 + min(5, loansBooked/20,000 × 5). */
+/** Customers across every sales office. */
+export function labCustomers(state: GameState): number {
+  let n = 0;
+  for (const b of Object.values(state.branches)) n += b.customers;
+  return n;
+}
+
+/** An input's profile now: Customer Feedback Reasoning = 4 + min(5, customers/50,000 × 5). */
 export function inputProfile(state: GameState, inputId: string): Pentagon | undefined {
   const input = DATA_INPUTS[inputId];
   if (!input) return undefined;
   if (inputId !== 'internal') return input.profile;
   const h = INTERNAL_HISTORY;
-  const accuracy =
+  const reasoning =
     h.accuracyBase +
-    Math.min(h.accuracyGain, (state.underwriting.loansBooked / h.fullLoans) * h.accuracyGain);
+    Math.min(h.accuracyGain, (labCustomers(state) / h.fullCustomers) * h.accuracyGain);
   const p: Pentagon = [...input.profile];
-  p[RADAR.accuracy] = accuracy;
+  p[RADAR.reasoning] = reasoning;
   return p;
 }
 
-/** qualityMult = 0.9 + 0.2 × productsCoverage′ × avgSkill/100, or the bureau's fixed 0.95. */
+/** qualityMult = 0.9 + 0.2 × productsCoverage′ × avgSkill/100, or the vendor's fixed 0.95. */
 export function modelQualityMult(state: GameState, source: ModelSource): number {
   if (source === 'hosted') return BUREAU_HOSTED.qualityMult;
   const dept = state.departments.products;
@@ -78,8 +89,8 @@ export function mixProblem(state: GameState, mix: Record<string, number>): strin
     const input = DATA_INPUTS[id];
     if (!input) return 'Unknown data input.';
     if (!Number.isFinite(w) || w < 0) return 'Weights must be zero or more.';
-    if (w > 0 && input.minLoansBooked && state.underwriting.loansBooked < input.minLoansBooked)
-      return `${input.name} needs ${input.minLoansBooked.toLocaleString('en-US')} loans booked first.`;
+    if (w > 0 && input.minCustomers && labCustomers(state) < input.minCustomers)
+      return `${input.name} needs ${input.minCustomers.toLocaleString('en-US')} customers first.`;
     sum += w;
   }
   if (Math.abs(sum - 1) > MODEL_MIX_TOLERANCE) return 'The data inputs must add up to 100%.';
@@ -100,7 +111,7 @@ export function customFigures(
   state: GameState,
   mix: Record<string, number>,
   source: ModelSource,
-): { radar: Pentagon; costPerApp: number } {
+): { radar: Pentagon; costPerCustomer: number } {
   const q = modelQualityMult(state, source);
   const radar: Pentagon = [0, 0, 0, 0, 0];
   let cost = 0;
@@ -108,12 +119,12 @@ export function customFigures(
     const profile = inputProfile(state, id);
     if (!profile) continue;
     for (let i = 0; i < 5; i++) radar[i] = radar[i]! + w * profile[i]! * q;
-    cost += w * DATA_INPUTS[id]!.costPerApp;
+    cost += w * DATA_INPUTS[id]!.costPerCustomer;
   }
   for (let i = 0; i < 5; i++) radar[i] = Math.min(MODEL_RADAR_MAX, radar[i]!);
   return {
     radar,
-    costPerApp: source === 'hosted' ? cost * BUREAU_HOSTED.costMult : cost,
+    costPerCustomer: source === 'hosted' ? cost * BUREAU_HOSTED.costMult : cost,
   };
 }
 
@@ -122,7 +133,7 @@ export function previewModel(
   state: GameState,
   mix: Record<string, number>,
   source: ModelSource,
-): { radar: Pentagon; costPerApp: number; quality: number; problem: string | null } {
+): { radar: Pentagon; costPerCustomer: number; quality: number; problem: string | null } {
   const figures = customFigures(state, normalizeMix(mix), source);
   const radar: Pentagon = [...figures.radar];
   radar[RADAR.speed] = Math.min(
@@ -131,13 +142,13 @@ export function previewModel(
   );
   return {
     radar,
-    costPerApp: figures.costPerApp,
+    costPerCustomer: figures.costPerCustomer,
     quality: modelQuality({ radar }),
     problem: mixProblem(state, mix),
   };
 }
 
-/** Weekly: custom models track the Products team and Internal History; a switch counts down. */
+/** Weekly: custom models track the Products team and Customer Feedback; a switch counts down. */
 export function updateModels(state: GameState): void {
   const u = state.underwriting;
   for (const m of Object.values(u.models)) {
@@ -160,29 +171,59 @@ export function updateModels(state: GameState): void {
 export function activeModel(state: GameState): UnderwritingModel {
   const u = state.underwriting;
   const target = u.models[u.activeModelId];
-  if (!target) throw new Error('No active underwriting model');
+  if (!target) throw new Error('No active AI model');
   const from = u.switching ? u.models[u.switching.fromId] : undefined;
   const speedBonus = digitalBonus(state, 'modelSpeed');
   if (!from && speedBonus === 0) return target;
   const radar: Pentagon = [...target.radar];
-  let costPerApp = target.costPerApp;
+  let costPerCustomer = target.costPerCustomer;
   if (from && u.switching) {
     const w = u.switching.weeksLeft / (MODEL_SWITCH_WEEKS + 1);
     for (let i = 0; i < 5; i++) radar[i] = radar[i]! * (1 - w) + from.radar[i]! * w;
-    costPerApp = costPerApp * (1 - w) + from.costPerApp * w;
+    costPerCustomer = costPerCustomer * (1 - w) + from.costPerCustomer * w;
   }
   radar[RADAR.speed] = Math.min(MODEL_RADAR_MAX, radar[RADAR.speed] + speedBonus);
-  return { ...target, radar, costPerApp };
+  return { ...target, radar, costPerCustomer };
 }
 
-/** Mean of the five radar values (1–10), used by the Products rating (§8). */
+/** Mean of the five radar values (1–10), used by the Model rating (§8). */
 export function modelQuality(m: { radar: Pentagon }): number {
   return m.radar.reduce((a, b) => a + b, 0) / m.radar.length;
 }
 
-/** Cost per application paid this week: + (1 − k′) × 30% when the Products team is short (CONTENT §9). */
-export function appCost(state: GameState): number {
+/** Data licence per customer a year: + (1 − k′) × 30% when the Products team is short (CONTENT §9). */
+export function modelCostPerCustomer(state: GameState): number {
   return (
-    activeModel(state).costPerApp * (1 + HQ_EFFECTS.modelCostPenalty * shortfall(state, 'products'))
+    activeModel(state).costPerCustomer *
+    (1 + HQ_EFFECTS.modelCostPenalty * shortfall(state, 'products'))
+  );
+}
+
+// ─── What the model does (C6a) ────────────────────────────────────────────────
+
+/** §16.7: compute behind each customer, 1 − 0.05 × (Efficiency − 7) (0.85–1.35 over the radar). */
+export function inferenceMult(state: GameState): number {
+  const e = MODEL_EFFECTS;
+  const eff = activeModel(state).radar[RADAR.efficiency];
+  return 1 - e.efficiencySlope * (eff - e.efficiencyRef);
+}
+
+/** §16.7: price headroom, the market price multiplier customers accept, 1 + 0.04 × (quality − 5.8). */
+export function priceHeadroom(state: GameState): number {
+  const e = MODEL_EFFECTS;
+  const q = modelQuality(activeModel(state));
+  return 1 + e.headroomSlope * (q - e.qualityRef);
+}
+
+/**
+ * §11.3: the model's pull on a contract, added to win and keep chances:
+ * 0.05 × (quality − 5.8) + 0.03 × (Safety − 5) × (Data sensitivity − 5) / 5.
+ */
+export function modelDealEdge(state: GameState, b: Business): number {
+  const e = MODEL_EFFECTS;
+  const m = activeModel(state);
+  return (
+    e.dealQuality * (modelQuality(m) - e.qualityRef) +
+    (e.dealSafety * (m.radar[RADAR.safety] - 5) * (b.pentagon[2] - 5)) / 5
   );
 }

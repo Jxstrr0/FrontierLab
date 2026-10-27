@@ -20,7 +20,7 @@ export function ProductsFloor() {
   }
   return (
     <div class="stack">
-      <SectionTitle>House model</SectionTitle>
+      <SectionTitle>AI model</SectionTitle>
       <HouseModelCard />
 
       <SectionTitle>Deposits and loans</SectionTitle>

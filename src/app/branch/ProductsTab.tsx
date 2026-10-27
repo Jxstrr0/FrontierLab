@@ -1,6 +1,6 @@
-// Sales office Products tab (SCREENS §5.2): the house underwriting model (its radar,
-// cost per application and Manage models, which opens the HQ Products floor
-// or, without one, points to the credit bureaus), a category switch and one
+// Sales office Products tab (SCREENS §5.2): the house AI model (its radar,
+// data licence per customer and Manage models, which opens the HQ Products floor
+// or, without one, points to the data vendors), a category switch and one
 // card per product, plus "Set prices here" while HQ sets prices (C2d2). Cards
 // stack vertically so every product's toggle and price stay visible on a phone.
 import { useState } from 'preact/hooks';
@@ -31,14 +31,14 @@ export function ProductsTab(p: { branch: Branch; onDealDesk: () => void }) {
     <div class="stack">
       <Card>
         <div class="br-model">
-          <div class="muted small">House model</div>
+          <div class="muted small">AI model</div>
           <div class="br-model-name">{model.name}</div>
           <div class="small">
             {s.settings.currency}
-            {model.costPerApp.toFixed(2)} per application
+            {model.costPerCustomer.toFixed(2)} per customer a year
           </div>
         </div>
-        <ModelRosette radar={model.radar} label="House model" />
+        <ModelRosette radar={model.radar} label="AI model" />
         {hasProductsFloor ? (
           <button
             type="button"
@@ -49,7 +49,7 @@ export function ProductsTab(p: { branch: Branch; onDealDesk: () => void }) {
           </button>
         ) : (
           <p class="muted small br-model-hint">
-            Visit a credit bureau on the map for a better model, or add a Products floor at HQ to
+            Visit a data vendor on the map for a better model, or add a Products floor at HQ to
             build your own.
           </p>
         )}

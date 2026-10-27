@@ -1,4 +1,4 @@
-// Slider maths for the underwriting mix editor (SCREENS §10 Manage models,
+// Slider maths for the AI model mix editor (SCREENS §10 Manage models,
 // §13 My model). The sliders work in whole percents that always add up to
 // 100: moving one slider rescales the others in proportion (or shares the
 // rest equally when they are all at zero), so a one-handed player never has
