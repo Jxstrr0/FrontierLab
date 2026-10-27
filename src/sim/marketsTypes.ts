@@ -10,7 +10,7 @@ import type { AvatarSpec } from './state';
 // ─── Executives (SIMULATION §17.2) ────────────────────────────────────────────
 
 /** The six hired seats; the CEO seat is you. */
-export type ExecSeat = 'coo' | 'cfo' | 'cpo' | 'cmo' | 'cto' | 'cro' | 'creo';
+export type ExecSeat = 'coo' | 'cfo' | 'cpo' | 'cmo' | 'cto' | 'cro' | 'creo' | 'csci';
 
 /** A stock option or RSU grant vesting yearly over four years (SCREENS §10.1). */
 export interface EquityGrant {

@@ -38,6 +38,7 @@ import {
 } from './marketInit';
 import { emptyCorporateDebt } from './corporateDebt';
 import { seedRivalModels } from './rivalModels';
+import { seedResearchers } from './talent';
 import type { LayoutVersion } from '../config/cityGeo';
 import { SCHEMA_VERSION, type AvatarSpec, type GameState, type Settings } from './state';
 import { packagedModel } from './underwriting';
@@ -188,6 +189,7 @@ export function newGame(opts: NewGameOptions): GameState {
     products: { catalog: {}, developments: [] },
     underwriting: { activeModelId: model.id, models: { [model.id]: model }, loansBooked: 0 },
     training: { generation: 0, frontierBase: 0 },
+    talent: { researchers: {} },
     treasury: {
       reserves: CHARTER_CAPITAL,
       liqTarget: LIQ_TARGET_DEFAULT,
@@ -247,6 +249,7 @@ export function newGame(opts: NewGameOptions): GameState {
   initCountries(state, city.country);
   generateCity(state, city.id, { layout: opts.layout });
   seedRivalModels(state);
+  seedResearchers(state);
 
   const cap = capitalSnapshot(state);
   state.company.capitalRatio = cap.capitalRatio;

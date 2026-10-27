@@ -35,7 +35,7 @@ export function startTrainingRun(
     return fail(`The weekly budget starts at ${money(TRAINING.minWeekly)}.`);
   if (state.company.cash < weeklyBudget)
     return fail(`You need ${money(weeklyBudget)} in cash for the first week.`);
-  const odds = trainingOdds(state, input.weeks, weeklyBudget);
+  const odds = trainingOdds(state, input.weeks, weeklyBudget, input.focus);
   const id = newId(state, 'train');
   state.training.run = {
     id,

@@ -3,13 +3,41 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C6b done (v0.1.19, save schema 15): training runs, rival model releases, a rising frontier bar and a benchmark leaderboard. C6a (v0.1.18) made the AI model's radar (Reasoning/Speed/Breadth/Safety/Efficiency) count. C5 (v0.1.16–v0.1.17) added customer businesses and the Deal Desk. Next: C6c (the Chief Scientist and the talent war).
+**Current stage:** C6 done (v0.1.18–v0.1.20, save schema 16): the AI model's radar counts (C6a); training runs, rival model releases, a rising frontier and a leaderboard (C6b); and the Chief Scientist seat with the talent war over named researchers (C6c). Next: C7 (safety, regulation and valuation).
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `15f792ff539b0e` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `00077caa138f05` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-27 — Stage C6c: the Chief Scientist and the talent war (v0.1.20)
+
+**What you asked for:** finish C6, then move on to C7. This is the last part of C6.
+
+**What changed.**
+- **A ninth executive: the Chief Scientist.**
+  - They appear on the Executive floor next to the others.
+  - Their expertise makes training runs more likely to turn out well: up to +15 points on the run's score.
+  - Their one job switch, **Routine training runs**, runs 12-week runs on the model's weakest score while cash allows. It also switches on a newly trained model when it beats the one in use.
+- **The talent war.** There are now 16 named AI researchers, most working at rival labs when the game starts. The Products floor has a new **Research team** card.
+  - **Hiring:** someone free costs their salary. Poaching from a rival costs 30% more salary plus a signing bonus of about three months' pay. Your team holds up to 8.
+  - **What they do:** your researchers make training runs more likely to go well, twice as much when the run focuses on their specialty. A rival's researchers make that rival's new models better, so poaching one also weakens the rival.
+  - **Rivals fight back:** each quarter a rival may try to hire one of yours. You get a **Researcher poached** case: counter-offer (+25% salary) or let them go. Paying above the going rate makes these bids rarer.
+  - The training card now shows how much your team and the Chief Scientist add. A rival's HQ panel lists its researchers.
+
+**Balance.**
+- With rival researchers adding to every rival release, I trimmed the rivals' base gain (0.22 → 0.18 a release). The frontier now raises the bar at 50% of the rivals' rise instead of 60%.
+- That keeps the do-nothing strategy above $0 cash. It loses about $2.5k a week through the year-2 recession, so it's always close.
+- 20-city median: ARR $4.3M at week 52 and $24.3M at week 260, payback 39.5 weeks. Every check passes.
+
+**Checks.**
+- New tests cover hiring and poaching costs, the team cap, the training-odds lift (and its cap), rival lift, how pay affects poaching, the quarterly market, both answers to the poaching case, the Chief Scientist's lift and job switch, and the save upgrade.
+- One older test, on executive share grants, only passed by luck: its "never resigns" executive could still be poached now and then. The new seat changed the dice and the executive left. The test now counter-offers.
+- Saves from v0.1.19 load: researchers appear, and Chief Scientist candidates are ready if you have an Executive floor.
+- I checked the new cards and the 9-seat executive grid in a phone-sized browser, with no console errors. The determinism snapshot changed as intended.
+
+**Next:** C7, safety, regulation and valuation.
 
 ### 2026-10-27 — Stage C6b: training runs and the frontier (v0.1.19)
 

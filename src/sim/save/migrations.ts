@@ -11,6 +11,7 @@ import { migrateCompute } from './migrateCompute';
 import { migrateGpuLots } from './migrateGpuLots';
 import { migrateBusinesses } from './migrateBusinesses';
 import { migrateModel } from './migrateModel';
+import { migrateTalent } from './migrateTalent';
 import { migrateTraining } from './migrateTraining';
 import { migrateDealDesk } from './migrateDealDesk';
 import { migrateSpotLimits } from './migrateSpotLimits';
@@ -100,6 +101,10 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
   // 14 → 15 (stage C6b): training runs, rival models and the frontier.
   14: (s) => {
     migrateTraining(s as unknown as GameState);
+    return s;
+  },
+  15: (s) => {
+    migrateTalent(s as unknown as GameState);
     return s;
   },
 };
