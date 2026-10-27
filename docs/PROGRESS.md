@@ -3,13 +3,28 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.30, save schema 21). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
+**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.31, save schema 21). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `1450001cc8011a` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `057e043201ebad` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-27 — AI milestones and AI-native incidents (v0.1.31)
+
+Second of the three audit releases. The goals and the trouble now belong to an AI lab.
+
+**What changed.**
+- **Milestones 25 → 32.** The three total-assets goals keep their ids but are now valuation goals: *A ten-billion lab*, *A hundred-billion lab*, *A trillion-dollar lab* (market cap when listed, otherwise the private valuation). Seven new ones: first trained model shipped; model generation 5; top of the benchmark board (your model beats every rival's); a full research team (8); the Strong safety tier held for two years; a full quarter with every GPU of demand met from your own data centers; a first enterprise contract worth $1M+ a year. Thresholds in `MILESTONE_GOALS`. The Milestones screen reads "n of 32".
+- **Seven new incidents**, each with two texts: *Jailbreak goes viral* (patch / ignore / post-mortem), *Hallucination lawsuit* (settle / fight / disclaimers), *Training-data copyright suit* (licence / fight, odds from the CSO and the Safety floor / retrain, −0.3 Breadth), *Model weights leak* (rotate and notify / stay quiet, with the breach-style exposure roll), *Deepfake misuse* in a city (watermark / pull Creative Suite there for 8 weeks / statement), *Data-centre fire* (30% fewer running GPUs for 12 weeks or pay for repairs) and *Grid failure* at an energy site (a week of outage or diesel backup). Odds and costs in `incidentParams.ts` and `balance.ts`; news templates in `ledgerTemplatesIncidents.ts`.
+- **Under the hood:** two new timed effects (`pulled` for a product in one office, `gpuDerate` for a data center) and `runningGpus()` for a derated hall; an optional `compute.ownedStreak` counter for the owned-compute milestone. No save change: every new field is optional.
+- **Docs:** CONTENT §19b (milestones table, new) and §22; SIMULATION §23; DESIGN §5.14, §5.18 and the decision log; SCREENS §28; DATA_MODEL note.
+- **Determinism snapshot** `1450001cc8011a` → `057e043201ebad`: the weekly jailbreak and lawsuit rolls draw from the incidents stream once customers exist; intended.
+
+**Checked.** `npm run lint`, `npx vitest run` (1043 tests, 24 new) and `npm run build` pass. `npm run balance -- --years 10 --seed 42 --strategy steady`: all checkpoints in range.
+
+**Dependencies:** none added.
 
 ### 2026-10-27 — Bank-wording sweep and content fills (v0.1.30, schema 21)
 
