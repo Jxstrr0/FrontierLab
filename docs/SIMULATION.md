@@ -943,7 +943,7 @@ Levels 1–5 (Very conservative to Very aggressive):
   - Growth of 200% or more: 15× → $60.00.
   - No ARR: $5.00, the book floor.
 - ROE_ttm stays for board votes and the CEO pay vote.
-- Listed rivals still price at book × clamp(ROE/COE): they keep a bank-style balance sheet until the C8 balance pass.
+- **Listed rivals (C8d)** price on revenue too: target = `max(BVPS, revenue_ttm × multiple ÷ shares) × sentiment`, with the same multiple from their own reported quarters' growth and their model's quality over the bar (`multipleFor` in `valuation.ts`, `rivalTargetPrice` in `marketRivals.ts`). Revenue_ttm is the last four quarters, annualised when fewer. Seed 42's listed rivals trade at about 1–8× book. Offers for a listed rival measure their premium against this price (§19.8), so buying one costs more than under book × ROE.
 
 ### 19.3 Private placement
 - Sell new shares up to 25% of outstanding per round at `PB_priv` valuation × 0.9.
@@ -1212,14 +1212,16 @@ Run `npm run balance` with seed 42 and the start city Calgary, unless noted. Bra
 | Company loan-to-deposit ratio | 0.75–0.90 in Expansion (tune mortgage approval first) |
 | ROE | 8–18% in Expansion |
 | Turtle (deposits only) | profitable, but < 40% of steady's year-5 equity |
-| Aggressive (appetite 5, cheapest prices) | higher growth to year 3, then Watch tier or worse in the first recession |
-| Recession stress (forced at year 3) | steady survives without Critical tier; aggressive hits Restricted or Critical |
+| Aggressive (appetite 5, cheapest prices) | higher growth to year 3; its fast growth strains Safety into the Watch tier or worse at some point (C8d; was Watch or worse in the first recession) |
+| Recession stress (forced at year 3) | steady survives without Critical tier; aggressive reaches Watch or worse and its cash never goes below 0 (C8d; was Restricted or Critical) |
 
 **Note (Stage 8):** steady now expands to other cities once the home city has no good lots left (years 5–6). Year 10: seed 42 223 branches / $9.8B assets, seed 7 171 / $7.2B, seed 99 167 / $8.1B. Seed 42 sits just above the branch band and seed 7 just below the asset band; left for the full tuning pass (owner: testing and tuning come later).
 
 **Updated 2026-10-24 (Stage 10 balance pass):** `npm run balance` now checks each strategy's own targets (`scripts/strategyTargets.ts`): the first-branch checkpoints apply to steady only, as this section always said; turtle is compared with a steady run on the same seed; aggressive's year-3 growth is total assets against steady's, and its first-recession tier must be Watch or worse; stress checks steady never reaches Critical and runs aggressive under the same forced recession (must reach Restricted or Critical). Three bands moved, with reasons: mature deposits to $40–70M and loans to 70–90% of deposits (chequing balances keep growing for five years while loan demand doesn't — the seed-42 branch reads $67M and 74% at week 260), and year 10 to 60–250 branches and $6–40B of assets (since Stage 8 steady expands to other cities, which the old band didn't foresee; seeds 42/7/99 read 235/171/167 branches and $10.3/7.2/8.1B). Seed 42: every target met for steady, turtle, aggressive and stress. Seeds 7 and 99 still miss the first-branch checkpoints (their median Midtown lot is weaker) — part of the owner's later tuning pass.
 
 **Note (2026-10-26, the nominal index §4.6):** every money band in this table is in start-of-game money. Balances and wages now grow with each country's economy (about 9% a year in an expansion), so `npm run balance` deflates the first-branch checkpoints and the year-10 asset band by the home country's index before judging them, prints the index in its yearly table, and labels the asset check "(real)". Nominal figures run far above the bands in a long game by design: seed 42 steady reads about $20B of deposits at year 10 (index 2.2) where the real figure is $9B.
+
+**Updated 2026-10-27 (stage C8d, balance pass):** the two recession-tier checks are real again, in safety-tier terms. A recession reaches a lab through its cash and its customers, not through bank capital, and the safety ratio (C7a) doesn't move with the economy. So aggressive must reach Watch or worse at some point in its run (growth outpaces its Safety floor), and in the forced recession stress-aggressive must reach Watch or worse and keep cash at or above $0. Listed rivals now price on revenue (§19.5). Seeds 42 and 7: every target met for steady, turtle, aggressive and stress (seed 42 aggressive and stress-aggressive both reach Watch; stress-aggressive's lowest cash is just above $0). The 20-city median passes every first-branch checkpoint. Seed 42 steady's week-52 income ($23.3k) sits just under its band on its own, as since C3a.
 
 **Strategies** (`scripts/strategies/*.ts`):
 - `idle`: one branch, no further actions

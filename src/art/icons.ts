@@ -4,24 +4,27 @@
 // here (src/app/components/Icon.tsx renders them).
 //
 // The place glyphs are drawn to read at 18–24 px inside a map medallion, and
-// each has its own silhouette: a credit score dial for bureaus, a megaphone for
+// each has its own silhouette: a database for data vendors, a megaphone for
 // agencies, a podium and microphone for lobbying firms, a name badge on a lanyard
 // for conventions, a gavel on its block for auction houses, a palm on its
 // island for vacation homes. Closely related ideas never share an outline.
 
 export const ICON_PATHS = {
   // Buildings and places
-  branch: 'M3 9.5 12 4l9 5.5M4 20h16M5 18h14M6.5 11v6M10 11v6M14 11v6M17.5 11v6M4 9.5h16',
+  // A sales office: a shopfront under a scalloped awning with its door and window (C8c).
+  branch:
+    'M4.5 12v8.5h15V12M3 20.5h18M4 8l1.5-4h13L20 8M4 8c0 1.4 1 2.3 2 2.3S8 9.4 8 8c0 1.4 1 2.3 2 2.3S12 9.4 12 8c0 1.4 1 2.3 2 2.3S16 9.4 16 8c0 1.4 1 2.3 2 2.3S20 9.4 20 8M7 20.5v-5.5h3.5v5.5M13 14h4v3.5h-4z',
   office:
     'M6 21V3.5h12V21M4 21h16M9 6.5h2M13 6.5h2M9 10h2M13 10h2M9 13.5h2M13 13.5h2M10.5 21v-3.5h3V21',
   realEstate: 'M3.5 11.5 12 4.5l8.5 7M6 10v10h12V10M10 20v-5h4v5M15.5 7.4V4.5h2v4.5',
   // A palm tree on its island, waves lapping (vacation homes).
   villa:
     'M11 21c.3-4-.2-7.5-1.5-10.5M9.5 10.5C8 8.5 5.5 8 3.5 9.2M9.5 10.5C9.2 8 10.8 6 13.5 5.5M9.5 10.5c2.3-1.3 5-1 7 .8M9.5 10.5c-2.2.2-4 1.6-4.8 3.8M9.5 10.5c1.8.6 3.2 2 3.8 4M4 21h11M15 18.5c1-.7 2-.7 3 0s2 .7 3 0',
-  // A credit score dial: needle swinging across a graduated arc.
+  // A database: three stacked discs (data vendors, C8c; once a credit score dial).
   bureau:
-    'M3.5 17a8.5 8.5 0 0 1 17 0M12 8.5v2M6 11l1.4 1.4M18 11l-1.4 1.4M12 17l4-4.6M13.1 17a1.1 1.1 0 1 1-2.2 0 1.1 1.1 0 0 1 2.2 0M4 20.5h16',
-  bank: 'M5 21V9h14v12M3 21h18M4 9h16M12 9V3l4 1.5L12 6M8 12v6M12 12v6M16 12v6',
+    'M5 6c0-1.7 3.1-3 7-3s7 1.3 7 3-3.1 3-7 3-7-1.3-7-3zM5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3M15.5 10.6v.01M15.5 16.6v.01',
+  // A rival lab: a research block with a beacon mast sending out signal arcs (C8c).
+  bank: 'M5 21V10h14v11M3 21h18M8 13h2M14 13h2M8 16.5h2M14 16.5h2M11 21v-3h2v3M12 10V5.5M12 3.6a1.1 1.1 0 1 0 .01 0M8.6 5.2a4.6 4.6 0 0 1 0-3.2M15.4 5.2a4.6 4.6 0 0 0 0-3.2',
   investmentBank: 'M3 20.5h18M4 16.5l5-5 4 3 7-8M15.5 6.5H20V11M6 20.5v-2M10 20.5v-4M14 20.5v-3',
   agency: 'M4 10v4h3l8 4V6l-8 4H4M7 14l1.5 5h2L9.5 15M18 9.5a3 3 0 0 1 0 5M20.5 7.5a6 6 0 0 1 0 9',
   // A name badge on its lanyard (conventions).
@@ -50,13 +53,23 @@ export const ICON_PATHS = {
   dome: 'M5 12a7 6 0 0 1 14 0M12 4v2M4 12h16M6 12v7M10 12v7M14 12v7M18 12v7M3 20h18',
   // Money and banking
   coin: 'M12 4a8 8 0 1 0 .01 0zM12 8v8M9.5 10.5c0-1 1-1.5 2.5-1.5s2.5.5 2.5 1.5-1 1.3-2.5 1.5-2.5.5-2.5 1.5 1 1.5 2.5 1.5 2.5-.5 2.5-1.5',
-  vault: 'M4 4h16v16H4zM12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM12 10v4M10 12h4M6 20v1.5M18 20v1.5',
-  atm: 'M6 3h12v18H6zM8 6h8v5H8zM9 15h6M9 18h6',
-  teller: 'M3 20h18M4 20V9h16v11M8 9V5h8v4M8 13h3v3H8zM13 13h3v3h-3z',
+  // AI compute and models (C8c): a GPU chip with its pins, and a model's radar rosette.
+  gpu: 'M6 6h12v12H6zM9 9h6v6H9zM9 3v3M12 3v3M15 3v3M9 18v3M12 18v3M15 18v3M3 9h3M3 12h3M3 15h3M18 9h3M18 12h3M18 15h3',
+  model:
+    'M12 3l8.6 6.2-3.3 10.1H6.7L3.4 9.2zM12 3v9M20.6 9.2 12 12M17.3 19.3 12 12M6.7 19.3 12 12M3.4 9.2 12 12M12 7.5l4.4 3.4-1.9 5.2H9.8l-2.4-4.6z',
+  // Sales office fit-out slots, re-skinned in C8c (ids kept): the machine room (a
+  // rack cabinet with a badge lock), the demo kiosk (a screen with a chat on a
+  // stand) and the sales counter (a screen on a desk with someone behind it).
+  vault:
+    'M6 3h12v18H6zM8.5 6h7M8.5 9h7M8.5 12h7M8.5 15h7M10 6v.01M10 9v.01M10 12v.01M19.5 11v3M6 21v1M18 21v1',
+  atm: 'M7 3h10v10H7zM9.5 6h5M9.5 8.5h3M12 13v6M8 21h8M14.5 8.5l1.2 1.2',
+  teller:
+    'M3 20.5h18M4 20.5V14h16v6.5M9 11.5h6V14H9zM12 4.5a2 2 0 1 0 .01 0M8.5 11c.5-2 1.9-3 3.5-3s3 1 3.5 3',
   chart: 'M4 4v16h16M7 15l4-5 3 3 5-7',
   shield: 'M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6zM9 12l2 2 4-4',
-  // HQ floors: an open ledger (Finance), a bank card (Products), a screen with
-  // its rating line (IT) and a briefcase (Executive suite).
+  // HQ floors: an open ledger (Finance), a payment card, a screen with its
+  // rating line (IT) and a briefcase (Executive suite). Products shows the
+  // model rosette above.
   ledger:
     'M4 5h6a2 2 0 0 1 2 2v13a2 2 0 0 0-2-2H4zM20 5h-6a2 2 0 0 0-2 2v13a2 2 0 0 1 2-2h6zM6.5 9h3M6.5 12h3M14.5 9h3M14.5 12h3',
   card: 'M3 6h18v12H3zM3 10h18M6 14.5h4M14 14.5h4',

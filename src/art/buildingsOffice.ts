@@ -7,6 +7,7 @@ import { STOREY_PX } from '../config/map';
 import { roofFlag } from './buildings';
 import type { TileInfo } from './citygen';
 import type { Engraver, Vec3 } from './engraver';
+import { drawEnergySite } from './buildingsDataCenter';
 import type { LotOccupant } from './mapRenderer';
 import { artRng } from './prng';
 import { bands, box, castShadow, cylinder, onFace, ribs, windowSlits, type Face } from './solids';
@@ -86,8 +87,16 @@ function letBanner(e: Engraver, face: Face, r: Rect, top: number): void {
   e.segments(lines, e.inks.detail, 0.8);
 }
 
-/** Credit bureau (archive block, slit windows, mast) or marketing agency (glass studio, billboard). */
-export function drawSite(e: Engraver, t: TileInfo): void {
+/**
+ * Credit bureau (archive block, slit windows, mast) or marketing agency (glass
+ * studio, billboard); an energy site draws its substation yard and any data
+ * center hall instead (buildingsDataCenter.ts, C8c).
+ */
+export function drawSite(e: Engraver, t: TileInfo, occupant?: LotOccupant): void {
+  if (occupant?.building) {
+    drawEnergySite(e, t, occupant);
+    return;
+  }
   e.origin(t.x, t.y);
   if (t.siteKind === 'agency') agency(e, t);
   else bureau(e, t);

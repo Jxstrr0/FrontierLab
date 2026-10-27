@@ -1,8 +1,9 @@
-// Branch interior hero (ART_DIRECTION §3, "Branch interior"): an engraved
-// isometric cut-away of the banking hall you built. The teller line takes the
-// fit-out's shape (counter, pods, express line or concierge desks), the lobby
-// sets the floor and furnishings and the number of glass advisor offices, the
-// vault and ATMs stand where customers can see them, and the bank's plaque
+// Sales office interior hero (ART_DIRECTION §3, "Sales office interior"): an
+// engraved isometric cut-away of the sales floor you built. The counter takes
+// the fit-out's shape (counter, pods, express line or concierge desks), the
+// lobby sets the floor and furnishings and the number of glass meeting rooms,
+// the machine room, its wall of server units and the demo kiosks stand where
+// customers can see them (C8c, once the vault and ATMs), and the lab's plaque
 // hangs over the counter. With live figures it fills with the real staff
 // (tellers first, then advisors, then a greeter), tinted by morale, and a
 // queue as long as the wait, someone always walking in at the back of it.
@@ -15,11 +16,11 @@ import { Vignette } from '../components/Vignette';
 import { isoPt, placeAt, type Iso } from '../components/isoKit';
 import { SeatedFront, Standing, StandingBack, type Mood } from '../components/isoPeople';
 import { IsoRoom, type FloorFinish, type RoomSpec } from '../components/isoRoom';
-import { Bench, Plant, Safe } from '../components/isoProps';
+import { Bench, Plant, Rack } from '../components/isoProps';
 import { Frame, WallClock } from '../components/isoWall';
 import '../components/interior.css';
-import { AdvisorOffice, Atm, COUNTER, Ladder, Stanchions, TellerLine } from './interiorParts';
-import { BrandPlaque, DepositBoxes, VaultDoor } from './interiorWall';
+import { AdvisorOffice, COUNTER, Kiosk, Ladder, Stanchions, TellerLine } from './interiorParts';
+import { BrandPlaque, MachineRoom, ServerWall } from './interiorWall';
 import { moodTone } from './selectors';
 
 /** Picture box inside the vignette (as the HQ floor). */
@@ -122,12 +123,12 @@ export const BranchInterior = memo(function BranchInterior(p: {
   const s = step;
 
   const caption = !live
-    ? 'Your banking hall'
+    ? 'Your sales floor'
     : live.status === 'fitout'
       ? 'Fit-out under way'
       : live.status === 'closed'
         ? 'Closed'
-        : `${tellers} of ${stations} windows open · ${wait > WAIT_LABELS.long ? 'long wait' : busy ? 'busy' : 'short wait'}`;
+        : `${tellers} of ${stations} desks open · ${wait > WAIT_LABELS.long ? 'long wait' : busy ? 'busy' : 'short wait'}`;
 
   return (
     <Vignette
@@ -149,8 +150,8 @@ export const BranchInterior = memo(function BranchInterior(p: {
               shape={p.logoShape ?? DEFAULT_LOGO_SHAPE}
             />
             <WallClock x={(boxesI + Math.max(0.4, boxesW / 2)) * s} y={-2.25 * s} />
-            <DepositBoxes x={boxesI * s} s={s} boxes={boxes} />
-            <VaultDoor x={doorI * s} s={s} id={p.build.vault} />
+            <ServerWall x={boxesI * s} s={s} boxes={boxes} />
+            <MachineRoom x={doorI * s} s={s} id={p.build.vault} />
           </g>
         }
         left={
@@ -159,7 +160,7 @@ export const BranchInterior = memo(function BranchInterior(p: {
           ) : undefined
         }
       />
-      {p.build.vault === 'vlt_safe' && <Safe g={g} i={doorI} j={0.25} />}
+      {p.build.vault === 'vlt_safe' && <Rack g={g} i={doorI} j={0.2} seed={3} />}
       {offices === 0 && <Plant g={g} i={0.45} j={0.5} tall />}
       <TellerLine
         g={g}
@@ -180,10 +181,13 @@ export const BranchInterior = memo(function BranchInterior(p: {
           n={n}
         />
       ))}
-      {atm === 'atm_wall' && <Atm g={g} j={d - 1.05} />}
-      {atm === 'atm_dual' && [<Atm g={g} j={d - 1.75} />, <Atm g={g} j={d - 1.05} />]}
-      {atm === 'atm_smart' && <Atm g={g} j={d - 1.05} smart />}
-      {atm === 'atm_lobby' && [<Atm g={g} j={d - 1.75} smart />, <Atm g={g} j={d - 1.05} smart />]}
+      {atm === 'atm_wall' && <Kiosk g={g} j={d - 1.05} />}
+      {atm === 'atm_dual' && [<Kiosk g={g} j={d - 1.75} />, <Kiosk g={g} j={d - 1.05} />]}
+      {atm === 'atm_smart' && <Kiosk g={g} j={d - 1.05} smart />}
+      {atm === 'atm_lobby' && [
+        <Kiosk g={g} j={d - 1.75} smart />,
+        <Kiosk g={g} j={d - 1.05} smart />,
+      ]}
       {ropes && queue > 0 && (
         <Stanchions g={g} a={[qi - 0.3, q0 + 0.45]} b={[queueAt(queue - 1)[0] + 0.3, q0 + 0.45]} />
       )}

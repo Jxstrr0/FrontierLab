@@ -15,7 +15,7 @@ import { landmarkCentre } from './landmarkPins';
 import { siteEnabled } from './pins';
 
 /** Fallback for the map paper if the --paper token can't be read (ART_DIRECTION §1.1). */
-const PAPER_FALLBACK = '#E3E9DF';
+const PAPER_FALLBACK = '#DFE7E7';
 
 export interface Scene {
   key: string;

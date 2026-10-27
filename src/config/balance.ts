@@ -2212,9 +2212,8 @@ export const IPO = {
   floatPct: [0.1, 0.4] as [number, number],
   discount: 0.9,
 } as const;
-/** Your bank and listed rivals while public (§19.5). */
+/** Your lab and listed rivals while public (§19.5). */
 export const PUBLIC_PRICE = {
-  roeClamp: [0.3, 3] as [number, number],
   irPenalty: 0.15,
   sentimentSigma: 0.02,
   sentimentRevert: 0.05,

@@ -1,11 +1,18 @@
 // The tutorial's step machine (SCREENS §27), pure so it can be unit-tested.
 // Each step watches what the player actually does: entering a step records a
-// baseline (branch count, Plus prices, managers, the API, contracts won,
-// campaigns) and the step is done when the game moves past it. Nothing
-// advances on a timer. guidance() says where the brass ring should go, as an ordered
+// baseline (office count, Plus prices, the API, managers, campaigns,
+// contracts won) and the step is done when the game moves past it. Nothing
+// advances on a timer. Steps are worked out by id (data/tutorial.ts
+// TUTORIAL_ORDER), so reordering them never touches this file. guidance() says where the brass ring should go, as an ordered
 // list of targets (closest to done first); the overlay rings the first one
 // that is on screen.
-import { TUTORIAL, TUTORIAL_STEPS, TUTORIAL_TEXT, type TutorialTarget } from '../../data/tutorial';
+import {
+  TUTORIAL,
+  TUTORIAL_STEPS,
+  TUTORIAL_TEXT,
+  tutorialStepId,
+  type TutorialTarget,
+} from '../../data/tutorial';
 
 /** What the tutorial can see of the game and the UI (built by observe.ts). */
 export interface TutorialObs {
@@ -45,9 +52,9 @@ export interface StepMemo {
   managers: Record<string, string | undefined>;
   loansBooked: number;
   campaigns: Record<string, string>;
-  /** Step 5: the weekly results have been on screen. */
+  /** "Open the doors": the weekly results have been on screen. */
   sawWeekly: boolean;
-  /** Step 9: the Company summary has been open. */
+  /** "Meet the lab": the Company summary has been open. */
   sawCompany: boolean;
 }
 
@@ -96,7 +103,7 @@ export function enterStep(step: number, obs: TutorialObs): StepMemo {
 /** Folds in what has happened since the last look (the weekly results or the Company summary showing up). */
 export function updateMemo(memo: StepMemo, obs: TutorialObs): StepMemo {
   if (obs.modalType === 'weekly' && !memo.sawWeekly) return { ...memo, sawWeekly: true };
-  if (memo.step === 9 && obs.panelType === 'company' && !memo.sawCompany) {
+  if (tutorialStepId(memo.step) === 'company' && obs.panelType === 'company' && !memo.sawCompany) {
     return { ...memo, sawCompany: true };
   }
   return memo;
@@ -108,35 +115,36 @@ export function updateMemo(memo: StepMemo, obs: TutorialObs): StepMemo {
  */
 export function alreadyDone(memo: StepMemo, obs: TutorialObs): boolean {
   if (obs.branches.length === 0) return false;
-  if (memo.step === 4) return obs.branches.every((b) => b.managerId);
-  if (memo.step === 6) return obs.branches.every((b) => b.api);
-  if (memo.step === 8) return obs.branches.every((b) => b.marketingDelegated);
+  const id = tutorialStepId(memo.step);
+  if (id === 'manager') return obs.branches.every((b) => b.managerId);
+  if (id === 'api') return obs.branches.every((b) => b.api);
+  if (id === 'campaign') return obs.branches.every((b) => b.marketingDelegated);
   return false;
 }
 
 /** Whether the player has done what the step asks since it began. */
 export function isDone(memo: StepMemo, obs: TutorialObs): boolean {
-  switch (memo.step) {
-    case 1:
+  switch (tutorialStepId(memo.step)) {
+    case 'storefront':
       return obs.panelType === 'storefront' || obs.panelType === 'build';
-    case 2:
+    case 'build':
       return obs.branches.length > memo.branchCount;
-    case 3:
+    case 'price':
       return obs.branches.some((b) => b.id in memo.plus && b.plus !== memo.plus[b.id]);
-    case 4:
-      return obs.branches.some((b) => b.managerId && b.managerId !== memo.managers[b.id]);
-    case 5:
-      return memo.sawWeekly && obs.modalType !== 'weekly';
-    case 6:
+    case 'api':
       return obs.branches.some((b) => b.api && memo.api[b.id] === false);
-    case 7:
-      return obs.loansBooked > memo.loansBooked;
-    case 8:
+    case 'manager':
+      return obs.branches.some((b) => b.managerId && b.managerId !== memo.managers[b.id]);
+    case 'campaign':
       return obs.branches.some(
         (b) => b.id in memo.campaigns && b.campaigns !== memo.campaigns[b.id],
       );
-    case 9:
+    case 'week':
+      return memo.sawWeekly && obs.modalType !== 'weekly';
+    case 'company':
       return memo.sawCompany && obs.panelType !== 'company';
+    case 'contract':
+      return obs.loansBooked > memo.loansBooked;
     default:
       return true;
   }
@@ -153,22 +161,24 @@ export function focusBranch(obs: TutorialObs): BranchObs | undefined {
 
 /** Where to put the ring, and what to say there. */
 export function guidance(memo: StepMemo, obs: TutorialObs): Guidance {
-  const text = TUTORIAL_STEPS[memo.step];
+  const id = tutorialStepId(memo.step);
+  const text = id ? TUTORIAL_STEPS[id] : undefined;
   const title = text?.title ?? '';
   if (!text) return { title, targets: [], idle: '' };
+  const week = id === 'week';
   const lotId = focusBranch(obs)?.lotId;
   const targets: Target[] = [];
   for (const [key, line] of Object.entries(text.lines) as [TutorialTarget, string][]) {
-    // Once the clock runs, step 5 only waits for the week (the play button is now pause).
-    if (memo.step === 5 && obs.running && (key === 'play' || key === 'panel-close')) continue;
+    // Once the clock runs, "Open the doors" only waits for the week (play is now pause).
+    if (week && obs.running && (key === 'play' || key === 'panel-close')) continue;
     targets.push(key === 'my-branch' ? { key, line, lotId } : { key, line });
   }
   let idle = text.idle;
-  if (memo.step === 5 && !obs.running && obs.modalType !== 'weekly') {
+  if (week && !obs.running && obs.modalType !== 'weekly') {
     idle = text.lines.play ?? idle;
   }
   // Another modal is up (an incident, the board, or the weekly results mid-step).
-  if (obs.modalType && !(memo.step === 5 && obs.modalType === 'weekly')) {
+  if (obs.modalType && !(week && obs.modalType === 'weekly')) {
     if (obs.modalType === 'weekly') {
       return {
         title,
@@ -181,12 +191,17 @@ export function guidance(memo: StepMemo, obs: TutorialObs): Guidance {
   return { title, targets, idle };
 }
 
-/** Step 7 needs a proposal request on the desk; true when the tutorial should ask for one. */
+/** The contract step needs a proposal request on the desk; true when the tutorial should ask for one. */
 export function needsApplication(memo: StepMemo, obs: TutorialObs): boolean {
   return memo.step === TUTORIAL.loan && obs.pendingApps === 0 && obs.branches.length > 0;
 }
 
-/** Step 5 with weekly results switched off: the tutorial opens them itself once the week turns. */
+/** "Open the doors" with weekly results switched off: the tutorial opens them itself once the week turns. */
 export function shouldOpenWeekly(memo: StepMemo, obs: TutorialObs): boolean {
-  return memo.step === 5 && !memo.sawWeekly && obs.week > memo.week && obs.modalType === null;
+  return (
+    tutorialStepId(memo.step) === 'week' &&
+    !memo.sawWeekly &&
+    obs.week > memo.week &&
+    obs.modalType === null
+  );
 }

@@ -3,8 +3,8 @@
 // setTutorialStep command when the step machine (steps.ts) says the player did
 // the thing. Side effects kept here: pausing the clock where a step needs
 // reading (the start and the contract step), asking for a tutorial proposal
-// request on step 7, and opening the weekly results on step 5 when the player
-// has them switched off. The "seen" preference is written when the tutorial ends.
+// request on the contract step (again after a lost bid), and opening the
+// weekly results on "Open the doors" when the player has them switched off. The "seen" preference is written when the tutorial ends.
 // Whenever Part 1 isn't running, Part 2's guides and tips take over
 // (lessonController.ts).
 import { effect, signal } from '@preact/signals';
@@ -32,13 +32,17 @@ import {
 export const tutorialMemo = signal<StepMemo | null>(null);
 
 let scheduled = false;
-/** Game day of the last tutorial application request, so a failed one isn't retried every frame. */
-let askedDay = -1;
+/**
+ * Game day a tutorial proposal request last failed (no business left to ask),
+ * so it isn't retried every frame. A request that worked is asked again as soon
+ * as the bid on it is lost or declined, even with the clock paused.
+ */
+let failedDay = -1;
 
 /** Starts watching the game; returns the stop function (GameScreen mounts it). */
 export function watchTutorial(): () => void {
   tutorialMemo.value = null;
-  askedDay = -1;
+  failedDay = -1;
   const stop = effect(() => {
     void rev.value;
     void panel.value;
@@ -78,7 +82,7 @@ function evaluate(): void {
   if (!memo || memo.step !== step) {
     memo = enterStep(step, obs);
     tutorialMemo.value = memo;
-    // Reading steps start paused; step 5 is where the player starts the clock.
+    // Reading steps start paused; "Open the doors" is where the player starts the clock.
     if (step === TUTORIAL.first || step === TUTORIAL.loan) pause();
     if (alreadyDone(memo, obs)) return goTo(nextStep(step));
   }
@@ -87,10 +91,10 @@ function evaluate(): void {
   if (isDone(memo, obs)) return goTo(nextStep(step));
 
   if (shouldOpenWeekly(memo, obs)) modal.value = { type: 'weekly', week: obs.week - 1 };
-  if (needsApplication(memo, obs) && askedDay !== s.clock.day) {
-    askedDay = s.clock.day;
+  if (needsApplication(memo, obs) && failedDay !== s.clock.day) {
     const branch = focusBranch(obs);
     if (branch && cmd.requestTutorialApplication(s, branch.id).ok) bump();
+    else failedDay = s.clock.day;
   }
 }
 

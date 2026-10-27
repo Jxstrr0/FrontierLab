@@ -21,9 +21,9 @@
   top: 50%;
   transform: translate(-50%, -50%) rotate(-18deg);
   padding: 0 3px;
-  border: 2px solid #e07a7a;
+  border: 2px solid var(--oxblood-text);
   border-radius: 3px;
-  color: #e07a7a;
+  color: var(--oxblood-text);
   background: rgb(15 24 40 / 55%);
   font-family: var(--font-display);
   font-weight: 700;

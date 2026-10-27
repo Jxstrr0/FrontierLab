@@ -43,7 +43,7 @@
   font: inherit;
 }
 .card-tap:active {
-  background-color: #283857;
+  background-color: var(--vault-pressed);
 }
 .card + .card {
   margin-top: var(--space-4);
@@ -103,10 +103,10 @@
   font-weight: 700;
 }
 .tone-good {
-  color: #6cc3a6;
+  color: var(--jade-text);
 }
 .tone-bad {
-  color: #e07a7a;
+  color: var(--oxblood-text);
 }
 .tone-flat,
 .tone-dim {
@@ -123,16 +123,16 @@
   white-space: nowrap;
 }
 .badge-good {
-  color: #6cc3a6;
+  color: var(--jade-text);
 }
 .badge-bad {
-  color: #e07a7a;
+  color: var(--oxblood-text);
 }
 .badge-warn {
   color: var(--brass-light);
 }
 .badge-info {
-  color: var(--ivory-dim);
+  color: var(--signal-text);
 }
 
 /* ─── Controls ─────────────────────────────────────────────────────────── */
@@ -609,7 +609,7 @@
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-2) var(--space-4);
-  background: #1c2943;
+  background: var(--vault-band);
   border-bottom: 1px solid var(--hairline);
 }
 .advisor-portrait {

@@ -114,6 +114,6 @@ function drawItem(e: Engraver, pc: PaintContext, item: DrawItem): void {
   const t = tileAt(pc.map, item.x, item.y)!;
   if (t.kind === 'park') parkTrees(e, t.x, t.y, t.seed, isParkMiddle(pc.map, t.x, t.y));
   else if (t.kind === 'office') drawOffice(e, t, t.officeId ? pc.occupants[t.officeId] : undefined);
-  else if (t.kind === 'site') drawSite(e, t);
+  else if (t.kind === 'site') drawSite(e, t, t.siteId ? pc.occupants[t.siteId] : undefined);
   else drawBuilding(e, t, t.lotId ? pc.occupants[t.lotId] : undefined, pc.map);
 }

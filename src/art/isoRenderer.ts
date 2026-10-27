@@ -73,6 +73,7 @@ export const createMapRenderer: CreateMapRenderer = (map, style) => {
   const tileOfLot = new Map<string, number>();
   for (const [index, lotId] of map.lotAt) tileOfLot.set(lotId, index);
   for (const [index, officeId] of map.officeAt) tileOfLot.set(officeId, index);
+  for (const [index, site] of map.siteAt) tileOfLot.set(site.id, index);
   const lru = new PixelLru<Entry>(CHUNK_CACHE_BUDGET_PX);
   let dpr = 0;
   let grids = new Map<number, ChunkGrid>();
@@ -181,7 +182,7 @@ export const createMapRenderer: CreateMapRenderer = (map, style) => {
       for (const id of new Set([...Object.keys(prev), ...Object.keys(next)])) {
         const a = prev[id];
         const b = next[id];
-        if (a?.type === b?.type && a?.ink === b?.ink) continue;
+        if (a?.type === b?.type && a?.ink === b?.ink && a?.building === b?.building) continue;
         const index = tileOfLot.get(id);
         if (index === undefined) continue;
         changed.push(tileBounds(map, index % map.tiles, Math.floor(index / map.tiles)));

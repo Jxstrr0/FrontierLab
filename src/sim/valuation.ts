@@ -31,7 +31,11 @@ export function roeTtm(state: GameState, equity = balanceSheet(state).equity): n
  * a year; 0 before two quarters or while the base is zero.
  */
 export function revenueGrowth(state: GameState): number {
-  const q = state.history.quarterly;
+  return quarterlyGrowth(state.history.quarterly);
+}
+
+/** §19.2 growth over a list of reported quarters, oldest first (yours or a rival's). */
+export function quarterlyGrowth(q: readonly { revenue: number }[]): number {
   if (q.length < 2) return 0;
   const last = q[q.length - 1]!.revenue;
   const back = Math.min(QUARTERS_PER_YEAR, q.length - 1);
@@ -42,8 +46,12 @@ export function revenueGrowth(state: GameState): number {
 
 /** §19.2: base + growthSlope × growth + qualitySlope × the model's lead over the bar, clamped. */
 export function revenueMultiple(state: GameState): number {
-  const growth = clamp(revenueGrowth(state), 0, VALUATION.growthCap);
-  const lead = modelQuality(activeModel(state)) - qualityBar(state);
+  return multipleFor(revenueGrowth(state), modelQuality(activeModel(state)) - qualityBar(state));
+}
+
+/** §19.2: the multiple for a growth rate and a model lead over the bar. */
+export function multipleFor(growth: number, lead: number): number {
+  growth = clamp(growth, 0, VALUATION.growthCap);
   return clamp(
     VALUATION.base + VALUATION.growthSlope * growth + VALUATION.qualitySlope * lead,
     ...VALUATION.range,

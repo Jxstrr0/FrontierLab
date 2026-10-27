@@ -335,10 +335,10 @@ Follows the brief's map structure (1–2 main offices worldwide, one sales offic
 
 ### C8 — Polish and relaunch
 - **Build:**
-  - Tutorial rewrite
+  - Tutorial rewrite. **C8b done (v0.1.24).**
   - Data-centre and power deals on the regional energy sites (the payroll partnerships, moved from C4). **C8a done (v0.1.23, schema 18):** SIMULATION §13.7a.
-  - Art pass (campus and GPU-hall vignettes, icons)
-  - Balance pass across every strategy
+  - Art pass (campus and GPU-hall vignettes, icons). **C8c done (v0.1.24).**
+  - Balance pass across every strategy. **C8d done (v0.1.24):** rivals priced on revenue, recession checks in safety tiers.
   - Docs sweep: DESIGN, SIMULATION, SCREENS and CONTENT fully in AI terms, and this file archived
   - Hub card on Kelbo.Website (in a separate session)
 - **Accept:** same as ROADMAP Stage 10.
