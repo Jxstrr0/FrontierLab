@@ -3,13 +3,25 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.27, save schema 20). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
+**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.28, save schema 20). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
 **Determinism snapshot:** `0bf7d7abb55509` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-27 — Dev tools for staff and bankruptcy, AI-lab city blurbs (v0.1.28)
+
+**What changed.**
+- **Settings → Developer → Top staff.** With developer tools on, inside a game, this holds the skill and morale of every sales office's staff and every HQ team at 95 or better. It applies the moment you switch it on and again after every weekly update, so hiring and wages can't drag the average down. Switch it off and they drift back to normal.
+- **Settings → Developer → No bankruptcy.** Weeks with cash below zero no longer end the game. Cash still goes negative and the warnings still show, so you can see what happens without losing the run. A game already over isn't revived.
+- Both switches are saved with the game, not the device. They're optional flags, so no save change and the determinism snapshot stays `0bf7d7abb55509`.
+- **City picker blurbs.** All 20 start cities now read the way an AI lab would see them: talent, cheap power, rents, rival labs and who the customers are. The intro line now says the start country sets the interest rates you borrow at, the taxes and the exchange, instead of "the central bank you borrow from".
+
+**Checked.** `npm run lint`, `npx vitest run` and `npm run build` pass, including 4 new tests for the two switches.
+
+**Dependencies:** none added.
 
 ### 2026-10-27 — The CTO manages compute (v0.1.27)
 

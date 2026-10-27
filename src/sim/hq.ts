@@ -32,6 +32,7 @@ import { DEPARTMENTS, HQ_DEPTS } from '../data/departments';
 import { dpow, dtanh } from './detmath';
 import { execMult, seated } from './execSeats';
 import { totalWholesale } from './fundingLots';
+import { holdTopStaff } from './devStaff';
 import { riskCoverageBonus } from './incident/effects';
 import { spend } from './ledger';
 import { clamp, ema } from './math';
@@ -359,6 +360,7 @@ function updateDepartment(state: GameState, d: Department, mods: StaffMods): voi
     d.skill = (d.skill * d.staff + SKILL.newHireFrac * sTarget * hires) / (d.staff + hires);
     d.staff += hires;
   }
+  holdTopStaff(state, d);
 }
 
 /** Hires per week (§6.3): 1 + floor(2 × hrCoverage′ × attraction), attraction with benefits. */
