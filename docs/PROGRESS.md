@@ -3,13 +3,28 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.36, save schema 24). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
+**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.37, save schema 25). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `1311ec96765325` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `1eb88e2834bb61` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-27 — Landmark towers in London and Moscow (v0.1.37, schema 25)
+
+The owner asked for a giant rental office in London's and Moscow's business districts, big enough to build everything in one place rather than sprawling across two main offices.
+
+**What changed.**
+- **Kestrel Tower** (London, 20 floors) and **Polaris Tower** (Moscow, 18 floors) are new office listings in each city's Financial District, with open-plan 32-desk floors. Ordinary listings top out at 10 floors and there are 9 departments, so a tower fits every department with spare floors for second floors of the busy ones. Rent and fit-out work like any other listing: the whole building, per floor.
+- Content lives in `src/data/landmarkTowers.ts`; `src/sim/landmarkTowers.ts` places each tower last, from its own random stream, so no other building in any city moves. The layout test checks that: with the tower set aside, London's and Moscow's maps are unchanged.
+- On the map they draw as 22-storey office towers (lobby and crown on top). Checked in the map lab at 390×844: London's is the tallest thing in its block; Moscow's stands among its existing skyscrapers. No console errors.
+- **Save schema 25.** Migration 24 → 25 adds the tower to any save that already has London or Moscow.
+- **Determinism snapshot** `1311ec96765325` → `1eb88e2834bb61`. Only the schema number changed: the script never leaves Calgary, and with the schema set back to 24 the old snapshot matches.
+
+**Checked.** `npm run lint`, `npx vitest run` (1061 tests, 5 new) and `npm run build` pass. Balance unchanged (scripts don't lease towers).
+
+**Dependencies:** none added.
 
 ### 2026-10-27 — Balance table drops the bank columns (v0.1.36)
 

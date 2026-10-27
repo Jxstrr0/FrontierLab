@@ -540,7 +540,7 @@ New labs founded during a game (SIMULATION §18.7) take an invented name from `s
   - Sokolov & Lind (Moscow, St Petersburg): 9%
 - **Convention centre:** one per L and XL city, plus every city that hosts a convention (Saskatoon, Calgary). Venue names are in `src/data/conventions.ts`; other cities use "{City} Convention Centre".
 - **Property buildings:** 6 / 9 / 12 / 15 per S / M / L / XL city, in any district; towers (over 5,000 m²) only in the financial, downtown and waterfront districts, and the biggest only in L and XL cities (SIMULATION §21.5).
-- **Office listings:** 2 / 2 / 3 / 4 per S / M / L / XL city (SIMULATION §16.1).
+- **Office listings:** 2 / 2 / 3 / 4 per S / M / L / XL city (SIMULATION §16.1), plus one landmark tower in London (Kestrel Tower, 1 Fenmarch Square, 20 floors) and Moscow (Polaris Tower, 1 Severny Prospect, 18 floors), in `src/data/landmarkTowers.ts`.
 - **Airports** (code, name): SAS Saskatoon Regional · CAL Calgary International · VAN Vancouver International · TOR Toronto Pearson-style "Lakeshore International" · MTL Montréal-Mercier · NYC Liberty International · CHI O'Hare-style "Lakefront International" · SFO Bayview International · SEA Sound International · LON Thameshaven · PAR Charles-Lumière · FRA Rhein-Main · AMS Polder International · ZUR Kloten-Alpen · TYO Haneda-Bay · SYD Harbour Kingsford · SIN Changi-Garden · HKG Lantau Harbour · MOW Vnukovo Fields · LED Pulkovo-Neva. Regional sites: FMM Athabasca Field · PHE Port Hedland Strip · MAF Permian Regional. All fictional names; use the city name in UI where clearer.
 
 ## 17. Stock market (listed companies outside AI)
