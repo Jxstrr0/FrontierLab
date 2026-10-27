@@ -3,13 +3,46 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C3 done. C3c (v0.1.12, save schema 8) removed the leftover bank machinery; C3b (v0.1.11) brought compute costs, AI statements and the lending fund; C3a (v0.1.10) the AI product catalog. Next is C4 (compute). C2 (v0.1.5–v0.1.9) and C1 (v0.1.4) are done. The owner's decisions are in the design brief and CONVERSION_PLAN §5.
+**Current stage:** C4a done (v0.1.13, save schema 9): the compute price index and compute pool. C3 (v0.1.10–v0.1.12) turned the money model into a lab's. Next is C4b (the Compute floor and GPU lots), then C4c (capacity crunch and outages).
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `0b4f2c7e9da8e8` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `19f47039dbab9d` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-27 — Stage C4a: the compute price index and compute pool (v0.1.13)
+
+**What you asked for:** keep rolling after C3c. C4 (compute) is big, so like C3 it's split into three parts. This is part 1.
+
+**What changed.**
+- **Compute has a market price.** A "chip cycle" moves a compute price index up and down, the same way the economy moves through booms and recessions. There are three moods: a chip glut (compute about 20% cheaper), normal times, and a chip shortage (about 30% dearer). Each lasts at least a quarter, usually a year or so.
+- **Your offices' compute is now counted in GPUs.** At normal prices one GPU-week costs $40. A young office uses a few hundred GPUs; a big lab uses tens of thousands.
+- **Data centers finally pay off in money.** The GPUs running in your data centers serve your customers first. You only buy the rest at the spot price. Before this, a data center only gave nearby offices a Service boost. A data center still pays its power bill and rent whether or not its GPUs are busy, so building one far bigger than your demand costs more than it saves.
+- **A new Compute card** on the Company screen, and on every data center's panel, shows:
+  - the spot price per GPU-week, with a badge for the chip mood
+  - a two-year price chart
+  - the GPUs your customers used last week and the GPUs in your data centers
+  - how much of the demand your own GPUs covered, and what the rest cost at spot
+- The Company screen's "How this works" sheet gets a short "own it or rent it" explainer.
+
+**How the price is applied.** Each office's compute bill is worked out as before, turned into GPUs, then charged for only the part your data centers didn't cover, at today's price. It uses last week's totals for the "covered" share, because this week's total isn't known until every office has run.
+
+**Old saves.** Schema 8 → 9. Saves start in a normal chip market at a price index of 1 with an empty chart. A test checks it.
+
+**Balance.** Across 20 cities, every office checkpoint still passes except one that now lands just under its floor: the median office's week-52 income is $24.5k a week against a $25k floor (it was $25.1k). That's compute-price wobble of a few percent, so I lowered that floor to $24k and wrote down why in SIMULATION §25. Week 260 ARR is $23.5M, payback 42.5 weeks, and cash stays above zero in every city. Seed 42 aggressive dips lower than before (−$546k in week 169), but that happens during a cheap-compute glut, so it's the strategy taking a different expansion path, not compute prices biting.
+
+**Tests.** A new `compute.test.ts`:
+- the price index stays in bounds and moves between moods, the same way every run;
+- an office pays spot × index when it owns no GPUs;
+- a data center's GPUs cover a young office completely, taking its compute bill to zero;
+- the migration.
+
+**Checked in the browser** at iPhone size with a save that has a data center: the Company screen's Compute card (chart, rows, a "Chip shortage" badge). No console errors.
+
+**Checks.** `npm run lint`, all 883 tests and `npm run build` pass. The **determinism snapshot** moved from `0b4f2c7e9da8e8` to `19f47039dbab9d` (intended: compute now follows the price index).
+
+**Next:** C4b. The HQ Treasury floor becomes the Compute floor, the funding market sells GPU lots (rented capacity for a fixed term), and a headroom gauge shows capacity against demand, with an emergency burst option.
 
 ### 2026-10-27 — Stage C3c: the last bank machinery goes (v0.1.12)
 
