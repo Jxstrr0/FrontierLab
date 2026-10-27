@@ -1122,7 +1122,7 @@ Run `npm run balance` with seed 42 and the start city Calgary, unless noted. Off
 **Strategies** (`scripts/strategies/*.ts`):
 - `idle`: one sales office, no further actions.
 - `steady`: follows default prices; staffs HQ floors to 100%; takes up to 2 placements when runway is under 7 months and cash is short (`manageEquity`); grows the busiest office a size, or else opens an office in the next city, when cash > 2× the cost, runway is over 6 months (or the lab isn't burning cash) and 2 weeks of running costs stay in reserve; builds a data center at 4× its cost from year 5; reserves GPU lots; trains at 1% of cash a week.
-- `turtle`: declines new RFPs and turns Enterprise contracts off; grows its one office to Standard at most, and only after a profitable quarter with 26 weeks of running costs in hand.
+- `turtle`: declines new RFPs and turns Enterprise contracts off; grows its one office to Standard at most, and only after a profitable quarter with 26 weeks of running costs in hand. It never lists, but once runway falls out of Comfortable (under 12 months) it sells a private placement of half the largest size, as a CFO's Share sales switch would.
 - `aggressive`: launch posture 5 (Very bold); default prices with rate offsets (which touch only the Enterprise contracts' list rate); expands at 1.2× the cost with over 3 months of runway (grows offices down to 2) and 3 weeks of costs in reserve; a data center at 3× its cost; trains at 1.5% of cash.
 - `stress`: steady plus `forceRecessionAtWeek = 156` (and aggressive under the same recession).
 - `nohq`: steady without HQ floors, for comparison.
