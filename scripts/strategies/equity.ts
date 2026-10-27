@@ -8,7 +8,7 @@ import { PLACEMENT, SECONDARY } from '../../src/config/balance';
 import { investmentBanksIn } from '../../src/data/investmentBanks';
 import * as cmd from '../../src/sim/commands';
 import { ipoEligible, placementStatus } from '../../src/sim/equityOffers';
-import { runwaySnapshot } from '../../src/sim/runway';
+import { runwayHealthy, runwaySnapshot } from '../../src/sim/runway';
 import type { GameState } from '../../src/sim/state';
 import { bestLot, buildCost } from './common';
 
@@ -53,4 +53,24 @@ export function manageEquity(state: GameState, gate: number, cashMult: number): 
     if (cmd.secondaryOffering(state, bankId, SECONDARY.maxPct / 2).ok)
       lastSecondary.set(state, state.clock.week);
   }
+}
+
+/**
+ * A cautious founder's top-up: no IPO, but once runway falls out of
+ * Comfortable, a private placement (or, once listed, a secondary) of half the
+ * largest size, as the CFO's Share sales switch would.
+ */
+export function topUpRunway(state: GameState): void {
+  if (runwayHealthy(runwaySnapshot(state).tier)) return;
+  const bankId = investmentBanksIn(state.world.currentCityId)[0];
+  if (!bankId) return;
+  if (state.stock.status === 'public') {
+    const since = state.clock.week - (lastSecondary.get(state) ?? -Infinity);
+    if (since >= SECONDARY_GAP && cmd.secondaryOffering(state, bankId, SECONDARY.maxPct / 2).ok)
+      lastSecondary.set(state, state.clock.week);
+    return;
+  }
+  const rounds = placementStatus(state);
+  if (state.stock.ipo || rounds.left <= 0 || state.clock.week < rounds.nextWeek) return;
+  cmd.privatePlacement(state, bankId, PLACEMENT.maxPct / 2);
 }
