@@ -139,7 +139,7 @@ describe('captions', () => {
   it("uses the pin's own caption, else the type's, else none", () => {
     expect(captionOf({ kind: 'rival', caption: 'Fizz' })).toBe('Fizz');
     expect(captionOf({ kind: 'auctionHouse' })).toBe('Auction house');
-    expect(captionOf({ kind: 'bureau' })).toBe('Credit bureau');
+    expect(captionOf({ kind: 'bureau' })).toBe('Data vendor');
     expect(captionOf({ kind: 'lot' })).toBe('');
     expect(captionOf({ kind: 'mine' })).toBe('');
   });
@@ -217,7 +217,7 @@ describe('clustering like with like', () => {
     expect(clusterLabel('rival', rivals)).toBe('3 rival lab buildings: Fizz, Volt. Zoom in');
     const places = [pin('a', 'bureau', 0), pin('b', 'employer', 0, { alert: true })];
     expect(clusterLabel('medallion', places)).toBe(
-      '2 places: Credit bureau, Employer, open incident. Zoom in',
+      '2 places: Data vendor, Employer, open incident. Zoom in',
     );
   });
 });

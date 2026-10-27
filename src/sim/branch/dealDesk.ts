@@ -13,6 +13,7 @@ import { newId } from '../ids';
 import { clamp } from '../math';
 import { stream, type Rng } from '../rng';
 import type { Branch, Business, DeskWeek, GameState, Rfp } from '../state';
+import { inferenceMult, modelDealEdge } from '../underwriting';
 import { effectiveAwareness, type CampaignEffects } from './marketing';
 import type { BranchWeek } from './week';
 
@@ -81,7 +82,7 @@ export function winChance(state: GameState, branch: Branch, b: Business, discoun
   let p = DEAL.winBase + DEAL.discountSlope * discount;
   p += rival === undefined ? DEAL.noRivalBonus : DEAL.starSlope * (branch.ratings.overall - rival);
   if (incumbent !== undefined) p -= DEAL.switchSlope * (b.pentagon[3] - 5);
-  return clampChance(p);
+  return clampChance(p + modelDealEdge(state, b));
 }
 
 /** §11: chance you keep your own contract at renewal, offering `discount` off its budget. */
@@ -94,7 +95,7 @@ export function keepChance(
   const rival = bestRival(state, b.cityId)?.stars;
   let p = DEAL.keepBase + DEAL.discountSlope * discount + DEAL.switchSlope * (b.pentagon[3] - 5);
   p += rival === undefined ? DEAL.noRivalBonus : DEAL.starSlope * (branch.ratings.overall - rival);
-  return clampChance(p);
+  return clampChance(p + modelDealEdge(state, b));
 }
 
 /** The chance an RFP's offer succeeds: keeping your contract, or winning the business. */
@@ -329,7 +330,7 @@ export function runDealDesk(
     if (b.vendor?.type !== 'player' || b.vendor.id !== branch.id || !b.contractValue) continue;
     const weekly = b.contractValue / WEEKS_PER_YEAR;
     wk.loanInterest += weekly;
-    wk.compute += weekly * DEAL.computeShare;
+    wk.compute += weekly * DEAL.computeShare * inferenceMult(state);
     wk.servicing += weekly * DEAL.serviceShare;
   }
 }

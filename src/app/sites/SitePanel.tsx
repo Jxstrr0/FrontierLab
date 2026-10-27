@@ -1,4 +1,4 @@
-// Credit bureau (SCREENS §13) and marketing agency (SCREENS §15) panels:
+// Data vendor (SCREENS §13) and marketing agency (SCREENS §15) panels:
 // header with the address, the advisor's line and the vignette. The agency's
 // body is its package cards (AgencyBody); the bureau's is its packaged models
 // and "My model" (BureauBody).
@@ -16,14 +16,14 @@ type HqSiteKind = 'bureau' | 'agency';
 
 /** The advisor's line for each building. */
 const ADVISOR: Record<HqSiteKind, string> = {
-  bureau: 'Better data, fewer defaults. What can we score for you?',
+  bureau: 'Better data, better models. What can we train for you?',
   agency: "Let's put your name on every billboard in town.",
 };
 
 export function SitePanel(p: { siteId: string; kind: HqSiteKind }) {
   const s = useGame();
   const site = s.world.sites[p.siteId];
-  const label = p.kind === 'bureau' ? 'Credit bureau' : 'Marketing agency';
+  const label = p.kind === 'bureau' ? 'Data vendor' : 'Marketing agency';
   if (!site) {
     return (
       <Panel title={label} onClose={closePanel}>

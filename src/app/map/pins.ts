@@ -249,7 +249,7 @@ export function siteName(s: GameState | undefined, site: Site): string {
     case 'agency':
       return AGENCIES[site.refId]?.name ?? 'Marketing agency';
     case 'bureau':
-      return `${site.refId} credit bureau`;
+      return `${site.refId} data vendor`;
     case 'rivalHq':
       return `${s?.rivals[site.refId]?.name ?? 'Rival lab'} head office`;
     case 'investmentBank':
