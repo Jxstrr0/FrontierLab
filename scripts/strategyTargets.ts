@@ -23,7 +23,7 @@ export interface Check {
 /** Worst first: a lower index is a weaker tier. */
 const TIER_ORDER: Tier[] = ['critical', 'restricted', 'watch', 'adequate', 'strong'];
 /** True when `t` is `line` or a worse tier. */
-const atOrBelow = (t: Tier, line: Tier) => TIER_ORDER.indexOf(t) >= TIER_ORDER.indexOf(line);
+const atOrBelow = (t: Tier, line: Tier) => TIER_ORDER.indexOf(t) <= TIER_ORDER.indexOf(line);
 
 export const worse = (a: Tier, b: Tier): Tier =>
   TIER_ORDER.indexOf(a) <= TIER_ORDER.indexOf(b) ? a : b;

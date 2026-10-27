@@ -35,7 +35,7 @@ export interface BalanceSheet {
   assets: number;
   deposits: number;
   wholesale: number;
-  /** Business loans and drawn credit lines from rival banks (§19.9). */
+  /** Venture debt and drawn credit lines from investment banks (§19.9). */
   corporateDebt: number;
   /** Dividends declared but not yet paid (§14.4). */
   dividendsPayable: number;

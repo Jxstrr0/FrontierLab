@@ -99,9 +99,11 @@ describe('mix slider maths', () => {
 
 describe('Finance floor risk appetite wording', () => {
   it('describes risk appetite from the balance table', () => {
-    expect(riskHint(3)).toBe('Standard loan volumes and default rates.');
-    expect(riskHint(1)).toBe('About 30% fewer loans, with defaults 30% lower.');
-    expect(riskHint(5)).toBe('About 30% more loans, with defaults 45% higher.');
+    expect(riskHint(3)).toBe('Standard deal odds and safety risk.');
+    expect(riskHint(1)).toBe('Deal odds −4 pts, safety exposure −10%.');
+    expect(riskHint(5)).toBe(
+      'Deal odds +6 pts, safety exposure +16%, and over-claims are likelier.',
+    );
   });
 });
 

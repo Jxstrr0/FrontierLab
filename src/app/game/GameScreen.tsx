@@ -117,9 +117,7 @@ function PanelHost() {
     case 'rivalBranch':
       return FEATURES.competition ? <RivalBranchPanel key={p.lotId} lotId={p.lotId} /> : null;
     case 'rivalHq':
-      return FEATURES.competition ? (
-        <RivalHqPanel key={p.siteId} siteId={p.siteId} tab={p.tab ?? 'overview'} />
-      ) : null;
+      return FEATURES.competition ? <RivalHqPanel key={p.siteId} siteId={p.siteId} /> : null;
     case 'centralBank':
       return FEATURES.competition ? <CentralBankPanel countryId={p.countryId} /> : null;
     case 'employer':

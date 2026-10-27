@@ -10,8 +10,8 @@ export const TAB_LABEL: Record<DeptId, string> = {
   products: 'Products',
   treasury: 'Compute',
   marketing: 'Marketing',
-  it: 'IT',
-  risk: 'Risk',
+  it: 'Platform',
+  risk: 'Safety',
   executive: 'Executive',
   investment: 'Investment',
 };

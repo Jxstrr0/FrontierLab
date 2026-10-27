@@ -4,13 +4,12 @@
 import { EQUIPMENT_LIFE_WEEKS, HOURS_PER_WEEK, INCIDENTS, WAGE_STEP } from '../../config/balance';
 import { EQUIPMENT } from '../../data/equipment';
 import { INCIDENT_PARAMS, INCIDENT_SPECS } from '../../data/incidents';
-import { isDeposit } from '../../data/products';
+import { branchArr } from '../arr';
 import { pushEvent } from '../events';
 import { newId } from '../ids';
 import { listPrice } from '../nominal';
 import { spend } from '../ledger';
 import { roundToStep } from '../math';
-import { productSpec } from '../products';
 import type { Branch, GameState } from '../state';
 import { addEffect, incidentPMult } from './effects';
 import { bumpMorale, fraudShield, nextVault, num, ratingHit, type IncidentRule } from './helpers';
@@ -144,16 +143,6 @@ const ATM_SKIM: IncidentRule = {
   },
 };
 
-/** Deposit balances at a branch. */
-function branchDeposits(state: GameState, b: Branch): number {
-  let total = 0;
-  for (const [pid, book] of Object.entries(b.books)) {
-    const spec = productSpec(state, pid);
-    if (spec && isDeposit(spec)) total += book.balance;
-  }
-  return total;
-}
-
 const MIS_SELLING: IncidentRule = {
   // × sign-up bonus level × (1.6 − ethics/100) × (appetite ≥ 4 ? 1.5 : 1)
   chance(state, scope) {
@@ -173,10 +162,8 @@ const MIS_SELLING: IncidentRule = {
     );
   },
   roll(state, scope) {
-    // Compensation = 2% of branch deposits ÷ 10
-    const comp =
-      (branchDeposits(state, branchOf(state, scope)!) * P.MIS_SELLING.compShare) /
-      P.MIS_SELLING.compDiv;
+    // Refunds = compShare × the sales office's ARR (C8f)
+    const comp = branchArr(state, branchOf(state, scope)!) * P.MIS_SELLING.compShare;
     return { comp, fine: comp * P.MIS_SELLING.denyFineMult };
   },
   costs: (_s, _scope, data) => ({

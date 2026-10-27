@@ -35,10 +35,10 @@ const STANDING: Record<string, string> = {
 
 const DELEGATIONS: [keyof Delegation, string][] = [
   ['staffing', 'Staffing & wages'],
-  ['products', 'Products & rates'],
+  ['products', 'Products & prices'],
   ['marketing', 'Sales office marketing'],
   ['troubles', 'Sales office troubles'],
-  ['loans', 'Loan approvals'],
+  ['loans', 'Deal approvals'],
 ];
 
 export function ManagerCard({ branch }: { branch: Branch }) {

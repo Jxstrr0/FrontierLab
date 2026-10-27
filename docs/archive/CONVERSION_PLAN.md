@@ -1,3 +1,5 @@
+> **Archived 2026-10-27 (stage C8e).** The conversion is complete: stages C0–C8 all landed (v0.1.0–v0.1.25). This file is kept as the record of how the bank game became the AI-lab game. DESIGN, SIMULATION, SCREENS and CONTENT now describe the game in AI terms and are the source of truth.
+
 # Frontier Lab — Conversion Plan (Vault Street → AI lab)
 
 **Status:** approved with changes, 2026-10-26. The owner's decisions and the revised map are in the full design brief ([Frontier Lab — Full Design Brief](https://claude.ai/artifact/XtCq5XYg2YaxkP5eSZ34KF), section "Decisions locked"). Where this plan and the brief differ, the brief wins. The biggest change: instead of 1–3 campuses per city there are 1–2 main offices worldwide, one sales office per city (the only way to open a city) and data centers anywhere, including remote energy sites. Read "campus" below as "sales office" (sales) or "data center" (compute). §4 is the working roadmap, and each stage updates SIMULATION, SCREENS, CONTENT and DATA_MODEL as it lands. **C0 is done** (v0.1.0, 2026-10-26).
@@ -339,7 +341,7 @@ Follows the brief's map structure (1–2 main offices worldwide, one sales offic
   - Data-centre and power deals on the regional energy sites (the payroll partnerships, moved from C4). **C8a done (v0.1.23, schema 18):** SIMULATION §13.7a.
   - Art pass (campus and GPU-hall vignettes, icons). **C8c done (v0.1.24).**
   - Balance pass across every strategy. **C8d done (v0.1.24):** rivals priced on revenue, recession checks in safety tiers.
-  - Docs sweep: DESIGN, SIMULATION, SCREENS and CONTENT fully in AI terms, and this file archived
+  - Docs sweep: DESIGN, SIMULATION, SCREENS and CONTENT fully in AI terms, and this file archived. **C8e done (v0.1.25).** Lighthouse mobile 95 / 95 / 96 / 91.
   - Hub card on Kelbo.Website (in a separate session)
 - **Accept:** same as ROADMAP Stage 10.
 

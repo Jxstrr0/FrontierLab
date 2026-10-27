@@ -33,7 +33,7 @@ export function UniversityPanel(p: { siteId: string }) {
       subtitle={['University', site.address, district].filter(Boolean).join(' · ')}
       icon={<LayerMedallion id="universities" size={32} />}
       onClose={closePanel}
-      advisor={{ text: 'Our graduates would love to join a growing bank.' }}
+      advisor={{ text: 'Our graduates would love to join a growing lab.' }}
       hero={<PartnerArt type="university" />}
     >
       <div class="stack">
@@ -41,7 +41,7 @@ export function UniversityPanel(p: { siteId: string }) {
           <Row label="Staff" value={count(site.employer.employees)} />
           <Row label="Students" value={count(students)} />
           <Row
-            label="Payroll partner"
+            label="Plans partner"
             value={currentPartner(s, site, mine)}
             tone={mine ? 'good' : undefined}
           />

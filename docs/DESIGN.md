@@ -1,111 +1,115 @@
 # Frontier Lab — Game Design
 
-> **Conversion in progress.** Frontier Lab is a fork of Vault Street being converted into an AI-lab tycoon. This document still describes the bank game that the code implements today; the proposed AI-lab mapping is in `CONVERSION_PLAN.md` and replaces §3.1 here once approved.
+Source of truth for intent. Formulas and numbers live in `SIMULATION.md`, screens in `SCREENS.md`, data in `CONTENT.md`. Last updated 2026-10-27 (stage C8f).
 
-Source of truth for intent. Formulas and numbers live in `SIMULATION.md`, screens in `SCREENS.md`, data in `CONTENT.md`. Last updated 2026-10-23.
+> **About the code names.** Frontier Lab began as a fork of the bank tycoon Vault Street. The bank-to-AI conversion (stages C0–C8) is finished, and its plan is archived in `docs/archive/CONVERSION_PLAN.md`. Many code identifiers still carry bank names so that saves and tests keep working: a sales office is a `branch`, the lab's name is `bankName`, the Compute floor is `treasury`, the Safety & Alignment floor is `risk`, and so on. This document describes the game in AI terms and names the code identifier in backticks where it helps.
 
 ---
 
 ## 1. Pitch
 
-You found a bank with a fresh charter: $2,000,000 of charter capital locked in the treasury and $900,000 to spend. Lease a storefront, build your first branch, set your rates and fees, hire tellers and a branch manager, and start gathering deposits. Lend them out, carefully. Ride the interest-rate cycle, build a headquarters, take the bank public, buy your rivals, and expand into the world's financial capitals. Your personal fortune grows alongside: homes, cars, collectibles, a jet, a sports franchise, and a climb up the rich list.
+You found an AI lab with a fresh seed round: $1,500,000, all of it yours to spend. Open your first sales office, price your plans and API, hire a sales team and an office manager, and start signing up customers. Buy compute to serve them, train better models, keep the safety regulator happy, win enterprise contracts from businesses across the city, take the lab public, buy your rivals, and expand into the world's tech capitals. Your personal fortune grows alongside: homes, cars, collectibles, a jet, a sports franchise, and a climb up the rich list.
 
-- **Title:** Frontier Lab (forked from Vault Street; working title on file there: Vault Street, alternatives Basis Point, Prime Rate).
+- **Title:** Frontier Lab (forked from the bank tycoon Vault Street).
 - **Repo:** `FrontierLab`; reference fork `VaultStreet` (remote `upstream`, read-only).
 - **Audience:** players of mobile tycoon and management sims who like numbers they can act on. Built for short phone sessions or long desktop sessions.
 
 ## 2. Pillars
 
 1. **Faithful tycoon structure.** Coffee Inc 2's loop carries over system for system: city map → location → tabbed location screen → HQ floors → capital markets → personal empire (§3).
-2. **Real banking, made legible.** Deposits fund loans, loans default, capital caps growth, and rates move. Every bank mechanic shows up as a number in the original's UI language: coins (stars), bars, margin rings, pentagons and income statements.
-3. **Decisions, not chores.** Delegation exists at every level (branch managers, executives, auto-funding), so the game scales from one branch to five hundred.
+2. **A real AI business, made legible.** Customers pay recurring fees (ARR), every customer needs compute, a better model earns better prices, and the safety regulator caps how fast you can grow. Every mechanic shows up as a number in the original's UI language: coins (stars), bars, margin rings, pentagons and income statements.
+3. **Decisions, not chores.** Delegation exists at every level (office managers, executives, auto spot-buy), so the game scales from one sales office to a worldwide lab.
 4. **Phone-first.** Every screen fits a phone in portrait, and a game week is a natural micro-session.
-5. **One bold look.** The world is engraved like a banknote; the interface is a quiet deco vault (ART_DIRECTION).
+5. **One bold look.** The world is engraved like a banknote; the interface is a quiet deco vault with a cool signal accent for live compute (ART_DIRECTION).
 
 ## 3. Faithfulness contract
 
-- **Keep identical in structure.** Everything in the mapping table (§3.1). Where the original has a screen, field, toggle or flow, the game has its banking equivalent in the same place in the hierarchy, using the same kind of control.
+- **Keep identical in structure.** Everything in the mapping table (§3.1). Where the original has a screen, field, toggle or flow, the game has its AI-lab equivalent in the same place in the hierarchy, using the same kind of control.
 - **Change.** The industry, all names and writing, all art and iconography, and the default currency ($, switchable in settings).
-- **Add (bank twists).** Each must be explainable in one sentence and shown with existing UI patterns:
-  - Balance sheet and **capital ratio** with regulator tiers (§5.6)
-  - **Liquidity** and wholesale funding, with funding freezes and bank runs (§5.6, §5.8.4)
-  - **Central banks** per country and a **business cycle** that moves rates, defaults and demand (§5.7)
-  - **Deposit beta:** rivals pass on only part of a rate hike to savers (§5.9)
-  - **Loan Desk:** individual business loan applications using the startup pentagon (§5.4.3)
-  - **Adverse selection:** charging far above market attracts riskier borrowers (§5.4.2)
-  - **Payroll partnerships** in place of plantations (§5.8.4)
-  - **Venture debt** alongside equity investing (§5.12)
+- **Add (AI-lab twists).** Each must be explainable in one sentence and shown with existing UI patterns:
+  - **Compute:** every customer uses GPUs, bought at a moving spot price, reserved in GPU lots or owned in data centers; running short means waitlists, then outages (§5.6, §5.8.4)
+  - **Safety ratio** with AI regulator tiers, a quarterly safety audit and a mandated pause (§5.6)
+  - **The AI model and training runs**, judged against a rising frontier set by rival labs (§5.8.3)
+  - **Deal Desk:** enterprise contracts with named businesses on the map, using the startup pentagon (§5.4.3)
+  - **Data-centre and power deals** at energy sites, and staff plan partnerships with employers, in place of plantations (§5.8.4)
+  - **Central banks** per country and a **business cycle** that move customer budgets, business failures and stock prices (§5.7)
+  - **Compute credits** alongside equity investing (§5.12)
   - **Insider-trading** risk on your personal trades (§5.16)
-  - **Regulator approval** on mergers, and **lobbying** (§5.10, §5.8.10)
+  - **Regulator approval** on mergers, and **lobbying** on AI policy (§5.10, §5.8.10)
 
 ### 3.1 Mapping table
 
-| Coffee Inc 2 | Vault Street | Notes |
-|---|---|---|
-| Coffee shop | Branch | |
-| Property for lease: weekly rent, deposit, foot traffic, area map | Available location (storefront) | Adds a demographics panel |
-| Build store: exterior, interior, espresso machine, brewer, blender | Build branch: exterior, lobby, teller line, vault, ATM | Each option shows price and quality/productivity stars |
-| Store tabs: Service, Product, Marketing, Finance | Branch tabs: Service, Products, Loan Desk, Marketing, Finance | Loan Desk is new |
-| Staff count, hourly salary, staff skill, staff morale | Same | |
-| Store manager: People, Product, Marketing, Ethics; four delegation toggles; fire manager | Branch manager: same skills; Staffing & wages, Products & rates, Branch marketing, Branch troubles, Loan approvals | One extra toggle |
-| Reviews: Price, Product, Service, Atmosphere, plus review cards | Rates, Products, Service, Branch, plus review cards | |
-| Menu tabs: Hot, Cold, Food | Deposits, Lending, Cards & Services | |
-| Product card: rating, on menu, sales last week, unit cost, margin ring, price | Product card: rating, offered, new accounts last week, balance, funding cost, margin ring, rate or fee | |
-| Company blend (radar, price per lb), Manage Blends; blend quality feeds product ratings | House underwriting model (radar, cost per application), Manage Models; model quality feeds the Products rating | |
-| Roasters selling packaged blends and roasting your custom blend | Credit bureaus selling scoring models and hosting your custom model | Map layer |
-| Coffee bean inventory: lots, harvest year, price/lb, quantity, radar | Funding inventory: lots, maturity, rate, amount, radar | Treasury floor |
-| Plantations: hectares, yield curve, "year X of Y", replant | Payroll partnerships: employees, deposit curve, "year X of Y", renew | Employers layer |
-| Ten marketing campaigns with levels and weekly costs | Ten branch campaigns with levels and weekly costs | See CONTENT |
-| HQ floors: Finance, HR, Product, Supply, Marketing, IT, Executive, Investment, Add Floor | Finance, HR, Products, Treasury, Marketing, IT & Security, Risk & Compliance, Executive, Investment, Add Floor | Risk is new |
-| Understaffing warnings from floor advisors | Same, plus coverage % per floor | |
-| HR employee benefits carousel | Same, plus Staff Mortgage Discount | |
-| Develop new product: type, target price, 4/8/12/24/48 weeks, weekly budget, star odds | Same, with bank product templates | |
-| Force the prices to all stores | Apply rates to all branches | |
-| Commercial bank: business loans, line of credit | Rival bank HQ: corporate loans and credit line | You borrow corporate cash |
-| Central bank rate headlines | Central bank building per country, plus headlines | Rates drive the economy |
-| Investment bank: Market, Equity, M&A | Same | Private placement and IPO added |
-| Secondary offering: shares, price, fees (4.55%), proceeds | Same | |
-| Stock card: price chart, market cap, dividend, 52w range, P/E, top shareholders, trade | Same | |
-| Coffee companies M&A | Rival bank M&A | Regulator approval required |
-| Competitor store: reviews, menu prices | Rival branch: reviews, rate sheet | |
-| Weekly results with cash flow and newspaper (Top, Retail, Business, Market, Politics, Sports) | Weekly results with The Weekly Ledger (Top, Banking, Business, Markets, Politics, Sports) | |
-| Company incidents ("case 1 of 1") | Incidents | Bank-specific cases |
-| Executive floor: board meeting, dividends, CEO pay, six seats (CEO, COO, CFO, CPO, CMO, CTO), delegation, option/RSU grants | Same six, plus a Chief Risk Officer as a seventh seat and a Chief Real Estate Officer as an eighth | Regulator can cap dividends |
-| Investment floor: ventures, benchmark pentagon, funding rounds, company/private toggle | Same | Plus venture debt |
-| Conventions | Fintech and finance conventions | |
-| Real estate: buy, rent per m², occupancy, ROI, for sale | Same | Plus foreclosed homes |
-| Airports, departures board with distances, weekly mileage limit, private jet | Same | |
-| Vacation homes (can rebuild), car dealer | Same | |
-| Auction house: upcoming auctions, your items, appraisal, counterfeit | Same | |
-| Football franchise: club, uniform, players, transfers, finance | Sports franchise, simplified | Kit sponsorship boosts brand |
-| Personal wealth: salary, total assets donut, stocks, real estate, other assets | Same | Plus rich list |
-| Settings, save slots, cloud sync | Settings, save slots, export/import save code | |
-| Map layers (13 types) | 14 types: Branches, Offices, Real Estate, Credit Bureaus, Banks, Investment Banks, Marketing Agencies, Conventions, Lobbying Firms, Sports Teams, Auto Dealers, Auction Houses, Universities, Employers | |
+How each of the original game's systems appears in Frontier Lab. The code-name column helps when reading the source.
+
+| Coffee Inc 2 | Frontier Lab | Code name | Notes |
+|---|---|---|---|
+| Coffee shop | Sales office (one per city, sizes Starter → Flagship) | `branch` | Grows in place instead of opening many shops |
+| — | Data center (on a free lot or an energy site) | `dataCenter` | Holds your own GPUs |
+| Property for lease: weekly rent, deposit, foot traffic, area map | Available storefront | `lot` | Adds a demographics panel |
+| Build store: exterior, interior, espresso machine, brewer, blender | Build sales office: exterior, lobby, sales desks, machine room, demo kiosks | slots `exterior`, `lobby`, `teller`, `vault`, `atm` | Each option shows price and quality/productivity stars |
+| Store tabs: Service, Product, Marketing, Finance | Office tabs: Service, Products, Deal Desk, Marketing, Finance | tab `loandesk` | Deal Desk is new |
+| Staff count, hourly salary, staff skill, staff morale | Same (sales and support staff) | | |
+| Store manager: People, Product, Marketing, Ethics; four delegation toggles; fire manager | Office manager: same skills; Staffing & wages, Products & prices, Sales office marketing, Sales office troubles, Deal approvals | delegation key `loans` | One extra toggle, bidding within a discount limit |
+| Reviews: Price, Product, Service, Atmosphere, plus review cards | Price, Products, Service, Office, plus review cards | rating keys `rates`, `products`, `service`, `branch` | |
+| Menu tabs: Hot, Cold, Food | Plans, API, Apps & Services | categories `deposits`, `lending`, `cards` | |
+| Product card: rating, on menu, sales last week, unit cost, margin ring, price | Product card: rating, offered, new sign-ups last week, ARR, compute cost, margin ring, price | | |
+| Company blend (radar, price per lb), Manage Blends; blend quality feeds product ratings | The AI model (radar: Reasoning, Speed, Breadth, Safety, Efficiency; data licence per customer), Manage Models | `underwriting` | Model quality feeds the Products rating, price headroom and deal odds |
+| Roasters selling packaged blends and roasting your custom blend | Data vendors selling dataset packages | `bureau`, layer `creditBureaus` | Map layer |
+| Develop new product | Product development, plus training runs for new model generations | `development`, `training` | Same terms and star-odds table |
+| Coffee bean inventory: lots, harvest year, price/lb, quantity, radar | Compute: GPU reservations (provider, term, price per GPU-week, size, radar) | `gpuLots` | Compute floor |
+| Plantations: hectares, yield curve, "year X of Y", replant | Data-centre and power deals at energy sites; staff plan partnerships with employers | `powerDeals`, `partnerships` | Same curve, health and renewal |
+| Ten marketing campaigns with levels and weekly costs | Ten office campaigns with levels and weekly costs | | See CONTENT §8 |
+| HQ floors: Finance, HR, Product, Supply, Marketing, IT, Executive, Investment, Add Floor | Finance, HR, Products, Compute, Marketing, Platform & Security, Safety & Alignment, Executive, Investment, Add Floor | `treasury` = Compute, `it` = Platform & Security, `risk` = Safety & Alignment | Safety is new |
+| Understaffing warnings from floor advisors | Same, plus coverage % per floor | | |
+| HR employee benefits carousel | Same, plus Compute Allowance | `mortgage_disc` | |
+| Force the prices to all stores | Apply prices to all sales offices, with a per-office "Set prices here" | `applyRatesToAll`, `ownPrices` | |
+| Commercial bank: business loans, line of credit | Investment bank Debt tab: venture debt and a revolving credit line | `corporateDebt` | You borrow corporate cash |
+| Central bank rate headlines | Central bank building per country, plus headlines | | Rates drive the economy |
+| Investment bank: Market, Equity, M&A | Market, Equity, Debt, M&A | | Private placement, IPO and corporate debt added |
+| Secondary offering: shares, price, fees (4.55%), proceeds | Same | | |
+| Stock card: price chart, market cap, dividend, 52w range, P/E, top shareholders, trade | Same | | |
+| Coffee companies M&A | Rival lab M&A | | Regulator approval required |
+| Competitor store: reviews, menu prices | Rival sales office: reviews, price sheet | | |
+| Weekly results with cash flow and newspaper (Top, Retail, Business, Market, Politics, Sports) | Weekly results with The Weekly Inference (Top, World, AI, Business, Markets, Politics, Sports) | tab `banking` = AI | |
+| Company incidents ("case 1 of 1") | Incidents | | AI-lab cases |
+| Executive floor: board meeting, dividends, CEO pay, six seats (CEO, COO, CFO, CPO, CMO, CTO), delegation, option/RSU grants | Same six, plus a Chief Safety Officer, a Chief Infrastructure Officer and a Chief Scientist | seats `cro`, `creo`, Chief Scientist | Regulator can cap dividends |
+| Investment floor: ventures, benchmark pentagon, funding rounds, company/private toggle | Same | | Plus compute credits |
+| Conventions | AI and developer conferences | `conventions` | |
+| Real estate: buy, rent per m², occupancy, ROI, for sale | Same | | |
+| Airports, departures board with distances, weekly mileage limit, private jet | Same | | |
+| Vacation homes (can rebuild), car dealer | Same | | |
+| Auction house: upcoming auctions, your items, appraisal, counterfeit | Same | | |
+| Football franchise: club, uniform, players, transfers, finance | Sports franchise, simplified | | Kit sponsorship boosts brand |
+| Personal wealth: salary, total assets donut, stocks, real estate, other assets | Same | | Plus rich list |
+| Settings, save slots, cloud sync | Settings, save slots, export/import save code | | Own storage keys, separate from Vault Street |
+| Map layers (13 types) | 16 types: Sales Offices, Data Centers, Offices, Real Estate, Data Vendors, Rival Labs, Investment Banks, Marketing Agencies, Conferences, Lobbying Firms, Sports Teams, Auto Dealers, Auction Houses, Universities, Businesses, Energy Sites | ids keep bank names (`branches`, `banks`, `employers` …) | |
 
 ## 4. Loops and arc
 
 ### 4.1 Weekly loop
-1. Read the weekly results and The Ledger.
-2. Spot what changed: a central bank move, a rival price war, a branch running hot.
-3. Act: adjust rates, staff and campaigns; approve business loans; top up funding.
-4. Expand: lease, build, hire.
+1. Read the weekly results and The Weekly Inference.
+2. Spot what changed: a chip shortage, a rival model release, a price war, an office running short of compute.
+3. Act: adjust prices, staff and campaigns; bid on proposal requests; buy or reserve compute.
+4. Expand: open or grow sales offices, build data centers, hire.
 
 ### 4.2 Quarterly loop
 - Quarter-end earnings arrive for you, rivals and listed companies.
 - Board meeting: set the dividend and CEO pay.
 - Dividends are paid three weeks later.
-- Regulator review.
+- The safety audit may land.
+- Enterprise contracts come up for renewal (the renewal season).
+- Rival labs may ship a new model generation.
 - Startups report results and raise new rounds.
 
 ### 4.3 Arc
 | Phase | Typical years | Shape |
 |---|---|---|
-| 1. Founder | 0–2 | One city, 1–4 branches, private. Learn deposits, then lending, then capital. No HQ needed while tiny ("founder mode"). |
-| 2. Regional | 1–5 | First HQ office and floors, 5–30 branches, treasury and partnerships, Loan Desk volume. Capital starts to bind, so private placements come in. |
-| 3. Public | 3–10 | IPO, board votes and share price, buying small rivals, more cities in your country, real estate and ventures. The personal empire begins. |
-| 4. Global | 8+ | New countries with their own central banks, hundreds of branches, big M&A, jets and franchises, the rich list. |
+| 1. Founder | 0–2 | One city, one sales office growing in size, private. Learn plans and the API, then compute, then contracts. No HQ needed while tiny ("founder mode"). |
+| 2. Regional | 1–5 | First HQ office and floors, a Safety team, a few cities, GPU reservations and a first data center, training runs. Cash and safety start to bind, so private placements come in. |
+| 3. Public | 3–10 | IPO (at $100M of ARR), board votes and share price, buying small rivals, more cities, real estate and ventures. The personal empire begins. |
+| 4. Global | 8+ | New countries, Flagship offices, several data centers and power deals, big M&A, jets and franchises, the rich list. |
 
-There's no fixed ending. Milestones, the annual rich list and the "fastest growing banks" ranking provide goals. You can fail through regulatory takeover or insolvency (§5.18).
+There's no fixed ending. Milestones, the annual rich list and the "fastest growing labs" ranking provide goals. You can fail only through insolvency (§5.18); a revoked licence is a long pause, never game over.
 
 ## 5. Systems
 
@@ -113,220 +117,251 @@ There's no fixed ending. Milestones, the annual rich list and the "fastest growi
 - The date sits top-right. Speeds are Pause, 1×, 2× and 4× (1× = one day per second).
 - The economy settles weekly; quarters and central bank meetings follow the calendar.
 - Results pop up every week by default (setting: every week, every month, every quarter, or off; a month or quarter rolls its weeks up).
-- The game auto-pauses for decisions: incidents, board meetings, and (optional setting) expiring loan applications.
+- The game auto-pauses for decisions: incidents, board meetings, and (optional setting) expiring proposal requests.
 - Time passes only on the map. Any open panel, sheet or popup holds the clock, and it resumes at the same speed when you return to the map, so results and prompts never land on top of a screen you are reading.
 
 ### 5.2 World and map
 - Real cities with procedurally generated maps, seeded per city, with no real street layouts.
 - Each city has districts with their own foot traffic, demographics, incomes and rents: Financial, Downtown, Midtown, University, Suburbs, Industrial and Waterfront.
-- Pins mark every interactive building. The Layers sheet filters the 14 types in §3.1.
-- **Start cities:** any of the 20 cities with storefronts (not the regional sites), picked under four region tabs: Canada, U.S., Europe, Asia-Pacific. The start city's country is the bank's home. The city sets the market's character, not the difficulty.
+- Pins mark every interactive building. The Layers sheet filters the 16 types in §3.1.
+- **Start cities:** any of the 20 cities with storefronts (not the regional energy sites), picked under four region tabs: Canada, U.S., Europe, Asia-Pacific. The start city's country is the lab's home. The city sets the market's character, not the difficulty.
 - **New Game options:**
-  - **Difficulty:** Easy, Normal, Hard or Expert. Harder levels mean fewer prospects, better-run rivals with sharper rates, and more loan defaults (SIMULATION §26 `DIFFICULTY`). Normal is the balance reference.
-  - **Competitors:** 1–5 rival banks in each city, defaulting to the city's usual count (CONTENT §2). Fewer rivals also means fewer rival branches.
-  - **Starting cash:** $600k, $900k (default), $1.2M or $1.5M of spendable cash. Charter capital stays at $2M.
+  - **Difficulty:** Easy, Normal, Hard or Expert. Harder levels mean fewer prospects and better-run rivals (SIMULATION §26 `DIFFICULTY`). Normal is the balance reference.
+  - **Competitors:** 1–5 rival labs in each city, defaulting to the city's usual count (CONTENT §2).
+  - **Seed money:** $1M, $1.5M (default), $2M or $2.5M, all of it spendable.
   - **Currency:** $, C$, £, € or ¥, the symbol money is shown in (as in the original's start options). It changes display only and can be switched later in Settings.
 - Other cities open up through travel (§5.17).
-- **One global enterprise.** You can fly to any city at any time and buy anything there: branches, offices, buildings, stakes, rival banks. Everything you own in every city keeps running every week at once, so the bank grows into a single worldwide business. Start cities differ in market size, rents and rivals, and that difference stays.
+- **One global enterprise.** You can fly to any city at any time and buy anything there: sales offices, data centers, offices, buildings, stakes, rival labs. Everything you own in every city keeps running every week at once, so the lab grows into a single worldwide business. Start cities differ in market size, rents and rivals, and that difference stays.
 
-### 5.3 Storefronts and building a branch
+### 5.3 Storefronts, sales offices and data centers
 - **For-lease storefronts** show:
   - weekly rent, security deposit and foot traffic
-  - demographics: students, young professionals, families, retirees, businesses
-  - income level and homeowner share
-  - the count and average rating of nearby rival branches
-- **Build Branch.** Pick five components: Exterior, Lobby, Teller line, Vault and ATM. Each option shows its price and coins for quality and productivity (vault: security).
-  - Lobby tier sets the number of advisor offices. Wealth Advice needs at least one, and mortgages sell better with more.
+  - demographics: students, developers, consumers, researchers, small shops
+  - income level
+  - the count and average rating of rival offices in the city
+- About half of each district's spare storefronts are taken by **customer businesses** (§5.5), so a few stay free in every district.
+- **One sales office per city.** An office reaches the whole city's market. Instead of opening more, you grow it in place (Grow office on its Finance tab): Starter ×1, Standard ×2.5, Large ×5, Flagship ×9. Size multiplies seats, staff needed, kiosk throughput, rent and the interior fit-out.
+- **Build sales office.** Pick five components: Exterior, Lobby, Sales desks, Machine room and Demo kiosks. Each option shows its price and coins for quality and productivity (machine room: security).
+  - Lobby tier sets the number of meeting rooms, which add sales seats.
   - After the cost summary comes a one-week fit-out ("Opening soon"; an assumption, since the original's build time wasn't visible), then a grand-opening awareness boost.
-- **Closing a branch:**
+- **Closing a sales office:**
   - You get back the lease deposit minus two weeks' rent, plus 30% of equipment value.
-  - Accounts move to your nearest branch in the city, with extra churn, or leave if there is none.
+  - Customers move to your office in the nearest city, with extra churn; contracts move or end.
+- **Data centers** are a second building kind, on a free storefront lot or at a regional energy site (up to three per site).
+  - Three slots: GPU hall (how many GPUs it holds), power (how many it can run) and cooling (its power efficiency). Fit-out takes 8–16 weeks.
+  - Its GPUs join the compute pool and serve customers first (§5.6). It pays power and rent each week; energy sites have cheaper power and land.
+  - It lifts the Service rating of sales offices in its city, and a little in cities nearby (lower latency).
 
-### 5.4 Running a branch
-Five tabs. Coffee Inc has four; the Loan Desk is the bank addition.
+### 5.4 Running a sales office
+Five tabs. Coffee Inc has four; the Deal Desk is the AI-lab addition.
 
 #### 5.4.1 Service
-- **Customer reviews:** overall rating plus Rates, Products, Service and Branch, with a carousel of review cards that mention real causes ("Free espresso while I signed my mortgage? Fine, you win.").
+- **Customer reviews:** overall rating plus Price, Products, Service and Office, with a carousel of review cards that mention real causes ("Support answered in five minutes and fixed it in ten.").
 - **Staff:** count and hourly wage steppers, skill and morale bars, and a wait indicator (Short / Busy / Long).
-- **Branch manager:**
+- **Office manager:**
   - Portrait and the four skills: People, Product, Marketing, Ethics.
   - Manager since, and an annual salary stepper.
-  - Delegation toggles: Staffing & wages, Products & rates, Branch marketing, Branch troubles, Loan approvals.
+  - Delegation toggles: Staffing & wages, Products & prices, Sales office marketing, Sales office troubles, Deal approvals (within the office's discount limit).
   - Fire or hire (a choice of three candidates).
 
 #### 5.4.2 Products
-- **House underwriting model card** at the top, like the original's company blend.
-- **Category control:** Deposits / Lending / Cards & Services.
+- **AI model card** at the top, like the original's company blend.
+- **Category control:** Plans / API / Apps & Services.
 - **Product cards** show:
   - coins for product quality and an Offered toggle
-  - new accounts last week with the change, and the balance
-  - funding cost, a margin ring and the spread
-  - a price stepper (interest rate or fee)
+  - new sign-ups last week with the change, and ARR
+  - compute cost, a margin ring and the margin
+  - a price stepper (a monthly or yearly fee, or a price per million tokens)
 - **Pricing trade-offs:**
-  - Savers chase rates and borrowers chase low rates.
-  - Fees drive away students first.
-  - Charging far above market brings in riskier borrowers (adverse selection).
+  - Each segment reacts to price versus the market; students are the most price-sensitive.
+  - A better model gives price headroom: customers accept a higher price before they churn.
+  - Discounts and sign-up credits bring in flightier customers.
 - **v1 catalog:**
-  - Deposits: Everyday Chequing, High-Interest Savings, 1-Year GIC, Student Account, Business Account
-  - Lending: Personal Loan, Auto Loan, Mortgage, Line of Credit, Small Business Loan (via the Loan Desk)
-  - Cards & Services: Credit Card, Wealth Advice, Safe Deposit Box, FX & Wires
+  - Plans: Free Tier, Plus, Pro, Team, Campus Plan
+  - API: Standard API, Batch API, Fine-tuning, plus the Enterprise contracts switch that opens the Deal Desk
+  - Apps & Services: Code Assistant, Agent Studio, Creative Suite, Priority Support
+- The Free Tier costs nothing and slowly upgrades users to Plus.
 - Product development adds variants (§5.8.3), which carry a delete icon like the original's.
 
-#### 5.4.3 Loan Desk
-- Local businesses apply each week. Each application shows:
-  - business name and sector
-  - amount, term and collateral
-  - the most they'll pay
-  - a pentagon: Management, Track record, Market, Competitiveness, Financial health
-- Approve at a rate you choose, decline, or let it expire after two weeks.
-- An estimated risk band appears only with a Risk & Compliance floor or a manager with Product skill ≥ 60.
-- **Delegated decisions** follow the manager's Product skill and Ethics plus the company risk appetite.
-- Approved loans are tracked individually, and big defaults make the news.
+#### 5.4.3 Deal Desk
+- Businesses in the city with no AI vendor send **proposal requests** (RFPs). Each request shows:
+  - business name, sector and size
+  - its yearly AI budget and the contract length
+  - a pentagon: AI readiness, Budget, Data sensitivity, Switching cost, Financial health
+- Bid a discount off the budget and see the exact win chance (your office's stars against the best rival's, plus the discount), decline, or let it expire after three weeks.
+- **Renewals due:** contracts that renew at the next quarter start show four weeks ahead, both yours (set your renewal offer) and rivals' (bid to take the account). The renewal season settles them all on the quarter start.
+- A contract is lost mid-term only if the business fails (more often in a downturn; a new business moves into the storefront) or walks during a compute outage.
+- **Delegated decisions:** the manager (or the Chief Safety Officer's policy) bids within the office's discount limit.
+- Contracts earn weekly, use compute and count in ARR. Big wins and losses make the news.
 
 #### 5.4.4 Marketing
-- Ten campaigns, each with levels and costs (CONTENT): Free Lobby Coffee, Charging Station, Saturday Hours, Sign-Up Bonus, Paperless Pledge, Direct Mail, Money Workshops, Community Sponsors, Social Media, Local Paid Search.
+- Ten campaigns, each with levels and costs (CONTENT §8): Coffee & Live Demos, Hack Nights, Weekend Support, Sign-Up Credits, Green Compute Pledge, Research Newsletter, AI Workshops, Community Sponsors, Social Media, Local Paid Search.
 - Campaigns build awareness, nudge ratings and target customer segments.
-- The Sign-Up Bonus trades more new deposits for flightier customers.
+- Sign-Up Credits trade more new customers for flightier ones.
 
 #### 5.4.5 Finance
-- Branch revenue and branch income, each with its weekly change.
+- Office revenue and office income, each with its weekly change.
 - A five-week paired bar chart.
-- The branch income statement (Week / Quarter / Year).
-- Balances: deposits, loans and customers.
+- The office income statement (Week / Quarter / Year): Plans, API, Apps & services, Enterprise contracts, then Compute and running costs.
+- ARR, customers and the office size, with Grow office.
 
 ### 5.5 Customers and competition
-1. **Prospects.** Each branch draws prospects from foot traffic, scaled by awareness and by how much of the neighbourhood already banks with you (saturation).
-2. **Share.** Prospects split by overall rating between you, nearby rival branches, your own nearby branches (cannibalisation), and the city's big incumbent banks.
-3. **Capacity.** Teller stations × productivity, plus ATMs, adjusted by staffing, skill and morale, caps how many you serve. Overflow becomes long waits and poor Service reviews.
-4. **Products.** New customers choose products by segment affinity, price versus market, product quality and loan approval.
+1. **Prospects.** Each sales office draws prospects from the whole city's traffic (more as it grows), scaled by awareness and by how much of the city already uses you (saturation).
+2. **Share.** Prospects split by overall rating between you, the rival labs' offices in the city, and the city's big incumbents.
+3. **Capacity.** Sales desks × productivity, plus demo kiosks, adjusted by staffing, skill and morale, caps how many you serve. Overflow becomes long waits and poor Service reviews.
+4. **Products.** New customers choose products by segment affinity, price versus market and product quality. The regulator's tier can halve or stop new sign-ups (§5.6), and so can a compute crunch.
+5. **Businesses.** Separately from walk-in customers, named businesses on spare storefronts (and big employers as anchor accounts) buy enterprise contracts through the Deal Desk. About half start on a rival lab's contract; the map shows each one's vendor in that lab's colour on the awning.
 
-### 5.6 The bank layer
+### 5.6 The lab's money, compute and the regulator
 Shown to the player in one place, the Company summary:
-- **Deposits fund loans.** Customer deposits aren't your money. They sit in the treasury as liquid assets or get lent out, and you earn the spread.
-- **Corporate cash** (top bar) is the company's own money: profit, capital raised and corporate borrowing. It pays for branches, salaries, acquisitions and dividends. Deposits can never be spent as corporate cash.
-- **Charter capital.** The bank starts with $2M of charter capital held in the treasury. It counts toward equity and liquidity but can never be spent. Together with the $900k of spendable cash, this keeps the founder phase to one branch, maybe two, like the original's £320k start.
-- **Funding transfer rate.** Inside each branch, deposits earn a funding credit and loans pay a funding charge at the central bank rate. Each branch's income therefore shows whether it gathers cheap money and lends it well.
-- **Liquidity.** Liquid assets must stay at or above 10% of deposits; the player sets a higher target in Treasury. On a shortfall, Treasury borrows overnight (auto-funding); without funding, new lending freezes.
-- **Capital ratio** = equity ÷ risk-weighted assets.
-  - Loans consume capital: mortgages lightly, business loans fully, equity stakes heavily.
-  - Grow capital by keeping profits or issuing shares.
+- **Revenue is cash.** Plans, API usage, apps and contracts are recurring revenue. The headline number is **ARR** (annual recurring revenue); each week a lab earns about ARR ÷ 52.
+- **Corporate cash** (top bar) pays for offices, data centers, compute, salaries, acquisitions and dividends.
+- **Seed money.** The whole seed round is corporate cash from day one; nothing is locked away. Treasury reserves (`treasury.reserves`) start at $0 and matter only to old bank-era saves.
+- **Compute.** Every plan seat, API token and contract needs GPUs, counted in GPU-weeks.
+  - Your own GPUs (data centers and power deals) serve demand first, then rented GPU lots, then the spot market.
+  - The spot price follows a global **chip cycle** (glut, normal, shortage).
+  - Spot buying is limited by your recent buying and a hard ceiling. Past it, auto spot-buy takes **emergency burst** compute at a premium, with a stigma on GPU offers.
+  - If demand still isn't met, a **capacity crunch** pauses new sign-ups. After three weeks of crunch, **outages** raise churn until it clears.
+  - Each office pays an internal compute charge at spot; the company books what it really paid.
+- **Safety ratio** = the Safety & Alignment floor's strength ÷ the risk your model carries. A model far ahead of the frontier carries more risk; a model with a high Safety axis carries less.
 
   | Tier | Ratio | Effect |
   |---|---|---|
-  | Strong | ≥ 14% | Cheaper funding |
-  | Adequate | ≥ 10.5% | No restrictions |
-  | Watch | ≥ 8% | Dividends capped |
-  | Restricted | ≥ 6% | No dividends, no new branches or acquisitions, lending halved |
-  | Critical | < 6% | No new lending, fines. Too long below 4.5% means regulator takeover. |
-- **Bank runs.** A terrible reputation plus weak capital or liquidity can trigger a run. Deposits flee fast until you respond.
+  | Strong | ≥ 105% | Data-sensitive businesses prefer you |
+  | Adequate | ≥ 85% | No restrictions |
+  | Watch | ≥ 70% | Dividends capped |
+  | Restricted | ≥ 55% | No dividends, no new sales offices or acquisitions, new sign-ups halved |
+  | Critical | < 55% | No new sign-ups, a fine each quarter |
+- **Mandated pause.** After eight weeks below 40%, the regulator offers an eight-week pause (no new customers, deals or training, for a fee) while its monitors work with your Safety team. Declining, or failing to recover, revokes the licence for 26 weeks, then a year of strict watch. It is never game over (`RECAP_OFFER` is the pause offer).
+- **Credit ratio.** The bank's old capital ratio (`capitalRatio`) lives on as the credit ratio lenders look at. It sets loan spreads and limits buybacks and acquisitions.
+- **Outage rumour.** Very poor ratings while the safety tier is Restricted or Critical can start a rumour that the lab is about to go dark: customers cancel their plans fast for a few weeks until you respond with service credits, a price cut or a public statement (code `BANK_RUN`).
 
 ### 5.7 Macro and central banks
 - **Cycle.** Every country moves through expansion, slowdown, recession and recovery.
 - **Central bank.** Each country's central bank (real institution names, simulated decisions) meets eight times a year; some meet four times. Policy follows inflation and growth.
-- **Effects.** The cycle moves loan demand, default rates, house prices, the yield curve (which inverts before recessions), stock prices and deposit growth.
-- **On the map.** The central bank building shows the country dashboard and offers an emergency lending facility, which carries stigma.
+- **Effects.** The cycle moves customer demand, business failures, house prices, the yield curve (which inverts before recessions), stock prices and lenders' rates.
+- **On the map.** The central bank building shows the country dashboard: your sales offices sell into an economy its rate steers. Its standing lending facility shows only for old bank-era saves that still carry funding.
+- **The chip cycle** is separate and global: one compute price index for the world (§5.6).
 
 ### 5.8 HQ and offices
-- **Offices.** Lease office buildings (floors, area, weekly rent, deposit). Each floor holds one department. Desks per floor depend on the building (24 or 32, as in the original); Investment floors have 32 and the Executive suite 8. Departments can span floors and offices.
+- **Offices.** Lease office buildings (floors, area, weekly rent, deposit); at most two main offices, the second in another country. Each floor holds one department. Desks per floor depend on the building (24 or 32, as in the original); Investment floors have 32 and the Executive suite 8. Departments can span floors and offices.
 - **Each department shows:**
   - employees (n / desks) and open positions
   - annual salary
   - skill and morale
   - coverage: staffing versus what the company's size requires
 - An advisor calls out shortfalls.
-- **Founder mode:** with two or fewer branches nothing is required. Requirements phase in from three to six branches.
+- **Founder mode:** with three or fewer office units nothing is required (a Starter office is one unit, a Flagship four). Requirements phase in fully by eight units, or at once when total assets reach $250M.
 
 #### 5.8.1 Finance
-- Company statements (income, balance sheet, cash flow; Week/Quarter/Year), a revenue and net income chart, and a capital and liquidity summary.
+- Company statements (income, balance sheet, cash flow; Week/Quarter/Year): Revenue → Compute → Gross profit, then running costs. A revenue and net income chart, and a credit summary (plus liquidity for old bank-era saves).
+- **Launch posture** (code `riskAppetite`): a 1–5 dial from Very cautious to Very bold. A bolder posture wins and keeps more Deal Desk contracts but adds to the model's safety exposure, and at Bold or Very bold capability over-claims are likelier. The Chief Safety Officer and the CFO can steer it.
 - Understaffed:
   - statements are delayed
   - an investor-relations discount hits your share price
   - late filings are fined once you're public
 
 #### 5.8.2 HR
-- Benefits carousel: Tuition Support, Pension Match, Employee Stock Plan, Childcare Support, Free Lunch & Snacks, Volunteer Days, Staff Mortgage Discount, Wellness Program, Remote Fridays.
+- Benefits carousel: Tuition Support, Pension Match, Employee Stock Plan, Childcare Support, Free Lunch & Snacks, Volunteer Days, Compute Allowance, Wellness Program, Remote Fridays.
 - Each shows cost per employee, estimated weekly cost and its effects. Benefits apply to everyone.
 - Understaffed: hiring slows and morale drifts down.
 
 #### 5.8.3 Products
-- House underwriting model: a radar (Accuracy, Speed, Inclusion, Fraud shield, Fairness) and cost per application. Manage Models mixes data sources. Model quality nudges every branch's Products rating, as the blend does in the original. Custom models can also be commissioned at a credit bureau, like a custom blend at a roaster.
-- Risk appetite, five levels.
-- Company product lineup with "Apply rates to all branches".
+- **The AI model:** a radar (Reasoning, Speed, Breadth, Safety, Efficiency) and a data licence per customer a year. Manage Models mixes training datasets bought from data vendors.
+  - Quality (the radar mean) gives price headroom, lifts every office's Products rating and adds to Deal Desk odds.
+  - Efficiency cuts the compute behind every customer. Speed lifts Service. Safety counts with data-sensitive businesses and lowers safety risk.
+- **The frontier.** Every rival lab has a named model, and some ship a new generation each quarter. The best rival model is the frontier; as it rises, the bar your model is judged against rises with it. A leaderboard ranks every lab's model.
+- **Training runs:** name, focus axis, term (4/8/12/24/48 weeks), weekly budget and a live star-odds table. The finished model waits in Manage Models to switch on.
+- **Research team:** up to eight named researchers hired from the market or poached from rivals. They lift training odds, most on their specialty, and rivals bid for them each quarter.
+- Company product lineup with "Apply prices to all sales offices".
 - Product development: type, target price tier, 4/8/12/24/48 weeks and a weekly budget, with a live star-odds table.
-- A company-wide deposits and loans trend chart.
+- A company-wide ARR trend chart.
 
-#### 5.8.4 Treasury
-- **Liquidity:** a gauge and the policy settings (target liquidity, auto-funding). Government bonds were removed in C3c.
-- **Funding inventory:** one card per lot with counterparty, type, rate, amount, maturity, and a radar (Cost, Term, Stability, Flexibility, Discretion).
-- **Funding market:** offers refresh every two weeks. A strong treasury team and capital ratio bring more and better offers.
-- **Payroll partnerships:** employer, employees, "Year 3 of 7", deposit curve and relationship health. Renew or let lapse.
+#### 5.8.4 Compute
+The Compute floor (code `treasury`).
+- **Compute pool:** the price index and its chart, GPUs used and owned, the spot bill, the spot limit, and the auto spot-buy switch.
+- **Rented GPUs:** one card per reservation with provider, term, price per GPU-week, GPUs and a radar (Cost, Term, Reliability, Flexibility, Latency). Reservations are billed every week of their term, used or not.
+- **GPU market:** 6-month, 1-year and 3-year reservations from fictional GPU clouds at a discount on spot. Offers refresh every two weeks; a fuller Compute team brings more and cheaper offers.
+- **Partnerships:**
+  - **Data-centre and power deals** at regional energy sites: contracted GPUs at a fixed price (take-or-pay) plus cheaper power for your data centers in that country. "Year 3 of 7", relationship health, renew or let lapse.
+  - **Staff plan partnerships** with employers: their staff join a plan (Team by default), adding ARR along the same curve.
+- Bank-era liquidity, funding and central bank cards show only for old saves that still carry deposits or wholesale funding.
 
 #### 5.8.5 Marketing
 Brand awareness by city, brand campaigns (TV, billboards, podcasts, creators, arena naming rights) and agency packages.
 
-#### 5.8.6 IT & Security
-- The mobile app rating feeds the Products rating and reduces branch visits.
+#### 5.8.6 Platform & Security
+- The app rating feeds the Products rating and reduces office visits.
 - Losing the CTO drags the app rating down until the seat is filled.
 - Breach and outage odds.
 - Digital projects, run as developments of type Digital.
 
-#### 5.8.7 Risk & Compliance (new floor)
-- Shows loss rates by product, delinquency, model performance and regulator status.
-- Understaffed: higher defaults, more fines and worse delegated loan decisions.
+#### 5.8.7 Safety & Alignment (new floor)
+- Shows the safety ratio and tier, the audit odds, model performance and losses.
+- Its staffing is the strength half of the safety ratio, and its requirement grows with ARR.
+- Understaffed: a lower safety ratio, more failed audits and fines.
 
 #### 5.8.8 Executive
 - Quarterly board meeting.
-- Senior executives: COO, CFO, CPO, CMO and CTO, as in the original, plus a Chief Risk Officer (on screen: Chief Safety Officer) as a seventh seat and a Chief Real Estate Officer (CREO; on screen: Chief Infrastructure Officer, CIO) as an eighth, who manages the rents on the bank's buildings and on yours (to an occupancy you dial) and can buy buildings for either.
+- Senior executives: COO, CFO, CPO, CMO and CTO, as in the original, plus three more seats:
+  - **Chief Safety Officer** (CSO; seat id `cro`): runs the Deal Desk policy and steers the launch posture by the safety tier (down at Watch or worse, up at Strong).
+  - **Chief Infrastructure Officer** (CIO; seat id `creo`): manages the rents on the lab's buildings and on yours (to an occupancy you dial) and can buy buildings for either.
+  - **Chief Scientist** (CSci): lifts training-run odds by expertise and can run routine training runs.
 - Each profile has skills (Leadership, Expertise, Loyalty), delegation toggles, salary, stock option and RSU grants with vesting, and a fire button. Delegations are on from the day of hire, and a seat remembers its last holder's toggles.
-- The COO can run expansion (branches in the cities you mark for growth) and settle company-level troubles, so a player who wants to run only the top of the bank can.
+- The COO can run expansion (opening or growing sales offices in the cities you mark for growth) and settle company-level troubles, so a player who wants to run only the top of the lab can.
 
 #### 5.8.9 Investment
-- Company portfolio: stocks, ventures, real estate and venture debt.
+- Company portfolio: stocks, ventures, real estate and compute credits.
 - Ventures pipeline. More staff finds more startups.
 
 #### 5.8.10 Outside HQ: agencies, lobbyists, universities
 - **Marketing agencies** sell city-wide campaign packages.
-- **Lobbying firms** push regulatory changes at a price, with a chance of failing and a chance of a Ledger exposé.
-- **Universities** offer student-account partnerships and a graduate program that improves hiring pools.
+- **Lobbying firms** push AI policy at a price (ease the AI safety rules, stall the AI safety bill, fast-track a merger review), with a chance of failing and a chance of an exposé in the paper.
+- **Universities** offer a student partnership (the Campus Plan) and a graduate program that improves hiring pools.
 
 ### 5.9 Rivals
-- **Who they are.** Each city has rival banks with a strategy (Incumbent, Disruptor, Premium or Community). Each has branches on the map, published rate sheets, reviews, quarterly earnings, dividends and executives, plus share prices if listed.
+- **Who they are.** Each city has rival labs with a strategy (Incumbent, Disruptor, Premium or Community). Each holds one sales office per city it serves, with a size, plus published price sheets, a named model, reviews, quarterly earnings, dividends and executives, and share prices if listed.
 - **How they behave:**
-  - expand into strong neighbourhoods in every city they serve, and enter new cities once they have a network: their home country first, then anywhere once they serve a few cities (SIMULATION §18.4)
-  - learn from you: in a city you share, a rival you out-serve lifts its branch quality and app rating a step each year (§18.3)
-  - close losing branches
+  - enter new cities and grow their offices: their home country first, then anywhere once they serve a few cities (SIMULATION §18.4)
+  - learn from you: in a city you share, a rival you out-serve lifts its office quality and app rating a step each year (§18.3)
+  - shrink or close losing offices
   - react to price wars
-  - pass rate hikes to savers slowly (deposit beta)
-- **They grow with the economy.** Every country's price-and-wealth level (the nominal index, SIMULATION §4.6) rises with its growth and inflation plus a trend, about 8–9% a year. Balances per account, market wages and rival books are all quoted at that level, so a world whose cities are full keeps growing, rivals become real acquisition targets, and a long game runs into the hundreds of billions and beyond.
-- **Failures.** Weak rivals can fail in recessions; their branch networks go up for distressed sale.
-- **Corporate lending.** Rival bank HQs (Banks layer) lend to your company: business loans and a line of credit. This is corporate cash, never deposits.
+  - ship new model generations, helped by the researchers they hire
+  - sign unserved businesses and take the contracts you lose
+- **They grow with the economy.** Every country's price-and-wealth level (the nominal index, SIMULATION §4.6) rises with its growth and inflation plus a trend, about 8–9% a year. Prices, wages and rival books are all quoted at that level, so a world whose cities are full keeps growing, rivals become real acquisition targets, and a long game runs into the hundreds of billions and beyond.
+- **Failures.** Weak rivals can fail in recessions; their office networks go up for distressed sale. New labs are founded during a game.
+- **Know your competition.** A rival lab's HQ (Rival Labs layer) shows who they are: model, researchers, cities, results. Rival labs don't lend to you; corporate borrowing is at the investment banks (§5.10).
 
 ### 5.10 Capital markets
-Investment banks on the map, with tabs Market / Equity / M&A:
+Investment banks on the map, with tabs Market / Equity / Debt / M&A:
 - **Market:**
-  - sector tabs: Banking, Technology, Energy, Auto, Retail, Real Estate
+  - sector tabs: AI labs, Technology, Energy, Auto, Retail, Real Estate
   - company cards: price chart, market cap, dividend and yield, 52-week range, P/E, top shareholders
   - trade from the company or the personal account
 - **Equity:**
   - While private: private placements, selling up to 25% per round.
-  - IPO once eligible: equity ≥ $25M, four profitable quarters, a finance team in place, and capital at least Adequate.
+  - IPO once eligible: ARR ≥ $100M, four profitable quarters, a finance team in place, a safety tier of Adequate or Strong, and no recession at home unless the credit ratio is strong.
   - After listing: secondary offerings showing new shares, price per share, gross proceeds, underwriting fee and capital raised.
+- **Debt:** an investment bank lends to labs with a sales office in its city.
+  - **Venture debt:** 2–3 fixed-rate term loan offers every four weeks, priced on your credit ratio and paid back weekly. All corporate debt together is capped at 40% of equity.
+  - **Credit line:** a revolving line at each bank, up to 60% of equity, at the policy rate + 4%. Draw or repay any week.
+  - This is corporate cash, shown under "Your debt" with early repayment.
 - **M&A:**
-  - Buy rival banks with an offer price and premium.
+  - Buy rival labs with an offer price and premium.
   - Acceptance depends on the premium and the target's health.
-  - The regulator checks your post-deal capital (at least 9%, so a deal may leave you in the Watch tier) and local market share (at most half a city's deposits; two-thirds after a fast-track lobbying win; not tested at all for a distressed sale). Rejected offers can be raised after two weeks.
-  - Acquired branches convert to your brand over eight weeks.
-- After the IPO, your share price tracks book value × (ROE ÷ cost of equity), moved by news, earnings and sentiment.
+  - The regulator checks your credit ratio after the deal (at least 9%) and your share of each affected city's market (at most half; two-thirds after a fast-track lobbying win; not tested at all for a distressed sale). Rejected offers can be raised after two weeks.
+  - An acquired lab's offices fold into yours city by city and convert to your brand over eight weeks.
+- **Valuation.** The lab is valued at ARR × a revenue multiple (1.5–16): higher for fast revenue growth and a model ahead of the bar, never below book value. It counts at a discount while private. After the IPO the share price follows that value, moved by news, earnings and sentiment. Listed rivals are priced the same way.
 
 ### 5.11 Real estate
 - **Buy buildings** as the company or personally. Listings show size, estimated value, market rent, occupancy and asking price.
 - **Run them.** Set rent per m² and occupancy responds. Weekly rent, maintenance and vacancy costs give ROI. List any building for sale.
 
-### 5.12 Ventures and conventions
-- **Where startups come from.** The Investment floor surfaces startups that are raising money. Conventions show exclusive ones; they're announced in the Ledger a month ahead, sit on the map for a month, and must be attended in person.
+### 5.12 Ventures and conferences
+- **Where startups come from.** The Investment floor surfaces startups that are raising money. Conferences show exclusive ones; they're announced in the paper a month ahead, sit on the map for a month, and must be attended in person.
 - **Startup screen:** description, founded, CEO, pre-money valuation, benchmark pentagon, quarterly financials, the current round with two offer lots (invest as Company or Private), funding history, top shareholders.
 - **Lifecycle.** Startups grow, raise up or down rounds, IPO, get acquired, or fail.
-- **Bank twist:** offer **venture debt** instead of buying shares.
+- **AI-lab twist:** offer **compute credits** (code `ventureDebt`) instead of buying shares.
 
 ### 5.12a Currencies (FX)
 - **A country bet.** Every country's currency is an investment: buy it when you think that country will do well against your home country, sell when you think it will slip. It's deliberately simple, a "country up or down" position, not real currency trading.
@@ -336,31 +371,33 @@ Investment banks on the map, with tabs Market / Equity / M&A:
 
 ### 5.13 Governance
 - **Quarterly board meeting.** Set the dividend per share and your CEO compensation, then the board votes. Your ownership, company performance and how reasonable the proposal is decide the result.
-- **Regulator caps** dividends in weak capital tiers.
+- **Regulator caps** dividends in weak safety tiers.
 - **Dividends** are paid three weeks after declaration; an incident reminds you to keep the cash.
 - **Executives** can resign or be poached; equity grants improve loyalty.
 
 ### 5.14 Incidents
 - Case-based modals ("Case 1 of 2") with two or three choices:
-  - robbery and ATM skimming
-  - data breach, card fraud ring and mis-selling
-  - regulator audit and insider-trading probe
-  - viral complaint, staff walkout and branch flood
-  - executive poached and price war
-  - bank-run rumour and big default
+  - server-room break-in and API key leak
+  - data breach, abuse ring and capability over-claim
+  - safety audit and insider-trading probe
+  - viral complaint, staff walkout and data-centre heatwave
+  - executive poached, researcher poached and price war
+  - outage rumour, the regulator's letter and the mandated pause
   - dividend reminders
-- Branch incidents can be delegated to managers.
+- Sales office incidents can be delegated to managers. The code keeps the bank-era case ids (CONTENT §22).
 
-### 5.15 The Weekly Ledger
+### 5.15 The Weekly Inference
 - The newspaper sits in the weekly results and is archived in the menu.
-- Tabs: Top / World / Banking / Business / Markets / Politics / Sports.
+- Tabs: Top / World / AI / Business / Markets / Politics / Sports.
 - Articles come from real simulation events:
-  - branch openings
+  - sales office openings, data centers and power deals
+  - model releases, the leaderboard and training runs
+  - contracts won and lost, compute crunches and outages
   - central bank decisions with GDP figures
   - earnings, dividends and executive moves
-  - conventions, rankings, fines and failures
+  - conferences, rankings, fines, safety pauses and failures
   - housing, auctions and sports
-- Most of each issue is about the world beyond your bank: a World desk (weather, science, work and prices, everyday life across all ten countries, shaped by each economy and season), the week's big share moves with a reason, corporate news, elections in every country, a fortnightly Money Column, leagues abroad, commodity prices, a world calendar (Nations Cup and World Games every four years, a World Expo every five, film awards, a science prize, New Year fireworks and the Grand Sale Weekend) and reprints of your own save's past headlines. Your own routine figures are rationed to what's news.
+- Most of each issue is about the world beyond your lab: a World desk (weather, science, work and prices, everyday life across all ten countries, shaped by each economy and season), the week's big share moves with a reason, corporate news, elections in every country, a fortnightly Money Column, leagues abroad, commodity prices, a world calendar (Nations Cup and World Games every four years, a World Expo every five, film awards, a science prize, New Year fireworks and the Grand Sale Weekend) and reprints of your own save's past headlines. Your own routine figures are rationed to what's news.
 
 ### 5.16 Personal layer
 - **Founder profile:** name, avatar, title and salary.
@@ -369,35 +406,35 @@ Investment banks on the map, with tabs Market / Equity / M&A:
   - vacation homes (which can be rebuilt to raise their value) and cars
   - collectibles from auction houses (appraise them to discover counterfeits)
   - a private jet
-  - a sports franchise, whose kit sponsorship boosts your bank's brand
+  - a sports franchise, whose kit sponsorship boosts your lab's brand
 - **Personal Wealth screen:** total assets with weekly change, a donut (cash, stocks, real estate, other), and holdings with cost basis and gains.
 - **Annual rich list.** Fifty fortunes sized to the game world ($150M–$2B at the start, growing 4–8% a year): you can enter it in the first decade, and topping it is the last milestone.
-- **Insider trading:** trading your own bank's stock just before earnings risks an investigation.
+- **Insider trading:** trading your own lab's stock just before earnings risks an investigation.
 
 ### 5.17 Travel
 - **Airports.** Every city map has one. Departure boards list destinations with real distances.
 - **Flying** animates across the map and loads the new city.
-- **Where you need to be.** Opening branches or visiting buildings in a city requires being there. Existing branches can be managed from the Branches list anywhere.
+- **Where you need to be.** Opening sales offices, building data centers, signing deals or visiting buildings in a city requires being there. Existing offices can be managed from the Sales Offices list anywhere.
 - **Travel is never blocked.** You can fly anywhere at any time.
-- **Weekly mileage:** flights within 24,140 km per week are free, as in the original. Remaining mileage shows on every departure board. Past the allowance, a destination still flies, as a paid one-way ticket from personal cash (the original charges a flat fare). If personal cash can't cover it, the bank pays the rest as a travel expense.
-- **First visit:** a city's storefronts, rivals and buildings are generated when you first land there, the same in a given save whenever you arrive. Regional sites (Fort McMurray, Pilbara, Midland) are small maps with an airport and a big employer, whose payroll deal any of your branches in that country can host.
+- **Weekly mileage:** flights within 24,140 km per week are free, as in the original. Remaining mileage shows on every departure board. Past the allowance, a destination still flies, as a paid one-way ticket from personal cash (the original charges a flat fare). If personal cash can't cover it, the lab pays the rest as a travel expense.
+- **First visit:** a city's storefronts, businesses, rivals and buildings are generated when you first land there, the same in a given save whenever you arrive. Regional energy sites (Fort McMurray, Pilbara, Midland) are small maps with an airport and a big employer, where you can build data centers and sign a power deal.
 - **Private jet:** bought with personal cash (Corvid 600, 6,000 km range; Albatross 8000, global). Adds a "Fly now" option from any map, and its flights never cost a ticket (assumption); a hop beyond the jet's range flies by the normal rules.
 
 ### 5.18 Goals, milestones, failure
-- **Milestones:** first branch, first loan, first profitable quarter, 10 branches, HQ fully staffed, IPO, first acquisition, 100 branches, ten cities, $1B in deposits, five countries, $10B in assets, five acquisitions, club owner, twenty cities, ten countries, billionaire founder, on the rich list, ten acquisitions, $100B in assets, rich list #1, ten-billion founder, $1T in assets.
+- **Milestones:** first sales office, first contract, first profitable quarter, first Flagship, first data center, HQ fully staffed, IPO, first acquisition, Five Flagships, three data centers, ten cities, a billion in ARR, five countries, $10B in assets, five acquisitions, club owner, twenty cities, ten countries, billionaire founder, on the rich list, ten acquisitions, $100B in assets, rich list #1, ten-billion founder, $1T in assets.
 - **Failure:**
-  - **Regulatory takeover:** Critical capital for too long, after an emergency recapitalisation offer is declined or fails.
-  - **Insolvency:** corporate cash below zero for four weeks with no credit available.
-- The game-over screen is a Ledger front page.
+  - **Insolvency:** corporate cash below zero for four weeks with no credit available. This is the only game over.
+  - **Licence revoked** is not failure: a 26-week pause, then a year of strict watch, with the personal fortune untouched (§5.6).
+- The game-over screen is a newspaper front page.
 
 ### 5.19 Settings and saves
 - Settings: currency symbol, distance units, weekly results frequency, default speed, auto-pause, sound, reduced motion, text size, founder avatar.
-- Autosave every week plus three manual slots.
-- Export/import save code to move a game between devices.
+- Autosave every week plus three manual slots, under Frontier Lab's own storage keys (separate from Vault Street on the same site).
+- Export/import save code to move a game between devices. A Vault Street code is turned away with a clear message.
 
 ### 5.20 Onboarding
-- **Part 1, Opening week.** The first branch manager guides the opening steps: lease, build, set the savings rate, hire a manager, read the weekly results, start lending, approve a business loan, run a campaign, and meet the bank behind the branches (corporate cash, deposits and capital on the Company summary).
-- **Part 2, Growing the bank.** The same guide comes back when a later mechanic opens up: headquarters at the third branch, the first executive, low capital, going public, a second city, and your personal fortune. The first time you open each HQ floor, map place or decision popup, a one-line "first look" explains it.
+- **Part 1, Opening week.** The first office manager guides nine steps from the seed round to the first enterprise contract: find a storefront, build a sales office, set the Plus price, turn on the API, hire a manager, run a campaign, open the doors, meet the lab (safety ratio, ARR and compute on the Company summary), and win your first contract.
+- **Part 2, Growing the lab.** The same guide comes back when a later mechanic opens up: headquarters, Safety & Alignment, short of compute, the first executive, training your own model, safety slipping, going public, a second city, and your personal fortune. The first time you open each HQ floor, map place or decision popup, a one-line "first look" explains it.
 - Everything is skippable, Part 2 can be switched off in Settings, and hints stay available in the advisor bar.
 
 ## 6. Out of scope for v1
@@ -684,3 +721,10 @@ Add one dated line per decision. Never delete entries; supersede them.
 - 2026-10-27 (stage C8c): **The engraving stays; the palette, icons and vignettes turn AI.** The UI keeps Banknote Deco with a deeper ink-navy, a cooler ivory and map paper, and one restrained cool accent (`--signal`) for live compute only, so brass stays the lead; every text pair still clears WCAG AA. Data centers get their own map building (a low, wide engraved hall with chillers and a substation yard, also drawn at energy sites) and an exterior and GPU-hall vignette on their panel that show the real hall, cooling, power and GPUs running. The sales office interior swaps the vault, deposit boxes and ATMs for a machine room, server wall and demo kiosks, and the bank-flavoured icons are redrawn, with every id kept so saves and data tables are untouched.
 - 2026-10-27 (stage C8d): **Listed rival labs are priced on revenue like yours.** Target = max(book per share, trailing revenue × the §19.2 multiple from their own growth and model lead) × sentiment. The bank-era ROE clamp is gone. Buying a listed rival now costs more, which suits an AI market where labs trade far above book.
 - 2026-10-27 (stage C8d): **The recession balance targets are read in safety tiers and cash.** Aggressive must reach Watch or worse at some point; under the forced recession, aggressive must reach Watch or worse without its cash going negative. The old Restricted-or-Critical-in-a-recession target came from bank capital, which an AI lab doesn't hold.
+- 2026-10-27 (stage C8e): **The docs are swept into AI terms.** DESIGN, SIMULATION, SCREENS and CONTENT now describe the AI-lab game as it is, with bank-era code identifiers (`branch`, `bankName`, `treasury`, `risk`, `capitalRatio`, `RECAP_OFFER`, `tel_*` and so on) named once with their AI meaning. Removed systems (Loan Desk, bonds, mortgages, deposits as a funding book, REO, the regulator takeover) are deleted or reduced to one line saying what replaced them. This log keeps its history unchanged. `CONVERSION_PLAN.md` is archived to `docs/archive/`.
+- 2026-10-27 (stage C8f, owner's call): **A $1.5M seed round, all of it spendable.** The bank's $2M of locked charter capital (`CHARTER_CAPITAL`) is gone: seed money is $1M, $1.5M (default), $2M or $2.5M of corporate cash, and treasury reserves start at $0. This supersedes the $10–15M seed round of owner decision A12 (2026-10-26 entry above); the owner chose $1.5M to keep the first-year curve, where one sales office, maybe two, is what a founder can afford. The all-spendable seed gives a lasting head start of about 20% in income, so the later income ceilings in SIMULATION §25 rise to match. Saves from before (schema 19) move their reserves into cash when they have no deposits, wholesale lots or central bank borrowing left.
+- 2026-10-27 (stage C8f): **"A billion in deposits" becomes "A billion in ARR".** The milestone keeps the id `deposits_1b` so saves keep it, and now reads company ARR. Other bank wording in milestone lines goes too ("the first customers are in", "now sells in five countries").
+- 2026-10-27 (stage C8f): **Risk appetite becomes the launch posture.** With no loans left, the 1–5 dial (code `riskAppetite`, Very cautious to Very bold) now trades deals against safety: each level adds −4 to +6 points to every Deal Desk win and keep chance and −10% to +16% to the safety exposure; Bold and Very bold still make capability over-claims 1.5× as likely. The Chief Safety Officer steers it by the safety tier (down at Watch or worse, up at Strong, at most Bold); the CFO's Capital switch still steps it down at a weak credit tier. Approval no longer uses a volume multiplier.
+- 2026-10-27 (stage C8f): **Two incidents lose their bank leftovers.** Capability over-claim refunds are 2% of the sales office's ARR (they were 2% of deposits ÷ 10, which came to $0). The outage rumour's central bank window is replaced by service credits worth 2% of company ARR, which end the rumour outright.
+- 2026-10-27 (stage C8f): **Corporate borrowing moves from rival labs to investment banks.** A rival lending to its competitor was a bank idea; a lab raises venture debt. The investment bank gets a Debt tab (venture debt offers and a revolving credit line) and lends to labs with a sales office in its city; the rival lab HQ panel is just an overview. The credit line limit rises from 20% to 60% of equity, since a city has about one investment bank where it had about three rival lenders. Loans and lines from rival labs in old saves keep running and can be repaid from the Debt tab, but not drawn; stale rival offers are replaced on the next tick.
+- 2026-10-27 (stage C8f): **The last bank labels go.** Office manager toggles read "Products & prices" and "Deal approvals", the service review category "Price", the office P&L "Bad debts", the build picker counts meeting rooms and storage bays, the wizard asks for a "Lab name", partner rows say "Plans partner" and "Staff plan deal", the HQ tabs read Platform and Safety, and M&A shows a rival's customers and customer share. The unused `EXEC_SUITE_DESKS` constant is removed.

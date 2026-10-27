@@ -50,9 +50,7 @@ export function StepOptions(p: { draft: Draft; patch: (d: Partial<Draft>) => voi
           }))}
           onChange={(v) => patch({ startCash: Number(v) })}
         />
-        <p class="option-note">
-          Spendable cash to open with. Your charter capital is held separately.
-        </p>
+        <p class="option-note">Your seed round: all of it is yours to spend.</p>
       </section>
 
       <section class="stack">

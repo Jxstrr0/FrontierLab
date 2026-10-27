@@ -39,7 +39,11 @@ export function EmployerPanel(p: { siteId: string }) {
       subtitle={[typeLabel(site), site.address, district].filter(Boolean).join(' · ')}
       icon={<LayerMedallion id="employers" size={32} />}
       onClose={closePanel}
-      advisor={{ text: `${count(e.employees)} people work here, and their payroll needs a bank.` }}
+      advisor={{
+        text: energy
+          ? `${count(e.employees)} people work here, on a site with power to spare for a data center.`
+          : `${count(e.employees)} people work here, and their team could use our plans.`,
+      }}
       hero={<PartnerArt type={e.type} />}
     >
       <div class="stack">
@@ -47,7 +51,7 @@ export function EmployerPanel(p: { siteId: string }) {
           <Row label="Employees" value={count(e.employees)} />
           <Row label="Average income" value={`${money(averageIncome(site), sym)} a year`} />
           <Row
-            label="Banking partner"
+            label="Plans partner"
             value={currentPartner(s, site, mine)}
             tone={mine ? 'good' : undefined}
           />
@@ -61,7 +65,7 @@ export function EmployerPanel(p: { siteId: string }) {
         {/* Energy sites sign power deals; a payroll deal signed before C8a runs on. */}
         {(!energy || mine) && (
           <>
-            <SectionTitle>{mine ? 'Yours' : 'Payroll deal'}</SectionTitle>
+            <SectionTitle>{mine ? 'Yours' : 'Staff plan deal'}</SectionTitle>
             <DealCard site={site} kind="payroll" people={e.employees} />
           </>
         )}

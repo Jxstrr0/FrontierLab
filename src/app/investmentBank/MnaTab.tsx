@@ -4,6 +4,7 @@
 // deposits and capital band; distressed sales with their badge and asking
 // price, your offer's status, the Offer sheet, and integrations in progress.
 import { useState } from 'preact/hooks';
+import { MERGERS } from '../../config/balance';
 import { targetBlocker } from '../../sim/mergerRules';
 import type { GameState, RivalBank } from '../../sim/state';
 import { Badge, Card, Medallion, Row, SectionTitle } from '../components';
@@ -88,7 +89,10 @@ function RivalCard(p: { s: GameState; bank: RivalBank; onOffer: () => void }) {
       )}
       <Row label="Sales offices" value={count(bank.branches.length)} />
       <Row label="Cities" value={rivalCities(bank) || '—'} />
-      <Row label="Deposits" value={money(rivalDeposits(bank), sym)} />
+      <Row
+        label="Customers"
+        value={count(Math.round(rivalDeposits(bank) / MERGERS.depositPerCustomer))}
+      />
       <Row
         label="Credit ratio"
         value={

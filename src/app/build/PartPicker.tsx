@@ -21,19 +21,19 @@ function coinRows(e: EquipmentSpec): { label: string; value: number }[] {
   }
 }
 
-/** One-line extra facts: stations, advisor offices, boxes, ATM traffic. */
+/** One-line extra facts: stations, meeting rooms, storage bays, kiosk traffic. */
 function facts(e: EquipmentSpec): string[] {
   const out: string[] = [];
   if (e.slot === 'lobby') {
     const n = e.advisorOffices ?? 0;
-    out.push(n === 0 ? 'No advisor offices' : `${n} advisor ${n === 1 ? 'office' : 'offices'}`);
+    out.push(n === 0 ? 'No meeting rooms' : `${n} meeting ${n === 1 ? 'room' : 'rooms'}`);
   }
   if (e.slot === 'teller') {
     out.push(`${e.stations} stations`);
     out.push(`${count(e.perStation ?? 0)} interactions per station each week`);
   }
   if (e.slot === 'vault') {
-    out.push(e.boxes ? `${count(e.boxes)} safe deposit boxes` : 'No safe deposit boxes');
+    out.push(e.boxes ? `${count(e.boxes)} storage bays` : 'No storage bays');
   }
   if (e.slot === 'atm' && e.atmProductivity) {
     out.push(`${count(e.atmProductivity)} interactions per week`);
