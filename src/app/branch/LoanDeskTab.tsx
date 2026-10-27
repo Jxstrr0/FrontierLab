@@ -2,7 +2,9 @@
 // strip (this week's applications, approved, declined, approval rate, business
 // loan balance, last week's defaults), the applications waiting for a decision
 // and the branch's booked business loans.
-import { useGame } from '../store';
+import { LOANDESK } from '../../config/balance';
+import * as cmd from '../../sim/commands';
+import { act, useGame } from '../store';
 import { Badge, Card, SectionTitle } from '../components';
 import { count, money, pct } from '../format/format';
 import { branchPrice } from '../../sim/branch/pricing';
@@ -63,6 +65,7 @@ export function LoanDeskTab({ branchId }: { branchId: string }) {
           }
         />
       </div>
+      <LendingFund reserves={s.treasury.reserves} cash={s.company.cash} sym={sym} />
       <p class="muted small loandesk-foot">
         Each offer starts at {pct(defaultRate)}, your Small Business Loan rate.
       </p>
@@ -90,6 +93,28 @@ export function LoanDeskTab({ branchId }: { branchId: string }) {
 
       <ActiveLoans loans={loans} currency={sym} />
     </div>
+  );
+}
+
+/** C3b: the desk lends from treasury reserves, topped up from company cash. */
+function LendingFund(p: { reserves: number; cash: number; sym: string }) {
+  const step = Math.min(LOANDESK.fundTopUp, Math.max(0, Math.floor(p.cash)));
+  return (
+    <Card>
+      <p class="loandesk-note">
+        <strong>Lending fund {money(p.reserves, p.sym)}.</strong> Loans are paid out of your
+        treasury reserves, and repayments flow back in. Applications larger than the fund cannot be
+        approved until you add to it.
+      </p>
+      <button
+        type="button"
+        class="btn btn-secondary btn-block"
+        disabled={step <= 0}
+        onClick={() => act(cmd.transferToTreasury, step)}
+      >
+        Add {money(step, p.sym)} from company cash
+      </button>
+    </Card>
   );
 }
 

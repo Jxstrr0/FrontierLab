@@ -12,7 +12,7 @@ export function decideApplication(
 ): CommandResult<{ accepted: boolean }> {
   const app = state.loanDesk.applications[appId];
   if (!app) return fail('That application has expired.');
-  const blocked = lendingBlocked(state);
+  const blocked = lendingBlocked(state, app.amount);
   if (blocked) return fail(blocked);
   const spec = PRODUCTS.sbl!;
   const r = clamp(roundToStep(rate, spec.step), spec.min, spec.max);

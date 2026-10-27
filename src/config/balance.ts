@@ -406,6 +406,8 @@ export const LOANDESK = {
   bigDefault: 500_000,
   /** Balances below this count as repaid. */
   dustBalance: 0.005,
+  /** C3b: cash the Loan Desk tab's "add to lending fund" button moves into reserves. */
+  fundTopUp: 250_000,
 } as const;
 /** Pentagon weights for the hidden score (Mgmt, Track, Market, Comp, FinHealth) (§11). */
 export const LOANDESK_WEIGHTS = [0.2, 0.2, 0.15, 0.15, 0.3] as const;

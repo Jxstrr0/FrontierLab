@@ -45,44 +45,48 @@ export function addBranchCosts(
     (EQUIPMENT[branch.build.atm]?.atmProductivity ?? 0) * mult * ATM_FEE.usage * ATM_FEE.fee;
 }
 
-/** Records the branch P&L row and posts company lines. Funding credit/charge are internal and net out. */
+/**
+ * Records the office P&L row (C3b: revenue by product line, then the compute
+ * bill) and posts company lines. The legacy bank books' funding credit and
+ * charge were internal transfers and stay out of the row; any deposit interest
+ * they still pay is shown with servicing until C3c removes them.
+ */
 export function closeBranchWeek(state: GameState, branch: Branch, wk: BranchWeek): BranchPnl {
-  const fees = wk.accountFees + wk.cardFees + wk.originationFees + wk.atmFees;
-  const wealthServices = wk.wealthFees + wk.serviceFees;
-  const row: BranchPnl = {
-    week: state.clock.week,
-    revenue: wk.loanInterest + wk.fundingCredit + fees + wealthServices,
-    income: 0,
-    lines: {
-      loanInterest: wk.loanInterest,
-      fundingCredit: wk.fundingCredit,
-      fees,
-      wealthServices,
-      depositInterest: wk.depositInterest,
-      fundingCharge: wk.fundingCharge,
-      losses: wk.losses,
-      staff: wk.staff,
-      manager: wk.manager,
-      rent: wk.rent,
-      marketing: wk.marketing,
-      equipment: wk.equipment,
-      servicing: wk.servicing + wk.underwriting,
-      overhead: wk.overhead,
-    },
+  const otherIncome = wk.originationFees + wk.atmFees + wk.wealthFees;
+  const servicing = wk.servicing + wk.underwriting + wk.depositInterest;
+  const lines = {
+    plans: wk.accountFees,
+    api: wk.serviceFees,
+    apps: wk.cardFees,
+    loanDesk: wk.loanInterest,
+    otherIncome,
+    compute: wk.compute,
+    losses: wk.losses,
+    staff: wk.staff,
+    manager: wk.manager,
+    rent: wk.rent,
+    marketing: wk.marketing,
+    equipment: wk.equipment,
+    servicing,
+    overhead: wk.overhead,
   };
+  const revenue = lines.plans + lines.api + lines.apps + lines.loanDesk + otherIncome;
   const expenses =
-    wk.depositInterest +
-    wk.fundingCharge +
+    wk.compute +
     wk.losses +
     wk.staff +
     wk.manager +
     wk.rent +
     wk.marketing +
     wk.equipment +
-    wk.servicing +
-    wk.underwriting +
+    servicing +
     wk.overhead;
-  row.income = row.revenue - expenses;
+  const row: BranchPnl = {
+    week: state.clock.week,
+    revenue,
+    income: revenue - expenses,
+    lines,
+  };
   branch.pnl.push(row);
   if (branch.pnl.length > BRANCH_PNL_WEEKS)
     branch.pnl.splice(0, branch.pnl.length - BRANCH_PNL_WEEKS);
@@ -102,6 +106,7 @@ export function closeBranchWeek(state: GameState, branch: Branch, wk: BranchWeek
   spend(state, 'equipment', wk.equipment);
   spend(state, 'overhead', wk.overhead);
   spend(state, 'servicing', wk.servicing);
+  spend(state, 'compute', wk.compute);
   spend(state, 'underwriting', wk.underwriting);
   postPnl(state, 'loanLosses', wk.losses);
   return row;

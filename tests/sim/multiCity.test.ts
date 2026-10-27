@@ -2,10 +2,9 @@
 // §4–5): (a) a bank with branches in three countries (Calgary, New York,
 // London) plays a year with the books balanced every week and every branch
 // running; (b) each country's policy rate is its own and drives only its own
-// branches' funding charges (FTP).
-// C3a: plans and API usage are recurring revenue with no deposit book, so the
-// policy rate now reaches an office only through its Loan Desk business loans,
-// funded at its own country's short FTP.
+// offices' Loan Desk pricing.
+// C3b: the Loan Desk lends company cash with no internal funding charge, so the
+// policy rate reaches an office through what its business borrowers will pay.
 import { describe, expect, it } from 'vitest';
 import { handleIncidents } from '../../scripts/strategies/common';
 import { CITIES } from '../../src/data/cities';
@@ -60,42 +59,39 @@ describe('Stage 8 acceptance: branches in three countries', () => {
   }, 60_000);
 });
 
-describe("Stage 8 acceptance: each country's policy rate drives its own branches", () => {
-  /** Funding charge per unit of Loan Desk loans, from the weekly P&L (annualised). */
-  const chargeRate = (s: GameState, b: Branch) =>
-    (lastRow(b).lines.fundingCharge * WEEKS_PER_YEAR) / loans(s, b);
+describe("Stage 8 acceptance: each country's policy rate drives its own offices", () => {
+  /** Rates on the Loan Desk loans an office booked since `before`, keyed by application order. */
+  const asks = (s: GameState, id: string, before: GameState) =>
+    Object.values(s.loanDesk.loans)
+      .filter((l) => l.branchId === id && !before.loanDesk.loans[l.id])
+      .map((l) => l.rate);
 
-  it('starts the three countries on different policy rates, each branch funded at its own', () => {
-    const { s, branches } = worldBank();
+  it('starts the three countries on different policy rates', () => {
+    const { s } = worldBank();
     advanceWeeks(s, 26);
     const policy = (c: CountryId) => s.world.countries[c]!.policyRate;
     expect(new Set([policy('CA'), policy('US'), policy('UK')]).size).toBe(3);
-    for (const id of Object.values(branches)) {
-      const b = s.branches[id]!;
-      const c = s.world.countries[countryOf(b)]!;
-      // Loan Desk loans are charged at the office's own country's short FTP (§5),
-      // on the balance before the week's repayment, so the read runs a touch high.
-      expect(loans(s, b)).toBeGreaterThan(0);
-      expect(Math.abs(chargeRate(s, b) - c.policyRate)).toBeLessThan(0.006);
-    }
   });
 
-  it('moves only the US branch funding charge when the US policy rate rises', () => {
+  it("moves only New York's Loan Desk loan rates when the US policy rate rises", () => {
     const { s, branches } = worldBank();
     advanceWeeks(s, 8);
+    const start: GameState = structuredClone(s);
     const base: GameState = structuredClone(s);
     const hike: GameState = structuredClone(s);
     hike.world.countries.US!.policyRate += 0.02;
     advanceWeeks(base, 1);
     advanceWeeks(hike, 1);
-    const charge = (st: GameState, id: string) => lastRow(st.branches[id]!).lines.fundingCharge;
     for (const id of [branches.cal, branches.lon])
-      expect(charge(hike, id)).toBeCloseTo(charge(base, id), 6);
-    const nyc = base.branches[branches.nyc]!;
-    const dCharge = charge(hike, branches.nyc) - charge(base, branches.nyc);
-    // Loans cost 2pp more to fund for the week (less the week's repayments).
-    expect(loans(base, nyc)).toBeGreaterThan(0);
-    expect(dCharge).toBeGreaterThan((loans(base, nyc) * 0.015) / WEEKS_PER_YEAR);
+      expect(asks(hike, id, start)).toEqual(asks(base, id, start));
+    const b = asks(base, branches.nyc, start);
+    const h = asks(hike, branches.nyc, start);
+    expect(b.length).toBeGreaterThan(0);
+    expect(h.length).toBe(b.length);
+    // The desk prices loans off the office's own country's short rate (§5, §11).
+    // The short rate follows the policy rate over a few weeks, so the first week moves a little.
+    h.forEach((r, i) => expect(r).toBeGreaterThanOrEqual(b[i]!));
+    expect(h.reduce((t, r) => t + r, 0)).toBeGreaterThan(b.reduce((t, r) => t + r, 0));
     expect(identityGap(hike)).toBeLessThan(1);
   });
 });
