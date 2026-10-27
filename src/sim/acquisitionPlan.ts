@@ -9,10 +9,10 @@
 // in new shares (a listed lab's share-for-share part, shareDeals.ts) and give
 // up any of its shares your company holds (V at market); goodwill = C + S + V −
 // net assets, or a bargain gain when that is negative.
-import { MERGERS, STOCK_RISK_WEIGHT } from '../config/balance';
-import { capitalSnapshot } from './capital';
+import { MERGERS, RUNWAY } from '../config/balance';
 import { companySharesOf, sharesToBuy } from './mergerPricing';
 import { rivalArr, rivalCustomers } from './rivalFinance';
+import { runwayHealthy, runwaySnapshot, type RunwaySnapshot } from './runway';
 import { securityPrice } from './securities';
 import { stockSplit, type StockSplit } from './shareDeals';
 import type { GameState, RivalBank } from './state';
@@ -52,7 +52,8 @@ export interface DealPlan {
   netAssets: number;
   goodwill: number;
   gain: number;
-  proFormaCr: number;
+  /** Runway once the cash price has left corporate cash (current burn). */
+  proFormaRunway: RunwaySnapshot;
   cityShares: CityShare[];
   /** City customer share limit: MERGERS.maxCityShare, or fastTrackShare after a won Lobbying fast-track. */
   shareLimit: number;
@@ -137,12 +138,9 @@ export function planDeal(
   const goodwill = Math.max(0, paid - netAssets);
   const gain = Math.max(0, netAssets - paid);
 
-  // Pro-forma capital (§15): CET1 = equity − goodwill − intangibles; cash and reserves carry
-  // no risk weight. New deal shares add their value to equity.
-  const rwaAdded = -holdingValue * STOCK_RISK_WEIGHT;
-  const snap = capitalSnapshot(state);
-  const cet1 = snap.cet1 + split.stockValue + gain - goodwill;
-  const proFormaCr = cet1 / Math.max(1, snap.rwa + rwaAdded);
+  // Pro-forma runway (§15, §19.8): the cash price leaves corporate cash; the
+  // target's reserves go to the treasury, and its burn is not counted.
+  const proFormaRunway = runwaySnapshot(state, -cash);
 
   return {
     rivalId: bank.id,
@@ -163,7 +161,7 @@ export function planDeal(
     netAssets,
     goodwill,
     gain,
-    proFormaCr,
+    proFormaRunway,
     cityShares: cityShares(state, bank),
     ...shareLimitFor(state),
   };
@@ -182,7 +180,7 @@ export interface RegulatorCheck {
 }
 
 /**
- * The regulator's two tests (§19.8): pro-forma CR and customer share in every
+ * The regulator's two tests (§19.8): runway after paying cash and customer share in every
  * affected city. A distressed sale skips the share test (the regulator wants
  * the failed network rescued), which the one row says.
  */
@@ -191,11 +189,13 @@ export function regulatorChecks(
   cityName: (id: string) => string,
 ): RegulatorCheck[] {
   const pct = (x: number) => `${(x * 100).toFixed(1)}%`;
+  const r = plan.proFormaRunway;
+  const after = r.months === null ? 'no burn' : `${Math.floor(r.months)} months at today's burn`;
   const checks: RegulatorCheck[] = [
     {
-      label: 'Credit after the deal',
-      ok: plan.proFormaCr >= MERGERS.minProFormaCr,
-      detail: `Pro-forma credit ratio ${pct(plan.proFormaCr)} (needs ${pct(MERGERS.minProFormaCr)})`,
+      label: 'Runway after the deal',
+      ok: runwayHealthy(r.tier),
+      detail: `Runway after paying cash: ${after} (needs ${RUNWAY.gateMonths})`,
     },
   ];
   if (plan.distressed && MERGERS.distressedShareExempt) {

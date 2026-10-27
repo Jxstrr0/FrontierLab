@@ -4,21 +4,21 @@
 // building, in any city, at its asking price (which the seller always takes).
 // It picks the listing with the best net yield (a year's rent less upkeep at
 // the rent the CFO would set, ÷ asking) that the budget allows:
-//   bank: never at a restricted safety tier; its buildings stay under
-//         buyAssetCap of total assets; the capital ratio stays at or above
-//         buyMinCr after the purchase; expansionReserveWeeks of costs stay in cash
+//   lab:  never at a restricted safety tier; its buildings stay under
+//         buyAssetCap of total assets; RUNWAY.gateMonths of runway stay after
+//         the purchase (runway.ts); expansionReserveWeeks of costs stay in cash
 //   you:  keeps buyReserveYears of CEO salary; a building costs at most
 //         buySpareShare of the cash above that
 // nextPurchase is also what the CFO's profile shows.
-import { EXEC_DELEGATION, PROPERTY_RISK_WEIGHT, WEEKS_PER_YEAR } from '../config/balance';
+import { EXEC_DELEGATION, RUNWAY, WEEKS_PER_YEAR } from '../config/balance';
 import { balanceSheet } from './balanceSheet';
-import { capitalSnapshot } from './capital';
 import { setPropertyRent } from './commands/realEstate';
 import { ventureTierBlock } from './commands/ventures';
 import { expansionReserve } from './execDelegationsGrowth';
 import { delegationOn, rentPricingPower, rentsManaged } from './execSeats';
 import { completePurchase } from './propertyBuy';
 import { marketRentNow, occupancyTarget, propertyWeek, rentForOccupancy } from './propertyMath';
+import { spendableCash } from './runway';
 import type { GameState, Property } from './state';
 
 type Owner = Property['owner'];
@@ -85,12 +85,8 @@ function bankBlocker(state: GameState, c: BuyPick): string | undefined {
   const bs = balanceSheet(state);
   if (bs.realEstate + c.value > d.buyAssetCap * bs.assets)
     return `The lab's buildings would pass ${Math.round(d.buyAssetCap * 100)}% of its assets.`;
-  const snap = capitalSnapshot(state);
-  // Cash (no risk weight) becomes a building booked at its value; the price gap hits equity.
-  const crAfter =
-    (snap.cet1 + c.value - c.asking) / Math.max(1, snap.rwa + c.value * PROPERTY_RISK_WEIGHT);
-  if (crAfter < d.buyMinCr)
-    return `The credit ratio would fall under ${Math.round(d.buyMinCr * 100)}%.`;
+  if (c.asking > spendableCash(state))
+    return `Runway would fall under ${RUNWAY.gateMonths} months.`;
   return undefined;
 }
 

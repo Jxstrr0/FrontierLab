@@ -8,7 +8,6 @@ How the economy works, step by step. Every CAPS name is a key in `src/config/bal
 |---|---|
 | `branch` | a sales office |
 | `bankName`, `RivalBank` | your lab's name, a rival lab |
-| `capitalRatio`, `TIER_THRESHOLDS` | the credit ratio and its credit tier (§15) |
 | `company.tier` | the safety tier (§15) |
 | `RECAP_OFFER` | the mandated pause offer (§15) |
 | `BANK_RUN` | the "Outage rumour" incident (§13.8) |
@@ -57,7 +56,7 @@ How the economy works, step by step. Every CAPS name is a key in `src/config/bal
 14. HQ: floors, coverage and benefits (§16), then product developments (§16.6), the training run (§16.12), the AI model (§16.7) and the app rating (§16.9).
 15. Corporate items: brand marketing, corporate debt, executives, the talent market, HR manager hiring, manager poaching, governance, M&A, real estate, ventures, conventions, lobbying, depreciation (§14, §16–§21).
 16. Close the week: P&L, cash flow, balance sheet, tax and the weekly snapshot (§14).
-17. The credit ratio (`evaluateCapital`), then the safety ratio and regulator tier (`evaluateSafety`), then the pause and failure checks (§15).
+17. The safety ratio and regulator tier (`evaluateSafety`), then the pause and failure checks (§15). Runway (§15) is not stored: it is worked out from cash and the weekly closes whenever it is read.
 18. Personal: cash and salary, travel (reset the km allowance, jet upkeep), personal assets, auctions, sports franchises (§22).
 19. Markets: listed prices, your valuation, portfolios (§19), then currencies (§19.10).
 20. **Quarter start** (the first weekly tick after Mar 31, Jun 30, Sep 30, Dec 31):
@@ -456,7 +455,7 @@ Reserves earn the deposit-facility rate, RESERVE_RATE_SPREAD (0.50%) below polic
 Retired in play. `runTreasury` still runs the bank's overnight and central bank window borrowing, but it measures the shortfall against deposits, which are $0, so it never borrows. A funding freeze can't happen.
 
 ### 13.6 Funding market
-Legacy. With a Compute floor, funding offers (Term Interbank, CONTENT §12) still refresh every 2 weeks (`FUNDING_REFRESH_WEEKS`), and any wholesale lot an old save holds still pays weekly interest from corporate cash and repays at maturity. The Compute floor shows the funding cards only for a save that still has deposits, lots or overnight borrowing (`hasLegacyFunding`). The rating spread (`RATING_SPREADS`, by credit ratio: ≥ 14% −0.10pp, 10.5–14% 0, 8–10.5% +0.35pp, < 8% +1.00pp) and TREASURY_PENALTY (0.5pp × the Compute floor's shortfall) still price them.
+Legacy. With a Compute floor, funding offers (Term Interbank, CONTENT §12) still refresh every 2 weeks (`FUNDING_REFRESH_WEEKS`), and any wholesale lot an old save holds still pays weekly interest from corporate cash and repays at maturity. The Compute floor shows the funding cards only for a save that still has deposits, lots or overnight borrowing (`hasLegacyFunding`). The rating spread (`RATING_SPREADS`, by runway tier, §15: Strong −0.10pp, Comfortable 0, Tight +0.35pp, Critical +1.00pp) and TREASURY_PENALTY (0.5pp × the Compute floor's shortfall) still price them.
 
 ### 13.7 Plans partnerships (employers)
 - **Signing:**
@@ -527,7 +526,7 @@ The statement reads like a software company's (`src/app/company/statementData.ts
 | Tax | country rate on positive pre-tax income, with loss carry-forward; accrued weekly, paid quarterly |
 | **Net income** | |
 
-"Weekly revenue" in the weekly results is the Revenue line. Internally the ledger still sums lines into bank-style groups (`netRevenue` = interest income + fee & other income), which the credit ratio's operating-risk term reads (§15).
+"Weekly revenue" in the weekly results is the Revenue line. Internally the ledger still sums lines into bank-style groups (`netRevenue` = interest income + fee & other income).
 
 ### 14.3 Cash flow
 - **Operations:** net income + non-cash items (bad debts, D&A, grant expense, investment gains) ± change in taxes payable.
@@ -550,7 +549,7 @@ If Finance coverage' < 0.9, the newest `ceil((0.9 − k') × 10)` weeks show as 
 
 ## 15. Safety and the regulator
 
-The AI regulator watches a **safety ratio**. The bank's capital ratio lives on as the **credit ratio**, what lenders price on.
+The AI regulator watches a **safety ratio**. Lenders, the CFO and the deal limits watch **runway**: how long the cash lasts. (The bank game's capital ratio became the safety ratio in C7a; the credit ratio that carried its formula for lenders gave way to runway at schema 24.)
 
 **Safety ratio** (`safety.ts`):
 - `strength = min(1, safetyCoverage′) + clamp(k − 1, 0, kMax − 1)`: the Safety & Alignment floor's coverage′ (§16.4, so founder mode reads 1 and audit consultants or the regulator's monitors count), plus staffing above the requirement, up to k = 1.2.
@@ -585,11 +584,17 @@ The AI regulator watches a **safety ratio**. The bank's capital ratio lives on a
 - Failure probability: `0.02 × (1 + 3 × (1 − safetyCoverage′)) × (1.6 − avgManagerEthics/100) × exposure`, × 2 under strict watch.
 - On failure: a fine of 0.05–0.3% of trailing annual revenue, plus the `REGULATOR_AUDIT` incident (Safety audit) and news.
 
-**Credit ratio** (`capital.ts`, `capitalRatio`):
-- `CET1 = equity − goodwill − intangibles`
-- `RWA = loans × risk weight (legacy) + fixedAssets × FIXED_ASSET_RISK_WEIGHT (1.0) + stocks × STOCK_RISK_WEIGHT (2.5) + ventures × VENTURE_RISK_WEIGHT (2.5) + compute credits × VENTURE_DEBT_RISK_WEIGHT (1.5) + realEstate × PROPERTY_RISK_WEIGHT (1.0) + currencies × FX_RISK_WEIGHT (1.0) + a sports franchise × FRANCHISE.riskWeight (2.5) + OP_RISK_MULT (1.0) × trailing-52-week net revenue`
-- `CR = CET1 / max(RWA, 1)`. It sets lenders' spreads (§13.6, §19.9), the CFO's Capital and Share-sales routines, buyback and acquisition limits, the Outage rumour's statement odds and the IPO's recession exception. Its credit tier uses `TIER_THRESHOLDS` (Strong ≥ 14%, Adequate ≥ 10.5%, Watch ≥ 8%, Restricted ≥ 6%), each raised by a point per point of AI safety buffer.
-- A lab short of capital can only fail by running out of cash (`checkFailure`).
+**Runway** (`runway.ts`, `RUNWAY`):
+- `burn = max(0, −average weekly net income over the last EXEC_DELEGATION.revenueWeeks (13) closes)`, the same window as cash cover (§24).
+- `months = max(0, cash) ÷ burn ÷ (52/12)`. With no burn (profitable, or no closes yet) there is no runway figure and the lab counts as Strong.
+- Tiers (`RUNWAY.tiers`): **Strong** 24 months or more, or not burning cash; **Comfortable** 12–24; **Tight** 6–12; **Critical** under 6, or cash below zero.
+- What reads it:
+  - lenders' spreads: the rating spread on legacy funding (§13.6) by tier, and venture debt (§19.9) by runway and ARR;
+  - the CFO's Capital and Share sales routines (§17.2);
+  - the gates: buybacks (§19.6a), acquisitions (§19.8) and the CFO's Buying (§21.1) and Investing (§17.2, §20.4) must leave at least `RUNWAY.gateMonths` (12) months of runway after the spend, so they never push the lab into Tight;
+  - the IPO's recession exception (§19.4).
+- Worked example: cash $6M, the last 13 closes average −$100k net income. Burn $100k a week, so runway = 6,000,000 ÷ 100,000 ÷ 4.33 = 13.8 months: Comfortable. A buyback costing $1.2M would leave 11.1 months, so it is refused.
+- A lab short of runway can only fail by running out of cash (`checkFailure`).
 
 ## 16. HQ
 
@@ -750,7 +755,7 @@ The Finance floor's 1–5 dial (code `company.riskAppetite`, set by `setRiskAppe
 | Exec | Domain | Delegations |
 |---|---|---|
 | COO | HR, all sales offices | **Expansion:** opens sales offices for you in the cities you mark for growth (one at most every 4 weeks, in the growth city with the most room, at the busiest free storefront, in your usual fit-out, keeping 8 weeks of costs in cash). **Company troubles:** settles company and city incidents the way a delegated manager would (§17.1), valuing effects in weeks of company revenue with error shrinking with Expertise; cases marked `yours` (the outage rumour, the mandated pause, poached executives) always come to you. **Sales office operations:** auto-hires managers for new offices and turns on default delegation. **HR benefits:** keeps average morale at or over the **morale target** you dial (`executives.moraleTarget`, one of `EXEC_DELEGATION.moraleTargets` 70 / 80 / 90, default 70) at least cost, within `benefitsBudgetShare` (8%) of payroll. **HR division:** auto-staffs every floor to 100% coverage. **Pay reviews:** on the **cadence** you dial (`executives.payReviewCadence`: quarterly = every 13 weeks, annual = every 52, `PAY_REVIEW.cadences`, default quarterly) sets every executive to `execMarketSalary × (1 + payPremium)` and every manager to their market pay (§6.5) × `(1 + payPremium)`, rounded to the salary steps and inside the allowed ranges; it also runs at once when switched on and whenever you change the premium (`setPayPremium`, −10% to +30% in 5% steps, default +5%). **Sales office guidance (staffing):** see below. |
-| CFO | Finance, owned buildings (the lab's and yours) | Halves statement delays. **Capital:** at Watch or worse (credit tier), sells the company's stocks and steps the launch posture down every 4 weeks, 2 weeks after the Chief Safety Officer's turn (`cfoAppetitePhase`). **Share sales** (its own switch, so the owner can keep their stake undiluted): at Restricted or Critical, sells new shares through the cheapest investment bank (private placement while private, within the round limits; secondary once listed), sized to reach a 12% credit ratio plus any buffer. Never launches the IPO. **Investing: the lab's money** and **Investing: your money:** every `EXEC_DELEGATION.investEveryWeeks` (4) weeks, on weeks ≡ `investPhase` (2), each switch for its account (rival labs' shares are never touched): (1) sells every listed-company stock whose price is ≤ `investTrimAt` (75%) of its average cost, and doesn't buy it back for `investCooldownWeeks` (52); (2) buys one stock, the listed company with the largest gap `capShare × (held + budget) − heldValue` (capShare = its market cap ÷ all listed companies'), so holdings build toward a market-cap weighting; buys under `investMinTrade` ($10K) are skipped; (3) backs one startup from the Investment floor pipeline: the highest pentagon average ≥ `investMinScore` (6) among those raising that the account doesn't already hold, taking one offer lot (§20.4); none without an Investment floor. Lab: never at a restricted or critical tier; stocks ≤ `investStockCap` (5%) and startup stakes ≤ `investVentureCap` (3%) of total assets; one stock buy ≤ `investStockLot` (1%) of total assets; the credit ratio after each buy stays ≥ `buyMinCr` (12%): a stock buy is at most `(CET1 − 0.12 × RWA) / (0.12 × STOCK_RISK_WEIGHT + COMMISSION)` and a lot needs `CET1 / (RWA + price × VENTURE_RISK_WEIGHT) ≥ 0.12`; `expansionReserveWeeks` (8) of costs stay in cash. You: keeps `buyReserveYears` (1) of CEO salary; one purchase spends at most `investSpareShare` (25%) of the personal cash above that. **Dividends:** proposes a dividend at board meetings. Under a **Buildings** heading: **Rents: the lab's buildings** and **Rents: your own buildings** (two switches, so your private buildings can stay yours to price): every `EXEC_DELEGATION.rentEveryWeeks` (4) weeks, and at once when a switch goes on, each covered building's rent is set to hold that owner's **occupancy dial** (80 / 85 / 90 / 95 / 100%, default 100, one dial under each switch; `rentForOccupancy`, §21.2). At 100% that is `bestRent`: the highest rent that still fills it, counting the CFO's pricing power, rounded down to the $5 step and kept inside the 50–160% range. Changing a dial reprices at once. **Buying: the lab's buildings** and **Buying: your own buildings:** every `EXEC_DELEGATION.buyEveryWeeks` (4) weeks each buys at most one listed building, in any city, at its asking price (always accepted, no travel needed): the listing with the best net yield, a year of `propertyWeek(…).net` at the rent the CFO would set and the occupancy it settles at ÷ asking, among those the budget allows. Lab: never at a restricted or critical tier; its buildings' value stays ≤ `buyAssetCap` (5%) of total assets; the credit ratio after the purchase, `(CET1 + value − asking) / (RWA + value × PROPERTY_RISK_WEIGHT)`, stays ≥ `buyMinCr` (12%); `expansionReserveWeeks` (8) of weekly costs stay in cash. You: keeps `buyReserveYears` (1) of CEO salary, and a building may cost at most `buySpareShare` (50%) of the personal cash above that. Tenants of a covered building accept rent up to `marketRent × (1 + 0.10 × expertise/100)` with no loss of occupancy. The lab pays the CFO either way. The old **Funding** switch (auto-funding and funding offers, §13.3) went in schema 22: legacy funding lots simply run off. |
+| CFO | Finance, owned buildings (the lab's and yours) | Halves statement delays. **Capital:** at Tight or Critical runway (§15), sells the company's stocks for cash. **Share sales** (its own switch, so the owner can keep their stake undiluted): under `RUNWAY.cfoRaiseBelowMonths` (12) months of runway, or with cash below zero, sells new shares through the cheapest investment bank (private placement while private, within the round limits; secondary once listed), sized to reach `RUNWAY.cfoTargetMonths` (18) at the current burn, in steps of `cfoRaiseStep` (1%) of the lab. Never launches the IPO. **Investing: the lab's money** and **Investing: your money:** every `EXEC_DELEGATION.investEveryWeeks` (4) weeks, on weeks ≡ `investPhase` (2), each switch for its account (rival labs' shares are never touched): (1) sells every listed-company stock whose price is ≤ `investTrimAt` (75%) of its average cost, and doesn't buy it back for `investCooldownWeeks` (52); (2) buys one stock, the listed company with the largest gap `capShare × (held + budget) − heldValue` (capShare = its market cap ÷ all listed companies'), so holdings build toward a market-cap weighting; buys under `investMinTrade` ($10K) are skipped; (3) backs one startup from the Investment floor pipeline: the highest pentagon average ≥ `investMinScore` (6) among those raising that the account doesn't already hold, taking one offer lot (§20.4); none without an Investment floor. Lab: never at a restricted or critical tier; stocks ≤ `investStockCap` (5%) and startup stakes ≤ `investVentureCap` (3%) of total assets; one stock buy ≤ `investStockLot` (1%) of total assets; each buy leaves at least `RUNWAY.gateMonths` (12) months of runway (it spends at most `cash − 12 × 52/12 × burn`, all of it with no burn); `expansionReserveWeeks` (8) of costs stay in cash. You: keeps `buyReserveYears` (1) of CEO salary; one purchase spends at most `investSpareShare` (25%) of the personal cash above that. **Dividends:** proposes a dividend at board meetings. Under a **Buildings** heading: **Rents: the lab's buildings** and **Rents: your own buildings** (two switches, so your private buildings can stay yours to price): every `EXEC_DELEGATION.rentEveryWeeks` (4) weeks, and at once when a switch goes on, each covered building's rent is set to hold that owner's **occupancy dial** (80 / 85 / 90 / 95 / 100%, default 100, one dial under each switch; `rentForOccupancy`, §21.2). At 100% that is `bestRent`: the highest rent that still fills it, counting the CFO's pricing power, rounded down to the $5 step and kept inside the 50–160% range. Changing a dial reprices at once. **Buying: the lab's buildings** and **Buying: your own buildings:** every `EXEC_DELEGATION.buyEveryWeeks` (4) weeks each buys at most one listed building, in any city, at its asking price (always accepted, no travel needed): the listing with the best net yield, a year of `propertyWeek(…).net` at the rent the CFO would set and the occupancy it settles at ÷ asking, among those the budget allows. Lab: never at a restricted or critical tier; its buildings' value stays ≤ `buyAssetCap` (5%) of total assets; at least `RUNWAY.gateMonths` (12) months of runway remain after the purchase (§15); `expansionReserveWeeks` (8) of weekly costs stay in cash. You: keeps `buyReserveYears` (1) of CEO salary, and a building may cost at most `buySpareShare` (50%) of the personal cash above that. Tenants of a covered building accept rent up to `marketRent × (1 + 0.10 × expertise/100)` with no loss of occupancy. The lab pays the CFO either way. The old **Funding** switch (auto-funding and funding offers, §13.3) went in schema 22: legacy funding lots simply run off. |
 | CPO | Products | **Pricing:** keeps the company lineup priced like a delegated manager (§17.1) when Apply-to-all is on. **Developments:** starts one when none is running, within a budget cap of 1% of revenue. **Models:** switches to the data package or trained model with the best quality per dollar (§16.7, §16.13). **Routine training runs** (§16.13). **Sales office guidance (lineup):** see below. |
 | CTO | Platform & Security, Compute | App rating bonus (§16.9); runs digital projects. **Compute** (`execDelegationsCompute.ts`): each week, with a Compute floor, reserves GPU lots from the floor's market (§13.0) until `plannedCapacity` (data-center and power-deal GPUs, data centers in fit-out at their usable GPUs, rented lots) covers the **cover target** you dial (`executives.computeCover`, one of `CTO_COMPUTE.coverTargets` 60 / 75 / 90%, default 75%) of last week's `demandGpus`. It acts only when the gap is at least `CTO_COMPUTE.slack` (5%) of demand, takes only offers priced under spot, in whole `GPU_MARKET.sizeStep` lots, and orders offers by the chip phase: longest term first in a glut, shortest first in a shortage, cheapest per GPU-week in a normal market (ties by price, then id). Auto spot-buy is untouched and covers the rest. An empty seat applies the vacancy penalty. |
 | Chief Safety Officer | Safety & Alignment | **Launch posture** switch (id `appetite`): every `croEveryWeeks` (4) weeks, steps it down one level while the safety tier is Watch, Restricted or Critical, and up one while it is Strong, up to `croMaxAppetite` (4, Bold). **Deal Desk policy** (§11.4). |
@@ -861,7 +866,7 @@ The Finance floor's 1–5 dial (code `company.riskAppetite`, set by `setRiskAppe
   - last 4 quarters profitable
   - Finance coverage' ≥ 0.8
   - safety tier Adequate or better
-  - not in a Recession, unless the credit ratio ≥ 14%
+  - not in a Recession, unless runway is Strong (§15)
 - **Choices:** float 10–40% as new shares, and the investment bank (fee 4.0–6.5%; quality sets the first-day pop of 0–25%).
 - **Offer price:** `max(BVPS, ARR × multiple ÷ shares) × 0.9` (§19.2).
 - **Listing:** at the next quarter-end tick, with a news event. Eligibility is checked again then; if it fails the IPO is withdrawn.
@@ -891,7 +896,7 @@ The Finance floor's 1–5 dial (code `company.riskAppetite`, set by `setRiskAppe
 - **Limits:**
   - one programme per 13 weeks (`gapWeeks`)
   - the public keeps at least 10% of the lab (`minFloat`): n ≤ (public − 0.10 × outstanding) / 0.90
-  - the credit ratio after the cost leaves CET1 must stay in the Adequate credit tier or better
+  - at least `RUNWAY.gateMonths` (12) months of runway must remain once the cost leaves cash (§15)
 - Price impact: +1% to +4%, scaled by size up to the 10% cap. The weekly price then follows its target as usual.
 
 ### 19.7 Trading
@@ -904,11 +909,11 @@ The Finance floor's 1–5 dial (code `company.riskAppetite`, set by `setRiskAppe
 - **Acceptance:** `accept = sigmoid((premium − req)/0.06)`.
   - `req` = 0.30 for healthy targets, 0.15 for targets whose runway tier is Watch or worse (§18.5), −0.20 for distressed sales.
   - Rejected offers can be raised once per 2 weeks (`MERGERS.retryWeeks`).
-- **Regulator check:** pro-forma credit ratio ≥ 9% (`minProFormaCr`) AND your share in every affected city ≤ 50% (`maxCityShare`, see Closing details). A Lobbying "Fast-track a merger review" win relaxes the share limit to 65% (`fastTrackShare`) for one deal. A **distressed sale** skips the share test (`distressedShareExempt`): the regulator wants the failed lab rescued, and the offer sheet says so in the share row.
+- **Regulator check:** at least `RUNWAY.gateMonths` (12) months of runway once the cash part of the price leaves corporate cash, at today's burn (§15), AND your share in every affected city ≤ 50% (`maxCityShare`, see Closing details). A Lobbying "Fast-track a merger review" win relaxes the share limit to 65% (`fastTrackShare`) for one deal. A **distressed sale** skips the share test (`distressedShareExempt`): the regulator wants the failed lab rescued, and the offer sheet says so in the share row.
 - **Payment:** cash, or once listed, a share-for-share mix: the offer sheet picks 0%, 25%, 50%, 75% or 100% paid in new shares (`SHARE_DEALS.stockStep`).
   - **Share part:** S = stockPct × price × shares bought. New shares = S ÷ your share price on closing day, issued to the public; your own holding of the target is paid in the same mix, so its share part becomes founder shares.
   - **Board:** the target weighs `boardPrice = P_offer × (1 − stockPct × 0.05)` (`boardDiscount`), so an all-share offer needs about 5% more on the price to land the same premium.
-  - **Books:** paid-in capital +S; goodwill = C + S + V − net assets. Pro-forma CET1 adds S, so paying in shares eases the credit test.
+  - **Books:** paid-in capital +S; goodwill = C + S + V − net assets. Paying in shares spends less cash, so it eases the runway test.
   - **Limits:** one deal may issue at most 50% new shares (`maxNewSharePct`). The issue moves your price −2% to −6% by size up to that cap (`SHARE_DEALS.impact`).
 - **On close:**
   - Offices convert over 8 weeks: REBRAND_COST ($60,000) per office unit (spread evenly over the 8 weeks), staff morale −10, managers kept.
@@ -920,7 +925,7 @@ Investment banks lend to you on their Debt tab (`src/sim/corporateDebt.ts`, `COR
 - **Lenders** (`lendersNearYou`): the investment bank offices in cities where you run an open sales office, keyed by site id. A bank in a city without your office shows its terms but won't lend.
 - **Venture debt** (term loans): every `refreshWeeks` (4) weeks, `offersPerLender` (2–3) offers from each lender, on the `corporateDebt` stream.
   - amount: a share of your room, where room = `maxEquityShare` (40%) × equity − corporate debt already owed
-  - rate `policy + 0.025` to `+0.05`, by your credit ratio, ± a little noise
+  - rate `policy + 0.05` (`spreadWorst`) down to `+0.025` (`spreadBest`) by a score from 0 to 1: the average of runway (months ÷ `bestRunwayMonths` 24, capped at 1, and 1 with no burn) and ARR (÷ `bestArr` $50M, capped at 1); ± a little noise
   - term 52–156 weeks
   - weekly payment amortized; payments are taken even when cash is short (the insolvency rule then applies)
 - **Credit line** (one per lender): limit = `lineEquityShare` (60%) × equity, live; rate `policy + lineSpread` (4%); draw or repay any week; never drawn automatically. The share was 20% when each city had about three rival lenders; a city has about one investment bank.
@@ -937,7 +942,7 @@ A deliberately simple "country up or down" investment (DESIGN §5.12a). Your boo
   - HK is pegged to the US: `L[HK] = L[US] × (1 + normal(0, FX.pegVol))`.
   - Currency volatilities are in `src/data/currencies.ts`.
 - **Positions:** buy an amount of a currency as the company or personally: `units = amount / fx[c]`; value = `units × fx[c]`. Buying and selling pay FX.spread on the amount (to `commissions` for the company). No carry is paid; the rate differential is already in the drift.
-- **Books:** company positions are investments at value, marked through `investmentGains` like stocks; risk weight FX_RISK_WEIGHT (1.0).
+- **Books:** company positions are investments at value, marked through `investmentGains` like stocks.
 - **News:** a currency moving more than FX.newsMove (2%) in a week makes the Markets page.
 
 ## 20. Ventures
@@ -960,7 +965,7 @@ A deliberately simple "country up or down" investment (DESIGN §5.12a). Your boo
   - **IPO:** 25% per quarter once quarterly revenue > $50M, net income > 0 and stage ≥ C. It becomes a listed company.
   - **Acquisition:** 5% per quarter at 2–6× annual revenue.
 - **20.3 Discovery:** the Investment floor refreshes every 4 weeks with `N = 1 + floor(staff/4)` (max 8) currently-raising startups. Conventions add 3–6 exclusive ones.
-- **20.4 Investing:** as the company (corporate cash, RWA 2.5×) or privately (personal cash).
+- **20.4 Investing:** as the company (corporate cash; the CFO keeps 12 months of runway, §17.2) or privately (personal cash).
 - **20.5 Compute credits (venture debt, `VENTURE_DEBT`):**
   - Offer up to 10% of post-money at a rate you choose. Accepted if rate ≤ `policy + 0.08`.
   - Amortizes over 156 weeks.
@@ -1116,9 +1121,9 @@ Run `npm run balance` with seed 42 and the start city Calgary, unless noted. Off
 
 **Strategies** (`scripts/strategies/*.ts`):
 - `idle`: one sales office, no further actions.
-- `steady`: follows default prices; staffs HQ floors to 100%; keeps the credit ratio near 12% with up to 2 placements (`manageEquity`); grows the busiest office a size, or else opens an office in the next city, when cash > 2× the cost, the credit ratio > 12% and 2 weeks of running costs stay in reserve; builds a data center at 4× its cost from year 5; reserves GPU lots; trains at 1% of cash a week.
+- `steady`: follows default prices; staffs HQ floors to 100%; takes up to 2 placements when runway is under 7 months and cash is short (`manageEquity`); grows the busiest office a size, or else opens an office in the next city, when cash > 2× the cost, runway is over 6 months (or the lab isn't burning cash) and 2 weeks of running costs stay in reserve; builds a data center at 4× its cost from year 5; reserves GPU lots; trains at 1% of cash a week.
 - `turtle`: declines new RFPs and turns Enterprise contracts off; grows its one office to Standard at most, and only after a profitable quarter with 26 weeks of running costs in hand.
-- `aggressive`: launch posture 5 (Very bold); default prices with rate offsets (which touch only the Enterprise contracts' list rate); expands at 1.2× the cost with a credit ratio over 8.5% (grows offices down to 7.5%) and 3 weeks of costs in reserve; a data center at 3× its cost; trains at 1.5% of cash.
+- `aggressive`: launch posture 5 (Very bold); default prices with rate offsets (which touch only the Enterprise contracts' list rate); expands at 1.2× the cost with over 3 months of runway (grows offices down to 2) and 3 weeks of costs in reserve; a data center at 3× its cost; trains at 1.5% of cash.
 - `stress`: steady plus `forceRecessionAtWeek = 156` (and aggressive under the same recession).
 - `nohq`: steady without HQ floors, for comparison.
 
@@ -1151,7 +1156,7 @@ The main groups, with the defaults shown above. Names marked (legacy) belong to 
 - **SALES OFFICE:** `EQUIP_MAINT`, `FITOUT_UPKEEP`, `BRANCH_OVERHEAD`, `ATM_FEE`, `CLOSE_RECOVERY = 0.30`, `CLOSE_RENT_WEEKS`, `LEASE_DEPOSIT_WEEKS`, `BRANCH_PNL_WEEKS`, `FITOUT_LIFE_WEEKS`, `EQUIPMENT_LIFE_WEEKS`
 - **TREASURY (legacy except reserves):** `RESERVE_RATE_SPREAD`, `LIQ_MIN`, `LIQ_TARGET_DEFAULT`, `OVERNIGHT_SPREAD`, `OVERNIGHT_LIMIT`, `WINDOW_SPREAD`, `WINDOW_STIGMA`, `RATING_SPREADS`, `TREASURY_PENALTY`, `FUNDING_REFRESH_WEEKS = 2`, `FUNDING_OFFERS`, `FUNDING_SIZE`, `FUNDING_RATE_NOISE = 0.0008`
 - **PARTNERSHIPS:** `PARTNER_CONTRACT_WEEKS`, `PARTNER_FEE_PER_EMPLOYEE`, `ARR_PER_EMPLOYEE`, `PARTICIPATION`, `PARTNER_HEALTH`, `PARTNER_PERKS`, `PARTNER_RUNOFF_WEEKS`, `PARTNER_RENEWAL`, `STUDENT_PARTNERSHIP`, `GRAD_PROGRAM`
-- **SAFETY AND CREDIT:** `SAFETY`, `SAFETY_TIER_THRESHOLDS`, `CAPITAL_GATE`, `MANDATED_PAUSE`, `LICENCE`, `REGULATOR_REVIEW` (fail base 0.02, ethics base 1.6, fine 0.05–0.3% of trailing revenue), `FAILURE`, `CAPITAL_BUFFER_PP`, `CAPITAL_BUFFER_WEEKS`, `BANK_RUN` (`creditShare` 0.02 for service credits); credit ratio: `OP_RISK_MULT`, `TIER_THRESHOLDS`, `FIXED_ASSET_RISK_WEIGHT`, `STOCK_RISK_WEIGHT`, `VENTURE_RISK_WEIGHT`, `VENTURE_DEBT_RISK_WEIGHT`, `PROPERTY_RISK_WEIGHT`, `FX_RISK_WEIGHT`; `LAUNCH_POSTURE`, `DEFAULT_LAUNCH_POSTURE`, `RISK_LOSS_WEEKS`, `DELINQUENCY`
+- **SAFETY AND CREDIT:** `SAFETY`, `SAFETY_TIER_THRESHOLDS`, `CAPITAL_GATE`, `MANDATED_PAUSE`, `LICENCE`, `REGULATOR_REVIEW` (fail base 0.02, ethics base 1.6, fine 0.05–0.3% of trailing revenue), `FAILURE`, `CAPITAL_BUFFER_PP`, `CAPITAL_BUFFER_WEEKS`, `BANK_RUN` (`creditShare` 0.02 for service credits); runway: `RUNWAY` (tiers, `gateMonths`, the CFO's `cfoRaiseBelowMonths` and `cfoTargetMonths`); `LAUNCH_POSTURE`, `DEFAULT_LAUNCH_POSTURE`, `RISK_LOSS_WEEKS`, `DELINQUENCY`
 - **RIVALS:** `RIVAL_EXPANSION`, `RIVAL_LEARNING`, `RIVAL_CHARTER`, `RIVAL_MERGERS`, `RIVAL_MARKETING`, `RIVAL_TECH`, `RIVAL_CLOSURE`, `RIVAL_FAILURE`, `RIVAL_RAISE`, `RIVAL_RUNWAY_TIERS`, `RIVAL_PAYOUT`, `PRICE_WAR`; the rival books: `RIVAL_BOOKS` (matureCustomers, ema, usagePerCustomer, cycle, computeShare, officeCost, trainingShare, cashTargetWeeks, startRunwayWeeks, strategy multipliers), `RIVAL_QUALITY_REF`, `RIVAL_RAMP_WEEKS`, `RIVAL_COMPETITION`
 - **HQ:** `OFFICE_LISTINGS`, `OFFICE_RENT_PER_FLOOR`, `OFFICE_DEPOSIT_WEEKS`, `FLOOR_FITOUT`, `MAIN_OFFICES_MAX`, `DESKS_PER_FLOOR_OPTIONS = [24, 32]` (the Executive suite's 7 desks come from `src/data/departments.ts`), `FOUNDER_MODE_ASSETS = 250_000_000`, `FOUNDER_RAMP`, `DEPT_REQUIREMENTS`, `HQ_COVERAGE`, `HQ_EFFECTS`, `APP_RATING`
 - **PRODUCTS AND MODELS:** `DEV_TERMS`, `DEV_*` (score, budget, `DEV_SIGMA`, `DEV_TIER`), `MODEL_QUALITY`, `BUREAU_HOSTED`, `INTERNAL_HISTORY`, `MODEL_EFFECTS`, `MODEL_DELEGATE`, `MODEL_SWITCH_WEEKS`, `TRAINING`, `RIVAL_MODEL`, `CPO_TRAINING`, `RESEARCHERS`, `DELEGATE`

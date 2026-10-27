@@ -1,22 +1,23 @@
-// Company summary (SCREENS §24): "Where to look", safety ratio and tier (with
-// the lenders' credit ratio beneath), cash cover, liquidity, the main
+// Company summary (SCREENS §24): "Where to look", safety ratio and tier,
+// corporate cash with its runway meter and cash cover, liquidity, the main
 // totals, your share price or private valuation with the cap table and your
 // personal line (ShareSummary.tsx), and simplified statements, with a link to
 // the full statements on the HQ Finance floor once you have one.
 import { useState } from 'preact/hooks';
-import { ATTENTION, FEATURES, LIQ_MIN, LIQ_REPAY_BUFFER } from '../../config/balance';
+import { ATTENTION, FEATURES, LIQ_MIN, LIQ_REPAY_BUFFER, RUNWAY } from '../../config/balance';
 import { companyArr } from '../../sim/arr';
 import { balanceSheet } from '../../sim/balanceSheet';
-import { capitalSnapshot } from '../../sim/capital';
 import { cashCoverWeeks, weeklyCosts } from '../../sim/cashCover';
+import { runwaySnapshot } from '../../sim/runway';
 import { safetySnapshot, tierLift } from '../../sim/safety';
 import { Badge, Card, Medallion, Panel, Row, SectionTitle, Sheet } from '../components';
-import { capitalRatioText, money, pct, safetyRatioText } from '../format/format';
+import { money, pct, runwayText, safetyRatioText } from '../format/format';
 import { RealEstateCard } from '../realEstate/RealEstateCard';
 import { closePanel, openPanel, useGame } from '../store';
 import { CapitalFixes } from './CapitalFixes';
 import { LIQUIDITY_STATUS, liquidityGauge } from '../hq/treasury/treasuryView';
 import { ComputeCard } from './ComputeCard';
+import { RUNWAY_LABEL, RUNWAY_TONE, RunwayMeter } from './RunwayMeter';
 import { CapitalMeter, TIER_LABEL, TIER_TONE } from './CapitalMeter';
 import { ShareSummary } from './ShareSummary';
 import { SafetyNotice } from './SafetyNotice';
@@ -59,7 +60,7 @@ export function CompanyPanel() {
   const s = useGame();
   const [learn, setLearn] = useState(false);
   const sym = s.settings.currency;
-  const cap = capitalSnapshot(s);
+  const runway = runwaySnapshot(s);
   const safe = safetySnapshot(s);
   const bs = balanceSheet(s);
   const liq = s.company.liquidityRatio;
@@ -101,11 +102,6 @@ export function CompanyPanel() {
             regulator compares your Safety &amp; Alignment floor with the risk your model carries;
             the tier decides how many new customers it lets in.
           </p>
-          <Row
-            label="Credit ratio (lenders)"
-            value={`${capitalRatioText(cap.capitalRatio)} · ${TIER_LABEL[cap.tier]}`}
-            tone="dim"
-          />
           <CapitalFixes tier={safe.tier} listing={s.stock.status} />
         </Card>
 
@@ -117,7 +113,15 @@ export function CompanyPanel() {
                 {money(s.company.cash, sym)}
               </div>
             </div>
+            <Badge tone={RUNWAY_TONE[runway.tier]}>{RUNWAY_LABEL[runway.tier]} runway</Badge>
           </div>
+          <Row label="Runway" value={runwayText(runway.months)} strong />
+          <RunwayMeter months={runway.months} tier={runway.tier} />
+          <p class="muted small cap-note">
+            Months the cash lasts at the last few weeks' net loss. Lenders price your debt on it,
+            and buybacks, buyouts and your CFO's buying need at least {RUNWAY.gateMonths} months
+            left after the spend.
+          </p>
           <Row
             label="Running costs"
             value={costs > 0 ? `${money(costs, sym)} / week` : 'Measuring'}

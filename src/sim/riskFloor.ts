@@ -180,8 +180,6 @@ export function reviewFailChance(state: GameState): number {
 
 export interface RegulatorStatus {
   tier: Tier;
-  /** The credit ratio (lenders' view). */
-  capitalRatio: number;
   safetyRatio: number;
   /** Chance the next quarterly review fails. */
   failChance: number;
@@ -192,7 +190,6 @@ export interface RegulatorStatus {
 export function regulatorStatus(state: GameState): RegulatorStatus {
   const status: RegulatorStatus = {
     tier: state.company.tier,
-    capitalRatio: state.company.capitalRatio,
     safetyRatio: state.company.safetyRatio,
     failChance: reviewFailChance(state),
     failedReviews: state.risk.reviews.filter((r) => !r.passed).length,

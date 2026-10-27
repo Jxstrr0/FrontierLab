@@ -1,23 +1,19 @@
 // The CFO's Capital and Share sales delegations (SIMULATION §17.2, §15): weekly
-// routines that steer a weak capital ratio back to a safe level using the
+// routines that keep the lab's runway (runway.ts) from running out, using the
 // player's own commands, in the order a careful finance chief would.
 // Capital:
-//   1. at Watch or worse, sell the company's stock holdings (risk weight 2.5×)
-//   2. at Watch or worse, step risk appetite down every few weeks so new
-//      lending carries less risk. A CRO tuning appetite keeps doing so too: the
-//      two act on different weeks of the cycle, so they never step it twice at once
+//   1. at Tight or Critical runway, sell the company's stock holdings for cash
 // Share sales (its own switch, so you can keep your stake from being diluted):
-//   3. at Restricted or Critical, sell new shares through the cheapest
-//      investment bank: a private placement while private (rounds and spacing
-//      permitting), a secondary offering once listed, sized to reach the target
-//      ratio (12%, plus any regulator buffer in force). Never launches an IPO.
-import { EXEC_DELEGATION as X, PLACEMENT, SECONDARY } from '../config/balance';
+//   2. under RUNWAY.cfoRaiseBelowMonths of runway, sell new shares through the
+//      cheapest investment bank: a private placement while private (rounds and
+//      spacing permitting), a secondary offering once listed, sized to reach
+//      RUNWAY.cfoTargetMonths. Never launches an IPO.
+import { EXEC_DELEGATION as X, PLACEMENT, RUNWAY, SECONDARY } from '../config/balance';
 import { INVESTMENT_BANKS } from '../data/investmentBanks';
-import { capitalBufferPp, capitalSnapshot } from './capital';
 import { trade } from './commands/markets';
 import { privatePlacement, secondaryOffering } from './commands/marketsEquity';
-import { setRiskAppetite } from './commands/products';
 import { placementQuote, placementStatus, secondaryQuote } from './equityOffers';
+import { runwayHealthy, runwaySnapshot } from './runway';
 import type { GameState } from './state';
 
 /** The investment bank with the lowest fee (ties by id, so the pick is stable). */
@@ -27,11 +23,10 @@ function cheapestBank(): string {
   )[0]!.id;
 }
 
-/** Capital the lab must add to reach the target ratio. */
+/** Cash the lab must add to reach RUNWAY.cfoTargetMonths at its current burn. */
 export function capitalNeeded(state: GameState): number {
-  const cap = capitalSnapshot(state);
-  const target = X.cfoTargetCr + capitalBufferPp(state) / 100;
-  return Math.max(0, target * cap.rwa - cap.cet1);
+  const r = runwaySnapshot(state);
+  return Math.max(0, r.burn * RUNWAY.cfoTargetMonths * RUNWAY.weeksPerMonth - r.cash);
 }
 
 /** Sells every stock the company holds. */
@@ -66,19 +61,18 @@ function raiseCapital(state: GameState): void {
   if (pct > 0) privatePlacement(state, bank, pct);
 }
 
-const WEAK = new Set(['watch', 'restricted', 'critical']);
-const RAISE = new Set(['restricted', 'critical']);
-
-/** Capital: at Watch or worse, sells company stocks and trims risk appetite. */
+/** Capital: at Tight or Critical runway, sells the company's stocks for cash. */
 export function cfoCapital(state: GameState): void {
-  if (!WEAK.has(capitalSnapshot(state).tier)) return;
-  sellCompanyStocks(state);
-  const level = state.company.riskAppetite;
-  if (level > 1 && state.clock.week % X.croEveryWeeks === X.cfoAppetitePhase)
-    setRiskAppetite(state, level - 1);
+  if (!runwayHealthy(runwaySnapshot(state).tier)) sellCompanyStocks(state);
 }
 
-/** Share sales: at Restricted or Critical, sells new shares sized to the target ratio. */
+/** True while runway is under RUNWAY.cfoRaiseBelowMonths. */
+function runwayShort(state: GameState): boolean {
+  const { months, cash } = runwaySnapshot(state);
+  return cash < 0 || (months !== null && months < RUNWAY.cfoRaiseBelowMonths);
+}
+
+/** Share sales: under cfoRaiseBelowMonths of runway, sells new shares sized to cfoTargetMonths. */
 export function cfoShares(state: GameState): void {
-  if (RAISE.has(capitalSnapshot(state).tier)) raiseCapital(state);
+  if (runwayShort(state)) raiseCapital(state);
 }

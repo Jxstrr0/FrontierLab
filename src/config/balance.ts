@@ -2,7 +2,7 @@
 // Names match the CAPS names used in docs/SIMULATION.md (§26 parameter index).
 // Constants that the docs give inline in a formula get a name here too, with the
 // section reference, so logic files never carry magic numbers.
-import type { Difficulty, Phase, Tier } from '../data/types';
+import type { Difficulty, Phase, RunwayTier, Tier } from '../data/types';
 
 /**
  * Feature flags, one per ROADMAP stage. A stage's systems stay switched off on
@@ -536,13 +536,13 @@ export const OVERNIGHT_LIMIT = 0.1;
 export const WINDOW_SPREAD = 0.01;
 export const WINDOW_STIGMA = { weeks: 4, rating: 0.05, newsChance: 0.2 } as const;
 export const TREASURY_PENALTY = 0.005;
-/** Funding spread by capital ratio (§13.6). */
-export const RATING_SPREADS: { minCr: number; spread: number }[] = [
-  { minCr: 0.14, spread: -0.001 },
-  { minCr: 0.105, spread: 0 },
-  { minCr: 0.08, spread: 0.0035 },
-  { minCr: -Infinity, spread: 0.01 },
-];
+/** Funding spread by runway tier (§13.6, §15). */
+export const RATING_SPREADS: Record<RunwayTier, number> = {
+  strong: -0.001,
+  comfortable: 0,
+  tight: 0.0035,
+  critical: 0.01,
+};
 /** Overnight limit multiplier by tier (assumption, DESIGN §7). */
 export const OVERNIGHT_LIMIT_MULT: Record<Tier, number> = {
   strong: 1,
@@ -562,16 +562,28 @@ export const FUNDING_SIZE = { scale: 100_000_000, noise: 0.25, amountStep: 100_0
 /** Offer rate noise: normal(0, FUNDING_RATE_NOISE). */
 export const FUNDING_RATE_NOISE = 0.0008;
 
-// ─── CAPITAL (§15) ────────────────────────────────────────────────────────────
-export const OP_RISK_MULT = 1.0;
-export const FIXED_ASSET_RISK_WEIGHT = 1.0;
-export const TIER_THRESHOLDS: { tier: Tier; minCr: number }[] = [
-  { tier: 'strong', minCr: 0.14 },
-  { tier: 'adequate', minCr: 0.105 },
-  { tier: 'watch', minCr: 0.08 },
-  { tier: 'restricted', minCr: 0.06 },
-  { tier: 'critical', minCr: -Infinity },
-];
+// ─── RUNWAY (§15) ─────────────────────────────────────────────────────────────
+/**
+ * Runway (SIMULATION §15): months of corporate cash at the average net burn
+ * over the last EXEC_DELEGATION.revenueWeeks closes. A lab that is not burning
+ * cash (or has no closes yet) is Strong. Tiers by months, high to low.
+ * gateMonths: buybacks, acquisitions and the CFO's buying and investing must
+ * leave at least this much runway. The CFO's Share sales switch raises below
+ * cfoRaiseBelowMonths, sized to cfoTargetMonths. meterMonths: right end of the meter.
+ */
+export const RUNWAY = {
+  weeksPerMonth: 52 / 12,
+  tiers: [
+    { tier: 'strong', minMonths: 24 },
+    { tier: 'comfortable', minMonths: 12 },
+    { tier: 'tight', minMonths: 6 },
+    { tier: 'critical', minMonths: -Infinity },
+  ] as readonly { tier: RunwayTier; minMonths: number }[],
+  gateMonths: 12,
+  cfoRaiseBelowMonths: 12,
+  cfoTargetMonths: 18,
+  meterMonths: 36,
+} as const;
 export const CAPITAL_GATE: Record<Tier, number> = {
   strong: 1,
   adequate: 1,
@@ -1344,11 +1356,14 @@ export const CORPORATE_LENDING = {
   amountStep: 10_000,
   /** Offer size as a share of the room left. */
   sizeRange: [0.3, 1] as [number, number],
-  /** Rate = home policy + spread: best at crBest, worst at crWorst. */
+  /**
+   * Rate = home policy + spread, from worst to best by a score that averages
+   * runway (full at bestRunwayMonths, or profitable) and ARR (full at bestArr).
+   */
   spreadBest: 0.025,
   spreadWorst: 0.05,
-  crBest: 0.16,
-  crWorst: 0.08,
+  bestRunwayMonths: 24,
+  bestArr: 50_000_000,
   spreadNoise: 0.004,
   terms: [52, 78, 104, 130, 156] as const,
   /** Line of credit: limit share of equity per lender, rate = policy + lineSpread. */
@@ -1887,7 +1902,6 @@ export const FRANCHISE = {
   offerStep: 0.01,
   /** Selling a club returns value × (1 − saleFee). */
   saleFee: 0.03,
-  riskWeight: 2.5,
 } as const;
 /**
  * The rich list (§22): 50 fortunes drawn log-uniform in `fortune`, each growing
@@ -2026,13 +2040,9 @@ export const EXEC_DELEGATION = {
   croMaxLoss: 0.012,
   croMaxAppetite: 4,
   /**
-   * CFO Capital (§17.2): acts at Watch or worse, raises equity at Restricted or
-   * worse, aims for 12%. Its risk-appetite step comes every croEveryWeeks too,
-   * cfoAppetitePhase weeks after the CRO's, so with both seated the dial can
-   * move every 2 weeks in a capital squeeze but never twice in one week.
+   * CFO Capital and Share sales (§17.2): act on runway (RUNWAY); a raise sells
+   * shares in steps of cfoRaiseStep of the lab.
    */
-  cfoTargetCr: 0.12,
-  cfoAppetitePhase: 2,
   cfoRaiseStep: 0.01,
   /**
    * COO Expansion (§17.2): one branch at most every expansionEveryWeeks, only in
@@ -2061,15 +2071,14 @@ export const EXEC_DELEGATION = {
   /**
    * CFO Buying (§21.1): every buyEveryWeeks weeks each Buying switch buys at
    * most one listed building, the best net yield at asking in any city. For the
-   * bank: its buildings stay under buyAssetCap of total assets, the capital ratio
-   * stays at or above buyMinCr after the purchase, expansionReserveWeeks of costs
-   * stay in cash, and never at a restricted capital tier. For you: keeps
+   * lab: its buildings stay under buyAssetCap of total assets, RUNWAY.gateMonths
+   * of runway stay after the purchase, expansionReserveWeeks of costs stay in
+   * cash, and never at a restricted safety tier. For you: keeps
    * buyReserveYears of CEO salary, and a building costs at most buySpareShare
    * of the cash above that.
    */
   buyEveryWeeks: 4,
   buyAssetCap: 0.05,
-  buyMinCr: 0.12,
   buyReserveYears: 1,
   buySpareShare: 0.5,
   /**
@@ -2080,7 +2089,7 @@ export const EXEC_DELEGATION = {
    * scoring investMinScore or more on average. For the bank: never at a
    * restricted tier; stocks stay under investStockCap and startup stakes under
    * investVentureCap of total assets; one stock buy is at most investStockLot of
-   * total assets; the capital ratio stays at or above buyMinCr after each buy and
+   * total assets; RUNWAY.gateMonths of runway stay after each buy and
    * expansionReserveWeeks of costs stay in cash. For you: keeps buyReserveYears
    * of CEO salary and spends at most investSpareShare of the cash above that on
    * one purchase. Stock buys under investMinTrade are skipped.
@@ -2238,7 +2247,7 @@ export const IPO = {
   minArr: 100_000_000,
   profitableQuarters: 4,
   minFinanceCoverage: 0.8,
-  minRecessionCr: 0.14,
+  /** In a home recession a lab may still list with Strong runway (RUNWAY). */
   floatPct: [0.1, 0.4] as [number, number],
   discount: 0.9,
 } as const;
@@ -2351,8 +2360,6 @@ export const INCIDENT_PRICE_SEVERITY: Record<string, number> = {
 };
 /** Listed and public: Finance k′ below minKPrime files late, fined fineRate × quarterly revenue (CONTENT §9). */
 export const LATE_FILING = { minKPrime: 0.6, fineRate: 0.0002 } as const;
-/** Risk weight on stocks held by the company (§15). */
-export const STOCK_RISK_WEIGHT = 2.5;
 export const QUARTERS_PER_YEAR = 4;
 
 // ─── M&A (SIMULATION §19.8) ───────────────────────────────────────────────────
@@ -2362,8 +2369,6 @@ export const MERGERS = {
   reqDistressed: -0.2,
   sigmoidScale: 0.06,
   retryWeeks: 2,
-  /** Pro-forma capital after the deal may sit in the Watch tier (DESIGN decision log 2026-10-26). */
-  minProFormaCr: 0.09,
   maxCityShare: 0.5,
   fastTrackShare: 0.65,
   /** A distressed sale skips the city share test: the regulator wants the network rescued. */
@@ -2512,10 +2517,6 @@ export const VENTURE_IPO = {
 } as const;
 /** Ledger thresholds for ventures stories (SIMULATION §24). */
 export const VENTURE_NEWS = { bigRound: 50_000_000, bigExit: 100_000_000 } as const;
-/** Risk weights (§15): venture equity like listed stocks; venture debt and buildings. */
-export const VENTURE_RISK_WEIGHT = 2.5;
-export const VENTURE_DEBT_RISK_WEIGHT = 1.5;
-export const PROPERTY_RISK_WEIGHT = 1.0;
 
 // ─── CONVENTIONS (CONTENT §19) ────────────────────────────────────────────────
 /**
@@ -2616,8 +2617,6 @@ export const FX = {
   /** A weekly move this large (vs your home currency) makes the Markets page. */
   newsMove: 0.02,
 } as const;
-/** Risk weight on company currency positions (§15). */
-export const FX_RISK_WEIGHT = 1.0;
 export const FX_START_INDEX = 100;
 
 // ─── MILESTONES (DESIGN §5.18) ────────────────────────────────────────────────
@@ -2665,7 +2664,7 @@ export const MILESTONE_HQ_DEPTS = [
 /**
  * When the "Your own fortune" guide starts: personal cash at or above
  * wealthCash (a year or so of CEO salary). The other guides start on game
- * conditions the sim already has (founder ramp, capital tier, IPO checklist,
+ * conditions the sim already has (founder ramp, safety tier, IPO checklist,
  * city coverage).
  */
 export const GUIDES = {

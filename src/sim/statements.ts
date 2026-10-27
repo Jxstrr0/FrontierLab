@@ -5,7 +5,6 @@ import { SAFETY, WEEKLY_HISTORY } from '../config/balance';
 import { COUNTRIES } from '../data/countries';
 import { balanceSheet, totalDeposits, loanTotals } from './balanceSheet';
 import { isFirstDayOfQuarter, previousQuarter } from './calendar';
-import { capitalSnapshot } from './capital';
 import { trailingRevenue } from './riskFloor';
 import { safetySnapshot } from './safety';
 import { emptyLedger, postCash, postPnl, spend, summarize } from './ledger';
@@ -40,7 +39,6 @@ export function closeWeek(state: GameState): WeeklySnapshot {
   const sum = summarize(state.ledger.pnl);
   state.company.retainedEarnings += sum.netIncome;
   const bs = balanceSheet(state);
-  const cap = capitalSnapshot(state);
   const safety = safetySnapshot(state);
   const cash = state.ledger.cash;
   const snap: WeeklySnapshot = {
@@ -60,12 +58,10 @@ export function closeWeek(state: GameState): WeeklySnapshot {
       deposits: totalDeposits(state),
       loans: loanTotals(state).total,
       equity: bs.equity,
-      rwa: cap.rwa,
       liquid: bs.reserves,
       taxPayable: bs.taxPayable,
     },
     pnl: { ...state.ledger.pnl },
-    capitalRatio: cap.capitalRatio,
     safetyRatio: safety.ratio,
     tier: safety.tier,
     appRating: state.company.appRating,

@@ -44,7 +44,6 @@ export function eligibleBank(seed = 42, capital = 40_000_000, arr = 120_000_000)
   giveArr(s, arr);
   setQuarters(s, 0.15);
   s.company.tier = 'strong';
-  s.company.capitalRatio = 0.2;
   return s;
 }
 
