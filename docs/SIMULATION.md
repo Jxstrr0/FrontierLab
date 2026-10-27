@@ -183,7 +183,7 @@ The §25 checkpoints are in start-of-game money: `npm run balance` deflates them
 - **Skill target:** `S* = 35 + 40 × clamp((wage/marketWage − 0.8)/0.6, 0, 1) + 0.10 × managerPeople + tuitionBonus`.
 - **Skill movement:** skill rises 0.6 per week toward `S*` (falls 3 per week if above it). New hires join at 0.8 × `S*`.
 - **Quits per week:** `staff × QUIT_BASE (0.004) × (2 − morale/100)² × (1 − retentionBonus)`. Accumulate the fractional part in state; a quit happens when it reaches 1.
-- **Hiring:** `openPositions = targetStaff − staff`. Hires per week = `min(open, HIRE_BASE (1) + floor(2 × hrCoverage' × attraction))`, where `attraction = clamp(wage/marketWage, 0.7, 1.3) × benefitsAttraction`.
+- **Hiring:** `openPositions = targetStaff − staff`. Hires per week = `min(open, round((HIRE_BASE (1) + floor(2 × hrCoverage' × attraction)) × scale))`, where `scale` is the sales office's size mult (Starter 1 … Flagship 9) or, for an HQ department, its floor count, so a bigger office recruits as fast for its size, and `attraction = clamp(wage/marketWage, 0.7, 1.3) × benefitsAttraction`.
 
 ### 6.4 Capacity and waits
 **Office size.** Each city holds one sales office of yours, grown in place: `OFFICE_SIZES` = Starter ×1, Standard ×2.5, Large ×5, Flagship ×9 (`size` 0–3 on the office, `src/sim/branch/officeSize.ts`). The size multiplier `sizeMult` scales seats (sales desk stations, the lobby's meeting rooms), staff needed, demo kiosk throughput, rent, lease deposit, overhead, and the cost and upkeep of every interior slot; the exterior is one piece at every size. `upgradeOffice` grows an open office one size: it pays the interior parts × (new mult − old mult) plus the extra lease deposit, multiplies the weekly rent by the ratio and raises the staff target.
@@ -730,14 +730,14 @@ The Finance floor's 1–5 dial (code `company.riskAppetite`, set by `setRiskAppe
   - For each of yours, a random active rival bids with chance `0.12 × (market salary ÷ salary)²` (capped at 1), raising **RESEARCHER_POACHED**: *Counter-offer* (salary +25%) or *Let them go* (they join that rival).
   - Each free researcher signs with a random rival with chance 0.2.
   - New graduates join until at least 3 are on the market.
-- **The CPO's Routine training runs** delegation (`training`, `CPO_TRAINING`): when no run is under way and there's a Products floor, starts a `runWeeks` (12) run on the active model's weakest axis.
-  - That run's budget is `cashShare` (1%) of cash a week, between $20k and `maxWeekly` ($150k) (step $5k), and needs `cashFloorRuns` (40) weeks of it in cash.
+- **The CPO's Routine training runs** delegation (`training`, `CPO_TRAINING`): when no run is under way and there's a Products floor, starts a run on the active model's weakest axis, shaped by the **training style** you dial (`executives.trainingStyle`, `CPO_TRAINING.styles`, default Balanced): Quantity 8-week runs at ×0.6 budget, Balanced 12 weeks at ×1, Quality 24 weeks at ×1.5. Quantity ships more generations with weaker star odds; Quality fewer, stronger ones.
+  - That run's budget is `cashShare` (1%) × the style's `budgetMult` of cash a week, between $20k and `maxWeekly` ($150k) × `budgetMult` (step $5k), and needs `cashFloorRuns` (40) weeks of it in cash.
   - It never switches models: the CPO's **Models** delegation (§17.2) switches to a trained model when its quality less licence cost beats the active model's by `MODEL_DELEGATE.minGain`, the same test it applies to data-vendor packages.
 
 ## 17. People AI
 
 ### 17.1 Sales office manager (when delegated)
-- **Staffing:** `targetStaff = ceil(staffNeeded × clamp(W, 0.9, 1.3))`; wage = `marketWage × (0.95 + 0.15 × People/100)`.
+- **Staffing:** `targetStaff = max(staffNeeded, ceil(staffNeeded × clamp(W, 1, 1.3) × COO step))`, so a manager never leaves a desk empty (the COO's trim only eats into the extra); wage = `marketWage × (0.95 + 0.15 × People/100)`.
 - **Products & rates:**
   - Each price targets `m ± offset` to hold the Price rating at 3.2–3.6 while keeping a healthy margin over the default price.
   - Product skill adds a pricing error that shrinks as Product rises.
@@ -771,6 +771,7 @@ The Finance floor's 1–5 dial (code `company.riskAppetite`, set by `setRiskAppe
 **Delegation dials** (`src/sim/execPolicy.ts`, the CTO's in `execDelegationsCompute.ts`): four delegations carry a stepped slider under their switch, and a tagline estimates what the chosen stop means right now, by the routine's own rule and without changing anything:
 - **Morale target** (COO · HR benefits): walks the routine's benefit steps from today's benefits (most morale per dollar up, least morale lost per dollar down) until the estimated average morale reaches the target or the 8% budget runs out, and reports the weekly benefits cost, its change, its share of payroll and the morale it reaches (`moraleEstimate`).
 - **Awareness target** (CMO · Brand campaigns): for each city with an open office, a campaign starts where `b < target − brandSlack` (the cheapest city campaign not already running, only while the 3% budget covers it) and running ones stop where `b > target + brandSlack`; reports the weekly spend, its change and share of revenue, how many cities are pushed, and the change in new-customer flow once those cities sit at the target, from the awareness factor in §9.2 with each office's own `a` held (`brandEstimate`).
+- **Training style** (CPO · Routine training runs): runs the routine's own plan (`cpoTrainingPlan`) for the chosen stop and reports the run length, weekly budget, focus axis and the chance of a 4★ or better model, or that it waits for more cash.
 - **Cover target** (CTO · Compute): runs the routine's own plan (`computeCoverPlan`) for the chosen stop and reports the share of demand covered now and the GPUs it would reserve this week with their weekly bill, "nothing to reserve" once covered, or that no offer under spot fits.
 - **Review cadence** (COO · Pay reviews): reviews a year, how far pay can lag the market between reviews (`MANAGER_PAY.tenureGrowth × weeks ÷ 52`: ~0.8% quarterly, 3% annual) and what the next review would add to annual pay across executives and managers (`nextReviewDelta`).
 

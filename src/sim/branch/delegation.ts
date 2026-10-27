@@ -45,10 +45,13 @@ export function runDelegation(state: GameState, branch: Branch): void {
   if (!mgr) return;
   if (branch.delegation.staffing) {
     const [lo, hi] = DELEGATE.staffWait;
-    // §17.2 branch guidance: the COO's step lifts (or trims) wages and headcount.
+    // §17.2 branch guidance: the COO's step lifts (or trims) wages and headcount;
+    // a manager never leaves a desk empty, so the trim only eats into the extra.
     const coo = guidanceStaffing(state);
-    branch.staff.target = Math.ceil(
-      staffNeeded(branch) * clamp(branch.waitIndex, lo, hi) * coo.staff,
+    const needed = staffNeeded(branch);
+    branch.staff.target = Math.max(
+      needed,
+      Math.ceil(needed * clamp(branch.waitIndex, lo, hi) * coo.staff),
     );
     branch.staff.wage = roundToStep(
       marketWage(state, branch.cityId) *

@@ -875,10 +875,20 @@ export const RIVAL_MODEL = {
  */
 export const CPO_TRAINING = {
   scoreMax: 0.15,
-  runWeeks: 12,
   cashShare: 0.01,
   maxWeekly: 150_000,
   cashFloorRuns: 40,
+  /**
+   * The CPO's training style (a dial): Quantity ships a model every few weeks
+   * on lean budgets, Quality runs long and well funded for better star odds.
+   * runWeeks is one of DEV_TERMS; budgetMult scales cashShare and maxWeekly.
+   */
+  styles: {
+    quantity: { runWeeks: 8, budgetMult: 0.6 },
+    balanced: { runWeeks: 12, budgetMult: 1 },
+    quality: { runWeeks: 24, budgetMult: 1.5 },
+  },
+  defaultStyle: 'balanced' as 'quantity' | 'balanced' | 'quality',
 } as const;
 /**
  * The CTO's Compute delegation (§17.2, post-C8): each week, with a Compute
@@ -942,7 +952,7 @@ export const APP_RATING = {
 
 // ─── DELEGATION (§17.1) ───────────────────────────────────────────────────────
 export const DELEGATE = {
-  staffWait: [0.9, 1.3],
+  staffWait: [1, 1.3],
   wageBase: 0.95,
   wageSlope: 0.15,
   rateOffsetComp: 0.6,
