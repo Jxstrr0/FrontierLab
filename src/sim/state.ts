@@ -157,6 +157,8 @@ export interface GameState {
     devStaff?: boolean;
     /** Developer tools: insolvency never ends the game (optional, no schema bump). */
     devNoBankruptcy?: boolean;
+    /** Developer tools: candidate rerolls are free and deal DEV_REROLL skills (optional, no schema bump). */
+    devRerolls?: boolean;
   };
   /** Monotonic counter for generated ids. */
   nextId: number;
