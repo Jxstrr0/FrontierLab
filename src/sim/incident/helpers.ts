@@ -1,9 +1,11 @@
 // Shared pieces for incident rules: the rule interface, fraudShield, rating hits
-// with their timed modifiers, morale bumps and the scope's display name.
+// with their timed modifiers, morale bumps, the press-angle roll and the
+// scope's display name.
 import { FRAUD_SHIELD, INCIDENTS } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { EQUIPMENT } from '../../data/equipment';
 import type { RatingCategory } from '../../data/types';
+import { pushEvent } from '../events';
 import { clamp } from '../math';
 import type { Rng } from '../rng';
 import type { Branch, GameState, Incident } from '../state';
@@ -83,6 +85,24 @@ export function ratingHit(
 /** Instant morale change for a branch's staff (0–100). */
 export function bumpMorale(branch: Branch, delta: number): void {
   branch.staff.morale = clamp(branch.staff.morale + delta, 0, INCIDENTS.moraleMax);
+}
+
+/** Chance an incident's press angle reaches The Weekly Ledger (INCIDENT_NEWS_{type} templates). */
+export function maybeNews(
+  state: GameState,
+  chance: number,
+  rng: { chance(p: number): boolean },
+  type: string,
+  branch?: Branch,
+): void {
+  if (!rng.chance(chance)) return;
+  pushEvent(
+    state,
+    'INCIDENT_NEWS',
+    { bank: state.meta.bankName, type, branchName: branch?.name ?? '', city: branch?.cityId ?? '' },
+    3,
+    branch?.id,
+  );
 }
 
 /** Branch name, city name or the bank's name for an incident's scope. */

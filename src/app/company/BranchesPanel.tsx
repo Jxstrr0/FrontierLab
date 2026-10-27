@@ -9,7 +9,7 @@ import { CITIES } from '../../data/cities';
 import { COUNTRIES } from '../../data/countries';
 import { Badge, Card, Chips, CoinRating, Panel, SectionTitle, Segmented } from '../components';
 import { count, money } from '../format/format';
-import { usableGpus } from '../../sim/dataCenters';
+import { runningGpus } from '../../sim/dataCenters';
 import { closePanel, openPanel, useGame } from '../store';
 import {
   branchRows,
@@ -171,7 +171,7 @@ function DataCenterList() {
           <div class="branch-row-head">
             <span class="branch-row-name">{dc.name}</span>
             <Badge tone={dc.status === 'open' ? 'good' : 'warn'}>
-              {dc.status === 'open' ? `${count(usableGpus(dc.build))} GPUs` : 'Fit-out'}
+              {dc.status === 'open' ? `${count(runningGpus(s, dc))} GPUs` : 'Fit-out'}
             </Badge>
           </div>
           <div class="branch-row-city muted small">{CITIES[dc.cityId]?.name ?? dc.cityId}</div>
