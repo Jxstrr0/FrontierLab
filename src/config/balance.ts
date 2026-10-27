@@ -67,7 +67,6 @@ export const CHARTER_CAPITAL = 2_000_000;
 export const START_SHARES = 10_000_000;
 export const START_PERSONAL_CASH = 150_000;
 export const START_CEO_SALARY = 120_000;
-export const CHARTER_MIN_EQUITY = 2_000_000;
 
 // ─── MACRO (§4) ───────────────────────────────────────────────────────────────
 export const MACRO_MIN_PHASE_WEEKS = 13;
@@ -145,7 +144,6 @@ export const GDP_FORECAST_SIGMA = 0.2;
 /** Derived factors (§4.5). */
 export const CREDIT_CYCLE = { floor: 0.8, slope: 0.35, base: 5.0 } as const;
 export const LOAN_DEMAND = { gdpSlope: 0.05, rateSlope: 0.12, min: 0.6, max: 1.3 } as const;
-export const DEPOSIT_GROWTH_SLOPE = 0.01;
 /**
  * The nominal index (§4.6): each country's price-and-wealth level, 1 at the
  * start, compounding weekly at (gdp + inflation + trend) % a year. Balances per
@@ -155,7 +153,6 @@ export const DEPOSIT_GROWTH_SLOPE = 0.01;
  * 2026-10-26). `trend` (percentage points) is the one dial for how fast.
  */
 export const NOMINAL_INDEX = { trend: 4.0 } as const;
-export const MORTGAGE_LGD_SLOPE = 3;
 export const EQUITY_MARKET_DRIFT: Record<Phase, number> = {
   expansion: 0.08,
   slowdown: 0,
@@ -357,20 +354,9 @@ export const FEE_PF_SCALE = 0.5;
 export const PRODUCTS_PER_CUSTOMER = 1.6;
 
 // ─── BOOKS (§10, §11) ─────────────────────────────────────────────────────────
-export const GIC_RENEW_BASE = 0.72;
-export const GIC_RENEW_CAP = 0.95;
-export const STUDENT_CONVERSION = 0.08;
 export const OVERALL_CHURN = { slope: 0.6, pivot: 3.2 } as const;
-export const PREPAY_BASE = 0.001;
-export const PREPAY_REFI = { slope: 0.003, threshold: 0.0075 } as const;
-export const MORTGAGE_REPRICE_WEEKS = 260;
-export const ADVERSE = { floor: 0.85, above: 0.25, below: 0.05, step: 0.01 } as const;
 export const MODEL_PD = { base: 1.3, accuracy: 0.06, inclusion: 0.02 } as const;
-export const REVOLVING_EMA = 0.2;
-export const RECESSION_DRAW_MULT = 1.1;
 export const INTERCHANGE = 0.015;
-export const WEALTH_MARKET_BETA = 0.6;
-export const FX_PER_CUSTOMER = 900;
 export const SBL_BASE_PD = 0.025;
 export const LOANDESK_BASE = 0.5;
 export const LOANDESK = {
@@ -437,11 +423,6 @@ export const LIQ_TARGET_DEFAULT = 0.15;
 export const LIQ_TARGET_RANGE: [number, number] = [0.1, 0.4];
 export const LIQ_REPAY_BUFFER = 0.05;
 export const FREEZE_RELEASE = 0.02;
-export const BOND_SHARE_DEFAULT = 0.3;
-export const BOND_SHARE_MAX = 0.8;
-export const BOND_DURATION = 4.0;
-export const BOND_YIELD_SPREAD = 0.001;
-export const BOND_PULL_TO_PAR_WEEKS = 208;
 export const OVERNIGHT_SPREAD = 0.002;
 export const OVERNIGHT_LIMIT = 0.1;
 export const WINDOW_SPREAD = 0.01;
@@ -475,7 +456,6 @@ export const FUNDING_RATE_NOISE = 0.0008;
 
 // ─── CAPITAL (§15) ────────────────────────────────────────────────────────────
 export const OP_RISK_MULT = 1.0;
-export const REO_RISK_WEIGHT = 1.0;
 export const FIXED_ASSET_RISK_WEIGHT = 1.0;
 export const TIER_THRESHOLDS: { tier: Tier; minCr: number }[] = [
   { tier: 'strong', minCr: 0.14 },
@@ -789,11 +769,7 @@ export const START_APP_RATING = 3.75;
 export const VISIT_APP = { base: 1.2, slope: 0.1 } as const;
 /** Chance a new review card quotes an active campaign instead of a category. */
 export const REVIEW_CAMPAIGN_CHANCE = 0.5;
-/** Foreclosed home value for REO unit counts: mortgage ticket × income ÷ loan-to-value. */
-export const REO_LTV = 0.75;
 export const INTEREST_PERIODS = { monthsPerYear: 12 } as const;
-/** apps = new accounts ÷ max(approval, 0.2) (§10.6). */
-export const APPROVAL_FLOOR_FOR_APPS = 0.2;
 /** Loan Desk sector pick: weight for sectors that fit the lot's district versus others. */
 export const SECTOR_DISTRICT_WEIGHT = { match: 4, other: 1 } as const;
 
@@ -1710,8 +1686,7 @@ export const EXEC_PAY = {
  * HR benefits, every benefitsEveryWeeks weeks, holds average morale at
  * moraleTarget (cuts back above moraleTarget + moraleSlack), spending at most
  * benefitsBudgetShare of the weekly payroll on benefits. CFO: statement delays × cfoDelayFactor (rounded
- * up); Treasury holds LR within ±lrBand of target, moving the bond share by
- * bondStep; Dividends proposes dividendPayout of trailing net income. CPO and
+ * up); Treasury borrows when LR is more than lrBand under target; Dividends proposes dividendPayout of trailing net income. CPO and
  * CTO: developments of devWeeks at devTier with a weekly budget of at most
  * devBudgetShare of weekly revenue (trailing revenueWeeks average). CMO: holds
  * brand awareness near brandTarget (± brandSlack) within brandBudgetShare of
@@ -1734,7 +1709,6 @@ export const EXEC_DELEGATION = {
   benefitsBudgetShare: 0.08,
   cfoDelayFactor: 0.5,
   lrBand: 0.02,
-  bondStep: 0.05,
   dividendPayout: 0.4,
   devWeeks: 12,
   devTier: 'medium',
@@ -2302,14 +2276,6 @@ export const REAL_ESTATE = {
   offerStep: 0.01,
   /** A purchase or sale at least this large makes The Weekly Ledger. */
   newsMin: 10_000_000,
-} as const;
-/** §21.3 foreclosed homes: carrying cost per year, Sell all at 90% in 1–4 weeks, Rent yield at 90% occupancy. */
-export const REO = {
-  carryingCost: 0.06,
-  sellPrice: 0.9,
-  sellWeeks: [1, 4] as [number, number],
-  rentYield: 0.045,
-  rentOcc: 0.9,
 } as const;
 
 // ─── LOBBYING (DESIGN §5.8.10, SCREENS §15) ───────────────────────────────────

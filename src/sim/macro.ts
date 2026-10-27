@@ -4,7 +4,6 @@
 // read by demand, books and treasury.
 import {
   CREDIT_CYCLE,
-  DEPOSIT_GROWTH_SLOPE,
   EQUITY_MARKET_DRIFT,
   GDP_FORECAST_SIGMA,
   GDP_HISTORY_WEEKS,
@@ -17,7 +16,6 @@ import {
   MACRO_TARGETS,
   MACRO_TRANSITIONS,
   MARKET_SHOCK_SIGMA,
-  MORTGAGE_LGD_SLOPE,
   NOMINAL_INDEX,
   POLICY_BIG_GAP,
   POLICY_BIG_STEP,
@@ -196,17 +194,9 @@ export function nominalWeeklyGrowth(c: CountryState): number {
   return (c.gdp + c.inflation + NOMINAL_INDEX.trend) / 100 / WEEKS_PER_YEAR;
 }
 
-export function depositGrowth(c: CountryState): number {
-  return 1 + DEPOSIT_GROWTH_SLOPE * (c.gdp - POLICY_GDP_NEUTRAL);
-}
-
 /** House price change over the last 52 weeks, as a fraction. */
 export function hpiYoY(c: CountryState): number {
   const first = c.hpiHistory[0];
   if (first === undefined || c.hpiHistory.length < 2) return 0;
   return c.hpi / first - 1;
-}
-
-export function mortgageLgdMult(c: CountryState): number {
-  return 1 + MORTGAGE_LGD_SLOPE * Math.max(0, -hpiYoY(c));
 }

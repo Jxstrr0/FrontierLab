@@ -11,7 +11,7 @@
 //      investment bank: a private placement while private (rounds and spacing
 //      permitting), a secondary offering once listed, sized to reach the target
 //      ratio (12%, plus any regulator buffer in force). Never launches an IPO.
-import { CHARTER_MIN_EQUITY, EXEC_DELEGATION as X, PLACEMENT, SECONDARY } from '../config/balance';
+import { EXEC_DELEGATION as X, PLACEMENT, SECONDARY } from '../config/balance';
 import { INVESTMENT_BANKS } from '../data/investmentBanks';
 import { capitalBufferPp, capitalSnapshot } from './capital';
 import { trade } from './commands/markets';
@@ -27,11 +27,11 @@ function cheapestBank(): string {
   )[0]!.id;
 }
 
-/** Capital the bank must add to reach the target ratio and clear the charter floor. */
+/** Capital the lab must add to reach the target ratio. */
 export function capitalNeeded(state: GameState): number {
   const cap = capitalSnapshot(state);
   const target = X.cfoTargetCr + capitalBufferPp(state) / 100;
-  return Math.max(0, target * cap.rwa - cap.cet1, CHARTER_MIN_EQUITY - cap.equity);
+  return Math.max(0, target * cap.rwa - cap.cet1);
 }
 
 /** Sells every stock the company holds. */

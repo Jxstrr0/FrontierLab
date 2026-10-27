@@ -72,15 +72,13 @@ describe('COO', () => {
 });
 
 describe('CFO treasury', () => {
-  it('switches auto-funding on and moves the bond share toward the band', () => {
+  it('switches auto-funding on', () => {
     const s = execGame();
     openFirst(s);
     s.treasury.autoFunding = false;
     s.company.liquidityRatio = s.treasury.liqTarget + 0.1;
-    const share = s.treasury.bondShare;
     cfoTreasury(s);
     expect(s.treasury.autoFunding).toBe(true);
-    expect(s.treasury.bondShare).toBeCloseTo(share + EXEC_DELEGATION.bondStep);
     expect(identityGap(s)).toBeLessThan(1);
   });
 });

@@ -37,7 +37,7 @@ How the economy works, step by step. Every CAPS name is a key in `src/config/bal
 5. `partnerships.weekly` (§13.7)
 6. `treasury.weekly` (§13)
 7. `hq.weekly`: floors, coverage, benefits, then developments (§16.6) and underwriting models (custom model refresh, switch countdown, §16.7)
-8. Corporate items: offices, executives, brand marketing, corporate debt, M&A, real estate, REO, ventures (venture debt payments, rounds closing, the pipeline), conventions, lobbying outcomes, depreciation (§14, §20, §21)
+8. Corporate items: offices, executives, brand marketing, corporate debt, M&A, real estate, ventures (venture debt payments, rounds closing, the pipeline), conventions, lobbying outcomes, depreciation (§14, §20, §21)
 9. `statements.close`: P&L, cash flow, balance sheet, tax (§14)
 10. `capital.evaluate` and regulator tier (§15)
 11. `personal.weekly` (§22), then `travel.weekly`: reset the km allowance, jet upkeep and depreciation (§22)
@@ -353,8 +353,7 @@ One `Book` per (branch, product): `accounts`, `balance`, `bookRate`, `pd` (annua
    - `loss = defaulted × lgd × (mortgage ? mortgageLgdMult : 1)`
    - `recovery = defaulted − loss`
    - `balance −= defaulted` and `accounts −= accounts × dRate`.
-   - **Non-mortgage** recovery goes to the liquid pool.
-   - **Mortgage** recovery becomes REO inventory in that city, at recovery value (§21.3).
+   - Recovery goes to the liquid pool. (C3c: mortgage recoveries no longer become REO; foreclosed homes are gone.)
    - `loss` is a non-cash expense (loan losses).
 6. **Interest received:** `balance × bookRate / 52`, after defaults (cash in).
 7. **Liquid pool flows:** principal runoff and prepayments go to the liquid pool.
@@ -470,29 +469,24 @@ The balance script should land near this; §25 targets match it. Treat it as cal
 ## 13. Treasury
 
 ### 13.1 Pools
-- **Liquid assets `L`:** reserves `R` plus government bonds `Bd` (market value).
+- **Liquid assets `L`:** reserves `R`, the Loan Desk's lending fund (C3b). Government bonds were removed in C3c.
 - **Wholesale funding:** lots `W[]`.
 - **Corporate cash** is separate (§14). Deposits never flow into corporate cash.
 - **Charter capital** (CHARTER_CAPITAL, $2,000,000) sits in reserves from the start. It's part of L, counts in equity and can't be transferred out.
 
 ### 13.2 Weekly flows into L
-- Plus: deposit net flows, loan principal repaid and prepaid, non-mortgage recoveries, wholesale draws, capital transfers (corporate cash → L).
-- Minus: loan originations, revolving draw increases, wholesale maturities and repayments, REO purchases.
-- The player can transfer corporate cash into L. There is no reverse transfer.
+- Plus: deposit net flows, loan principal repaid, recoveries, wholesale draws, lending-fund top-ups (company cash → L).
+- Minus: loan originations, wholesale maturities and repayments.
+- The player tops up the lending fund from the Loan Desk tab (`topUpLendingFund`, C3c; before C3c this was the HQ Treasury transfer). There is no reverse transfer.
 
 ### 13.3 Liquidity ratio
 - `LR = L / totalDeposits` (∞ with no deposits).
 - LIQ_MIN = 0.10.
 - Player target `liqTarget` defaults to 0.15 (range 0.10–0.40).
 
-### 13.4 Allocation, bonds and reserves
-- **Bonds share** `bondShare` (0–0.8, default 0.30) applies to liquid assets above `LIQ_MIN × deposits`. Rebalance weekly by buying or selling at market value.
-- **Bond yield on purchase:** `FTP_long + 0.0010`. Book yield is the purchase-weighted average.
-- **Duration:** BOND_DURATION = 4.0 years. When the country's `FTP_long` changes by Δ in a week, `Bd_market ×= 1 − 4.0 × Δ`.
-- **Unrealized gain/loss** = market − book. It counts in equity (§14.4). Selling realizes it pro rata.
-- **Bond coupon** cash = `book × bookYield / 52`.
-- **Reserves** earn the deposit-facility rate, RESERVE_RATE_SPREAD (0.50%) below policy: `R × max(0, policy − 0.005) / 52` cash in (Stage 5; keeps a deposits-only bank well behind a lender).
-- Bonds pull to par: each week, close 1/208 of the market–book gap.
+### 13.4 Reserves
+- **Reserves** earn the deposit-facility rate, RESERVE_RATE_SPREAD (0.50%) below policy: `R × max(0, policy − 0.005) / 52` cash in.
+- (C3c: the bond share, bond purchases, mark-to-market, coupons and pull to par are gone. Old saves sold their bonds into reserves at market; the unrealised gain or loss moved into retained earnings.)
 
 ### 13.5 Shortfall handling
 After all flows:
@@ -523,8 +517,7 @@ If `L > liqTarget + 0.05`: repay central bank window borrowing first, then overn
 - **Buying an offer:** borrow any amount up to the offer size. The lot's rate is fixed. L += amount and a liability is created.
 - **Interest** is paid weekly from corporate cash.
 - **Maturity:** L −= amount. If that breaches LIQ_MIN, §13.5 runs.
-- **Covered bonds** require mortgage balances ≥ 1.25 × covered bonds outstanding.
-- **Types offered:** Term Interbank and Covered Bond (CONTENT §12). Brokered Deposits and Senior Bond merged into them in schema v15.
+- **Types offered:** Term Interbank (CONTENT §12). Covered Bond, which needed mortgage cover, was removed in C3c; old covered bond lots became Term Interbank lots.
 
 ### 13.7 Payroll partnerships (Employers layer)
 - **Signing:**
@@ -565,7 +558,7 @@ Shown in the top bar. Moves only with cash items:
 - capex, lease and office deposits
 - wholesale interest, corporate debt draws, repayments and interest
 - taxes, dividends, share issuance proceeds
-- purchases and sales of assets (stocks, ventures, real estate, REO sales)
+- purchases and sales of assets (stocks, ventures, real estate)
 - partnership fees, fines, incident costs
 - transfers to Treasury
 
@@ -574,7 +567,7 @@ Shown in the top bar. Moves only with cash items:
 
 | Line | Contents |
 |---|---|
-| Interest income | loans and cards, reserves, bond coupons, venture debt |
+| Interest income | Loan Desk loans, reserves, venture debt |
 | Interest expense | deposits, wholesale funding, corporate debt |
 | **Net interest income** | |
 | Fee & other income | account fees, card fees and interchange, wealth, services, ATM, real estate rent, dividends received, realized gains/losses |
@@ -596,9 +589,8 @@ Shown in the top bar. Moves only with cash items:
 ### 14.4 Balance sheet
 - **Assets:**
   - corporate cash
-  - liquid assets (reserves + bonds at market value)
+  - liquid assets (reserves, the lending fund)
   - loans (books and business loans)
-  - REO
   - fixed assets at book value (branches, offices)
   - investments: stocks at market, ventures at last-round price, real estate at value, venture debt
   - intangibles (unamortized partnership fees)
@@ -610,8 +602,7 @@ Shown in the top bar. Moves only with cash items:
   - dividends payable
   - taxes payable
 - **Equity** = assets − liabilities. Track paid-in capital separately.
-  - Retained earnings = equity − paid-in − AOCI.
-  - AOCI = unrealized bond gains/losses.
+  - Retained earnings = equity − paid-in. (C3c: AOCI, the unrealised bond gain, went with the bonds.)
 - **Why it balances:** deposits arriving raise L and deposits together; a new loan moves L into loans; a write-off lowers loans and equity together. Corporate cash moves only with cash items.
 
 ### 14.5 Statement periods
@@ -623,9 +614,9 @@ If Finance coverage' < 0.9, the newest `ceil((0.9 − k') × 10)` weeks show as 
 ## 15. Capital and the regulator
 
 - `CET1 = equity − goodwill − intangibles`
-- `RWA = Σ loans × rw_p + REO × 1.0 + realEstate × 1.0 + (stocks + ventures) × 2.5 + ventureDebt × 1.5 + fixedAssets × 1.0 + OP_RISK_MULT (1.0) × trailing-52-week net revenue (net interest income + fee & other income)`
+- `RWA = Σ loans × rw_p + realEstate × 1.0 + (stocks + ventures) × 2.5 + ventureDebt × 1.5 + fixedAssets × 1.0 + OP_RISK_MULT (1.0) × trailing-52-week net revenue (net interest income + fee & other income)`
 - `CR = CET1 / max(RWA, 1)`
-- Charter floor: if equity < CHARTER_MIN_EQUITY ($2,000,000), the tier is Critical regardless of CR.
+- (C3c: the charter floor, Critical whenever equity fell under $2M, is gone. The tier follows CR alone.)
 
 **Tiers** (badge shown everywhere capital matters):
 
@@ -754,7 +745,7 @@ Levels 1–5 (Very conservative to Very aggressive):
 | Exec | Domain | Delegations |
 |---|---|---|
 | COO | HR, all branches | **Expansion:** opens branches for you in the cities you mark for growth (one at most every 4 weeks, in the growth city with the most room, at the busiest free storefront clear of your other branches, in your usual fit-out, keeping 8 weeks of costs in cash). **Company troubles:** settles company and city incidents the way a delegated manager would (§17.1), valuing effects in weeks of company revenue with error shrinking with Expertise; cases marked `yours` (bank run, rescue offer, poached executives) always come to you. **Branch operations:** auto-hires managers for new branches and turns on default delegation. **HR benefits:** keeps average morale at or over the **morale target** you dial (`executives.moraleTarget`, one of `EXEC_DELEGATION.moraleTargets` 70 / 80 / 90, default 70) at least cost, within `benefitsBudgetShare` (8%) of payroll. **HR division:** auto-staffs every floor to 100% coverage. **Pay reviews:** on the **cadence** you dial (`executives.payReviewCadence`: quarterly = every 13 weeks, annual = every 52, `PAY_REVIEW.cadences`, default quarterly) sets every executive to `execMarketSalary × (1 + payPremium)` and every branch manager to their market pay (§6.5) × `(1 + payPremium)`, rounded to the salary steps and inside the allowed ranges; it also runs at once when switched on and whenever you change the premium (`setPayPremium`, −10% to +30% in 5% steps, default +5%). **Branch guidance (staffing):** see below. |
-| CFO | Finance, Treasury | Halves statement delays. **Treasury:** auto-funding, bond share and buying funding offers to keep LR within ±2pp of target. **Capital:** at Watch or worse, sells the company's stocks and steps risk appetite down every 4 weeks, 2 weeks after the CRO's turn (`cfoAppetitePhase`), so a seated CRO keeps tuning it too and the two never move it twice in one week. **Share sales** (its own switch since 2026-10-25, so the owner can keep their stake undiluted): at Restricted or Critical, sells new shares through the cheapest investment bank (private placement while private, within the round limits; secondary once listed), sized to reach 12% plus any regulator buffer, or what the charter floor needs. Never launches the IPO. **Investing: the bank's money** and **Investing: your money**: every `EXEC_DELEGATION.investEveryWeeks` (4) weeks, on weeks ≡ `investPhase` (2), each switch for its account (rival banks' shares are never touched): (1) sells every listed-company stock whose price is ≤ `investTrimAt` (75%) of its average cost, and doesn't buy it back for `investCooldownWeeks` (52); (2) buys one stock, the listed company with the largest gap `capShare × (held + budget) − heldValue` (capShare = its market cap ÷ all listed companies'), so holdings build toward a market-cap weighting, largest company first; buys under `investMinTrade` ($10K) are skipped; (3) backs one startup from the Investment floor pipeline: the highest pentagon average ≥ `investMinScore` (6) among those raising that the account doesn't already hold, taking one offer lot (§20.4); none without an Investment floor. Bank: never at a restricted or critical tier; stocks ≤ `investStockCap` (5%) and startup stakes ≤ `investVentureCap` (3%) of total assets; one stock buy ≤ `investStockLot` (1%) of total assets; the capital ratio after each buy stays ≥ `buyMinCr` (12%): a stock buy is at most `(CET1 − 0.12 × RWA) / (0.12 × STOCK_RISK_WEIGHT + COMMISSION)` and a lot needs `CET1 / (RWA + price × VENTURE_RISK_WEIGHT) ≥ 0.12`; `expansionReserveWeeks` (8) of costs stay in cash. You: keeps `buyReserveYears` (1) of CEO salary; one purchase spends at most `investSpareShare` (25%) of the personal cash above that. The Capital switch still sells all company stocks at Watch; buying stops above that line, at 12%. **Dividends:** proposes a dividend at board meetings. **Branch guidance (funding),** with the CRO: see below. |
+| CFO | Finance, Treasury | Halves statement delays. **Treasury:** auto-funding and buying funding offers when LR is more than 2pp under target. **Capital:** at Watch or worse, sells the company's stocks and steps risk appetite down every 4 weeks, 2 weeks after the CRO's turn (`cfoAppetitePhase`), so a seated CRO keeps tuning it too and the two never move it twice in one week. **Share sales** (its own switch since 2026-10-25, so the owner can keep their stake undiluted): at Restricted or Critical, sells new shares through the cheapest investment bank (private placement while private, within the round limits; secondary once listed), sized to reach 12% plus any regulator buffer. Never launches the IPO. **Investing: the bank's money** and **Investing: your money**: every `EXEC_DELEGATION.investEveryWeeks` (4) weeks, on weeks ≡ `investPhase` (2), each switch for its account (rival banks' shares are never touched): (1) sells every listed-company stock whose price is ≤ `investTrimAt` (75%) of its average cost, and doesn't buy it back for `investCooldownWeeks` (52); (2) buys one stock, the listed company with the largest gap `capShare × (held + budget) − heldValue` (capShare = its market cap ÷ all listed companies'), so holdings build toward a market-cap weighting, largest company first; buys under `investMinTrade` ($10K) are skipped; (3) backs one startup from the Investment floor pipeline: the highest pentagon average ≥ `investMinScore` (6) among those raising that the account doesn't already hold, taking one offer lot (§20.4); none without an Investment floor. Bank: never at a restricted or critical tier; stocks ≤ `investStockCap` (5%) and startup stakes ≤ `investVentureCap` (3%) of total assets; one stock buy ≤ `investStockLot` (1%) of total assets; the capital ratio after each buy stays ≥ `buyMinCr` (12%): a stock buy is at most `(CET1 − 0.12 × RWA) / (0.12 × STOCK_RISK_WEIGHT + COMMISSION)` and a lot needs `CET1 / (RWA + price × VENTURE_RISK_WEIGHT) ≥ 0.12`; `expansionReserveWeeks` (8) of costs stay in cash. You: keeps `buyReserveYears` (1) of CEO salary; one purchase spends at most `investSpareShare` (25%) of the personal cash above that. The Capital switch still sells all company stocks at Watch; buying stops above that line, at 12%. **Dividends:** proposes a dividend at board meetings. **Branch guidance (funding),** with the CRO: see below. |
 | CPO | Products | **Pricing:** keeps the company lineup priced like a delegated manager (§17.1) when Apply-to-all is on. **Developments:** starts one when none is running, within a budget cap of 1% of revenue. **Models:** switches to the bureau package with the best defaults saved per dollar. **Branch guidance (lineup):** see below. |
 | CTO | IT | App rating bonus (§16.9); runs digital projects. An empty seat applies the vacancy penalty. |
 | CRO | Risk | Tunes risk appetite to hold CR ≥ 12% and the annualized loss rate ≤ 1.2% (expansion target); Loan Desk policy. **Branch guidance (lending),** with the CFO: see below. |
@@ -992,19 +983,13 @@ A deliberately simple "country up or down" investment (DESIGN §5.12a). Your boo
   - Value tracks `cre`: `size × baseRent × 3.2 × cre/100`, i.e. size × today's market rent × 3.2, whatever the building's own `marketRent` has caught up to.
   - **For Sale** toggle: sells within 2–8 weeks at value × normal(1, 0.04).
   - Reference: the original showed about 8.7% ROI at 85% occupancy.
-- **21.3 REO** (foreclosed homes, aggregated per city):
-  - units = `Σ recovery / avgHomeValue(city)`; value tracks `hpi`; carrying cost 6% per year
-  - **Rent** (every pool starts here): yield 4.5% per year of value at 90% occupancy
-  - **Sell all:** 90% of value, settles in 1–4 weeks, cash to corporate cash; carrying cost and rent stop
-  - (Hold, carrying the cost with no rent, was removed in schema v15: Rent always beat it.)
-  - RWA weight 1.0.
+- **21.3 REO:** removed in C3c. Foreclosed homes came from defaulted mortgages, which an AI lab doesn't hold. Old saves sold their pools into company cash at value.
 - **21.4 Ownership:** choose Company or Private at purchase. Private property counts in personal wealth only.
 - **21.5 Details (Stage 7):**
   - Each city has REAL_ESTATE.buildingsPerCity property buildings (S 6, M 9, L 12, XL 15), sized by city (`sqmRangeBySize`: S 1,500–5,000 m², M 2,000–7,000, L 3,000–12,000, XL 4,000–16,000) so the big cities hold the high-value towers; a building outside the financial, downtown and waterfront districts stays under `lowRiseMaxSqm` (5,000 m²). Every 4 weeks `max(1, round(0.4 × unowned))` are listed; listings not picked again disappear. An unowned building's occupancy is drawn once from U(0.75, 0.95). Estimates follow cre weekly; asking prices stay fixed.
   - **Offers** are answered at once. A rejected offer locks that listing until the city's next refresh. The offer stepper runs from 80% of asking up to asking.
   - **Books:** a company purchase pays investing cash and enters the balance sheet at the estimate; paying more or less than the estimate is posted to `propertyGains` (non-cash), as are weekly revaluations with cre. Rent → `rentalIncome`; maintenance and vacancy → `propertyCosts`. Company purchases are refused at the Restricted and Critical tiers.
   - Rent can be set from 50% to 160% of market rent in steps of 5 per m². Turning For Sale off cancels a pending sale. A sold building returns to the listable pool.
-  - **REO:** carrying cost is charged in Hold and Rent; selling has none, can't be called off, and includes foreclosures that arrive meanwhile. The 10% haircut at settlement is a property loss. Mode changes don't require being in that city.
   - Deals of $10M or more make the paper.
 - **21.6 Lobbying** (DESIGN §5.8.10, `src/data/lobbying.ts`, `LOBBYING`):
   - Campaigns: **Ease the capital buffer** ($2.5M, 55% success, 12% exposure): tier thresholds in that country drop 1pp for 52 weeks. **Fast-track a merger review** ($1.5M, 60%, 10%): the next deal that closes may reach 65% of a city's deposits (MERGERS.fastTrackShare). **Stall the capital buffer bill** ($1.2M, 50%, 15%): only while a capital-buffer bill is pending there; a win makes it fail its vote.
@@ -1147,7 +1132,6 @@ Group the constants like this, with the defaults shown above:
     | Expert | 0.85 | +0.4 | +0.20pp | 1.25 |
   - **Competitors:** a city takes the first n rivals in strategy order. Its starting rival branch total (CONTENT §15) scales by n ÷ the city's usual count, with at least one branch each.
   - `START_PERSONAL_CASH = 150_000`, `START_CEO_SALARY = 120_000`
-  - `CHARTER_MIN_EQUITY = 2_000_000`
 - **MACRO:**
   - `MACRO_TRANSITIONS`, `MACRO_TARGETS`, `MACRO_EMA`
   - `MACRO_MIN_PHASE_WEEKS`, `POLICY_FLOOR`, `POLICY_CAP`
@@ -1165,7 +1149,7 @@ Group the constants like this, with the defaults shown above:
   - `FX_PER_CUSTOMER`, `SBL_BASE_PD`, `LOANDESK_BASE`
 - **BRANCH:** `EQUIP_MAINT`, `FITOUT_UPKEEP`, `BRANCH_OVERHEAD`, `CLOSE_RECOVERY = 0.30`
 - **TREASURY:**
-  - `LIQ_MIN`, `LIQ_TARGET_DEFAULT`, `BOND_SHARE_DEFAULT`, `BOND_DURATION`
+  - `LIQ_MIN`, `LIQ_TARGET_DEFAULT`
   - `OVERNIGHT_SPREAD`, `WINDOW_SPREAD`, `RATING_SPREADS`
   - `ARR_PER_EMPLOYEE`
   - `FUNDING_REFRESH_WEEKS = 2`, `FUNDING_OFFERS`, `FUNDING_SIZE`, `FUNDING_RATE_NOISE = 0.0008`, `TREASURY_PENALTY = 0.005`
@@ -1180,6 +1164,6 @@ Group the constants like this, with the defaults shown above:
 - **INVESTMENTS (Stage 7):**
   - `VENTURES` (pipeline, growth, rounds, failure, IPO and acquisition odds), `VENTURE_DEBT`, `VENTURE_MARGIN`, `VENTURE_GEN`, `VENTURE_IPO`, `VENTURE_NEWS`
   - `VENTURE_RISK_WEIGHT = 2.5`, `VENTURE_DEBT_RISK_WEIGHT = 1.5`, `PROPERTY_RISK_WEIGHT = 1.0`, `FX_RISK_WEIGHT = 1.0`
-  - `CONVENTIONS`, `REAL_ESTATE`, `REO`, `LOBBYING`, `FX`, `FX_START_INDEX = 100`
+  - `CONVENTIONS`, `REAL_ESTATE`, `LOBBYING`, `FX`, `FX_START_INDEX = 100`
 - **PERSONAL:** `PERSONAL_TAX = 0`, `INSIDER_WINDOW_WEEKS = 2`, `INSIDER_PROB = 0.15`, `TRAVEL_KM_PER_WEEK = 24_140`, `FLIGHT_FARE = 80_000` (× destination costIndex), `EARTH_RADIUS_KM = 6_371`, `JET = { upkeepRate: 0.08, depreciation: 0.06, resaleHaircut: 0.1 }`; Stage 9: `HOMES_CFG`, `CARS_CFG`, `COLLECTIBLES_CFG`, `AUCTIONS`, `FRANCHISE`, `RICH_LIST`, `INSIDER` (src/config/balance.ts)
 - **FEATURES:** flags per stage (ROADMAP)

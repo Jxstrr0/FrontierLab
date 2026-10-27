@@ -55,7 +55,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState } from './personalTypes';
 
-export const SCHEMA_VERSION = 7;
+export const SCHEMA_VERSION = 8;
 
 export interface GameState {
   schemaVersion: number;
@@ -108,7 +108,6 @@ export interface GameState {
   /** Rival M&A offers, integrations and completed deals (§19.8). */
   mergers: MergersState;
   /** Foreclosed homes per city (SIMULATION §21.3): value tracks house prices; hold, rent or sell. */
-  reo: Record<Id, ReoPool>;
   /** Startups, the Investment floor pipeline and venture debt (Stage 7, SIMULATION §20). */
   ventures: VenturesState;
   /** This year's and next year's convention runs (CONTENT §19). */
@@ -759,12 +758,9 @@ export interface UnderwritingState {
 // ─── Treasury, Loan Desk ──────────────────────────────────────────────────────
 
 export interface Treasury {
+  /** The Loan Desk's lending fund (C3b); government bonds were removed in C3c. */
   reserves: Money;
-  bondsMarket: Money;
-  bondsBook: Money;
-  bondBookYield: Rate;
   liqTarget: Pct;
-  bondShare: Pct;
   autoFunding: boolean;
   freeze: boolean;
   overnight: Money;
@@ -911,16 +907,6 @@ export interface RivalBranch {
   contribution: Money;
   /** Consecutive weeks of negative contribution (closes at 26, §18.4). */
   negativeWeeks: number;
-}
-
-export interface ReoPool {
-  units: number;
-  value: Money;
-  /** Rent (carry the cost, earn rent) or Selling (settles at sellWeek), §21.3. */
-  mode: 'rent' | 'selling';
-  sellWeek?: Week;
-  /** House price index the value was last marked at (value tracks hpi). */
-  hpiRef: number;
 }
 
 // ─── Ledger, events, history ──────────────────────────────────────────────────

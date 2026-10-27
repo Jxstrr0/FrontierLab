@@ -44,14 +44,4 @@ export const REAL_ESTATE_TEMPLATES = {
       b: '{address} sold for {price} in a private deal.',
     },
   ],
-  REO_SOLD: [
-    {
-      h: '{bank} clears its foreclosed homes in {city}',
-      b: '{units} repossessed homes went in one lot for {price}, about a tenth under their value.',
-    },
-    {
-      h: 'Bulk sale: {bank} sells {units} foreclosed homes',
-      b: 'Investors paid {price} for the {city} portfolio. The lab takes a small haircut to free up capital.',
-    },
-  ],
 } satisfies Record<string, LedgerTemplate[]>;

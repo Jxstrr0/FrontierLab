@@ -59,7 +59,7 @@ export function runScript(weeks: number, onWeek?: (s: GameState, week: number) =
     if (week === 10) cmd.setPrice(s, first, 'savings', 0.03);
     if (week === 20) cmd.setCampaignLevel(s, first, 'charging', 1);
     if (week === 40 && s.company.cash > 500_000) cmd.upgradeOffice(s, first);
-    if (week === 60) cmd.transferToTreasury(s, 100_000);
+    if (week === 60) cmd.topUpLendingFund(s, 100_000);
     if (week === 80) leaseScriptedOffice(s);
     if (week === 100) cmd.setBenefit(s, 'lunch', 40);
     onWeek?.(s, week);

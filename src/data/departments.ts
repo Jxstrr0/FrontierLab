@@ -42,7 +42,7 @@ export const DEPARTMENTS: Record<DeptId, DepartmentSpec> = {
   treasury: {
     id: 'treasury',
     name: 'Treasury',
-    description: 'Liquidity policy, government bonds and the wholesale funding market.',
+    description: 'Liquidity policy, the lending fund and the wholesale funding market.',
     marketSalary: 95_000,
     feature: 'hq',
   },

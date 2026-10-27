@@ -6,12 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { REAL_ESTATE } from '../../src/config/balance';
 import { campaignCards, pendingCampaigns, winsInForce } from '../../src/app/lobbying/lobbyingView';
 import { propertyPinInfo } from '../../src/app/realEstate/propertyPin';
-import {
-  offerBounds,
-  ownedBuildings,
-  propertyView,
-  reoRows,
-} from '../../src/app/realEstate/realEstateView';
+import { offerBounds, ownedBuildings, propertyView } from '../../src/app/realEstate/realEstateView';
 import * as cmd from '../../src/sim/commands';
 import { newGame } from '../../src/sim/newGame';
 import type { GameState } from '../../src/sim/state';
@@ -69,16 +64,6 @@ describe('property panel views', () => {
     expect(b.min / b.max).toBeGreaterThan(0.79);
     expect(b.min / b.max).toBeLessThan(0.81);
     expect(b.step).toBeGreaterThanOrEqual(1000);
-  });
-
-  it('lists foreclosed homes per city with carrying cost', () => {
-    const s = game();
-    s.reo.cal = { units: 12.4, value: 5_200_000, mode: 'rent', hpiRef: 100 };
-    const [row] = reoRows(s);
-    expect(row).toMatchObject({ cityId: 'cal', city: 'Calgary', units: 12 });
-    expect(row!.carrying).toBeCloseTo(6_000, 6);
-    cmd.setReoMode(s, 'cal', 'selling');
-    expect(reoRows(s)[0]!.sellsIn).toBeGreaterThanOrEqual(1);
   });
 });
 

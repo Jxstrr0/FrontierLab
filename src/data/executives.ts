@@ -78,8 +78,7 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
       {
         id: 'treasury',
         label: 'Treasury',
-        description:
-          'Runs auto-funding, the bond share and funding offers to hold liquidity near target.',
+        description: 'Runs auto-funding and funding offers to hold liquidity near target.',
       },
       {
         id: 'capital',

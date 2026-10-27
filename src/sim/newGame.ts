@@ -3,7 +3,6 @@
 // the chosen corporate cash ($750k by default) and $2M of charter capital held
 // in treasury reserves.
 import {
-  BOND_SHARE_DEFAULT,
   CHARTER_CAPITAL,
   COMPETITORS,
   DEFAULT_RISK_APPETITE,
@@ -187,11 +186,7 @@ export function newGame(opts: NewGameOptions): GameState {
     underwriting: { activeModelId: model.id, models: { [model.id]: model }, loansBooked: 0 },
     treasury: {
       reserves: CHARTER_CAPITAL,
-      bondsMarket: 0,
-      bondsBook: 0,
-      bondBookYield: 0,
       liqTarget: LIQ_TARGET_DEFAULT,
-      bondShare: BOND_SHARE_DEFAULT,
       autoFunding: true,
       freeze: false,
       overnight: 0,
@@ -225,7 +220,6 @@ export function newGame(opts: NewGameOptions): GameState {
     market: initMarket(),
     personal: { cash: 0, empire: emptyEmpire() },
     mergers: emptyMergers(),
-    reo: {},
     ventures: emptyVentures(),
     conventions: emptyConventions(),
     realEstate: emptyRealEstate(),

@@ -3,7 +3,6 @@
 // maturity, is repaid from liquid assets (reserves). Offer generation lives in
 // fundingMarket.ts; this module only needs plain state, so treasury.ts can use it.
 import { WEEKS_PER_YEAR } from '../config/balance';
-import { FUNDING_TYPES } from '../data/fundingTypes';
 import { pushEvent } from './events';
 import { spend } from './ledger';
 import type { FundingLot, GameState } from './state';
@@ -17,20 +16,6 @@ export function lotsOutstanding(state: GameState): number {
 export function totalWholesale(state: GameState): number {
   const t = state.treasury;
   return t.overnight + t.window + lotsOutstanding(state);
-}
-
-/** Covered bonds outstanding (they need mortgage cover, §13.6). */
-export function coveredOutstanding(state: GameState): number {
-  return state.treasury.lots
-    .filter((l) => FUNDING_TYPES[l.type]?.mortgageCover)
-    .reduce((sum, l) => sum + l.amount, 0);
-}
-
-/** Mortgage balances across every branch, the cover pool for covered bonds. */
-export function mortgageBalances(state: GameState): number {
-  let total = 0;
-  for (const b of Object.values(state.branches)) total += b.books.mortgage?.balance ?? 0;
-  return total;
 }
 
 /** Weekly interest on every lot at its fixed rate. */

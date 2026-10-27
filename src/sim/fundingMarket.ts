@@ -10,7 +10,6 @@ import {
 } from '../config/balance';
 import { COUNTERPARTIES, FUNDING_TYPES, type FundingTypeSpec } from '../data/fundingTypes';
 import { totalDeposits } from './balanceSheet';
-import { coveredOutstanding, mortgageBalances } from './fundingLots';
 import { treasuryPenalty } from './hq';
 import { newId } from './ids';
 import { noise, roundToStep } from './math';
@@ -41,12 +40,6 @@ export function offerCount(state: GameState): number {
   );
 }
 
-/** Room left for covered bonds: mortgages ÷ 1.25 minus covered bonds outstanding. */
-export function coveredCapacity(state: GameState): number {
-  const cover = FUNDING_TYPES.covered_bond?.mortgageCover ?? 1;
-  return Math.max(0, mortgageBalances(state) / cover - coveredOutstanding(state));
-}
-
 /** The rate a type would carry today before noise: basis + spread + rating spread + penalty. */
 export function fundingRate(state: GameState, spec: FundingTypeSpec): number {
   const c = homeCountry(state);
@@ -54,21 +47,16 @@ export function fundingRate(state: GameState, spec: FundingTypeSpec): number {
   return basis + spec.spread + ratingSpread(state.company.capitalRatio) + treasuryPenalty(state);
 }
 
-/** The most you can borrow from an offer now (covered bonds are capped by mortgage cover). */
+/** The most you can borrow from an offer now: all of it until it expires. */
 export function maxBorrow(state: GameState, offer: FundingOffer): number {
   if (offer.expiresWeek < state.clock.week) return 0;
-  const spec = FUNDING_TYPES[offer.type];
-  if (spec?.mortgageCover) return Math.min(offer.amount, coveredCapacity(state));
   return offer.amount;
 }
 
 function generateOffer(state: GameState): FundingOffer | undefined {
   const rng = stream(state, 'funding');
-  const coveredRoom = coveredCapacity(state);
   const choices = Object.values(FUNDING_TYPES)
     .filter((t) => t.size && t.weight > 0)
-    // Covered bonds are only offered while the mortgage book leaves cover to spare.
-    .filter((t) => !t.mortgageCover || coveredRoom > 0)
     .map((t) => ({ item: t, weight: t.weight }));
   if (choices.length === 0) return undefined;
   const spec = rng.pickWeighted(choices);
