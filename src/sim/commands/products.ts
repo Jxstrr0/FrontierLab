@@ -1,10 +1,11 @@
 // Product and pricing commands at a branch, the company lineup on the Products
 // floor ("Apply rates to all branches"), and the company risk appetite.
-// While Apply-to-all is on, HQ owns every branch's prices and lineup.
+// While Apply-to-all is on, HQ owns the prices and lineup of every sales office
+// that hasn't been given its own (setOwnPrices, stage C2d2).
 import { CITIES } from '../../data/cities';
 import type { ProductSpec } from '../../data/products';
 import type { CountryId } from '../../data/types';
-import { isOffered } from '../branch/pricing';
+import { companyPrice, followsHq, isOffered } from '../branch/pricing';
 import { allProducts, productSpec } from '../products';
 import { clamp, roundToStep } from '../math';
 import { countryOfCity, defaultPrice } from '../rates';
@@ -29,7 +30,7 @@ export function setOffered(
   const spec = productSpec(state, productId);
   if (!branch) return fail('That sales office no longer exists.');
   if (!spec) return fail('Unknown product.');
-  if (state.company.applyRatesToAll) return fail('Set at HQ.');
+  if (followsHq(state, branch)) return fail('Set at HQ.');
   if (branch.delegation.products)
     return fail('Your manager sets products here. Turn off Products & rates delegation first.');
   slotOf(state, branch, spec).on = on;
@@ -46,7 +47,7 @@ export function setPrice(
   const spec = productSpec(state, productId);
   if (!branch) return fail('That sales office no longer exists.');
   if (!spec) return fail('Unknown product.');
-  if (state.company.applyRatesToAll) return fail('Set at HQ.');
+  if (followsHq(state, branch)) return fail('Set at HQ.');
   if (branch.delegation.products)
     return fail('Your manager sets prices here. Turn off Products & rates delegation first.');
   if (!Number.isFinite(price)) return fail('Enter a number.');
@@ -81,6 +82,7 @@ export function setApplyRatesToAll(state: GameState, on: boolean): CommandResult
     seedCountryPrices(state, country, ref);
   }
   for (const branch of openBranches(state)) {
+    if (branch.ownPrices) continue;
     for (const [pid, value] of Object.entries(lineup)) {
       const spec = productSpec(state, pid);
       if (spec) slotOf(state, branch, spec).on = value;
@@ -139,9 +141,31 @@ export function setCompanyOffered(state: GameState, productId: string, on: boole
   if (!spec) return fail('Unknown product.');
   (state.company.companyOffered ??= {})[productId] = on;
   for (const branch of openBranches(state)) {
-    if (branch.delegation.products && !state.company.applyRatesToAll) continue;
+    if (branch.delegation.products && !followsHq(state, branch)) continue;
+    if (branch.ownPrices && state.company.applyRatesToAll) continue;
     slotOf(state, branch, spec).on = on;
   }
+  return ok();
+}
+
+/**
+ * Gives one sales office its own prices and lineup while HQ prices apply to the
+ * rest (stage C2d2). It starts from the HQ prices and lineup, so nothing changes
+ * until you edit it; handing it back to HQ re-applies the HQ lineup.
+ */
+export function setOwnPrices(state: GameState, branchId: string, on: boolean): CommandResult {
+  const branch = state.branches[branchId];
+  if (!branch) return fail('That sales office no longer exists.');
+  if (!state.company.applyRatesToAll)
+    return fail('Every sales office already sets its own prices.');
+  if (branch.ownPrices === on) return ok();
+  const lineup = state.company.companyOffered ?? {};
+  for (const spec of allProducts(state)) {
+    const slot = slotOf(state, branch, spec);
+    if (on) slot.price = companyPrice(state, branch.cityId, spec.id) ?? slot.price;
+    if (lineup[spec.id] !== undefined) slot.on = lineup[spec.id]!;
+  }
+  branch.ownPrices = on;
   return ok();
 }
 

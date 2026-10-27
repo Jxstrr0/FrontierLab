@@ -176,7 +176,7 @@ After the wizard, the map opens with the tutorial (§27).
   - Price stepper (rate or fee)
   - trash icon on developed variants
   - The SBL card shows totals and "Managed on the Loan Desk →".
-- **HQ lock:** when "Apply rates to all branches" is on at HQ, steppers lock and show "Set at HQ".
+- **HQ lock:** when "Apply rates to all sales offices" is on at HQ, a **Set prices here** toggle card sits above the products (hint: which HQ list the office follows, or that it sets its own). Off, steppers and offer toggles lock and show "Set at HQ"; on, the office sets its own prices and lineup (C2d2).
 
 ### 5.3 Loan Desk
 - **Summary strip:** applications this week · approved · declined · approval rate · business loan balance · delinquent count.
@@ -242,7 +242,7 @@ Tabs: Overview · Loans · Credit.
 - **Stats:** floors, area m².
 - **Department list:** one Add toggle per department (description + desks). You can't select more departments than there are floor slots.
 - **Costs:** weekly rent, security deposit, fit-out total.
-- **Rent office** button, with available cash shown under it.
+- **Rent office** button, with available cash shown under it. Above it, a blocker line when the lease isn't allowed: two main offices already, or a second office in the same country as the first (C2d2).
 
 ## 10. HQ
 
