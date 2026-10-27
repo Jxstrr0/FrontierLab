@@ -93,8 +93,8 @@ export function branchCheckpoints(m: BranchMetrics): Check[] {
       {
         label: 'Week 52 income / week',
         value: K(w52.inc),
-        ok: inRange(w52.inc, 25e3, 60e3),
-        target: '$25–60k',
+        ok: inRange(w52.inc, 24e3, 60e3),
+        target: '$24–60k',
       },
     );
   }

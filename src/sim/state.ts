@@ -55,7 +55,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState } from './personalTypes';
 
-export const SCHEMA_VERSION = 8;
+export const SCHEMA_VERSION = 9;
 
 export interface GameState {
   schemaVersion: number;
@@ -69,6 +69,8 @@ export interface GameState {
   branches: Record<Id, Branch>;
   /** Your data centers (stage C2c, SIMULATION §9.9; schema 4). */
   dataCenters: Record<Id, DataCenter>;
+  /** The compute pool and the chip cycle (C4a). */
+  compute: ComputeState;
   /** Leased HQ offices (Stage 4, SIMULATION §16.1). */
   offices: Record<Id, Office>;
   /** HQ departments that have at least one floor (§16.2). */
@@ -560,6 +562,23 @@ export interface BranchPnl {
   revenue: Money;
   income: Money;
   lines: Record<BranchPnlLine, Money>;
+  /** GPUs this office's customers used this week (C4a; absent on older rows). */
+  gpus?: number;
+}
+
+export type ChipPhase = 'glut' | 'normal' | 'shortage';
+
+/** The compute pool and the chip cycle (stage C4a, SIMULATION §13.0). */
+export interface ComputeState {
+  /** Compute price index: 1 is a normal market. */
+  index: number;
+  phase: ChipPhase;
+  weeksInPhase: number;
+  /** Last week's totals: GPUs the offices used and GPUs running in your data centers. */
+  demandGpus: number;
+  ownedGpus: number;
+  /** Weekly index history, oldest first. */
+  history: number[];
 }
 
 export interface ReviewCard {

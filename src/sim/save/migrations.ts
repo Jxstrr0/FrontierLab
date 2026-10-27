@@ -7,6 +7,7 @@
 import { foldRivalCity } from '../rivalOffices';
 import { migrateCatalog } from './migrateCatalog';
 import { migrateBankCleanup } from './migrateBankCleanup';
+import { migrateCompute } from './migrateCompute';
 import { migrateMoney } from './migrateMoney';
 import { SCHEMA_VERSION, type GameState } from '../state';
 
@@ -59,6 +60,11 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
   // 7 → 8 (stage C3c): REO sold into cash, bonds into reserves, covered bonds gone.
   7: (s) => {
     migrateBankCleanup(s as unknown as GameState);
+    return s;
+  },
+  // 8 → 9 (stage C4a): the compute pool and the chip cycle.
+  8: (s) => {
+    migrateCompute(s as unknown as GameState);
     return s;
   },
 };

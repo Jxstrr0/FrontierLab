@@ -16,6 +16,7 @@ import {
 import { DEFAULT_MODEL_ID } from '../data/bureaus';
 import { CITIES } from '../data/cities';
 import { PRODUCTS } from '../data/products';
+import { newComputeState } from './compute';
 import { capitalSnapshot } from './capital';
 import { fullCoverage } from './hq';
 import { emptyLedger } from './ledger';
@@ -171,6 +172,7 @@ export function newGame(opts: NewGameOptions): GameState {
     },
     branches: {},
     dataCenters: {},
+    compute: newComputeState(),
     offices: {},
     departments: {},
     hq: { ramp: 0, coverage: fullCoverage() },

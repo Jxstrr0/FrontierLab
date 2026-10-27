@@ -332,6 +332,32 @@ export const DATA_CENTER = {
   liftNear: 0.1,
   nearKm: 1_200,
 } as const;
+/**
+ * Compute (stage C4a, SIMULATION §13.0): the chip cycle moves a global compute
+ * price index between a glut, normal times and a shortage, like the macro
+ * phases. Office compute is priced in GPU-weeks at spotPerGpuWeek × index;
+ * data-center GPUs serve demand first and only the rest is bought at spot.
+ */
+export const COMPUTE = {
+  /** Spot price of one GPU-week at an index of 1. Office compute costs convert to GPUs at this price. */
+  spotPerGpuWeek: 40,
+  /** Weekly pull of the index toward its phase target, and the weekly noise. */
+  ema: 0.08,
+  sigma: 0.012,
+  clamp: [0.5, 2] as readonly [number, number],
+  minPhaseWeeks: 13,
+  targets: { glut: 0.8, normal: 1, shortage: 1.3 },
+  transitions: {
+    normal: [
+      { to: 'shortage', p: 0.012 },
+      { to: 'glut', p: 0.012 },
+    ],
+    shortage: [{ to: 'normal', p: 0.03 }],
+    glut: [{ to: 'normal', p: 0.03 }],
+  } as Record<'glut' | 'normal' | 'shortage', { to: 'glut' | 'normal' | 'shortage'; p: number }[]>,
+  /** Weeks of index history kept for the chart. */
+  historyWeeks: 104,
+} as const;
 export const TAKEUP_CAP = 0.95;
 export const STARS_TAKEUP = { base: 0.6, slope: 0.2 } as const;
 export const MORTGAGE_SPECIAL = {
