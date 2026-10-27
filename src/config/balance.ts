@@ -1304,10 +1304,11 @@ export const PRICE_WAR = {
   decay: 0.005,
 } as const;
 
-// ─── RIVAL CORPORATE LENDING (§19.9) ──────────────────────────────────────────
+// ─── CORPORATE LENDING: INVESTMENT BANK DEBT (§19.9) ──────────────────────────────────────────
 export const CORPORATE_LENDING = {
   refreshWeeks: 4,
-  offersPerRival: [2, 3] as [number, number],
+  /** Venture debt offers per nearby investment bank office each refresh. */
+  offersPerLender: [2, 3] as [number, number],
   /** Loan offers up to this share of your equity, less corporate debt already owed. */
   maxEquityShare: 0.4,
   /** Smallest offer worth making. */

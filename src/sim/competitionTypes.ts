@@ -65,11 +65,11 @@ export interface GradProgram {
   renewWeek: Week;
 }
 
-// ─── Corporate debt from rival banks (SIMULATION §19.9) ───────────────────────
+// ─── Corporate debt from investment banks (SIMULATION §19.9) ──────────────────
 
 export interface CorporateLoan {
   id: Id;
-  /** Rival bank id. */
+  /** Investment bank site id (older saves may hold a rival lab id). */
   lenderId: Id;
   principal: Money;
   balance: Money;
@@ -83,6 +83,7 @@ export interface CorporateLoan {
 
 export interface CorporateLoanOffer {
   id: Id;
+  /** Investment bank site id. */
   lenderId: Id;
   amount: Money;
   rate: Rate;
@@ -92,6 +93,7 @@ export interface CorporateLoanOffer {
 }
 
 export interface CreditLine {
+  /** Investment bank site id (older saves may hold a rival lab id). */
   lenderId: Id;
   drawn: Money;
   rate: Rate;

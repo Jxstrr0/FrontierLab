@@ -1,6 +1,5 @@
 // Read-only views for the rival branch and rival head office panels (SCREENS
-// §6, §7): labels, the rate sheet against our nearest branch, the capital band
-// and what a rival offers us as a lender.
+// §6, §7): labels, the rate sheet against our nearest branch and the credit band.
 import type { Tier } from '../../data/types';
 import { isDeposit, PRODUCTS, type ProductSpec } from '../../data/products';
 import { tileDistance } from '../../sim/citygen';

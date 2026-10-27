@@ -62,19 +62,3 @@
 .rv-q {
   grid-template-columns: 1fr 6em 6em;
 }
-.rv-offer {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-.rv-offer + .rv-offer {
-  margin-top: var(--space-3);
-}
-.rv-offer .btn {
-  margin-top: var(--space-2);
-}
-.rv-offer-amount {
-  font-family: var(--font-display);
-  font-size: var(--text-24);
-  color: var(--brass-light);
-}
