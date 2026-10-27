@@ -4,7 +4,7 @@
 // Frontier Lab's chain starts at schema 1 (stage C0, DESIGN decision A6).
 // Vault Street's 37 steps were dropped: its saves live in a separate store
 // and its export codes are turned away, so none can reach this chain.
-import { CTO_COMPUTE } from '../../config/balance';
+import { CPO_TRAINING, CTO_COMPUTE } from '../../config/balance';
 import { foldRivalCity } from '../rivalOffices';
 import { migrateCatalog } from './migrateCatalog';
 import { migrateBankCleanup } from './migrateBankCleanup';
@@ -178,6 +178,11 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     for (const city of Object.values(state.world.cities)) {
       if (city.generated) generateLandmarkTower(state, city.id);
     }
+    return s;
+  },
+  // 25 → 26: the CPO's training style dial, Balanced (the old fixed 12-week runs).
+  25: (s) => {
+    (s as unknown as GameState).executives.trainingStyle ??= CPO_TRAINING.defaultStyle;
     return s;
   },
 };

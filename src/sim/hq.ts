@@ -136,6 +136,13 @@ export function deptDesks(state: GameState, id: DeptId): number {
   return desks;
 }
 
+/** Floors a department holds across the main offices (at least 1). */
+export function deptFloors(state: GameState, id: DeptId): number {
+  let floors = 0;
+  for (const o of Object.values(state.offices)) floors += o.floors.filter((f) => f === id).length;
+  return Math.max(1, floors);
+}
+
 /** The city that sets HQ salaries: the first office's, else the home city. */
 export function hqCityId(state: GameState): string {
   return Object.values(state.offices)[0]?.cityId ?? state.meta.homeCityId;
@@ -356,17 +363,22 @@ function updateDepartment(state: GameState, d: Department, mods: StaffMods): voi
   const target = Math.min(d.target, deptDesks(state, d.id));
   if (d.staff > target) d.staff = target;
   else if (d.staff < target) {
-    const hires = Math.min(target - d.staff, hiresPerWeek(ratio, mods));
+    const hires = Math.min(target - d.staff, hiresPerWeek(ratio, mods, deptFloors(state, d.id)));
     d.skill = (d.skill * d.staff + SKILL.newHireFrac * sTarget * hires) / (d.staff + hires);
     d.staff += hires;
   }
   holdTopStaff(state, d);
 }
 
-/** Hires per week (§6.3): 1 + floor(2 × hrCoverage′ × attraction), attraction with benefits. */
-export function hiresPerWeek(payRatio: number, mods: StaffMods): number {
+/**
+ * Hires per week (§6.3): 1 + floor(2 × hrCoverage′ × attraction), attraction
+ * with benefits, × `scale`: a sales office's size mult or a department's floor
+ * count, so a bigger place recruits as fast relative to its desks.
+ */
+export function hiresPerWeek(payRatio: number, mods: StaffMods, scale = 1): number {
   const attraction = clamp(payRatio + mods.attraction, ...ATTRACTION_RANGE);
-  return HIRE_BASE + Math.floor(2 * mods.hireMult * attraction) + mods.hireBonus;
+  const base = HIRE_BASE + Math.floor(2 * mods.hireMult * attraction) + mods.hireBonus;
+  return Math.max(1, Math.round(base * scale));
 }
 
 /** Tick step 7: department staffing and payroll, benefits, then coverage. */

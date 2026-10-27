@@ -81,7 +81,7 @@ export function updateStaff(state: GameState, branch: Branch): void {
   if (s.count > s.target) {
     s.count = s.target;
   } else if (s.count < s.target) {
-    const hires = Math.min(s.target - s.count, hiresPerWeek(ratio, mods));
+    const hires = Math.min(s.target - s.count, hiresPerWeek(ratio, mods, sizeMult(branch)));
     if (hires > 0) {
       s.skill = (s.skill * s.count + SKILL.newHireFrac * sTarget * hires) / (s.count + hires);
       s.count += hires;

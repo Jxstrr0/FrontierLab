@@ -3,13 +3,30 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.37, save schema 25). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
+**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.38, save schema 26). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `1eb88e2834bb61` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `133b7b9121d061` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-27 — Hiring in big offices, and a CPO training style dial (v0.1.38, schema 26)
+
+The owner saw a delegated manager run an office at 18 of 20 desks while asking "Can we hire?", with the staff controls locked to the manager, and asked to check hire limits in scaled-up offices. They also asked for a CPO toggle between quality and quantity of new models.
+
+**What was wrong with hiring.**
+- **The manager staffed under the desks.** A delegated manager aimed for desks × the queue (clamped 0.9–1.3), so a short queue meant 90% of desks: 18 of 20. Now the floor is every desk; a long queue (and the COO's step) only adds staff on top.
+- **Hiring speed didn't grow with the office.** Everyone hired about 3 people a week, whether a Starter office (a handful of desks) or a Flagship (9× the desks), so a fresh Flagship took most of a year to fill and quits kept it short. Hires per week now scale with the office's size (Starter ×1, Standard ×2.5, Large ×5, Flagship ×9). HQ departments scale by their floor count the same way, which matters in the new landmark towers.
+- The manual limit (up to 3× the desks needed) already scaled with size; unchanged.
+
+**CPO training style.** Under the CPO's Routine training runs there's now a **Training style** dial: Quantity (8-week runs, 0.6× budget: more model generations, weaker odds), Balanced (12 weeks, as before) and Quality (24 weeks, 1.5× budget: fewer, stronger models). The tagline shows the run length, weekly budget, the axis it'll train and the chance of a 4★ or better model.
+
+**Save schema 26.** Migration 25 → 26 sets the style to Balanced. **Determinism snapshot** `1eb88e2834bb61` → `133b7b9121d061` (schema bump, the new field and the hiring change).
+
+**Checked.** `npm run lint`, `npx vitest run` (1063 tests, 2 new) and `npm run build` pass. Balance at year 10 is unchanged in every strategy (steady $2.38B ARR, aggressive $2.40B, turtle $1.5M, nohq $74M, stress $2.39B).
+
+**Dependencies:** none added.
 
 ### 2026-10-27 — Landmark towers in London and Moscow (v0.1.37, schema 25)
 
