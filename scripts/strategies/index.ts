@@ -1,7 +1,9 @@
 // The scripted strategies from SIMULATION §25. Steady and aggressive grow their
 // offices when busy and open one office per city, city by city (expansion.ts);
 // turtle and nohq stay in the home city. Steady and aggressive also build one
-// data center once rich (dataCenter.ts, C2c).
+// data center once rich (dataCenter.ts, C2c), and reserve GPU lots once spot
+// runs short (compute.ts, C4c).
+import { manageCompute } from './compute';
 import { maybeBuildDataCenter } from './dataCenter';
 import { forceRecession } from './stress';
 import { averageLot, bestLot, buildCost, followDefaults, openBranch } from './common';
@@ -68,6 +70,7 @@ export const steady: Strategy = {
     manageEquity(s, 0.12, 2);
     expand(s, 2, 0.12, true);
     maybeBuildDataCenter(s, 4);
+    manageCompute(s);
   },
 };
 
@@ -109,6 +112,7 @@ export const aggressive: Strategy = {
     manageHq(s);
     expand(s, 1.2, 0.085, true, { growCr: 0.075 });
     maybeBuildDataCenter(s, 3);
+    manageCompute(s);
   },
 };
 

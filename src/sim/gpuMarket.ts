@@ -4,12 +4,11 @@
 // GPU_MARKET.refreshWeeks while you have the floor, counted like funding
 // offers. Rented GPUs join your own data centers in covering office demand,
 // and every active lot is billed to the compute line each week.
-import { GPU_MARKET } from '../config/balance';
+import { GPU_MARKET, SPOT } from '../config/balance';
 import { GPU_LOT_TYPES, GPU_PROVIDERS, type GpuLotSpec } from '../data/gpuLots';
 import { spotPrice } from './compute';
 import { hasTreasuryFloor, offerCount } from './fundingMarket';
 import { newId } from './ids';
-import { spend } from './ledger';
 import { noise, roundToStep } from './math';
 import { stream } from './rng';
 import type { GameState, GpuOffer } from './state';
@@ -22,7 +21,13 @@ function floorCoverage(state: GameState): number {
 /** §13.0: the price per GPU-week a type would carry today, before noise. */
 export function gpuLotPrice(state: GameState, spec: GpuLotSpec): number {
   const short = 1 - Math.min(1, floorCoverage(state));
-  return spotPrice(state) * (1 - spec.discount) * (1 + GPU_MARKET.understaffedMarkup * short);
+  const stigma = state.compute.burstStigmaWeeks > 0 ? SPOT.stigmaMarkup : 0;
+  return (
+    spotPrice(state) *
+    (1 - spec.discount) *
+    (1 + GPU_MARKET.understaffedMarkup * short) *
+    (1 + stigma)
+  );
 }
 
 function generateOffer(state: GameState): GpuOffer {
@@ -69,20 +74,14 @@ export function rentedGpus(state: GameState): number {
   return state.compute.lots.reduce((sum, l) => sum + l.gpus, 0);
 }
 
-/** Weekly bill of every active lot. */
-export function lotsWeeklyCost(state: GameState): number {
-  return state.compute.lots.reduce((sum, l) => sum + l.gpus * l.price, 0);
-}
-
 /**
- * Tick step 4 (with the compute tally): bill every active lot for this week,
- * then retire the ones whose last week this was. A lot runs startWeek to
- * endWeek − 1, so it is billed termWeeks times.
+ * Tick step 4 (after settleCompute has billed this week's lots, C4c): retire
+ * the lots whose last week this was. A lot runs startWeek to endWeek − 1, so
+ * it is billed termWeeks times.
  */
-export function billGpuLots(state: GameState): void {
+export function retireGpuLots(state: GameState): void {
   const c = state.compute;
   const week = state.clock.week;
-  for (const lot of c.lots) spend(state, 'compute', lot.gpus * lot.price);
   c.lots = c.lots.filter((l) => l.endWeek > week + 1);
   c.rentedGpus = rentedGpus(state);
 }

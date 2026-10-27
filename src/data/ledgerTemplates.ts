@@ -189,6 +189,46 @@ const BANK_TEMPLATES = {
       b: 'Withdrawals surged at sales offices across the network. Regulators are watching closely.',
     },
   ],
+  COMPUTE_BURST: [
+    {
+      h: '{bank} pays up for emergency GPUs',
+      b: 'The lab bought {gpus} GPUs of burst capacity at a premium this week after running past its spot allowance.',
+    },
+    {
+      h: '{bank} scrambles for compute',
+      b: 'Cloud brokers say the lab took {gpus} emergency GPUs at a steep markup. Rivals are watching its bills.',
+    },
+  ],
+  COMPUTE_CRUNCH: [
+    {
+      h: '{bank} puts new customers on a waitlist',
+      b: 'The lab has run out of GPUs to serve demand. Sign-ups are paused until capacity catches up.',
+    },
+    {
+      h: 'Capacity crunch at {bank}',
+      b: 'Would-be customers face a waitlist as the lab struggles to find enough compute.',
+    },
+  ],
+  COMPUTE_CRUNCH_ENDED: [
+    {
+      h: '{bank} reopens sign-ups',
+      b: 'Fresh capacity is online and the waitlist has cleared.',
+    },
+    {
+      h: 'Waitlist over at {bank}',
+      b: 'The lab says it now has the GPUs to serve everyone who wants in.',
+    },
+  ],
+  COMPUTE_OUTAGE: [
+    {
+      h: '{bank} goes down under the load',
+      b: 'Customers report errors and timeouts as demand outruns the lab’s GPUs. Some are already shopping around.',
+    },
+    {
+      h: 'Outage hits {bank}',
+      b: 'Weeks of too little compute have caught up with the lab. Its status page has been red since Monday.',
+    },
+  ],
   BANK_RUN_ENDED: [
     {
       h: 'Calm returns at {bank}',

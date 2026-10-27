@@ -17,6 +17,7 @@ import { signupChurnMult, type CampaignEffects } from './marketing';
 import { branchPrice, churnGap, isOffered } from './pricing';
 import type { BranchWeek } from './week';
 import { bankRunMult } from '../incident/effects';
+import { outageChurnMult } from '../compute';
 import { allProducts } from '../products';
 
 const NONE: Origination = { newAccounts: 0, newVolume: 0, approval: 1 };
@@ -98,7 +99,8 @@ function runRecurring(ctx: Ctx, spec: ProductSpec, book: Book, orig: Origination
     (1 + (spec.rateChurnSens ?? 0) * churnGap(spec, price, m)) *
     (1 + OVERALL_CHURN.slope * Math.max(0, OVERALL_CHURN.pivot - branch.ratings.overall)) *
     signupChurnMult(branch) *
-    bankRunMult(state);
+    bankRunMult(state) *
+    outageChurnMult(state);
   if (spec.kind === 'plan') {
     // Seats sign up as the "volume" of a plan, so a Team sign-up brings its whole team.
     book.last.newAccounts = orig.newVolume;

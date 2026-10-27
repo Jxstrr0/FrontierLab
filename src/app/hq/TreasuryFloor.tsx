@@ -1,5 +1,6 @@
 // Compute floor content (stage C4b, SCREENS §10, SIMULATION §13.0; the old
-// Treasury floor keeps its `treasury` id): the compute pool, rented GPU lots,
+// Treasury floor keeps its `treasury` id): the compute pool with its spot
+// limits and auto spot-buy (C4c), rented GPU lots,
 // the GPU market and a card per partnership. The bank-era liquidity, funding
 // market and central bank cards show only for saves that still carry
 // deposits, wholesale lots or central bank borrowing.
@@ -8,6 +9,7 @@ import type { GameState } from '../../sim/state';
 import { ComputeCard } from '../company/ComputeCard';
 import { SectionTitle } from '../components';
 import { useGame } from '../store';
+import { ComputeBanner, ComputePolicyCard } from './compute/ComputePolicyCard';
 import { GpuInventory } from './compute/GpuInventory';
 import { GpuMarket } from './compute/GpuMarket';
 import { CentralBankFacility } from './treasury/CentralBankFacility';
@@ -28,8 +30,10 @@ export function TreasuryFloor() {
   const s = useGame();
   return (
     <div class="stack tr-floor">
+      <ComputeBanner />
       <SectionTitle>Compute pool</SectionTitle>
       <ComputeCard />
+      <ComputePolicyCard />
 
       <SectionTitle>Rented GPUs</SectionTitle>
       <GpuInventory />

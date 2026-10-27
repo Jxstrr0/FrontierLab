@@ -3,13 +3,46 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C4b done (v0.1.14, save schema 10): the Compute floor and GPU lots. C4a (v0.1.13) added the compute price index and pool; C3 (v0.1.10–v0.1.12) turned the money model into a lab's. Next is C4c (spot limits, emergency burst, capacity crunch and outages).
+**Current stage:** C4 done (C4c is v0.1.15, save schema 11): compute has a price, a pool, a floor, GPU lots, spot limits, a capacity crunch and outages. C3 (v0.1.10–v0.1.12) turned the money model into a lab's. Next is C5 (businesses and the Deal Desk).
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `15dc2a49f9c8bf` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `031bda2c522626` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-27 — Stage C4c: spot limits, capacity crunch and outages (v0.1.15)
+
+**What you asked for:** keep rolling. This finishes the compute stage (C4).
+
+**What changed.**
+- **Clouds only sell so much at spot.** Each week there's a spot limit. It grows with how much you've been buying, shrinks in a chip shortage, and never goes past 20,000 GPUs. A big lab has to own data centers or reserve GPUs.
+- **Emergency burst.** If you need more than the limit, the game buys "burst" GPUs on top, at 1.6× the spot price. For four weeks after that, GPU offers on the market cost 8% more (cloud providers have noticed you're desperate).
+- **Capacity crunch.** If even burst isn't enough, customers you can't serve go unserved and **new sign-ups go on a waitlist** (no new plan seats or API customers).
+- **Outages.** After three weeks of crunch, the lab starts having outages: customers leave almost twice as fast until two weeks after the crunch ends.
+- **Auto spot-buy** is a new switch on the Compute floor. On (the default), the game buys spot and burst for you. Off, you run only on your own and reserved GPUs, and any shortfall goes straight on the waitlist.
+- **You'll hear about it:** news stories, a toast, a red item in the attention list, a banner on the Compute floor, a "Waitlist" or "Outage" badge on the Compute card, and the Compute lead's advisor line.
+- **How offices pay for compute changed.** Each office is now charged today's spot price for every GPU it uses, whether the GPU came from spot, a reservation or your own data center. The company then books the difference to what the lab really paid. This is the "funds transfer pricing" idea from the bank game. Office P&Ls stay comparable, and the savings from cheap reservations and data centers show up in the company's compute line. The Compute card's new "Pool cost vs spot" row shows the saving (for example 80% means you're paying 20% less than spot).
+
+**Old saves.** Schema 10 → 11. Auto spot-buy starts on, and the spot limit starts high enough to cover what the save already buys, so nothing breaks the week you load. A test checks it.
+
+**Balance.** The test strategies now reserve GPU lots once they use more than 60% of their spot limit, like a sensible player. With that, all 20 cities pass every checkpoint, and seed 42 shows the same single-city warnings as before. The aggressive strategy's cash no longer goes negative (its low is +$20k; in C4a it dipped to −$546k), because reservations are cheaper than spot. I also ran the same strategies with the GPU market emptied every week: they hit the 20,000 ceiling in year 4 and spend most of the rest of the game in crunch and outage. That's the C4 goal: "growing without buying compute visibly causes waitlists, then outages".
+
+**Tests.** New `spotLimits.test.ts`:
+- the limit's growth, shortage cut and ceiling;
+- how demand splits into spot, burst and unserved;
+- a crunch blocks new sign-ups, turns into an outage that raises churn, and then clears;
+- burst stigma;
+- offices pay spot and the pool books the cost;
+- the migration.
+
+`compute.test.ts` and `gpuMarket.test.ts` were updated for the internal charge.
+
+**Checked in the browser** at iPhone size with a save in outage: the banner, the badges and the new rows. No console errors.
+
+**Checks.** `npm run lint`, all 894 tests and `npm run build` pass. The **determinism snapshot** moved from `15dc2a49f9c8bf` to `031bda2c522626` (intended: offices pay the internal charge and the pool settles).
+
+**Next:** C5, businesses and the Deal Desk: companies on the map that sign contracts with you or with rivals.
 
 ### 2026-10-27 — Stage C4b: the Compute floor and GPU lots (v0.1.14)
 

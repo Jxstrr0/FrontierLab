@@ -1,10 +1,12 @@
 // Compute card (stage C4a, SCREENS §6, SIMULATION §13.0): the chip market's
 // spot price and phase with a two-year index chart, the GPUs your offices used
-// last week, the GPUs running in your data centers and rented in lots (C4b), the share they covered,
-// and what the rest costs at spot. Shown on the Company screen and on each
-// data center's panel.
+// last week, the GPUs running in your data centers and rented in lots (C4b),
+// the share they covered, what was bought at spot against the spot limit,
+// emergency burst and unserved demand with waitlist and outage badges, and the
+// pool's real cost against spot (C4c). Shown on the Company screen, on each
+// data center's panel and on the Compute floor.
 import { COMPUTE } from '../../config/balance';
-import { capacityGpus, ownedShare, spotPrice } from '../../sim/compute';
+import { allocation, ownedShare, poolCostFactor, spotCost, spotPrice } from '../../sim/compute';
 import type { ChipPhase } from '../../sim/state';
 import { Badge, Card, LineChart, Row } from '../components';
 import { count, money, pct } from '../format/format';
@@ -21,8 +23,9 @@ export function ComputeCard() {
   const sym = s.settings.currency;
   const c = s.compute;
   const phase = PHASES[c.phase];
-  const spotGpus = Math.max(0, c.demandGpus - capacityGpus(s));
+  const a = allocation(s);
   const history = c.history.length > 1 ? c.history : [c.index, c.index];
+  const pool = poolCostFactor(s);
   return (
     <Card>
       <div class="cap-head">
@@ -31,7 +34,14 @@ export function ComputeCard() {
           <div class="hero-number">{money(spotPrice(s), sym)}</div>
           <div class="muted small">per GPU-week</div>
         </div>
-        <Badge tone={phase.tone}>{phase.label}</Badge>
+        <div class="cap-badges">
+          <Badge tone={phase.tone}>{phase.label}</Badge>
+          {c.outageWeeksLeft > 0 ? (
+            <Badge tone="bad">Outage</Badge>
+          ) : (
+            c.crunchWeeks > 0 && <Badge tone="bad">Waitlist</Badge>
+          )}
+        </div>
       </div>
       <LineChart
         label="Compute price index"
@@ -48,10 +58,32 @@ export function ComputeCard() {
         value={c.demandGpus > 0 ? pct(ownedShare(s), 0) : '—'}
         tone="dim"
       />
-      <Row label="Bought at spot" value={`${money(spotGpus * spotPrice(s), sym)} / week`} strong />
+      <Row
+        label="Bought at spot"
+        value={`${count(Math.round(a.spot))} of ${count(Math.round(a.spotLimit))} max`}
+      />
+      {a.burst > 0 && (
+        <Row label="Emergency burst" value={`${count(Math.round(a.burst))} GPUs`} tone="bad" />
+      )}
+      {a.short > 0 && (
+        <Row
+          label="Not served (waitlist)"
+          value={`${count(Math.round(a.short))} GPUs`}
+          tone="bad"
+        />
+      )}
+      <Row label="Spot and burst bill" value={`${money(spotCost(s, a), sym)} / week`} strong />
+      {c.weekCost > 0 && (
+        <Row
+          label="Pool cost vs spot"
+          value={pct(pool, 0)}
+          tone={pool < 1 ? 'good' : pool > 1 ? 'bad' : 'dim'}
+        />
+      )}
       <p class="muted small cap-note">
-        Every seat and API call runs on GPUs. Your own data centers and reserved GPUs serve them
-        first; the rest is rented at the spot price, which swings with the chip market.
+        Every seat and API call runs on GPUs. Offices are charged today's spot price for what they
+        use; your data centers and reserved GPUs make the real bill cheaper. Clouds only sell so
+        much at spot: past that you pay for emergency burst, then new customers wait.
       </p>
     </Card>
   );

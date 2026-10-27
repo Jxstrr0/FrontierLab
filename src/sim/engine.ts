@@ -15,8 +15,8 @@ import { updateStaff } from './branch/staff';
 import { emptyWeek } from './branch/week';
 import { isQuarterStart, isYearStart } from './calendar';
 import { evaluateCapital } from './capital';
-import { tallyCompute, updateComputeIndex } from './compute';
-import { billGpuLots, refreshGpuOffers } from './gpuMarket';
+import { settleCompute, tallyCompute, updateComputeIndex } from './compute';
+import { refreshGpuOffers, retireGpuLots } from './gpuMarket';
 import { runDataCenters } from './dataCenters';
 import { runExecutives } from './executives';
 import { hrFillVacancies } from './hrHiring';
@@ -102,7 +102,8 @@ export function weeklyTick(state: GameState): void {
     if (branch.status === 'open') runBranch(state, branch, deskLoans.get(branch.id) ?? []); // 4
   }
   tallyCompute(state); // 4 (the compute pool, C4a)
-  billGpuLots(state); // 4 (rented GPU lots, C4b)
+  settleCompute(state); // 4 (pay the pool; spot trail, crunch and outages, C4c)
+  retireGpuLots(state); // 4 (rented GPU lots, C4b)
   updateBrandAwareness(state);
   runPartnerships(state); // 5
   runTreasury(state); // 6

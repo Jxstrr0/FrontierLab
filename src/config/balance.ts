@@ -372,6 +372,30 @@ export const GPU_MARKET = {
   priceNoise: 0.04,
   understaffedMarkup: 0.1,
 } as const;
+/**
+ * Spot compute limits (stage C4c, SIMULATION §13.0). Clouds sell you spot GPUs
+ * up to spotLimit = min(baseGpus + trailMult × trail, maxGpus) × phaseMult, where trail is
+ * an EMA (trailEma) of the spot and burst GPUs you bought. Past it, auto
+ * spot-buy takes an emergency burst of up to burstShare × spotLimit at
+ * burstPremium × spot, and any burst week marks you for stigmaWeeks (GPU
+ * offers cost stigmaMarkup more). Demand still unserved above crunchFrom of
+ * the total puts new sign-ups on a waitlist.
+ */
+export const SPOT = {
+  baseGpus: 1_000,
+  /** No cloud sells more than this at spot: a big lab must own or reserve compute. */
+  maxGpus: 20_000,
+  trailEma: 0.08,
+  trailMult: 1.25,
+  phaseMult: { glut: 1.2, normal: 1, shortage: 0.85 },
+  burstShare: 0.25,
+  burstPremium: 1.6,
+  stigmaWeeks: 4,
+  stigmaMarkup: 0.08,
+  crunchFrom: 0.02,
+} as const;
+/** Outages (stage C4c, §13.0): after afterWeeks of crunch, churn × churnMult until weeks after it ends. */
+export const OUTAGE = { afterWeeks: 3, weeks: 2, churnMult: 1.8 } as const;
 export const TAKEUP_CAP = 0.95;
 export const STARS_TAKEUP = { base: 0.6, slope: 0.2 } as const;
 export const MORTGAGE_SPECIAL = {
