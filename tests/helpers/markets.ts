@@ -1,11 +1,13 @@
 // Test setup for the stock market and equity raises: a Calgary game with extra
-// paid-in capital (identity kept), four profitable quarters on record and a
-// Strong tier, so it qualifies for an IPO; `publicBank` also lists it.
+// paid-in capital (identity kept), an office holding ARR, four profitable
+// quarters on record and a Strong tier, so it qualifies for an IPO;
+// `publicBank` also lists it.
 import { balanceSheet } from '../../src/sim/balanceSheet';
 import * as cmd from '../../src/sim/commands';
 import { listPendingIpo } from '../../src/sim/equityIpo';
 import { newGame } from '../../src/sim/newGame';
 import type { GameState } from '../../src/sim/state';
+import { openScriptedBranch } from './scenario';
 
 export const BANK = 'ashgrove';
 
@@ -13,6 +15,12 @@ export const BANK = 'ashgrove';
 export function addCapital(s: GameState, amount: number): void {
   s.company.cash += amount;
   s.company.paidInCapital += amount;
+}
+
+/** Puts `arr` of Pro plan ARR on an office (opening one if there is none). */
+export function giveArr(s: GameState, arr: number): void {
+  const id = Object.keys(s.branches)[0] ?? openScriptedBranch(s);
+  s.branches[id]!.books.pro!.balance += arr;
 }
 
 /** Four quarters each earning `roe`/4 of current equity. */
@@ -30,9 +38,10 @@ export function setQuarters(s: GameState, roe: number, n = 4): void {
 }
 
 /** A private bank that passes every IPO rule. */
-export function eligibleBank(seed = 42, capital = 40_000_000): GameState {
+export function eligibleBank(seed = 42, capital = 40_000_000, arr = 120_000_000): GameState {
   const s = newGame({ seed, cityId: 'cal', bankName: 'Test Bank' });
   addCapital(s, capital);
+  giveArr(s, arr);
   setQuarters(s, 0.15);
   s.company.tier = 'strong';
   s.company.capitalRatio = 0.2;

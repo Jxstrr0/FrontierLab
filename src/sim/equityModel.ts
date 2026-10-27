@@ -1,8 +1,8 @@
-// The share-price formulas shared by your bank and listed rivals (SIMULATION
-// §19.5): the mean-reverting sentiment walk, the shocks from earnings,
+// The share-price formulas for your lab (SIMULATION §19.5; listed rivals share
+// the sentiment walk and shocks): the mean-reverting sentiment walk, the shocks from earnings,
 // incidents and dividends, the investor-relations penalty and the target price.
 // Pure functions of their inputs; callers supply the random draws.
-import { COE, INCIDENT_PRICE_SEVERITY, OWN_STOCK, PUBLIC_PRICE } from '../config/balance';
+import { INCIDENT_PRICE_SEVERITY, OWN_STOCK, PUBLIC_PRICE } from '../config/balance';
 import { clamp } from './math';
 
 /** Sentiment stays inside OWN_STOCK.sentimentRange. */
@@ -45,17 +45,11 @@ export function irPenalty(financeKPrime: number): number {
   return 1 - PUBLIC_PRICE.irPenalty * (1 - clamp(financeKPrime, 0, 1));
 }
 
-/** §19.5: target = BVPS × clamp(ROE_ttm / COE, 0.3, 3) × sentiment × irPenalty. */
+/** §19.5: target = value per share (ARR × multiple, at least book) × sentiment × irPenalty. */
 export function publicTarget(
-  bvps: number,
-  roe: number,
+  valuePerShare: number,
   sentiment: number,
   financeKPrime: number,
 ): number {
-  return (
-    Math.max(0, bvps) *
-    clamp(roe / COE, ...PUBLIC_PRICE.roeClamp) *
-    sentiment *
-    irPenalty(financeKPrime)
-  );
+  return Math.max(0, valuePerShare) * sentiment * irPenalty(financeKPrime);
 }

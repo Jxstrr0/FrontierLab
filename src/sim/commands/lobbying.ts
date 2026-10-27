@@ -28,12 +28,12 @@ export function lobbyBlock(
     return 'You need to be in this city to hire the firm.';
   if (state.lobbying.campaigns.some((c) => c.campaignId === campaignId && c.status === 'pending'))
     return 'This campaign is already under way.';
-  // The capital buffer binds only at home (§15 follows the home regulator, DESIGN §5.2).
+  // The safety buffer binds only at home (§15 follows the home regulator, DESIGN §5.2).
   const home = CITIES[state.meta.homeCityId]?.country;
   if ((campaignId === 'easeBuffer' || campaignId === 'stallBuffer') && country !== home)
-    return `Your capital buffer is set at home in ${COUNTRIES[home ?? country].name}, so this campaign only helps there.`;
+    return `Your safety rules are set at home in ${COUNTRIES[home ?? country].name}, so this campaign only helps there.`;
   if (campaignId === 'stallBuffer' && !pendingBufferBill(state, country))
-    return 'There is no capital buffer bill before lawmakers here right now.';
+    return 'There is no AI safety bill before lawmakers here right now.';
   if (campaignId === 'fastTrack' && state.lobbying.fastTrack)
     return 'Your next merger review is already fast-tracked.';
   const price = lobbyingPrice(state, spec, site.cityId);

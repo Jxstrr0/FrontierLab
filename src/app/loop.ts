@@ -9,7 +9,7 @@
 // the weekly results never spends the seconds they were open. stepWeek() runs
 // the rest of the current week at once and leaves the game paused, for
 // week-by-week play.
-import { CAPITAL_BUFFER_PP, DAY_MS, DAYS_PER_WEEK, FEATURES } from '../config/balance';
+import { CAPITAL_BUFFER_PP, DAY_MS, DAYS_PER_WEEK, FEATURES, SAFETY } from '../config/balance';
 import { CITIES } from '../data/cities';
 import { INCIDENT_SPECS } from '../data/incidents';
 import { isQuarterStart } from '../sim/calendar';
@@ -232,7 +232,7 @@ const EVENT_TEXT: Record<string, (p: Record<string, unknown>) => string> = {
   WINDOW_USE: () => 'Treasury borrowed from the central bank window.',
   POLICY_PASSED: (p) =>
     p.policyId === CAPITAL_BUFFER_POLICY
-      ? `Lawmakers passed a capital buffer: capital requirements rise by ${CAPITAL_BUFFER_PP} pp for a year.`
+      ? `Lawmakers passed an AI safety buffer: every safety tier line rises by ${Math.round(CAPITAL_BUFFER_PP * SAFETY.bufferPerPp * 100)} points for a year.`
       : '',
   INCIDENT_RESOLVED: (p) => {
     const spec = INCIDENT_SPECS[String(p.type)];

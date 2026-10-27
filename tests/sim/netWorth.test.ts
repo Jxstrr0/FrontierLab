@@ -14,7 +14,6 @@ import { securityPrice } from '../../src/sim/securities';
 import { FOUNDER_ID, sharesHeld } from '../../src/sim/shares';
 import type { GameState } from '../../src/sim/state';
 import { publicBank } from '../helpers/markets';
-import { openScriptedBranch } from '../helpers/scenario';
 
 /** Every part summed straight from the state, without netWorth(). */
 function partsByHand(s: GameState): number {
@@ -40,7 +39,7 @@ function partsByHand(s: GameState): number {
 
 function founderWithEverything(): GameState {
   const s = publicBank();
-  openScriptedBranch(s, 'midtown');
+  // The listed lab already has an office (it holds the ARR that let it list).
   s.personal.cash = 200_000_000;
   // Other stocks, personally.
   expect(cmd.trade(s, 'personal', 'kslr', 10_000).ok).toBe(true);
