@@ -10,8 +10,14 @@ import {
   TEXT_SCALES,
   WEEKLY_RESULTS_MODES,
 } from '../../data/settingsOptions';
-import { DEV_PAYMENT } from '../../config/balance';
-import { devPayment, setFounderAvatar, setSettings } from '../../sim/commands';
+import { DEV_PAYMENT, DEV_STAFF } from '../../config/balance';
+import {
+  devPayment,
+  setDevNoBankruptcy,
+  setDevStaff,
+  setFounderAvatar,
+  setSettings,
+} from '../../sim/commands';
 import { DEFAULT_SETTINGS } from '../../sim/newGame';
 import type { Settings } from '../../sim/state';
 import { Panel, Row, SectionTitle, Segmented, Sheet, Toggle } from '../components';
@@ -167,17 +173,31 @@ export function SettingsScreen(p: { inGame?: boolean }) {
           />
           {devTools &&
             (game ? (
-              <button
-                type="button"
-                class="btn btn-secondary btn-block"
-                onClick={() => {
-                  if (act(devPayment).ok) {
-                    toast(`${money(DEV_PAYMENT, s.currency)} added to company cash.`, 'good');
-                  }
-                }}
-              >
-                Add {money(DEV_PAYMENT, s.currency)} to company cash
-              </button>
+              <>
+                <button
+                  type="button"
+                  class="btn btn-secondary btn-block"
+                  onClick={() => {
+                    if (act(devPayment).ok) {
+                      toast(`${money(DEV_PAYMENT, s.currency)} added to company cash.`, 'good');
+                    }
+                  }}
+                >
+                  Add {money(DEV_PAYMENT, s.currency)} to company cash
+                </button>
+                <Toggle
+                  label="Top staff"
+                  hint={`Holds every team's skill and morale at ${DEV_STAFF.skill} or better, so you can test a high-staff game. Saved with this game.`}
+                  checked={!!game.flags.devStaff}
+                  onChange={(on) => act(setDevStaff, on)}
+                />
+                <Toggle
+                  label="No bankruptcy"
+                  hint="Weeks in the red never end the game. Cash can still go negative. Saved with this game."
+                  checked={!!game.flags.devNoBankruptcy}
+                  onChange={(on) => act(setDevNoBankruptcy, on)}
+                />
+              </>
             ) : (
               <p class="muted small">
                 Open Settings from inside a game to use the developer tools.

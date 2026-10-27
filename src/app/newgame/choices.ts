@@ -1,5 +1,5 @@
 // Wording for the New Game choices: how a city's numbers read in plain language,
-// each city's one-line flavour and what each difficulty means. Nothing here
+// each city's one-line flavour (how an AI lab would see it: talent, power, rents, rivals) and what each difficulty means. Nothing here
 // labels a city with a difficulty (DESIGN §5.2: the city sets the character).
 import { CITIES, START_CITIES, type CitySize } from '../../data/cities';
 import { COUNTRIES } from '../../data/countries';
@@ -32,9 +32,9 @@ export function regionOf(cityId: string): StartRegion {
 
 /** Euro-area cities read as their own country, not "Eurozone". */
 const EURO_NATION: Record<string, string> = {
-  par: 'France',
-  fra: 'Germany',
-  ams: 'Netherlands',
+  par: 'Elegant boulevards and a proud research tradition: customers value a trusted name and careful safety.',
+  fra: 'Europe’s enterprise hub: orderly, competitive and fair, with big banks and carmakers as customers.',
+  ams: 'Canals, cyclists and fast fibre, with a market that rewards good service.',
 };
 
 /** "Canada", "United Kingdom", "France" for a city's card. */
@@ -64,26 +64,26 @@ export const SIZE_WORD: Record<CitySize, string> = {
 };
 
 export const CITY_FLAVOUR: Record<string, string> = {
-  sas: 'A quiet prairie market with kind rents, where every customer counts.',
-  cal: 'Oil-patch money and a growing downtown, with room to find your feet.',
-  van: 'Harbour views, pricey corners and savers who expect a lot.',
-  tor: 'A deep market where the big banks are always watching every move.',
-  mtl: 'A bilingual city of loyal neighbourhoods and moderate rents.',
-  nyc: 'The biggest stage there is: huge demand, towering rents, no mercy.',
-  chi: 'Steady trade and broad neighbourhoods in a market that plays fair.',
-  sfo: 'Tech money everywhere, but every storefront costs a fortune.',
-  sea: 'A fast-growing port where new arrivals are still picking a lab.',
-  lon: 'An old money capital with rivals on every corner.',
+  sas: 'A small prairie tech town with the cheapest rents on the map. Few rival labs, so a lean team gets noticed.',
+  cal: 'Oil-patch money turning to data centers, with cheap power, modest rents and room to find your feet.',
+  van: 'Harbour-view offices and a deep bench of ML graduates, but pricey corners and picky customers.',
+  tor: 'A research hub with famous labs of its own: deep talent, and rivals watching every launch.',
+  mtl: 'A bilingual research city with loyal neighbourhoods, a strong academic pipeline and moderate rents.',
+  nyc: 'The biggest stage there is: every enterprise customer in reach, rivals on every block, towering rents.',
+  chi: 'A broad, steady market of insurers, retailers and manufacturers that buy on merit.',
+  sfo: 'The heart of the AI scene: top talent and eager customers, at the highest rents and wages.',
+  sea: 'A cloud-computing port town where new labs are still finding their footing and customers pay well.',
+  lon: 'An old finance capital with every big enterprise in reach, and a rival lab on every corner.',
   par: 'Elegant boulevards and careful savers who value a good name.',
   fra: 'The continent’s banking desk: orderly, competitive and fair.',
   ams: 'Canals, cyclists and a market that rewards good service.',
-  zur: 'Rich clients and low rates: deposits come cheap, but loans earn little.',
-  tyo: 'A vast market of patient savers where margins run thin.',
-  syd: 'Sun, surf and a startup scene that keeps the Deal Desk busy.',
-  sin: 'A tidy trading hub with high rents and higher standards.',
-  hkg: 'Dense, fast and expensive: a harbour city that never sleeps.',
-  mos: 'A vast, crowded capital: packed streets, high rates and big state banks.',
-  spb: 'Canals, palaces and thrifty savers in the north’s grand old port.',
+  zur: 'Rich clients and the highest wages on the map: a small market with big contracts for careful labs.',
+  tyo: 'A vast market of patient enterprise buyers and robotics know-how, where margins run thin.',
+  syd: 'Sun, surf and a lively startup scene that keeps the Deal Desk busy.',
+  sin: 'A tidy trading hub with high rents, higher standards and a government keen on AI.',
+  hkg: 'Dense, fast and expensive: a harbour city where enterprise customers want results yesterday.',
+  mos: 'A vast, crowded capital: packed streets, cheap talent and big domestic labs.',
+  spb: 'Canals, palaces and a proud maths tradition in the north’s grand old port, where talent comes cheap.',
 };
 
 export const DIFFICULTY_BLURB: Record<Difficulty, string> = {
