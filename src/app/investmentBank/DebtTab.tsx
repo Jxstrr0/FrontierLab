@@ -53,6 +53,9 @@ export function DebtTab(p: { siteId: string }) {
           {money(loanRoom(s), sym)} more. New offers every {CORPORATE_LENDING.refreshWeeks} weeks.
         </p>
       )}
+      {!near && (
+        <p class="muted small">Term loan offers appear once you have a sales office here.</p>
+      )}
       {near && offers.length === 0 && (
         <p class="muted small">No offers right now. Check back after the next refresh.</p>
       )}

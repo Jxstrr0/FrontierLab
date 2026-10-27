@@ -13,7 +13,8 @@ import { openPanel, useGame } from '../store';
 import { initialCamera, mapPlaces, rememberCamera, sceneFor } from './mapScene';
 import { MapController } from './mapController';
 import { landmarkCentre } from './landmarkPins';
-import { buildPins, occupantsKey, occupantsOf, pinsKey } from './pins';
+import { occupantsKey, occupantsOf } from './mapOccupants';
+import { buildPins, pinsKey } from './pins';
 import './map.css';
 
 let active: MapController | null = null;

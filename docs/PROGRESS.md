@@ -3,13 +3,35 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.25, save schema 19). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
+**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.26, save schema 19). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
 **Determinism snapshot:** `15c9b9a3361bdb` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-27 — Post-C8 polish: the four open items (v0.1.26)
+
+**What changed.**
+- **Cover art.** The title screen's city print now draws your data centers as low halls instead of storefronts, and energy sites as substation yards, the same as the live map. To do that, each save card now remembers which of your flags are data centers. Older save cards don't have that list and simply show storefronts until you save again. This is save-card information, not game state, so there is no save schema change.
+- **Safety floor.** The safe is gone. In its place is a server rack behind a wire cage, the red-team sandbox where models are tested.
+- **Map coins.** Open locations show a "+" coin instead of "$": they're places to build, not money.
+- **Long lab names.**
+  - A sales office's header now reads its own name (for example "Midtown") with "Your Lab · address" under it. Before, a long lab name pushed the district onto a second line.
+  - The HQ header now reads "HQ" with "Your Lab · address · city" under it. The Office button beside it left so little room that even "Frontier Lab HQ" was cut to "Frontier Lab …".
+  - The title screen caption trims a long name with "…" before it reaches the page dots.
+  - Elsewhere, panel titles already trim cleanly; I checked the Company, HQ, sales office and title screens with the longest allowed name (24 wide letters).
+- **Debt tab, checked at phone size (390×844).** It works and fits. Two fixes:
+  - Before you have a sales office in the bank's city, "Venture debt" showed an empty heading. It now says "Term loan offers appear once you have a sales office here."
+  - The credit line showed a Draw slider stuck at $0. It now hides the controls and says you can draw once you have a sales office there. (If you moved away with money still drawn, Repay still shows.)
+- **Code tidy-up.** `src/app/map/pins.ts` (495 lines) is split into four files: `pins.ts` (sales office, business and office pins, and the pin list, 253 lines), `pinTypes.ts` (pin types and the roof anchor), `sitePins.ts` (pins for bureaus, employers, banks and other places) and `mapOccupants.ts` (what the renderer draws on each lot). No behaviour change.
+
+**Checked.** `npm run lint`, `npx vitest run` (157 files, 997 tests, including a new test for the data-center cover record) and `npm run build` all pass. The determinism snapshot is unchanged (`15c9b9a3361bdb`). Screens checked in Chromium at 390×844, with no console errors: Company, HQ, sales office, Investment Bank Debt tab (with and without a sales office) and the title cover with three data centers. The Safety floor's caged rack checked on a leased HQ too.
+
+**Dependencies:** none added.
+
+**Open items, not blocking.** None from this list.
 
 ### 2026-10-27 — Stages C8e–C8f: docs sweep and the last bank leftovers (v0.1.25). Conversion complete.
 
@@ -54,11 +76,7 @@ The turtle test lab now grows its office only after a profitable quarter, with h
 
 **Dependencies:** none added.
 
-**Open items, not blocking.**
-- The cover print still draws data centers as storefronts.
-- `src/app/map/pins.ts` is 495 lines and should be split.
-- The Safety floor art still has a safe and "$" lot pins.
-- Long company names can crowd the company bar.
+**Open items, not blocking.** All four were fixed in v0.1.26 (entry above).
 
 ### 2026-10-27 — Stages C8b–C8d: tutorial, art and balance (v0.1.24)
 

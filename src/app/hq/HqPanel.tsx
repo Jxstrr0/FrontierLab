@@ -1,4 +1,4 @@
-// HQ panel (SCREENS §10): header "{Bank} HQ" with the office's address, an
+// HQ panel (SCREENS §10): header "HQ" with "{Lab} · address · city" under it, an
 // Office button (floors, rent and the release actions in a sheet) and an
 // office switcher when you lease more than one, the floor's lead as advisor,
 // the engraved office interior, and a bottom icon bar with each department you
@@ -55,8 +55,8 @@ export function HqPanel(p: { officeId?: string; dept?: DeptId }) {
 
   return (
     <Panel
-      title={`${s.meta.bankName} HQ`}
-      subtitle={[officeAddress(s, office), city].filter(Boolean).join(' · ')}
+      title="HQ"
+      subtitle={[s.meta.bankName, officeAddress(s, office), city].filter(Boolean).join(' · ')}
       icon={
         <Medallion
           ink={s.meta.brandInk}
@@ -144,8 +144,8 @@ function NoHq() {
   };
   return (
     <Panel
-      title={`${s.meta.bankName} HQ`}
-      subtitle="No head office yet"
+      title="HQ"
+      subtitle={`${s.meta.bankName} · no head office yet`}
       icon={<LayerMedallion id="offices" size={32} />}
       onClose={closePanel}
       advisor={{ text: 'Every growing lab needs a head office. Let’s find one.' }}

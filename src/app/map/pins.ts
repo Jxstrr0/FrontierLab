@@ -1,99 +1,24 @@
 // Pin data for the map (SCREENS §2, ART_DIRECTION §2): one entry per storefront
-// lot (your branches, rivals and open branch locations) in the current city and, with the HQ stage (FEATURES.hq), per office
-// building, credit bureau and marketing agency, filtered by the Layers
-// settings, plus the central bank and (Stage 8) airport landmarks, with its roof anchor in world px and its accessible label. An
-// acquired branch still converting wears the old bank's ink with a progress
-// ring. Also the renderer's occupants (lots and leased offices). Read-only views of
-// GameState; positions come from the CityMap.
+// lot (your sales offices and data centers, rivals and open locations) in the
+// current city and, with the HQ stage (FEATURES.hq), per office building and
+// site (sitePins.ts), filtered by the Layers settings, plus the central bank
+// and airport landmarks, each with its roof anchor in world px and its
+// accessible label. An acquired office still converting wears the old lab's
+// ink with a progress ring. Types live in pinTypes.ts; what the renderer draws
+// on each lot in mapOccupants.ts. Read-only views of GameState.
 import type { CityMap } from '../../art/citygen';
-import { roofAnchor } from '../../art/iso';
-import type { LotOccupant } from '../../art/mapRenderer';
 import { FEATURES, MERGERS, type FeatureId } from '../../config/balance';
-import { AGENCIES } from '../../data/brandCampaigns';
-import { CITIES, isRegional } from '../../data/cities';
-import { AUCTION_HOUSES } from '../../data/collectibles';
-import { HOMES } from '../../data/homes';
-import { CONVENTIONS_CALENDAR, DEFAULT_VENUE } from '../../data/conventions';
-import { INVESTMENT_BANKS } from '../../data/investmentBanks';
-import { LOBBY_FIRMS } from '../../data/lobbying';
-import { conventionPinInfo } from '../convention/conventionPin';
-import { propertyPinInfo } from '../realEstate/propertyPin';
-import { airportPin, centralBankPin } from './landmarkPins';
-import { auctionPinInfo } from '../auction/auctionPin';
-import { stadiumPins } from '../franchise/stadiumPin';
-import { personalPinInfo } from '../personal/personalPins';
-import type { SitePinInfo } from './sitePinInfo';
-import type { CountryId } from '../../data/types';
-import { LEASE_ONLY_KEY, layerOn, type MapLayerId } from '../../data/mapLayers';
-import { rivalShortName } from './markers';
-import type { Business, GameState, Lot, OfficeListing, Site } from '../../sim/state';
-import { vendorCaption, vendorInk, vendorName } from '../business/businessView';
+import { LEASE_ONLY_KEY, layerOn } from '../../data/mapLayers';
+import type { Business, GameState, Lot, OfficeListing } from '../../sim/state';
+import { vendorCaption, vendorName } from '../business/businessView';
 import { newRfpsByBranch } from '../branch/dealDeskSelectors';
+import { stadiumPins } from '../franchise/stadiumPin';
+import { airportPin, centralBankPin } from './landmarkPins';
+import { rivalShortName } from './markers';
+import { pinAnchor, type PinKind, type PinSpec } from './pinTypes';
+import { siteEnabled, siteLayer, sitePin, stage7Info } from './sitePins';
 
-export type PinKind =
-  | 'mine'
-  | 'hq'
-  | 'rival'
-  | 'office'
-  | 'bureau'
-  | 'agency'
-  | 'centralBank'
-  | 'rivalHq'
-  | 'employer'
-  | 'energySite'
-  | 'university'
-  | 'investmentBank'
-  | 'property'
-  | 'conventionCenter'
-  | 'lobbyingFirm'
-  | 'airport'
-  | 'autoDealer'
-  | 'auctionHouse'
-  | 'vacationHome'
-  | 'stadium'
-  | 'business'
-  | 'lot';
-
-export interface PinSpec {
-  /** Lot, office listing or site id (also the DOM `data-lot-id`). */
-  id: string;
-  kind: PinKind;
-  /** World position of the roof anchor (zoom-1 px). */
-  x: number;
-  y: number;
-  label: string;
-  ink: string;
-  monogram: string;
-  /** Brass dot: Deal Desk proposal requests waiting (SCREENS §0.2). */
-  badge: boolean;
-  /** Oxblood dot: an unresolved incident at this branch (SCREENS §0.2). */
-  alert?: boolean;
-  branchId?: string;
-  /** Your data center on this lot (C2c). */
-  dataCenterId?: string;
-  /** Your office in this building (kind 'hq'). */
-  officeId?: string;
-  /** Type icon for office, bureau and agency pins (offices also wear the For lease tag). */
-  icon?: MapLayerId;
-  /** The central bank pin's country. */
-  countryId?: CountryId;
-  /** Employer, university or car dealer you partner with: a brand-ink seal on the medallion (ink = brand ink). */
-  partner?: boolean;
-  /** A place you own (HQ, property, vacation home, club): a brand-ink crest with the type's glyph. */
-  owned?: boolean;
-  /** A failed rival's head office (distressed): drawn faded with a dashed ring. */
-  muted?: boolean;
-  /** Your acquired branch still converting (§19.8): old ink and monogram, with a progress ring. */
-  converting?: { from: string; weeksLeft: number; progress: number };
-  /** The business a business pin opens (stage C5a). */
-  businessId?: string;
-  /** The club a stadium pin opens (Stage 9). */
-  clubId?: string;
-  /** A short note under the medallion on Stage 7 sites ("For sale", "Open now"). */
-  tag?: string;
-  /** Caption under the pin at close zoom when not the type's own (a rival's short name). */
-  caption?: string;
-}
+export type { PinKind, PinSpec } from './pinTypes';
 
 /** Clustering seeds and stacking: yours first, then rivals, then other buildings, open locations last. */
 const KIND_ORDER: Record<PinKind, number> = {
@@ -124,13 +49,8 @@ const KIND_ORDER: Record<PinKind, number> = {
 /** New proposal requests waiting at each of your offices (the pin's badge). */
 export const pendingByBranch = (s: GameState): Record<string, number> => newRfpsByBranch(s);
 
-function anchor(map: CityMap, tile: { x: number; y: number }) {
-  const floors = map.floors[tile.y * map.tiles + tile.x] ?? 0;
-  return roofAnchor(map.tiles, tile.x, tile.y, floors);
-}
-
 function lotPin(s: GameState, map: CityMap, lot: Lot, pending: Record<string, number>): PinSpec {
-  const at = anchor(map, lot.tile);
+  const at = pinAnchor(map, lot.tile);
   const occ = lot.occupant;
   const base = { id: lot.id, x: at.x, y: at.y };
   const dc = occ?.type === 'player' ? s.dataCenters[occ.id] : undefined;
@@ -199,7 +119,7 @@ function lotPin(s: GameState, map: CityMap, lot: Lot, pending: Record<string, nu
 
 /** A business on its storefront (C5a): the Businesses medallion, your seal once it is yours. */
 function businessPin(s: GameState, map: CityMap, lot: Lot, b: Business): PinSpec {
-  const at = anchor(map, lot.tile);
+  const at = pinAnchor(map, lot.tile);
   const mine = b.vendor?.type === 'player';
   const pin: PinSpec = {
     id: lot.id,
@@ -220,7 +140,7 @@ function businessPin(s: GameState, map: CityMap, lot: Lot, b: Business): PinSpec
 }
 
 function officePin(s: GameState, map: CityMap, o: OfficeListing): PinSpec {
-  const at = anchor(map, o.tile);
+  const at = pinAnchor(map, o.tile);
   const base = { id: o.id, x: at.x, y: at.y, badge: false };
   if (o.officeId) {
     return {
@@ -241,126 +161,6 @@ function officePin(s: GameState, map: CityMap, o: OfficeListing): PinSpec {
     monogram: '',
     icon: 'offices',
   };
-}
-
-/** A site's display name: the bureau's, agency's, rival head office's, employer's or university's. */
-export function siteName(s: GameState | undefined, site: Site): string {
-  switch (site.kind) {
-    case 'agency':
-      return AGENCIES[site.refId]?.name ?? 'Marketing agency';
-    case 'bureau':
-      return `${site.refId} data vendor`;
-    case 'rivalHq':
-      return `${s?.rivals[site.refId]?.name ?? 'Rival lab'} head office`;
-    case 'investmentBank':
-      return INVESTMENT_BANKS[site.refId]?.name ?? 'Investment bank';
-    case 'property':
-      return `Building at ${site.address}`;
-    case 'conventionCenter':
-      return (
-        CONVENTIONS_CALENDAR.find((c) => c.id === site.refId)?.venue ??
-        DEFAULT_VENUE(CITIES[site.cityId]?.name ?? 'City')
-      );
-    case 'lobbyingFirm':
-      return LOBBY_FIRMS[site.refId]?.name ?? 'Lobbying firm';
-    case 'auctionHouse':
-      return AUCTION_HOUSES[site.refId]?.name ?? 'Auction house';
-    case 'vacationHome':
-      return HOMES[site.refId]?.name ?? 'Vacation home';
-    default:
-      return site.employer?.name ?? site.refId;
-  }
-}
-
-const SITE_ICON: Record<Site['kind'], MapLayerId> = {
-  bureau: 'creditBureaus',
-  agency: 'marketingAgencies',
-  rivalHq: 'banks',
-  employer: 'employers',
-  university: 'universities',
-  investmentBank: 'investmentBanks',
-  property: 'realEstate',
-  conventionCenter: 'conventions',
-  lobbyingFirm: 'lobbyingFirms',
-  autoDealer: 'autoDealers',
-  auctionHouse: 'auctionHouses',
-  vacationHome: 'realEstate',
-};
-
-/** A regional site's employer is an energy site (C2d): data centers can go there. */
-const isEnergySite = (site: Site): boolean => site.kind === 'employer' && isRegional(site.cityId);
-
-const siteLayer = (site: Site): MapLayerId =>
-  isEnergySite(site) ? 'energySites' : SITE_ICON[site.kind];
-
-/** You hold a partnership (or the graduate program) at this employer or university. */
-export function isPartnerSite(s: GameState, site: Site): boolean {
-  if (site.kind !== 'employer' && site.kind !== 'university') return false;
-  if (s.company.gradProgram?.siteId === site.id) return true;
-  return Object.values(s.partnerships).some((p) => p.siteId === site.id && p.status === 'active');
-}
-
-/** Visibility, label, tag and owned seal for Stage 7 sites; undefined for other kinds. */
-function stage7Info(s: GameState, site: Site): SitePinInfo | undefined {
-  if (site.kind === 'property') return propertyPinInfo(s, site);
-  if (site.kind === 'conventionCenter') return conventionPinInfo(s, site);
-  if (site.kind === 'lobbyingFirm') return { visible: true, suffix: ', lobbying firm' };
-  // Stage 9: per-kind rules live with each system.
-  if (site.kind === 'auctionHouse') return auctionPinInfo(s, site);
-  return personalPinInfo(s, site);
-}
-
-function sitePin(s: GameState, map: CityMap, site: Site, info?: SitePinInfo): PinSpec {
-  const at = anchor(map, site.tile);
-  // Property and homes you own become your crests; a car dealer deal is a partnership.
-  const owned = !!info?.owned && (site.kind === 'property' || site.kind === 'vacationHome');
-  const partner = isPartnerSite(s, site) || (!!info?.owned && !owned);
-  const suffix =
-    (info
-      ? info.suffix
-      : site.kind === 'agency'
-        ? ', marketing agency'
-        : isEnergySite(site)
-          ? ', energy site'
-          : site.kind === 'employer'
-            ? ', employer'
-            : site.kind === 'investmentBank'
-              ? ', investment bank'
-              : site.kind === 'rivalHq' && s.rivals[site.refId]?.status === 'distressed'
-                ? ', seized by regulators'
-                : '') + (partner && !info?.owned ? ', your partner' : '');
-  const rival = site.kind === 'rivalHq' ? s.rivals[site.refId] : undefined;
-  const pin: PinSpec = {
-    id: site.id,
-    kind: isEnergySite(site) ? 'energySite' : site.kind,
-    x: at.x,
-    y: at.y,
-    label: `${siteName(s, site)}${suffix}, ${site.address}`,
-    ink: rival?.ink ?? (partner || owned ? s.meta.brandInk : ''),
-    monogram: rival?.monogram ?? '',
-    badge: false,
-    icon: siteLayer(site),
-    ...(rival && rival.status !== 'active' ? { muted: true } : {}),
-    ...(rival ? { caption: `${rivalShortName(rival.name)} HQ` } : {}),
-  };
-  if (partner) pin.partner = true;
-  if (owned) pin.owned = true;
-  if (info?.tag) pin.tag = info.tag;
-  return pin;
-}
-
-/** Whether a site kind's stage is switched on (bureaus and agencies come with the HQ stage). */
-export function siteEnabled(
-  kind: Site['kind'],
-  features: Record<FeatureId, boolean> = FEATURES,
-): boolean {
-  if (kind === 'bureau' || kind === 'agency') return features.hq;
-  if (kind === 'investmentBank') return features.capitalMarkets;
-  if (kind === 'property' || kind === 'conventionCenter' || kind === 'lobbyingFirm')
-    return features.investments;
-  if (kind === 'autoDealer' || kind === 'auctionHouse' || kind === 'vacationHome')
-    return features.personalEmpire;
-  return features.competition;
 }
 
 /** Pins for the city on screen, after the Layers settings, in stacking order. */
@@ -434,62 +234,5 @@ export function pinsKey(pins: PinSpec[]): string {
       (p) =>
         `${p.id}|${p.kind}|${p.ink}|${p.monogram}|${p.label}|${p.muted ? 1 : 0}|${p.converting?.weeksLeft ?? ''}|${p.tag ?? ''}|${p.partner ? 1 : 0}|${p.owned ? 1 : 0}|${p.caption ?? ''}`,
     )
-    .join(';');
-}
-
-/**
- * Who is in each lot (and, with FEATURES.hq, which office buildings you lease
- * and what stands at each energy site), for the renderer's roof flags, awnings
- * and data center halls (src/art/mapRenderer.ts).
- */
-export function occupantsOf(
-  s: GameState,
-  lots: Lot[],
-  features: Record<FeatureId, boolean> = FEATURES,
-): Record<string, LotOccupant> {
-  const out: Record<string, LotOccupant> = {};
-  for (const lot of lots) {
-    const occ = lot.occupant;
-    if (!occ) continue;
-    if (occ.type === 'business') {
-      // C5a: a business wears its AI vendor's awning; one with no vendor stays plain.
-      const ink = vendorInk(s, s.businesses[occ.id]);
-      if (ink) out[lot.id] = { type: 'business', ink };
-      continue;
-    }
-    // Your data center stands as a low hall (C8c), not a storefront.
-    if (occ.type === 'player' && s.dataCenters[occ.id]) {
-      out[lot.id] = { type: 'player', ink: s.meta.brandInk, building: 'dataCenter' };
-      continue;
-    }
-    // A converting branch still flies the old bank's colours (§19.8).
-    out[lot.id] =
-      occ.type === 'player'
-        ? { type: 'player', ink: s.branches[occ.id]?.converting?.ink ?? s.meta.brandInk }
-        : { type: 'rival', ink: s.rivals[occ.id]?.ink ?? '#5a5a5a' };
-  }
-  // Energy sites (C2d) draw a substation yard, with your hall once you build there (C8c).
-  if (features.hq) {
-    for (const site of Object.values(s.world.sites)) {
-      if (site.cityId !== s.world.currentCityId || !isEnergySite(site)) continue;
-      const dc = Object.values(s.dataCenters).some((d) => d.siteId === site.id);
-      out[site.id] = dc
-        ? { type: 'player', ink: s.meta.brandInk, building: 'dataCenter' }
-        : { type: 'site', ink: '', building: 'energySite' };
-    }
-  }
-  if (features.hq) {
-    for (const o of Object.values(s.world.officeListings)) {
-      if (o.officeId && o.cityId === s.world.currentCityId)
-        out[o.id] = { type: 'player', ink: s.meta.brandInk };
-    }
-  }
-  return out;
-}
-
-export function occupantsKey(o: Record<string, LotOccupant>): string {
-  return Object.keys(o)
-    .sort()
-    .map((k) => `${k}:${o[k]!.type}:${o[k]!.ink}:${o[k]!.building ?? ''}`)
     .join(';');
 }

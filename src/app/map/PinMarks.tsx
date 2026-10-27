@@ -1,5 +1,5 @@
 // The map's pin marks as small SVG components (ART_DIRECTION §2 Pins; the shape
-// language is in markers.ts): the bank crest, the landmark seal, the "$" coin
+// language is in markers.ts): the bank crest, the landmark seal, the "+" coin
 // and the price tag. Map pins and clusters (pinElements.ts), the Layers legend
 // and panel headers all draw from here, so a type looks the same everywhere.
 import { ICON_PATHS, type IconName } from '../../art/icons';
@@ -180,7 +180,7 @@ export function LandmarkSeal(p: { marker: MarkerId; size?: number; class?: strin
   );
 }
 
-/** An open branch location: a small ivory coin with a milled edge and a plain "$". */
+/** An open location to build on: a small ivory coin with a milled edge and a plain "+". */
 export function LotCoin(p: { size?: number }) {
   const size = p.size ?? PIN_COIN_PX;
   return (
@@ -204,7 +204,7 @@ export function LotCoin(p: { size?: number }) {
         class="coin-text"
         fill="var(--ledger-ink)"
       >
-        $
+        +
       </text>
     </svg>
   );

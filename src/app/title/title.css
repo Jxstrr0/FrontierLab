@@ -150,6 +150,11 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.title-now-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .title-swatch {
   flex: none;
   width: 8px;

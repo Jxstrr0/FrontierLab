@@ -12,7 +12,7 @@ import type { CitySpec } from '../../data/cities';
 import type { GameState, Lot } from '../../sim/state';
 import type { ViewCamera } from './camera';
 import { landmarkCentre } from './landmarkPins';
-import { siteEnabled } from './pins';
+import { siteEnabled } from './sitePins';
 
 /** Fallback for the map paper if the --paper token can't be read (ART_DIRECTION §1.1). */
 const PAPER_FALLBACK = '#DFE7E7';

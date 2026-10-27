@@ -109,7 +109,9 @@ function Caption(p: { choice: CoverChoice }) {
   return (
     <span class="title-now">
       <span class="title-swatch" style={{ background: brandInk }} aria-hidden="true" />
-      {bankName} · {cover ? city : `Now showing ${city}`}
+      <span class="title-now-text">
+        {bankName} · {cover ? city : `Now showing ${city}`}
+      </span>
     </span>
   );
 }

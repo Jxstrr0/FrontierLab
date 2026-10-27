@@ -19,8 +19,10 @@ export interface CoverMeta {
   competitors: number;
   /** Lot and office listing ids that fly the player's flag in that city. */
   flags: string[];
-  /** Lot id → brand ink of the rival bank there. */
+  /** Lot id → brand ink of the rival lab there. */
   rivals: Record<string, string>;
+  /** The flags that are data centers (lot or energy-site ids); older cards lack it. */
+  dataCenters?: string[];
 }
 
 /** The cover record for a game as it is now, or undefined if the city is unknown. */
@@ -29,12 +31,15 @@ export function coverMetaFor(state: GameState): CoverMeta | undefined {
   const city = state.world.cities[cityId];
   if (!city || !CITIES[cityId]) return undefined;
   const flags: string[] = [];
+  const dataCenters: string[] = [];
   const rivals: Record<string, string> = {};
   let rivalCount = 0;
   for (const lot of Object.values(state.world.lots)) {
     if (lot.cityId !== cityId || !lot.occupant) continue;
-    if (lot.occupant.type === 'player') flags.push(lot.id);
-    else if (rivalCount < COVER_MAX_RIVAL_FLAGS) {
+    if (lot.occupant.type === 'player') {
+      flags.push(lot.id);
+      if (state.dataCenters[lot.occupant.id]) dataCenters.push(lot.id);
+    } else if (rivalCount < COVER_MAX_RIVAL_FLAGS) {
       const ink = state.rivals[lot.occupant.id]?.ink;
       if (ink) {
         rivals[lot.id] = ink;
@@ -45,6 +50,13 @@ export function coverMetaFor(state: GameState): CoverMeta | undefined {
   for (const o of Object.values(state.world.officeListings)) {
     if (o.cityId === cityId && o.officeId) flags.push(o.id);
   }
+  // A data center built at an energy site stands on the site, not a lot.
+  for (const dc of Object.values(state.dataCenters)) {
+    if (dc.cityId === cityId && dc.siteId) {
+      flags.push(dc.siteId);
+      dataCenters.push(dc.siteId);
+    }
+  }
   return {
     cityId,
     seed: state.meta.seed,
@@ -53,5 +65,6 @@ export function coverMetaFor(state: GameState): CoverMeta | undefined {
     competitors: state.meta.competitors,
     flags: flags.slice(0, COVER_MAX_FLAGS),
     rivals,
+    dataCenters,
   };
 }
