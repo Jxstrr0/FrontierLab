@@ -629,6 +629,8 @@ export interface ComputeState {
   /** Last week's internal compute charges to the offices, and what the pool really paid (spot, burst, lots). */
   weekCharge: Money;
   weekCost: Money;
+  /** Weeks in a row that owned GPUs (data centers and power deals) covered all demand (milestone; optional, 2026-10-27). */
+  ownedStreak?: number;
 }
 
 /** A GPU reservation rented from the market: fixed GPUs at a fixed weekly price until endWeek. */

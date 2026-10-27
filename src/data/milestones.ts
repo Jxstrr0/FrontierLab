@@ -106,10 +106,11 @@ export const MILESTONES: MilestoneSpec[] = [
     news: true,
   },
   {
+    // 2026-10-27: id kept for saves; once total assets, now the company's valuation.
     id: 'assets_10b',
-    title: 'Ten billion in assets',
-    goal: 'Grow total assets past ten billion.',
-    line: 'Total assets at {bank} passed ten billion.',
+    title: 'A ten-billion lab',
+    goal: 'Grow the lab to a valuation of ten billion.',
+    line: '{bank} is now valued at ten billion.',
     news: true,
   },
   {
@@ -162,10 +163,11 @@ export const MILESTONES: MilestoneSpec[] = [
     news: false,
   },
   {
+    // 2026-10-27: id kept for saves; now a valuation of a hundred billion.
     id: 'assets_100b',
-    title: 'A hundred billion in assets',
-    goal: 'Grow total assets past a hundred billion.',
-    line: 'Total assets at {bank} passed a hundred billion.',
+    title: 'A hundred-billion lab',
+    goal: 'Grow the lab to a valuation of a hundred billion.',
+    line: '{bank} is now valued at a hundred billion.',
     news: true,
   },
   {
@@ -183,10 +185,61 @@ export const MILESTONES: MilestoneSpec[] = [
     news: true,
   },
   {
+    // 2026-10-27: id kept for saves; now a valuation of a trillion.
     id: 'assets_1t',
-    title: 'A trillion in assets',
-    goal: 'Grow total assets past a trillion.',
-    line: 'Total assets at {bank} passed a trillion.',
+    title: 'A trillion-dollar lab',
+    goal: 'Grow the lab to a valuation of a trillion.',
+    line: '{bank} is now valued at a trillion. Few companies ever get here.',
+    news: true,
+  },
+  // ─── AI milestones (2026-10-27): the research side of the lab ──────────────
+  {
+    id: 'first_model',
+    title: 'First trained model',
+    goal: 'Finish a training run and ship your first model generation.',
+    line: '{bank} shipped its first trained model.',
+    news: true,
+  },
+  {
+    id: 'big_contract',
+    title: 'A million-dollar contract',
+    goal: 'Sign an enterprise contract worth a million a year.',
+    line: '{bank} signed its first million-a-year enterprise contract.',
+    news: false,
+  },
+  {
+    id: 'full_research_team',
+    title: 'A full research team',
+    goal: 'Employ eight researchers at once.',
+    line: 'Every desk in the research wing at {bank} is taken.',
+    news: false,
+  },
+  {
+    id: 'leaderboard_top',
+    title: 'Top of the leaderboard',
+    goal: 'Beat every rival model on the benchmark leaderboard.',
+    line: '{bank} holds the best model on the benchmark leaderboard.',
+    news: true,
+  },
+  {
+    id: 'owned_compute_quarter',
+    title: 'Compute independence',
+    goal: 'Serve every GPU-week of demand from your own GPUs for a full quarter.',
+    line: '{bank} ran a whole quarter without buying a GPU-week at spot.',
+    news: true,
+  },
+  {
+    id: 'model_gen_5',
+    title: 'Fifth generation',
+    goal: 'Train a fifth generation of your model.',
+    line: 'The fifth generation of the {bank} model is live.',
+    news: true,
+  },
+  {
+    id: 'safety_strong_2y',
+    title: 'Two years of Strong safety',
+    goal: 'Hold the Strong safety tier for 104 weeks in a row.',
+    line: '{bank} has held the regulator’s Strong safety tier for two years running.',
     news: true,
   },
 ];

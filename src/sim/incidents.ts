@@ -3,7 +3,8 @@
 // with Company troubles), deadlines and the timed effects choices leave behind, plus the bank-run clock
 // (§13.8) and the regulator's letter (§15). Other systems raise incidents
 // through `raiseIncident`; the player answers through commands/incidents.ts.
-// Per-type rules live in src/sim/incident/, numbers in src/data/incidents.ts.
+// Per-type rules live in src/sim/incident/ (bank-era branch and company rules,
+// the AI-native aiRules and computeRules), numbers in src/data/incidentParams.ts.
 import { BANK_RUN, EXEC_DELEGATION, FEATURES, INCIDENTS, type FeatureId } from '../config/balance';
 import { INCIDENT_SPECS, type IncidentSpec } from '../data/incidents';
 import { pushEvent } from './events';
@@ -12,14 +13,21 @@ import { newId } from './ids';
 import { postCash, spend } from './ledger';
 import { stream } from './rng';
 import type { GameState, Incident, IncidentScopeKind } from './state';
+import { AI_RULES } from './incident/aiRules';
 import { BRANCH_RULES } from './incident/branchRules';
 import { bankRunCondition, endBankRun, startBankRun } from './incident/capitalEvents';
 import { COMPANY_RULES } from './incident/companyRules';
+import { COMPUTE_RULES } from './incident/computeRules';
 import { expireEffects } from './incident/effects';
 import { scopeName, type IncidentRule } from './incident/helpers';
 import { compactMoney, fillTemplate } from './incident/text';
 
-const RULES: Record<string, IncidentRule> = { ...BRANCH_RULES, ...COMPANY_RULES };
+const RULES: Record<string, IncidentRule> = {
+  ...BRANCH_RULES,
+  ...COMPANY_RULES,
+  ...AI_RULES,
+  ...COMPUTE_RULES,
+};
 
 /** The feature flag each later ROADMAP stage switches on. */
 const STAGE_FEATURE: Record<number, FeatureId> = {
@@ -74,7 +82,9 @@ export function raiseIncident(
   if (scopeKind === 'branch') d.branch = state.branches[scope]?.name ?? 'the sales office';
   rule.prepare?.(state, scope, d);
   const costs = rule.costs(state, scope, d);
-  d.text = fillTemplate(spec.text, spec, d, sym);
+  // Cases with alternative texts pick one; the others read the same every time.
+  const text = spec.texts ? stream(state, 'incidents').pick([spec.text, ...spec.texts]) : spec.text;
+  d.text = fillTemplate(text, spec, d, sym);
   const inc: Incident = {
     id: newId(state, 'inc'),
     type,
