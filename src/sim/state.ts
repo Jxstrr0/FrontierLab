@@ -26,6 +26,7 @@ import type {
 } from '../data/types';
 import type {
   Business,
+  Rfp,
   CompetitionState,
   CorporateDebt,
   EmployerInfo,
@@ -56,7 +57,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState } from './personalTypes';
 
-export const SCHEMA_VERSION = 12;
+export const SCHEMA_VERSION = 13;
 
 export interface GameState {
   schemaVersion: number;
@@ -82,7 +83,8 @@ export interface GameState {
   products: ProductsState;
   underwriting: UnderwritingState;
   treasury: Treasury;
-  loanDesk: { applications: Record<Id, LoanApplication>; loans: Record<Id, BusinessLoan> };
+  /** Open RFPs on the Deal Desk (stage C5b; schema 13). Contracts live on the businesses. */
+  dealDesk: { rfps: Record<Id, Rfp> };
   rivals: Record<Id, RivalBank>;
   /** Customer businesses and anchor accounts in generated cities (stage C5a; schema 12). */
   businesses: Record<Id, Business>;
@@ -463,8 +465,10 @@ export interface Branch {
   /** Load and service figures from the last tick, for the UI. */
   last: { prospects: number; captured: number; served: number; share: number };
   pnl: BranchPnl[];
-  /** Loan Desk outcomes for the current week (schema v3). */
+  /** Deal Desk outcomes for the current week (schema v3; renamed in C5b). */
   desk: DeskWeek;
+  /** The most a delegated manager may discount a contract bid (C5b, schema 13). */
+  discountLimit: number;
   /** An acquired branch still converting to your brand (Stage 6). */
   converting?: BranchConversion;
 }
@@ -503,6 +507,7 @@ export interface Delegation {
   products: boolean;
   marketing: boolean;
   troubles: boolean;
+  /** Deal Desk bids within the office's discount limit (C5b; the key is the Loan Desk's). */
   loans: boolean;
 }
 
@@ -515,14 +520,15 @@ export interface Ratings {
   reviewCount: number;
 }
 
-/** Loan Desk outcomes in one week; reset when the week changes. */
+/** Deal Desk outcomes in one week; reset when the week changes (C5b). */
 export interface DeskWeek {
   week: Week;
-  /** Applications that arrived this week. */
+  /** RFPs that arrived this week. */
   arrived: number;
-  approved: number;
-  /** Offers the business turned down. */
-  refused: number;
+  /** Bids won. */
+  won: number;
+  /** Bids the business turned down. */
+  lost: number;
   declined: number;
   expired: number;
 }
@@ -862,43 +868,6 @@ export interface FundingOffer {
   termWeeks: number;
   radar: Pentagon;
   expiresWeek: Week;
-}
-
-/** Pentagon order: Management, Track record, Market, Competitiveness, Financial health. */
-export interface LoanApplication {
-  id: Id;
-  branchId: Id;
-  business: string;
-  sector: string;
-  amount: Money;
-  termWeeks: number;
-  collateral: 'none' | 'partial' | 'full';
-  maxRate: Rate;
-  pentagon: Pentagon;
-  /** Hidden PD before the credit cycle multiplier. */
-  hiddenPd: Rate;
-  lgd: Pct;
-  /** Noisy estimate shown as a risk band when visible (§11). */
-  estPd: Rate;
-  createdWeek: Week;
-  expiresWeek: Week;
-}
-
-export interface BusinessLoan {
-  id: Id;
-  branchId: Id;
-  business: string;
-  sector: string;
-  principal: Money;
-  balance: Money;
-  rate: Rate;
-  /** PD before the credit cycle multiplier. */
-  pd: Rate;
-  lgd: Pct;
-  termWeeks: number;
-  weeksLeft: number;
-  payment: Money;
-  status: 'current' | 'defaulted' | 'repaid';
 }
 
 // ─── Rivals, REO ──────────────────────────────────────────────────────────────

@@ -451,46 +451,53 @@ export const PRODUCTS_PER_CUSTOMER = 1.6;
 export const OVERALL_CHURN = { slope: 0.6, pivot: 3.2 } as const;
 export const MODEL_PD = { base: 1.3, accuracy: 0.06, inclusion: 0.02 } as const;
 export const INTERCHANGE = 0.015;
-export const SBL_BASE_PD = 0.025;
-export const LOANDESK_BASE = 0.5;
-export const LOANDESK = {
-  bizSlope: 3.0,
-  trafficRef: 8000,
-  amountMedian: 70_000,
-  amountSigma: 0.7,
-  amountMin: 20_000,
-  amountMax: 3_000_000,
-  pentagonSigma: 1.6,
-  recessionFinHealth: -1,
-  collateralOdds: { none: 0.3, partial: 0.45, full: 0.25 },
-  maxRateSpread: 0.0525,
-  maxRateSlope: 0.006,
-  maxRateSigma: 0.004,
-  pdSlope: 0.22,
-  collateralPd: { none: 1.2, partial: 1.0, full: 0.85 },
-  collateralLgd: { none: 0.75, partial: 0.5, full: 0.3 },
-  expiryWeeks: 2,
-  acceptBelowMax: 0.97,
-  acceptSlope: 0.6,
-  acceptStep: 0.01,
-  estimateSigma: 0.6,
-  estimatorBase: 40,
-  estimatorSlope: 50,
-  riskBandVisibleProduct: 60,
-  riskBands: { low: 0.02, high: 0.045 },
-  delegatedThresholds: [0.02, 0.03, 0.045, 0.06, 0.08],
-  delegatedMargin: 0.025,
-  /** Delegated threshold × (1 + (ethicsRef − Ethics)/100 × ethicsSlope): Ethics 30 → ×1.3, 90 → ×0.7. */
-  ethicsRef: 60,
-  ethicsSlope: 1,
-  bigDefault: 500_000,
-  /** Balances below this count as repaid. */
-  dustBalance: 0.005,
-  /** C3b: cash the Loan Desk tab's "add to lending fund" button moves into reserves. */
-  fundTopUp: 250_000,
+// ─── DEAL DESK (§11, stage C5b) ───────────────────────────────────────────────
+/** Enterprise contracts with the businesses on the map (SIMULATION §11). */
+export const DEAL = {
+  /** Weekly chance an unserved business asks your office for a proposal, before awareness and readiness. */
+  rfpWeekly: 0.04,
+  /** RFP odds × (1 + readinessSlope × (AI readiness − 5)). */
+  readinessSlope: 0.12,
+  /** A new RFP waits this many weeks for your bid. */
+  expiryWeeks: 3,
+  /** A business that turned you down (or that you declined) waits this long before asking again. */
+  cooldownWeeks: 13,
+  /** Contracts due at a quarter start show under "Renewals due" this many weeks ahead (A7). */
+  renewalNoticeWeeks: 4,
+  /** Win chance = winBase + starSlope × (your stars − rival stars) + discountSlope × discount, clamped. */
+  winBase: 0.5,
+  /** Added when no rival lab has an office in the city. */
+  noRivalBonus: 0.2,
+  starSlope: 0.15,
+  discountSlope: 1.5,
+  /** Per Switching-cost point above 5: harder to win a business from its vendor, easier to keep your own. */
+  switchSlope: 0.04,
+  /** Your own renewals start from this keep chance. */
+  keepBase: 0.8,
+  winClamp: [0.05, 0.95],
+  discountMax: 0.4,
+  discountStep: 0.01,
+  /** A new office's discount limit for its manager (and the default first offer). */
+  defaultLimit: 0.1,
+  /** A delegated manager bids the smallest discount within the limit that reaches this chance… */
+  delegateTarget: 0.6,
+  /** …and declines an RFP that stays under this one even at the limit. */
+  delegateFloor: 0.3,
+  /** Share of contract revenue that runs on compute (base spot dollars, SIMULATION §13.0). */
+  computeShare: 0.3,
+  /** Share of contract revenue spent on account management. */
+  serviceShare: 0.1,
+  /** Yearly failure odds of a business: failYear × exp(−failSlope × (Financial health − 5)) × credit cycle. */
+  failYear: 0.03,
+  failSlope: 0.25,
+  /** While an outage runs: weekly chance a contract walks, × (1 + sensitivitySlope × (Data sensitivity − 5)). */
+  outageLossWeekly: 0.02,
+  sensitivitySlope: 0.1,
+  /** Each quarter start, an unserved business in a city with rival offices signs with one at this chance. */
+  rivalSignQuarterly: 0.12,
+  /** Contracts worth at least this a year make the news when won or lost. */
+  bigDeal: 250_000,
 } as const;
-/** Pentagon weights for the hidden score (Mgmt, Track, Market, Comp, FinHealth) (§11). */
-export const LOANDESK_WEIGHTS = [0.2, 0.2, 0.15, 0.15, 0.3] as const;
 
 // ─── BRANCH (§12, §5.3) ───────────────────────────────────────────────────────
 export const EQUIP_MAINT = 0.06;
