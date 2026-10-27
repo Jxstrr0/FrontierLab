@@ -101,7 +101,7 @@ export interface CreditLine {
 
 export interface CorporateDebt {
   loans: Record<Id, CorporateLoan>;
-  /** Lines of credit by lender (limit = 20% of equity, computed live). */
+  /** Lines of credit by lender (limit = CORPORATE_LENDING.lineEquityShare of equity, computed live). */
   lines: Record<Id, CreditLine>;
   offers: CorporateLoanOffer[];
   offersRefreshWeek: Week;

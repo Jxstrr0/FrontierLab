@@ -131,7 +131,7 @@ After the wizard, the map opens with the tutorial (§27).
 - **Starting pick:** the fit-out you last built with (`company.lastBuild`), so the parts don't need choosing again; before your first build, the mid reference build if cash allows, then basic, then the cheapest parts.
 - **Hero:** the vignette updates live as you change parts. The same Inside / Outside switch as the sales office panel shows the inside the lobby, sales desks, machine room and demo kiosk picks make.
 - **Five tiles:** Exterior, Lobby, Sales desks, Machine room, Demo kiosks (slot ids `teller`, `vault`, `atm`). Each shows the current pick's thumbnail and price. Option names follow, e.g. Standard Sales Floor, Machine Room, Wall Kiosk (`src/app/build/builds.ts`).
-- **Tap a tile** to open a picker sheet: a carousel of options with name, one-line description, coins (Quality, Productivity, or Security for the machine room), extra facts (stations, "meeting rooms" for the lobby, "server racks" for the machine room, kiosk traffic), price, and Select.
+- **Tap a tile** to open a picker sheet: a carousel of options with name, one-line description, coins (Quality, Productivity, or Security for the machine room), extra facts (stations, "meeting rooms" for the lobby, "storage bays" for the machine room, kiosk traffic), price, and Select.
 - **Summary:**
   - itemized parts, lease deposit and first week's rent
   - total vs available cash
@@ -223,7 +223,7 @@ After the wizard, the map opens with the tutorial (§27).
 - **Header:** the rival lab's name, with the district and address.
 - **Advisor:** "This is {Rival}'s sales office. Their Plus plan is {x}; ours is {y}."
 - **Customer reviews:** same block as §5.1.
-- **Price sheet:** two groups, Plans (Plus, Pro, Team) and API and apps (Standard API, Batch API, Code Assistant, Agent Studio), in Theirs and Ours columns (jade/oxblood), with "Compared with our {name} sales office." when you have one nearby. The rival sheet on the city list shows Plus, Pro, Team and the Standard API.
+- **Price sheet:** two groups, Plans (Plus, Pro, Team) and API and apps (Standard API, Batch API, Code Assistant, Agent Studio), in Theirs and Ours columns (jade/oxblood), with "Compared with our {name} sales office." when you have one nearby. The rival sheet on the city list shows Plus, Pro, Team and the Standard API, and "A new lab, founded in {year}" for a lab founded during the game.
 
 ## 7. Rival lab HQ
 
@@ -270,7 +270,7 @@ No tabs: one overview page.
 - **Finance:**
   - **Results:** total revenue and net income with weekly change, and the bar chart
   - **Credit and liquidity:** the credit ratio (what lenders price on; credit-tier badge + meter with thresholds); the liquidity ratio and target rows show only when there is a liquidity ratio (bank-era saves with deposits)
-  - **Launch posture** (code `riskAppetite`, SIMULATION §16.8): Segmented (1–5, "Launch posture, 1 very cautious to 5 very bold"), with the level's name (Very cautious, Cautious, Balanced, Bold, Very bold), a hint such as "Deal odds +6 pts, safety exposure +16%, and over-claims are likelier." ("Standard deal odds and safety risk." at Balanced) and a line naming who else steers it: the Chief Safety Officer ("tunes this to the safety tier every 4 weeks"; Risk appetite switch) or the CFO ("steps it down while the credit ratio is under …"; Capital switch)
+  - **Launch posture** (code `riskAppetite`, SIMULATION §16.8): Segmented (1–5, "Launch posture, 1 very cautious to 5 very bold"), with the level's name (Very cautious, Cautious, Balanced, Bold, Very bold), a hint such as "Deal odds +6 pts, safety exposure +16%, and over-claims are likelier." ("Standard deal odds and safety risk." at Balanced) and a line naming who else steers it: the Chief Safety Officer ("tunes this to the safety tier every 4 weeks"; Launch posture switch) or the CFO ("steps it down while the credit ratio is under …"; Capital switch)
   - **Statements:** Income / Balance sheet / Cash flow, each Week | Quarter | Year
   - "Delayed" placeholders when short-staffed
 - **HR:**
@@ -410,7 +410,7 @@ No tabs: one overview page.
   - once listed, "Paid in your shares": Cash · 25% · 50% · 75% · All; with a share part, rows for paid in new shares, new shares issued (% of outstanding) and your stake after
   - paid in cash (total cost when all cash)
   - available cash
-  - regulator pre-check (✓/✗ with reasons)
+  - regulator pre-check (✓/✗ with reasons): credit ratio after the deal, and "Customer share in {city}" ("{x}% of the city's AI customers (limit {y}%)"), or "Not tested for a distressed sale: the regulator wants the lab rescued"
   - Offer merger
 - The response arrives the next week.
 - Below the cards: Integrations in progress (lab, sales offices converting, weeks left) and Completed deals.
@@ -562,10 +562,9 @@ Opened by tapping a business pin on the map (the **Businesses** layer, which als
 - at Watch, Restricted or Critical, a "How to fix this" checklist under the meter (`src/data/capitalFixes.ts`): hire safety staff on the Safety & Alignment floor, pay them better, seat a Chief Safety Officer, train or switch to a safer model, grow the Safety team before shipping a model far ahead of the frontier; at Critical, a line on the mandated pause and the licence
 - **Cash** card: corporate cash, running costs a week and **cash cover** (weeks of running costs; red under `ATTENTION.cashCoverWeeks`)
 - a liquidity section (Target, Overnight borrowing), only while an older save still holds deposits or overnight borrowing
-- the **Treasury reserves** row (under the cash cover) shows only when reserves are above $0, which only bank-era saves have
 - **Compute** card (SIMULATION §13.0): spot price per GPU-week with the chip phase badge (Chip glut green, Normal market, Chip shortage red), a line chart of the price index over the last 104 weeks, GPUs your customers used last week, GPUs running in your data centers, the share they covered, and what the rest costs at spot a week, with a one-line note
   - a red **Waitlist** or **Outage** badge under the phase badge; "Bought at spot" reads "N of M max" against the spot limit; red "Emergency burst" and "Not served (waitlist)" rows when non-zero; "Spot and burst bill" a week; "Pool cost vs spot" (green under 100%) once the pool has paid anything. The Company explainer "Compute: own it or rent it" covers the internal charge and the limit.
-- **Totals:** Assets, ARR, Treasury reserves, Equity
+- **Totals:** Assets, ARR, Treasury reserves (only when above $0, which only bank-era saves have), Equity
 - share price or private valuation, with the 52-week range, market cap, your stake and top shareholders
 - a Personal line: personal cash plus holdings
 - one-line explanations ("Grow recurring revenue; watch the compute bill") with a "Learn more" sheet: Revenue recurs, compute bills · Compute: own it or rent it · Safety limits growth · Treasury reserves · Cash cover

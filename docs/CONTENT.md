@@ -227,7 +227,7 @@ Meeting rooms are `advisorOffices` in code.
 | vlt_timelock | Glazed Machine Room | 4 | 4 | 95,000 |
 | vlt_fortress | Showcase Machine Room | 5 | 5 | 180,000 |
 
-The code still gives each one a `boxes` count (0 / 150 / 300 / 600) from the bank's safe deposit boxes; no product uses it any more.
+The code still gives each one a `boxes` count (0 / 150 / 300 / 600) from the bank's safe deposit boxes; the build picker shows it as "storage bays" ("No storage bays" at 0), and no product uses it.
 
 **Demo kiosks** (`atm_*`):
 
@@ -506,7 +506,7 @@ New labs founded during a game (SIMULATION §18.7) take an invented name from `s
   | Sakura Bridge Securities | Tokyo, Singapore, Hong Kong | 4.40% | 0–10% | |
   | Southern Gate Advisory | Sydney, Vancouver | 4.70% | 0–12% | |
 
-  Cities not listed borrow the nearest house: Saskatoon and Montréal → Ashgrove Capital, Seattle → Whitlock & Rowe, Frankfurt, Amsterdam, Moscow and St Petersburg → Meridian Partners. Implemented in `src/data/investmentBanks.ts`.
+  Cities not listed borrow the nearest house: Saskatoon and Montréal → Ashgrove Capital, Seattle → Whitlock & Rowe, Frankfurt, Amsterdam, Moscow and St Petersburg → Meridian Partners. Implemented in `src/data/investmentBanks.ts`. Each office is also a lender: its Debt tab offers venture debt and a credit line to labs with a sales office in its city (SIMULATION §19.9).
 - **Marketing agencies:** Brightwell Creative, Northwind & Pike, Studio Halcyon. Present in L and XL cities; M cities get one.
 - **Lobbying firms:** Capitol Bridge Advisors (US), Parliament Row Partners (CA, UK), Rue Royale Affairs (EA, and CH by borrowing), Harbourline Policy Group (AU, SG, HK, and JP by borrowing), Granite Quay Advisors (RU). Campaigns are in SIMULATION §21.6.
 - **Universities:**
@@ -721,13 +721,13 @@ Default cooldown: 8 weeks per scope. Office cases go to a manager trusted with S
 | ROBBERY | Server-room break-in | office | 0.0015 | × (6 − machine room security)/3 | Upgrade the secure room (50% of the next machine room's price → morale +5) · Paid leave ($2k × staff → morale +10) · Business as usual (morale −15, Office −0.3 for 8 wk). Loss: $20k–150k ÷ security, 80% insured. |
 | ATM_SKIM | API key leak | office with a demo kiosk | 0.002 | × (1.3 − model Safety/10) | Refund customers ($5k–40k) · Rotate every key ($15k; p ×0.5 for 26 wk) · Deny liability (Service −0.4 for 8 wk; 30% news) |
 | DATA_BREACH | Data breach | company | 0.002 | × (1 + 2(1 − Platform & Security coverage′)) × (1.2 − CTO expertise/100) | Notify and monitor ($15 × affected; Overall −0.1 for 4 wk) · Quiet fix (40% discovered → fine 2% of annual revenue, Overall −0.4 for 12 wk, news) · Forensic firm ($500k; breach p −50% for 52 wk) |
-| MIS_SELLING | Capability over-claim | office | 0.001 | × Sign-Up Credits level × (1.6 − ethics/100) × (risk appetite ≥ 4 ? 1.5 : 1) | Fire the manager and compensate · Compensate only · Deny it (40% chance of a fine of 5× compensation; news). Compensation is 2% of the office's deposit books ÷ 10 (see note below). |
+| MIS_SELLING | Capability over-claim | office | 0.001 | × Sign-Up Credits level × (1.6 − ethics/100) × (launch posture ≥ 4 ? 1.5 : 1) | Fire the manager and compensate · Compensate only · Deny it (40% chance of a fine of 5× compensation; news). Compensation (refunds to customers) is `compShare` (2%) of the office's ARR. |
 | REGULATOR_AUDIT | Safety audit | company | quarterly (SIMULATION §15) | fail only | Pay the fine · Appeal (50%: fine ×0 or ×1.5) · Pay and hire consultants ($ = 0.5 × fine; Safety coverage +0.2 for 26 wk) |
 | VIRAL_COMPLAINT | Viral complaint | office | 0.01 | Service < 2.5 | Apologise and fix it ($10k; Service +0.2) · Ignore it (awareness −0.05; 30% news) |
 | EXEC_POACHED | Executive poached | company | SIMULATION §17.2 | per exec | Counter-offer (+25% salary, loyalty +10) · Let them go |
 | RESEARCHER_POACHED | Researcher poached | company | quarterly rival bid (§13c) | per researcher | Counter-offer (their salary +25%) · Let them go (they join the rival, whose next models get better) |
 | BRANCH_FLOOD | Heatwave | office | 0.0005 | Waterfront ×3 | Fast repair ($80k; closed 1 wk) · Slow repair ($30k; closed 4 wk) |
-| BANK_RUN | Outage rumour | company | SIMULATION §13.8 | very poor ratings and a Restricted or Critical safety tier | Central bank window (bank-era: lends a share of deposits, so nothing for a lab; stigma) · Cut plan prices 10% everywhere for 8 wk (`planCut`) · Public statement (success 30% + 5% per credit-ratio point above 8%; success ends the rumour) |
+| BANK_RUN | Outage rumour | company | SIMULATION §13.8 | very poor ratings and a Restricted or Critical safety tier | Service credits (`creditShare` 2% of company ARR; ends the rumour) · Cut plan prices 10% everywhere for 8 wk (`planCut`) · Public statement (success 30% + 5% per credit-ratio point above 8%; "calms customers and ends the rumour") |
 | CARD_FRAUD | Abuse ring | company offering the API | 0.0015 | × (1.3 − model Safety/10) | Absorb the losses (2% of API ARR) · Freeze API sign-ups for a week (API take-up −50% for 4 wk) · Absorb and call a fraud firm |
 | STAFF_WALKOUT | Staff walkout | office | 0.03 | morale < 25 | Raise wages 10% · Pay a bonus ($1,000 per staff, morale +20) · Wait it out (closed 1 wk, then morale +10) |
 | DIVIDEND_DUE | Dividend due | company | 3 weeks before payment | info | OK |
@@ -737,7 +737,7 @@ Default cooldown: 8 weeks per scope. Office cases go to a manager trusted with S
 | REGULATOR_LETTER | Letter from the regulator | company | on entering the Restricted safety tier | info | OK (explains how to lift the safety ratio) |
 | RECAP_OFFER | Mandated pause | company | SIMULATION §15 | — | Accept the pause (fee 2% of trailing revenue, at least $250k) · Decline (the licence is revoked) |
 
-Note: the over-claim compensation still reads the office's deposit books, which a lab no longer has, so it comes out at $0. The same goes for the outage rumour's central bank window. Both are bank-era leftovers in the code.
+The outage rumour's text: "Rumours that we are about to go dark are spreading, and customers are cancelling their plans before it happens."
 
 ## 23. Ledger headline templates
 The paper is The Weekly Inference; the code calls it the Ledger, and event types keep bank-era ids (`NEW_BRANCH`, `BANK_RUN` and so on). Tokens are in {braces}; `{bank}` is a lab's name. Write 2–4 variants per type in code. The full set lives in `src/data/ledgerTemplates.ts` and its siblings: `ledgerTemplatesRivals.ts`, `ledgerTemplatesWorld.ts`, `ledgerTemplatesGlobe.ts` (§23.1 World desk: 35 beats), `ledgerTemplatesGlobeMore.ts` (26 more World desk beats), `ledgerTemplatesDesk.ts` (§23.2 company desk, §23.3 Money Column, §23.4 elections) and `ledgerTemplatesCalendar.ts` (§23.5 commodities, §23.6 world calendar, §23.7 the archive), plus the markets, mergers, ventures, personal and other files. The fictional leagues, parties and policies are in `src/data/newsWorld.ts`, and the World desk's beat rules (country, months, phase, condition, number ranges), share-move reasons by sector and launch products in `src/data/newsWorldBeats.ts` (and `newsWorldBeatsMore.ts` with its invented book, game, show, species, dish and record names); commodities in `src/data/commodities.ts`; the Nations Cup and World Games nations, fixtures, prize fields and films in `src/data/worldCalendar.ts`. Every place, person and company in them is invented or a game city.
@@ -763,6 +763,7 @@ Examples:
 | ACQUISITION_CLOSED | {bank} buys {target} for {price} | {target}'s {n} sales offices join {bank}. Signs come down over the next eight weeks. |
 | IPO_LISTED | {bank} opens at {open} on its first day | Shares priced at {price} {pop} as {ticker} began trading on the {exchange}. The listing raised {raised}. |
 | BREACH | {bank} discloses data breach | About {n} customers may be affected. |
+| CORPORATE_LOAN | {bank} raises {amount} in venture debt | The term loan, arranged with {lender}, carries a rate of {rate}. |
 | BANK_RUN | Queues form outside {bank} | (bank-era wording about depositors; the outage rumour, §22) |
 | AUCTION_PREVIEW | {house} unveils {lots} lots for its next sale | (see `ledgerTemplatesAuctions.ts`) |
 | SPORTS_RESULT | {winner} beat {loser} {score} | A {margin} win in the {league}{extra}. {winner} are now {record} on the season. |
@@ -808,7 +809,7 @@ Pick by category and sentiment. Use campaign-specific lines when the campaign is
 Fill these per panel and state.
 
 - **Office manager:**
-  - "Morning, boss. Drawers are balanced and the coffee's on." (bank-era wording still in code)
+  - "Morning, boss. The pipeline's warm and the coffee's on."
   - Busy: "We're slammed. The line's out the door."
   - Quiet: "Quiet week. Want to sharpen our rates?"
   - Low morale: "The team's frustrated about pay."
@@ -819,9 +820,9 @@ Fill these per panel and state.
 - **HQ (no office yet):** "Every growing lab needs a head office. Let's find one."
 - **Company summary:** "Grow recurring revenue; watch the compute bill."
 - **Rival sales office:** "This is {rival}'s sales office. Their Plus plan is {x}; ours is {y}."
-- **Rival lab HQ:** "Welcome to {rival}. We lend to businesses — even competitors."
+- **Rival lab HQ:** "{rival} head office. Know your competition."
 - **Central bank:** "The governor's office. Rates are on everyone's mind."
-- **Investment bank:** "Welcome to {name}. Raising capital or buying a competitor?"
+- **Investment bank:** "Welcome to {name}. Raising capital, borrowing or buying a competitor?"
 - **Data vendor:** "Better data, better models. What can we train for you?"
 - **Employer:** "{n} people work here, and their team could use our plans."
 - **Energy site employer:** "{n} people work here, on a site with power to spare for a data center."

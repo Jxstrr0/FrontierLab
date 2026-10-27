@@ -1215,7 +1215,7 @@ You asked for no game code changes.
 - **HQ floors, redrawn.** Same engraved isometric look, much more in the room:
   - A plank floor (carpet in the Executive suite), skirting and cornice, wall tops inked like an architect's cut, windows that throw pale daylight across the floor, a clock and a door.
   - Workers sit at glowing screens with their own hairstyles and desk clutter, still tinted by team mood, with empty desks dashed.
-  - Each department furnishes its own floor. Finance has cabinets and certificates, HR a water cooler and pinboard, Products a whiteboard, Treasury and IT a live ticker (IT adds blinking server racks), Marketing posters and an easel, Risk a safe and a chart, and the Executive suite books, a sofa, a painting and a huddle table.
+  - Each department furnishes its own floor. Finance has cabinets and certificates, HR a water cooler and pinboard, Products a whiteboard, Treasury and IT a live ticker (IT adds blinking storage bays), Marketing posters and an easel, Risk a safe and a chart, and the Executive suite books, a sofa, a painting and a huddle table.
   - Busy floors have someone walking the aisle with a folder and two colleagues chatting at the back.
 - **New: a branch Inside view.** An "Inside" pill on the branch picture switches to the banking hall, drawn from what you built:
   - the teller line's own shape (glazed counter, express counter, pods or concierge desks)
