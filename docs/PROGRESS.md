@@ -3,13 +3,21 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.35, save schema 24). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
+**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.36, save schema 24). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
 **Determinism snapshot:** `1311ec96765325` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-27 — Balance table drops the bank columns (v0.1.36)
+
+`npm run balance` no longer prints the **Loans** and **Loss** columns. They were left over from the bank game and read 0 for every strategy every year, since the lab has no loan book. Scripts only, no game change.
+
+**Checked.** `npm run lint`, `npx vitest run` and `npm run build` pass; all five strategies (seed 42, 10 years) are in range.
+
+**Dependencies:** none added.
 
 ### 2026-10-27 — Turtle tops up its runway (v0.1.35)
 
