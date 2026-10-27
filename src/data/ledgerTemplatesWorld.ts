@@ -40,7 +40,7 @@ export const WORLD_TEMPLATES = {
     },
     {
       h: '{cb} eases policy to {rate}',
-      b: 'A {bp} basis-point cut in {theCountry} as growth cools to {gdp}. Cheaper credit helps borrowers; deposit margins get thinner.',
+      b: 'A {bp} basis-point cut in {theCountry} as growth cools to {gdp}. Cheaper credit helps borrowers; savers earn less.',
     },
     {
       h: 'Relief for borrowers as {cb} trims to {rate}',

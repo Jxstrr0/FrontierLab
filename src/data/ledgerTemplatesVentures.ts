@@ -92,7 +92,7 @@ export const VENTURES_TEMPLATES = {
   VENTURE_FAILED_HELD: [
     {
       h: '{name} collapses, hitting {investor}',
-      b: 'The startup has failed. {investor} writes the stake off and recovers only part of any loans.',
+      b: 'The startup has failed. {investor} writes the stake off and recovers only part of any credits.',
     },
     {
       h: '{investor} loses a bet on {name}',

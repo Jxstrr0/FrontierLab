@@ -205,6 +205,7 @@ export const SECTOR_SUFFIXES: Record<string, readonly string[]> = {
   logistics: ['Freight', 'Logistics', 'Routes', 'Cargo', 'Shipping', 'Depots'],
   mobility: ['Mobility', 'Motors', 'Rides', 'Transit', 'Wheels', 'Moves'],
   cybersecurity: ['Security', 'Shield', 'Defense', 'Guard', 'Cyber', 'Sentinel'],
+  aiTools: ['AI', 'Models', 'Inference', 'Agents', 'Tensor', 'Evals'],
 };
 
 /** Generic second words for a sector without its own list. */

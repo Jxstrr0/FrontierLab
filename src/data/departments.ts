@@ -21,7 +21,7 @@ export const DEPARTMENTS: Record<DeptId, DepartmentSpec> = {
   finance: {
     id: 'finance',
     name: 'Finance',
-    description: 'Company statements on time, capital and liquidity reporting.',
+    description: 'Company statements on time, credit and cash reporting.',
     marketSalary: 82_000,
     feature: 'hq',
   },
@@ -63,7 +63,7 @@ export const DEPARTMENTS: Record<DeptId, DepartmentSpec> = {
   risk: {
     id: 'risk',
     name: 'Safety & Alignment',
-    description: 'Safety reviews with the regulator, loss tracking and sharper loan estimates.',
+    description: 'Safety reviews with the regulator, loss tracking and sharper risk estimates.',
     marketSalary: 88_000,
     feature: 'hq',
   },

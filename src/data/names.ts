@@ -95,6 +95,23 @@ export const FUND_NAMES = [
   'Bluewater Equity',
   'Corbel Asset Management',
   'Fenwick Family Office',
+  'Greyfell Growth',
+  'Tidewater Ventures',
+  'Ironbridge Capital',
+  'Marrow & Vale',
+  'Quill Street Partners',
+  'Halden Pension Trust',
+  'Oakmere Endowment',
+  'Stirling Ridge Capital',
+  'Pelican Point Ventures',
+  'Ashcombe Holdings',
+  'Lantern Hill Partners',
+  'Blackwater Growth Fund',
+  'Carrick Sovereign Fund',
+  'Foxglove Capital',
+  'Winterbourne Family Office',
+  'Keel & Compass Ventures',
+  'Rookery Asset Management',
 ];
 
 /** Street names for generated lot addresses (original). */

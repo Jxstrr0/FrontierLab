@@ -292,7 +292,7 @@ export const STRATEGY_PROFILES: Record<Strategy, StrategyProfile> = {
 };
 
 /** Senior seats below the CEO on every rival's team (SIMULATION §18.1). */
-export const RIVAL_BENCH_TITLES = ['CFO', 'COO', 'CRO'] as const;
+export const RIVAL_BENCH_TITLES = ['CFO', 'COO', 'CSO'] as const;
 
 /** How each bench seat reads on the rival's HQ panel. */
 export const RIVAL_BENCH_LABEL: Record<string, string> = {

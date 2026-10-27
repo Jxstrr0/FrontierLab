@@ -40,7 +40,7 @@ export const FRANCHISE_TEMPLATES = {
       b: 'Home of {club}, the ground will carry the lab’s name for as long as the deal runs. Some fans say they will never call it that.',
     },
     {
-      h: '{stadium} gets a banking makeover',
+      h: '{stadium} gets an AI makeover',
       b: '{bank} bought the naming rights to the home of {club}. New signs go up before the next home game.',
     },
   ],
