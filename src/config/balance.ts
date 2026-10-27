@@ -851,6 +851,13 @@ export const TRAINING = {
   focusLift: [0.2, 0.3, 0.4, 0.5, 0.6] as readonly number[],
 } as const;
 /**
+ * The frontier cost curve (post-C8, SIMULATION §16.12): past fromQuality,
+ * every point of house model quality makes training perPoint× dearer. A run's
+ * budget counts as budget ÷ frontierCostMult on the training budget scale, and
+ * the budget slider's top and the CPO's weekly cap grow by the same factor.
+ */
+export const FRONTIER_COST = { fromQuality: 7, perPoint: 2.5 } as const;
+/**
  * Rival model releases (§16.12): each quarter an active rival ships a new
  * generation with chance releaseQuarterly, gaining normal(gainMean, gainSigma)
  * quality (at least minGain, capped at MODEL_RADAR_MAX). Rivals start at
@@ -933,6 +940,11 @@ export const RESEARCHERS = {
   freeMin: 3,
   /** The most researchers your lab can employ. */
   maxTeam: 8,
+  /**
+   * Frontier pay (post-C8): the going salary × (1 + frontierPay × points of
+   * the frontier (best model anywhere) above FRONTIER_COST.fromQuality).
+   */
+  frontierPay: 0.6,
 } as const;
 export const MODEL_SWITCH_WEEKS = 2;
 /** Mix weights must sum to 1 within this tolerance (sliders in whole percent). */
@@ -1394,6 +1406,12 @@ export const CORPORATE_LENDING = {
  * A branch with no manager reads ethics as defaultEthics; the CTO's expertise
  * comes from the CTO seat (EXECUTIVES.vacantCtoExpertise while it is empty).
  */
+/**
+ * The flat costs of company-wide AI incidents (jailbreak fix, post-mortem,
+ * weights rotation, breach forensics) grow with the lab (post-C8): × max(1,
+ * ARR ÷ refArr)^exp, so a $2.5B lab pays about 23× the start-up price.
+ */
+export const INCIDENT_SCALE = { refArr: 50_000_000, exp: 0.8 } as const;
 export const INCIDENTS = {
   deadlineWeeks: 4,
   cooldownWeeks: 8,

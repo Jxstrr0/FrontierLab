@@ -3,12 +3,15 @@
 // the model's weakest axis, its length and budget set by the training style
 // dial (executives.trainingStyle, CPO_TRAINING.styles): Quantity ships often on
 // lean budgets, Quality runs long and well funded. The budget is cashShare ×
-// budgetMult of cash a week, while cashFloorRuns weeks of it stay in cash.
+// budgetMult of cash a week (its cap × frontierCostMult, §16.12), while
+// cashFloorRuns weeks of it stay in cash. At the radar's ceiling there is
+// nothing left to train, so no run starts.
 // Switching to the trained result is the CPO's Models routine's job
 // (execDelegationsFinance.ts). Runs from executives.ts each week; the dial's
 // tagline reads cpoTrainingPlan without changing anything.
 import { CPO_TRAINING, TRAINING } from '../config/balance';
 import { startTrainingRun } from './commands/training';
+import { atModelCeiling, frontierCostMult } from './frontier';
 import { clamp, roundToStep } from './math';
 import type { TrainingStyle } from './marketsTypes';
 import type { GameState } from './state';
@@ -25,6 +28,8 @@ export interface TrainingPlan {
   odds: number[];
   /** Cash covers cashFloorRuns weeks of the budget, so a run would start. */
   affordable: boolean;
+  /** Every radar axis is at the ceiling: no run would lift the model. */
+  atCeiling: boolean;
 }
 
 /** The run the CPO would start now under `style`. */
@@ -35,7 +40,7 @@ export function cpoTrainingPlan(state: GameState, style: TrainingStyle): Trainin
     clamp(
       state.company.cash * c.cashShare * budgetMult,
       TRAINING.minWeekly,
-      c.maxWeekly * budgetMult,
+      c.maxWeekly * budgetMult * frontierCostMult(state),
     ),
     TRAINING.budgetStep,
   );
@@ -48,13 +53,14 @@ export function cpoTrainingPlan(state: GameState, style: TrainingStyle): Trainin
     focus,
     odds: trainingOdds(state, runWeeks, weeklyBudget, focus),
     affordable: state.company.cash >= c.cashFloorRuns * weeklyBudget,
+    atCeiling: atModelCeiling(state),
   };
 }
 
 export function cpoTraining(state: GameState): void {
   if (!state.departments.products || state.training.run) return;
   const plan = cpoTrainingPlan(state, state.executives.trainingStyle);
-  if (!plan.affordable) return;
+  if (!plan.affordable || plan.atCeiling) return;
   startTrainingRun(state, {
     name: `Gen ${state.training.generation + 1}`,
     focus: plan.focus,

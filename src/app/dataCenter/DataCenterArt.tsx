@@ -14,9 +14,21 @@ import { Face, Hatch, Vignette, Wash } from '../components';
 import '../components/interior.css';
 
 /** Hall front width by GPU hall (CONTENT §7.4 ids). */
-const HALL_W: Record<string, number> = { hall_row: 150, hall_twin: 186, hall_campus: 204 };
+const HALL_W: Record<string, number> = {
+  hall_row: 150,
+  hall_twin: 186,
+  hall_campus: 204,
+  hall_hyperscale: 222,
+};
 /** Rooftop units by cooling. */
-const CHILLERS: Record<string, number> = { cool_air: 5, cool_liquid: 4, cool_immersion: 3 };
+const CHILLERS: Record<string, number> = {
+  cool_air: 5,
+  cool_liquid: 4,
+  cool_immersion: 3,
+  cool_twophase: 2,
+};
+/** Coolings drawn as low tank units rather than tall chillers. */
+const LOW_UNITS = new Set(['cool_immersion', 'cool_twophase']);
 const G = 132;
 const TOP = 84;
 const PARAPET = 6;
@@ -42,7 +54,7 @@ export function DataCenterArt(p: {
     <Vignette label={label} ink={p.ink} class="in-alive">
       <path d={`M0 ${G}h320`} class="art-line" />
       {p.energySite ? <Turbines /> : <Neighbours />}
-      {p.hall === 'hall_campus' && <BackHall x0={x0} x1={x1} />}
+      {(p.hall === 'hall_campus' || p.hall === 'hall_hyperscale') && <BackHall x0={x0} x1={x1} />}
       <Hall x0={x0} x1={x1} split={p.hall !== 'hall_row'} />
       <Chillers x0={x0} x1={x1} n={CHILLERS[p.cooling] ?? 5} kind={p.cooling} fitout={!!p.fitout} />
       <Entrance x0={x0} ink={p.brandInk} />
@@ -142,7 +154,7 @@ function Chillers(p: { x0: number; x1: number; n: number; kind: string; fitout: 
   const roof = TOP - PARAPET - 3;
   const span = p.x1 - p.x0 - 60;
   const step = span / p.n;
-  const h = p.kind === 'cool_immersion' ? 6 : 10;
+  const h = LOW_UNITS.has(p.kind) ? 6 : 10;
   const units = Array.from({ length: p.fitout ? p.n - 1 : p.n }, (_, k) => {
     const x = p.x0 + 44 + k * step;
     const uw = step * 0.72;
