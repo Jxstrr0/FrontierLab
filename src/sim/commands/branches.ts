@@ -1,6 +1,7 @@
 // Branch commands: lease a storefront and build a sales office on it (one per
 // city, at a size, C2a), grow it a size, rename or close it.
 import {
+  DEAL,
   BRANCH_NAME_MAX,
   CLOSE_RECOVERY,
   CLOSE_RENT_WEEKS,
@@ -21,6 +22,7 @@ import { isDeposit, isLoan } from '../../data/products';
 import { allProducts, productSpec } from '../products';
 import { assetBookValue } from '../balanceSheet';
 import { tileDistance } from '../citygen';
+import { endOfficeContracts, moveOfficeContracts } from '../contracts';
 import { cityDistanceKm } from '../geo';
 import { emptyBook } from '../branch/books';
 import { campaignEffects } from '../branch/marketing';
@@ -165,7 +167,8 @@ export function buildBranch(
     capacity: 0,
     last: { prospects: 0, captured: 0, served: 0, share: 0 },
     pnl: [],
-    desk: { week: 0, arrived: 0, approved: 0, refused: 0, declined: 0, expired: 0 },
+    desk: { week: 0, arrived: 0, won: 0, lost: 0, declined: 0, expired: 0 },
+    discountLimit: DEAL.defaultLimit,
   };
   branch.staff.count = branch.staff.target = staffNeeded(branch);
   const lineup = state.company.companyOffered;
@@ -358,7 +361,7 @@ function hasLoans(state: GameState, branch: Branch): boolean {
     const spec = productSpec(state, pid);
     return spec && isLoan(spec) && b.balance > 0;
   });
-  return books || Object.values(state.loanDesk.loans).some((l) => l.branchId === branch.id);
+  return books;
 }
 
 /** What closing a branch returns and where its accounts go (DESIGN §5.3). */
@@ -428,13 +431,10 @@ export function closeBranch(
   }
   if (target) {
     target.customers += Math.round(branch.customers * quote.retention);
-    for (const loan of Object.values(state.loanDesk.loans)) {
-      if (loan.branchId === branchId) loan.branchId = target.id;
-    }
   }
-  for (const app of Object.values(state.loanDesk.applications)) {
-    if (app.branchId === branchId) delete state.loanDesk.applications[app.id];
-  }
+  // C5b: contracts stay with an office in the same city; elsewhere they end.
+  if (target?.cityId === branch.cityId) moveOfficeContracts(state, branchId, target.id);
+  else endOfficeContracts(state, branchId);
 
   // Equipment: recover 30% of book value and write off the rest.
   state.company.fixedAssets = state.company.fixedAssets.filter((a) => a.ownerId !== branchId);

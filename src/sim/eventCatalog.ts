@@ -21,9 +21,25 @@ export interface EventPayloads {
   /** A data center part was upgraded; `part` is the new part's name. */
   DATA_CENTER_UPGRADED: { dataCenterId: Id; name: string; slot: string; part: string };
   DATA_CENTER_CLOSED: { dataCenterId: Id; name: string; city: Id };
-  LOAN_BOOKED: { branchId: Id; business: string; amount: Money; rate: Rate };
-  /** A Loan Desk loan of any size defaulted at or above the BIG_DEFAULT line. */
-  BIG_DEFAULT: { business: string; sector: string; amount: Money; branchId?: Id };
+  /** Deal Desk (C5b): you won a business's contract; `from` names the rival you took it from. */
+  CONTRACT_WON: {
+    branchId: Id;
+    businessId: Id;
+    business: string;
+    sector: string;
+    value: Money;
+    from?: string;
+  };
+  /** One of your contracts ended; `to` names the rival that took it. */
+  CONTRACT_LOST: {
+    branchId: Id;
+    businessId: Id;
+    business: string;
+    sector: string;
+    value: Money;
+    reason: 'renewal' | 'outage' | 'failed' | 'office';
+    to?: string;
+  };
   WINDOW_USE: { amount: Money };
   FUNDING_MATURED: { lotId: Id; type: string; counterparty: string; amount: Money };
   REGULATOR_AUDIT: { fine: Money };

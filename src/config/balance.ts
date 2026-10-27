@@ -411,11 +411,13 @@ export const BUSINESS = {
   lotShare: 0.5,
   keepFreePerDistrict: 1,
   sizes: {
-    small: { weight: 0.55, budget: 30_000, budgetPip: -1, switchPip: -1 },
-    mid: { weight: 0.33, budget: 120_000, budgetPip: 0, switchPip: 0 },
-    large: { weight: 0.12, budget: 450_000, budgetPip: 1, switchPip: 1 },
-    anchor: { weight: 0, budget: 1_800_000, budgetPip: 2, switchPip: 2 },
+    small: { weight: 0.55, budget: 6_000, budgetPip: -1, switchPip: -1 },
+    mid: { weight: 0.33, budget: 25_000, budgetPip: 0, switchPip: 0 },
+    large: { weight: 0.12, budget: 90_000, budgetPip: 1, switchPip: 1 },
+    anchor: { weight: 0, budget: 360_000, budgetPip: 2, switchPip: 2 },
   },
+  /** C5b: schema-12 budgets were set at these per-size bases; migration 12 → 13 rescales them. */
+  oldBudgets: { small: 30_000, mid: 120_000, large: 450_000, anchor: 1_800_000 },
   /** Anchor budget scales with headcount against this reference. */
   anchorEmployeesRef: 2500,
   budgetSigma: 0.3,

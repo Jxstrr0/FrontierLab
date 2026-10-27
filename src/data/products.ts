@@ -253,9 +253,11 @@ export const PRODUCTS: Record<string, ProductSpec> = {
     rateChurnSens: 0.2,
     startStars: 2.5,
   },
+  // Enterprise contracts (C5b): the switch that opens the Deal Desk. Bids are
+  // a discount off each business's budget, so the price fields are unused.
   sbl: {
     id: 'sbl',
-    name: 'Business Loan',
+    name: 'Enterprise contracts',
     category: 'lending',
     kind: 'sbl',
     priceType: 'rate',
@@ -265,7 +267,7 @@ export const PRODUCTS: Record<string, ProductSpec> = {
     max: 0.2,
     step: 0.0005,
     ticket: 0,
-    riskWeight: 1.0,
+    riskWeight: 0,
     churn: 0,
     servicing: 1.2,
     startStars: 2.5,
@@ -353,5 +355,4 @@ export const isDeposit = (p: ProductSpec) => p.kind === 'deposit';
 /** Products that need credit approval (loans and cards, excluding the Loan Desk). */
 export const needsApproval = (p: ProductSpec) => p.kind === 'amortizing' || p.kind === 'revolving';
 /** Products whose balances are loans on the balance sheet. */
-export const isLoan = (p: ProductSpec) =>
-  p.kind === 'amortizing' || p.kind === 'revolving' || p.kind === 'sbl';
+export const isLoan = (p: ProductSpec) => p.kind === 'amortizing' || p.kind === 'revolving';

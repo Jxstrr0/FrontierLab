@@ -6,7 +6,7 @@
 // customers (C3a: its book deposits ÷ MERGERS.depositPerCustomer, split by
 // ACQUIRED_PLAN_MIX). Plan ARR is not on the balance sheet, so nothing is
 // paired with reserves.
-import { MERGERS, PRODUCTS_PER_CUSTOMER, START_STAFF_MORALE, WAGE_STEP } from '../config/balance';
+import { DEAL, MERGERS, PRODUCTS_PER_CUSTOMER, START_STAFF_MORALE, WAGE_STEP } from '../config/balance';
 import { EQUIPMENT } from '../data/equipment';
 import { ACQUIRED_BUILDS, ACQUIRED_PLAN_MIX } from '../data/mergers';
 import { PRODUCTS, type ProductSpec } from '../data/products';
@@ -109,7 +109,8 @@ export function convertRivalBranch(
     capacity: 0,
     last: { prospects: 0, captured: 0, served: 0, share: 0 },
     pnl: [],
-    desk: { week: state.clock.week, arrived: 0, approved: 0, refused: 0, declined: 0, expired: 0 },
+    desk: { week: state.clock.week, arrived: 0, won: 0, lost: 0, declined: 0, expired: 0 },
+    discountLimit: DEAL.defaultLimit,
     converting: {
       rivalId: bank.id,
       name: bank.name,
