@@ -2,8 +2,9 @@
 // offices when busy and open one office per city, city by city (expansion.ts);
 // turtle and nohq stay in the home city. Steady and aggressive also build one
 // data center once rich (dataCenter.ts, C2c), and reserve GPU lots once spot
-// runs short (compute.ts, C4c).
+// runs short (compute.ts, C4c), and train new models (training.ts, C6b).
 import { manageCompute } from './compute';
+import { manageTraining } from './training';
 import { maybeBuildDataCenter } from './dataCenter';
 import { forceRecession } from './stress';
 import { averageLot, bestLot, buildCost, followDefaults, openBranch } from './common';
@@ -17,6 +18,9 @@ import type { GameState } from '../../src/sim/state';
 
 /** Weeks of running costs aggressive keeps in cash before it expands (C5a). */
 const AGGRESSIVE_RESERVE_WEEKS = 3;
+/** Share of cash a week each strategy spends on a training run (C6b). */
+const STEADY_TRAINING_SHARE = 0.01;
+const AGGRESSIVE_TRAINING_SHARE = 0.015;
 
 const DELEGATE_OPS = { staffing: true, loans: true, marketing: true, products: false };
 
@@ -87,6 +91,7 @@ export const steady: Strategy = {
     expand(s, 2, 0.12, true);
     maybeBuildDataCenter(s, 4);
     manageCompute(s);
+    manageTraining(s, STEADY_TRAINING_SHARE);
   },
 };
 
@@ -130,6 +135,7 @@ export const aggressive: Strategy = {
     expand(s, 1.2, 0.085, true, { growCr: 0.075, reserveWeeks: AGGRESSIVE_RESERVE_WEEKS });
     maybeBuildDataCenter(s, 3);
     manageCompute(s);
+    manageTraining(s, AGGRESSIVE_TRAINING_SHARE);
   },
 };
 

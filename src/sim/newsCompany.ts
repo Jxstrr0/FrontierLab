@@ -200,6 +200,14 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
         },
       });
     }
+    case 'MODEL_TRAINED':
+      return business({
+        key: p.leads ? 'MODEL_TRAINED_LEADS' : 'MODEL_TRAINED',
+        subject: str(p.modelId),
+        icon: 'spark',
+        priority: p.leads ? P.company : P.companyRoutine,
+        tokens: { bank, name: str(p.name), score: num(p.quality).toFixed(1) },
+      });
     case 'DIGITAL_PROJECT_DONE':
       return business({
         key: 'DIGITAL_PROJECT_DONE',

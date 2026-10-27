@@ -3,13 +3,40 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C6a done (v0.1.18, save schema 14): the AI model, with a Reasoning/Speed/Breadth/Safety/Efficiency radar and real effects. C5 (v0.1.16–v0.1.17) added customer businesses and the Deal Desk. Next is C6b (training runs, rival model releases, the frontier bar), then C6c (the Chief Scientist).
+**Current stage:** C6b done (v0.1.19, save schema 15): training runs, rival model releases, a rising frontier bar and a benchmark leaderboard. C6a (v0.1.18) made the AI model's radar (Reasoning/Speed/Breadth/Safety/Efficiency) count. C5 (v0.1.16–v0.1.17) added customer businesses and the Deal Desk. Next: C6c (the Chief Scientist and the talent war).
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `03e826dfac25bd` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `15f792ff539b0e` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-27 — Stage C6b: training runs and the frontier (v0.1.19)
+
+**What you asked for:** carry on with C6. This is the second of its three parts.
+
+**What changed.**
+- **Training runs.** The HQ Products floor has a new **Training run** card.
+  - You name the next model, pick what to focus on (Reasoning, Speed, Breadth, Safety or Efficiency), choose how long to train and set a weekly budget (from $20k).
+  - It shows the odds of each star result and what each one adds to the model. More money and more time give better odds, as with new products.
+  - When the run finishes, the new model appears in **Manage models** as "Trained · Gen N". It doesn't switch on by itself: tap **Use as AI model** (the usual two-week switch).
+  - Each star result adds to every score, plus a bit more to the focus. Training from a trained model stacks, so generations keep improving.
+- **Rival models.** Every rival lab now has a named model (Wren 2, Lantern 2 and so on). Each quarter some of them release a new generation, and the Ledger reports it, with a bigger story when one takes the lead.
+- **The frontier.** As the best rival model gets better, customers expect more. If your model stands still, you slowly lose the ability to charge above market, contracts get harder to win, and the Model rating slips. Training is how you keep up.
+- **Leaderboard.** A new card ranks every lab's model by quality, with your row highlighted and a line saying how much more than the market your model lets you charge. A rival's HQ panel shows its current model and when it shipped.
+
+**Balance.** The test strategies now train once they have a Products floor.
+- Steady run, seed 42: by year 5 it is on its fifth generation, at 8.0 against the best rival's 8.3.
+- 20-city median: ARR of $4.3M at week 52 and $24.3M at week 260, payback in 39.5 weeks. Every check passes.
+- At first, rival progress cost a do-nothing lab too much: its cash dipped just below zero in the year-3 recession. So the bar now rises by 60% of how far the rivals climb.
+
+**Checks.**
+- New tests cover training odds and lift, a run finishing, stacked generations, pausing, cancelling, validation, rival models, the leaderboard and the save upgrade.
+- Saves from v0.1.18 load: every rival gets a starting model and the race starts level.
+- The determinism snapshot changed as intended.
+- One news test's floor went from 60 commodity wraps in six years to 50, because model stories now fill some quiet weeks.
+
+**Next:** C6c, the Chief Scientist seat and the talent war.
 
 ### 2026-10-27 — Stage C6a: the AI model (v0.1.18)
 

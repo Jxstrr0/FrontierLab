@@ -287,6 +287,9 @@ Tabs: Overview · Loans · Credit.
     - open-positions chip for the Products team
     - probability table (5★ … 1★ with %)
     - Start development
+  - **Training run** (C6b): with no run, the model name (default "Gen N"), a focus picker over the five axes, training time (the development terms), weekly budget stepper ($20k up, step $5k) with total cost, an odds table (each star result with its % and lift, e.g. "+0.4 on all, +0.4 more Reasoning") and Start. While a run is under way: name, focus, progress bar, weeks left, budget and spent so far, and Cancel (with a confirm). "Paused: no Products floor" if the floor goes.
+  - **Leaderboard** (C6b): a line on today's quality bar and your price headroom, then every lab ranked by model quality (rank, lab, model, quality to one decimal), your row highlighted. A rival HQ panel's Overview shows that lab's AI model (name · quality) and when it shipped.
+  - Manage models lists trained models as "Trained · Gen N" with **Use as AI model**.
 - **Compute** (C4b; was Treasury):
   - An **Outage** or **Capacity crunch** banner at the top while either runs (C4c)
   - **Compute pool:** the Compute card (§24), with a "GPUs rented in lots" row when you have any, then the **Compute policy** card (C4c): spot limit this week, emergency burst on top, the "GPU offers +8%" stigma row while it lasts, a note on how the limit moves, and the **Auto spot-buy** toggle (hint: buys at spot then burst / runs on your own GPUs only, with a waitlist)

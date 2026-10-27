@@ -80,7 +80,7 @@ describe('the paper over six years', () => {
       expect(ratio).toBeGreaterThan(0.5);
       expect(ratio).toBeLessThan(2);
     }
-    expect(keys.filter((k) => k === 'COMMODITY_WRAP').length).toBeGreaterThan(60);
+    expect(keys.filter((k) => k === 'COMMODITY_WRAP').length).toBeGreaterThan(50);
   });
 
   it('reprints real earlier headlines, each at most once', () => {

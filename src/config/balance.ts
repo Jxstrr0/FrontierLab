@@ -756,9 +756,42 @@ export const MODEL_EFFECTS = {
   headroomSlope: 0.04,
   dealQuality: 0.05,
   dealSafety: 0.03,
+  /** Share of the frontier's rise (C6b) that raises the quality bar. */
+  frontierWeight: 0.6,
 } as const;
 /** CPO delegation: a local package must beat the model by minGain after costWeight × $ per customer. */
 export const MODEL_DELEGATE = { minGain: 0.3, costWeight: 0.02 } as const;
+
+// ─── TRAINING RUNS AND THE FRONTIER (§16.12, stage C6b) ──────────────────────
+/**
+ * Training runs use the development terms and star odds (§16.6) with their
+ * own budget scale ($20k a week → B 0, $2M → B 1). A finished run adds
+ * starLift[stars − 1] to every radar value of the house model, and
+ * focusLift[stars − 1] more to the chosen axis.
+ */
+export const TRAINING = {
+  minWeekly: 20_000,
+  maxBudgetScoreAt: 2_000_000,
+  budgetStep: 5_000,
+  starLift: [0, 0.2, 0.4, 0.6, 0.9] as readonly number[],
+  focusLift: [0.2, 0.3, 0.4, 0.5, 0.6] as readonly number[],
+} as const;
+/**
+ * Rival model releases (§16.12): each quarter an active rival ships a new
+ * generation with chance releaseQuarterly, gaining normal(gainMean, gainSigma)
+ * quality (at least minGain, capped at MODEL_RADAR_MAX). Rivals start at
+ * startQuality + U(startSpread); a rival founded later starts lateGap under the
+ * best rival model. The frontier is the best rival model.
+ */
+export const RIVAL_MODEL = {
+  releaseQuarterly: 0.2,
+  gainMean: 0.22,
+  gainSigma: 0.12,
+  minGain: 0.05,
+  startQuality: 5.8,
+  startSpread: [-0.5, 0.1] as readonly [number, number],
+  lateGap: 0.3,
+} as const;
 export const MODEL_SWITCH_WEEKS = 2;
 /** Mix weights must sum to 1 within this tolerance (sliders in whole percent). */
 export const MODEL_MIX_TOLERANCE = 0.005;

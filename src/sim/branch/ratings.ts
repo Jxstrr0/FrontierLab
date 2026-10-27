@@ -18,6 +18,7 @@ import {
   SERVICE_RATING,
   UPKEEP_PENALTY,
   WINDOW_STIGMA,
+  MODEL_EFFECTS,
 } from '../../config/balance';
 import { BUILD_SLOTS, EQUIPMENT } from '../../data/equipment';
 import { CAMPAIGN_REVIEW_LINES, REVIEW_LINES } from '../../data/reviews';
@@ -26,7 +27,7 @@ import { clamp, ema } from '../math';
 import { marketRef } from '../rates';
 import { stream } from '../rng';
 import type { Branch, GameState } from '../state';
-import { activeModel, modelQuality, RADAR } from '../underwriting';
+import { activeModel, modelQuality, qualityBar, RADAR } from '../underwriting';
 import type { CampaignEffects } from './marketing';
 import { branchPrice, competitiveness, isOffered } from './pricing';
 import { managerOf } from './staff';
@@ -107,7 +108,10 @@ export function productsTarget(state: GameState, branch: Branch, fx: CampaignEff
     mean +
       breadth +
       PRODUCTS_RATING.app * (state.company.appRating - PRODUCTS_RATING.appBase) +
-      PRODUCTS_RATING.model * (modelQuality(activeModel(state)) - PRODUCTS_RATING.modelBase) +
+      PRODUCTS_RATING.model *
+        (modelQuality(activeModel(state)) -
+          PRODUCTS_RATING.modelBase -
+          (qualityBar(state) - MODEL_EFFECTS.qualityRef)) +
       fx.bumps.products +
       bump,
     1,

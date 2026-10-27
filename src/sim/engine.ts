@@ -59,6 +59,8 @@ import { closeWeek, depreciate, quarterEnd } from './statements';
 import { renewalSeason, runContracts } from './contracts';
 import { runTreasury } from './treasury';
 import { updateModels } from './underwriting';
+import { runTraining } from './training';
+import { rivalModelsQuarter } from './rivalModels';
 import { productSpec } from './products';
 
 /** Advances one game day; runs the weekly tick on every 7th day. */
@@ -113,6 +115,7 @@ export function weeklyTick(state: GameState): void {
   refreshGpuOffers(state); // 6 (the GPU market, C4b)
   runHq(state); // 7
   runDevelopments(state);
+  runTraining(state); // 7 (training runs, C6b)
   updateModels(state);
   updateAppRating(state);
   runBrandMarketing(state); // 8 (brand marketing)
@@ -142,6 +145,7 @@ export function weeklyTick(state: GameState): void {
     quarterEnd(state); // 13
     regulatorReview(state); // 13 (§15)
     rivalsQuarter(state); // 13 (rival earnings and failures)
+    rivalModelsQuarter(state); // 13 (rival model releases, C6b)
     renewalSeason(state); // 13 (the renewal season for business contracts, C5b)
     marketsQuarter(state); // 13 (listed earnings, IPO listing)
     governanceQuarter(state); // 13 (board meeting unlocks)
