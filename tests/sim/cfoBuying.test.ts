@@ -1,5 +1,5 @@
-// The CREO's occupancy dials and Buying switches (SIMULATION §21.1, §21.2,
-// §17.2; DESIGN decision log 2026-10-26): a dial stop prices each managed
+// The CFO's occupancy dials and Buying switches (SIMULATION §21.1, §21.2,
+// §17.2; DESIGN decision log 2026-10-26, the CFO's since 2026-10-27): a dial stop prices each managed
 // building to hold that occupancy (100% = bestRent), at once when changed;
 // Buying buys the best-yield listing at asking for the bank or for you, within
 // each budget.
@@ -9,7 +9,7 @@ import { balanceSheet } from '../../src/sim/balanceSheet';
 import * as cmd from '../../src/sim/commands';
 import { advanceWeeks } from '../../src/sim/engine';
 import { refreshExecCandidates } from '../../src/sim/execCandidates';
-import { creoBuy, creoRent, nextPurchase, personalBuyLimit } from '../../src/sim/execBuying';
+import { cfoBuy, cfoRent, nextPurchase, personalBuyLimit } from '../../src/sim/execBuying';
 import { occupancyEstimate } from '../../src/sim/execDelegationsProperty';
 import { rentPricingPower } from '../../src/sim/execSeats';
 import { postCash } from '../../src/sim/ledger';
@@ -22,13 +22,13 @@ function fund(s: GameState, amount: number) {
   s.company.paidInCapital += amount;
 }
 
-/** A game with a seated CREO whose four switches are as given. */
+/** A game with a seated CFO whose four building switches are as given. */
 function chiefGame(on: Partial<Record<string, boolean>> = {}): GameState {
   const s = execGame();
   refreshExecCandidates(s, true);
-  hire(s, 'creo');
+  hire(s, 'cfo');
   for (const id of ['bankRents', 'privateRents', 'bankBuys', 'privateBuys'])
-    cmd.setExecDelegation(s, 'creo', id, on[id] ?? false);
+    cmd.setExecDelegation(s, 'cfo', id, on[id] ?? false);
   return s;
 }
 
@@ -55,7 +55,7 @@ describe('occupancy dial', () => {
   it('reprices managed buildings at once and earns less below 100%', () => {
     const s = chiefGame({ bankRents: true });
     fund(s, 1_000_000_000);
-    const pick = creoBuy(s, 'company')!;
+    const pick = cfoBuy(s, 'company')!;
     const p = s.realEstate.properties[pick.siteId]!;
     const power = rentPricingPower(s, 'company');
     expect(p.rent).toBe(bestRent(p.marketRent, power));
@@ -80,13 +80,13 @@ describe('buying for the bank', () => {
     const plan = nextPurchase(s, 'company');
     expect(plan.pick).toBeDefined();
     const cash = s.company.cash;
-    const pick = creoBuy(s, 'company')!;
+    const pick = cfoBuy(s, 'company')!;
     expect(pick.siteId).toBe(plan.pick!.siteId);
     expect(s.company.cash).toBeCloseTo(cash - pick.asking, 2);
     const p = s.realEstate.properties[pick.siteId]!;
     expect(p.owner).toBe('company');
     expect(p.purchasePrice).toBe(pick.asking);
-    expect(p.rent).toBe(creoRent(s, 'company', p.marketRent));
+    expect(p.rent).toBe(cfoRent(s, 'company', p.marketRent));
     expect(s.realEstate.listings[pick.siteId]).toBeUndefined();
     expect(identityGap(s)).toBeLessThan(1);
     // Over a couple of reviews the switch keeps buying by itself.
@@ -108,7 +108,7 @@ describe('buying for the bank', () => {
   it('keeps the bank’s buildings under 5% of its assets', () => {
     const s = chiefGame({ bankBuys: true });
     fund(s, 300_000_000);
-    for (let i = 0; i < 40 && creoBuy(s, 'company'); i++);
+    for (let i = 0; i < 40 && cfoBuy(s, 'company'); i++);
     const bs = balanceSheet(s);
     expect(bs.realEstate).toBeLessThanOrEqual(EXEC_DELEGATION.buyAssetCap * bs.assets + 1);
   });
@@ -124,7 +124,7 @@ describe('buying for you', () => {
     s.personal.cash = reserve + 200_000_000;
     expect(personalBuyLimit(s)).toBeCloseTo(100_000_000, 2);
     const cash = s.personal.cash;
-    const pick = creoBuy(s, 'personal')!;
+    const pick = cfoBuy(s, 'personal')!;
     expect(pick.asking).toBeLessThanOrEqual(100_000_000);
     expect(s.personal.cash).toBeCloseTo(cash - pick.asking, 2);
     expect(s.realEstate.properties[pick.siteId]!.owner).toBe('personal');

@@ -4,7 +4,7 @@
 //   COO · HR benefits   morale target 70 / 80 / 90
 //   COO · Pay reviews   quarterly or annual, with the pay premium (PayPolicy.tsx)
 //   CMO · Brand campaigns   awareness target 40–70%
-//   CREO · Rents (bank, yours)   occupancy 80–100% (OccupancyDial.tsx)
+//   CFO · Rents (the lab's, yours)   occupancy 80–100% (OccupancyDial.tsx)
 //   CTO · Compute   share of GPU demand covered outside spot 60 / 75 / 90%
 import { CTO_COMPUTE, EXEC_DELEGATION } from '../../config/balance';
 import * as cmd from '../../sim/commands';
@@ -136,8 +136,8 @@ export function DelegationDial(p: { s: GameState; seat: ExecSeat; id: string }) 
   if (p.seat === 'coo' && p.id === 'payReviews') return <CadenceDial s={p.s} />;
   if (p.seat === 'cmo' && p.id === 'brand') return <BrandDial s={p.s} />;
   if (p.seat === 'cto' && p.id === 'compute') return <ComputeCoverDial s={p.s} />;
-  if (p.seat === 'creo' && p.id === 'bankRents') return <OccupancyDial s={p.s} owner="company" />;
-  if (p.seat === 'creo' && p.id === 'privateRents')
+  if (p.seat === 'cfo' && p.id === 'bankRents') return <OccupancyDial s={p.s} owner="company" />;
+  if (p.seat === 'cfo' && p.id === 'privateRents')
     return <OccupancyDial s={p.s} owner="personal" />;
   return null;
 }

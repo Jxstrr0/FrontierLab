@@ -1,14 +1,16 @@
 // Executive profile sheet (SCREENS §10.1): portrait, name, title and hire date;
 // Leadership, Expertise and Loyalty bars; the seat's delegation toggles with
-// what each does, some with a dial under them (DelegationDials.tsx: the COO's
+// what each does, some under a group heading (the CFO's Investing and
+// Buildings) and some with a dial under them (DelegationDials.tsx: the COO's
 // morale target and review cadence with the pay premium, the CMO's awareness
-// target); the salary stepper with the market hint; the grants list with
-// vesting progress, Add grant, and Fire with a confirm showing severance. The
-// COO's sheet adds the growth cities their Expansion delegation may build in,
-// each with an "Open a branch now" button (GrowthCities.tsx). Seats that give
-// branch guidance show what they are telling managers (GuidanceNote.tsx); the
-// CREO shows the buildings it manages (PropertyNote.tsx) and the CFO what it
-// invests in next (InvestNote.tsx).
+// target, the CFO's occupancy dials); the salary stepper with the market hint;
+// the grants list with vesting progress, Add grant, and Fire with a confirm
+// showing severance. The COO's sheet adds the growth cities their Expansion
+// delegation may build in, each with an "Open a branch now" button
+// (GrowthCities.tsx). Seats that give sales office guidance show what they are
+// telling managers (GuidanceNote.tsx); the CFO shows what it invests in next
+// (InvestNote.tsx) and the buildings it manages (PropertyNote.tsx); the CPO
+// its training-odds boost.
 import { useState } from 'preact/hooks';
 import * as cmd from '../../sim/commands';
 import type { ExecSeat } from '../../sim/state';
@@ -29,7 +31,7 @@ import { ExecGrantForm } from './ExecGrantForm';
 import { GrowthCities } from './GrowthCities';
 import { GUIDANCE_SEATS, GuidanceNote } from './GuidanceNote';
 import { InvestNote } from './InvestNote';
-import { chiefScientistBonus } from '../../sim/talent';
+import { cpoTrainingBonus } from '../../sim/talent';
 import { PropertyNote } from './PropertyNote';
 import { dayOf, execSalaryStepper, seatSpec, vestProgress } from './execSelectors';
 
@@ -65,8 +67,11 @@ export function ExecProfileSheet(p: { seat: ExecSeat; onClose: () => void }) {
           <section>
             <SectionTitle>Delegations</SectionTitle>
             <Card>
-              {spec.delegations.map((d) => (
+              {spec.delegations.map((d, i) => (
                 <>
+                  {d.group && d.group !== spec.delegations[i - 1]?.group && (
+                    <h4 class="exec-toggle-group">{d.group}</h4>
+                  )}
                   <Toggle
                     label={d.label}
                     hint={d.description}
@@ -78,16 +83,16 @@ export function ExecProfileSheet(p: { seat: ExecSeat; onClose: () => void }) {
               ))}
               {p.seat === 'coo' && <GrowthCities s={s} />}
               {GUIDANCE_SEATS.includes(p.seat) && <GuidanceNote s={s} seat={p.seat} />}
-              {p.seat === 'creo' && <PropertyNote s={s} />}
               {p.seat === 'cfo' && <InvestNote s={s} />}
+              {p.seat === 'cfo' && <PropertyNote s={s} />}
               {p.seat === 'cfo' && (
                 <p class="muted small exec-note">
                   Statement delays are halved while a CFO is seated.
                 </p>
               )}
-              {p.seat === 'csci' && (
+              {p.seat === 'cpo' && (
                 <p class="muted small exec-note">
-                  Training odds boost: +{Math.round(chiefScientistBonus(s) * 100)} points.
+                  Training odds boost: +{Math.round(cpoTrainingBonus(s) * 100)} points.
                 </p>
               )}
               {p.seat === 'cto' && (

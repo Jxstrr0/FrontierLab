@@ -30,7 +30,7 @@ export function OwnedProperty(p: { property: Property; site: Site }) {
   const target = occupancyTarget(prop.rent, prop.marketRent, power);
   const heading = marketRentNow(s, p.site);
   const drifting = Math.abs(heading - prop.marketRent) / Math.max(1, prop.marketRent) > 0.005;
-  const chief = s.executives.seats.creo;
+  const chief = s.executives.seats.cfo;
   const weeksLeft = prop.saleWeek !== undefined ? Math.max(1, prop.saleWeek - s.clock.week) : 0;
   const [lo, hi] = REAL_ESTATE.saleWeeks;
   return (
@@ -60,8 +60,9 @@ export function OwnedProperty(p: { property: Property; site: Site }) {
         />
         {managed && chief && (
           <p class="muted small">
-            {chief.name} (CIO) reviews this rent every {EXEC_DELEGATION.rentEveryWeeks} weeks;
-            tenants here pay up to {pct(power, 0)} over market.
+            Managed by your CFO: {chief.name} reviews this rent every{' '}
+            {EXEC_DELEGATION.rentEveryWeeks} weeks; tenants here pay up to {pct(power, 0)} over
+            market.
           </p>
         )}
         <Row label="Occupancy" value={pct(prop.occupancy, 1)} />

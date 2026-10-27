@@ -34,7 +34,7 @@ const tick = (s: GameState) => {
 describe('candidate pools', () => {
   it('fills every seat once there is an Executive floor, skills in range', () => {
     const s = execGame();
-    for (const seat of ['coo', 'cfo', 'cpo', 'cmo', 'cto', 'cro', 'creo'] as const) {
+    for (const seat of ['coo', 'cfo', 'cpo', 'cmo', 'cto', 'cro'] as const) {
       const pool = s.executives.candidates[seat]!;
       expect(pool).toHaveLength(EXECUTIVES.candidatesPerSeat);
       for (const c of pool) {
@@ -330,12 +330,12 @@ describe('delegation defaults and seat memory (schema v13)', () => {
     cmd.setExecDelegation(s, 'cfo', 'capital', false);
     cmd.fireExec(s, 'cfo');
     expect(s.executives.remembered.cfo).toMatchObject({
-      treasury: true,
+      shares: true,
       capital: false,
       dividends: false,
     });
     refreshExecCandidates(s, true);
     const next = hire(s, 'cfo');
-    expect(next.delegations).toMatchObject({ treasury: true, capital: false, dividends: false });
+    expect(next.delegations).toMatchObject({ shares: true, capital: false, dividends: false });
   });
 });

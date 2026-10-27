@@ -1,6 +1,6 @@
 // Read-only views of the executive seats (SIMULATION §17.2) that other systems
 // consult: who sits where, whether a delegation is on, the department
-// multiplier execMult, the CTO's expertise, the CREO's rent management and
+// multiplier execMult, the CTO's expertise, the CFO's rent management and
 // pricing power, the executive market salary and the weekly resignation chance.
 // No mutation here, and no imports of the systems that read it (HQ, incidents,
 // the app rating), so there are no import cycles.
@@ -51,22 +51,22 @@ export function ctoExpertise(state: GameState): number {
   return state.executives.seats.cto?.expertise ?? EXECUTIVES.vacantCtoExpertise;
 }
 
-/** The CREO's Rents switch that covers buildings of this owner. */
+/** The CFO's Rents switch that covers buildings of this owner. */
 export const rentsSwitch = (owner: Property['owner']): string =>
   owner === 'company' ? 'bankRents' : 'privateRents';
 
-/** True when a seated CREO manages the rents of this owner's buildings. */
+/** True when a seated CFO manages the rents of this owner's buildings. */
 export function rentsManaged(state: GameState, owner: Property['owner']): boolean {
-  return delegationOn(state, 'creo', rentsSwitch(owner));
+  return delegationOn(state, 'cfo', rentsSwitch(owner));
 }
 
 /**
  * §21.2: the premium over market rent tenants of a managed building accept,
- * rentPricingPower × the CREO's expertise/100; 0 when nobody manages them.
+ * rentPricingPower × the CFO's expertise/100; 0 when nobody manages them.
  */
 export function rentPricingPower(state: GameState, owner: Property['owner']): number {
   if (!rentsManaged(state, owner)) return 0;
-  const exec = state.executives.seats.creo!;
+  const exec = state.executives.seats.cfo!;
   return (EXEC_DELEGATION.rentPricingPower * exec.expertise) / 100;
 }
 

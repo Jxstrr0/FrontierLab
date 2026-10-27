@@ -20,6 +20,7 @@ import { migrateSpotLimits } from './migrateSpotLimits';
 import { migrateMoney } from './migrateMoney';
 import { SCHEMA_VERSION, type GameState } from '../state';
 import { migrateSeedMoney } from './migrateSeedMoney';
+import { migrateSeats } from './migrateSeats';
 import { generatePersonalSites } from '../personalSites';
 
 type RawSave = Record<string, unknown> & { schemaVersion: number };
@@ -138,6 +139,14 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     for (const city of Object.values(state.world.cities)) {
       if (city.generated) generatePersonalSites(state, city.id);
     }
+    return s;
+  },
+  // 21 → 22: seven executive seats. The Chief Scientist folds into the CPO and
+  // the Chief Infrastructure Officer into the CFO; the dormant CFO Funding and
+  // CFO/CSO guidance switches go; the HR floor's manager-hiring switch becomes
+  // the COO's Sales office operations.
+  21: (s) => {
+    migrateSeats(s as unknown as GameState);
     return s;
   },
 };

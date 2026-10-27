@@ -1,16 +1,16 @@
-// Branch guidance (SIMULATION §17.2): the CFO moves delegated managers' deposit
-// rates with liquidity, the CRO their loan rates and Loan Desk approvals with
-// capital and losses; a switched-off half returns to zero.
+// Sales office guidance (SIMULATION §17.2): the COO moves delegated managers'
+// wages and staffing with morale, the CMO their campaign push with awareness
+// and the CPO their fees and lineup with the products rating; a switched-off
+// part returns to zero. The CFO and CSO rate steps went in schema 22.
 import { describe, expect, it } from 'vitest';
 import { GUIDANCE } from '../../src/config/balance';
 import { PRODUCTS } from '../../src/data/products';
 import { delegatedPrice, runDelegation } from '../../src/sim/branch/delegation';
 import {
   guidanceMarketingMult,
+  guidanceOf,
   guidanceProducts,
-  guidanceRateOffset,
   guidanceStaffing,
-  guidanceThresholdMult,
   runBranchGuidance,
 } from '../../src/sim/branchGuidance';
 import * as cmd from '../../src/sim/commands';
@@ -34,57 +34,37 @@ const managed = (s: GameState) => {
   return b;
 };
 
-describe('branch guidance', () => {
-  it('has the CFO pay savers more while liquidity is short, and trim when flush', () => {
+describe('sales office guidance', () => {
+  it('has no CFO or CSO switch, and reads an older save’s guidance without its rate steps', () => {
     const s = execGame();
     hire(s, 'cfo');
-    onCadence(s);
-    s.company.liquidityRatio = s.treasury.liqTarget - 0.05;
-    runBranchGuidance(s);
-    expect(s.company.guidance.deposits).toBe(1);
-    s.company.liquidityRatio = s.treasury.liqTarget + 0.2;
-    runBranchGuidance(s);
-    runBranchGuidance(s);
-    expect(s.company.guidance.deposits).toBe(GUIDANCE.min);
-  });
-
-  it('has the CRO tighten lending when capital misses target, up to the cap', () => {
-    const s = execGame();
     hire(s, 'cro');
-    onCadence(s);
-    s.company.capitalRatio = 0.09;
-    for (let i = 0; i < 6; i++) runBranchGuidance(s);
-    expect(s.company.guidance.loans).toBe(GUIDANCE.max);
-    expect(guidanceRateOffset(s, 'loans')).toBeCloseTo(GUIDANCE.max * GUIDANCE.rateStep);
-    expect(guidanceThresholdMult(s)).toBeCloseTo(1 - GUIDANCE.thresholdStep * GUIDANCE.max);
+    expect(cmd.setExecDelegation(s, 'cfo', 'guidance', true).ok).toBe(false);
+    expect(cmd.setExecDelegation(s, 'cro', 'guidance', true).ok).toBe(false);
+    expect(cmd.setExecDelegation(s, 'cfo', 'treasury', true).ok).toBe(false);
+    s.company.guidance = {
+      deposits: 2,
+      loans: 1,
+      staffing: 1,
+      marketing: 0,
+      products: -1,
+    } as never;
+    expect(guidanceOf(s)).toEqual({ staffing: 1, marketing: 0, products: -1 });
   });
 
-  it('returns a half to zero when its delegation is switched off', () => {
-    const s = execGame();
-    hire(s, 'cro');
-    onCadence(s);
-    s.company.capitalRatio = 0.09;
-    runBranchGuidance(s);
-    expect(s.company.guidance.loans).toBe(1);
-    expect(cmd.setExecDelegation(s, 'cro', 'guidance', false).ok).toBe(true);
-    s.clock.week += 1;
-    runBranchGuidance(s);
-    expect(s.company.guidance.loans).toBe(0);
-  });
-
-  it('moves a delegated manager’s prices', () => {
+  it('moves a delegated manager’s fee prices and leaves rate prices alone', () => {
     const s = execGame();
     const b = Object.values(s.branches)[0]!;
     const price = (id: string) => {
       s.rng.guidanceTest = [1, 2, 3, 4];
       return delegatedPrice(s, b, PRODUCTS[id]!, 100, stream(s, 'guidanceTest'));
     };
-    // The Loan Desk is the rate product left (CFO/CRO steps); plans are priced
-    // off the market fee, which the CPO's products step cuts.
+    // Plans are priced off the market fee, which the CPO's products step cuts;
+    // the Loan Desk's rate no longer moves with guidance.
     const loan = price('sbl');
     const plus = price('plus');
-    s.company.guidance = { ...s.company.guidance, deposits: 2, loans: 2, products: 2 };
-    expect(price('sbl')).toBeGreaterThan(loan);
+    s.company.guidance = { ...s.company.guidance, products: 2 };
+    expect(price('sbl')).toBe(loan);
     expect(price('plus')).toBeLessThan(plus);
   });
 
