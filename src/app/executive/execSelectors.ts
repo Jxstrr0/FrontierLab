@@ -1,5 +1,5 @@
 // Read-only views for the Executive floor (SCREENS §10, §10.1, §10.2): the board
-// card's lines, the eight seats, an executive's grants with vesting progress,
+// card's lines, the seven seats, an executive's grants with vesting progress,
 // the 4-year vesting preview and the board meeting's figures. Nothing here
 // mutates GameState.
 import { BOARD_VOTE, EXEC_PAY, EXECUTIVES, QUARTERS_PER_YEAR } from '../../config/balance';

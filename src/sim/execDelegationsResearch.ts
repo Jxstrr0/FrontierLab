@@ -1,24 +1,18 @@
-// The Chief Scientist's delegation (stage C6c, SIMULATION §17.2/§16.13),
-// Routine training runs: switch to a trained model that beats the one in use,
-// and when no run is under way start a runWeeks run on the model's weakest
-// axis at cashShare of cash a week, while cashFloorRuns weeks of it stay in
-// cash. Runs from executives.ts each week.
-import { CHIEF_SCIENTIST, TRAINING } from '../config/balance';
+// The CPO's Routine training runs delegation (SIMULATION §17.2/§16.13, the
+// Chief Scientist's until schema 22): when no run is under way start a runWeeks
+// run on the model's weakest axis at cashShare of cash a week, while
+// cashFloorRuns weeks of it stay in cash. Switching to the trained result is the
+// CPO's Models routine's job (execDelegationsFinance.ts). Runs from
+// executives.ts each week.
+import { CPO_TRAINING, TRAINING } from '../config/balance';
 import { startTrainingRun } from './commands/training';
-import { activateModel } from './commands/underwriting';
 import { clamp, roundToStep } from './math';
 import type { GameState } from './state';
-import { activeModel, modelQuality } from './underwriting';
+import { activeModel } from './underwriting';
 
-export function csciTraining(state: GameState): void {
-  const current = activeModel(state);
-  const best = Object.values(state.underwriting.models)
-    .filter((m) => m.source === 'trained')
-    .sort((a, b) => modelQuality(b) - modelQuality(a) || (a.id < b.id ? -1 : 1))[0];
-  if (best && best.id !== current.id && modelQuality(best) > modelQuality(current))
-    activateModel(state, best.id);
+export function cpoTraining(state: GameState): void {
   if (!state.departments.products || state.training.run) return;
-  const c = CHIEF_SCIENTIST;
+  const c = CPO_TRAINING;
   const weeklyBudget = roundToStep(
     clamp(state.company.cash * c.cashShare, TRAINING.minWeekly, c.maxWeekly),
     TRAINING.budgetStep,

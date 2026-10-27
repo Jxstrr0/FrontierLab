@@ -1,4 +1,4 @@
-// Save migration for rival books (schema 21 → 22): deposits become customers
+// Save migration for rival books (schema 22 → 23): deposits become customers
 // and ARR at the rival's prices, equity less the offices becomes cash, and the
 // bank-era fields are dropped.
 import { describe, expect, it } from 'vitest';
@@ -25,7 +25,7 @@ function legacy(s: GameState) {
   }
 }
 
-describe('migrateRivalBooks (21 → 22)', () => {
+describe('migrateRivalBooks (22 → 23)', () => {
   it('derives customers, ARR, cash and costs and drops the bank fields', () => {
     const s = newGame({ seed: 42, cityId: 'cal', competitors: 3 });
     legacy(s);
