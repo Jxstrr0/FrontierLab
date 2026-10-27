@@ -34,9 +34,9 @@ describe('HQ price lists per country', () => {
   it("reads each country's own HQ price", () => {
     const { s } = worldBank();
     cmd.setApplyRatesToAll(s, true);
-    cmd.setCompanyPrice(s, 'savings', 0.051, 'UK');
-    expect(companyPrice(s, PRODUCTS.savings!, 'UK')).toBe(0.051);
-    expect(companyPrice(s, PRODUCTS.savings!, 'CA')).not.toBe(0.051);
+    cmd.setCompanyPrice(s, 'plus', 31, 'UK');
+    expect(companyPrice(s, PRODUCTS.plus!, 'UK')).toBe(31);
+    expect(companyPrice(s, PRODUCTS.plus!, 'CA')).not.toBe(31);
   });
 });
 

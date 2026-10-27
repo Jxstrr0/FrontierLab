@@ -9,7 +9,8 @@ import { campaignWeeksLeft, rivalOverall } from '../../sim/rivalMarketing';
 import { rivalPriceInCity } from '../../sim/rivalPrices';
 import type { GameState, RivalBank } from '../../sim/state';
 import { AdvisorBar, Badge, CoinRating, Medallion, Sheet } from '../components';
-import { count, pct } from '../format/format';
+import { count } from '../format/format';
+import { priceText } from '../branch/selectors';
 import { sizeName } from '../../sim/branch/officeSize';
 
 const STRATEGY_LABEL: Record<RivalBank['strategy'], string> = {
@@ -19,8 +20,8 @@ const STRATEGY_LABEL: Record<RivalBank['strategy'], string> = {
   community: 'Community bank',
 };
 
-/** Products shown on the rate sheet, in order. */
-const RATE_PRODUCTS = ['savings', 'gic1y', 'personal_loan', 'mortgage'] as const;
+/** Products shown on the price sheet, in order. */
+const RATE_PRODUCTS = ['plus', 'pro', 'team', 'api'] as const;
 
 /** Our price for a product: our first branch in the city that offers it, else one in its country. */
 function ourPrice(s: GameState, cityId: string, productId: string): number | undefined {
@@ -52,13 +53,15 @@ export function RivalSheet(p: { s: GameState; lotId: string; onClose: () => void
   const adWeeks = campaignWeeksLeft(bank, lot.cityId);
   // C2b: one office per lab per city, sized like yours.
   const office = branch ? `${sizeName(branch.size).toLowerCase()} sales office` : 'sales office';
-  const ours = ourPrice(p.s, lot.cityId, 'savings');
-  const theirs = rivalPriceInCity(p.s, bank, 'savings', lot.cityId);
+  const sym = p.s.settings.currency;
+  const plus = PRODUCTS.plus!;
+  const ours = ourPrice(p.s, lot.cityId, 'plus');
+  const theirs = rivalPriceInCity(p.s, bank, 'plus', lot.cityId);
   const advice =
     theirs !== undefined && ours !== undefined
-      ? `This is ${bank.name}'s ${office}. Their savings rate is ${pct(theirs)}; ours is ${pct(ours)}.`
+      ? `This is ${bank.name}'s ${office}. Their Plus plan is ${priceText(plus, theirs, sym)}; ours is ${priceText(plus, ours, sym)}.`
       : theirs !== undefined
-        ? `This is ${bank.name}'s ${office}. Their savings rate is ${pct(theirs)}.`
+        ? `This is ${bank.name}'s ${office}. Their Plus plan is ${priceText(plus, theirs, sym)}.`
         : `This is ${bank.name}'s ${office}.`;
   return (
     <Sheet title={bank.name} onClose={p.onClose}>
@@ -91,18 +94,21 @@ export function RivalSheet(p: { s: GameState; lotId: string; onClose: () => void
         )}
         <div>
           <div class="rate-head">
-            <span>Rate sheet</span>
+            <span>Price sheet</span>
             <span>Theirs</span>
             <span>Ours</span>
           </div>
           {RATE_PRODUCTS.map((id) => {
             const theirRate = rivalPriceInCity(p.s, bank, id, lot.cityId);
             const ourRate = ourPrice(p.s, lot.cityId, id);
+            const spec = PRODUCTS[id]!;
             return (
               <div class="rate-row">
-                <span class="muted">{PRODUCTS[id]?.name ?? id}</span>
-                <span>{theirRate !== undefined ? pct(theirRate) : '—'}</span>
-                <span class="muted">{ourRate !== undefined ? pct(ourRate) : '—'}</span>
+                <span class="muted">{spec.name}</span>
+                <span>{theirRate !== undefined ? priceText(spec, theirRate, sym) : '—'}</span>
+                <span class="muted">
+                  {ourRate !== undefined ? priceText(spec, ourRate, sym) : '—'}
+                </span>
               </div>
             );
           })}

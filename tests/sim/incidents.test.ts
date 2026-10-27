@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { INCIDENTS } from '../../src/config/balance';
 import { INCIDENT_SPECS } from '../../src/data/incidents';
 import { balanceSheet } from '../../src/sim/balanceSheet';
+import { emptyBook } from '../../src/sim/branch/books';
 import { branchPrice } from '../../src/sim/branch/pricing';
 import * as cmd from '../../src/sim/commands';
 import { weeklyTick } from '../../src/sim/engine';
@@ -88,9 +89,9 @@ describe('rolled incidents', () => {
     expect(steel).toBeCloseTo(0.0015);
     b.build.vault = 'vlt_fortress';
     expect(incidentChance(s, 'ROBBERY', b.id)).toBeCloseTo(steel / 3);
-    // Card fraud needs card balances.
+    // API fraud needs API usage on the books.
     expect(incidentChance(s, 'CARD_FRAUD', 'company')).toBe(0);
-    b.books.credit_card!.balance = 1_000_000;
+    (b.books.api ??= emptyBook()).balance = 1_000_000;
     expect(incidentChance(s, 'CARD_FRAUD', 'company')).toBeGreaterThan(0);
     expect(incidentChance(s, 'DATA_BREACH', 'company')).toBeGreaterThan(0);
   });
@@ -109,7 +110,7 @@ describe('rolled incidents', () => {
       b.campaigns.signup_bonus = 2;
       b.ratings.service = 2;
       b.staff.morale = 10;
-      b.books.credit_card!.balance = 1_000_000;
+      (b.books.api ??= emptyBook()).balance = 1_000_000;
       const spec = INCIDENT_SPECS[type]!;
       const scope = spec.scope === 'branch' ? b.id : 'company';
       // A huge probability multiplier makes the roll certain.

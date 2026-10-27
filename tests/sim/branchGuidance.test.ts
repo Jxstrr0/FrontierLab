@@ -79,11 +79,13 @@ describe('branch guidance', () => {
       s.rng.guidanceTest = [1, 2, 3, 4];
       return delegatedPrice(s, b, PRODUCTS[id]!, 100, stream(s, 'guidanceTest'));
     };
-    const loan = price('personal_loan');
-    const savings = price('savings');
-    s.company.guidance = { ...s.company.guidance, deposits: 2, loans: 2 };
-    expect(price('personal_loan')).toBeGreaterThan(loan);
-    expect(price('savings')).toBeGreaterThanOrEqual(savings);
+    // The Loan Desk is the rate product left (CFO/CRO steps); plans are priced
+    // off the market fee, which the CPO's products step cuts.
+    const loan = price('sbl');
+    const plus = price('plus');
+    s.company.guidance = { ...s.company.guidance, deposits: 2, loans: 2, products: 2 };
+    expect(price('sbl')).toBeGreaterThan(loan);
+    expect(price('plus')).toBeLessThan(plus);
   });
 
   it('has the COO pay and staff more while morale is low, and trim when high', () => {

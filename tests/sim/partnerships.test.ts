@@ -1,9 +1,9 @@
 // Payroll and student partnerships (SIMULATION §13.7): fee formula, the
-// participation curve, balances converging, termination and runoff, renewal,
+// participation curve, ARR converging, termination and runoff, renewal,
 // amortization, the balance identity and a save round-trip.
 import { describe, expect, it } from 'vitest';
 import {
-  DEPOSIT_PER_EMPLOYEE,
+  ARR_PER_EMPLOYEE,
   MANAGER_SKILL,
   PARTICIPATION,
   PARTNER_CONTRACT_WEEKS,
@@ -12,14 +12,13 @@ import {
   STUDENT_PARTNERSHIP,
 } from '../../src/config/balance';
 import { CITIES } from '../../src/data/cities';
-import { balanceSheet, intangibleAssets, totalDeposits } from '../../src/sim/balanceSheet';
+import { balanceSheet, intangibleAssets } from '../../src/sim/balanceSheet';
 import * as cmd from '../../src/sim/commands';
 import { advanceWeeks } from '../../src/sim/engine';
 import { hiresPerWeek, staffMods } from '../../src/sim/hq';
 import { refreshManagerPool } from '../../src/sim/people';
 import { newGame } from '../../src/sim/newGame';
 import { balanceTarget, participation, renewalFee, signingFee } from '../../src/sim/partnerships';
-import { liquidAssets } from '../../src/sim/treasury';
 import { exportCode, importCode } from '../../src/sim/save/serialize';
 import type { GameState, Site } from '../../src/sim/state';
 import { openScriptedBranch } from '../helpers/scenario';
@@ -43,7 +42,7 @@ const identity = (s: GameState) => {
 };
 
 function sign(s: GameState, site: Site, branchId: string, kind: 'payroll' | 'student' = 'payroll') {
-  const r = cmd.signPartnership(s, site.id, branchId, 'savings', kind);
+  const r = cmd.signPartnership(s, site.id, branchId, 'team', kind);
   if (!r.ok) throw new Error(r.reason);
   return s.partnerships[r.partnershipId]!;
 }
@@ -81,7 +80,7 @@ describe('partnership formulas', () => {
     const e = employer.employer!;
     const at = (h: number) => balanceTarget(employer, 'payroll', 0.8, h);
     expect(at(100)).toBeCloseTo(
-      e.employees * 0.8 * DEPOSIT_PER_EMPLOYEE * e.incomeMult * CITIES.cal!.incomeIndex * 1.1,
+      e.employees * 0.8 * ARR_PER_EMPLOYEE * e.incomeMult * CITIES.cal!.incomeIndex * 1.1,
       4,
     );
     expect(at(0)).toBeCloseTo(at(100) * (0.5 / 1.1), 4);
@@ -100,20 +99,22 @@ describe('payroll partnerships', () => {
     expect(employer.employer!.partnerRivalId).toBeUndefined();
     expect(identity(s)).toBeLessThan(Math.max(1, before + 1));
     expect(s.events.log.some((e) => e.type === 'PARTNERSHIP_SIGNED')).toBe(true);
-    const again = cmd.signPartnership(s, employer.id, branchId, 'savings');
+    const again = cmd.signPartnership(s, employer.id, branchId, 'team');
     expect(again.ok).toBe(false);
   });
 
   it('refuses without a branch in the city or enough cash', () => {
     const { s, branchId, employer } = setup();
-    expect(cmd.signPartnership(s, employer.id, 'nope', 'savings').ok).toBe(false);
-    expect(cmd.signPartnership(s, employer.id, branchId, 'mortgage').ok).toBe(false);
+    expect(cmd.signPartnership(s, employer.id, 'nope', 'team').ok).toBe(false);
+    // The package must be a paid plan: not the API, not the free tier.
+    expect(cmd.signPartnership(s, employer.id, branchId, 'api').ok).toBe(false);
+    expect(cmd.signPartnership(s, employer.id, branchId, 'free_tier').ok).toBe(false);
     s.company.cash = 10;
-    const r = cmd.signPartnership(s, employer.id, branchId, 'savings');
+    const r = cmd.signPartnership(s, employer.id, branchId, 'team');
     expect(r.ok).toBe(false);
   });
 
-  it('grows deposits toward target through liquid assets, keeping the identity', () => {
+  it('grows ARR toward target and bills it as plan fees, keeping the identity', () => {
     const { s, branchId, employer } = setup();
     const p = sign(s, employer, branchId);
     for (let w = 0; w < 60; w++) {
@@ -125,10 +126,9 @@ describe('payroll partnerships', () => {
     expect(p.balance).toBeGreaterThan(0.8 * target);
     expect(p.balance).toBeLessThan(1.05 * target);
     expect(p.accounts).toBeGreaterThan(0.5 * employer.employer!.employees * 0.65);
-    expect(totalDeposits(s)).toBeGreaterThan(p.balance);
-    // Liquidity reads the partnership deposits too.
-    expect(s.company.liquidityRatio).toBeCloseTo(liquidAssets(s) / totalDeposits(s), 9);
     const snap = s.history.weekly.at(-1)!;
+    // The staff plans bill a week of their ARR on top of the office's own plans.
+    expect(snap.pnl.accountFees).toBeGreaterThan(p.balance / 52);
     expect(snap.pnl.amortization).toBeGreaterThan(0);
   });
 
@@ -139,7 +139,7 @@ describe('payroll partnerships', () => {
     const peak = p.balance;
     expect(peak).toBeGreaterThan(0);
     // Stop offering the package: c_package = −2 drags health down.
-    s.branches[branchId]!.offered.savings!.on = false;
+    s.branches[branchId]!.offered.team!.on = false;
     p.health = PARTNER_HEALTH.terminateBelow - 1;
     let weeks = 0;
     while (p.status === 'active' && weeks < 20) {

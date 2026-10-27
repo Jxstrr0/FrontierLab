@@ -1,9 +1,9 @@
 // Price wars (SIMULATION §18.6). Tracks how many weeks in a row your average
 // Rates rating across a city's open branches has been ≥ 4.0. After 8 weeks,
-// each month every active rival there has a 30% chance to lift its deposit
-// rates by 0.15pp (capped); once your streak ends the bumps fade slowly.
+// each month every active rival there has a 30% chance to cut its plan prices
+// by 5% (capped); once your streak ends the cuts fade slowly.
 import { PRICE_WAR } from '../config/balance';
-import { isDeposit, PRODUCTS } from '../data/products';
+import { PRODUCTS } from '../data/products';
 import { pushEvent } from './events';
 import { raiseIncident } from './incidents';
 import { clamp } from './math';
@@ -60,10 +60,8 @@ export function runPriceWars(state: GameState): void {
       // The sheet moves now; the target (rivalTargetPrice) carries the bump from here on.
       for (const spec of Object.values(PRODUCTS)) {
         const price = bank.prices[spec.id];
-        if (spec.priceType !== 'rate' || !isDeposit(spec) || price === undefined) continue;
-        bank.prices[spec.id] = clamp(price + bump, spec.min, spec.max);
-        const lag = bank.priceLags[spec.id];
-        if (lag) lag.target += bump;
+        if (spec.kind !== 'plan' || spec.category !== 'deposits' || price === undefined) continue;
+        bank.prices[spec.id] = clamp(price * (1 - bump), spec.min, spec.max);
       }
       pushEvent(
         state,
@@ -73,7 +71,7 @@ export function runPriceWars(state: GameState): void {
           bank: bank.name,
           city,
           bump,
-          savingsRate: rivalPriceInCity(state, bank, 'savings', city) ?? 0,
+          plusPrice: rivalPriceInCity(state, bank, 'plus', city) ?? 0,
         },
         4,
         city,

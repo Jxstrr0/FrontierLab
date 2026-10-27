@@ -2,15 +2,16 @@
 // §5.10). It stays on its lot and opens at once under your name, still wearing
 // the old brand while it converts: the seller strategy's fit-out
 // (ACQUIRED_BUILDS), a full staff, the old manager kept with delegation on,
-// your products at company or default prices, and books seeded from its
-// aggregate deposits and loans split by a mature product mix. Balances are
-// booked by acquisition.ts, which pairs them with treasury reserves.
+// your products at company or default prices, and plan books seeded with its
+// customers (C3a: its book deposits ÷ MERGERS.depositPerCustomer, split by
+// ACQUIRED_PLAN_MIX). Plan ARR is not on the balance sheet, so nothing is
+// paired with reserves.
 import { MERGERS, PRODUCTS_PER_CUSTOMER, START_STAFF_MORALE, WAGE_STEP } from '../config/balance';
 import { EQUIPMENT } from '../data/equipment';
-import { ACQUIRED_BUILDS, ACQUIRED_DEPOSIT_MIX, ACQUIRED_LOAN_MIX } from '../data/mergers';
+import { ACQUIRED_BUILDS, ACQUIRED_PLAN_MIX } from '../data/mergers';
 import { PRODUCTS, type ProductSpec } from '../data/products';
 import { splitByMix } from './acquisitionPlan';
-import { emptyBook } from './branch/books';
+import { emptyBook, periodsPerYear } from './branch/books';
 import { companyPrice } from './branch/pricing';
 import { marketWage, skillTarget, staffNeeded } from './branch/staff';
 import { defaultName } from './commands/branches';
@@ -19,7 +20,7 @@ import { newId } from './ids';
 import { clamp, roundToStep } from './math';
 import { generateManager } from './people';
 import { allProducts } from './products';
-import { countryOfCity, defaultPrice, marketRef } from './rates';
+import { countryOfCity, defaultPrice } from './rates';
 import type { Rng } from './rng';
 import { overallOf } from './rivals';
 import type { Book, Branch, GameState, RivalBank, RivalBranch } from './state';
@@ -43,26 +44,13 @@ function startPrice(state: GameState, spec: ProductSpec, cityId: string): number
   return hq ?? roundToStep(defaultPrice(spec, countryOfCity(state, cityId)), spec.step);
 }
 
-/**
- * A book seeded with an acquired balance: accounts from typical ticket sizes
- * (× the lot's income), rates at today's market reference (fee accounts at
- * their pay rate), PD and LGD from the product defaults.
- */
-function seededBook(
-  state: GameState,
-  spec: ProductSpec,
-  cityId: string,
-  balance: number,
-  income: number,
-): Book {
+/** A plan book seeded with acquired seats, billed at the office's price. */
+function seededBook(spec: ProductSpec, seats: number, price: number): Book {
   const book = emptyBook();
-  if (balance <= 0) return book;
-  book.balance = balance;
-  book.accounts = balance / Math.max(1, spec.ticket * income);
-  book.bookRate =
-    spec.priceType === 'rate' ? marketRef(state, cityId, spec.id) : (spec.payRate ?? 0);
-  book.pd = spec.basePd ?? 0;
-  book.lgd = spec.lgd ?? 0;
+  if (seats <= 0) return book;
+  book.accounts = seats;
+  book.balance = seats * price * periodsPerYear(spec);
+  book.bookRate = price;
   return book;
 }
 
@@ -71,12 +59,10 @@ export function convertRivalBranch(
   state: GameState,
   bank: RivalBank,
   rb: RivalBranch,
-  loanFactor: number,
   rng: Rng,
 ): string {
   const lot = state.world.lots[rb.lotId]!;
   const id = newId(state, 'br');
-  const income = lot.incomeIndex;
   const branch: Branch = {
     id,
     cityId: rb.cityId,
@@ -142,18 +128,14 @@ export function convertRivalBranch(
   branch.managerId = mgr.id;
   branch.staff.skill = skillTarget(state, branch);
 
-  const deposits = splitByMix(rb.deposits, ACQUIRED_DEPOSIT_MIX);
-  const loans = splitByMix(rb.loans * loanFactor, ACQUIRED_LOAN_MIX);
+  const seats = splitByMix(rb.deposits / MERGERS.depositPerCustomer, ACQUIRED_PLAN_MIX);
   for (const spec of allProducts(state)) {
-    branch.offered[spec.id] = {
-      on: startsOn(state, spec, branch),
-      price: startPrice(state, spec, rb.cityId),
-    };
-    const balance = deposits[spec.id] ?? loans[spec.id] ?? 0;
-    branch.books[spec.id] = seededBook(state, spec, rb.cityId, balance, income);
+    const price = startPrice(state, spec, rb.cityId);
+    branch.offered[spec.id] = { on: startsOn(state, spec, branch), price };
+    branch.books[spec.id] = seededBook(spec, seats[spec.id] ?? 0, price);
   }
-  // Mixes only name base products, so every seeded balance has a book.
-  for (const pid of [...Object.keys(deposits), ...Object.keys(loans)]) {
+  // The mix only names base products, so every seeded seat has a book.
+  for (const pid of Object.keys(seats)) {
     if (!PRODUCTS[pid]) throw new Error(`Acquired mix names unknown product ${pid}`);
   }
   const accounts = Object.values(branch.books).reduce((s, b) => s + b.accounts, 0);

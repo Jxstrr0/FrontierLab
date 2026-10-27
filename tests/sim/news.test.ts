@@ -170,8 +170,8 @@ describe('Ledger stories from events', () => {
       rivalId: rival.id,
       bank: rival.name,
       city: 'cal',
-      bump: 0.0015,
-      savingsRate: 0.031,
+      bump: 0.05,
+      plusPrice: 19,
     });
     pushEvent(s, 'PARTNERSHIP_SIGNED', {
       partnershipId: 'p1',
@@ -189,7 +189,7 @@ describe('Ledger stories from events', () => {
     expect(text).toMatch(/RIVAL_EARNINGS_DOWN.*4\.6%/);
     expect(text).toMatch(/RIVAL_DIVIDEND.*\$0\.30/);
     expect(text).toMatch(/BANK_FAILURE.*7/);
-    expect(text).toMatch(/PRICE_WAR.*3\.10%/);
+    expect(text).toMatch(/PRICE_WAR.*(19.*5%|5%.*19)/);
     expect(text).toMatch(/PARTNERSHIP_SIGNED.*Northfield Hospital/);
   });
 

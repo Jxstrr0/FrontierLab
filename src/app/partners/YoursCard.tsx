@@ -1,20 +1,17 @@
-// Your partnership (SCREENS §14 "Yours"): health bar, "Year X of 7", deposits
+// Your partnership (SCREENS §14 "Yours"): health bar, "Year X of 7", ARR
 // and accounts, the host and package, the contract curve with a "you are here"
 // marker, Renew (shows the fee; opens in the last year) and Release.
 import { useState } from 'preact/hooks';
 import { PARTNER_RENEWAL } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import * as cmd from '../../sim/commands';
-import {
-  canRenew,
-  elapsedWeeks,
-  packageRate,
-  renewalFee,
-  yearOfTerm,
-} from '../../sim/partnerships';
+import { canRenew, elapsedWeeks, renewalFee, yearOfTerm } from '../../sim/partnerships';
 import type { Partnership, Site } from '../../sim/state';
 import { Card, Confirm, LineChart, Row, StatBar } from '../components';
-import { count, money, pct } from '../format/format';
+import { branchPrice } from '../../sim/branch/pricing';
+import { productSpec } from '../../sim/products';
+import { count, money } from '../format/format';
+import { priceText } from '../branch/selectors';
 import { act, toast, useGame } from '../store';
 import { contractCurve, productName } from './partnerView';
 
@@ -24,6 +21,7 @@ export function YoursCard(p: { site: Site; partnership: Partnership }) {
   const { site, partnership: ps } = p;
   const [confirm, setConfirm] = useState(false);
   const host = s.branches[ps.hostBranchId];
+  const spec = productSpec(s, ps.productId);
   const { year, of } = yearOfTerm(s, ps);
   const curve = contractCurve(s, site, ps);
   const fee = renewalFee(s, site, ps);
@@ -50,14 +48,14 @@ export function YoursCard(p: { site: Site; partnership: Partnership }) {
     <Card class="pt-deal pt-yours">
       <div class="pt-deal-head">
         <div class="pt-deal-name">
-          {ps.kind === 'student' ? 'Student accounts' : 'Staff payroll'} · yours
+          {ps.kind === 'student' ? 'Student plans' : 'Staff plans'} · yours
         </div>
         <span class="small muted">
           Year {year} of {of}
         </span>
       </div>
       <StatBar label="Health" value={ps.health} />
-      <Row label="Deposits" value={money(ps.balance, sym)} strong />
+      <Row label="ARR" value={money(ps.balance, sym)} strong />
       <Row label="Accounts" value={count(ps.accounts)} />
       <Row
         label="Host sales office"
@@ -71,13 +69,15 @@ export function YoursCard(p: { site: Site; partnership: Partnership }) {
       />
       <Row
         label="Package"
-        value={`${productName(s, ps.productId)} · pays ${pct(packageRate(s, host, ps.productId))}`}
+        value={
+          host && spec
+            ? `${productName(s, ps.productId)} · ${priceText(spec, branchPrice(s, host, ps.productId), s.settings.currency)}`
+            : productName(s, ps.productId)
+        }
       />
       <LineChart
-        label="Expected deposits over this contract, with where you are now"
-        series={[
-          { label: 'Expected deposits · you are here', values: curve.values, tone: 'brass' },
-        ]}
+        label="Expected ARR over this contract, with where you are now"
+        series={[{ label: 'Expected ARR · you are here', values: curve.values, tone: 'brass' }]}
         startLabel={`Year 1`}
         endLabel={`Year ${of}`}
         markerIndex={curve.marker}

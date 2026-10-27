@@ -58,15 +58,15 @@ describe('bank runs', () => {
     expect(s.events.log.some((e) => e.type === 'BANK_RUN_ENDED')).toBe(true);
   });
 
-  it('multiplies deposit churn by six while it lasts', () => {
+  it('multiplies plan churn by six while it lasts', () => {
     const base = bankWithFloors([], { weeks: 20 });
     const run = structuredClone(base);
     run.incidents.bankRunWeeksLeft = 3;
     advanceWeeks(base, 1);
     advanceWeeks(run, 1);
     const id = Object.keys(base.branches)[0]!;
-    const calm = base.branches[id]!.books.savings!.last.churned;
-    const panic = run.branches[id]!.books.savings!.last.churned;
+    const calm = base.branches[id]!.books.plus!.last.churned;
+    const panic = run.branches[id]!.books.plus!.last.churned;
     expect(calm).toBeGreaterThan(0);
     expect(panic / calm).toBeCloseTo(BANK_RUN.runMult, 1);
   });
@@ -84,20 +84,33 @@ describe('bank runs', () => {
     expect(s.incidents.bankRunWeeksLeft).toBeUndefined();
   });
 
-  it('borrows from the central bank window', () => {
+  it('lends nothing from the central bank window with no deposit book (C3a)', () => {
+    // The window lends a share of deposits; an AI lab holds none, so it borrows
+    // nothing. The window itself goes in C3c.
     const { s, b } = openBank();
     b.ratings.overall = 2;
     s.company.tier = 'critical';
     s.company.tierWeeks = 3;
-    b.books.savings!.balance = 10_000_000;
-    s.treasury.reserves += 10_000_000;
     startRun(s);
     const inc = s.incidents.active.find((i) => i.type === 'BANK_RUN')!;
+    expect(inc.data.window).toBe(0);
     const reserves = s.treasury.reserves;
     cmd.resolveIncident(s, inc.id, 'window');
-    expect(s.treasury.window).toBeCloseTo(BANK_RUN.windowShare * 10_000_000);
-    expect(s.treasury.reserves - reserves).toBeCloseTo(BANK_RUN.windowShare * 10_000_000);
-    expect(s.treasury.windowStigmaWeeks).toBeGreaterThan(0);
+    expect(s.treasury.window).toBe(0);
+    expect(s.treasury.reserves).toBe(reserves);
+  });
+
+  it('cuts plan prices when the lab chooses to raise its offer', () => {
+    const { s, b } = openBank();
+    b.ratings.overall = 2;
+    s.company.tier = 'critical';
+    s.company.tierWeeks = 3;
+    startRun(s);
+    const inc = s.incidents.active.find((i) => i.type === 'BANK_RUN')!;
+    cmd.resolveIncident(s, inc.id, 'raise');
+    const fx = s.incidents.effects.filter((e) => e.kind === 'planCut');
+    expect(fx).toHaveLength(1);
+    expect(fx[0]!.value).toBe(BANK_RUN.planCut);
   });
 });
 

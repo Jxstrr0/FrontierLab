@@ -1,6 +1,6 @@
 // Price wars (SIMULATION §18.6): eight weeks of a ≥ 4.0 Rates rating in a city
-// start monthly 0.15pp deposit-rate bumps by the rivals there, which lift their
-// savings rates above where they would otherwise be.
+// start monthly 5% plan-price cuts by the rivals there, which push their Plus
+// price below where it would otherwise be.
 import { describe, expect, it } from 'vitest';
 import { PRICE_WAR } from '../../src/config/balance';
 import { REFERENCE_BUILDS } from '../../src/data/equipment';
@@ -29,7 +29,7 @@ function run(s: GameState, branchId: string, weeks: number, rates?: number): Gam
 }
 
 describe('price wars', () => {
-  it('trigger after the streak and raise rival savings rates', () => {
+  it('trigger after the streak and cut rival plan prices', () => {
     const war = setup();
     const calm = setup();
     const events = run(war.s, war.branchId, 40, 4.6);
@@ -39,7 +39,7 @@ describe('price wars', () => {
     expect(calm.s.competition.ratesStreak.cal ?? 0).toBeLessThan(PRICE_WAR.streakWeeks);
     const wars = events.filter((e) => e.type === 'PRICE_WAR');
     expect(wars.length).toBeGreaterThan(0);
-    // No bump before the streak has run for eight weeks.
+    // No cut before the streak has run for eight weeks.
     expect(Math.min(...wars.map((e) => e.week))).toBeGreaterThanOrEqual(PRICE_WAR.streakWeeks);
 
     let lifted = 0;
@@ -48,8 +48,8 @@ describe('price wars', () => {
       expect(bump).toBeLessThanOrEqual(PRICE_WAR.cap + 1e-12);
       if (bump <= 0) continue;
       lifted += 1;
-      const calmSavings = calm.s.rivals[bank.id]!.prices.savings!;
-      expect(bank.prices.savings!).toBeGreaterThan(calmSavings);
+      const calmPlus = calm.s.rivals[bank.id]!.prices.plus!;
+      expect(bank.prices.plus!).toBeLessThan(calmPlus);
     }
     expect(lifted).toBeGreaterThan(0);
   }, 30_000);

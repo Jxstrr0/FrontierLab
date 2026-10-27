@@ -1,12 +1,12 @@
 // Payroll and student partnerships (SIMULATION §13.7) and the university
 // graduate program (DESIGN §5.8.10). Pure formulas (fees, participation curve,
-// balance target, health) plus the weekly step: each partnership's deposit
-// mini-book moves toward its target through treasury reserves, pays interest at
-// the package rate, amortizes its fee, and ends by termination or lapse with a
+// ARR target, health) plus the weekly step: each partnership's plan mini-book
+// (seats and their ARR, stage C3a) moves toward its target, earns its ARR / 52
+// in plan fees, amortizes its fee, and ends by termination or lapse with a
 // 12-week runoff. Signing, renewing and releasing live in commands/partnerships.ts.
 import {
   COMP_CLAMP,
-  DEPOSIT_PER_EMPLOYEE,
+  ARR_PER_EMPLOYEE,
   GRAD_PROGRAM,
   PARTICIPATION,
   PARTNER_BALANCE_STEP,
@@ -19,12 +19,11 @@ import {
   WEEKS_PER_YEAR,
 } from '../config/balance';
 import { CITIES } from '../data/cities';
-import { isDeposit } from '../data/products';
 import { branchPrice, competitiveness, isOffered } from './branch/pricing';
 import { dexp } from './detmath';
 import { pushEvent } from './events';
 import { staffMods } from './hq';
-import { postPnl, spend } from './ledger';
+import { earn, postPnl, spend } from './ledger';
 import { clamp, ema } from './math';
 import { listLevel } from './nominal';
 import { productSpec } from './products';
@@ -59,9 +58,9 @@ export function signingFee(state: GameState, site: Site, kind: PartnershipKind):
   return headcount(site, kind) * perHead * incomeFactor(site, kind) * listLevel(state, site.cityId);
 }
 
-/** Balance per participating person at income factor 1. */
-const depositPerHead = (kind: PartnershipKind) =>
-  kind === 'student' ? STUDENT_PARTNERSHIP.depositPerStudent : DEPOSIT_PER_EMPLOYEE;
+/** ARR per participating person at income factor 1. */
+const arrPerHead = (kind: PartnershipKind) =>
+  kind === 'student' ? STUDENT_PARTNERSHIP.arrPerStudent : ARR_PER_EMPLOYEE;
 
 const logistic = (x: number) => 1 / (1 + dexp(-x));
 
@@ -86,7 +85,7 @@ export function participation(t: number, L: number): number {
   return P.peak + ((P.end - P.peak) * (t - declineFrom)) / (L - declineFrom);
 }
 
-/** §13.7: people × participation × deposit per head × income × (0.5 + 0.6 × health/100). */
+/** §13.7: people × participation × ARR per head × income × (0.5 + 0.6 × health/100). */
 export function balanceTarget(
   site: Site,
   kind: PartnershipKind,
@@ -97,7 +96,7 @@ export function balanceTarget(
   return (
     headcount(site, kind) *
     part *
-    depositPerHead(kind) *
+    arrPerHead(kind) *
     incomeFactor(site, kind) *
     (H.balanceBase + (H.balanceSlope * health) / 100)
   );
@@ -123,14 +122,6 @@ export function canRenew(state: GameState, p: Partnership): boolean {
   return (
     p.status === 'active' && elapsedWeeks(state, p) >= p.termWeeks - PARTNER_RENEWAL.windowWeeks
   );
-}
-
-/** The package's pay rate: the host's price for rate products, the fixed pay rate otherwise. */
-export function packageRate(state: GameState, branch: Branch | undefined, productId: string) {
-  const spec = productSpec(state, productId);
-  if (!spec) return 0;
-  if (spec.priceType !== 'rate') return spec.payRate ?? 0;
-  return branch ? branchPrice(state, branch, productId) : 0;
 }
 
 /** c_package (§8): the package's competitiveness at the host; −2 if the host stopped offering it. */
@@ -174,12 +165,17 @@ export function hostCandidates(state: GameState, cityId: string, productId?: str
     .sort((a, b) => offers(a) - offers(b) || a.id.localeCompare(b.id));
 }
 
-/** Deposit products a host branch offers (possible packages). */
+/** A plan can be a partnership's package (C3a: Plans, not the Free Tier). */
+export function isPackage(state: GameState, productId: string): boolean {
+  const spec = productSpec(state, productId);
+  return !!spec && spec.kind === 'plan' && spec.category === 'deposits' && !spec.convertsTo;
+}
+
+/** Plans a host branch offers (possible packages). */
 export function packageOptions(state: GameState, branch: Branch): string[] {
-  return Object.keys(branch.offered).filter((pid) => {
-    const spec = productSpec(state, pid);
-    return !!spec && isDeposit(spec) && isOffered(branch, pid);
-  });
+  return Object.keys(branch.offered).filter(
+    (pid) => isPackage(state, pid) && isOffered(branch, pid),
+  );
 }
 
 // ─── Weekly step (tick step 5) ────────────────────────────────────────────────
@@ -204,10 +200,9 @@ export function startRunoff(
   );
 }
 
-/** Moves balance between the mini-book and treasury reserves (deposits flow through L, §13.2). */
-function moveBalance(state: GameState, p: Partnership, delta: number): void {
+/** Moves the mini-book's ARR (C3a: subscriptions, no balance-sheet item). */
+function moveBalance(_state: GameState, p: Partnership, delta: number): void {
   p.balance += delta;
-  state.treasury.reserves += delta;
 }
 
 /** Keeps the host valid: a closed host hands over to another branch in the city, else runoff. */
@@ -254,12 +249,8 @@ export function runPartnerships(state: GameState): void {
   for (const p of Object.values(state.partnerships)) {
     const site = state.world.sites[p.siteId];
     const host = site ? checkHost(state, p, site) : undefined;
-    // Interest on last week's balance at the package rate (§10.1 cash: balance × rate / 52).
-    spend(
-      state,
-      'depositInterest',
-      (p.balance * packageRate(state, host, p.productId)) / WEEKS_PER_YEAR,
-    );
+    // A week of last week's ARR, as plan fees (C3a).
+    earn(state, 'accountFees', p.balance / WEEKS_PER_YEAR);
     if (p.status === 'active' && site && host) runActive(state, p, site, host);
     else if (p.status === 'active') startRunoff(state, p, 'terminated');
     if (p.status === 'runoff') runRunoff(state, p);

@@ -79,20 +79,20 @@ const DATA_BREACH: IncidentRule = {
   },
 };
 
-/** Credit card balances across every branch. */
+/** API ARR across every office: what an abuse ring can run stolen cards through (C3a). */
 function cardBalances(state: GameState): number {
   let total = 0;
   for (const b of Object.values(state.branches)) {
     for (const [pid, book] of Object.entries(b.books)) {
       const spec = productSpec(state, pid);
-      if (spec && baseId(spec) === 'credit_card') total += book.balance;
+      if (spec && baseId(spec) === P.CARD_FRAUD.product) total += book.balance;
     }
   }
   return total;
 }
 
 const CARD_FRAUD: IncidentRule = {
-  // Banks with card balances: × (1.3 − fraudShield/10)
+  // Labs selling the API: × (1.3 − fraudShield/10)
   chance(state) {
     if (cardBalances(state) <= 0) return 0;
     return (
@@ -115,7 +115,7 @@ const CARD_FRAUD: IncidentRule = {
         'company',
         P.CARD_FRAUD.takeupMult,
         P.CARD_FRAUD.takeupWeeks,
-        'credit_card',
+        P.CARD_FRAUD.product,
       );
   },
 };
@@ -155,12 +155,12 @@ const PRICE_WAR: IncidentRule = {
   prepare(_s, scope, data) {
     data.city = CITIES[scope]?.name ?? scope;
     if (typeof data.bank !== 'string') data.bank = 'A rival';
-    if (typeof data.bump !== 'number') data.bump = P.PRICE_WAR.matchBoost;
+    if (typeof data.bump !== 'number') data.bump = P.PRICE_WAR.matchCut;
   },
   costs: () => ({ match: 0, hold: 0 }),
   apply(state, inc, optionId) {
     if (optionId === 'match')
-      addEffect(state, 'savingsBoost', inc.scope, P.PRICE_WAR.matchBoost, P.PRICE_WAR.matchWeeks);
+      addEffect(state, 'planCut', inc.scope, P.PRICE_WAR.matchCut, P.PRICE_WAR.matchWeeks);
   },
 };
 
@@ -177,7 +177,7 @@ const BANK_RUN: IncidentRule = {
       state.treasury.reserves += amount;
       applyWindowStigma(state, amount);
     } else if (optionId === 'raise') {
-      addEffect(state, 'savingsBoost', 'company', BANK_RUN_P.savingsBoost, BANK_RUN_P.boostWeeks);
+      addEffect(state, 'planCut', 'company', BANK_RUN_P.planCut, BANK_RUN_P.boostWeeks);
     } else if (state.incidents.bankRunWeeksLeft === undefined) {
       return 'The run had already ended.';
     } else if (rng.chance(num(inc.data, 'odds'))) {

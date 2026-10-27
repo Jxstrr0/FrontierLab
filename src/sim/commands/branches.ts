@@ -170,7 +170,7 @@ export function buildBranch(
   branch.staff.count = branch.staff.target = staffNeeded(branch);
   const lineup = state.company.companyOffered;
   for (const spec of allProducts(state)) {
-    // Deposits and everyday services start on; lending and cards wait for the player (SCREENS §27).
+    // Plans and the Loan Desk start on; the API and apps wait for the player (SCREENS §27).
     let on = spec.category === 'deposits' || spec.kind === 'fx' || spec.kind === 'sbl';
     if (spec.kind === 'wealth') on = offices > 0 || spec.noAdvisorOffice === true;
     if (spec.kind === 'safebox') on = boxes > 0;

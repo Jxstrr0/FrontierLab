@@ -312,6 +312,8 @@ A second building kind beside the sales office (`src/sim/dataCenters.ts`, comman
 
 ## 10. Books
 
+**Stage C3a:** the catalog is now plans and usage products (§10.7). §10.1–10.5 describe the bank book paths, which no product in the catalog uses any more; their code stays until C3c removes it. The Loan Desk (§11) is unchanged.
+
 One `Book` per (branch, product): `accounts`, `balance`, `bookRate`, `pd` (annual, balance-weighted), `lgd`, plus last-week flow fields for the UI (`newAccounts`, `newVolume`, `deltaAccounts`).
 
 ### 10.1 Deposits
@@ -381,6 +383,23 @@ One `Book` per (branch, product): `accounts`, `balance`, `bookRate`, `pd` (annua
 ### 10.6 Applications and servicing
 - **Applications:** `apps = Σ (new loan and card accounts) / max(approval, 0.2)`. Underwriting cost = `apps × model.costPerApp`.
 - **Servicing:** `Σ accounts_p × servicing_p` (CONTENT, $ per account per week).
+
+### 10.7 Plans and usage (stage C3a)
+A book's balance is its **ARR** (annual recurring revenue).
+- **Plans** (`kind: 'plan'`): `accounts` counts seats. A sign-up brings `ticket` seats (CONTENT §5), so `newAccounts = newVolume` (seats). Every seat re-bills at today's price:
+  - `balance = seats × price × periods`, where periods = 12 for a monthly fee and 1 for an annual fee.
+- **Usage** (`kind: 'usage'`, priced per million tokens): a sign-up brings `ticket × lot.incomeIndex × ticketMult_segment[category]` million tokens a month (§9.6).
+  - When the price moves, the book re-scales: `balance ×= price / bookRate`.
+  - Inflow: `balance += newVolume × price × 12`.
+  - Organic growth: `balance ×= 1 + organic_p / 52` (customers build more on the API).
+  - Compute behind the usage (until C3b's compute charge): `servicing += unitCost_p × balance / (price × 52)`.
+- **Churn** for both, like deposit churn did:
+  - `k = churn_p/52 × (1 + rateChurnSens_p × gap) × (1 + OVERALL_CHURN.slope × max(0, OVERALL_CHURN.pivot − Overall)) × signupChurn × runMult`, where `gap` is the price comparison of §8.
+  - Plans lose `seats × k`; usage books lose `accounts × k` and `balance × k`.
+- **Revenue:** `balance / 52` a week, posted to `accountFees` (Plans), `serviceFees` (API) or `cardFees` (Apps & Services).
+- **Free-tier conversion:** each week, `conversion_p / 52` of a free tier's seats move to the plan it `convertsTo` (Free Tier → Plus, 12% a year), if that office offers it.
+- **Customers** = all accounts and seats ÷ PRODUCTS_PER_CUSTOMER, as before.
+- **Not on the balance sheet.** ARR is a run-rate, not an asset: revenue reaches the books week by week. Company ARR (`companyArr`) sums every office that isn't closed plus partnership mini-books, and is stored in each weekly snapshot (`totals.arr`) for the trend chart and the balance script.
 
 ## 11. Loan Desk
 
@@ -508,13 +527,13 @@ If `L > liqTarget + 0.05`: repay central bank window borrowing first, then overn
 ### 13.7 Payroll partnerships (Employers layer)
 - **Signing:**
   - Signing fee paid from corporate cash (CONTENT formula). It becomes an intangible asset amortized over the contract.
-  - Choose a host branch in the same city and a package (any offered deposit product).
+  - Choose a host branch in the same city and a package: any plan the host offers that isn't a free tier (C3a).
 - **Participation curve** over a contract of `L` weeks (default 364):
   - rises along an S-curve from 0 to 0.65 by week 52
   - linear to 0.80 by week 104
   - flat at 0.80 until `L − 104`
   - linear down to 0.45 at `L`
-- **Balance target:** `employees × participation × DEPOSIT_PER_EMPLOYEE (4,500) × incomeIndex × (0.5 + 0.6 × health/100)`. The partnership keeps its own mini-book (balance, accounts, rate = package price). It moves toward target at 0.15 of the gap per week; the flow goes through L. Accounts are reported inside the host branch's product card as "incl. partners".
+- **Balance target (ARR):** `employees × participation × ARR_PER_EMPLOYEE (300) × incomeIndex × (0.5 + 0.6 × health/100)`. The partnership keeps its own mini-book of plan seats and their ARR. It moves toward target at 0.15 of the gap per week and earns `balance / 52` a week as `accountFees` (C3a; it no longer moves money through L or pays interest). Accounts are reported inside the host branch's product card as "incl. partners".
 - **Health:**
   - target = `40 + 12 × (hostOverall − 3) + 10 × c_package + perksBonus`, where `c_package` is the competitiveness of the package (§8)
   - `health = ema(health, target, 0.05)`
@@ -523,7 +542,7 @@ If `L > liqTarget + 0.05`: repay central bank window borrowing first, then overn
   - Renew at fee × `(1.5 − health/100)` for another full term.
   - Or let it lapse: run off over 12 weeks.
 
-- **Student partnership (universities):** students by city size S 6,000 / M 10,000 / L 16,000 / XL 24,000; fee $30 × students × incomeIndex; $600 per participating student; same curve, health and term rules. A university has one payroll and one student deal at a time.
+- **Student partnership (universities):** students by city size S 6,000 / M 10,000 / L 16,000 / XL 24,000; fee $30 × students × incomeIndex; ARR $80 per participating student (`STUDENT_PARTNERSHIP.arrPerStudent`); same curve, health and term rules. A university has one payroll and one student deal at a time.
 - **Graduate program (universities):** $120,000 × city wageIndex a year, charged up front and every 52 weeks; +10 skill for manager candidates and +1 hire a week at branches and HQ floors.
 
 ### 13.8 Bank runs
@@ -531,7 +550,8 @@ If `L > liqTarget + 0.05`: repay central bank window borrowing first, then overn
   - Condition: average overall rating < 2.6 AND (capital tier Restricted or Critical OR LR < 0.08).
   - Chance: 4% per week while the condition holds.
   - Duration: 3–6 weeks.
-- **During a run:** `runMult = 6` on deposit churn (§10.1).
+- **During a run:** `runMult = 6` on churn (§10.1; since C3a also plan and usage churn, §10.7).
+- **Cut plan prices** (the incident's raise option since C3a): plan prices −`BANK_RUN.planCut` (10%) everywhere for `BANK_RUN.boostWeeks` (8) weeks, through the `planCut` effect.
 - **Response:** the `BANK_RUN` incident offers the choices (§23).
 
 ## 14. Corporate cash and statements
@@ -794,7 +814,7 @@ Levels 1–5 (Very conservative to Very aggressive):
   - Branch earnings = `NIM_city × assets + fees − costs`, using the same constants as yours, simplified. Running costs are `RIVAL_BRANCH_COST` ($18k a week) × the city's cost index × the strategy's cost multiplier × the price list (§4.6).
   - Quarterly revenue and net income are reported.
   - **Recession failure check:** a rival with CR < 6% fails with 15% probability per quarter. It is seized and its network is offered as a **distressed sale** in M&A for 8 weeks at P/B 0.4–0.7. Unsold networks are split among the other rivals.
-- **18.6 Price wars:** if your Rates rating in a city stays ≥ 4.0 for 8 weeks, each rival there has a 30% chance per month to raise deposit rates +0.15pp (`PRICE_WAR` incident and news).
+- **18.6 Price wars:** if your Rates rating in a city stays ≥ 4.0 for 8 weeks, each rival there has a 30% chance per month to cut its plan prices by `PRICE_WAR.bump` (5%), up to `PRICE_WAR.cap` (20%) in all; once your streak ends the cut fades by `PRICE_WAR.decay` (0.5 points) a week. Rival plan price = base × (1 + fee stance − cut). The `PRICE_WAR` incident's Match option cuts your plan prices in the city by `matchCut` (10%) for 26 weeks (the `planCut` effect; C3a, was a savings-rate rise).
 - **18.7 New charters (2026-10-26):** at each year end every generated city (not a regional site) rolls for a newly chartered bank: `RIVAL_CHARTER.chance` (35%) when it has fewer active rival banks than its usual count (`competitorsFor`, because you bought one, the regulator seized one or one merged away), else `roomChance` (8%) when at least `roomShare` (35%) of its storefronts are empty. A city needs at least three free lots and `RIVAL_EXPANSION.minFreeLotShare` free. At most `maxPerYear` (3) charters a year, from the `charters` stream. The new bank draws a strategy (disruptor 35%, community 30%, premium 20%, incumbent 15%), an invented name (CONTENT §15 charter names), an ink and a CEO; it is private, its home is the city's country, it starts with `capital` ($25M) × the nominal index of equity, and opens 2–3 branches on the best free lots by the §18.4 score (C2b: one office on the best lot, sized for 2–3 branches, a Standard). Its branches ramp like any new rival branch, and it expands once it has a year of profits. A bank with capital and no loans yet reads a capital ratio of 100%. The paper runs "New bank on the block".
 - **18.8 Rivals buy each other (2026-10-26):** at each quarter-end, after earnings, every rival rolls `RIVAL_MERGERS.chance` (4%) from the `rivalMergers` stream. A buyer needs four reported quarters, a profitable year and a capital ratio of its strategy target + `excessCr` (1.5pp). Its target is an active rival with equity at most `maxTargetShare` (50%) of the buyer's, not under your pending offer, that it meets in a shared city or in one of its home countries (most shared cities first, then the biggest). The price is book value × (1 + premium), premium U(15%, 40%); the deal goes ahead only if the buyer's pro-forma capital ratio (equity − premium × target book over the combined loans) stays at or above `MERGERS.minProFormaCr` (9%). At most `maxPerQuarter` (1) a quarter. Every holder is paid in cash at the deal price: your company's holding is marked to the price first (gain or loss to Investment gains, §19.7), then turned into cash; your personal shares become personal cash. The buyer takes the target's branches (lots change hands), cities, any corporate loans and credit line it made you (§19.9) and its payroll partnerships with employers; the target's status becomes `merged` (`mergedInto` the buyer) and it leaves the market like a bank you bought.
 - **18.9 Campaigns and technology (2026-10-26):**
@@ -875,7 +895,7 @@ Levels 1–5 (Very conservative to Very aggressive):
 - **Acceptance:** `accept = sigmoid((premium − req)/0.06)`.
   - `req` = 0.30 for healthy targets, 0.15 for Watch-tier targets, −0.20 for distressed sales.
   - Rejected offers can be raised once per 2 weeks (`MERGERS.retryWeeks`; was 4 until 2026-10-26).
-- **Regulator check (lightened 2026-10-26):** pro-forma CR ≥ 9% (`minProFormaCr`; was 10.5%, so the bank may sit in the Watch tier after a deal) AND your deposit share in every affected city ≤ 50% (`maxCityShare`; was 35%). A Lobbying "Fast-track merger" win relaxes the share limit to 65% (`fastTrackShare`; was 45%) for one deal. A **distressed sale** skips the share test altogether (`distressedShareExempt`): the regulator wants the failed network rescued, and the offer sheet says so in the share row.
+- **Regulator check (lightened 2026-10-26):** pro-forma CR ≥ 9% (`minProFormaCr`; was 10.5%, so the bank may sit in the Watch tier after a deal) AND your share in every affected city ≤ 50% (customers in deposit terms since C3a, see Closing details) (`maxCityShare`; was 35%). A Lobbying "Fast-track merger" win relaxes the share limit to 65% (`fastTrackShare`; was 45%) for one deal. A **distressed sale** skips the share test altogether (`distressedShareExempt`): the regulator wants the failed network rescued, and the offer sheet says so in the share row.
 - **Payment:** cash, or once listed, a share-for-share mix: the offer sheet picks 0%, 25%, 50%, 75% or 100% paid in new shares (`SHARE_DEALS.stockStep`).
   - **Share part:** S = stockPct × price × shares bought. New shares = S ÷ your share price on closing day, issued to the public; your own holding of the target is paid in the same mix, so its share part becomes founder shares.
   - **Board:** the target weighs `boardPrice = P_offer × (1 − stockPct × 0.05)` (`boardDiscount`), so an all-share offer needs about 5% more on the price to land the same premium.
@@ -885,7 +905,7 @@ Levels 1–5 (Very conservative to Very aggressive):
   - Goodwill = price − target book equity (floored at 0; a negative difference is booked as a gain).
   - Books and wholesale funding merge.
   - Branches convert over 8 weeks: REBRAND_COST ($60,000) per branch (spread evenly over the 8 weeks), staff morale −10, managers kept.
-- **Closing details (Stage 6):** the target brings cash R = D + E − L − (corporate debt you owe it, which is settled) − (lease deposits on its lots, which move to you); if R would be negative its loans are marked down until R = 0. Goodwill = cash paid + your company's holding of it at market − net assets. Personal holdings are paid out at the offer price. Acquired fit-outs aren't booked as fixed assets. Books split by a mature mix (deposits: chequing 28%, savings 34%, GIC 26%, business 10%, student 2%; loans: mortgage 62%, personal 8%, auto 12%, line of credit 8%, card 10%), which also sets the pro-forma risk weights. Build by seller strategy: premium → premium, incumbent and community → mid, disruptor → basic. City share counts branch deposit books of you and every rival not seized or acquired. A regulator block doesn't start the 4-week retry wait; an accepted deal that can no longer close (cash or tier) lapses.
+- **Closing details (Stage 6, reworked in C3a):** the target settles its own books before closing (deposits paid out, loans sold), so it brings cash R = max(0, E − X − LD), where E is its book equity, X the corporate debt you owe it (settled) and LD the lease deposits on its lots (which move to you). Net assets = R + LD + X. Goodwill = cash paid + new shares + your company's holding of it at market − net assets (a negative difference is a bargain gain). Personal holdings are paid out at the offer price. Acquired fit-outs aren't booked as fixed assets. A rival's book "deposits" stand for its customers until C5, one customer per `MERGERS.depositPerCustomer` ($10,000): an acquired office starts with that many plan seats, split by `ACQUIRED_PLAN_MIX` (Plus 60%, Team 20%, Pro 15%, Campus Plan 5%). Build by seller strategy: premium → premium, incumbent and community → mid, disruptor → basic. City share compares your customers × `depositPerCustomer` (plus the target's deposits) with every rival's branch deposits not seized or acquired. A regulator block doesn't start the 4-week retry wait; an accepted deal that can no longer close (cash or tier) lapses.
 - **Distressed ask:** BVPS × P/B rolled once at failure in 0.4–0.7, floored at $1 per share. Offers to a distressed bank compare with the ask.
 
 ### 19.9 Rival corporate lending (Banks layer)
@@ -1058,6 +1078,8 @@ Run `npm run balance` with seed 42 and the start city Calgary, unless noted. Bra
 
 **Updated 2026-10-26 (stage C2c, data centers):** steady (cash over 4× the cost) and aggressive (3×) build one Row-hall data center from year 5 on the busiest free lot of a city with their office; stress follows steady. Seed 42 builds in weeks 260–300. Every strategy target and the 20-city median still pass; seed 42 steady's year-10 real assets read $8.4B (was $8.6B: about $5M to build and $35–40k a week of rent and power).
 
+**Updated 2026-10-27 (stage C3a, the AI product catalog):** offices sell Plans, API usage and Apps & Services (§10.7) instead of deposits and loans, so the office checkpoints measure ARR, and year 10 measures company ARR in start-of-game money instead of total assets. The ARR bands were set from the 20-city median (week 26 $1.6M; week 52 $3.7M / 5,028 customers / $28k income; week 104 $10.8M / $207k / $86k; week 156 $17.7M / $343k / $158k; week 208 $20.8M / $405k / $196k; week 260 $23.8M / $453k / $233k); the revenue and income bands did not move. Payback moved to ≤ 44 weeks: a subscription office earns nothing until its seats build up, where a bank branch earned a margin on deposits from its first week, so the median reads 41.5 weeks and neither lower churn nor faster Free-tier upgrades moved it without pushing a seed's cash below zero. Seed 42 steady is a weak city (week 52 ARR $3.0M, payback 46 weeks, IPO week 209) and reads $1.0B ARR in year 10; aggressive's year-3 check compares ARR with steady's. The two recession-tier checks (aggressive at Watch or worse, stress-aggressive at Restricted or Critical) read n/a until C7: with no deposit book a lab's risk-weighted assets are small, so bank capital tiers no longer bind (seed 42 aggressive and stress both stay Strong).
+
 **Note (Stage 5):** the branch checkpoints are a seed-42 reference and assume Expansion. With every country simulated, seed 42's path has a recession at weeks 97–134 and policy cuts to 1.5%, so week 156 reads about $90k revenue / $41k income (below band) before recovering inside it by week 208. Other seeds (e.g. 7, 99) already missed the first-branch checkpoints in Stage 4 because their median Midtown lot is weaker; a cross-seed calibration is open.
 
 **Note (Stage 6):** steady takes one private placement when capital binds and lists as soon as it's eligible: seed 42 lists in week 222, seed 7 in week 248, seed 99 in week 261 (years 5–6), with the founder keeping 60%. The IPO money lifts steady from 7 to about 44 branches in year 5. Acceptance test: `tests/sim/ipoAcceptance.test.ts`.
@@ -1068,15 +1090,15 @@ Run `npm run balance` with seed 42 and the start city Calgary, unless noted. Bra
 |---|---|
 | First branch build + lease deposit (mid build, average lot) | $300k–$450k, leaving room for at most one more basic branch from the $900k start |
 | First branch weekly income turns positive | week 6–16 |
-| Branch at week 26 | deposits $15–30M; income positive |
-| Office at week 52 | deposits $35–80M; loans 65–90% of deposits; customers 3,500–8,000; income +$25k–$60k/week [was $30–50M, 75–90%, 3,000–5,000 and $20–40k before C2a] |
+| Branch at week 26 | ARR $1–2.5M; income positive [deposits $15–30M before C3a] |
+| Office at week 52 | ARR $3–6.5M; customers 3,500–8,000; income +$25k–$60k/week [deposits $35–80M and loans 65–90% of deposits before C3a; $30–50M, 75–90%, 3,000–5,000 and $20–40k before C2a] |
 | Mature branch (week 104+) | deposits $38–70M (organic chequing growth keeps it creeping up; in start-of-game money) [was $40–65M, then $40–70M until 2026-10-26]; loans 70–90% of deposits [was 75–90%]; revenue $85k–$150k/week from week 156, $80k+ at week 104 [was $110k+ from week 208, then $95k+ from week 156 until 2026-10-26, and $85k+ at week 104 until the price-list change of 2026-10-26, when the 20-city median read $84k there on main as well]; income +$32k–$70k/week from week 156, +$31k+ at week 104 [was +$45k+ from week 208, then +$38k+, then +$35k (+$33k at week 104) until the rival-competition change of 2026-10-26: chartered banks replace the rivals that fail in recessions, rivals advertise in your cities, and rivals ride out downturns instead of closing branches (§18.4), so the 20-city median first branch reads $32.6–35k from week 156 and $32.8k at week 104]. Since rivals learn (§18.3), a first branch the steady script never upgrades gives up about 1.5% of its deposits a year to them, which is where the 2026-10-26 lower edges come from (seed 42 reads $40.3M, $88k and $38k real at week 260 against $43.6M, $97k and a one-week default loss before). With fewer storefronts per city (CONTENT §3, 2026-10-25) rival branches stand closer to yours, so year 2 ramps a little slower. Since the city-wide customer pool (§9.2, 2026-10-25) the home city fills at about 7 branches by year 4, so the first branch levels off instead of climbing through years 4–5. Loan-ratio, revenue and income checkpoints in a recession or the 26 weeks after it read n/a |
-| Growing home office (C2a, from week 104) | week 104: deposits $70–180M, revenue $160–380k/week, income $55–140k/week; week 156: $110–260M, $250–520k, $85–190k; weeks 208–260: $140–360M, $320–720k, $110–260k; loans 65–90% of deposits. Replaces the mature-branch row above, kept for the record |
-| Payback of a mid build on an average lot | ≤ 40 weeks from opening |
+| Growing home office (C2a, from week 104) | week 104: ARR $8–20M, revenue $160–380k/week, income $55–140k/week; week 156: $12–28M, $250–520k, $85–190k; week 208: $16–36M, $320–700k, $110–260k; week 260: $16–38M, $320–720k, $110–260k [deposits $70–180M / $110–260M / $140–360M and loans 65–90% of deposits before C3a]. Replaces the mature-branch row above, kept for the record |
+| Payback of a mid build on an average lot | ≤ 44 weeks from opening [≤ 40 before C3a] |
 | Year 2 (steady) | 1–4 sales offices [3–8 branches before C2a; 4–8 before 2026-10-26]; HQ required; cash never < 0 |
 | Capital first binds (no raises) | years 1–3; private placements and the IPO are the intended growth fuel |
 | IPO eligible (steady) | years 3–6 |
-| Year 10 (steady) | offices in 10–25 cities [60–250 branches before C2a]; total assets $6–40B [was 60–200; $8–40B] |
+| Year 10 (steady) | offices in 10–25 cities [60–250 branches before C2a]; company ARR $0.5–5B (real) [total assets $6–40B before C3a; was 60–200; $8–40B] |
 | Year 15 (steady) | weekly revenue $20–80M; founder net worth $2–40B |
 | Annual loan loss rate | 0.4–1.0% of loans in Expansion; 1.2–2.5% in Recession |
 | Net interest margin | 3.0–5.0% [was 2.0–3.5%; even §12.1's own figures give about 4.7%] |
@@ -1141,7 +1163,7 @@ Group the constants like this, with the defaults shown above:
 - **TREASURY:**
   - `LIQ_MIN`, `LIQ_TARGET_DEFAULT`, `BOND_SHARE_DEFAULT`, `BOND_DURATION`
   - `OVERNIGHT_SPREAD`, `WINDOW_SPREAD`, `RATING_SPREADS`
-  - `DEPOSIT_PER_EMPLOYEE`
+  - `ARR_PER_EMPLOYEE`
   - `FUNDING_REFRESH_WEEKS = 2`, `FUNDING_OFFERS`, `FUNDING_SIZE`, `FUNDING_RATE_NOISE = 0.0008`, `TREASURY_PENALTY = 0.005`
 - **CAPITAL:** `RISK_WEIGHTS`, `OP_RISK_MULT`, `TIER_THRESHOLDS`, `RECAP_DISCOUNT = 0.5`
   - `REGULATOR_REVIEW` (fail base 0.02, ethics base 1.6, fine 0.05–0.3% of trailing revenue), `RISK_LOSS_WEEKS = 13`, `DELINQUENCY`

@@ -8,7 +8,6 @@ import {
   CATCHMENT_MULT,
   DEMAND_NOISE,
   DISTANCE_FALLOFF,
-  MORTGAGE_SPECIAL,
   PROSPECT_RATE,
   RISK_APPETITE,
   RIVAL_RADIUS,
@@ -18,12 +17,10 @@ import {
   TAKEUP_CAP,
 } from '../../config/balance';
 import { CITIES } from '../../data/cities';
-import { EQUIPMENT } from '../../data/equipment';
 import { needsApproval, type ProductSpec } from '../../data/products';
-import { BUSINESS_ACCT_BIZ_TICKET_MULT, SEGMENT_SPECS } from '../../data/segments';
+import { SEGMENT_SPECS } from '../../data/segments';
 import { SEGMENTS, type SegmentId } from '../../data/types';
 import { loanDemand } from '../macro';
-import { nominalIndex } from '../nominal';
 import { clamp, noise } from '../math';
 import { countryOfCity, marketRef } from '../rates';
 import { stream } from '../rng';
@@ -38,7 +35,7 @@ import { brandSegmentMults } from '../hqMarketing';
 import { isClosed, takeupMult } from '../incident/effects';
 import { affinityOf, allProducts, baseId, starsOf } from '../products';
 import { cityRoom } from './cityMarket';
-import { officeTraffic, sizeMult } from './officeSize';
+import { officeTraffic } from './officeSize';
 import { rivalOverall } from '../rivalMarketing';
 
 export interface Origination {
@@ -122,25 +119,6 @@ export function approvalOf(state: GameState, spec: ProductSpec): number {
   );
 }
 
-/** special_p (§9.6): mortgages need homeowners and advisor offices, and so on. */
-function special(state: GameState, branch: Branch, spec: ProductSpec): number {
-  const lot = state.world.lots[branch.lotId];
-  const offices = EQUIPMENT[branch.build.lobby]?.advisorOffices ?? 0;
-  if (baseId(spec) === 'mortgage') {
-    const m = MORTGAGE_SPECIAL;
-    return (
-      ((lot?.homeownerShare ?? 0) / m.homeownerRef) *
-      clamp(m.base + m.perOffice * offices, m.min, m.max)
-    );
-  }
-  if (spec.kind === 'wealth') return offices > 0 || spec.noAdvisorOffice ? 1 : 0;
-  if (spec.kind === 'safebox') {
-    const boxes = (EQUIPMENT[branch.build.vault]?.boxes ?? 0) * sizeMult(branch);
-    return (branch.books[spec.id]?.accounts ?? 0) < boxes ? 1 : 0;
-  }
-  return 1;
-}
-
 export function runDemand(state: GameState, branch: Branch, fx: CampaignEffects): DemandResult {
   const lot = state.world.lots[branch.lotId];
   if (!lot) throw new Error(`Sales office ${branch.id} has no lot`);
@@ -180,8 +158,7 @@ export function runDemand(state: GameState, branch: Branch, fx: CampaignEffects)
   const newBySeg = {} as Record<SegmentId, number>;
   SEGMENTS.forEach((s, i) => (newBySeg[s] = (served * boosted[i]!) / boostSum));
 
-  // §9.6 take-up per offered product; tickets are quoted at today's price level (§4.6)
-  const nominal = nominalIndex(state, branch.cityId);
+  // §9.6 take-up per offered product: new accounts and their seats or monthly usage
   const byProduct: Record<string, Origination> = {};
   for (const spec of allProducts(state)) {
     if (spec.kind === 'sbl' || spec.kind === 'fx' || !isOffered(branch, spec.id)) continue;
@@ -190,7 +167,6 @@ export function runDemand(state: GameState, branch: Branch, fx: CampaignEffects)
     const stars = starsOf(state, spec);
     const affinity = affinityOf(spec);
     const approval = approvalOf(state, spec);
-    const sp = special(state, branch, spec);
     const boost =
       (spec.category === 'deposits' ? fx.depositTakeUp : 1) * takeupMult(state, baseId(spec));
     let accounts = 0;
@@ -204,17 +180,17 @@ export function runDemand(state: GameState, branch: Branch, fx: CampaignEffects)
           priceFactor(spec, s, price, m) *
           (STARS_TAKEUP.base + STARS_TAKEUP.slope * stars) *
           approval *
-          sp *
           boost *
           (spec.takeUpMult ?? 1),
       );
       const n = newBySeg[s] * q;
-      const ticketMult =
-        baseId(spec) === 'business_acct' && s === 'BIZ'
-          ? BUSINESS_ACCT_BIZ_TICKET_MULT
-          : SEGMENT_SPECS[s].ticketMult[spec.category];
+      // §9.6 (C3a): plans sign seats; usage products a month of usage, more in richer cities.
+      const units =
+        spec.kind === 'usage'
+          ? spec.ticket * lot.incomeIndex * SEGMENT_SPECS[s].ticketMult[spec.category]
+          : spec.ticket;
       accounts += n;
-      volume += n * spec.ticket * lot.incomeIndex * ticketMult * nominal;
+      volume += n * units;
     }
     byProduct[spec.id] = {
       newAccounts: accounts,

@@ -9,7 +9,15 @@ import { managerChoice, optionBlocker } from '../../src/sim/incidents';
 import { countryOfCity, defaultPrice } from '../../src/sim/rates';
 import type { GameState, Lot } from '../../src/sim/state';
 
-export const LENDING = ['personal_loan', 'auto_loan', 'mortgage', 'loc', 'credit_card'];
+/** Products past the starting Plans that a strategy switches on when it "lends" (C3a: API and apps). */
+export const LENDING = [
+  'api',
+  'batch_api',
+  'fine_tuning',
+  'code_assistant',
+  'agent_studio',
+  'creative_suite',
+];
 
 /**
  * An "average lot" for calibration (SIMULATION §25): the median-rent free lot in

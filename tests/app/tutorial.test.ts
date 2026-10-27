@@ -59,12 +59,12 @@ function playThrough(): { s: GameState; trail: number[] } {
   expect(isDone(memo, look(s))).toBe(true);
   advance(memo);
 
-  // 3. Set the savings rate.
+  // 3. Set the Plus price.
   const panel: PanelRoute = { type: 'branch', branchId, tab: 'products' };
   memo = enterStep(3, look(s, panel));
   expect(isDone(memo, look(s, panel))).toBe(false);
-  const savings = s.branches[branchId]!.offered.savings!.price;
-  expect(cmd.setPrice(s, branchId, 'savings', savings + 0.0025).ok).toBe(true);
+  const plus = s.branches[branchId]!.offered.plus!.price;
+  expect(cmd.setPrice(s, branchId, 'plus', plus + 2).ok).toBe(true);
   expect(isDone(memo, look(s, panel))).toBe(true);
   advance(memo);
 
@@ -98,7 +98,7 @@ function playThrough(): { s: GameState; trail: number[] } {
   // 6. Turn on Personal Loans.
   memo = enterStep(6, look(s, panel));
   expect(isDone(memo, look(s))).toBe(false);
-  expect(cmd.setOffered(s, branchId, 'personal_loan', true).ok).toBe(true);
+  expect(cmd.setOffered(s, branchId, 'api', true).ok).toBe(true);
   expect(isDone(memo, look(s))).toBe(true);
   advance(memo);
 
@@ -159,7 +159,7 @@ describe('tutorial step machine', () => {
     if (!r.ok) throw new Error(r.reason);
     const g = guidance(enterStep(3, look(s)), look(s));
     expect(g.targets.map((t) => t.key)).toEqual([
-      'price-savings',
+      'price-plus',
       'product-category',
       'tab-products',
       'my-branch',
@@ -183,7 +183,7 @@ describe('tutorial step machine', () => {
     const lot = freeLot(s);
     const r = cmd.buildBranch(s, { lotId: lot.id, build: REFERENCE_BUILDS.basic });
     if (!r.ok) throw new Error(r.reason);
-    cmd.setOffered(s, r.branchId, 'personal_loan', true);
+    cmd.setOffered(s, r.branchId, 'api', true);
     expect(alreadyDone(enterStep(6, look(s)), look(s))).toBe(true);
     expect(alreadyDone(enterStep(4, look(s)), look(s))).toBe(false);
     expect(alreadyDone(enterStep(8, look(s)), look(s))).toBe(false);

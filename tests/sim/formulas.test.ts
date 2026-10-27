@@ -21,28 +21,30 @@ describe('share of prospects (§9.3)', () => {
 });
 
 describe('pricing (§8, §9.7)', () => {
-  const savings = PRODUCTS.savings!;
-  const loan = PRODUCTS.personal_loan!;
-  const chequing = PRODUCTS.chequing!;
+  const plus = PRODUCTS.plus!;
+  const sbl = PRODUCTS.sbl!;
+  const api = PRODUCTS.api!;
 
-  it('scores deposit rates above market as competitive', () => {
-    expect(competitiveness(savings, 0.03, 0.025)).toBeCloseTo(1);
-    expect(competitiveness(savings, 0.02, 0.025)).toBeCloseTo(-1);
+  it('compares plan fees against a quarter of the market fee', () => {
+    expect(competitiveness(plus, 15, 20)).toBeCloseTo(1);
+    expect(competitiveness(plus, 25, 20)).toBeCloseTo(-1);
   });
 
-  it('scores loan rates below market as competitive and clamps to ±2', () => {
-    expect(competitiveness(loan, 0.09, 0.095)).toBeCloseTo(1);
-    expect(competitiveness(loan, 0.2, 0.1)).toBe(-2);
+  it('scores Loan Desk rates below market as competitive and clamps to ±2', () => {
+    expect(competitiveness(sbl, 0.09, 0.095)).toBeCloseTo(1);
+    expect(competitiveness(sbl, 0.2, 0.1)).toBe(-2);
   });
 
-  it('compares fees against a quarter of the market fee', () => {
-    expect(competitiveness(chequing, 9, 12)).toBeCloseTo(1);
+  it('compares API prices per unit, with a $0.10 floor on the step', () => {
+    expect(competitiveness(api, 3, 4)).toBeCloseTo(1);
+    // A quarter of $0.20 is under the floor, so the step is $0.10.
+    expect(competitiveness(api, 0.05, 0.2)).toBeCloseTo(1.5);
   });
 
   it('raises take-up when the price beats the market', () => {
-    expect(priceFactor(savings, 'RET', 0.03, 0.025)).toBeGreaterThan(1);
-    expect(priceFactor(loan, 'FAM', 0.12, 0.1)).toBeLessThan(1);
-    expect(priceFactor(chequing, 'STU', 30, 12)).toBeCloseTo(0.2);
+    expect(priceFactor(plus, 'RET', 15, 20)).toBeGreaterThan(1);
+    expect(priceFactor(sbl, 'FAM', 0.12, 0.1)).toBeLessThan(1);
+    expect(priceFactor(plus, 'STU', 60, 20)).toBeCloseTo(0.2);
   });
 });
 

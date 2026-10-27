@@ -1,6 +1,6 @@
-// Company deposits and loans (SCREENS §10 Products floor): a weekly line chart
-// of total deposits and loans with each one's latest balance and its change
-// on the week before.
+// Company ARR and lending (SCREENS §10 Products floor): a weekly line chart of
+// annual recurring revenue and Loan Desk lending, with each one's latest value
+// and its change on the week before.
 import { Card, LineChart } from '../../components';
 import { dayOfWeek } from '../../branch/selectors';
 import { delta, money, shortDate } from '../../format/format';
@@ -26,14 +26,14 @@ export function CompanyTrend() {
     <Card>
       <div class="grid-2">
         <Figure
-          label="Deposits"
+          label="ARR"
           tone="ivory"
-          now={t.last.totals.deposits}
-          prev={t.prev?.totals.deposits}
+          now={t.last.totals.arr ?? 0}
+          prev={t.prev?.totals.arr}
           sym={sym}
         />
         <Figure
-          label="Loans"
+          label="Lending"
           tone="brass"
           now={t.last.totals.loans}
           prev={t.prev?.totals.loans}
@@ -43,10 +43,10 @@ export function CompanyTrend() {
       {t.prev && <p class="muted small hq-note">Changes are on the week before.</p>}
       {t.weeks.length > 1 ? (
         <LineChart
-          label="Company deposits and loans by week"
+          label="Company ARR and lending by week"
           series={[
-            { label: 'Deposits', values: t.deposits, tone: 'ivory' },
-            { label: 'Loans', values: t.loans, tone: 'brass' },
+            { label: 'ARR', values: t.arr, tone: 'ivory' },
+            { label: 'Lending', values: t.loans, tone: 'brass' },
           ]}
           startLabel={date(t.weeks[0]!)}
           endLabel={date(t.weeks[t.weeks.length - 1]!)}
