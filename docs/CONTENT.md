@@ -331,7 +331,7 @@ Department ids keep their bank-era names; the screens show the AI names. "Units"
 | marketing | Marketing | 24 | 72,000 | 1 + 0.15 × units + 2 per active brand campaign | all campaign effects ×(0.5 + 0.5k′) |
 | it | Platform & Security | 24 | 98,000 | 2 + 0.25 × units + 1 per $5B assets | app rating target ×k′; breach and outage odds ×(1 + 2(1 − k′)) |
 | risk | Safety & Alignment | 24 | 88,000 | 2 + 0.15 × units + 1 per $50M of ARR | sets the safety ratio's strength (SIMULATION §15); audit odds ×(1 + 3(1 − k′)) |
-| executive | Executive | 8 (suite) | (per exec) | — | enables executives: COO, CFO, CPO, CMO, CTO, CSO, CIO, Chief Scientist |
+| executive | Executive | 7 (suite) | (per exec) | — | enables executives: COO, CFO, CPO, CMO, CTO, CSO |
 | investment | Investment | 32 | 120,000 | optional | ventures shown = 1 + floor(staff / 4), max 8 |
 
 Shortfall effects read effect(k′) = k′^0.7. Requirements phase in with the founder ramp (SIMULATION §16.3). The cuts from Stage 4 tuning still hold: a lab without an HQ ends a 6-year steady run clearly behind one with a staffed HQ (balance strategy `nohq`).
@@ -420,9 +420,9 @@ Provider names (fictional GPU clouds): Northbeam Cloud · Halcyon Compute · Str
 
 Rival model families (one per lab, numbered by generation, starting at 2; 52 names in `src/data/modelNames.ts`, enough for the 34 rivals plus labs founded later): Wren, Lantern, Cobalt, Kestrel, Fathom, Juniper, Halyard, Tessel, Sable, Quarry, Marlin, Ember, then birds (Osprey, Plover, Siskin, Curlew, Heron, Tern, Linnet, Gannet), winds (Foehn, Gale, Sirocco, Bora, Chinook, Squall, Levant, Harmattan), minerals (Basalt, Garnet, Feldspar, Onyx, Tourmaline, Beryl, Obsidian, Agate), stars (Vega, Altair, Deneb, Rigel, Spica, Mizar, Capella, Procyon) and trees (Rowan, Alder, Larch, Hazel, Tamarack, Hemlock, Birch, Cedar). Your trained models take the name you give them (the strategies use "Gen N").
 
-## 13c. Researchers and the Chief Scientist
+## 13c. Researchers and the CPO's research lead
 
-Researchers take names and portraits from the shared person generator (the same lists as managers and executives), so every one is fictional. The Chief Scientist (short CSci) is the ninth executive seat, with one delegation, **Routine training runs**. A rival bidding for one of yours raises **Researcher poached**: "{rival} is trying to hire away our researcher {name}." It offers *Counter-offer* (their salary +25%) or *Let them go* (they join the rival lab, and its next models get better).
+Researchers take names and portraits from the shared person generator (the same lists as managers and executives), so every one is fictional. The CPO leads research: their Expertise lifts training odds and their **Routine training runs** delegation trains for you (the Chief Scientist seat's job until 2026-10-27, when the seat folded into the CPO). A rival bidding for one of yours raises **Researcher poached**: "{rival} is trying to hire away our researcher {name}." It offers *Counter-offer* (their salary +25%) or *Let them go* (they join the rival lab, and its next models get better).
 
 ## 14. Employers (staff plan partnerships)
 

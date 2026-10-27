@@ -21,6 +21,7 @@ import { migrateMoney } from './migrateMoney';
 import { migrateRivalBooks } from './migrateRivalBooks';
 import { SCHEMA_VERSION, type GameState } from '../state';
 import { migrateSeedMoney } from './migrateSeedMoney';
+import { migrateSeats } from './migrateSeats';
 import { generatePersonalSites } from '../personalSites';
 
 type RawSave = Record<string, unknown> & { schemaVersion: number };
@@ -141,9 +142,17 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     }
     return s;
   },
-  // 21 → 22: rival labs keep books on customers, ARR, cash and runway instead
-  // of deposits, loans and a capital ratio.
+  // 21 → 22: seven executive seats. The Chief Scientist folds into the CPO and
+  // the Chief Infrastructure Officer into the CFO; the dormant CFO Funding and
+  // CFO/CSO guidance switches go; the HR floor's manager-hiring switch becomes
+  // the COO's Sales office operations.
   21: (s) => {
+    migrateSeats(s as unknown as GameState);
+    return s;
+  },
+  // 22 → 23: rival labs keep books on customers, ARR, cash and runway instead
+  // of deposits, loans and a capital ratio.
+  22: (s) => {
     migrateRivalBooks(s as unknown as GameState);
     return s;
   },

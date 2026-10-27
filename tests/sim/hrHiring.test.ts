@@ -1,13 +1,13 @@
-// HR fills manager vacancies (SIMULATION §16.11): with an HR floor and the
-// switch on, each week an open branch without a manager gets the strongest
-// candidate in its city; delegations stay as they were; nothing happens
-// without the floor, with the switch off, or while the branch is still being
-// built; the COO's Branch operations hires first.
+// Manager vacancies (SIMULATION §17.2): the COO's Sales office operations is
+// the one way managers are hired for you since schema 22. Each week an open
+// branch without a manager gets the strongest candidate in its city with
+// default delegation; nothing happens without a COO or the switch, or while
+// the branch is still being built. The HR floor's own switch is gone.
 import { describe, expect, it } from 'vitest';
 import { EXEC_DELEGATION } from '../../src/config/balance';
 import * as cmd from '../../src/sim/commands';
 import { weeklyTick } from '../../src/sim/engine';
-import { hrFillVacancies, strongestCandidate } from '../../src/sim/hrHiring';
+import { strongestCandidate, unstaffedBranches } from '../../src/sim/hrHiring';
 import { newGame } from '../../src/sim/newGame';
 import { refreshManagerPool } from '../../src/sim/people';
 import { type GameState, type Manager } from '../../src/sim/state';
@@ -24,54 +24,46 @@ function openBranch(s: GameState) {
   return b;
 }
 
-describe('HR hiring branch managers', () => {
-  it('hires the strongest candidate and leaves delegation alone', () => {
-    const s = execGame(['hr']);
-    const b = openBranch(s);
-    const before = { ...b.delegation };
-    const best = Math.max(...s.people.managerCandidates[b.cityId]!.map(score));
-    expect(hrFillVacancies(s)).toBe(1);
-    expect(score(s.people.managers[b.managerId!]!)).toBe(best);
-    expect(b.delegation).toEqual(before);
-    // Nothing left to fill.
-    expect(hrFillVacancies(s)).toBe(0);
+describe('hiring office managers', () => {
+  it('has no HR floor switch any more', () => {
+    const s = newGame({ seed: 1, cityId: 'cal' });
+    expect('hrHiring' in s.people).toBe(false);
+    expect('setHrHiring' in cmd).toBe(false);
   });
 
-  it('does nothing without an HR floor, with the switch off, or before opening', () => {
-    const noFloor = execGame();
-    openBranch(noFloor);
-    expect(hrFillVacancies(noFloor)).toBe(0);
-
-    const off = execGame(['hr']);
-    openBranch(off);
-    expect(cmd.setHrHiring(off, false).ok).toBe(true);
-    expect(hrFillVacancies(off)).toBe(0);
-
-    const building = execGame(['hr']);
-    const b = Object.values(building.branches)[0]!;
-    expect(b.status).not.toBe('open');
-    expect(hrFillVacancies(building)).toBe(0);
+  it('nobody hires without a COO, even with an HR floor', () => {
+    const s = execGame(['hr']);
+    const b = openBranch(s);
+    expect(unstaffedBranches(s)).toHaveLength(1);
+    weeklyTick(s);
     expect(b.managerId).toBeUndefined();
   });
 
-  it('refuses the switch without an HR floor', () => {
-    const s = newGame({ seed: 1, cityId: 'cal' });
-    expect(s.people.hrHiring).toBe(true);
-    expect(cmd.setHrHiring(s, false).ok).toBe(false);
-  });
-
-  it('runs in the weekly tick, after a COO who hires first', () => {
+  it('the COO hires the strongest candidate with default delegation in the weekly tick', () => {
     const s = execGame(['hr']);
+    hire(s, 'coo');
     const b = openBranch(s);
+    const best = Math.max(...s.people.managerCandidates[b.cityId]!.map(score));
     weeklyTick(s);
     expect(b.managerId).toBeDefined();
+    expect(score(s.people.managers[b.managerId!]!)).toBe(best);
+    expect(b.delegation).toEqual(EXEC_DELEGATION.cooDelegation);
+    expect(unstaffedBranches(s)).toHaveLength(0);
+  });
 
-    const withCoo = execGame(['hr']);
-    hire(withCoo, 'coo');
-    const b2 = openBranch(withCoo);
-    weeklyTick(withCoo);
-    expect(b2.managerId).toBeDefined();
-    expect(b2.delegation).toEqual(EXEC_DELEGATION.cooDelegation);
+  it('waits for the switch and for the branch to open', () => {
+    const off = execGame();
+    hire(off, 'coo');
+    cmd.setExecDelegation(off, 'coo', 'branchOps', false);
+    const b = openBranch(off);
+    weeklyTick(off);
+    expect(b.managerId).toBeUndefined();
+
+    const building = execGame();
+    hire(building, 'coo');
+    const b2 = Object.values(building.branches)[0]!;
+    expect(b2.status).not.toBe('open');
+    expect(unstaffedBranches(building)).toHaveLength(0);
   });
 
   it('picks the first of equally strong candidates', () => {

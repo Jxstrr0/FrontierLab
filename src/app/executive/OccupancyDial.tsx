@@ -1,4 +1,4 @@
-// The CREO's occupancy dials (SCREENS §10.1), one under each Rents switch:
+// The CFO's occupancy dials (SCREENS §10.1), one under each Rents switch:
 // 80 / 85 / 90 / 95 / 100% full. The tagline says what the stop would do to
 // rent per m² and to yearly net rent across that owner's buildings, against
 // 100% (estimates from src/sim/execDelegationsProperty.ts occupancyEstimate).

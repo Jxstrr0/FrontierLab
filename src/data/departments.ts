@@ -72,7 +72,7 @@ export const DEPARTMENTS: Record<DeptId, DepartmentSpec> = {
     name: 'Executive',
     description: 'Senior executives and the quarterly board meeting.',
     marketSalary: 0,
-    fixedDesks: 8,
+    fixedDesks: 7,
     feature: 'capitalMarkets',
   },
   investment: {

@@ -7,7 +7,7 @@ import { DEV_TERMS, MODEL_NAME_MAX, TRAINING } from '../../../config/balance';
 import * as cmd from '../../../sim/commands';
 import { devSpeed } from '../../../sim/development';
 import type { TrainingRun } from '../../../sim/state';
-import { chiefScientistBonus, researchBonus } from '../../../sim/talent';
+import { cpoTrainingBonus, researchBonus } from '../../../sim/talent';
 import { trainingLift, trainingOdds, trainingWeeksLeft } from '../../../sim/training';
 import { Card, CoinRating, Confirm, Row, Stepper } from '../../components';
 import { moneyFull, moneyStepper } from '../../format/format';
@@ -38,14 +38,14 @@ function NewRun() {
   const rows = oddsRows(trainingOdds(s, weeks, budget, focus));
 
   const team = Math.round(researchBonus(s, focus) * 100);
-  const chief = Math.round(chiefScientistBonus(s) * 100);
+  const chief = Math.round(cpoTrainingBonus(s) * 100);
   const boostText =
     team > 0 && chief > 0
-      ? `Your research team adds +${team}, the Chief Scientist +${chief}.`
+      ? `Your research team adds +${team}, your CPO +${chief}.`
       : team > 0
         ? `Your research team adds +${team}.`
         : chief > 0
-          ? `The Chief Scientist adds +${chief}.`
+          ? `Your CPO adds +${chief}.`
           : '';
 
   const start = () => {

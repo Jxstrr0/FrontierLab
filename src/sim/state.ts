@@ -58,7 +58,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState } from './personalTypes';
 
-export const SCHEMA_VERSION = 22;
+export const SCHEMA_VERSION = 23;
 
 export interface GameState {
   schemaVersion: number;
@@ -424,21 +424,18 @@ export interface Company {
   /** The fit-out you last built with (schema v14): the build sheet and the COO start from it. */
   lastBuild?: BuildSpec;
   /**
-   * Branch guidance from the C-suite (schema v15, §17.2): whole steps that move
-   * delegated managers' pricing, Loan Desk approvals, wages, marketing and
-   * lineup. Staffing, marketing and products joined in schema v18.
+   * Sales office guidance from the C-suite (§17.2): whole steps that move
+   * delegated managers' wages, marketing and lineup (schema v18). The CFO and
+   * CSO's deposit and loan steps of schema v15 were removed in schema 22.
    */
   guidance: BranchGuidance;
 }
 
 /**
- * Positive deposits pays savers more; positive loans charges borrowers more and
- * approves less; positive staffing pays and staffs more; positive marketing
- * spends more on campaigns; positive products offers more and charges less.
+ * Positive staffing pays and staffs more; positive marketing spends more on
+ * campaigns; positive products offers more and charges less.
  */
 export interface BranchGuidance {
-  deposits: number;
-  loans: number;
   staffing: number;
   marketing: number;
   products: number;
@@ -781,8 +778,6 @@ export interface People {
   rerolls: Record<Id, number>;
   /** HR benefit control values by benefit id (§16.5). */
   benefits: Record<string, number>;
-  /** With an HR floor, HR hires a manager for every open branch without one (§16.11, schema v25). */
-  hrHiring: boolean;
 }
 
 export interface Manager {
@@ -978,7 +973,7 @@ export interface RivalBank {
   /** Running ad campaigns by city (§18.9): overall-rating boost and weeks left. */
   campaigns?: Record<Id, { boost: number; weeksLeft: number }>;
   /**
-   * Books on ARR and runway (schema 22, §18.1, §18.5): corporate cash, last
+   * Books on ARR and runway (schema 23, §18.1, §18.5): corporate cash, last
    * week's running costs (compute, offices, training; runway = cash ÷ costs),
    * quarter-ends in a row with negative cash, and equity = cash + the offices'
    * replacement value (synced every week, so panels and prices can read it).
@@ -1029,7 +1024,7 @@ export interface RivalBranch {
   quality: [Stars, Stars, Stars, Stars];
   overall: Stars;
   reviewCount: number;
-  /** Customers served from this office and the ARR they pay (§18.1, schema 22). */
+  /** Customers served from this office and the ARR they pay (§18.1, schema 23). */
   customers: number;
   arr: Money;
   /** Last week's contribution (earnings minus costs). */

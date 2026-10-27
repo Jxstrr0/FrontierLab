@@ -1,4 +1,4 @@
-// Save migration (schema 21 → 22): rival labs stop running bank books. Each
+// Save migration (schema 22 → 23): rival labs stop running bank books. Each
 // office's "deposits" become customers (one per the old $10,000 of deposits,
 // the figure the M&A tab used) with the ARR they pay at the rival's prices;
 // the lab's cash is its old equity less its offices' replacement value (at

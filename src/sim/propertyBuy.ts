@@ -1,6 +1,6 @@
 // Completing a building purchase (SIMULATION §21.1): pays for a listed building
 // from corporate or personal cash, books it and takes it off the market. Shared
-// by your own offers (commands/realEstate.ts) and the CREO's Buying switches
+// by your own offers (commands/realEstate.ts) and the CFO's Buying switches
 // (execBuying.ts). A company purchase pays investing cash and books the
 // building at its estimated value; the difference is a property gain or loss.
 import { pushEvent } from './events';

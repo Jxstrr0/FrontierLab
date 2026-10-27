@@ -1,13 +1,13 @@
 // Executive delegations for money and products (SIMULATION §17.2 table), each a
 // small weekly routine that only uses the player's own commands:
-//   CFO  treasury      auto-funding on; borrows the cheapest funding offer when LR is
-//                      more than 2pp under target
 //   CPO  pricing       prices the company lineup like a delegated manager (§17.1)
 //                      while Apply-to-all is on
 //   CPO  developments  starts the next undeveloped template when none is running, on a
 //                      weekly budget of at most 1% of weekly revenue
-//   CPO  models        switches to the local data-vendor package whose quality, less
-//                      its licence cost, beats the house model's by a margin (C6a)
+//   CPO  models        switches to the model whose quality, less its licence cost,
+//                      beats the one in use by a margin: a local data-vendor package
+//                      (C6a) or a model you have trained (the CPO's Routine training
+//                      runs leave the switch to this routine)
 //   CTO  digital       starts the next digital project when no development is running
 // The CFO's halved statement delay is passive (hq.ts); the dividend proposal is a
 // selector the board meeting reads (governance.ts).
@@ -24,10 +24,7 @@ import type { CountryId } from '../data/types';
 import { delegatedPrice } from './branch/delegation';
 import { startDevelopment } from './commands/development';
 import { setCompanyPrice } from './commands/products';
-import { borrowOffer, setTreasuryPolicy } from './commands/treasury';
-import { buyBureauModel } from './commands/underwriting';
-import { totalDeposits } from './balanceSheet';
-import { hasTreasuryFloor, maxBorrow } from './fundingMarket';
+import { activateModel, buyBureauModel } from './commands/underwriting';
 import { allProducts } from './products';
 import { stream } from './rng';
 import type { Branch, GameState } from './state';
@@ -38,22 +35,6 @@ export function weeklyRevenue(state: GameState): number {
   const recent = state.history.weekly.slice(-X.revenueWeeks);
   if (recent.length === 0) return 0;
   return recent.reduce((s, w) => s + w.revenue, 0) / recent.length;
-}
-
-// ─── CFO ──────────────────────────────────────────────────────────────────────
-
-/** Treasury: auto-funding on, funding offers keep LR within ±2pp of target. */
-export function cfoTreasury(state: GameState): void {
-  const t = state.treasury;
-  if (!t.autoFunding) setTreasuryPolicy(state, { autoFunding: true });
-  const lr = state.company.liquidityRatio;
-  if (lr === null) return;
-  if (lr < t.liqTarget - X.lrBand && hasTreasuryFloor(state)) {
-    const offer = [...t.offers].sort((a, b) => a.rate - b.rate)[0];
-    const need = (t.liqTarget - lr) * totalDeposits(state);
-    const amount = offer ? Math.min(maxBorrow(state, offer), need) : 0;
-    if (offer && amount >= 1) borrowOffer(state, offer.id, amount);
-  }
 }
 
 // ─── CPO ──────────────────────────────────────────────────────────────────────
@@ -116,8 +97,9 @@ const modelScore = (quality: number, costPerCustomer: number) =>
   quality - MODEL_DELEGATE.costWeight * costPerCustomer;
 
 /**
- * Models (C6a): the local data-vendor package that beats the house model's
- * score by at least minGain.
+ * Models (C6a, and the trained models since schema 22): the local data-vendor
+ * package or trained model that beats the active model's score by at least
+ * minGain; the best of them is switched on (ties: packages first, then by id).
  */
 export function cpoModels(state: GameState): void {
   const u = state.underwriting;
@@ -125,14 +107,26 @@ export function cpoModels(state: GameState): void {
   const current = activeModel(state);
   const now = modelScore(modelQuality(current), current.costPerCustomer);
   const local = bureausIn(state.world.currentCityId);
-  let best: { id: string; score: number } | undefined;
+  let best: { id: string; score: number; trained: boolean } | undefined;
+  const consider = (id: string, score: number, trained: boolean) => {
+    if (score >= now + MODEL_DELEGATE.minGain && (!best || score > best.score))
+      best = { id, score, trained };
+  };
   for (const pkg of Object.values(BUREAU_PACKAGES)) {
     if (!local.includes(pkg.bureau) || pkg.id === u.activeModelId) continue;
-    const score = modelScore(modelQuality({ radar: mixRadar(pkg.mix) }), pkg.costPerCustomer);
-    if (score >= now + MODEL_DELEGATE.minGain && (!best || score > best.score))
-      best = { id: pkg.id, score };
+    consider(
+      pkg.id,
+      modelScore(modelQuality({ radar: mixRadar(pkg.mix) }), pkg.costPerCustomer),
+      false,
+    );
   }
-  if (best) buyBureauModel(state, best.id);
+  const trained = Object.values(u.models)
+    .filter((m) => m.source === 'trained' && m.id !== u.activeModelId)
+    .sort((a, b) => (a.id < b.id ? -1 : 1));
+  for (const m of trained) consider(m.id, modelScore(modelQuality(m), m.costPerCustomer), true);
+  if (!best) return;
+  if (best.trained) activateModel(state, best.id);
+  else buyBureauModel(state, best.id);
 }
 
 // ─── CTO ──────────────────────────────────────────────────────────────────────
