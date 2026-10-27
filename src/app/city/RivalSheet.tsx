@@ -9,7 +9,7 @@ import { campaignWeeksLeft, rivalOverall } from '../../sim/rivalMarketing';
 import { rivalPriceInCity } from '../../sim/rivalPrices';
 import type { GameState } from '../../sim/state';
 import { AdvisorBar, Badge, CoinRating, Medallion, Sheet } from '../components';
-import { count } from '../format/format';
+import { count, money } from '../format/format';
 import { priceText } from '../branch/selectors';
 import { sizeName } from '../../sim/branch/officeSize';
 
@@ -74,6 +74,9 @@ export function RivalSheet(p: { s: GameState; lotId: string; onClose: () => void
           <div>
             <CoinRating value={rivalOverall(bank, branch)} />
             <div class="muted small">{count(branch.reviewCount)} reviews at this office</div>
+            <div class="muted small">
+              {count(Math.round(branch.customers))} customers · {money(branch.arr, sym)} ARR
+            </div>
             {adWeeks > 0 && (
               <div class="small tone-bad">
                 Advertising in this city: +{RIVAL_MARKETING.boost.toFixed(2)} for {adWeeks} more

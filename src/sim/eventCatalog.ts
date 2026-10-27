@@ -131,8 +131,17 @@ export interface EventPayloads {
   /** Listed rivals only. `yieldPct` is the annualised yield on the notional share price. */
   RIVAL_DIVIDEND: { rivalId: Id; company: string; dps: Money; yieldPct: number; quarter: string };
   RIVAL_EXEC_RESIGN: { rivalId: Id; company: string; title: string; name: string };
-  /** A rival fails its recession check and is seized (§18.5). */
+  /** A rival runs out of cash and goes into administration (§18.5). */
   BANK_FAILURE: { rivalId: Id; bank: string; n: number };
+  /** A rival short of runway raises a funding round: new shares for `weeks` of running costs (§18.5). */
+  RIVAL_RAISE: {
+    rivalId: Id;
+    bank: string;
+    amount: Money;
+    newShares: number;
+    price: Money;
+    weeks: number;
+  };
   /** Its unsold network is split among the other rivals (or closed). */
   RIVAL_NETWORK_SPLIT: { rivalId: Id; bank: string; n: number; takers: string[] };
   /** A rival raises deposit rates in a price war (§18.6). */
@@ -280,8 +289,15 @@ export interface EventPayloads {
   CONVERSION_DONE: { rivalId: Id; bank: string; buyer: string; branches: number };
   /** An accepted offer that could not close (cash or safety tier), or a target gone from the market. */
   MERGER_LAPSED: { rivalId: Id; bank: string; reason: string };
-  /** A failed rival's network goes on sale in M&A (rivalQuarter.ts failureCheck, §18.5). */
-  DISTRESSED_SALE: { rivalId: Id; bank: string; ask: Money; pb: number; weeks: number; n: number };
+  /** A failed rival's network goes on sale in M&A (rivalQuarter.ts failureCheck, §18.5). `multiple` is the ask as a multiple of its ARR. */
+  DISTRESSED_SALE: {
+    rivalId: Id;
+    bank: string;
+    ask: Money;
+    multiple: number;
+    weeks: number;
+    n: number;
+  };
 
   /** A currency moved ≥ FX.newsMove against your home currency this week (fx.ts, §19.10). */
   FX_MOVE: { country: string; currency: string; home: string; pct: number };

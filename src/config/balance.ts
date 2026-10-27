@@ -491,7 +491,7 @@ export const DEAL = {
   /** …and declines an RFP that stays under this one even at the limit. */
   delegateFloor: 0.3,
   /** Share of contract revenue that runs on compute (base spot dollars, SIMULATION §13.0). */
-  computeShare: 0.3,
+  computeShare: 0.25,
   /** Share of contract revenue spent on account management. */
   serviceShare: 0.1,
   /** Yearly failure odds of a business: failYear × exp(−failSlope × (Financial health − 5)) × credit cycle. */
@@ -1068,25 +1068,7 @@ export const BRANCH_NAME_MAX = 32;
 export const EMPLOYER_PARTNER_CHANCE = 0.6;
 
 // ─── RIVAL AI (§18) ───────────────────────────────────────────────────────────
-/** Starting capital ratio range by strategy (§18.5, simplified financials). */
-export const RIVAL_START_CR: Record<
-  'incumbent' | 'disruptor' | 'premium' | 'community',
-  [number, number]
-> = {
-  incumbent: [0.125, 0.14],
-  premium: [0.13, 0.15],
-  community: [0.105, 0.125],
-  disruptor: [0.08, 0.1],
-};
-/** A mature rival branch's deposits at quality RIVAL_QUALITY_REF and incomeIndex 1 (§18.1). */
-export const RIVAL_MATURE_DEPOSITS = 45_000_000;
 export const RIVAL_QUALITY_REF = 3.4;
-/** Rival loans per $ of deposits (their LDR). */
-export const RIVAL_LDR = 0.82;
-/** Risk weight on a rival's loans for its capital ratio. */
-export const RIVAL_LOAN_RISK_WEIGHT = 0.75;
-/** Books move this share of the gap to their target each week (§18.1). */
-export const RIVAL_BOOK_EMA = 0.05;
 /** Branches opened after the start ramp to their mature size over this many weeks (§18.1). */
 export const RIVAL_RAMP_WEEKS = 156;
 /**
@@ -1101,80 +1083,104 @@ export const RIVAL_COMPETITION = {
   playerK: 1.2,
   min: 0.35,
 } as const;
-/** Loans = deposits × RIVAL_LDR × (1 + slope × (loanDemand − 1)). */
-export const RIVAL_LDR_DEMAND_SLOPE = 0.3;
 /**
- * Simplified weekly financials by strategy (§18.5): net interest margin on loans,
- * fee yield on deposits, cost and loss multipliers, how hard the credit cycle
- * bites (losses × (1 + cycleSens × (creditCycle − 1)); thin-file disruptors feel
- * a recession most), the capital ratio dividends steer toward, and the
- * expansion rate multiplier (disruptors 0.25×, §18.4).
+ * Rival lab books (SIMULATION §18.1, §18.5): each office holds customers that
+ * grow toward matureCustomers × units × incomeIndex × quality ÷ RIVAL_QUALITY_REF
+ * × competition × ramp × the downturn factor, moving `ema` of the gap a week.
+ * ARR = customers × (plan ARR from the rival's own price sheet, weighted by
+ * ACQUIRED_PLAN_MIX, + usagePerCustomer × the price list). Weekly revenue is
+ * ARR ÷ 52; costs are compute (computeShare × revenue × the compute index),
+ * staff and rent (officeCost × units × city cost index × price list) and model
+ * training (trainingShare × revenue), each × the strategy's multiplier. Cash
+ * takes the after-tax earnings; equity = cash + the offices' replacement value.
  */
-export const RIVAL_FINANCE: Record<
-  'incumbent' | 'disruptor' | 'premium' | 'community',
-  {
-    nim: number;
-    feeMult: number;
-    costMult: number;
-    lossMult: number;
-    cycleSens: number;
-    crTarget: number;
-    expandMult: number;
-  }
-> = {
-  incumbent: {
-    nim: 0.03,
-    feeMult: 1.1,
-    costMult: 1,
-    lossMult: 1,
-    cycleSens: 4,
-    crTarget: 0.13,
-    expandMult: 1,
-  },
-  premium: {
-    nim: 0.031,
-    feeMult: 1.4,
-    costMult: 1.3,
-    lossMult: 0.7,
-    cycleSens: 3,
-    crTarget: 0.14,
-    expandMult: 1,
-  },
-  community: {
-    nim: 0.028,
-    feeMult: 0.8,
-    costMult: 0.95,
-    lossMult: 1.1,
-    cycleSens: 5,
-    crTarget: 0.115,
-    expandMult: 1,
-  },
-  disruptor: {
-    nim: 0.026,
-    feeMult: 0.4,
-    costMult: 0.6,
-    lossMult: 1.6,
-    cycleSens: 7,
-    crTarget: 0.085,
-    expandMult: 0.25,
-  },
-};
-/** NIM moves with the policy rate's gap from neutral (low rates squeeze deposit margins). */
-export const RIVAL_NIM_POLICY_SLOPE = 0.25;
-/** Gross loan yield over policy, for reported revenue. */
-export const RIVAL_LOAN_YIELD_SPREAD = 0.03;
-/** Fee income per $ of deposits a year, before the strategy multiplier. */
-export const RIVAL_FEE_YIELD = 0.02;
-/** Weekly cost of running a branch, × city cost index × strategy cost multiplier × the price list (§4.6). */
-export const RIVAL_BRANCH_COST = 18_000;
-/** Servicing cost per $ of deposits a year. */
-export const RIVAL_SERVICING = 0.004;
-/** Annual loss rate on loans in a neutral cycle, before the strategy multiplier. */
-export const RIVAL_BASE_LOSS_RATE = 0.006;
+export const RIVAL_BOOKS = {
+  /** Mature customers of one office unit at quality RIVAL_QUALITY_REF and incomeIndex 1. */
+  matureCustomers: 4_500,
+  /** Customers move this share of the gap to their target each week. */
+  ema: 0.05,
+  /** API and app ARR per customer a year in start-of-game money (× the price list, §4.6). */
+  usagePerCustomer: 520,
+  /** Downturns: the customer target × max(min, 1 − sens × strategy cycleMult × (creditCycle − 1)). */
+  cycle: { sens: 0.4, min: 0.6 },
+  /** Compute spend as a share of revenue at a compute index of 1. */
+  computeShare: 0.25,
+  /** Weekly staff and rent of one office unit, × city cost index × the price list. */
+  officeCost: 35_000,
+  /** Model training spend as a share of revenue. */
+  trainingShare: 0.08,
+  /** Cash a rival keeps, in weeks of running costs, before it pays dividends. */
+  cashTargetWeeks: 26,
+  /** Starting cash by strategy, in weeks of running costs (drawn once at seeding). */
+  startRunwayWeeks: {
+    incumbent: [78, 104],
+    premium: [78, 104],
+    community: [52, 78],
+    disruptor: [30, 52],
+  } as Record<'incumbent' | 'disruptor' | 'premium' | 'community', [number, number]>,
+  /**
+   * Strategy multipliers: on office costs, compute, training, how hard a
+   * downturn shrinks customers (cycleMult), and the expansion rate (disruptors
+   * 0.25×, §18.4).
+   */
+  strategy: {
+    incumbent: { costMult: 1, computeMult: 1, trainingMult: 1, cycleMult: 1, expandMult: 1 },
+    premium: { costMult: 1.3, computeMult: 0.9, trainingMult: 1.2, cycleMult: 0.8, expandMult: 1 },
+    community: {
+      costMult: 0.95,
+      computeMult: 1.1,
+      trainingMult: 0.8,
+      cycleMult: 1.2,
+      expandMult: 1,
+    },
+    disruptor: {
+      costMult: 0.6,
+      computeMult: 1.2,
+      trainingMult: 1.3,
+      cycleMult: 1.6,
+      expandMult: 0.25,
+    },
+  } as Record<
+    'incumbent' | 'disruptor' | 'premium' | 'community',
+    {
+      costMult: number;
+      computeMult: number;
+      trainingMult: number;
+      cycleMult: number;
+      expandMult: number;
+    }
+  >,
+} as const;
+/**
+ * A rival's runway is cash ÷ weekly running costs. These bands put it on the
+ * same tier scale as yours for panels and the premium a target wants (§19.8):
+ * Watch or worse asks only MERGERS.reqWatch.
+ */
+export const RIVAL_RUNWAY_TIERS: { tier: Tier; minWeeks: number }[] = [
+  { tier: 'strong', minWeeks: 104 },
+  { tier: 'adequate', minWeeks: 52 },
+  { tier: 'watch', minWeeks: 26 },
+  { tier: 'restricted', minWeeks: 8 },
+  { tier: 'critical', minWeeks: -Infinity },
+];
+/**
+ * Funding rounds (§18.5): a rival that lost money over the last quarter with
+ * less than maxRunwayWeeks of cash rolls `chance` at quarter-end to raise
+ * `weeks` of running costs, selling new shares at its fair value per share
+ * less `discount` (never under minPrice), which dilutes every holder.
+ */
+export const RIVAL_RAISE = {
+  maxRunwayWeeks: 26,
+  chance: 0.2,
+  weeks: 78,
+  discount: 0.2,
+  minPrice: 1,
+} as const;
 /** Monthly expansion check (§18.4). */
 export const RIVAL_EXPANSION = {
   everyWeeks: 4,
-  minCr: 0.11,
+  /** An eligible rival keeps this many weeks of running costs in cash after a build. */
+  minRunwayWeeks: 52,
   /**
    * Chance per monthly check, in each city it serves, that an eligible rival
    * grows its office there, divided by the units the next size adds (C2b).
@@ -1186,7 +1192,10 @@ export const RIVAL_EXPANSION = {
   maxRivalLotShare: 0.4,
   /** …or once fewer than this share of lots is free. */
   minFreeLotShare: 0.2,
-  /** Build cost taken from equity, × city cost index × the nominal index. */
+  /**
+   * Build cost per unit, × city cost index × the nominal index, paid from cash;
+   * it is also what an office unit counts for in the lab's equity (§18.1).
+   */
   buildCost: 450_000,
   reviews: [20, 120] as [number, number],
   /**
@@ -1213,7 +1222,7 @@ export const RIVAL_LEARNING = { step: 0.1, maxQuality: 4.6 } as const;
  * its usual count, or `roomChance` when it is full but still has `roomShare` of
  * its storefronts free. At most `maxPerYear` new banks a year. A new bank opens
  * `branches` storefronts in that city with `capital` × the nominal index of
- * starting equity, is private, and starts growing after a year like any rival.
+ * starting cash, is private, and starts growing after a year like any rival.
  */
 export const RIVAL_CHARTER = {
   chance: 0.35,
@@ -1221,22 +1230,23 @@ export const RIVAL_CHARTER = {
   roomShare: 0.35,
   maxPerYear: 3,
   branches: [2, 3] as [number, number],
-  capital: 25_000_000,
+  capital: 15_000_000,
   strategyWeights: { disruptor: 0.35, community: 0.3, premium: 0.2, incumbent: 0.15 },
 } as const;
 /**
  * Rivals buy each other (§18.8): at each quarter-end, every active rival with a
- * profitable year and capital `excessCr` above its strategy target rolls
- * `chance` to bid for the best smaller rival it shares a city or home country
- * with (equity at most `maxTargetShare` of its own). The price is book value ×
- * (1 + a premium in `premium`), paid to every holder; the premium comes off the
- * buyer's equity. The deal needs the buyer's pro-forma capital ratio to stay at
- * or above MERGERS.minProFormaCr. At most `maxPerQuarter` deals a quarter.
+ * profitable year rolls `chance` to bid for the best smaller rival it shares a
+ * city or home country with (ARR at most `maxTargetShare` of its own). The
+ * price is the target's fair value (ARR × the §19.2 multiple, at least book) ×
+ * (1 + a premium in `premium`), paid in cash to every holder. The deal goes
+ * ahead only if the buyer keeps `minRunwayWeeks` of the combined running costs
+ * in cash after paying, the target's cash counted. At most `maxPerQuarter`
+ * deals a quarter.
  */
 export const RIVAL_MERGERS = {
   chance: 0.04,
   minQuarters: 4,
-  excessCr: 0.015,
+  minRunwayWeeks: 52,
   maxTargetShare: 0.5,
   premium: [0.15, 0.4] as [number, number],
   maxPerQuarter: 1,
@@ -1245,7 +1255,7 @@ export const RIVAL_MERGERS = {
  * Rival ad campaigns (§18.9): each monthly check, a profitable rival rolls
  * `chance` × its strategy weight in each city it shares with your branches.
  * A campaign lifts its branches' overall rating there by `boost` for `weeks`
- * weeks (in the share formula and its own deposit target) and costs
+ * weeks (in the share formula and its own customer target) and costs
  * `costPerBranch` a week per branch there, × the city's cost index and price list.
  */
 export const RIVAL_MARKETING = {
@@ -1285,9 +1295,9 @@ export const RIVAL_REVIEW_CARDS = 4;
 /** New reviews a rival branch collects each week. */
 export const RIVAL_REVIEWS_PER_WEEK = 2;
 /**
- * Quarterly dividends: clamp(excessShare × excess capital, ratio × net income,
+ * Quarterly dividends: clamp(excessShare × excess cash, ratio × net income,
  * maxRatio × net income), never more than the excess; paid only when profitable
- * and above the strategy's capital target.
+ * and holding more cash than RIVAL_BOOKS.cashTargetWeeks of running costs.
  */
 export const RIVAL_PAYOUT = { ratio: 0.45, maxRatio: 0.8, excessShare: 0.5 } as const;
 /**
@@ -1300,14 +1310,14 @@ export const RIVAL_NOTIONAL_SHARE = {
 } as const;
 export const RIVAL_EXEC_RESIGN_CHANCE = 0.03;
 /**
- * Recession failure check (§18.5): CR below maxCr fails with `chance` per quarter.
- * A rival whose CR falls below insolventCr is seized at quarter-end in any phase
- * (assumption, DESIGN §7: no zombie banks with negative equity).
+ * Insolvency (§18.5): at quarter-end a rival goes into administration once its
+ * cash has been negative for `insolventQuarters` quarter-ends in a row, or at
+ * once when its cash is below −maxDebtWeeks of running costs. Its network is on
+ * distressed sale in M&A for `distressWeeks`, then split among the other labs.
  */
 export const RIVAL_FAILURE = {
-  maxCr: 0.06,
-  chance: 0.15,
-  insolventCr: 0.02,
+  insolventQuarters: 2,
+  maxDebtWeeks: 13,
   distressWeeks: 8,
 } as const;
 /** Price wars (§18.6). Bumps are shares cut off rival plan prices; decay per week once your streak ends. */
@@ -1387,17 +1397,20 @@ export const FRAUD_SHIELD = {
 
 // ─── BANK RUNS AND RECAPITALISATION (§13.8, §15) ──────────────────────────────
 /**
- * Bank runs (§13.8): while the average overall rating is under maxOverall and the
- * tier is Restricted/Critical or the liquidity ratio is under maxLiquidity, a run
- * starts with weeklyChance and lasts `weeks`; deposit churn × runMult meanwhile.
- * BANK_RUN options: the central bank window borrows windowShare × deposits;
- * the price cut takes planCut off every plan price for boostWeeks;
- * a public statement succeeds with statementBase + statementPerPoint per CR point
- * above statementFromCr (capped at statementMax) and ends the run.
+ * Outage rumours (§13.8, the `BANK_RUN` case): while the average overall rating
+ * is under maxOverall and one of these holds (a compute outage is running; the
+ * safety tier is Restricted or Critical; the tier dropped within the last
+ * tierDropWeeks; the average rating has slid under slideOverall), a rumour
+ * starts with weeklyChance and lasts `weeks`; plan and usage churn × runMult
+ * meanwhile. Options: service credits worth creditShare × company ARR end it;
+ * the price cut takes planCut off every plan price for boostWeeks; a public
+ * statement succeeds with statementBase + statementPerPoint per safety-ratio
+ * point above statementFromSr (capped at statementMax) and ends the rumour.
  */
 export const BANK_RUN = {
   maxOverall: 2.6,
-  maxLiquidity: 0.08,
+  tierDropWeeks: 8,
+  slideOverall: 2.2,
   weeklyChance: 0.04,
   weeks: [3, 6] as [number, number],
   runMult: 6,
@@ -1406,8 +1419,8 @@ export const BANK_RUN = {
   planCut: 0.1,
   boostWeeks: 8,
   statementBase: 0.3,
-  statementPerPoint: 0.05,
-  statementFromCr: 0.08,
+  statementPerPoint: 0.02,
+  statementFromSr: 0.7,
   statementMax: 0.95,
 } as const;
 
@@ -2357,8 +2370,6 @@ export const MERGERS = {
   reqHealthy: 0.3,
   reqWatch: 0.15,
   reqDistressed: -0.2,
-  /** Rival CR below this counts as Watch tier for the premium it requires. */
-  watchCr: 0.105,
   sigmoidScale: 0.06,
   retryWeeks: 2,
   /** Pro-forma capital after the deal may sit in the Watch tier (DESIGN decision log 2026-10-26). */
@@ -2369,9 +2380,9 @@ export const MERGERS = {
   distressedShareExempt: true,
   conversionWeeks: 8,
   moraleHit: 10,
-  /** A distressed network's asking price as P/B (§18.5). */
-  distressedPb: [0.4, 0.7] as [number, number],
-  /** Floor on a distressed asking price per share (thin or negative equity, like the $1 price floor). */
+  /** A distressed network's asking price as a multiple of its ARR (§18.5, against the §19.2 curve). */
+  distressedMultiple: [0.5, 0.8] as [number, number],
+  /** Floor on a distressed asking price per share (a network with no ARR left, like the $1 price floor). */
   distressedMinAsk: 1,
   /** Offers kept in state.mergers.offers for the M&A tab. */
   offersKept: 12,
@@ -2382,12 +2393,6 @@ export const MERGERS = {
   offerStep: 0.1,
   /** An acquired branch's awareness = perStar × the rival branch's overall stars, clamped. */
   acquiredAwareness: { perStar: 0.12, min: 0.2, max: 0.6 },
-  /**
-   * C3a: a rival's book "deposits" stand for its customers until C5, one per
-   * depositPerCustomer. They size the city share test and the plan seats an
-   * acquired office starts with (split by ACQUIRED_PLAN_MIX).
-   */
-  depositPerCustomer: 10_000,
 } as const;
 /**
  * Share-for-share deals (§19.8): a listed bank may pay part of a takeover in

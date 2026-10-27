@@ -1,15 +1,14 @@
-// Investment bank M&A tab (SCREENS §12, SIMULATION §19.8): rival bank cards
+// Investment bank M&A tab (SCREENS §12, SIMULATION §19.8): rival lab cards
 // like Market cards (sparkline and price, market cap, dividend, 52-week range,
-// P/E, top shareholders; "Private" for unlisted banks) plus branches, cities,
-// deposits and capital band; distressed sales with their badge and asking
+// P/E, top shareholders; "Private" for unlisted labs) plus offices, cities,
+// customers, ARR and runway band; distressed sales with their badge and asking
 // price, your offer's status, the Offer sheet, and integrations in progress.
 import { useState } from 'preact/hooks';
-import { MERGERS } from '../../config/balance';
 import { targetBlocker } from '../../sim/mergerRules';
 import type { GameState, RivalBank } from '../../sim/state';
 import { Badge, Card, Medallion, Row, SectionTitle } from '../components';
-import { capitalRatioText, count, exactMoney, money } from '../format/format';
-import { rivalTier, TIER_LABEL, TIER_TONE } from '../rivals/rivalSelectors';
+import { count, exactMoney, money } from '../format/format';
+import { rivalTier, runwayText, TIER_LABEL, TIER_TONE } from '../rivals/rivalSelectors';
 import { useGame } from '../store';
 import { sharePrice } from './marketView';
 import {
@@ -18,8 +17,9 @@ import {
   mnaRivals,
   offerStatusText,
   offerTone,
+  rivalArr,
   rivalCities,
-  rivalDeposits,
+  rivalCustomers,
   saleWeeksLeft,
 } from './mnaSelectors';
 import { OfferSheet } from './OfferSheet';
@@ -89,19 +89,17 @@ function RivalCard(p: { s: GameState; bank: RivalBank; onOffer: () => void }) {
       )}
       <Row label="Sales offices" value={count(bank.branches.length)} />
       <Row label="Cities" value={rivalCities(bank) || '—'} />
+      <Row label="Customers" value={count(Math.round(rivalCustomers(bank)))} />
+      <Row label="ARR" value={money(rivalArr(bank), sym)} />
       <Row
-        label="Customers"
-        value={count(Math.round(rivalDeposits(bank) / MERGERS.depositPerCustomer))}
-      />
-      <Row
-        label="Credit ratio"
+        label="Runway"
         value={
           distressed ? (
             <Badge tone="bad">Failed</Badge>
           ) : (
             <span class="ma-capital">
               <Badge tone={TIER_TONE[tier]}>{TIER_LABEL[tier]}</Badge>
-              <span>{capitalRatioText(bank.capitalRatio)}</span>
+              <span>{runwayText(bank)}</span>
             </span>
           )
         }

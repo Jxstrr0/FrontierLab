@@ -15,8 +15,10 @@ import { COUNTRIES } from '../data/countries';
 import { HOUSING_REASONS, MARKET_SECTORS } from '../data/newsWorld';
 import { MARKET_INDEX_NAME } from '../data/stocks';
 import type { CountryId } from '../data/types';
+import { companyArr } from './arr';
 import { dateOf, isYearStart } from './calendar';
 import { hpiYoY } from './macro';
+import { rivalArr } from './rivalFinance';
 import { indexWeeklyMove } from './marketStocks';
 import { basisPoints, grouped, newsAbsPct, newsPct, newsRate } from './newsFormat';
 import {
@@ -150,16 +152,14 @@ export function marketStory(ctx: NewsContext, rng: Rng): Story | undefined {
   };
 }
 
-/** Total assets per bank now: yours from the weekly close, rivals' from their books and equity. */
+/** ARR per lab now: yours across your offices, each active rival's across its books (§18.1). */
 function currentAssets(ctx: NewsContext): Map<string, { name: string; assets: number }> {
   const s = ctx.state;
   const out = new Map<string, { name: string; assets: number }>();
-  const snap = s.history.weekly.at(-1);
-  if (snap) out.set('you', { name: ctx.bank, assets: snap.totals.assets });
+  out.set('you', { name: ctx.bank, assets: companyArr(s) });
   for (const r of Object.values(s.rivals)) {
     if (r.status !== 'active') continue;
-    const deposits = r.branches.reduce((sum, b) => sum + b.deposits, 0);
-    out.set(r.id, { name: r.name, assets: deposits + r.equity });
+    out.set(r.id, { name: r.name, assets: rivalArr(r) });
   }
   return out;
 }
@@ -167,8 +167,9 @@ function currentAssets(ctx: NewsContext): Map<string, { name: string; assets: nu
 const growthText = (pct: number) => (Math.abs(pct) >= 100 ? `${grouped(pct)}%` : newsAbsPct(pct));
 
 /**
- * Year end (tick step 14): Fastest Growing Labs by asset growth since the
- * last marks, then new marks for next year. The first issue sets the marks.
+ * Year end (tick step 14): Fastest Growing Labs by ARR growth since the last
+ * marks (kept in `desk.assetMarks`), then new marks for next year. The first
+ * issue sets the marks.
  */
 export function rankingStory(ctx: NewsContext, desk: NewsDesk): Story | undefined {
   const s = ctx.state;

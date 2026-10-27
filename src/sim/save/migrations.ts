@@ -18,6 +18,7 @@ import { migrateTraining } from './migrateTraining';
 import { migrateDealDesk } from './migrateDealDesk';
 import { migrateSpotLimits } from './migrateSpotLimits';
 import { migrateMoney } from './migrateMoney';
+import { migrateRivalBooks } from './migrateRivalBooks';
 import { SCHEMA_VERSION, type GameState } from '../state';
 import { migrateSeedMoney } from './migrateSeedMoney';
 import { generatePersonalSites } from '../personalSites';
@@ -138,6 +139,12 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     for (const city of Object.values(state.world.cities)) {
       if (city.generated) generatePersonalSites(state, city.id);
     }
+    return s;
+  },
+  // 21 → 22: rival labs keep books on customers, ARR, cash and runway instead
+  // of deposits, loans and a capital ratio.
+  21: (s) => {
+    migrateRivalBooks(s as unknown as GameState);
     return s;
   },
 };

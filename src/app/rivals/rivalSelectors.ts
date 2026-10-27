@@ -1,11 +1,14 @@
 // Read-only views for the rival branch and rival head office panels (SCREENS
-// §6, §7): labels, the rate sheet against our nearest branch and the credit band.
+// §6, §7): labels, the rate sheet against our nearest branch and the runway band.
 import type { Tier } from '../../data/types';
 import { isDeposit, PRODUCTS, type ProductSpec } from '../../data/products';
 import { tileDistance } from '../../sim/citygen';
 import { branchPrice, isOffered } from '../../sim/branch/pricing';
-import { tierFor } from '../../sim/capital';
+import { rivalRunwayWeeks } from '../../sim/rivalFinance';
 import type { Branch, GameState, RivalBank, RivalBranch } from '../../sim/state';
+import { WEEKS_PER_YEAR } from '../../config/balance';
+
+export { rivalTier } from '../../sim/rivalFinance';
 
 export const STRATEGY_LABEL: Record<RivalBank['strategy'], string> = {
   incumbent: 'Incumbent lab',
@@ -37,9 +40,13 @@ export const TIER_TONE: Record<Tier, 'good' | 'info' | 'warn' | 'bad'> = {
   critical: 'bad',
 };
 
-/** The capital band a rival's ratio falls in, on the same scale as yours (§15). */
-export function rivalTier(bank: RivalBank): Tier {
-  return tierFor(bank.capitalRatio);
+/** A rival's runway as text: "2.3 years", "14 weeks", "No costs" or "None" (§18.5). */
+export function runwayText(bank: RivalBank): string {
+  const weeks = rivalRunwayWeeks(bank);
+  if (!Number.isFinite(weeks)) return bank.cash > 0 ? 'No running costs' : 'None';
+  if (weeks <= 0) return 'None';
+  if (weeks >= WEEKS_PER_YEAR) return `${(weeks / WEEKS_PER_YEAR).toFixed(1)} years`;
+  return `${Math.round(weeks)} weeks`;
 }
 
 /** Products on the price sheet, plans first (C3a). */

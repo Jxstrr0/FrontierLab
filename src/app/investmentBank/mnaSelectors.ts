@@ -3,23 +3,22 @@
 // card) and size, and how your last offer to each went.
 import { CITIES } from '../../data/cities';
 import { referencePrice, requiredPremium } from '../../sim/mergerPricing';
+import { rivalArr } from '../../sim/rivalFinance';
 import type { GameState, MergerOffer, RivalBank } from '../../sim/state';
 import { rivalSecurity, type SecurityView } from './marketView';
 
-/** Rivals you could bid for: active or on distressed sale, with branches. Distressed first, then biggest. */
+export { rivalArr, rivalCustomers, rivalRunwayWeeks } from '../../sim/rivalFinance';
+
+/** Rivals you could bid for: active or on distressed sale, with offices. Distressed first, then the biggest ARR. */
 export function mnaRivals(s: GameState): RivalBank[] {
   return Object.values(s.rivals)
     .filter((r) => (r.status === 'active' || r.status === 'distressed') && r.branches.length > 0)
     .sort(
       (a, b) =>
         Number(b.status === 'distressed') - Number(a.status === 'distressed') ||
-        rivalDeposits(b) - rivalDeposits(a) ||
+        rivalArr(b) - rivalArr(a) ||
         a.id.localeCompare(b.id),
     );
-}
-
-export function rivalDeposits(bank: RivalBank): number {
-  return bank.branches.reduce((x, b) => x + b.deposits, 0);
 }
 
 export function rivalCities(bank: RivalBank): string {
@@ -30,7 +29,7 @@ export function rivalCities(bank: RivalBank): string {
 /** What the reference price is, for its label. */
 export function referenceLabel(bank: RivalBank): string {
   if (bank.status === 'distressed') return 'Asking price';
-  return bank.listed ? 'Share price' : 'Book value / share';
+  return bank.listed ? 'Share price' : 'Fair value / share';
 }
 
 export interface MnaMarketFacts {
@@ -95,5 +94,5 @@ export function boardHint(bank: RivalBank): string {
   const req = requiredPremium(bank);
   if (bank.status === 'distressed')
     return 'Administrators want the failed lab sold. Offers near the asking price usually succeed.';
-  return `A lab in this shape usually wants about ${Math.round(req * 100)}% over the ${bank.listed ? 'share price' : 'book value'}.`;
+  return `A lab in this shape usually wants about ${Math.round(req * 100)}% over the ${bank.listed ? 'share price' : 'fair value'}.`;
 }

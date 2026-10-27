@@ -2,7 +2,12 @@
 // are chartered where rivals have gone, rivals buy each other, and rivals run
 // ad campaigns and invest in technology.
 import { describe, expect, it } from 'vitest';
-import { MERGERS, RIVAL_CHARTER, RIVAL_MARKETING, RIVAL_TECH } from '../../src/config/balance';
+import {
+  RIVAL_CHARTER,
+  RIVAL_MARKETING,
+  RIVAL_MERGERS,
+  RIVAL_TECH,
+} from '../../src/config/balance';
 import { balanceSheet } from '../../src/sim/balanceSheet';
 import { newGame } from '../../src/sim/newGame';
 import { stream } from '../../src/sim/rng';
@@ -14,7 +19,8 @@ import {
   rivalOverall,
   runRivalCampaigns,
 } from '../../src/sim/rivalMarketing';
-import { canBuy, mergeRivals, mergerTarget, proFormaCr } from '../../src/sim/rivalMergers';
+import { rivalArr, rivalFairPerShare } from '../../src/sim/rivalFinance';
+import { canBuy, mergeRivals, mergerTarget, proFormaRunway } from '../../src/sim/rivalMergers';
 import { type GameState, type RivalBank } from '../../src/sim/state';
 import { openScriptedBranch } from '../helpers/scenario';
 import { nearestSize, rivalUnits } from '../../src/sim/rivalOffices';
@@ -26,10 +32,10 @@ const identityGap = (s: GameState) => {
   return Math.abs(bs.equity - bs.expectedEquity);
 };
 
-/** Profitable for a year with capital to spare. */
+/** Profitable for a year with runway to spare. */
 function profitable(bank: RivalBank): void {
   bank.quarters = [1, 2, 3, 4].map(() => ({ revenue: 4e6, netIncome: 1e6 }));
-  bank.capitalRatio = 0.3;
+  bank.cash = Math.max(bank.cash, 3 * RIVAL_MERGERS.minRunwayWeeks * bank.costs);
 }
 
 /** Removes a rival from the city as if the regulator had seized it. */
@@ -56,7 +62,9 @@ describe('chartered rivals (§18.7)', () => {
     expect(bank.branches).toHaveLength(1);
     expect(bank.branches[0]!.size).toBe(nearestSize(RIVAL_CHARTER.branches[0]));
     expect(bank.equity).toBeGreaterThan(0);
-    expect(bank.capitalRatio).toBeGreaterThan(0.5); // no loans yet
+    // Seed money less the first office's build, with the office counted in equity.
+    expect(bank.cash).toBeGreaterThan(0);
+    expect(bank.equity).toBeCloseTo(RIVAL_CHARTER.capital, 0);
     expect(bank.ceo).not.toBe('');
     for (const b of bank.branches) expect(s.world.lots[b.lotId]!.occupant?.id).toBe(bank.id);
     expect(activeRivalsIn(s, 'cal')).toContain(bank);
@@ -68,18 +76,23 @@ describe('chartered rivals (§18.7)', () => {
 });
 
 describe('rivals buy each other (§18.8)', () => {
-  it('a profitable, well-capitalised rival buys a smaller one and pays every holder', () => {
+  it('a profitable rival with runway buys a smaller one and pays every holder', () => {
     const s = newGame({ seed: 42, cityId: 'cal', competitors: 3 });
     const [a, b] = Object.values(s.rivals)
       .filter((r) => r.cities.includes('cal'))
-      .sort((x, y) => y.equity - x.equity);
+      .sort((x, y) => rivalArr(y) - rivalArr(x));
     const buyer = a!;
     const target = b!;
-    buyer.equity = Math.max(buyer.equity, 3 * target.equity);
+    // Make the target small enough and the buyer rich enough for the deal.
+    for (const office of target.branches)
+      office.arr = (0.3 * rivalArr(buyer)) / target.branches.length;
+    const fair = rivalFairPerShare(target);
+    buyer.cash =
+      fair * 1.2 * target.shares + 3 * RIVAL_MERGERS.minRunwayWeeks * (buyer.costs + target.costs);
     profitable(buyer);
     expect(canBuy(buyer)).toBe(true);
-    expect(mergerTarget(s, buyer)).toBeDefined();
-    expect(proFormaCr(buyer, target, 0.2)).toBeGreaterThanOrEqual(MERGERS.minProFormaCr);
+    expect(mergerTarget(s, buyer)).toBe(target);
+    expect(proFormaRunway(buyer, target, 0.2)).toBeGreaterThanOrEqual(RIVAL_MERGERS.minRunwayWeeks);
 
     // You hold some of the target: you are paid out at the deal price.
     s.market.holdings.personal[target.id] = { shares: 1000, avgCost: target.price };
@@ -87,28 +100,30 @@ describe('rivals buy each other (§18.8)', () => {
     // Offices in a shared city fold into one (C2b): one per city afterwards.
     const cities = new Set([...buyer.branches, ...target.branches].map((x) => x.cityId));
     const units = rivalUnits(buyer) + rivalUnits(target);
-    const equity = buyer.equity;
-    const book = target.equity;
+    const buyerCash = buyer.cash;
+    const targetCash = target.cash;
     mergeRivals(s, buyer, target, 0.2);
     expect(target.status).toBe('merged');
     expect(target.mergedInto).toBe(buyer.id);
     expect(target.branches).toHaveLength(0);
     expect(buyer.branches).toHaveLength(cities.size);
     expect(rivalUnits(buyer)).toBeGreaterThanOrEqual(units - 1.5);
-    expect(buyer.equity).toBeCloseTo(equity - 0.2 * book, 0);
+    // The buyer pays fair value × 1.2 in cash and takes the target's cash.
+    expect(buyer.cash).toBeCloseTo(buyerCash + targetCash - fair * 1.2 * target.shares, 0);
     for (const br of buyer.branches) expect(s.world.lots[br.lotId]!.occupant?.id).toBe(buyer.id);
-    expect(s.personal.cash).toBeCloseTo(cash + 1000 * (book / target.shares) * 1.2, 0);
+    expect(s.personal.cash).toBeCloseTo(cash + 1000 * fair * 1.2, 0);
     expect(s.market.holdings.personal[target.id]).toBeUndefined();
     expect(s.events.log.some((e) => e.type === 'RIVAL_MERGER')).toBe(true);
     expect(identityGap(s)).toBeLessThan(1);
   });
 
-  it('never bids for a bigger bank or without a year of profit', () => {
+  it('never bids for a bigger lab or without a year of profit', () => {
     const s = newGame({ seed: 42, cityId: 'cal', competitors: 3 });
     const buyer = Object.values(s.rivals)[0]!;
     expect(canBuy(buyer)).toBe(false); // no reported quarters yet
     profitable(buyer);
-    for (const r of Object.values(s.rivals)) if (r !== buyer) r.equity = buyer.equity * 2;
+    for (const r of Object.values(s.rivals))
+      if (r !== buyer) for (const o of r.branches) o.arr = 2 * rivalArr(buyer);
     expect(mergerTarget(s, buyer)).toBeUndefined();
   });
 });
@@ -135,9 +150,9 @@ describe('rival campaigns and tech (§18.9)', () => {
       Math.min(5, branch.overall + RIVAL_MARKETING.boost),
       10,
     );
-    const equity = bank.equity;
+    const cash = bank.cash;
     runRivalCampaigns(s);
-    expect(bank.equity).toBeLessThan(equity);
+    expect(bank.cash).toBeLessThan(cash);
     for (let w = 1; w < RIVAL_MARKETING.weeks; w++) runRivalCampaigns(s);
     expect(bank.campaigns).toBeUndefined();
     expect(rivalOverall(bank, branch)).toBe(branch.overall);
@@ -150,11 +165,11 @@ describe('rival campaigns and tech (§18.9)', () => {
     profitable(bank);
     bank.appRating = 3;
     const products = bank.branches[0]!.quality[1];
-    const equity = bank.equity;
+    const cash = bank.cash;
     expect(investInTech(s, bank)).toBe(true);
     expect(bank.appRating).toBeCloseTo(3 + RIVAL_TECH.appStep[bank.strategy], 10);
     expect(bank.branches[0]!.quality[1]).toBeGreaterThanOrEqual(products);
-    expect(bank.equity).toBeCloseTo(equity - RIVAL_TECH.spendShare * 4e6, 0);
+    expect(bank.cash).toBeCloseTo(cash - RIVAL_TECH.spendShare * 4e6, 0);
 
     bank.strategy = 'disruptor';
     growUp(s, bank);
