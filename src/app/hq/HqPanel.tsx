@@ -148,7 +148,7 @@ function NoHq() {
       subtitle="No head office yet"
       icon={<LayerMedallion id="offices" size={32} />}
       onClose={closePanel}
-      advisor={{ text: 'Every growing bank needs a head office. Let’s find one.' }}
+      advisor={{ text: 'Every growing lab needs a head office. Let’s find one.' }}
     >
       <div class="stack">
         <Card>
@@ -158,7 +158,7 @@ function NoHq() {
           </p>
           <p class="muted small">
             Each floor holds one department. With two sales offices or fewer nothing is required
-            yet, but Finance, HR and the other teams keep a growing bank running.
+            yet, but Finance, HR and the other teams keep a growing lab running.
           </p>
         </Card>
         <button type="button" class="btn btn-primary btn-block" onClick={showOffices}>

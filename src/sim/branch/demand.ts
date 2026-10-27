@@ -8,7 +8,6 @@ import {
   DEMAND_NOISE,
   DISTANCE_FALLOFF,
   PROSPECT_RATE,
-  RISK_APPETITE,
   RIVAL_RADIUS,
   SATURATION_EXP,
   SHARE_EXP,
@@ -109,11 +108,9 @@ export function shareOf(state: GameState, branch: Branch): number {
 export function approvalOf(state: GameState, spec: ProductSpec): number {
   if (!needsApproval(spec)) return 1;
   const model = activeModel(state);
-  const appetite = state.company.riskAppetite - 1;
   const fundingGate = state.treasury.freeze ? 0 : 1;
   return (
     (spec.baseApproval ?? 0) *
-    (RISK_APPETITE.volumeMult[appetite] ?? 1) *
     (APPROVAL_INCLUSION.base + APPROVAL_INCLUSION.slope * model.radar[RADAR.breadth]) *
     fundingGate
   );

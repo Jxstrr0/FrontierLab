@@ -1,4 +1,4 @@
-// Customer businesses (stage C5a, SIMULATION §11.0, CONVERSION_PLAN §3.3): when
+// Customer businesses (stage C5a, SIMULATION §11.0, archive/CONVERSION_PLAN §3.3): when
 // a city is generated, part of its spare storefronts become named businesses
 // that hold their lot for good, and its employers become anchor accounts. Each
 // has a sector, size, pentagon and yearly AI budget; some start with a rival

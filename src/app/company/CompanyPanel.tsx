@@ -170,7 +170,9 @@ export function CompanyPanel() {
           <Card>
             <Row label="Assets" value={money(bs.assets, sym)} />
             <Row label="ARR" value={money(companyArr(s), sym)} />
-            <Row label="Treasury reserves" value={money(s.treasury.reserves, sym)} />
+            {s.treasury.reserves > 0 && (
+              <Row label="Treasury reserves" value={money(s.treasury.reserves, sym)} />
+            )}
             <Row label="Equity" value={money(bs.equity, sym)} strong />
           </Card>
         </div>

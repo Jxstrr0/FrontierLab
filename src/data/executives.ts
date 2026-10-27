@@ -189,9 +189,9 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
     delegations: [
       {
         id: 'appetite',
-        label: 'Risk appetite',
+        label: 'Launch posture',
         description:
-          'Tunes risk appetite to hold capital at 12% and losses at 1.2% a year or less.',
+          'Steps the launch posture down while the safety tier is Watch or worse, and back up while it is Strong.',
       },
       {
         id: 'loanPolicy',

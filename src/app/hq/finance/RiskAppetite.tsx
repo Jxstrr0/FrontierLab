@@ -1,6 +1,6 @@
-// Risk appetite (SCREENS §10, SIMULATION §16.8): a 1–5 switch with the level's
-// plain name, a one-line effect on loan volume and defaults, and a note when
-// the CRO or the CFO is steering it too.
+// Launch posture (SCREENS §10, SIMULATION §16.8; code id riskAppetite): a 1–5
+// switch with the level's plain name, a one-line effect on deal odds, safety
+// exposure and over-claims, and a note when the CSO or the CFO is steering it too.
 import * as cmd from '../../../sim/commands';
 import { Card, Segmented } from '../../components';
 import { act, useGame } from '../../store';
@@ -16,11 +16,11 @@ export function RiskAppetite() {
   return (
     <Card>
       <div class="fin-risk-head">
-        <span class="muted small">Risk appetite</span>
+        <span class="muted small">Launch posture</span>
         <span class="fin-risk-name">{RISK_LABELS[level - 1]}</span>
       </div>
       <Segmented
-        label="Risk appetite, 1 very conservative to 5 very aggressive"
+        label="Launch posture, 1 very cautious to 5 very bold"
         options={LEVELS}
         value={String(level)}
         onChange={(v) => act(cmd.setRiskAppetite, Number(v))}

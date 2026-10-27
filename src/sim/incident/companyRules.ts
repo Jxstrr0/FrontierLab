@@ -10,13 +10,12 @@ import {
 } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { INCIDENT_PARAMS, INCIDENT_SPECS } from '../../data/incidents';
-import { totalDeposits } from '../balanceSheet';
+import { companyArr } from '../arr';
 import { ctoExpertise } from '../execSeats';
 import { pushEvent } from '../events';
 import { spend } from '../ledger';
 import { baseId, productSpec } from '../products';
 import type { GameState } from '../state';
-import { applyWindowStigma } from '../treasury';
 import { endBankRun, statementOdds } from './capitalEvents';
 import { acceptPause, pauseFee, revokeLicence } from '../mandatedPause';
 import { addEffect, incidentPMult } from './effects';
@@ -172,16 +171,15 @@ const PRICE_WAR: IncidentRule = {
 
 const BANK_RUN: IncidentRule = {
   prepare(state, _scope, data) {
-    data.window = windowAmount(state);
+    data.credits = BANK_RUN_P.creditShare * companyArr(state);
     data.odds = statementOdds(state);
   },
-  costs: () => ({ window: 0, raise: 0, statement: 0 }),
+  costs: (_s, _scope, data) => ({ credits: num(data, 'credits'), raise: 0, statement: 0 }),
   apply(state, inc, optionId, rng) {
-    if (optionId === 'window') {
-      const amount = windowAmount(state);
-      state.treasury.window += amount;
-      state.treasury.reserves += amount;
-      applyWindowStigma(state, amount);
+    if (optionId === 'credits') {
+      // C8f: service credits to every customer end the rumour outright.
+      endBankRun(state);
+      return 'The credits landed. Customers are staying.';
     } else if (optionId === 'raise') {
       addEffect(state, 'planCut', 'company', BANK_RUN_P.planCut, BANK_RUN_P.boostWeeks);
     } else if (state.incidents.bankRunWeeksLeft === undefined) {
@@ -227,11 +225,6 @@ export const COMPANY_RULES: Record<string, IncidentRule> = {
   DIVIDEND_DUE,
   INSIDER_PROBE, // Stage 9 (insiderRule.ts)
 };
-
-/** Liquidity the central bank window lends in a run: a share of deposits. */
-function windowAmount(state: GameState): number {
-  return BANK_RUN_P.windowShare * totalDeposits(state);
-}
 
 /** This week's data-breach odds, for the IT floor's security posture (CONTENT §22). */
 export function breachChance(state: GameState): number {

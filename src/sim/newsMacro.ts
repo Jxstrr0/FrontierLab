@@ -167,7 +167,7 @@ function currentAssets(ctx: NewsContext): Map<string, { name: string; assets: nu
 const growthText = (pct: number) => (Math.abs(pct) >= 100 ? `${grouped(pct)}%` : newsAbsPct(pct));
 
 /**
- * Year end (tick step 14): Fastest Growing Banks by asset growth since the
+ * Year end (tick step 14): Fastest Growing Labs by asset growth since the
  * last marks, then new marks for next year. The first issue sets the marks.
  */
 export function rankingStory(ctx: NewsContext, desk: NewsDesk): Story | undefined {

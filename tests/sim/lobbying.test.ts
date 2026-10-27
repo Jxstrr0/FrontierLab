@@ -83,6 +83,7 @@ describe('starting a campaign', () => {
 
   it('needs you in the city, the cash, and a pending bill for a stall', () => {
     const s = newGame({ seed: 42, cityId: 'cal', bankName: 'Lobby Bank' });
+    s.company.cash = 750_000;
     expect(cmd.startLobbying(s, FIRM, 'fastTrack').ok).toBe(false); // $750k cash
     addCapital(s, 20_000_000);
     expect(cmd.startLobbying(s, FIRM, 'stallBuffer').ok).toBe(false);

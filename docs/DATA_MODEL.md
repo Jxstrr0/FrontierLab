@@ -45,6 +45,7 @@ export interface GameState {
   underwriting: UnderwritingState;
   treasury: Treasury;
   partnerships: Record<Id, Partnership>;
+  corporateDebt: CorporateDebt;       // venture debt and credit lines (SIMULATION §19.9), below
   dealDesk: { rfps: Record<Id, Rfp> };      // C5b (schema 13); was loanDesk { applications, loans }
   rivals: Record<Id, RivalBank>;
   market: MarketState;
@@ -101,11 +102,10 @@ export interface Lot {
 export interface Company {
   cash: Money; paidInCapital: Money; sharesOutstanding: number; listed: boolean; ticker?: string;
   sharePrice: Money; sentiment: number; privateRounds: number; lastRoundWeek?: Week;
-  corporateDebt: CorporateLoan[]; creditLine?: { lenderId: Id; limit: Money; drawn: Money; rate: Rate };
   taxPayable: Money; taxLossCarry: Money; dividendsPayable: Money;
   goodwill: Money; intangibles: Money; fixedAssets: FixedAsset[];
   tier: Tier; tierWeeks: number; capitalRatio: number; liquidityRatio: number;
-  appRating: Stars; riskAppetite: 1|2|3|4|5; applyRatesToAll: boolean; companyPrices: Record<string, number>;
+  appRating: Stars; riskAppetite: 1|2|3|4|5; /* the launch posture, SIMULATION §16.8 */ applyRatesToAll: boolean; companyPrices: Record<string, number>;
 }
 export interface FixedAsset { id: Id; kind: 'fitout'|'equipment'|'officeFitout'; cost: Money; lifeWeeks: number; ageWeeks: number; ownerId: Id }
 
@@ -185,7 +185,7 @@ export interface UnderwritingState {
 
 ```ts
 export interface Treasury {
-  reserves: Money; // the Loan Desk's lending fund (C3b); bonds removed in C3c
+  reserves: Money; // 0 in new games (C8f); only bank-era saves with funding still hold any
   liqTarget: Pct; autoFunding: boolean; freeze: boolean;
   lots: FundingLot[]; offers: FundingOffer[]; offersRefreshWeek: Week;
   overnight: Money; window: Money; windowStigmaWeeks: number;
@@ -198,6 +198,17 @@ export interface Partnership {
   startWeek: Week; lengthWeeks: number; fee: Money; health: Score; lowHealthWeeks: number;
   balance: Money; accounts: number; status: 'active'|'terminating'|'lapsed'; runoffWeeksLeft?: number;
 }
+// Corporate debt (src/sim/competitionTypes.ts). lenderId is an investment bank site id
+// (schema 19 on); older saves may still hold a rival lab id, repayable but not drawable.
+export interface CorporateDebt {
+  loans: Record<Id, CorporateLoan>;
+  lines: Record<Id, CreditLine>;   // by lender; the limit (60% of equity) is computed live
+  offers: CorporateLoanOffer[]; offersRefreshWeek: Week;
+}
+export interface CorporateLoan { id: Id; lenderId: Id; principal: Money; balance: Money; rate: Rate; termWeeks: number; weeksLeft: number; payment: Money; startWeek: Week }
+export interface CorporateLoanOffer { id: Id; lenderId: Id; amount: Money; rate: Rate; termWeeks: number; payment: Money; expiresWeek: Week }
+export interface CreditLine { lenderId: Id; drawn: Money; rate: Rate }
+
 // C5b: LoanApplication and BusinessLoan are gone. Contracts live on Business (schema 12/13).
 export interface Rfp {
   id: Id; branchId: Id; businessId: Id; kind: 'new'|'renewal'; createdWeek: Week;
@@ -321,12 +332,12 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 | Branch staff and marketing | `setStaffTarget`, `setWage`, `hireManager`, `fireManager`, `setManagerSalary`, `setDelegation`, `setCampaignLevel` |
 | Loan Desk | `decideApplication(id, 'approve', rate)`, `declineApplication` |
 | Offices and departments | `leaseOffice`, `addFloor`, `releaseFloor`, `setDeptTarget`, `setDeptSalary`, `setBenefit` |
-| Finance floor | `setRiskAppetite` |
+| Finance floor | `setRiskAppetite` (the launch posture, 1–5) |
 | Products floor | `startDevelopment`, `cancelDevelopment`, `deleteProduct`, `buyBureauModel`, `commissionBureauModel`, `saveCustomModel`, `activateModel` |
 | Treasury | `setTreasuryPolicy`, `borrowOffer`, `repayLot`, `topUpLendingFund`, `borrowWindow`, `repayWindow` |
 | Partnerships and partners | `signPartnership` (payroll or student), `renewPartnership`, `releasePartnership`, `startGradProgram`, `endGradProgram` |
 | Marketing and lobbying | `startBrandCampaign`, `buyAgencyPackage`, `startLobbying` (was `lobby`) |
-| Corporate borrowing | `acceptCorporateLoan`, `repayCorporateLoan`, `drawCredit`, `repayCredit` |
+| Corporate borrowing (investment bank Debt tab) | `acceptCorporateLoan`, `repayCorporateLoan`, `drawCredit(lenderSiteId, amount)`, `repayCredit(lenderId, amount)` (repaying works for any lender, old rival lines included) |
 | Capital markets | `trade(account, securityId, shares)`, `privatePlacement(bankId, pct)`, `launchIpo(bankId, floatPct)`, `secondaryOffering(bankId, pct)`, `offerMerger(rivalId, pricePerShare)` |
 | Investments and property | `buyStartupLot` (was `investInRound`), `offerVentureDebt`, `offerProperty` (was `buyProperty`), `setPropertyRent`, `setPropertyForSale`, `setReoMode`, `tradeFx` |
 | Governance and executives | `holdBoardMeeting(dividendPerShare, ceoSalary)`, `hireExec(seat, candidateId)`, `fireExec`, `setExecSalary`, `setExecDelegation`, `addGrant(seat, type, shares, strike)`, `setGrowthCity(cityId, on)`, `cooOpenBranch(cityId)` |
@@ -357,6 +368,8 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 **Frontier Lab schema 16 (stage C6c, the Chief Scientist and the talent war):** `GameState.talent = { researchers: Record<Id, Researcher> }` with `Researcher { id, name, portrait, specialty, stars, salary, employer?: { type: 'player' } | { type: 'rival', id }, joinedWeek? }`. `ExecSeat` gains `'csci'`. Migration 15 → 16 (`src/sim/save/migrateTalent.ts`) seeds the researchers and, with an Executive floor, Chief Scientist candidates. New RNG stream: `talent`.
 
 **Frontier Lab schema 18 (stage C8a, data-centre and power deals):** `GameState.powerDeals: Record<Id, PowerDeal>` (types in `src/sim/competitionTypes.ts`): `siteId`, `startWeek`, `termWeeks`, `fee` (total paid) and `unamortized` (an intangible, as for partnerships), `gpus` (contracted this week), `price` (per GPU-week, fixed at signing), `health`, `lowHealthWeeks`, `status` active/runoff, `runoffWeeksLeft?`. Migration 17 → 18 adds an empty book. New events: `POWER_DEAL_SIGNED`, `POWER_DEAL_RENEWED`, `POWER_DEAL_ENDED`.
+
+**Frontier Lab schema 19 (stage C8f, seed money):** no shape change. The bank's locked charter capital is gone: a new game starts with `treasury.reserves = 0` and `company.paidInCapital = startCash` (`meta.startCash` is one of 1M / 1.5M / 2M / 2.5M). Migration 18 → 19 (`src/sim/save/migrateSeedMoney.ts`) moves treasury reserves into `company.cash` when the save has no deposits, wholesale lots, overnight or central bank window borrowing; both are assets, so equity is unchanged. A save that still carries bank-era funding keeps its reserves. `CorporateDebt` lender ids (`CorporateLoan.lenderId`, `CorporateLoanOffer.lenderId`, the keys of `lines`) are now investment bank site ids; saves from before may still hold rival lab ids, which keep accruing and can be repaid but not drawn, and offers from them are replaced on the next tick. `company.riskAppetite` is unchanged in shape and now holds the launch posture. The `deposits_1b` milestone id stays and now means a billion in ARR.
 
 **Frontier Lab schema 17 (stage C7a, the safety ratio and the AI regulator):** `Company` gains `safetyRatio: number` (it sets `tier`, now the regulator's safety tier), `pause?: { reason: 'voluntary' | 'revoked'; untilWeek }` and `watchUntilWeek?`. `capitalRatio` stays as the lenders' credit ratio; `lowCapitalWeeks` now counts weeks under the safety revoke line. `WeeklySnapshot` gains `safetyRatio?` (its `tier` is the safety tier). Migration 16 → 17 (`src/sim/save/migrateSafety.ts`) sets the ratio and tier, restarts the low-ratio count and drops a pending emergency recapitalisation (the `RECAP_OFFER` case is now the mandated pause). New events: `SAFETY_PAUSE`, `LICENCE_REVOKED`, `LICENCE_RESTORED`. `GameOverReason` `'takeover'` is no longer produced.
 

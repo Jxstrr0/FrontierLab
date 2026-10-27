@@ -76,16 +76,14 @@ export function FinanceFloor() {
           on the Safety floor instead.
         </p>
       </Card>
-      <Card>
-        <Row
-          label="Liquidity ratio"
-          value={liq === null ? 'No deposits yet' : pct(liq, 1)}
-          strong
-        />
-        <Row label="Target" value={pct(s.treasury.liqTarget, 1)} tone="dim" />
-      </Card>
+      {liq !== null && (
+        <Card>
+          <Row label="Liquidity ratio" value={pct(liq, 1)} strong />
+          <Row label="Target" value={pct(s.treasury.liqTarget, 1)} tone="dim" />
+        </Card>
+      )}
 
-      <SectionTitle>Risk appetite</SectionTitle>
+      <SectionTitle>Launch posture</SectionTitle>
       <RiskAppetite />
 
       <SectionTitle>Statements</SectionTitle>

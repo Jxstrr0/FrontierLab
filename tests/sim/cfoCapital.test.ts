@@ -134,6 +134,7 @@ describe('CFO capital', () => {
     expect(cmd.setExecDelegation(s, 'cro', 'appetite', true).ok).toBe(true);
     s.company.riskAppetite = 4;
     s.company.capitalRatio = capitalSnapshot(s).capitalRatio; // the weekly close's figure
+    s.company.tier = 'watch'; // the CSO steps down on a weak safety tier (C8f)
     while (s.clock.week % EXEC_DELEGATION.croEveryWeeks !== 0) s.clock.week++;
     croAppetite(s); // the CRO's week: one step down, and the CFO waits
     cfoCapital(s);

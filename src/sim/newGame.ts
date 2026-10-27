@@ -3,9 +3,8 @@
 // the chosen corporate cash ($750k by default) and $2M of charter capital held
 // in treasury reserves.
 import {
-  CHARTER_CAPITAL,
   COMPETITORS,
-  DEFAULT_RISK_APPETITE,
+  DEFAULT_LAUNCH_POSTURE,
   LIQ_TARGET_DEFAULT,
   START_APP_RATING,
   START_CASH,
@@ -106,7 +105,7 @@ const DEFAULT_AVATAR: AvatarSpec = {
 export function newGame(opts: NewGameOptions): GameState {
   const city = CITIES[opts.cityId];
   if (!city) throw new Error(`Unknown city ${opts.cityId}`);
-  const bankName = opts.bankName ?? 'Vault Street Bank';
+  const bankName = opts.bankName ?? 'Frontier Lab';
   const model = packagedModel(DEFAULT_MODEL_ID);
   const startCash = opts.startCash ?? START_CASH;
   if (!(START_CASH_OPTIONS as readonly number[]).includes(startCash)) {
@@ -121,7 +120,7 @@ export function newGame(opts: NewGameOptions): GameState {
     meta: {
       saveName: bankName,
       bankName,
-      monogram: opts.monogram ?? 'VS',
+      monogram: opts.monogram ?? 'FL',
       brandInk: opts.brandInk ?? '#2C4A7A',
       founderName: opts.founderName ?? 'Founder',
       founderAvatar: opts.founderAvatar ?? DEFAULT_AVATAR,
@@ -153,7 +152,7 @@ export function newGame(opts: NewGameOptions): GameState {
     },
     company: {
       cash: startCash,
-      paidInCapital: startCash + CHARTER_CAPITAL,
+      paidInCapital: startCash,
       retainedEarnings: 0,
       goodwill: 0,
       sharesOutstanding: START_SHARES,
@@ -169,7 +168,7 @@ export function newGame(opts: NewGameOptions): GameState {
       safetyRatio: 1,
       liquidityRatio: null,
       appRating: START_APP_RATING,
-      riskAppetite: DEFAULT_RISK_APPETITE,
+      riskAppetite: DEFAULT_LAUNCH_POSTURE,
       applyRatesToAll: false,
       companyPrices: {},
       guidance: { deposits: 0, loans: 0, staffing: 0, marketing: 0, products: 0 },
@@ -193,7 +192,7 @@ export function newGame(opts: NewGameOptions): GameState {
     training: { generation: 0, frontierBase: 0 },
     talent: { researchers: {} },
     treasury: {
-      reserves: CHARTER_CAPITAL,
+      reserves: 0,
       liqTarget: LIQ_TARGET_DEFAULT,
       autoFunding: true,
       freeze: false,

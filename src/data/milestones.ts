@@ -17,7 +17,7 @@ export const MILESTONES: MilestoneSpec[] = [
     id: 'first_branch',
     title: 'First sales office',
     goal: 'Open your first sales office.',
-    line: 'The doors are open and the first deposits are in.',
+    line: 'The doors are open and the first customers are in.',
     news: false,
   },
   {
@@ -91,17 +91,18 @@ export const MILESTONES: MilestoneSpec[] = [
     news: true,
   },
   {
+    // C8f: id kept for saves; once a billion in deposits, now a billion in ARR.
     id: 'deposits_1b',
-    title: 'A billion in deposits',
-    goal: 'Hold a billion in customer deposits.',
-    line: 'Customer deposits at {bank} passed the billion mark.',
+    title: 'A billion in ARR',
+    goal: 'Reach a billion in annual recurring revenue.',
+    line: 'Annual recurring revenue at {bank} passed the billion mark.',
     news: true,
   },
   {
     id: 'five_countries',
     title: 'Five countries',
     goal: 'Run sales offices in five countries.',
-    line: '{bank} now banks customers in five countries.',
+    line: '{bank} now sells in five countries.',
     news: true,
   },
   {

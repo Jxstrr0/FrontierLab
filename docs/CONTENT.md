@@ -1,6 +1,8 @@
 # Content Tables
 
-Data for `src/data/*.ts`. All names are original. Index values are relative to 1.00 (Toronto-like). Extend lists freely. Keep new entries original and match the field shapes in DATA_MODEL.md.
+Data for `src/data/*.ts`. All names are original and fictional: no real AI companies, models or people. Index values are relative to 1.00 (Toronto-like). Extend lists freely. Keep new entries original and match the field shapes in DATA_MODEL.md.
+
+Many ids keep their bank-era names so saves keep working (a sales office is a `branch`, a product category `deposits` is Plans, and so on). The tables give the AI meaning; the ids are what the code uses.
 
 ---
 
@@ -45,10 +47,10 @@ Starting values are fictional. Meeting weeks are weeks of the year.
 | mos | Moscow | RU | XL | 84 | 55.76, 37.62 | 1.05 | 0.70 | 0.85 | 0.80 | 0.50 | 5 | Brick Crimson | density 1.35 |
 | spb | St Petersburg | RU | L | 64 | 59.94, 30.31 | 0.85 | 0.65 | 0.90 | 0.75 | 0.42 | 4 | Neva Blue | density 1.15 |
 
-**Density** (optional, default 1): how crowded a city is. It multiplies every lot's foot traffic and the city-wide customer pool (`CITY_MARKET`, SIMULATION §9.2) and the branch guide, so each branch's catchment holds more people. Rent still follows `rentIndex`.
+**Density** (optional, default 1): how crowded a city is. It multiplies every lot's foot traffic and the city-wide customer pool (`CITY_MARKET`, SIMULATION §9.2) and `CITY_BRANCH_GUIDE` (how far a sales office's reach grows with its size), so each office reaches more people. Rent still follows `rentIndex`.
 
 ### Regional sites
-Each site is a small map with an airport and 1–2 employers. There are no storefronts.
+Each site is a small map with an airport and 1–2 employers. There are no storefronts. These are the **energy sites**: you can build up to three data centers on each (cheaper power and land) and sign a data-centre and power deal with its employer (§14).
 
 | id | Site | Country | Lat, Lon | Employer |
 |---|---|---|---|---|
@@ -71,7 +73,7 @@ Each city's generator mixes these districts in proportions set by city size.
 | Industrial | 3,000 | 500 | .03 | .20 | .25 | .07 | .45 | 0.90 | .50 | 180 |
 | Waterfront | 10,000 | 1,800 | .05 | .35 | .20 | .30 | .10 | 1.50 | .60 | 700 |
 
-**How many storefronts** (2026-10-25): `round(LOTS_BASE[size] + LOTS_PER_RIVAL[size] × rival banks in the city)`, with `LOTS_BASE = { S: 12, M: 18, L: 24, XL: 32 }` and `LOTS_PER_RIVAL = { S: 4, M: 4.5, L: 5, XL: 6 }`. With the usual rival count that is about 20 / 32 / 44 / 62 storefronts (it was 36 / 56 / 80 / 110), so good corners feel slightly scarce and a city with more competitors has more of them. At the start about three times the advised branch count (SIMULATION §9.2) is free; rivals take more as they grow. Cities already on the map in a save (layout 1) keep their original count.
+**How many storefronts** (2026-10-25): `round(LOTS_BASE[size] + LOTS_PER_RIVAL[size] × rival labs in the city)`, with `LOTS_BASE = { S: 12, M: 18, L: 24, XL: 32 }` and `LOTS_PER_RIVAL = { S: 4, M: 4.5, L: 5, XL: 6 }`. With the usual rival count that is about 20 / 32 / 44 / 62 storefronts (it was 36 / 56 / 80 / 110), so good corners feel slightly scarce and a city with more competitors has more of them. About half of each district's free storefronts then become customer businesses (§21b), always leaving at least one free; rivals take more as they grow. Cities already on the map in a save (layout 1) keep their original count.
 
 **Cities grow** (2026-10-26): every `CITY_GROWTH.everyYears` (2) at the year end, each generated city (not a regional site) adds `CITY_GROWTH.share` (10%) of the storefronts it started with, at least one, drawn by district share from the city's own `citygrow:{cityId}` stream and placed on free street frontage like the originals, until it has added `maxGrowth` (1.5×) its starting count or runs out of frontage. The paper reports it ("{city} grows: {n} new storefronts"). Rivals expand into the new corners the same way they do into free ones (SIMULATION §18.4).
 
@@ -84,16 +86,22 @@ How a lot's values are derived:
 
 ## 4. Segments
 
-| id | Segment | sensDep | sensLoan | sensFee | Ticket mult: Plans (deposits) | Ticket mult: API (lending) | Ticket mult: Apps (cards) |
-|---|---|---|---|---|---|---|---|
-| STU | Students | 0.3 | 0.6 | 1.2 | 0.25 | 0.40 | 0.50 |
-| YP | Developers | 0.6 | 0.7 | 0.8 | 0.80 | 0.90 | 0.90 |
-| FAM | Consumers | 0.5 | 0.9 | 0.7 | 1.00 | 1.10 | 1.00 |
-| RET | Researchers | 1.0 | 0.4 | 0.5 | 1.80 | 0.70 | 1.10 |
-| BIZ | Small shops | 0.4 | 0.7 | 0.5 | 1.50 | 1.00 | 1.40 |
+The five segment ids are bank-era (`STU`, `YP`, `FAM`, `RET`, `BIZ`); the screens show the names below.
+
+| id | Segment | sensFee | API usage mult |
+|---|---|---|---|
+| STU | Students | 1.2 | 0.3 |
+| YP | Developers | 0.8 | 1.0 |
+| FAM | Consumers | 0.7 | 0.3 |
+| RET | Researchers | 0.5 | 1.5 |
+| BIZ | Small shops | 0.5 | 2.0 |
+
+- **sensFee:** how strongly the segment reacts to a price above the market. Every product in the catalog is fee-priced or usage-priced, so this is the price sensitivity that counts.
+- **API usage mult** (`ticketMult.lending`): × the API usage a sign-up brings. Plans and apps sign a fixed number of seats, so their multiplier is 1.
+- `sensDep` and `sensLoan` are still in `src/data/segments.ts` but only rate-priced products read them, and none are left.
 
 ### Affinity matrix
-Base probability that a new customer in the segment opens the product, before modifiers (`AFFINITY` in `src/data/segments.ts`; stage C3a, raised about 1.4× from the first draft in tuning).
+Base probability that a new customer in the segment opens the product, before modifiers (`AFFINITY` in `src/data/segments.ts`, raised about 1.4× from the first draft in tuning).
 
 | Product | STU | YP | FAM | RET | BIZ |
 |---|---|---|---|---|---|
@@ -114,13 +122,13 @@ The segment ticket multipliers above apply to usage products only (a month of AP
 
 ## 5. Products (v1 catalog)
 
-Stage C3a replaced the bank catalog. The three categories keep their ids (`deposits`, `lending`, `cards`) so every table keyed by category carries over; the screens call them **Plans**, **API** and **Apps & Services** (`CATEGORY_NAMES`).
+The three categories keep their bank-era ids (`deposits`, `lending`, `cards`) so every table keyed by category carries over; the screens call them **Plans**, **API** and **Apps & Services** (`CATEGORY_NAMES`).
 
-- **Plan** products bill seats. A sign-up brings `ticket` seats; the book balance is ARR = seats × price × billing periods (12 for a monthly fee, 1 for an annual fee).
-- **Usage** products bill per million tokens. A sign-up brings `ticket × incomeIndex × segment ticket mult` million tokens a month; the book balance is a year of that usage at today's price.
-- The **Business Loan** (Loan Desk, `sbl`) is unchanged and still the only rate product.
+- **Plan** products bill seats. A sign-up brings `ticket` seats; the book balance is ARR = seats × price × billing periods (12 for a monthly fee, 1 for a yearly fee).
+- **Usage** products bill per million tokens. A sign-up brings `ticket × incomeIndex × segment API usage mult` million tokens a month; the book balance is a year of that usage at today's price.
+- **Enterprise contracts** (id `sbl`) is the switch that opens the Deal Desk (§21b). Bids are a discount off each business's budget, so its price fields are unused.
 
-| id | Name | Category | Kind | Price type | Default price | Range / step | Ticket | Churn/yr | Servicing $/acct/wk | Notes |
+| id | Name | Category | Kind | Price type | Default price | Range / step | Ticket | Churn/yr | Compute $/seat/wk | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|
 | free_tier | Free Tier | Plans | plan | fee $/mo | $0 | 0–5 / 1 | 1 seat | 25% | 0.05 | 12%/yr upgrade to Plus |
 | plus | Plus | Plans | plan | fee $/mo | $20 | 5–60 / 1 | 1 seat | 14% | 1.00 | rateChurnSens 0.3; starts 3.0★ |
@@ -130,15 +138,15 @@ Stage C3a replaced the bank catalog. The three categories keep their ids (`depos
 | api | Standard API | API | usage | $ per M tokens | $3 | 0.5–15 / 0.25 | 40 M tok/mo | 10% | 0.50 | compute $1.00/unit; organic +25%/yr; starts 3.0★ |
 | batch_api | Batch API | API | usage | $ per M tokens | $1.50 | 0.25–6 / 0.25 | 80 M tok/mo | 9% | 0.50 | compute $0.50/unit; organic +20%/yr |
 | fine_tuning | Fine-tuning | API | usage | $ per M tokens | $8 | 2–30 / 0.5 | 5 M tok/mo | 10% | 1.50 | compute $3.00/unit; organic +15%/yr |
-| sbl | Business Loan | API | Loan Desk | rate | FTP + 4.50% | 3–20% / 0.05 | Loan Desk | — | 1.20 | individual loans (§21) |
+| sbl | Enterprise contracts | API | Deal Desk | — | — | — | — | — | 1.20 | opens the Deal Desk (§21b) |
 | code_assistant | Code Assistant | Apps & Services | plan | fee $/mo | $19 | 5–60 / 1 | 1 seat | 13% | 0.90 | rateChurnSens 0.3 |
 | agent_studio | Agent Studio | Apps & Services | plan | fee $/mo | $99 | 25–400 / 5 | 1 seat | 10% | 4.00 | rateChurnSens 0.2 |
 | creative_suite | Creative Suite | Apps & Services | plan | fee $/mo | $15 | 5–50 / 1 | 1 seat | 14% | 0.80 | rateChurnSens 0.3 |
 | priority_support | Priority Support | Apps & Services | plan | fee $/yr | $1,500 | 300–6,000 / 50 | 1 seat | 8% | 1.00 | billed yearly |
 
-Starting quality: every product starts at 2.5 stars, except Free Tier, Plus and the Standard API at 3.0. All plan and usage products carry risk weight 0. Servicing stands in for support and, until C3b's compute charge, inference; usage products also pay compute per unit used (`unitCost`).
+Starting quality: every product starts at 2.5 stars, except Free Tier, Plus and the Standard API at 3.0. All products carry risk weight 0. The compute column is the weekly compute cost per seat or account (`servicing`); usage products also pay compute per unit used (`unitCost`). Both are posted to the compute line (SIMULATION §12).
 
-Plans and the Loan Desk start switched on in a new office; the API and Apps & Services wait for the player.
+Plans and Enterprise contracts start switched on in a new sales office; the API and Apps & Services wait for the player.
 
 ## 6. Product development templates
 
@@ -160,12 +168,24 @@ Prices in the tier column are the default price × 0.85 / 1 / 1.25 for Low / Med
 | study_buddy | Study Buddy | creative_suite | STU +0.2; default $8 |
 | voice_companion | Voice Companion | creative_suite | RET/FAM +0.1; take-up ×1.15 |
 | contract_copilot | Contract Copilot | agent_studio | BIZ +0.15; default $149; reputation +0.05 |
-| mobile_app_v2 | Mobile App 2.0 (Digital) | — | app rating +0.3 (one-time); requires IT floor |
-| instant_decisions | Instant Decisions (Digital) | — | model speed +2; requires IT floor |
+| mobile_app_v2 | Mobile App 2.0 (Digital) | — | app rating +0.3 (one-time); requires the Platform & Security floor |
+| instant_decisions | Instant Decisions (Digital) | — | model Speed +2; requires the Platform & Security floor |
 
-## 7. Branch build options
+Training runs for new model generations are separate from these templates; their numbers are `TRAINING` in balance.ts (SIMULATION §16.12).
 
-**Exterior** (fit-out, 10-year depreciation):
+## 7. Sales office build options
+
+The five slots keep their bank-era ids; the screens show the AI names. Exterior and lobby are fit-out (10-year depreciation); the other three are equipment (5 years). Office size (Starter ×1 to Flagship ×9) multiplies the interior's cost and capacity; the exterior is one piece at every size.
+
+| Slot id | On screen | What it does |
+|---|---|---|
+| `exterior` | Exterior | Office rating |
+| `lobby` | Lobby | Office rating; meeting rooms add sales seats |
+| `teller` | Sales desks | Seats × interactions per week: how many prospects the office serves |
+| `vault` | Machine room | Security (lowers break-in odds) |
+| `atm` | Demo kiosks | Extra self-serve capacity; an office with a kiosk can suffer an API key leak |
+
+**Exterior:**
 
 | id | Name | Quality | Cost |
 |---|---|---|---|
@@ -176,51 +196,55 @@ Prices in the tier column are the default price × 0.85 / 1 / 1.25 for Low / Med
 | ext_deco | Deco Tower Front | 5.0 | 340,000 |
 | ext_lattice | Lattice Pavilion | 5.0 | 340,000 |
 
-**Lobby** (fit-out):
+**Lobby:**
 
-| id | Name | Quality | Advisor offices | Cost |
+| id | Name | Quality | Meeting rooms | Cost |
 |---|---|---|---|---|
 | lob_basic | Basic Lobby | 1.5 | 0 | 90,000 |
 | lob_comfort | Comfort Lobby | 2.5 | 1 | 145,000 |
-| lob_advice | Advice Centre | 3.5 | 2 | 220,000 |
-| lob_marble | Marble Hall | 4.5 | 3 | 340,000 |
-| lob_private | Private Banking Suite | 5.0 | 4 | 520,000 |
+| lob_advice | Demo Lounge | 3.5 | 2 | 220,000 |
+| lob_marble | Showcase Hall | 4.5 | 3 | 340,000 |
+| lob_private | Executive Briefing Suite | 5.0 | 4 | 520,000 |
 
-**Teller line** (equipment, 5-year depreciation):
+Meeting rooms are `advisorOffices` in code.
 
-| id | Name | Quality | Productivity coins | Stations × /wk | Cost |
+**Sales desks** (`tel_*`):
+
+| id | Name | Quality | Productivity coins | Seats × /wk | Cost |
 |---|---|---|---|---|---|
-| tel_counter | Two-Window Counter | 2 | 2 | 2 × 70 | 24,000 |
-| tel_standard | Standard Teller Line | 3 | 3 | 3 × 80 | 48,000 |
+| tel_counter | Two-Seat Counter | 2 | 2 | 2 × 70 | 24,000 |
+| tel_standard | Standard Sales Floor | 3 | 3 | 3 × 80 | 48,000 |
 | tel_pods | Service Pods | 4 | 3 | 3 × 95 | 82,000 |
-| tel_express | Express Line | 3 | 5 | 5 × 90 | 115,000 |
+| tel_express | Express Desks | 3 | 5 | 5 × 90 | 115,000 |
 | tel_concierge | Concierge Desks | 5 | 4 | 4 × 110 | 160,000 |
 
-**Vault** (equipment):
+**Machine room** (`vlt_*`):
 
-| id | Name | Quality | Security | Boxes | Cost |
-|---|---|---|---|---|---|
-| vlt_safe | Back-Office Safe | 1 | 1 | 0 | 18,000 |
-| vlt_steel | Steel Vault | 3 | 3 | 150 | 55,000 |
-| vlt_timelock | Time-Lock Vault | 4 | 4 | 300 | 95,000 |
-| vlt_fortress | Fortress Vault | 5 | 5 | 600 | 180,000 |
+| id | Name | Quality | Security | Cost |
+|---|---|---|---|---|
+| vlt_safe | Floor Rack | 1 | 1 | 18,000 |
+| vlt_steel | Machine Room | 3 | 3 | 55,000 |
+| vlt_timelock | Glazed Machine Room | 4 | 4 | 95,000 |
+| vlt_fortress | Showcase Machine Room | 5 | 5 | 180,000 |
 
-**ATM** (equipment):
+The code still gives each one a `boxes` count (0 / 150 / 300 / 600) from the bank's safe deposit boxes; the build picker shows it as "storage bays" ("No storage bays" at 0), and no product uses it.
+
+**Demo kiosks** (`atm_*`):
 
 | id | Name | Quality | Productivity /wk | Cost |
 |---|---|---|---|---|
-| atm_none | No ATM | — | 0 | 0 |
-| atm_wall | Wall ATM | 2 | 120 | 14,000 |
-| atm_dual | Dual ATM | 3 | 240 | 28,000 |
-| atm_smart | Smart ATM (deposits) | 4 | 300 | 46,000 |
-| atm_lobby | 24/7 ATM Lobby | 5 | 480 | 78,000 |
+| atm_none | No Kiosk | — | 0 | 0 |
+| atm_wall | Wall Kiosk | 2 | 120 | 14,000 |
+| atm_dual | Dual Kiosk | 3 | 240 | 28,000 |
+| atm_smart | Self-Serve Kiosk | 4 | 300 | 46,000 |
+| atm_lobby | 24/7 Demo Lobby | 5 | 480 | 78,000 |
 
-Reference builds:
-- **Basic:** $177k (storefront, basic lobby, counter, safe, no ATM).
-- **Mid:** $332k (brick, comfort, standard, steel, wall ATM).
-- **Premium:** $883k (columns, marble, concierge, time-lock, ATM lobby).
+Reference builds (Starter size):
+- **Basic:** $177k (Plain Storefront, Basic Lobby, Two-Seat Counter, Floor Rack, No Kiosk).
+- **Mid:** $332k (Heritage Brick, Comfort Lobby, Standard Sales Floor, Machine Room, Wall Kiosk).
+- **Premium:** $883k (Classic Columns, Showcase Hall, Concierge Desks, Glazed Machine Room, 24/7 Demo Lobby).
 
-### 7c. Data center parts (stage C2c, `src/data/dataCenters.ts`)
+### 7c. Data center parts (`src/data/dataCenters.ts`)
 
 | Slot | Part | Cost | Does | Fit-out |
 |---|---|---|---|---|
@@ -238,7 +262,7 @@ The default (and cheapest) build is Row hall, Grid feed, Air handlers. Default n
 
 ### 7a. House styles
 
-Chosen on New Game (`src/data/houseStyles.ts`); every branch front wears it, whatever the exterior option. A game started without a style, and saves from before styles existed, draw one of the first five from the seed (`SEEDED_HOUSE_STYLE_IDS`), so adding a style never changes an old game.
+Chosen on New Game (`src/data/houseStyles.ts`); every sales office front wears it, whatever the exterior option. A game started without a style, and saves from before styles existed, draw one of the first five from the seed (`SEEDED_HOUSE_STYLE_IDS`), so adding a style never changes an old game.
 
 | id | Name | Sign | Lamps | Planters | Door | Flag |
 |---|---|---|---|---|---|---|
@@ -251,11 +275,11 @@ Chosen on New Game (`src/data/houseStyles.ts`); every branch front wears it, wha
 
 ### 7b. Logo shapes
 
-Chosen on New Game (`src/data/logoShapes.ts`); the outline of the bank's mark everywhere it appears: the medallion in the top bar and panel icons, the seal on every branch front, the plaque over the counter and the mark over an owned building's door. Rivals keep the round medallion. Outlines are drawn by `src/art/logoShapes.ts`.
+Chosen on New Game (`src/data/logoShapes.ts`); the outline of the lab's mark everywhere it appears: the medallion in the top bar and panel icons, the seal on every sales office front, the plaque over the counter and the mark over an owned building's door. Rivals keep the round medallion. Outlines are drawn by `src/art/logoShapes.ts`.
 
 | id | Name | Outline |
 |---|---|---|
-| round | Coin | the classic round medallion (the default, and what every bank wore before v20) |
+| round | Coin | the classic round medallion (the default, and what every company wore before logo shapes existed) |
 | shield | Shield | heraldic shield, square-topped, pointed foot |
 | lozenge | Lozenge | a diamond on its point |
 | hex | Hexagon | six sides, flat top and bottom |
@@ -265,42 +289,44 @@ Chosen on New Game (`src/data/logoShapes.ts`); the outline of the bank's mark ev
 | pebble | Pebble | a softly rounded square |
 | octagon | Octagon | eight sides, flat top and bottom |
 
-## 8. Branch campaigns
+## 8. Sales office campaigns
 
 | id | Name | Levels: label (cost) | Effects per level |
 |---|---|---|---|
-| lobby_coffee | Coffee & Live Demos | Drip ($120/wk) · Espresso bar ($260/wk) | Branch +0.20 / +0.40; awareness +0.004 / +0.008 |
-| charging | Hack Nights | On ($80/wk) | Branch +0.10; YP boost ×1.05 |
+| lobby_coffee | Coffee & Live Demos | Drip ($120/wk) · Espresso bar ($260/wk) | Office +0.20 / +0.40; awareness +0.004 / +0.008 |
+| charging | Hack Nights | On ($80/wk) | Office +0.10; YP boost ×1.05 |
 | saturday | Weekend Support | Mornings ($600/wk) · Full day ($1,100/wk) | capacity ×1.10 / ×1.20; Service +0.15 / +0.30; FAM, YP ×1.05 / ×1.10 |
-| signup_bonus | Sign-Up Credits | $50 · $150 · $300 per new deposit account | deposit take-up ×1.15 / 1.30 / 1.50; cohort churn ×1.15 / 1.30 / 1.45 for 26 weeks; Rates +0.10 / 0.20 / 0.30 |
+| signup_bonus | Sign-Up Credits | $50 · $150 · $300 per new plan sign-up | plan take-up ×1.15 / 1.30 / 1.50; cohort churn ×1.15 / 1.30 / 1.45 for 26 weeks; Price +0.10 / 0.20 / 0.30 |
 | paperless | Green Compute Pledge | Half (+$0.05/acct/wk) · Full (+$0.10/acct/wk) | Products +0.10 / +0.20; YP, STU ×1.05 / ×1.10 |
 | direct_mail | Research Newsletter | Light ($300/wk) · Heavy ($700/wk) | awareness +0.010 / +0.020; RET, FAM ×1.08 / ×1.15 |
 | workshops | AI Workshops | Monthly ($250/wk) · Weekly ($600/wk) | awareness +0.006 / +0.012; STU, YP ×1.08 / ×1.15; Service +0.10 |
-| sponsors | Community Sponsors | Modest ($300/wk) · Generous ($800/wk) | awareness +0.010 / +0.022; Branch +0.05 / +0.10; FAM ×1.1, BIZ ×1.08 / ×1.15 |
+| sponsors | Community Sponsors | Modest ($300/wk) · Generous ($800/wk) | awareness +0.010 / +0.022; Office +0.05 / +0.10; FAM ×1.1, BIZ ×1.08 / ×1.15 |
 | social | Social Media | Steady ($400/wk) · Viral push ($900/wk) | awareness +0.012 / +0.026; STU, YP ×1.10 / ×1.20 |
-| search | Local Paid Search | Moderate ($450/wk) · Aggressive ($1,000/wk) | awareness +0.014 / +0.030; YP, BIZ ×1.08 / ×1.15; Loan Desk λ ×1.10 / ×1.20 |
+| search | Local Paid Search | Moderate ($450/wk) · Aggressive ($1,000/wk) | awareness +0.014 / +0.030; YP, BIZ ×1.08 / ×1.15; Deal Desk requests ×1.10 / ×1.20 |
 
-Weekly campaign costs scale by city.costIndex. Per-account costs don't.
+Weekly campaign costs scale by city.costIndex. Per-account costs don't. In code the Office rating is `branch`, the Price rating `rates`, and the Deal Desk request boost `loanDesk`.
 
-Content trim (2026-10-25): each campaign now has its own job. Coffee & Live Demos lifts Branch, Green Compute Pledge lifts Products (it used to repeat Lobby Coffee's Branch bump), Research Newsletter reaches researchers and families, and Community Sponsors adds businesses and a small Branch lift to its families (it used to be a cheaper Research Newsletter: awareness and families only). A version with Research Newsletter on researchers alone plus a deposit take-up boost was tried and dropped: it pulled first-year loans/deposits under the 75% floor. So was moving Community Sponsors from families to businesses outright (merged 2026-10-26): businesses bring deposits but borrow little, and the 20-city median of first-year loans/deposits fell from 77.0% to 73.9%; keeping families and adding businesses holds 76.2%.
+Each campaign has its own job: Coffee & Live Demos lifts the Office rating, Green Compute Pledge lifts Products, Research Newsletter reaches researchers and consumers, and Community Sponsors adds small shops and a small Office lift on top of consumers.
 
 ## 9. HQ floors
 
-| Dept | Desks | Market salary | Required staff | Effects when short (k′ < 1) |
-|---|---|---|---|---|
-| finance | 24 | 82,000 | 2 + 0.35 × branches + 1 per $2B assets (+4 if public) | statement delay `ceil((0.9 − k′) × 10)` weeks; IR discount; public & k′ < 0.6 → late filing fine of 0.02% of revenue per quarter; IPO needs k′ ≥ 0.8 |
-| hr | 24 | 68,000 | 1 + employees / 80 | hiring ×k′; morale −(1 − k′) × 15 company-wide |
-| products | 24 | 90,000 | 2 + 0.2 × branches + 2 per active development | dev duration ÷ max(0.3, k′); model cost +(1 − k′) × 30% |
-| treasury | 24 | 95,000 | 1 + 1 per $1B (deposits + wholesale) | funding spread +(1 − k′) × 0.50%; fewer market offers |
-| marketing | 24 | 72,000 | 1 + 0.15 × branches + 2 per active brand campaign | all campaign effects ×(0.5 + 0.5k′) |
-| it | 24 | 98,000 | 2 + 0.25 × branches + 1 per $5B assets | app rating target ×k′; breach and outage odds ×(1 + 2(1 − k′)) |
-| risk | 24 | 88,000 | 2 + 0.15 × branches + 1 per $50M of ARR (C7a) | Sets the safety ratio's strength (SIMULATION §15); audit odds ×(1 + 3(1 − k′)); PD ×(1 + 1.5(1 − k′)) |
-| executive | 8 (suite) | (per exec) | — | enables executives: COO, CFO, CPO, CMO, CTO, CSO, CIO |
-| investment | 32 | 120,000 | optional | ventures shown = 1 + floor(staff / 4), max 8 |
+Department ids keep their bank-era names; the screens show the AI names. "Units" are office units: each sales office counts its size's `hqUnits` (Starter 1, Standard 2, Large 3, Flagship 4).
 
-Stage 4 tuning (2026-10-24): per-branch requirements were cut by about 40% and the Risk PD penalty raised from 0.4 to 1.5 so that a bank without an HQ ends a 6-year steady run clearly behind one with a staffed HQ (balance strategy `nohq`), instead of ahead of it. Shortfall effects read effect(k′) = k′^0.7.
+| Dept id | On screen | Desks | Market salary | Required staff | Effects when short (k′ < 1) |
+|---|---|---|---|---|---|
+| finance | Finance | 24 | 82,000 | 2 + 0.35 × units + 1 per $2B assets (+4 if public) | statement delay `ceil((0.9 − k′) × 10)` weeks; IR discount; public & k′ < 0.6 → late filing fine of 0.02% of revenue per quarter; IPO needs k′ ≥ 0.8 |
+| hr | HR | 24 | 68,000 | 1 + employees / 80 | hiring ×k′; morale −(1 − k′) × 15 company-wide |
+| products | Products | 24 | 90,000 | 2 + 0.2 × units + 2 per active development | development time ÷ max(0.3, k′); data licence +(1 − k′) × 30% |
+| treasury | Compute | 24 | 95,000 | 1 (+1 per $1B of old deposits and wholesale funding, which a lab no longer has) | fewer GPU offers, priced up to 10% higher |
+| marketing | Marketing | 24 | 72,000 | 1 + 0.15 × units + 2 per active brand campaign | all campaign effects ×(0.5 + 0.5k′) |
+| it | Platform & Security | 24 | 98,000 | 2 + 0.25 × units + 1 per $5B assets | app rating target ×k′; breach and outage odds ×(1 + 2(1 − k′)) |
+| risk | Safety & Alignment | 24 | 88,000 | 2 + 0.15 × units + 1 per $50M of ARR | sets the safety ratio's strength (SIMULATION §15); audit odds ×(1 + 3(1 − k′)) |
+| executive | Executive | 8 (suite) | (per exec) | — | enables executives: COO, CFO, CPO, CMO, CTO, CSO, CIO, Chief Scientist |
+| investment | Investment | 32 | 120,000 | optional | ventures shown = 1 + floor(staff / 4), max 8 |
 
-Salaries scale by city.wageIndex. Desks per floor come from the building (24 or 32); Investment floors are always 32 and the Executive suite 7.
+Shortfall effects read effect(k′) = k′^0.7. Requirements phase in with the founder ramp (SIMULATION §16.3). The cuts from Stage 4 tuning still hold: a lab without an HQ ends a 6-year steady run clearly behind one with a staffed HQ (balance strategy `nohq`).
+
+Salaries scale by city.wageIndex. Desks per floor come from the building (24 or 32); Investment floors are always 32 and the Executive suite 8.
 
 ## 10. Benefits
 
@@ -311,8 +337,8 @@ Salaries scale by city.wageIndex. Desks per floor come from the building (24 or 
 | espp | Employee Stock Plan | discount (0–15%), public only | 0.5% of payroll per discount point, in cash (dilution not modelled) | executive loyalty +5; morale +2 at ≥ 10% |
 | childcare | Childcare Support | $/employee/yr (0–10,000) | as set | morale +3 at $6k; retention +10% |
 | lunch | Free Lunch & Snacks | $/employee/wk (0–100) | as set | morale +4 at $60 |
-| volunteer | Volunteer Days | $/employee/wk (0–150) | as set | morale +3 at $100; reputation +0.05 on all branches |
-| mortgage_disc | Compute Allowance | rate discount (0–2%) | employees × 0.3 × 340,000 × discount / yr | morale +3; attraction +3 |
+| volunteer | Volunteer Days | $/employee/wk (0–150) | as set | morale +3 at $100; reputation +0.05 on all sales offices |
+| mortgage_disc | Compute Allowance | discount (0–2%) | employees × 0.3 × 340,000 × discount / yr (the bank-era mortgage formula, kept) | morale +3; attraction +3 |
 | wellness | Wellness Program | $/employee/yr (0–2,500) | as set | morale +2; quits −15% |
 | remote_fri | Remote Fridays | on/off (HQ only) | 0 | HQ morale +3; HQ effective staff −3% |
 
@@ -334,21 +360,13 @@ Benefit effects scale linearly up to the stated amount, then flatten (capped at 
 |---|---|---|---|---|
 | Brightwell Creative | City Blitz | 8 wk | 180,000 | +0.25 |
 | Northwind & Pike | Street Team | 2 wk | 45,000 | +0.10 (one city) |
-| Studio Halcyon | Prestige Campaign | 12 wk | 420,000 | +0.30, plus Branch +0.1 in that city for 26 weeks |
+| Studio Halcyon | Prestige Campaign | 12 wk | 420,000 | +0.30, plus Office +0.1 in that city for 26 weeks |
 
-## 12. Funding types (Treasury)
+## 12. Funding types (old saves only)
 
-| type | Name | Basis | Spread | Term (wk) | Size (× scale) | Cost | Term | Stability | Flexibility | Discretion |
-|---|---|---|---|---|---|---|---|---|---|---|
-| overnight | Overnight Interbank | policy | +0.20% | 1 (auto-roll) | — | 8 | 1 | 3 | 10 | 8 |
-| term_interbank | Term Interbank | policy | +0.50% | 26–104 | 2–50M | 7 | 5 | 5 | 5 | 7 |
-| cb_window | Central Bank Window | policy | +1.00% | 1 | unlimited | 5 | 1 | 10 | 10 | 1 |
+The bank's wholesale funding market is gone from new games. `src/data/fundingTypes.ts` keeps Overnight Interbank, Term Interbank and the Central Bank Window so an old save that still carries deposits or funding lots can run them off; their cards show on the Compute floor only for such a save. The GPU reservations of §12b replaced them.
 
-Content trim (2026-10-25): Brokered Deposits merged into Term Interbank and Senior Bond into Covered Bond, each new type keeping the pair's combined offer weight (8 and 4). Covered Bond was removed in C3c (it needed mortgage cover, and an AI lab holds no mortgages); old covered bond lots became Term Interbank lots.
-
-Counterparty names: Harbor Clearing Bank · Meridian Treasury · Atlas Money Markets · Pinecrest Capital · Northwind Securities · Bellwether Funding · Granite Bay Trust · Cobalt Street Markets · Ironbridge Capital · Silverpine Partners.
-
-## 12b. GPU reservations (Compute floor, C4b; `src/data/gpuLots.ts`)
+## 12b. GPU reservations (Compute floor; `src/data/gpuLots.ts`)
 
 Radar: Cost, Term, Reliability, Flexibility, Latency (1–10, higher is better for you).
 
@@ -360,9 +378,9 @@ Radar: Cost, Term, Reliability, Flexibility, Latency (1–10, higher is better f
 
 Provider names (fictional GPU clouds): Northbeam Cloud · Halcyon Compute · Stratus Forge · Ironleaf Racks · Cobalt Grid · Lumen Hollow · Tidewater Compute · Saltmarsh Cloud · Kestrel Silicon · Bramblewood GPU.
 
-## 13. The AI model's training data (C6a; was Underwriting)
+## 13. The AI model's training data
 
-**Training datasets** (Reasoning, Speed, Breadth, Safety, Efficiency; licence per customer a year). Ids are the bank-era ones.
+**Training datasets** (Reasoning, Speed, Breadth, Safety, Efficiency; licence per customer a year). Ids are the bank-era ones (the model is `underwriting` in code, data vendors are `bureau` sites).
 
 | id | Dataset | Profile | $/customer/yr | Requirement |
 |---|---|---|---|---|
@@ -388,15 +406,17 @@ Provider names (fictional GPU clouds): Northbeam Cloud · Halcyon Compute · Str
 - Sentinel Data: San Francisco, Frankfurt, Singapore.
 - TrueMark: every XL city plus Sydney.
 
-## 13b. Model names (C6b)
+## 13b. Model names
 
 Rival model families (one per lab, numbered by generation, starting at 2): Wren, Lantern, Cobalt, Kestrel, Fathom, Juniper, Halyard, Tessel, Sable, Quarry, Marlin, Ember. Your trained models take the name you give them (the strategies use "Gen N").
 
-## 13c. Researchers and the Chief Scientist (C6c)
+## 13c. Researchers and the Chief Scientist
 
 Researchers take names and portraits from the shared person generator (the same lists as managers and executives), so every one is fictional. The Chief Scientist (short CSci) is the ninth executive seat, with one delegation, **Routine training runs**. A rival bidding for one of yours raises **Researcher poached**: "{rival} is trying to hire away our researcher {name}." It offers *Counter-offer* (their salary +25%) or *Let them go* (they join the rival lab, and its next models get better).
 
-## 14. Employers (payroll partnerships)
+## 14. Employers (staff plan partnerships)
+
+Employers sit on the Businesses layer (layer id `employers`). Each is also an anchor account for the Deal Desk (§21b). The partnership kind keeps its bank-era id `payroll`.
 
 | Type | Employees | Income mult | Notes |
 |---|---|---|---|
@@ -407,15 +427,16 @@ Researchers take names and portraits from the shared person generator (the same 
 | City Hall | 5,000 | 1.05 | one per city |
 | Port Authority | 1,500 | 1.00 | waterfront cities |
 | Potash Mine | 1,200 | 1.40 | Saskatoon: "Prairie Potash Co." |
+| Resource Camp | 3,000 | 1.50 | regional energy sites |
 | Oil Sands Camp | 4,000 | 1.60 | Fort McMurray |
 | Iron Ore Mine | 3,000 | 1.70 | Pilbara |
 | Shale Field Services | 2,500 | 1.50 | Midland |
 
 - **Signing fee:** employees × $160 × income mult × city.incomeIndex.
 - **Contract:** 364 weeks ("Year X of 7").
-- **ARR per participating employee:** $300 (`ARR_PER_EMPLOYEE`, C3a; about a Team seat). Student deals: $80 per participating student. The package is a plan (Team for staff, Campus Plan for students by default).
+- **ARR per participating employee:** $300 (`ARR_PER_EMPLOYEE`; about a Team seat). Student deals: $80 per participating student. The package is a plan (Team for staff, Campus Plan for students by default). The employer panel shows the current "Plans partner".
 - **Generation:** 2–4 employers per city.
-- **Energy sites (C8a):** the regional sites (the mine, camp and field rows) sign data-centre and power deals instead of payroll: fee employees × $500 × the price list, 1.5 contracted GPUs per employee at full participation, $20 per GPU-week fixed at signing, and 25% off power for your data centers in the country (`POWER_DEAL`, SIMULATION §13.7a).
+- **Energy sites:** the regional sites (the mine, camp and field rows) sign data-centre and power deals instead: fee employees × $500 × the price list, 1.5 contracted GPUs per employee at full participation, $20 per GPU-week fixed at signing, and 25% off power for your data centers in the country (`POWER_DEAL`, SIMULATION §13.7a).
 
 ## 15. Rivals
 
@@ -456,19 +477,21 @@ Researchers take names and portraits from the shared person generator (the same 
 | ambermark | Ambermark Research | Premium | RU | #4A3A5A | no |
 | nevasavings | Neva Open Models | Community | RU | #4A7A9A | no |
 
-**Strategy offsets and quality profiles:**
+**Strategy profiles** (`STRATEGY_PROFILES` in `src/data/rivals.ts`):
 
-| Strategy | Savings | GIC | Loans | Mortgage | Card APR | Fees | Rates / Products / Service / Branch | App |
-|---|---|---|---|---|---|---|---|---|
-| Incumbent | −0.20pp | −0.10pp | +0.20pp | +0.10pp | +1.0pp | +10% | 2.8 / 3.6 / 3.2 / 3.6 | 3.6 |
-| Disruptor | +0.60pp | +0.25pp | −0.30pp | −0.10pp | −2.0pp | −60% | 4.3 / 3.4 / 3.0 / 2.5 | 4.6 |
-| Premium | −0.40pp | −0.15pp | +0.50pp | +0.20pp | +2.0pp | +40% | 2.4 / 4.0 / 4.4 / 4.6 | 4.0 |
-| Community | +0.15pp | +0.10pp | −0.25pp | −0.15pp | −1.5pp | −20% | 3.6 / 3.0 / 4.0 / 3.0 | 2.8 |
+| Strategy | Fees | Price / Products / Service / Office | App |
+|---|---|---|---|
+| Incumbent | +10% | 2.8 / 3.6 / 3.2 / 3.6 | 3.6 |
+| Disruptor | −60% | 4.3 / 3.4 / 3.0 / 2.5 | 4.6 |
+| Premium | +40% | 2.4 / 4.0 / 4.4 / 4.6 | 4.0 |
+| Community | −20% | 3.6 / 3.0 / 4.0 / 3.0 | 2.8 |
 
-Branch counts at start, by city size: S 3–5, M 6–10, L 10–16, XL 16–24 in total across that city's rivals. Disruptors get 1–2 each.
+- **Fees** move a rival's plan, API and app prices against the default. (The profile also keeps a `loans` rate offset from the bank era; nothing priced as a rate is left for it to move.)
+- Each rival lab holds one sales office per city it serves, with a size (SIMULATION §18.4). At the start a city's rivals draw S 3–5, M 6–10, L 10–16 or XL 16–24 bank-sized branches in total (`RIVAL_BRANCHES_BY_SIZE`; disruptors 1–2 each), and each lab's draw folds into one office sized to match.
+- Every rival has a named model (§13b) and a bench of a CFO, a COO and a Chief Safety Officer.
 
-### Chartered banks (2026-10-26)
-New labs founded during a game (SIMULATION §18.7) take an invented name from `src/data/rivalCharters.ts`: a place-style stem (Ashcombe, Copperleaf, Glenhaven, Lanternhill, Wrenfield and others) with a suffix by strategy (incumbent: AI, Labs, Intelligence; premium: Research, Institute, & Partners; community: Collective, Open Models, Open Lab), or for a disruptor a one-word brand (Zephly, Pocketwell, Quillo, Lumio, Nuvra, Sprigly, Taffel, Glimmr, Vantlo, Ottery, Brisko, Pennyloop). Since 2026-10-26 (procedural names), 40% of charters (`NAME_GEN.listedName`) use these listed stems and brands; the rest get a generated one from `src/data/nameParts.ts`: a stem from a head and a tail (Ash + combe, Raven + sford, Maple + water: 40 × 30 combinations), or a coined brand from an onset, vowel, coda and ending (Quinly, Naloop, Polwell), 4–8 letters, with awkward clusters redrawn. Names never repeat in a save. Inks come from a ten-colour palette. Their ids are `charter1`, `charter2`, …; they have no head-office building on the map.
+### New labs (2026-10-26)
+New labs founded during a game (SIMULATION §18.7) take an invented name from `src/data/rivalCharters.ts`: a place-style stem (Ashcombe, Copperleaf, Glenhaven, Lanternhill, Wrenfield and others) with a suffix by strategy (incumbent: AI, Labs, Intelligence; premium: Research, Institute, & Partners; community: Collective, Open Models, Open Lab), or for a disruptor a one-word brand (Zephly, Pocketwell, Quillo, Lumio, Nuvra, Sprigly, Taffel, Glimmr, Vantlo, Ottery, Brisko, Pennyloop). 40% of new labs (`NAME_GEN.listedName`) use these listed stems and brands; the rest get a generated one from `src/data/nameParts.ts`: a stem from a head and a tail (Ash + combe, Raven + sford, Maple + water: 40 × 30 combinations), or a coined brand from an onset, vowel, coda and ending (Quinly, Naloop, Polwell), 4–8 letters, with awkward clusters redrawn. Names never repeat in a save. Inks come from a ten-colour palette. Their ids are `charter1`, `charter2`, … (the code calls them charters); they have no head-office building on the map.
 
 ## 16. Other map buildings
 
@@ -483,7 +506,7 @@ New labs founded during a game (SIMULATION §18.7) take an invented name from `s
   | Sakura Bridge Securities | Tokyo, Singapore, Hong Kong | 4.40% | 0–10% | |
   | Southern Gate Advisory | Sydney, Vancouver | 4.70% | 0–12% | |
 
-  Cities not listed borrow the nearest house: Saskatoon and Montréal → Ashgrove Capital, Seattle → Whitlock & Rowe, Frankfurt, Amsterdam, Moscow and St Petersburg → Meridian Partners. Implemented in `src/data/investmentBanks.ts`.
+  Cities not listed borrow the nearest house: Saskatoon and Montréal → Ashgrove Capital, Seattle → Whitlock & Rowe, Frankfurt, Amsterdam, Moscow and St Petersburg → Meridian Partners. Implemented in `src/data/investmentBanks.ts`. Each office is also a lender: its Debt tab offers venture debt and a credit line to labs with a sales office in its city (SIMULATION §19.9).
 - **Marketing agencies:** Brightwell Creative, Northwind & Pike, Studio Halcyon. Present in L and XL cities; M cities get one.
 - **Lobbying firms:** Capitol Bridge Advisors (US), Parliament Row Partners (CA, UK), Rue Royale Affairs (EA, and CH by borrowing), Harbourline Policy Group (AU, SG, HK, and JP by borrowing), Granite Quay Advisors (RU). Campaigns are in SIMULATION §21.6.
 - **Universities:**
@@ -499,7 +522,7 @@ New labs founded during a game (SIMULATION §18.7) take an invented name from `s
 - **Office listings:** 2 / 2 / 3 / 4 per S / M / L / XL city (SIMULATION §16.1).
 - **Airports** (code, name): SAS Saskatoon Regional · CAL Calgary International · VAN Vancouver International · TOR Toronto Pearson-style "Lakeshore International" · MTL Montréal-Mercier · NYC Liberty International · CHI O'Hare-style "Lakefront International" · SFO Bayview International · SEA Sound International · LON Thameshaven · PAR Charles-Lumière · FRA Rhein-Main · AMS Polder International · ZUR Kloten-Alpen · TYO Haneda-Bay · SYD Harbour Kingsford · SIN Changi-Garden · HKG Lantau Harbour · MOW Vnukovo Fields · LED Pulkovo-Neva. Regional sites: FMM Athabasca Field · PHE Port Hedland Strip · MAF Permian Regional. All fictional names; use the city name in UI where clearer.
 
-## 17. Stock market (non-bank listed companies)
+## 17. Stock market (listed companies outside AI)
 
 | Ticker | Company | Sector | Start price | Shares | EPS | Growth | Vol | Div. yield |
 |---|---|---|---|---|---|---|---|---|
@@ -520,9 +543,9 @@ New labs founded during a game (SIMULATION §18.7) take an invented name from `s
 | GSQR | Granite Square REIT | Real estate | 24 | 900M | 1.40 | 3% | 20% | 5.8% |
 | HBFP | Harbourfront Properties | Real estate | 47 | 350M | 2.90 | 4% | 22% | 4.1% |
 
-The Banking sector lists the rivals marked "Listed" in §15, and your bank once it lists.
+The **AI labs** sector (id `banking`) lists the rivals marked "Listed" in §15, and your lab once it lists.
 
-Implemented in `src/data/stocks.ts`, with a home exchange per company and beta by sector (Technology 1.3, Auto 1.2, Banking 1.1, Energy 0.9, Retail 0.8, Real estate 0.7). **Exchanges** (fictional, one per country): CA Maple Exchange · US Union Exchange · UK Thames Exchange · EA Rhine Bourse · CH Alpine Exchange · JP Sakura Exchange · AU Coral Exchange · SG Lion City Exchange · HK Pearl Exchange · RU Neva Exchange. **Index:** the Inference Composite.
+Implemented in `src/data/stocks.ts`, with a home exchange per company and beta by sector (Technology 1.3, Auto 1.2, AI labs 1.1, Energy 0.9, Retail 0.8, Real estate 0.7). **Exchanges** (fictional, one per country): CA Maple Exchange · US Union Exchange · UK Thames Exchange · EA Rhine Bourse · CH Alpine Exchange · JP Sakura Exchange · AU Coral Exchange · SG Lion City Exchange · HK Pearl Exchange · RU Neva Exchange. **Index:** the Inference Composite.
 
 **Sector μ by phase** (annual, Expansion / Slowdown / Recession / Recovery):
 
@@ -533,7 +556,7 @@ Implemented in `src/data/stocks.ts`, with a home exchange per company and beta b
 | Auto | +7% | −3% | −25% | +20% |
 | Retail | +6% | +1% | −10% | +10% |
 | Real estate | +5% | 0% | −14% | +9% |
-| Banking | +8% | −2% | −24% | +22% |
+| AI labs | +8% | −2% | −24% | +22% |
 
 ## 18. Startups (seed list; generate more from templates)
 
@@ -569,7 +592,7 @@ Pentagon order: Management, Product maturity, Market size, Competitiveness, Fina
 Startups generated during a game (conventions and the Investment floor pipeline, SIMULATION §20.1) take names and descriptions from templates, so a pipeline keeps showing new companies:
 - **Names** (`src/data/nameParts.ts`, `NAME_GEN.startupPatterns`): half are a word and a suffix that fits the sector (Cobalt Grid, Mosaic Arcade, Echo Volt); a quarter are coined brands (Quindra, Zandwell); a quarter a coined brand with a sector suffix (Tremio Shield). 50 words; 6 suffixes for each of the 17 sectors. A name already used by a startup or listed company is drawn again.
 - **Descriptions** (`src/data/startupBlurbs.ts`): "{offer} for {customer}" from six offers and six customers per sector (36 per sector), e.g. "Cold-chain trucking for pharmacies"; 15% of the time one of the sector's handwritten lines instead. A description already used by a startup still in the pipeline is drawn again.
-## 19. Conventions (yearly calendar)
+## 19. Conferences (yearly calendar)
 
 | Event | City | Week |
 |---|---|---|
@@ -583,7 +606,7 @@ Startups generated during a game (conventions and the Investment floor pipeline,
 | Harbour Dev Summit | Sydney | 41 |
 | Asia Compute Forum | Singapore | 45 |
 
-Announced in the Ledger 4 weeks before. Active for 4 weeks (was 2 and 1 until 2026-10-26, so monthly results never miss one). Calgary's fair is our addition so every start city has a convention before travel arrives.
+Announced in the paper 4 weeks before. Active for 4 weeks (was 2 and 1 until 2026-10-26, so monthly results never miss one). Calgary's fair is our addition so every start city has a conference before travel arrives. The code calls conferences `conventions`.
 
 ### 19a. Currencies (SIMULATION §19.10)
 
@@ -662,11 +685,11 @@ Announced in the Ledger 4 weeks before. Active for 4 weeks (was 2 and 1 until 20
 | Tokyo Tide | Tokyo | Baseball | 1.4B |
 | Sydney Breakers | Sydney | Rugby | 480M |
 
-## 21. Loan Desk sectors (retired in C5b)
+## 21. Loan Desk sectors (removed)
 
-The Loan Desk and its sector table are gone; the Deal Desk's businesses use the deal sectors of §21b.
+The Loan Desk and its sector table were removed in C5b. The Deal Desk's businesses use the deal sectors of §21b.
 
-## 21b. Deal sectors (stage C5a)
+## 21b. Deal sectors
 
 Customer businesses on spare storefronts (`src/data/dealSectors.ts`). Pentagon order: AI readiness, Budget, Data sensitivity, Switching cost, Financial health. Names are a prefix (28 invented words such as the ones in the file) plus one of the sector's business words.
 
@@ -686,63 +709,69 @@ Customer businesses on spare storefronts (`src/data/dealSectors.ts`). Pentagon o
 | Hotel & hospitality | 1.0 | 4–6 | 4, 5, 5, 5, 4 | Waterfront, Downtown |
 | Major employer (anchor) | 1 | 8–12 | 5, 8, 7, 8, 7 | employer sites |
 
-Sizes (`BUSINESS.sizes` in balance.ts): small, mid and large weigh 0.55 / 0.33 / 0.12 with base budgets of $6k / $25k / $90k a year; anchors start at $360k scaled by headcount (per 2,500 staff) and pay (C5b; C5a used $30k / $120k / $450k / $1.8M).
+Sizes (`BUSINESS.sizes` in balance.ts): small, mid and large weigh 0.55 / 0.33 / 0.12 with base budgets of $6k / $25k / $90k a year; anchors start at $360k scaled by headcount (per 2,500 staff) and pay. About half the businesses (70% of anchors) start on a rival lab's contract. Big contracts ($250k a year or more) make the paper when won from a rival or lost.
 
 ## 22. Incidents
-Implemented in `src/data/incidents.ts` (texts and options) and `src/data/incidentParams.ts` (numbers).
+Implemented in `src/data/incidents.ts` (texts and options) and `src/data/incidentParams.ts` (numbers). The case ids are bank-era; the title column is what the player sees.
 
-Default cooldown: 8 weeks per scope. Branch cases go to a manager trusted with Branch troubles; company and city cases to a COO trusted with Company troubles (§17.2), except those marked **yours** below (EXEC_POACHED, BANK_RUN, RECAP_OFFER), which always reach you. `penaltyWeeks` on an option is how a delegated decider values its non-cash effects, in weeks of revenue.
+Default cooldown: 8 weeks per scope. Office cases go to a manager trusted with Sales office troubles; company and city cases to a COO trusted with Company troubles (SIMULATION §17.2), except those marked **yours** below (EXEC_POACHED, RESEARCHER_POACHED, BANK_RUN, RECAP_OFFER), which always reach you. `penaltyWeeks` on an option is how a delegated decider values its non-cash effects, in weeks of revenue.
 
-| id | Scope | Weekly base p | Condition / multiplier | Options (cost → effect) |
-|---|---|---|---|---|
-| ROBBERY | branch | 0.0015 | × (6 − vault.security)/3 | Upgrade vault (50% of next-tier price → morale +5) · Paid leave ($2k × staff → morale +10) · Business as usual (morale −15, Branch −0.3 for 8 wk). Loss: $20k–150k ÷ security, 80% insured. |
-| ATM_SKIM | branch with ATM | 0.002 | × (1.3 − fraudShield/10) | Refund customers ($5k–40k) · Replace firmware ($15k; p ×0.5 for 26 wk) · Deny liability (Service −0.4 for 8 wk; 30% news) |
-| DATA_BREACH | company | 0.002 | × (1 + 2(1 − itCov′)) × (1.2 − CTO expertise/100) | Notify + credit monitoring ($15 × affected; Overall −0.1 for 4 wk) · Quiet fix (40% discovered → fine 2% of annual revenue, Overall −0.4 for 12 wk, news) · Forensic firm ($500k; breach p −50% for 52 wk) |
-| MIS_SELLING | branch | 0.001 | × signup level × (1.6 − ethics/100) × (appetite ≥ 4 ? 1.5 : 1) | Fire manager + compensate ($ = 2% of branch deposits ÷ 10) · Compensate only · Deny (40% fine of 5× compensation; news) |
-| REGULATOR_AUDIT | company | quarterly (§15) | fail only | Pay fine · Appeal (50%: fine ×0 or ×1.5) · Hire consultants ($ = 0.5 × fine; Risk coverage +0.2 for 26 wk) |
-| VIRAL_COMPLAINT | branch | 0.01 | Service < 2.5 | Public apology + fix ($10k; Service +0.2) · Ignore (awareness −0.05; 30% news) |
-| EXEC_POACHED | company | §17.2 | per exec | Counter-offer (+25% salary, loyalty +10) · Let them go |
-| BRANCH_FLOOD | branch | 0.0005 | Waterfront ×3 | Fast repair ($80k; closed 1 wk) · Slow repair ($30k; closed 4 wk) |
-| BANK_RUN | company | §13.8 | — | Central bank window (liquidity +; stigma) · Cut plan prices 10% everywhere for 8 wk (`planCut`, C3a) · Public statement (success 30% + 5% per CR point above 8%; success ends the run) |
-| CARD_FRAUD | company offering the API | 0.0015 | × (1.3 − fraudShield/10) | Abuse ring on API sign-ups (C3a). Absorb the losses (2% of API ARR) · Freeze API sign-ups 1 wk (API take-up −50% for 4 wk) · Absorb and call a fraud firm |
-| STAFF_WALKOUT | branch | 0.03 | morale < 25 | Raise wages 10% · Bonus $1,000 per staff (morale +20) · Wait it out (closed 1 wk, then morale +10) |
-| DIVIDEND_DUE | company | 3 weeks before payment | info | OK |
-| PRICE_WAR | city | §18.6 | — | Match (plan prices −10% at every office in the city for 26 wk, `planCut`) · Hold |
-| BIG_DEFAULT | branch | business default ≥ $500k | info | OK |
-| INSIDER_PROBE | personal | §22 | — | Settle (fine) · Fight (50%: cleared, or fine ×2 and news) |
-| REGULATOR_LETTER | company | on entering Restricted | info | OK (shows how to raise capital) |
-| RECAP_OFFER | company | §15 | — | Accept recapitalisation · Decline (takeover risk) |
+| id | Title | Scope | Weekly base p | Condition / multiplier | Options (cost → effect) |
+|---|---|---|---|---|---|
+| ROBBERY | Server-room break-in | office | 0.0015 | × (6 − machine room security)/3 | Upgrade the secure room (50% of the next machine room's price → morale +5) · Paid leave ($2k × staff → morale +10) · Business as usual (morale −15, Office −0.3 for 8 wk). Loss: $20k–150k ÷ security, 80% insured. |
+| ATM_SKIM | API key leak | office with a demo kiosk | 0.002 | × (1.3 − model Safety/10) | Refund customers ($5k–40k) · Rotate every key ($15k; p ×0.5 for 26 wk) · Deny liability (Service −0.4 for 8 wk; 30% news) |
+| DATA_BREACH | Data breach | company | 0.002 | × (1 + 2(1 − Platform & Security coverage′)) × (1.2 − CTO expertise/100) | Notify and monitor ($15 × affected; Overall −0.1 for 4 wk) · Quiet fix (40% discovered → fine 2% of annual revenue, Overall −0.4 for 12 wk, news) · Forensic firm ($500k; breach p −50% for 52 wk) |
+| MIS_SELLING | Capability over-claim | office | 0.001 | × Sign-Up Credits level × (1.6 − ethics/100) × (launch posture ≥ 4 ? 1.5 : 1) | Fire the manager and compensate · Compensate only · Deny it (40% chance of a fine of 5× compensation; news). Compensation (refunds to customers) is `compShare` (2%) of the office's ARR. |
+| REGULATOR_AUDIT | Safety audit | company | quarterly (SIMULATION §15) | fail only | Pay the fine · Appeal (50%: fine ×0 or ×1.5) · Pay and hire consultants ($ = 0.5 × fine; Safety coverage +0.2 for 26 wk) |
+| VIRAL_COMPLAINT | Viral complaint | office | 0.01 | Service < 2.5 | Apologise and fix it ($10k; Service +0.2) · Ignore it (awareness −0.05; 30% news) |
+| EXEC_POACHED | Executive poached | company | SIMULATION §17.2 | per exec | Counter-offer (+25% salary, loyalty +10) · Let them go |
+| RESEARCHER_POACHED | Researcher poached | company | quarterly rival bid (§13c) | per researcher | Counter-offer (their salary +25%) · Let them go (they join the rival, whose next models get better) |
+| BRANCH_FLOOD | Heatwave | office | 0.0005 | Waterfront ×3 | Fast repair ($80k; closed 1 wk) · Slow repair ($30k; closed 4 wk) |
+| BANK_RUN | Outage rumour | company | SIMULATION §13.8 | very poor ratings and a Restricted or Critical safety tier | Service credits (`creditShare` 2% of company ARR; ends the rumour) · Cut plan prices 10% everywhere for 8 wk (`planCut`) · Public statement (success 30% + 5% per credit-ratio point above 8%; "calms customers and ends the rumour") |
+| CARD_FRAUD | Abuse ring | company offering the API | 0.0015 | × (1.3 − model Safety/10) | Absorb the losses (2% of API ARR) · Freeze API sign-ups for a week (API take-up −50% for 4 wk) · Absorb and call a fraud firm |
+| STAFF_WALKOUT | Staff walkout | office | 0.03 | morale < 25 | Raise wages 10% · Pay a bonus ($1,000 per staff, morale +20) · Wait it out (closed 1 wk, then morale +10) |
+| DIVIDEND_DUE | Dividend due | company | 3 weeks before payment | info | OK |
+| PRICE_WAR | Price war | city | SIMULATION §18.6 | — | Match it (plan prices −10% at your office in the city for 26 wk, `planCut`) · Hold our prices |
+| BIG_DEFAULT | Big customer failure | office | — | no longer raised; big contract losses make the paper instead (§23) | OK |
+| INSIDER_PROBE | Insider trading probe | personal | SIMULATION §22 | — | Settle (fine) · Fight it (50%: cleared, or fine ×2 and news) |
+| REGULATOR_LETTER | Letter from the regulator | company | on entering the Restricted safety tier | info | OK (explains how to lift the safety ratio) |
+| RECAP_OFFER | Mandated pause | company | SIMULATION §15 | — | Accept the pause (fee 2% of trailing revenue, at least $250k) · Decline (the licence is revoked) |
+
+The outage rumour's text: "Rumours that we are about to go dark are spreading, and customers are cancelling their plans before it happens."
 
 ## 23. Ledger headline templates
-Tokens are in {braces}. Write 2–4 variants per type in code. The full set lives in `src/data/ledgerTemplates.ts`, `ledgerTemplatesRivals.ts`, `ledgerTemplatesWorld.ts`, `ledgerTemplatesGlobe.ts` (§23.1 World desk: 35 beats) `ledgerTemplatesGlobeMore.ts` (26 more World desk beats), `ledgerTemplatesDesk.ts` (§23.2 company desk, §23.3 Money Column, §23.4 elections) and `ledgerTemplatesCalendar.ts` (§23.5 commodities, §23.6 world calendar, §23.7 the archive); the fictional leagues, parties and policies are in `src/data/newsWorld.ts`, and the World desk's beat rules (country, months, phase, condition, number ranges), share-move reasons by sector and launch products in `src/data/newsWorldBeats.ts` (and `newsWorldBeatsMore.ts` with its invented book, game, show, species, dish and record names); commodities in `src/data/commodities.ts`; the Nations Cup and World Games nations, fixtures, prize fields and films in `src/data/worldCalendar.ts`. Every place, person and company in them is invented or a game city.
+The paper is The Weekly Inference; the code calls it the Ledger, and event types keep bank-era ids (`NEW_BRANCH`, `BANK_RUN` and so on). Tokens are in {braces}; `{bank}` is a lab's name. Write 2–4 variants per type in code. The full set lives in `src/data/ledgerTemplates.ts` and its siblings: `ledgerTemplatesRivals.ts`, `ledgerTemplatesWorld.ts`, `ledgerTemplatesGlobe.ts` (§23.1 World desk: 35 beats), `ledgerTemplatesGlobeMore.ts` (26 more World desk beats), `ledgerTemplatesDesk.ts` (§23.2 company desk, §23.3 Money Column, §23.4 elections) and `ledgerTemplatesCalendar.ts` (§23.5 commodities, §23.6 world calendar, §23.7 the archive), plus the markets, mergers, ventures, personal and other files. The fictional leagues, parties and policies are in `src/data/newsWorld.ts`, and the World desk's beat rules (country, months, phase, condition, number ranges), share-move reasons by sector and launch products in `src/data/newsWorldBeats.ts` (and `newsWorldBeatsMore.ts` with its invented book, game, show, species, dish and record names); commodities in `src/data/commodities.ts`; the Nations Cup and World Games nations, fixtures, prize fields and films in `src/data/worldCalendar.ts`. Every place, person and company in them is invented or a game city.
+
+Examples:
 
 | Type | Headline | Body |
 |---|---|---|
-| NEW_BRANCH | New branch: {bank} opens in {district}, {city} | {bank} opened a branch at {address} this week. |
-| CB_HOLD | {cb} holds its rate at {rate} | At last week's meeting the {cb} kept its policy rate at {rate}. GDP grew {gdp}% last quarter; it expects {fc}% this quarter. |
-| CB_RAISE / CB_CUT | {cb} {raises\|cuts} rate to {rate} | The {cb} moved its policy rate by {bp} basis points to {rate}, citing inflation of {infl}% and growth of {gdp}%. |
-| EARNINGS | {company} revenue {rises\|falls} {pct}% | {company} reported quarterly revenue of {rev}, {up\|down} {pct}% from the previous quarter. |
-| DIVIDEND | {company} pays quarterly dividend | {company} declared a cash dividend of {dps} ({yield}) per share for {quarter}. |
-| EXEC_RESIGN | {company} {title} resigns | {name} stepped down as {title} of {company}, effective immediately. |
-| CONVENTION | {event} comes to {city} | Founders and investors gather in {city} next week. Find the convention on the map to attend. |
-| FASTEST_GROWING | The fastest growing banks of {year} | {bank} tops this year's list after growing assets {pct}%. |
+| NEW_BRANCH | New sales office: {bank} opens in {district}, {city} | {bank} signed for {address} this week. Fitters are in and the doors open within days. |
+| CB_HOLD | {cb} holds its rate at {rate} | At this week's meeting the {cb} kept its policy rate at {rate}. GDP growth was {gdp} last quarter; it expects {fc} this quarter. |
+| CB_RAISE / CB_CUT | {cb} {raises\|cuts} rate to {rate} | The {cb} moved its policy rate by {bp} basis points to {rate}, citing inflation of {infl} and growth of {gdp}. |
+| CONTRACT_WON_BIG | {bank} wins {business} from {rival} | The {sector} account, worth {amount} a year, switched at its renewal, leaving {rival}. |
+| CONTRACT_LOST_BIG | {business} drops {bank} | The {sector} account, worth {amount} a year, {why}. |
+| COMPUTE_OUTAGE | {bank} goes down under the load | Customers report errors and timeouts as demand outruns the lab's GPUs. Some are already shopping around. |
+| MODEL_TRAINED | {bank} finishes training {name} | The new model scores {score} on the benchmark board and is ready to switch on in Manage Models. |
+| RIVAL_MODEL_RELEASED | {bank} ships {model} | The new release scores {score} on the benchmark board. |
+| SAFETY_PAUSE | {bank} agrees to a {weeks}-week safety pause | Regulators will sit alongside the lab's safety team. No new customers or training runs until they leave. |
+| POWER_DEAL_SIGNED | {bank} signs a power deal at {site} | The {fee} contract brings cheap power and contracted GPUs to the lab over seven years. |
+| FASTEST_GROWING | The fastest growing labs of {year} | {bank} tops this year's list after growing assets {pct}. |
 | RICH_LIST | {name} enters the rich list at #{rank} | The {bank} founder's fortune is estimated at {worth}. |
 | REG_FINE | Regulator fines {bank} {amount} | The penalty follows {reason}. |
-| BANK_FAILURE | Regulators seize {bank} | {bank}'s {n} branches will be offered to buyers. |
-| HOUSING | {city} home prices {rise\|fall} {pct}% over the year | Analysts point to {reason}. |
-| AUCTION_PREVIEW | Coming to {house}: {item} | Estimate {estimate}. Bidding opens {date}. |
-| SPORTS | {club} finish {pos} in the {league} | {club} closed the season with a record of {record}. |
-| IPO | {bank} lists at {price} a share | Shares opened {pop}% above the offer price. |
-| MERGER | {acquirer} to acquire {target} for {amount} | The deal adds {n} branches across {cities}. |
-| WINDOW_USE | {bank} taps emergency central bank funding | The bank borrowed from the {cb}'s standing facility this week. |
+| BANK_FAILURE | Regulators seize {bank} | {bank}'s {n} sales offices will be offered to buyers. |
+| ACQUISITION_CLOSED | {bank} buys {target} for {price} | {target}'s {n} sales offices join {bank}. Signs come down over the next eight weeks. |
+| IPO_LISTED | {bank} opens at {open} on its first day | Shares priced at {price} {pop} as {ticker} began trading on the {exchange}. The listing raised {raised}. |
 | BREACH | {bank} discloses data breach | About {n} customers may be affected. |
-| BIG_DEFAULT | {business} defaults on {amount} loan | The {sector} business owed {bank} {amount}. |
-| POLITICS | {country} government proposes {policy} | The proposal would {effect} if passed. |
-| FILLER_MARKET | Markets {rally\|slide} as {sector} stocks {rise\|fall} | The index moved {pct}% this week. |
+| CORPORATE_LOAN | {bank} raises {amount} in venture debt | The term loan, arranged with {lender}, carries a rate of {rate}. |
+| BANK_RUN | Queues form outside {bank} | (bank-era wording about depositors; the outage rumour, §22) |
+| AUCTION_PREVIEW | {house} unveils {lots} lots for its next sale | (see `ledgerTemplatesAuctions.ts`) |
+| SPORTS_RESULT | {winner} beat {loser} {score} | A {margin} win in the {league}{extra}. {winner} are now {record} on the season. |
+| POLICY_PROPOSED | {country} government proposes {policy} | The proposal from the {party} would {effect} if passed. A vote is due within weeks. |
 
 ## 24. Review card templates
 
-Pick by category and sentiment. Use campaign-specific lines when the campaign is active. The full lists live in `src/data/reviews.ts` (rewritten for the lab in C3b; examples below).
+Pick by category and sentiment. Use campaign-specific lines when the campaign is active. The full lists live in `src/data/reviews.ts` (examples below).
 
 - **Price +**
   - "Pro costs less here than anywhere else I tried. Switched the whole team."
@@ -769,18 +798,18 @@ Pick by category and sentiment. Use campaign-specific lines when the campaign is
   - "No campus plan? Come on."
   - "The model got my simple question confidently wrong."
 - **Campaigns:**
-  - Lobby coffee: "Free espresso while they set up my account? Fine, you win."
-  - Charging station: "Charged my laptop while I waited. Small thing, big difference."
-  - Saturday hours: "Open Saturday mornings. Thank you!"
-  - Sign-up bonus: "Came for the free credits. Might stay."
-  - Money workshops: "The prompting workshop finally made it click for me."
+  - Coffee & Live Demos: "Free espresso while they set up my account? Fine, you win."
+  - Hack Nights: "Charged my laptop while I waited. Small thing, big difference."
+  - Weekend Support: "Open Saturday mornings. Thank you!"
+  - Sign-Up Credits: "Came for the free credits. Might stay."
+  - AI Workshops: "The prompting workshop finally made it click for me."
 
 ## 25. Advisor lines (contextual)
 
 Fill these per panel and state.
 
-- **Branch manager:**
-  - "Morning, boss. Drawers are balanced and the coffee's on."
+- **Office manager:**
+  - "Morning, boss. The pipeline's warm and the coffee's on."
   - Busy: "We're slammed. The line's out the door."
   - Quiet: "Quiet week. Want to sharpen our rates?"
   - Low morale: "The team's frustrated about pay."
@@ -788,23 +817,22 @@ Fill these per panel and state.
   - "{traffic: Foot traffic is heavy / steady / light here}, {rent: and the rent's steep / fair / cheap}."
   - Plus a demographic hint ("lots of researchers nearby").
 - **Office for lease:** "Plenty of desks here. We can bring more teams in-house."
-- **HQ floors** (coverage ≥ 1 / short):
-  - Finance: "Books are closed on time." / "We're short on finance staff. Statements are running late."
-  - Treasury: "Liquidity's healthy." / "We're paying up for funding without more hands."
-- **Rival branch:** "This is {rival}'s sales office. Their Plus plan is {x}; ours is {y}." (C3a: compares the Plus price.)
-- **Rival HQ:** "Welcome to {rival}. We lend to businesses — even competitors."
+- **HQ (no office yet):** "Every growing lab needs a head office. Let's find one."
+- **Company summary:** "Grow recurring revenue; watch the compute bill."
+- **Rival sales office:** "This is {rival}'s sales office. Their Plus plan is {x}; ours is {y}."
+- **Rival lab HQ:** "{rival} head office. Know your competition."
 - **Central bank:** "The governor's office. Rates are on everyone's mind."
-- **Investment bank:** "Welcome to {name}. Raising capital or buying a competitor?"
-- **Credit bureau:** "Better data, fewer defaults. What can we score for you?"
-- **Employer:** "{n} people work here, and their payroll needs a bank."
+- **Investment bank:** "Welcome to {name}. Raising capital, borrowing or buying a competitor?"
+- **Data vendor:** "Better data, better models. What can we train for you?"
+- **Employer:** "{n} people work here, and their team could use our plans."
+- **Energy site employer:** "{n} people work here, on a site with power to spare for a data center."
+- **Business:** "{business} spends about {budget} a year on AI and has no vendor yet." / "{business} runs on our models." / "{rival} serves {business} today."
 - **Airport:** "Welcome to {airport}. Where are we headed?"
 - **Auction house:** "Exceptional pieces this season. Buying or selling?"
 - **Car dealer:** "Our finest machines. Something for the weekend?"
-- **Convention:** "Founders everywhere. Let's find the next big thing."
-- **University:** "Our graduates would love to join a growing bank."
-- **Lobbying firm:** "Policy is a long game. What would you like changed?"
+- **University:** "Our graduates would love to join a growing lab."
+- **Lobbying firm:** "We know the right people. Results take a few weeks, and discretion is never guaranteed."
 - **Marketing agency:** "Let's put your name on every billboard in town."
-- **Sports franchise:** "Fans, a stadium, and a lot of payroll. Interested?"
 - **Vacation home:** "A place to get away from it all — bought with your own money."
 
 ## 26. Name pools

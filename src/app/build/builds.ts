@@ -14,9 +14,9 @@ import type { GameState } from '../../sim/state';
 export const SLOT_LABEL: Record<BuildSlot, string> = {
   exterior: 'Exterior',
   lobby: 'Lobby',
-  teller: 'Teller line',
-  vault: 'Vault',
-  atm: 'ATM',
+  teller: 'Sales desks',
+  vault: 'Machine room',
+  atm: 'Demo kiosks',
 };
 
 /** Options for one slot, cheapest first. */

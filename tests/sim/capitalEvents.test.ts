@@ -3,6 +3,7 @@
 // emergency recapitalisation is tested in safety.test.ts.
 import { describe, expect, it } from 'vitest';
 import { BANK_RUN } from '../../src/config/balance';
+import { companyArr } from '../../src/sim/arr';
 import * as cmd from '../../src/sim/commands';
 import { advanceWeeks } from '../../src/sim/engine';
 import { bankRunMult } from '../../src/sim/incident/effects';
@@ -75,20 +76,17 @@ describe('bank runs', () => {
     expect(s.incidents.bankRunWeeksLeft).toBeUndefined();
   });
 
-  it('lends nothing from the central bank window with no deposit book (C3a)', () => {
-    // The window lends a share of deposits; an AI lab holds none, so it borrows
-    // nothing. The window itself goes in C3c.
+  it('ends the rumour with service credits priced on ARR (C8f)', () => {
     const { s, b } = openBank();
     b.ratings.overall = 2;
     s.company.tier = 'critical';
     s.company.tierWeeks = 3;
     startRun(s);
     const inc = s.incidents.active.find((i) => i.type === 'BANK_RUN')!;
-    expect(inc.data.window).toBe(0);
-    const reserves = s.treasury.reserves;
-    cmd.resolveIncident(s, inc.id, 'window');
-    expect(s.treasury.window).toBe(0);
-    expect(s.treasury.reserves).toBe(reserves);
+    expect(inc.data.credits).toBeCloseTo(BANK_RUN.creditShare * companyArr(s));
+    const r = cmd.resolveIncident(s, inc.id, 'credits');
+    expect(r.ok).toBe(true);
+    expect(s.incidents.bankRunWeeksLeft).toBeUndefined();
   });
 
   it('cuts plan prices when the lab chooses to raise its offer', () => {

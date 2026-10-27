@@ -32,14 +32,15 @@ const OFFICE_BANDS: Record<
   { arr: [number, number]; rev: [number, number]; inc: [number, number] }
 > = {
   104: { arr: [8e6, 20e6], rev: [160e3, 380e3], inc: [55e3, 140e3] },
-  156: { arr: [12e6, 28e6], rev: [250e3, 520e3], inc: [85e3, 190e3] },
-  208: { arr: [16e6, 36e6], rev: [320e3, 700e3], inc: [110e3, 260e3] },
-  260: { arr: [16e6, 38e6], rev: [320e3, 720e3], inc: [110e3, 260e3] },
+  // C8f: income ceilings raised for the all-spendable seed's lasting head start.
+  156: { arr: [12e6, 28e6], rev: [250e3, 520e3], inc: [85e3, 230e3] },
+  208: { arr: [16e6, 36e6], rev: [320e3, 700e3], inc: [110e3, 340e3] },
+  260: { arr: [16e6, 38e6], rev: [320e3, 720e3], inc: [110e3, 360e3] },
 };
 
-/** §25 first-year ARR bands (C3a). */
-const W26_ARR: [number, number] = [1e6, 2.5e6];
-const W52_ARR: [number, number] = [3e6, 6.5e6];
+/** §25 first-year ARR bands (C3a; raised in C8f for the $1.5M all-spendable seed). */
+const W26_ARR: [number, number] = [1.5e6, 5e6];
+const W52_ARR: [number, number] = [3e6, 8e6];
 
 const M = (x: number) => `${(x / 1e6).toFixed(1)}M`;
 const K = (x: number) => `${(x / 1e3).toFixed(1)}k`;
@@ -87,8 +88,8 @@ export function branchCheckpoints(m: BranchMetrics): Check[] {
       {
         label: 'Week 52 customers',
         value: String(Math.round(w52.cust)),
-        ok: inRange(w52.cust, 3500, 8000),
-        target: '3,500–8,000',
+        ok: inRange(w52.cust, 3500, 9000),
+        target: '3,500–9,000',
       },
       {
         label: 'Week 52 income / week',

@@ -4,8 +4,6 @@
 // the GPU market and a card per partnership. The bank-era liquidity, funding
 // market and central bank cards show only for saves that still carry
 // deposits, wholesale lots or central bank borrowing.
-import { totalDeposits } from '../../sim/balanceSheet';
-import type { GameState } from '../../sim/state';
 import { ComputeCard } from '../company/ComputeCard';
 import { SectionTitle } from '../components';
 import { useGame } from '../store';
@@ -18,13 +16,8 @@ import { FundingMarket } from './treasury/FundingMarket';
 import { LiquidityCard } from './treasury/LiquidityCard';
 import { PartnershipCards } from './treasury/PartnershipCards';
 import { TreasuryPolicyCard } from './treasury/TreasuryPolicyCard';
+import { hasLegacyFunding } from './treasury/legacyFunding';
 import './treasury/treasury.css';
-
-/** A save from the bank era that still has deposits or wholesale funding to manage. */
-function hasLegacyFunding(s: GameState): boolean {
-  const t = s.treasury;
-  return totalDeposits(s) > 0 || t.lots.length > 0 || t.overnight > 0 || t.window > 0;
-}
 
 export function TreasuryFloor() {
   const s = useGame();

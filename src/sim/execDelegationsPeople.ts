@@ -203,13 +203,13 @@ export function cmoBrand(state: GameState): void {
 
 // ─── CRO ──────────────────────────────────────────────────────────────────────
 
-/** Risk appetite: one step at a time toward the CR and loss-rate targets. */
+/** Launch posture (C8f): one step down while the safety tier is weak, up while it is Strong. */
 export function croAppetite(state: GameState): void {
   if (state.clock.week % X.croEveryWeeks !== 0) return;
-  const cr = state.company.capitalRatio;
-  const loss = companyLossRate(state);
+  const tier = state.company.tier;
   const level = state.company.riskAppetite;
-  if ((cr < X.croMinCr || loss > X.croMaxLoss) && level > 1) setRiskAppetite(state, level - 1);
-  else if (cr >= X.croRaiseCr && loss <= X.croRaiseLoss && level < X.croMaxAppetite)
-    setRiskAppetite(state, level + 1);
+  if (CSO_STEP_DOWN.has(tier) && level > 1) setRiskAppetite(state, level - 1);
+  else if (tier === 'strong' && level < X.croMaxAppetite) setRiskAppetite(state, level + 1);
 }
+
+const CSO_STEP_DOWN = new Set(['watch', 'restricted', 'critical']);

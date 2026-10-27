@@ -14,7 +14,7 @@ import { addCapital, identityGap } from '../helpers/mergers';
 import { freeLot } from '../helpers/scenario';
 
 function rich() {
-  const s = newGame({ seed: 7, cityId: 'cal', startCash: 1_500_000 });
+  const s = newGame({ seed: 7, cityId: 'cal', startCash: 2_500_000 });
   addCapital(s, 60_000_000);
   return s;
 }
@@ -66,7 +66,7 @@ describe('building a data center', () => {
   });
 
   it('only builds in the city you are in, and needs the cash', () => {
-    const s = newGame({ seed: 7, cityId: 'cal', startCash: 1_500_000 });
+    const s = newGame({ seed: 7, cityId: 'cal', startCash: 2_500_000 });
     const lot = freeLot(s);
     expect(cmd.dataCenterBlocker(s, { lotId: lot.id }, DEFAULT_DC_BUILD)).toMatch(/cash/);
     addCapital(s, 60_000_000);

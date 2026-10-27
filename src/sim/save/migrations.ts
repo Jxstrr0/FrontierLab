@@ -18,6 +18,7 @@ import { migrateDealDesk } from './migrateDealDesk';
 import { migrateSpotLimits } from './migrateSpotLimits';
 import { migrateMoney } from './migrateMoney';
 import { SCHEMA_VERSION, type GameState } from '../state';
+import { migrateSeedMoney } from './migrateSeedMoney';
 
 type RawSave = Record<string, unknown> & { schemaVersion: number };
 
@@ -115,6 +116,11 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
   // 17 → 18 (stage C8a): data-centre and power deals at energy sites.
   17: (s) => {
     (s as unknown as GameState).powerDeals ??= {};
+    return s;
+  },
+  // 18 → 19 (stage C8f): treasury reserves become spendable seed money.
+  18: (s) => {
+    migrateSeedMoney(s as unknown as GameState);
     return s;
   },
 };
