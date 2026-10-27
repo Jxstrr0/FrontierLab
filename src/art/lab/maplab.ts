@@ -21,7 +21,7 @@ import { tileCenter } from '../iso';
 import { createMapRenderer } from '../isoRenderer';
 import type { Camera, LotOccupant } from '../mapRenderer';
 
-const PAPER = '#E3E9DF';
+const PAPER = '#DFE7E7';
 const PLAYER_INK = '#2C4A7A';
 const PLAYER_LOTS = 3;
 

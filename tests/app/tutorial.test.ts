@@ -1,5 +1,6 @@
 // The tutorial step machine (src/app/tutorial/steps.ts) driven through a whole
-// opening week with real commands, plus the tutorial commands and save safety.
+// Part 1, from the seed round to the first enterprise contract, with real
+// commands, plus the tutorial commands and save safety.
 import { describe, expect, it } from 'vitest';
 import { observe, guideOf } from '../../src/app/tutorial/observe';
 import {
@@ -17,7 +18,15 @@ import {
 import type { ModalRoute, PanelRoute } from '../../src/app/store';
 import { CAMPAIGNS } from '../../src/data/campaigns';
 import { REFERENCE_BUILDS } from '../../src/data/equipment';
-import { TUTORIAL, TUTORIAL_TEXT } from '../../src/data/tutorial';
+import {
+  TUTORIAL,
+  TUTORIAL_ORDER,
+  TUTORIAL_STEPS,
+  TUTORIAL_TEXT,
+  tutorialStepId,
+  tutorialStepNumber,
+  type TutorialStepId,
+} from '../../src/data/tutorial';
 import * as cmd from '../../src/sim/commands';
 import { advanceWeeks } from '../../src/sim/engine';
 import { newGame } from '../../src/sim/newGame';
@@ -33,7 +42,9 @@ const start = () => {
 const look = (s: GameState, panel: PanelRoute | null = null, modal: ModalRoute | null = null) =>
   observe(s, panel, modal);
 
-/** Plays the nine steps with commands; returns the memo trail and the game. */
+const at = (id: TutorialStepId) => tutorialStepNumber(id);
+
+/** Plays the nine steps with commands; returns the step trail and the game. */
 function playThrough(): { s: GameState; trail: number[] } {
   const s = start();
   const trail: number[] = [];
@@ -44,14 +55,14 @@ function playThrough(): { s: GameState; trail: number[] } {
   };
 
   // 1. Tap a storefront.
-  memo = enterStep(1, look(s));
+  memo = enterStep(at('storefront'), look(s));
   expect(isDone(memo, look(s))).toBe(false);
   const lot = freeLot(s, 'midtown');
   expect(isDone(memo, look(s, { type: 'storefront', lotId: lot.id }))).toBe(true);
   advance(memo);
 
-  // 2. Build a branch.
-  memo = enterStep(2, look(s, { type: 'build', lotId: lot.id }));
+  // 2. Build a sales office.
+  memo = enterStep(at('build'), look(s, { type: 'build', lotId: lot.id }));
   expect(isDone(memo, look(s))).toBe(false);
   const built = cmd.buildBranch(s, { lotId: lot.id, build: REFERENCE_BUILDS.basic });
   if (!built.ok) throw new Error(built.reason);
@@ -59,17 +70,26 @@ function playThrough(): { s: GameState; trail: number[] } {
   expect(isDone(memo, look(s))).toBe(true);
   advance(memo);
 
-  // 3. Set the Plus price.
+  // 3. Set the Plus price (on the office's Products tab while HQ doesn't set prices).
   const panel: PanelRoute = { type: 'branch', branchId, tab: 'products' };
-  memo = enterStep(3, look(s, panel));
+  memo = enterStep(at('price'), look(s, panel));
   expect(isDone(memo, look(s, panel))).toBe(false);
+  expect(s.company.applyRatesToAll).toBe(false);
   const plus = s.branches[branchId]!.offered.plus!.price;
   expect(cmd.setPrice(s, branchId, 'plus', plus + 2).ok).toBe(true);
   expect(isDone(memo, look(s, panel))).toBe(true);
   advance(memo);
 
-  // 4. Hire a manager: the guide is the first candidate until someone is hired.
-  memo = enterStep(4, look(s, panel));
+  // 4. Turn on the API (new offices open with it off).
+  memo = enterStep(at('api'), look(s, panel));
+  expect(alreadyDone(memo, look(s))).toBe(false);
+  expect(isDone(memo, look(s))).toBe(false);
+  expect(cmd.setOffered(s, branchId, 'api', true).ok).toBe(true);
+  expect(isDone(memo, look(s))).toBe(true);
+  advance(memo);
+
+  // 5. Hire a manager: the guide is the first candidate until someone is hired.
+  memo = enterStep(at('manager'), look(s, panel));
   expect(alreadyDone(memo, look(s))).toBe(false);
   const candidate = s.people.managerCandidates.cal![0]!;
   expect(guideOf(s)?.id).toBe(candidate.id);
@@ -79,8 +99,18 @@ function playThrough(): { s: GameState; trail: number[] } {
   expect(guideOf(s)?.id).toBe(second.id);
   advance(memo);
 
-  // 5. Unpause and read the weekly results (done once they have been shown and closed).
-  memo = enterStep(5, look(s));
+  // 6. Run a campaign.
+  const marketing: PanelRoute = { type: 'branch', branchId, tab: 'marketing' };
+  memo = enterStep(at('campaign'), look(s, marketing));
+  expect(alreadyDone(memo, look(s, marketing))).toBe(false);
+  expect(isDone(memo, look(s, marketing))).toBe(false);
+  const campaign = Object.keys(CAMPAIGNS)[0]!;
+  expect(cmd.setCampaignLevel(s, branchId, campaign, 1).ok).toBe(true);
+  expect(isDone(memo, look(s, marketing))).toBe(true);
+  advance(memo);
+
+  // 7. Unpause and read the weekly results (done once they have been shown and closed).
+  memo = enterStep(at('week'), look(s));
   expect(guidance(memo, look(s)).idle).toMatch(/play/);
   s.clock.speed = 1;
   expect(guidance(memo, look(s)).targets).toEqual([
@@ -94,39 +124,10 @@ function playThrough(): { s: GameState; trail: number[] } {
   expect(guidance(memo, look(s, null, weekly)).targets[0]?.key).toBe('weekly-continue');
   expect(isDone(memo, look(s))).toBe(true);
   advance(memo);
+  s.clock.speed = 0;
 
-  // 6. Turn on Personal Loans.
-  memo = enterStep(6, look(s, panel));
-  expect(isDone(memo, look(s))).toBe(false);
-  expect(cmd.setOffered(s, branchId, 'api', true).ok).toBe(true);
-  expect(isDone(memo, look(s))).toBe(true);
-  advance(memo);
-
-  // 7. Win your first contract: the tutorial asks for a proposal request when none waits.
-  memo = enterStep(7, look(s));
-  for (let tries = 0; !isDone(memo, look(s)); tries++) {
-    if (tries > 10) throw new Error('No contract won');
-    if (needsApplication(memo, look(s))) {
-      expect(cmd.requestTutorialApplication(s, branchId).ok).toBe(true);
-    }
-    expect(needsApplication(memo, look(s))).toBe(false);
-    const rfp = Object.values(s.dealDesk.rfps).find((r) => r.kind === 'new')!;
-    cmd.bidOnRfp(s, rfp.id, 0.3);
-  }
-  advance(memo);
-
-  // 8. Run a campaign.
-  const marketing: PanelRoute = { type: 'branch', branchId, tab: 'marketing' };
-  memo = enterStep(8, look(s, marketing));
-  expect(alreadyDone(memo, look(s, marketing))).toBe(false);
-  expect(isDone(memo, look(s, marketing))).toBe(false);
-  const campaign = Object.keys(CAMPAIGNS)[0]!;
-  expect(cmd.setCampaignLevel(s, branchId, campaign, 1).ok).toBe(true);
-  expect(isDone(memo, look(s, marketing))).toBe(true);
-  advance(memo);
-
-  // 9. Meet the bank: done once the Company summary has been open and is closed.
-  memo = enterStep(9, look(s));
+  // 8. Meet the lab: done once the Company summary has been open and is closed.
+  memo = enterStep(at('company'), look(s));
   expect(guidance(memo, look(s)).targets.map((t) => t.key)).toEqual([
     'capital-meter',
     'hud-bank',
@@ -137,6 +138,21 @@ function playThrough(): { s: GameState; trail: number[] } {
   expect(isDone(memo, look(s, company))).toBe(false);
   expect(isDone(memo, look(s))).toBe(true);
   advance(memo);
+
+  // 9. Win your first contract: the tutorial asks for a proposal request when none waits,
+  // and again after a lost bid.
+  memo = enterStep(at('contract'), look(s));
+  expect(memo.step).toBe(TUTORIAL.loan);
+  for (let tries = 0; !isDone(memo, look(s)); tries++) {
+    if (tries > 10) throw new Error('No contract won');
+    if (needsApplication(memo, look(s))) {
+      expect(cmd.requestTutorialApplication(s, branchId).ok).toBe(true);
+    }
+    expect(needsApplication(memo, look(s))).toBe(false);
+    const rfp = Object.values(s.dealDesk.rfps).find((r) => r.kind === 'new')!;
+    cmd.bidOnRfp(s, rfp.id, 0.3);
+  }
+  advance(memo);
   return { s, trail };
 }
 
@@ -146,6 +162,28 @@ describe('tutorial step machine', () => {
     expect(trail).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9]);
     expect(s.flags.tutorialStep).toBe(TUTORIAL.finale);
     expect(s.underwriting.loansBooked).toBeGreaterThan(0);
+    expect(Object.values(s.businesses).some((b) => b.vendor?.type === 'player')).toBe(true);
+  });
+
+  it('runs the steps in TUTORIAL_ORDER, ending on the contract step', () => {
+    expect(TUTORIAL_ORDER).toHaveLength(TUTORIAL.last - TUTORIAL.first + 1);
+    expect(tutorialStepId(TUTORIAL.first)).toBe('storefront');
+    expect(tutorialStepId(TUTORIAL.loan)).toBe('contract');
+    expect(TUTORIAL.loan).toBe(TUTORIAL.last);
+    expect(tutorialStepId(TUTORIAL.finale)).toBeUndefined();
+    for (const id of TUTORIAL_ORDER) expect(tutorialStepId(tutorialStepNumber(id))).toBe(id);
+  });
+
+  it('keeps bank words out of the guide’s lines', () => {
+    const bank = /\b(bank|branch|deposit|loan|lend|capital|teller|vault)/i;
+    const all = Object.values(TUTORIAL_STEPS).flatMap((t) => [
+      t.title,
+      t.idle,
+      ...Object.values(t.lines),
+    ]);
+    for (const line of [...all, TUTORIAL_TEXT.offer, TUTORIAL_TEXT.finale]) {
+      expect(line).not.toMatch(bank);
+    }
   });
 
   it('is deterministic: the same seed and commands give the same game', () => {
@@ -157,7 +195,7 @@ describe('tutorial step machine', () => {
     const lot = freeLot(s, 'midtown');
     const r = cmd.buildBranch(s, { lotId: lot.id, build: REFERENCE_BUILDS.basic });
     if (!r.ok) throw new Error(r.reason);
-    const g = guidance(enterStep(3, look(s)), look(s));
+    const g = guidance(enterStep(at('price'), look(s)), look(s));
     expect(g.targets.map((t) => t.key)).toEqual([
       'price-plus',
       'product-category',
@@ -169,7 +207,7 @@ describe('tutorial step machine', () => {
 
   it('waits for other modals, and points at Continue when weekly results interrupt', () => {
     const s = start();
-    const memo = enterStep(3, look(s));
+    const memo = enterStep(at('price'), look(s));
     expect(guidance(memo, look(s, null, { type: 'incident' }))).toMatchObject({
       targets: [],
       idle: TUTORIAL_TEXT.waitModal,
@@ -184,11 +222,11 @@ describe('tutorial step machine', () => {
     const r = cmd.buildBranch(s, { lotId: lot.id, build: REFERENCE_BUILDS.basic });
     if (!r.ok) throw new Error(r.reason);
     cmd.setOffered(s, r.branchId, 'api', true);
-    expect(alreadyDone(enterStep(6, look(s)), look(s))).toBe(true);
-    expect(alreadyDone(enterStep(4, look(s)), look(s))).toBe(false);
-    expect(alreadyDone(enterStep(8, look(s)), look(s))).toBe(false);
+    expect(alreadyDone(enterStep(at('api'), look(s)), look(s))).toBe(true);
+    expect(alreadyDone(enterStep(at('manager'), look(s)), look(s))).toBe(false);
+    expect(alreadyDone(enterStep(at('campaign'), look(s)), look(s))).toBe(false);
     s.branches[r.branchId]!.delegation.marketing = true;
-    expect(alreadyDone(enterStep(8, look(s)), look(s))).toBe(true);
+    expect(alreadyDone(enterStep(at('campaign'), look(s)), look(s))).toBe(true);
   });
 
   it('only steps 1–9 are active; the closing card follows step 9', () => {
@@ -214,7 +252,7 @@ describe('tutorial commands', () => {
     expect(s.flags.tutorialStep).toBe(TUTORIAL.done);
   });
 
-  it('asks for an application only on step 7 and only when none is waiting', () => {
+  it('asks for a proposal request only on the contract step and only when none is waiting', () => {
     const s = start();
     const r = cmd.buildBranch(s, { lotId: freeLot(s).id, build: REFERENCE_BUILDS.basic });
     if (!r.ok) throw new Error(r.reason);

@@ -208,7 +208,7 @@
   padding: 2px 10px;
   border: 1px solid var(--oxblood);
   border-radius: var(--radius-pill);
-  color: #e07a7a;
+  color: var(--oxblood-text);
   font-size: var(--text-12);
   font-weight: 700;
 }
@@ -234,7 +234,7 @@
 }
 .cap-fixes.is-restricted,
 .cap-fixes.is-critical {
-  border-left-color: #e07a7a;
+  border-left-color: var(--oxblood-text);
 }
 .cap-fixes-title {
   color: var(--ivory);
@@ -251,7 +251,7 @@
 }
 .cap-fixes-warn {
   margin: var(--space-3) 0 0;
-  color: #e07a7a;
+  color: var(--oxblood-text);
   font-size: 0.875rem;
   font-weight: 600;
 }

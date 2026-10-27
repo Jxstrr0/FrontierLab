@@ -141,6 +141,7 @@ function NewRun() {
         class="btn btn-primary btn-block"
         disabled={short || !name.trim()}
         onClick={start}
+        data-tutorial="training-start"
       >
         Start training
       </button>

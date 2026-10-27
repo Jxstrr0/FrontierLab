@@ -22,6 +22,9 @@ export interface Check {
 
 /** Worst first: a lower index is a weaker tier. */
 const TIER_ORDER: Tier[] = ['critical', 'restricted', 'watch', 'adequate', 'strong'];
+/** True when `t` is `line` or a worse tier. */
+const atOrBelow = (t: Tier, line: Tier) => TIER_ORDER.indexOf(t) >= TIER_ORDER.indexOf(line);
+
 export const worse = (a: Tier, b: Tier): Tier =>
   TIER_ORDER.indexOf(a) <= TIER_ORDER.indexOf(b) ? a : b;
 
@@ -37,6 +40,8 @@ export interface RunLog {
   recession: boolean[];
   /** The home country's nominal index (§4.6), to read targets in start-of-game money. */
   nominal: number[];
+  /** Corporate cash at the week's end (C8d). */
+  cash: number[];
 }
 
 export const emptyLog = (): RunLog => ({
@@ -48,6 +53,7 @@ export const emptyLog = (): RunLog => ({
   tier: ['strong'],
   recession: [false],
   nominal: [1],
+  cash: [0],
 });
 
 export function logWeek(log: RunLog, state: GameState, netIncome: number): void {
@@ -60,6 +66,7 @@ export function logWeek(log: RunLog, state: GameState, netIncome: number): void 
   log.tier.push(state.company.tier);
   log.recession.push(homeCountry(state).phase === 'recession');
   log.nominal.push(homeCountry(state).nominal);
+  log.cash.push(state.company.cash);
 }
 
 /** Whether the home country was in recession within `window` weeks before `week`. */
@@ -154,15 +161,13 @@ export function strategyChecks(name: string, opts: NewGameOptions, log: RunLog):
       ok: mine > steady.arr[156]!,
       target: 'higher growth',
     });
-    const start = log.recession.indexOf(true);
-    const end = start < 0 ? -1 : log.recession.indexOf(false, start);
-    const tier = start < 0 ? 'n/a' : worstOver(start, end < 0 ? weeks : end);
+    // C8d: growing fast strains the Safety floor; the safety tier (C7a) shows it.
+    const tier = worstOver(0, weeks);
     checks.push({
-      label: 'Tier in the first recession',
+      label: 'Worst safety tier',
       value: tier,
-      // A lab with no deposit book rarely binds on bank capital; C7 replaces the tiers.
-      ok: true,
-      target: 'Watch or worse (n/a until C7)',
+      ok: atOrBelow(tier, 'watch'),
+      target: 'Watch or worse',
     });
   }
   if (name === 'stress') {
@@ -178,9 +183,16 @@ export function strategyChecks(name: string, opts: NewGameOptions, log: RunLog):
     checks.push({
       label: 'Worst tier (aggressive)',
       value: aggTier,
-      // As above: informational until C7's safety and regulation model.
-      ok: true,
-      target: 'Restricted or Critical (n/a until C7)',
+      ok: atOrBelow(aggTier, 'watch'),
+      target: 'Watch or worse',
+    });
+    // C8d: a recession hits a lab through its cash, not bank capital: aggressive bends, not breaks.
+    const aggCash = Math.min(...agg.cash);
+    checks.push({
+      label: 'Aggressive min cash',
+      value: M(aggCash),
+      ok: aggCash >= 0,
+      target: '≥ 0',
     });
   }
   return checks;

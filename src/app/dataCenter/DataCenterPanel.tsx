@@ -1,5 +1,6 @@
-// Data center panel (SCREENS §5b): status, the compute pool (C4a), the three
-// parts with an Upgrade button each, weekly costs, which cities get faster service, and Close.
+// Data center panel (SCREENS §5b): the engraved hall outside and in (C8c),
+// status, the compute pool (C4a), the three parts with an Upgrade button each,
+// weekly costs, which cities get faster service, and Close.
 import { useState } from 'preact/hooks';
 import { DATA_CENTER } from '../../config/balance';
 import { CITIES } from '../../data/cities';
@@ -10,6 +11,7 @@ import { Badge, Card, Confirm, Panel, Row, SectionTitle } from '../components';
 import { count, money, moneyFull } from '../format/format';
 import { act, closePanel, toast, useGame } from '../store';
 import { ComputeCard } from '../company/ComputeCard';
+import { DataCenterHero } from './DataCenterHero';
 import { DcPartSheet } from './DcPartSheet';
 import { partFact } from './dcView';
 import '../build/build.css';
@@ -45,6 +47,19 @@ export function DataCenterPanel(p: { dataCenterId: string }) {
         subtitle={`${place} · ${city}`}
         onClose={closePanel}
         advisor={{ text: advice }}
+        hero={
+          <DataCenterHero
+            build={dc.build}
+            gpus={hallGpus(dc.build)}
+            running={usableGpus(dc.build)}
+            brandInk={s.meta.brandInk}
+            monogram={s.meta.monogram}
+            logoShape={s.meta.logoShape}
+            energySite={!!dc.siteId}
+            fitout={!open}
+            ink={CITIES[dc.cityId]?.ink}
+          />
+        }
       >
         <div class="stack">
           <Card>

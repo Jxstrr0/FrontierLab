@@ -23,7 +23,7 @@ import { newGame } from '../../src/sim/newGame';
 import { deserialize, serialize } from '../../src/sim/save/serialize';
 import { execGame } from '../helpers/executives';
 
-/** A bank on the map after Part 1, with nothing due. */
+/** A lab on the map after Part 1, with nothing due. */
 const base = (o: Partial<LessonObs> = {}): LessonObs => ({
   panelType: null,
   modalType: null,
@@ -41,6 +41,8 @@ const base = (o: Partial<LessonObs> = {}): LessonObs => ({
   cityCovered: false,
   flights: 0,
   personalCash: 0,
+  computeShort: false,
+  trainingStarted: false,
   ...o,
 });
 
@@ -53,6 +55,21 @@ describe('when guides start', () => {
     expect(chapterToStart(base({ cityCovered: true }))).toBe('travel');
     expect(chapterToStart(base({ personalCash: GUIDES.wealthCash }))).toBe('wealth');
     expect(chapterToStart(base({ tier: 'watch' }))).toBe('capital');
+    expect(chapterToStart(base({ hqRamp: 0.25, offices: 1 }))).toBe('safetyFloor');
+    expect(chapterToStart(base({ computeShort: true }))).toBe('compute');
+    expect(chapterToStart(base({ depts: ['products'] }))).toBe('training');
+  });
+
+  it('skips the new AI guides once their point is met', () => {
+    const hq = { hqRamp: 0.25, offices: 1 };
+    expect(chapterDue('safetyFloor', base({ ...hq, depts: ['risk'] }))).toBe(false);
+    expect(chapterDue('safetyFloor', base({ offices: 1 }))).toBe(false);
+    expect(chapterDue('training', base({ depts: ['products'], trainingStarted: true }))).toBe(
+      false,
+    );
+    // The HQ guide comes first, then the Safety & Alignment floor once the office is rented.
+    expect(chapterToStart(base({ hqRamp: 0.25 }))).toBe('hq');
+    expect(chapterToStart(base({ ...hq, lessonsDone: ['hq'] }))).toBe('safetyFloor');
   });
 
   it('puts capital first and skips guides already seen or already done', () => {
@@ -78,7 +95,7 @@ describe('when guides start', () => {
     expect(chapterToStart(base({ ...due, lesson: { id: 'ipo', step: 0 } }))).toBeUndefined();
   });
 
-  it('reads a real game: the HQ guide is due from the third branch', () => {
+  it('reads a real game: the HQ guide waits for the founder ramp and an office', () => {
     const s = newGame({ seed: 42, cityId: 'cal' });
     expect(observeLessons(s, null, null, null).hqRamp).toBe(0);
     s.hq.ramp = 0.25;
@@ -114,6 +131,84 @@ describe('guide steps', () => {
     expect(chapterGuidance(m, o).idle).toBe(CHAPTERS.hq.steps[2]!.here);
     expect(chapterStepDone(m, o)).toBe(false);
     expect(chapterStepDone(m, { ...o, panelType: null })).toBe(true);
+  });
+
+  it('walks the Safety & Alignment guide: add the floor, then read it and leave', () => {
+    const o = base({ hqRamp: 1, offices: 1, depts: ['finance', 'hr'] });
+    const m0 = enterChapterStep('safetyFloor', 0, o);
+    expect(chapterGuidance(m0, o).targets.map((t) => t.key)).toEqual([
+      'add-floor-risk',
+      'tab-add',
+      'menu-hq',
+      'hud-menu',
+      'panel-close',
+    ]);
+    expect(chapterStepDone(m0, o)).toBe(false);
+    const added = { ...o, depts: ['finance', 'hr', 'risk'] as LessonObs['depts'] };
+    expect(chapterStepDone(m0, added)).toBe(true);
+    const floor = { ...added, panelType: 'hq', hqDept: 'risk' as const };
+    const m1 = updateChapterMemo(enterChapterStep('safetyFloor', 1, floor), floor);
+    expect(chapterGuidance(m1, floor).idle).toBe(CHAPTERS.safetyFloor.steps[1]!.here);
+    // On the floor itself only its own target is ringed, not the floor's tab.
+    expect(chapterGuidance(m1, floor).targets.map((t) => t.key)).toEqual(['hq-coverage']);
+    const elsewhere = { ...floor, hqDept: 'finance' as const };
+    expect(chapterGuidance(m1, elsewhere).targets[0]?.key).toBe('tab-risk');
+    expect(chapterStepDone(m1, floor)).toBe(false);
+    expect(chapterStepDone(m1, { ...floor, panelType: null, hqDept: undefined })).toBe(true);
+  });
+
+  it('sends the compute guide to the Compute floor, or to the Company summary without one', () => {
+    const noFloor = base({ computeShort: true });
+    const m = enterChapterStep('compute', 0, noFloor);
+    expect(chapterGuidance(m, noFloor).targets.map((t) => t.key)).toEqual([
+      'compute-card',
+      'hud-bank',
+      'panel-close',
+    ]);
+    const company = { ...noFloor, panelType: 'company' };
+    const seen = updateChapterMemo(m, company);
+    expect(chapterGuidance(seen, company).idle).toBe(CHAPTERS.compute.steps[0]!.alt!.here);
+    expect(chapterStepDone(seen, company)).toBe(false);
+    expect(chapterStepDone(seen, noFloor)).toBe(true);
+
+    const withFloor = base({ computeShort: true, offices: 1, depts: ['treasury'] });
+    const f = enterChapterStep('compute', 0, withFloor);
+    expect(chapterGuidance(f, withFloor).targets.map((t) => t.key)).toEqual([
+      'compute-card',
+      'tab-treasury',
+      'menu-hq',
+      'hud-menu',
+    ]);
+    // The Company summary is not the Compute floor.
+    expect(updateChapterMemo(f, { ...withFloor, panelType: 'company' }).saw).toBe(false);
+    const atFloor = { ...withFloor, panelType: 'hq', hqDept: 'treasury' as const };
+    expect(chapterGuidance(f, atFloor).idle).toBe(CHAPTERS.compute.steps[0]!.here);
+  });
+
+  it('ends the training guide on a started run, or once you have seen the floor', () => {
+    const o = base({ offices: 1, depts: ['products'] });
+    const m = enterChapterStep('training', 0, o);
+    expect(chapterGuidance(m, o).targets[0]?.key).toBe('training-start');
+    expect(chapterStepDone(m, o)).toBe(false);
+    expect(chapterStepDone(m, { ...o, trainingStarted: true })).toBe(true);
+    const floor = { ...o, panelType: 'hq', hqDept: 'products' as const };
+    const seen = updateChapterMemo(m, floor);
+    expect(chapterStepDone(seen, floor)).toBe(false);
+    expect(chapterStepDone(seen, o)).toBe(true);
+  });
+
+  it('reads compute shortfalls and training from a real game', () => {
+    const s = newGame({ seed: 42, cityId: 'cal' });
+    expect(observeLessons(s, null, null, null)).toMatchObject({
+      computeShort: false,
+      trainingStarted: false,
+    });
+    s.compute.burstStigmaWeeks = 2;
+    s.training.generation = 1;
+    expect(observeLessons(s, null, null, null)).toMatchObject({
+      computeShort: true,
+      trainingStarted: true,
+    });
   });
 
   it('ends the executive guide on a hire, then on "Got it"', () => {
@@ -173,7 +268,10 @@ describe('first-look tips', () => {
   it('has words for every tip and every guide step', () => {
     for (const id of TIP_IDS) expect(tipText(id)?.line.length).toBeGreaterThan(20);
     for (const c of Object.values(CHAPTERS)) {
-      for (const st of c.steps) expect(st.idle.length).toBeGreaterThan(10);
+      for (const st of c.steps) {
+        expect(st.idle.length).toBeGreaterThan(10);
+        if (st.alt) expect(st.alt.idle.length).toBeGreaterThan(10);
+      }
     }
     for (const tips of Object.values(CHAPTER_COVERS)) {
       for (const id of tips ?? []) expect(TIP_IDS).toContain(id);

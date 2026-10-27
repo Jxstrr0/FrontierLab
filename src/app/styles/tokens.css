@@ -1,23 +1,33 @@
 /*
  * Design tokens for the "Banknote Deco" look (docs/ART_DIRECTION.md §1).
- * Every colour, font and size used by the UI comes from here.
+ * Every colour, font and size used by the UI comes from here. Stage C8c moved
+ * the palette toward the AI theme: a deeper ink-navy, a cooler ivory and map
+ * paper, and one cool accent (--signal) beside the brass, for live compute.
  */
 :root {
   /* UI colour (ART_DIRECTION §1.1) */
-  --vault: #18233a;
-  --vault-deep: #0f1828;
-  --vault-raised: #22304a;
-  --ivory: #eee7d3;
-  --ivory-dim: #b9b3a2;
+  --vault: #131d33;
+  --vault-deep: #0a1222;
+  --vault-raised: #1c2943;
+  /* The advisor bar's band, and a card being pressed. */
+  --vault-band: #182540;
+  --vault-pressed: #263655;
+  --ivory: #ece8da;
+  --ivory-dim: #b3b5ae;
   --brass: #b8913d;
   --brass-light: #d9be7a;
+  /* The AI accent: a cool signal cyan for live compute (rack lights, glowing
+     screens, info badges). A fill and line colour; --signal-text is for text
+     on navy (9.4:1 on --vault). Used sparingly, so brass stays the lead. */
+  --signal: #3aafbf;
+  --signal-text: #6fd0db;
   --jade: #3e8a73;
   --oxblood: #9e3d3d;
-  /* Jade and oxblood are fills; as text on navy they miss WCAG AA (3.8:1, 2.4:1).
-     These lighter tints are for text (7.5:1, 5.4:1 on --vault; Stage 10 a11y). */
+  /* Jade and oxblood are fills; as text on navy they miss WCAG AA (4.1:1, 2.6:1).
+     These lighter tints are for text (8.0:1, 5.8:1 on --vault; Stage 10 a11y). */
   --jade-text: #6cc3a6;
   --oxblood-text: #e07a7a;
-  --paper: #e3e9df;
+  --paper: #dfe7e7;
   --ledger-ink: #22252b;
 
   /* Place-type inks (ART_DIRECTION §2 Pins): every kind of place on the map has

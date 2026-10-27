@@ -32,7 +32,7 @@
   opacity: 0.32;
 }
 .vignette .in-glow {
-  fill: var(--brass);
+  fill: var(--signal);
   opacity: 0.18;
 }
 .vignette .in-light {
@@ -50,7 +50,7 @@
   fill: var(--ivory);
 }
 .vignette .in-led {
-  fill: var(--jade);
+  fill: var(--signal);
 }
 .vignette .in-caption {
   font-family: var(--font-ui);
