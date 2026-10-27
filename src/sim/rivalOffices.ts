@@ -60,8 +60,8 @@ export function foldRivalOffice(state: GameState, into: RivalBranch, from: Rival
   ];
   into.overall = overallOf(into.quality);
   into.size = Math.max(into.size ?? 0, from.size ?? 0, nearestSize(a + b));
-  into.deposits += from.deposits;
-  into.loans += from.loans;
+  into.customers += from.customers;
+  into.arr += from.arr;
   into.contribution += from.contribution;
   into.reviewCount += from.reviewCount;
   into.openedWeek = Math.min(into.openedWeek, from.openedWeek);
@@ -91,8 +91,8 @@ export function foldRivalCity(
   ) as RivalBranch['quality'];
   keeper.overall = overallOf(keeper.quality);
   for (const other of here.slice(1)) {
-    keeper.deposits += other.deposits;
-    keeper.loans += other.loans;
+    keeper.customers += other.customers;
+    keeper.arr += other.arr;
     keeper.contribution += other.contribution;
     keeper.reviewCount += other.reviewCount;
     keeper.openedWeek = Math.min(keeper.openedWeek, other.openedWeek);

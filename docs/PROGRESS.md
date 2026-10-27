@@ -3,13 +3,31 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.32, save schema 22). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
+**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.33, save schema 23). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `1d68d256a0e64b` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `10188f73131935` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-27 — Rival labs keep AI books (v0.1.33, schema 23)
+
+Fourth audit release, the owner's pick from the content-gap review: rivals stop running hidden bank books.
+
+**What changed.**
+- **Each rival office has customers and the ARR they pay** at that lab's own prices. A lab's week is ARR ÷ 52 less compute, offices and training, banked as cash. Its equity is cash plus its offices at replacement value. New module `src/sim/rivalFinance.ts`.
+- **Runway, not a capital ratio.** Rival panels and the M&A tab show customers, ARR, cash and runway. A lab short of runway may raise a funding round (diluting holders); a lab whose cash is negative at two quarter-ends, or more than 13 weeks of costs in the hole, "goes into administration".
+- **M&A prices on ARR** × the valuation multiple; a distressed sale goes for 0.5–0.8× ARR. An acquired office brings its real customers.
+- Downturns shrink rival customers and spend, and your share of a city's prospects presses on every rival office there.
+- **A bug found on the way:** the old books' mass rival failures (34 in ten years) came from the price-war cut being read as a 20-point margin cut. Gone with the old books.
+- **Tuning.** Honest books first gave zero failures, which would have killed distressed buyouts. Offices now cost $45k a week, rescue rounds land 5% of the time, disruptors start with 20–40 weeks of runway, and a lab expands only with 39 weeks in hand. Ten years, steady strategy: rival failures 0 / 8 / 5 on seeds 42 / 7 / 3; labs grown 10 / 6 / 8; offices opened 25 / 18 / 21 (old books: 7 grown, 21 opened).
+- **Save schema 23.** Migration 22 → 23 (`migrateRivalBooks`) turns each rival office's old deposits into customers (one per $10,000) paying the lab's prices, sets each lab's cash to its old equity less its offices (at least 13 weeks of running costs), and drops loans and the capital ratio.
+- **Determinism snapshot** `1d68d256a0e64b` → `10188f73131935`: rivals now run on the new books; intended.
+
+**Checked.** `npm run lint`, `npx vitest run` (1057 tests) and `npm run build` pass. `npm run balance -- --years 10 --seed 42 --strategy steady`: all checkpoints in range.
+
+**Dependencies:** none added.
 
 ### 2026-10-27 — Seven executive seats (v0.1.32, schema 22)
 

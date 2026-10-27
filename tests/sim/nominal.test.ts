@@ -2,7 +2,7 @@
 // compounds with growth, inflation and the trend; market wages and rival books
 // are quoted at that level, while plan ARR follows the price charged (C3a).
 import { describe, expect, it } from 'vitest';
-import { MACRO_TARGETS, NOMINAL_INDEX } from '../../src/config/balance';
+import { MACRO_TARGETS, NOMINAL_INDEX, RIVAL_BOOKS } from '../../src/config/balance';
 import { marketWage } from '../../src/sim/branch/staff';
 import { advanceWeeks } from '../../src/sim/engine';
 import { deptMarketSalary } from '../../src/sim/hq';
@@ -10,7 +10,7 @@ import { updateMacro } from '../../src/sim/macro';
 import { newGame } from '../../src/sim/newGame';
 import { nominalIndex } from '../../src/sim/nominal';
 import { managerBaseSalary } from '../../src/sim/payReviews';
-import { matureDeposits } from '../../src/sim/rivals';
+import { arrPerCustomer } from '../../src/sim/rivalFinance';
 import { openScriptedBranch } from '../helpers/scenario';
 
 describe('nominal index (§4.6)', () => {
@@ -30,19 +30,23 @@ describe('nominal index (§4.6)', () => {
     expect(ca.nominal).toBeLessThan(expected + 0.015);
   });
 
-  it('scales market wages, manager and HQ pay and rival mature books with the index', () => {
+  it('scales market wages, manager and HQ pay and rival usage ARR with the index', () => {
     const s = newGame({ seed: 3, cityId: 'cal' });
     const wage = marketWage(s, 'cal');
     const mgr = managerBaseSalary(s, 'cal');
     const dept = deptMarketSalary(s, 'finance');
-    const rival = Object.values(s.rivals)[0]!.branches[0]!;
-    const books = matureDeposits(s, rival);
+    const rival = Object.values(s.rivals)[0]!;
+    const perCustomer = arrPerCustomer(s, rival, 'cal');
     s.world.countries.CA!.nominal = 2;
     expect(nominalIndex(s, 'cal')).toBe(2);
     expect(marketWage(s, 'cal')).toBeCloseTo(wage * 2, 6);
     expect(managerBaseSalary(s, 'cal')).toBeCloseTo(mgr * 2, 6);
     expect(deptMarketSalary(s, 'finance')).toBeCloseTo(dept * 2, 6);
-    expect(matureDeposits(s, rival)).toBeCloseTo(books * 2, 6);
+    // The usage part of a rival customer's ARR is quoted at the index; plan prices follow its own sheet.
+    expect(arrPerCustomer(s, rival, 'cal')).toBeCloseTo(
+      perCustomer + RIVAL_BOOKS.usagePerCustomer,
+      6,
+    );
     expect(nominalIndex(s, 'nowhere')).toBe(1);
   });
 

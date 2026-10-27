@@ -1,41 +1,33 @@
-// Rival quarter-end and failures (SIMULATION §18.5): quarterly earnings,
-// dividends for listed rivals (paid to your holdings), the occasional CEO
-// change, and the recession failure check. A failed rival is distressed for 8
-// weeks, its network offered as a distressed sale in M&A; unless you buy it,
-// its branches are then split among the other rivals in each city, or closed
-// where there are none.
+// Rival quarter-end (SIMULATION §18.5): quarterly earnings, dividends out of
+// spare cash (paid to your holdings of listed rivals), a funding round for a lab
+// running out of runway, the occasional CEO change, and the insolvency check. A
+// failed rival is in administration for 8 weeks, its network offered as a
+// distressed sale in M&A; unless you buy it, its offices are then split among
+// the other rivals in each city, or closed where there are none.
 import {
+  RIVAL_BOOKS,
   RIVAL_EXEC_RESIGN_CHANCE,
   RIVAL_FAILURE,
-  RIVAL_FINANCE,
-  RIVAL_LOAN_RISK_WEIGHT,
   RIVAL_PAYOUT,
+  RIVAL_RAISE,
 } from '../config/balance';
-import { CITIES } from '../data/cities';
 import { FIRST_NAMES, LAST_NAMES } from '../data/names';
 import { previousQuarter } from './calendar';
 import { pushEvent } from './events';
 import { payHolders } from './marketStocks';
 import { clamp } from './math';
 import { pendingOffer } from './mergerRules';
-import { rivalBvps, rollDistressedAsk } from './mergerPricing';
+import { rollDistressedAsk } from './mergerPricing';
 import { stream, type Rng } from './rng';
-import { rivalCapitalRatio, rivalLoans } from './rivalBooks';
+import { refreshRivalFinances } from './rivalBooks';
+import { rivalArr, rivalFairPerShare, rivalRunwayWeeks, syncRivalEquity } from './rivalFinance';
 import type { GameState, RivalBank } from './state';
 import { giveRivalOffice, rivalUnits } from './rivalOffices';
 
 const QUARTERS_KEPT = 8;
 const QUARTERS_PER_YEAR = 4;
 
-/** True when any country the rival operates in is in recession. */
-function inRecession(state: GameState, bank: RivalBank): boolean {
-  return bank.cities.some((id) => {
-    const country = CITIES[id]?.country;
-    return country !== undefined && state.world.countries[country]?.phase === 'recession';
-  });
-}
-
-/** Quarter-end for every rival: report, pay, maybe change CEO, then the failure check. */
+/** Quarter-end for every rival: report, pay, maybe raise, maybe change CEO, then the insolvency check. */
 export function runRivalQuarter(state: GameState): void {
   const rng = stream(state, 'rivalsAi');
   const { year, q } = previousQuarter(state.meta.startDate, state.clock.day);
@@ -45,10 +37,11 @@ export function runRivalQuarter(state: GameState): void {
     if (bank.status !== 'active') continue;
     report(state, bank, quarter);
     payDividend(state, bank, quarter);
+    raiseRound(state, bank, rng);
     // One roll per seat's worth of risk, so a fuller team makes the news a little more often.
     if (rng.chance(RIVAL_EXEC_RESIGN_CHANCE * (1 + bank.execs.length)))
       changeExec(state, bank, rng);
-    failureCheck(state, bank, rng);
+    failureCheck(state, bank);
   }
 }
 
@@ -76,21 +69,20 @@ function report(state: GameState, bank: RivalBank, quarter: string): void {
   );
 }
 
-/** A rival's share price: market price if listed, book value if private (src/sim/marketRivals.ts). */
+/** A rival's share price: market price if listed, fair value if private (src/sim/marketRivals.ts). */
 export function rivalSharePrice(bank: RivalBank): number {
   return bank.price;
 }
 
 /**
  * Dividend = clamp(excessShare × excess, ratio × NI, maxRatio × NI), capped at
- * the excess over the strategy's capital target and paid only when profitable,
- * so the capital ratio settles near its target. Every rival pays; listed ones
- * announce it and pay your company's and your own holdings (§19.1).
+ * the cash over RIVAL_BOOKS.cashTargetWeeks of running costs and paid only when
+ * profitable, so a lab keeps its runway. Every rival pays; listed ones announce
+ * it and pay your company's and your own holdings (§19.1).
  */
 function payDividend(state: GameState, bank: RivalBank, quarter: string): void {
   const netIncome = bank.quarters[bank.quarters.length - 1]?.netIncome ?? 0;
-  const target = RIVAL_FINANCE[bank.strategy].crTarget * rivalLoans(bank) * RIVAL_LOAN_RISK_WEIGHT;
-  const excess = bank.equity - target;
+  const excess = bank.cash - RIVAL_BOOKS.cashTargetWeeks * bank.costs;
   bank.dps = 0;
   if (netIncome <= 0 || excess <= 0) return;
   const p = RIVAL_PAYOUT;
@@ -100,8 +92,8 @@ function payDividend(state: GameState, bank: RivalBank, quarter: string): void {
   );
   const dps = dividend / Math.max(1, bank.shares);
   bank.dps = dps;
-  bank.equity -= dividend;
-  bank.capitalRatio = rivalCapitalRatio(bank);
+  bank.cash -= dividend;
+  syncRivalEquity(state, bank);
   if (!bank.listed) return;
   payHolders(state, bank.id, dps);
   pushEvent(
@@ -116,6 +108,36 @@ function payDividend(state: GameState, bank: RivalBank, quarter: string): void {
     },
     1,
   );
+}
+
+/**
+ * §18.5 funding round: a lab that lost money last quarter with under
+ * RIVAL_RAISE.maxRunwayWeeks of cash rolls `chance` to sell new shares worth
+ * `weeks` of running costs at its fair value less `discount`, diluting every
+ * holder (your stake included). Draws only when at risk, so healthy quarters
+ * leave the stream untouched.
+ */
+export function raiseRound(state: GameState, bank: RivalBank, rng: Rng): boolean {
+  const lost = (bank.quarters[bank.quarters.length - 1]?.netIncome ?? 0) < 0;
+  if (!lost || rivalRunwayWeeks(bank) >= RIVAL_RAISE.maxRunwayWeeks) return false;
+  if (!rng.chance(RIVAL_RAISE.chance)) return false;
+  const amount = RIVAL_RAISE.weeks * bank.costs;
+  if (amount <= 0) return false;
+  const price = Math.max(
+    RIVAL_RAISE.minPrice,
+    rivalFairPerShare(bank) * (1 - RIVAL_RAISE.discount),
+  );
+  const newShares = Math.round(amount / price);
+  bank.shares += newShares;
+  bank.cash += amount;
+  syncRivalEquity(state, bank);
+  pushEvent(
+    state,
+    'RIVAL_RAISE',
+    { rivalId: bank.id, bank: bank.name, amount, newShares, price, weeks: RIVAL_RAISE.weeks },
+    4,
+  );
+  return true;
 }
 
 /** One of the CEO or the bench steps down and is replaced (§18.1). */
@@ -139,12 +161,21 @@ function changeExec(state: GameState, bank: RivalBank, rng: Rng): void {
   );
 }
 
-/** §18.5: in a recession, CR below 6% fails with 15% per quarter; below 2% it fails outright. */
-function failureCheck(state: GameState, bank: RivalBank, rng: Rng): void {
-  const insolvent = bank.capitalRatio < RIVAL_FAILURE.insolventCr;
-  const atRisk = inRecession(state, bank) && bank.capitalRatio < RIVAL_FAILURE.maxCr;
-  // Roll only for banks at risk, so healthy quarters leave the stream untouched.
-  if (!insolvent && !(atRisk && rng.chance(RIVAL_FAILURE.chance))) return;
+/** True when the lab's cash has run out for good (§18.5, RIVAL_FAILURE). */
+export function insolvent(bank: RivalBank): boolean {
+  return (
+    bank.negativeQuarters >= RIVAL_FAILURE.insolventQuarters ||
+    bank.cash < -RIVAL_FAILURE.maxDebtWeeks * bank.costs
+  );
+}
+
+/**
+ * §18.5: negative cash at two quarter-ends in a row, or a hole deeper than
+ * RIVAL_FAILURE.maxDebtWeeks of costs, puts the lab into administration.
+ */
+function failureCheck(state: GameState, bank: RivalBank): void {
+  bank.negativeQuarters = bank.cash < 0 ? bank.negativeQuarters + 1 : 0;
+  if (!insolvent(bank)) return;
   bank.status = 'distressed';
   bank.distressedUntil = state.clock.week + RIVAL_FAILURE.distressWeeks;
   pushEvent(
@@ -157,14 +188,14 @@ function failureCheck(state: GameState, bank: RivalBank, rng: Rng): void {
 }
 
 /**
- * §18.5: the seized network goes up for sale in M&A for its distressed weeks,
- * asking BVPS × P/B (0.4–0.7, floored per share). The roll uses the `mergers`
- * stream so the rival stream's draws don't shift.
+ * §18.5: the network goes up for sale in M&A for its distressed weeks, asking
+ * ARR × a distressed multiple (0.5–0.8, floored per share). The roll uses the
+ * `mergers` stream so the rival stream's draws don't shift.
  */
 function offerDistressedSale(state: GameState, bank: RivalBank): void {
   const ask = rollDistressedAsk(bank, stream(state, 'mergers'));
   bank.distressedAsk = ask;
-  const bvps = rivalBvps(bank);
+  const arrPerShare = rivalArr(bank) / Math.max(1, bank.shares);
   pushEvent(
     state,
     'DISTRESSED_SALE',
@@ -172,7 +203,7 @@ function offerDistressedSale(state: GameState, bank: RivalBank): void {
       rivalId: bank.id,
       bank: bank.name,
       ask,
-      pb: bvps > 0 ? ask / bvps : 0,
+      multiple: arrPerShare > 0 ? ask / arrPerShare : 0,
       weeks: RIVAL_FAILURE.distressWeeks,
       n: bank.branches.length,
     },
@@ -181,9 +212,9 @@ function offerDistressedSale(state: GameState, bank: RivalBank): void {
 }
 
 /**
- * Weekly: once a distressed rival's 8 weeks are up, its branches go to the
- * other active rivals in each city (round robin, fewest branches first), or
- * close where no rival is left; the bank is then seized.
+ * Weekly: once a distressed rival's 8 weeks are up, its offices go to the
+ * other active rivals in each city (round robin, fewest units first), or
+ * close where no rival is left; the lab is then wound up.
  */
 export function splitDistressed(state: GameState): void {
   for (const bank of Object.values(state.rivals)) {
@@ -203,7 +234,7 @@ export function splitDistressed(state: GameState): void {
       if (taker && lot) {
         // It joins the taker's office in the city, or becomes it (C2b).
         giveRivalOffice(state, taker, branch);
-        taker.capitalRatio = rivalCapitalRatio(taker);
+        refreshRivalFinances(state, taker);
         takers.add(taker.name);
       } else if (lot?.occupant?.id === bank.id) {
         delete lot.occupant;
@@ -211,6 +242,9 @@ export function splitDistressed(state: GameState): void {
     }
     bank.branches = [];
     bank.status = 'seized';
+    bank.cash = 0;
+    bank.costs = 0;
+    syncRivalEquity(state, bank);
     delete bank.distressedUntil;
     delete bank.distressedAsk;
     bank.priceWar = {};

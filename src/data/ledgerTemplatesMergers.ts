@@ -91,11 +91,11 @@ export const MERGERS_TEMPLATES = {
   DISTRESSED_SALE: [
     {
       h: 'Fire sale: {target} on the block at {ask} a share',
-      b: 'Administrators want about {pb}× book for the failed lab. Bids close in {weeks} weeks.',
+      b: 'Administrators want about {multiple}× ARR for the failed lab. Bids close in {weeks} weeks.',
     },
     {
       h: 'Bargain hunters circle {target}',
-      b: 'The failed lab is priced at {ask} a share, roughly {pb}× book, with {weeks} weeks to find a buyer.',
+      b: 'The failed lab is priced at {ask} a share, roughly {multiple}× its ARR, with {weeks} weeks to find a buyer.',
     },
   ],
 } satisfies Record<string, LedgerTemplate[]>;

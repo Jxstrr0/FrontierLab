@@ -1,21 +1,23 @@
 // Rival lab head office panel (SCREENS §7): who they are (strategy, sales
-// offices, cities, listing, credit band, model, researchers, CEO, recent
-// quarters). Rival labs do not lend to you; corporate borrowing lives on the
-// investment bank Debt tab (SIMULATION §19.9).
+// offices, cities, listing, ARR and growth, cash and runway band, model,
+// researchers, CEO, recent quarters). Rival labs do not lend to you; corporate
+// borrowing lives on the investment bank Debt tab (SIMULATION §19.9).
 import { CITIES } from '../../data/cities';
 import { DISTRICT_SPECS } from '../../data/districts';
 import { RIVAL_BENCH_LABEL } from '../../data/rivals';
 import { previousQuarter } from '../../sim/calendar';
+import { rivalArr, rivalCustomers, rivalGrowth } from '../../sim/rivalFinance';
 import { rivalSharePrice } from '../../sim/rivalQuarter';
 import { rivalResearchers } from '../../sim/talent';
 import type { GameState, RivalBank } from '../../sim/state';
 import { Badge, Card, Medallion, Panel, Row, SectionTitle } from '../components';
-import { capitalRatioText, count, money } from '../format/format';
+import { count, money, signedPct } from '../format/format';
 import { closePanel, useGame } from '../store';
 import { RivalHqArt } from './RivalArt';
 import {
   failedText,
   rivalTier,
+  runwayText,
   STRATEGY_BLURB,
   STRATEGY_LABEL,
   TIER_LABEL,
@@ -100,13 +102,21 @@ function Overview(p: { s: GameState; bank: RivalBank }) {
         {bank.listed && active && (
           <Row label="Share price" value={money(rivalSharePrice(bank), sym)} />
         )}
+        {active && <Row label="Customers" value={count(Math.round(rivalCustomers(bank)))} />}
+        {active && (
+          <Row
+            label="ARR"
+            value={`${money(rivalArr(bank), sym)}${bank.quarters.length >= 2 ? ` · ${signedPct(rivalGrowth(bank), 0)} a year` : ''}`}
+          />
+        )}
+        {active && <Row label="Cash" value={money(bank.cash, sym)} />}
         <Row
-          label="Credit ratio"
+          label="Runway"
           value={
             active ? (
               <span class="rv-capital">
                 <Badge tone={TIER_TONE[tier]}>{TIER_LABEL[tier]}</Badge>
-                <span>{capitalRatioText(bank.capitalRatio)}</span>
+                <span>{runwayText(bank)}</span>
               </span>
             ) : (
               <Badge tone="bad">Failed</Badge>

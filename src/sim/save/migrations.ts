@@ -18,6 +18,7 @@ import { migrateTraining } from './migrateTraining';
 import { migrateDealDesk } from './migrateDealDesk';
 import { migrateSpotLimits } from './migrateSpotLimits';
 import { migrateMoney } from './migrateMoney';
+import { migrateRivalBooks } from './migrateRivalBooks';
 import { SCHEMA_VERSION, type GameState } from '../state';
 import { migrateSeedMoney } from './migrateSeedMoney';
 import { migrateSeats } from './migrateSeats';
@@ -147,6 +148,12 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
   // the COO's Sales office operations.
   21: (s) => {
     migrateSeats(s as unknown as GameState);
+    return s;
+  },
+  // 22 → 23: rival labs keep books on customers, ARR, cash and runway instead
+  // of deposits, loans and a capital ratio.
+  22: (s) => {
+    migrateRivalBooks(s as unknown as GameState);
     return s;
   },
 };

@@ -1,19 +1,19 @@
 // Distressed sales (SIMULATION §18.5, §19.8): a failed rival's network goes on
-// sale at BVPS × P/B 0.4–0.7 (floored per share); you can buy it, and a
-// network you buy (or are still bidding for) is never split among the others.
+// sale at ARR × a distressed multiple 0.5–0.8 (floored per share); you can buy
+// it, and a network you buy (or are still bidding for) is never split among the
+// others.
 import { describe, expect, it } from 'vitest';
-import { MERGERS, RIVAL_FAILURE, RIVAL_LOAN_RISK_WEIGHT } from '../../src/config/balance';
+import { MERGERS, RIVAL_FAILURE } from '../../src/config/balance';
 import { advanceWeeks } from '../../src/sim/engine';
-import { askFromPb, rivalBvps } from '../../src/sim/mergerPricing';
-import { rivalLoans } from '../../src/sim/rivalBooks';
+import { askFromMultiple } from '../../src/sim/mergerPricing';
+import { rivalArr } from '../../src/sim/rivalFinance';
 import { runRivalQuarter } from '../../src/sim/rivalQuarter';
 import type { GameEvent, GameState, RivalBank } from '../../src/sim/state';
 import { capitalisedBank, cmd, identityGap, smallestRival } from '../helpers/mergers';
 
-/** Drives a rival below the insolvency line and runs a quarter-end so it fails. */
-function fail(s: GameState, bank: RivalBank, cr = 0.01): void {
-  bank.equity = rivalLoans(bank) * RIVAL_LOAN_RISK_WEIGHT * cr;
-  bank.capitalRatio = cr;
+/** Drives a rival's cash deep below zero and runs a quarter-end so it fails. */
+function fail(s: GameState, bank: RivalBank): void {
+  bank.cash = -(RIVAL_FAILURE.maxDebtWeeks + 1) * bank.costs;
   runRivalQuarter(s);
 }
 
@@ -22,23 +22,23 @@ function eventsSince(s: GameState, week: number): GameEvent[] {
 }
 
 describe('distressed sales', () => {
-  it('asks BVPS × P/B in 0.4–0.7 when a rival fails, floored per share', () => {
+  it('asks ARR × a multiple in 0.5–0.8 when a rival fails, floored per share', () => {
     const s = capitalisedBank();
     const bank = smallestRival(s);
-    fail(s, bank, 0.015);
+    fail(s, bank);
     expect(bank.status).toBe('distressed');
-    const bvps = rivalBvps(bank);
     const ask = bank.distressedAsk!;
-    expect(ask).toBeGreaterThanOrEqual(askFromPb(bank, MERGERS.distressedPb[0]) - 1e-9);
-    expect(ask).toBeLessThanOrEqual(askFromPb(bank, MERGERS.distressedPb[1]) + 1e-9);
+    const [lo, hi] = MERGERS.distressedMultiple;
+    expect(ask).toBeGreaterThanOrEqual(askFromMultiple(bank, lo) - 1e-9);
+    expect(ask).toBeLessThanOrEqual(askFromMultiple(bank, hi) + 1e-9);
     expect(ask).toBeGreaterThanOrEqual(MERGERS.distressedMinAsk);
     const sale = s.events.log.find((e) => e.type === 'DISTRESSED_SALE')!;
     expect(sale.payload.ask).toBe(ask);
     expect(sale.payload.weeks).toBe(RIVAL_FAILURE.distressWeeks);
-    // Negative equity: the floor holds.
-    bank.equity = -1_000_000;
-    expect(askFromPb(bank, 0.5)).toBe(MERGERS.distressedMinAsk);
-    expect(bvps).toBeGreaterThan(0);
+    expect(sale.payload.multiple as number).toBeCloseTo((ask * bank.shares) / rivalArr(bank), 6);
+    // No ARR left: the floor holds.
+    for (const b of bank.branches) b.arr = 0;
+    expect(askFromMultiple(bank, 0.5)).toBe(MERGERS.distressedMinAsk);
   });
 
   it('sells the network to you and never splits it', () => {

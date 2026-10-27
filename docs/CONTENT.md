@@ -883,10 +883,12 @@ Examples:
 | RIVAL_MODEL_RELEASED | {bank} ships {model} | The new release scores {score} on the benchmark board. |
 | SAFETY_PAUSE | {bank} agrees to a {weeks}-week safety pause | Regulators will sit alongside the lab's safety team. No new customers or training runs until they leave. |
 | POWER_DEAL_SIGNED | {bank} signs a power deal at {site} | The {fee} contract brings cheap power and contracted GPUs to the lab over seven years. |
-| FASTEST_GROWING | The fastest growing labs of {year} | {bank} tops this year's list after growing assets {pct}. |
+| FASTEST_GROWING | The fastest growing labs of {year} | {bank} tops this year's list after growing ARR {pct}. |
 | RICH_LIST | {name} enters the rich list at #{rank} | The {bank} founder's fortune is estimated at {worth}. |
 | REG_FINE | Regulator fines {bank} {amount} | The penalty follows {reason}. |
 | BANK_FAILURE | {bank} collapses into administration | {bank}'s {n} sales offices will be offered to buyers. |
+| RIVAL_RAISE | {bank} raises {amount} to keep the lights on | Short of runway, the lab sold new shares at {price} apiece. Existing holders are diluted. |
+| DISTRESSED_SALE | Fire sale: {target} on the block at {ask} a share | Administrators want about {multiple}× ARR for the failed lab. Bids close in {weeks} weeks. |
 | ACQUISITION_CLOSED | {bank} buys {target} for {price} | {target}'s {n} sales offices join {bank}. Signs come down over the next eight weeks. |
 | IPO_LISTED | {bank} opens at {open} on its first day | Shares priced at {price} {pop} as {ticker} began trading on the {exchange}. The listing raised {raised}. |
 | BREACH | {bank} discloses data breach | About {n} customers may be affected. |

@@ -1,6 +1,6 @@
 // Rival expansion and closures (SIMULATION §18.4, C2b). Each rival lab holds
-// one sales office per city. Monthly, a profitable, well-capitalised rival may
-// grow its office a size in each city it serves (the chance is divided by the
+// one sales office per city. Monthly, a profitable rival with runway to spare
+// may grow its office a size in each city it serves (the chance is divided by the
 // units the step adds, so a network grows about as fast as when it opened
 // branches), while leaving the city room for you, and a rival with a network
 // may enter a new city on its best free storefront (score = footTraffic ×
@@ -8,9 +8,9 @@
 // serves a few. Weekly, an office whose contribution has been negative for 26
 // weeks (after its first year) shrinks a size, or closes when it is a Starter.
 import {
+  RIVAL_BOOKS,
   RIVAL_CLOSURE,
   RIVAL_EXPANSION,
-  RIVAL_FINANCE,
   RIVAL_PLACEMENT,
   RIVAL_QUALITY_SIGMA,
   RIVAL_RADIUS,
@@ -23,8 +23,8 @@ import { difficultyOf } from './difficulty';
 import { pushEvent } from './events';
 import { newId } from './ids';
 import { clamp } from './math';
-import { nominalIndex } from './nominal';
 import { countryOfCity } from './rates';
+import { syncRivalEquity, unitBuildCost } from './rivalFinance';
 import { stream, type Rng } from './rng';
 import { incomeFit, overallOf } from './rivals';
 import { sizeMult, sizeName } from './branch/officeSize';
@@ -109,14 +109,16 @@ export function openRivalBranch(
     quality,
     overall: overallOf(quality),
     reviewCount: rng.int(...RIVAL_EXPANSION.reviews),
-    deposits: 0,
-    loans: 0,
+    customers: 0,
+    arr: 0,
     contribution: 0,
     negativeWeeks: 0,
   };
   lot.occupant = { type: 'rival', id: bank.id };
   bank.branches.push(branch);
-  bank.equity -= buildCost(state, lot.cityId) * rivalMult(branch);
+  // Cash becomes an office at the same value, so equity is unchanged (§18.1).
+  bank.cash -= unitBuildCost(state, lot.cityId) * rivalMult(branch);
+  syncRivalEquity(state, bank);
   pushEvent(
     state,
     'RIVAL_BRANCH_OPENED',
@@ -134,17 +136,21 @@ export function openRivalBranch(
   return branch;
 }
 
-/** One storefront's build cost for a rival, × city cost index × the nominal index. */
-function buildCost(state: GameState, cityId: string): number {
-  return RIVAL_EXPANSION.buildCost * (CITIES[cityId]?.costIndex ?? 1) * nominalIndex(state, cityId);
+/**
+ * §18.4: a rival can pay a build when the cash left afterwards still covers
+ * RIVAL_EXPANSION.minRunwayWeeks of its running costs.
+ */
+export function canAffordBuild(bank: RivalBank, cost: number): boolean {
+  return bank.cash - cost >= RIVAL_EXPANSION.minRunwayWeeks * bank.costs;
 }
 
 /** Grows a rival's office one size, paying for the units it adds (C2b). */
 export function growRivalOffice(state: GameState, bank: RivalBank, office: RivalBranch): void {
   const step = growStep(office);
   if (step <= 0) return;
-  bank.equity -= buildCost(state, office.cityId) * step;
+  bank.cash -= unitBuildCost(state, office.cityId) * step;
   office.size += 1;
+  syncRivalEquity(state, bank);
   pushEvent(
     state,
     'RIVAL_OFFICE_GROWN',
@@ -166,9 +172,9 @@ export function runExpansion(state: GameState): void {
   const banks = Object.values(state.rivals).sort((a, b) => (a.id < b.id ? -1 : 1));
   for (const bank of banks) {
     if (bank.status !== 'active') continue;
-    const mult = RIVAL_FINANCE[bank.strategy].expandMult;
+    const mult = RIVAL_BOOKS.strategy[bank.strategy].expandMult;
     const chance = RIVAL_EXPANSION.chance * mult;
-    const eligible = trailingProfit(bank) > 0 && bank.capitalRatio > RIVAL_EXPANSION.minCr;
+    const eligible = trailingProfit(bank) > 0;
     for (const cityId of [...bank.cities].sort()) {
       // Draw first so every rival consumes the stream the same way.
       const roll = rng.next();
@@ -176,6 +182,8 @@ export function runExpansion(state: GameState): void {
       // A step that adds more units is rarer, so units grow at `chance` a city.
       const step = office ? growStep(office) : 1;
       if (!eligible || step <= 0 || roll >= chance / step) continue;
+      // The build must leave the lab its runway (§18.4).
+      if (!canAffordBuild(bank, unitBuildCost(state, cityId) * step)) continue;
       const lots = allLots.filter((l) => l.cityId === cityId);
       if (!cityHasRoom(state, cityId, lots)) continue;
       if (office) {
@@ -190,7 +198,8 @@ export function runExpansion(state: GameState): void {
     if (!eligible || entry >= RIVAL_EXPANSION.entryChance * mult) continue;
     if (rivalUnits(bank) < RIVAL_EXPANSION.entryMinUnits) continue;
     const cityId = entryCity(state, bank, allLots);
-    if (cityId) enterCity(state, bank, cityId, allLots, rng);
+    if (cityId && canAffordBuild(bank, unitBuildCost(state, cityId)))
+      enterCity(state, bank, cityId, allLots, rng);
   }
 }
 
@@ -295,9 +304,10 @@ export function shrinkRivalOffice(state: GameState, bank: RivalBank, office: Riv
   const before = rivalMult(office);
   office.size -= 1;
   const keep = rivalMult(office) / before;
-  office.deposits *= keep;
-  office.loans *= keep;
+  office.customers *= keep;
+  office.arr *= keep;
   office.negativeWeeks = 0;
+  syncRivalEquity(state, bank);
   pushEvent(
     state,
     'RIVAL_OFFICE_SHRUNK',

@@ -7,7 +7,13 @@ import { SECTOR_MU } from '../../src/data/stocks';
 import { advanceWeeks } from '../../src/sim/engine';
 import { earningsShock, incidentShock, irPenalty, publicTarget } from '../../src/sim/equityModel';
 import { capWeightedReturn, marketsQuarter, runMarkets } from '../../src/sim/market';
-import { bankingReturn, priceRivalShares, rivalTargetPrice } from '../../src/sim/marketRivals';
+import {
+  bankingReturn,
+  priceRivalShares,
+  rivalModelLead,
+  rivalTargetPrice,
+} from '../../src/sim/marketRivals';
+import { rivalFairPerShare } from '../../src/sim/rivalFinance';
 import { companyReturn, payCompanyDividends, recordClose } from '../../src/sim/marketStocks';
 import { topHolders } from '../../src/sim/marketHolders';
 import * as cmd from '../../src/sim/commands';
@@ -148,12 +154,12 @@ describe('public price model (§19.5)', () => {
 });
 
 describe('rival banks (§19.5 for rivals)', () => {
-  it('private rivals trade at book, listed rivals follow the target', () => {
+  it('private rivals trade at fair value, listed rivals follow the target', () => {
     const s = game();
     advanceWeeks(s, 30);
     for (const r of Object.values(s.rivals)) {
       if (r.status !== 'active') continue;
-      if (!r.listed) expect(r.price).toBeCloseTo(r.equity / r.shares, 6);
+      if (!r.listed) expect(r.price).toBeCloseTo(rivalFairPerShare(r, rivalModelLead(s, r)), 6);
       else {
         expect(r.history.length).toBeGreaterThan(20);
         expect(r.price).toBeGreaterThan(0.3 * (r.equity / r.shares) * 0.5);
@@ -161,10 +167,11 @@ describe('rival banks (§19.5 for rivals)', () => {
     }
   });
 
-  it('the target trades at book before the first report', () => {
+  it('the target is ARR × the multiple per share, never below book, × sentiment', () => {
     const s = game();
     const r = Object.values(s.rivals).find((x) => x.listed)!;
-    expect(rivalTargetPrice(r)).toBeCloseTo(r.equity / r.shares, 9);
+    expect(rivalTargetPrice(r)).toBeCloseTo(rivalFairPerShare(r) * r.sentiment, 9);
+    expect(rivalTargetPrice(r)).toBeGreaterThanOrEqual((r.equity / r.shares) * r.sentiment);
   });
 
   it('a seized rival is worth nothing', () => {

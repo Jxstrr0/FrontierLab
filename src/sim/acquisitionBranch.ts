@@ -3,9 +3,9 @@
 // the old brand while it converts: the seller strategy's fit-out
 // (ACQUIRED_BUILDS), a full staff, the old manager kept with delegation on,
 // your products at company or default prices, and plan books seeded with its
-// customers (C3a: its book deposits ÷ MERGERS.depositPerCustomer, split by
-// ACQUIRED_PLAN_MIX). Plan ARR is not on the balance sheet, so nothing is
-// paired with reserves.
+// customers (PRODUCTS_PER_CUSTOMER seats each, split by ACQUIRED_PLAN_MIX, so
+// the office keeps the customer count it had). Plan ARR is not on the balance
+// sheet, so nothing is paired with reserves.
 import {
   DEAL,
   MERGERS,
@@ -135,7 +135,7 @@ export function convertRivalBranch(
   branch.managerId = mgr.id;
   branch.staff.skill = skillTarget(state, branch);
 
-  const seats = splitByMix(rb.deposits / MERGERS.depositPerCustomer, ACQUIRED_PLAN_MIX);
+  const seats = splitByMix(rb.customers * PRODUCTS_PER_CUSTOMER, ACQUIRED_PLAN_MIX);
   for (const spec of allProducts(state)) {
     const price = startPrice(state, spec, rb.cityId);
     branch.offered[spec.id] = { on: startsOn(state, spec, branch), price };
