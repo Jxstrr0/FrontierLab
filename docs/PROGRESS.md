@@ -3,13 +3,33 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C7 done (v0.1.21–v0.1.22, save schema 17): the safety ratio and AI regulator (C7a), then revenue-multiple valuation, IPO rules on ARR and AI policy lobbying (C7b). Next: C8 (polish and relaunch).
+**Current stage:** C8 in progress (polish and relaunch). C8a done (v0.1.23, save schema 18): data-centre and power deals at energy sites. Next: the tutorial rewrite, art pass, balance pass and docs sweep.
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `1a7af941900270` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `1e244412c59c8a` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-27 — Stage C8a: power deals at energy sites (v0.1.23)
+
+**What you asked for:** go through C8 and finish the conversion. This is the first part of C8.
+
+**What changed.**
+- **Energy sites sign power deals.** The mines, camps and oil fields used to sign payroll partnerships, like any employer. Now they sign a data-centre and power deal: a seven-year contract that works like a partnership, with the same ramp-up curve, health, renewal and release.
+  - You pay a signing fee up front: $500 per worker at the site (about $0.6–2.5M). Travel there to sign.
+  - The deal brings contracted GPUs that ramp up over two years, to about 1.5 per worker. They join your compute pool as owned capacity, so you buy less at spot.
+  - You pay $20 a week for each one, used or not. That's half the spot price, and the price is fixed for the contract.
+  - Your data centers in that country pay 25% less for power while the deal runs.
+  - Health starts at 60 and heads for 50, or 70 with a data center of yours in the country. A weak safety tier pulls it down. If health stays under 30 for 8 weeks, the site walks away.
+- **Where to find it:** tap an energy site on the map. The Power deal card sits above the Energy site section.
+- **Old saves:** they get an empty deal book (save schema 18). A payroll deal you already signed at an energy site keeps running.
+- **Also fixed:** two incident and news texts showed "{sales office}" instead of the office's name.
+
+**What was checked.**
+- New tests: signing, the fee, the GPU ramp into the pool, the bill, the power discount, health, renewal, release and runoff, the payroll block, and the migration.
+- All tests pass, and lint and the build are clean.
+- The determinism snapshot changed because the save has a new field. The scripted run doesn't sign a deal, so nothing else moved.
 
 ### 2026-10-27 — Stage C7b: valuing the lab on revenue (v0.1.22)
 

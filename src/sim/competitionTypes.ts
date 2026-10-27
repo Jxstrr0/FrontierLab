@@ -33,6 +33,30 @@ export interface Partnership {
   runoffWeeksLeft?: number;
 }
 
+// ─── Power deals at energy sites (stage C8a, SIMULATION §13.7a) ─────────────────
+
+/** A data-centre and power deal: owned capacity and cheaper power over a long contract. */
+export interface PowerDeal {
+  id: Id;
+  /** The regional energy site. */
+  siteId: Id;
+  startWeek: Week;
+  termWeeks: number;
+  /** Total fees paid: the signing fee plus renewals (an intangible amortized over the term). */
+  fee: Money;
+  /** Fee not yet amortized. */
+  unamortized: Money;
+  /** Contracted GPUs this week; they join the compute pool. */
+  gpus: number;
+  /** Take-or-pay price per contracted GPU-week, fixed at signing. */
+  price: Money;
+  /** 0–100. */
+  health: number;
+  lowHealthWeeks: number;
+  status: 'active' | 'runoff';
+  runoffWeeksLeft?: number;
+}
+
 /** A university's graduate program you pay for yearly (DESIGN §5.8.10). */
 export interface GradProgram {
   siteId: Id;

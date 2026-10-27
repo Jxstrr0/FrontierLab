@@ -4,6 +4,7 @@
 import { isRegional } from '../../data/cities';
 import { DISTRICT_SPECS } from '../../data/districts';
 import { EnergySiteCard } from '../dataCenter/EnergySiteCard';
+import { PowerDealCard } from '../dataCenter/PowerDealCard';
 import * as cmd from '../../sim/commands';
 import { Card, Panel, Row, SectionTitle } from '../components';
 import { count, money } from '../format/format';
@@ -31,6 +32,7 @@ export function EmployerPanel(p: { siteId: string }) {
   const mine = !!cmd.activePartnership(s, site.id, 'payroll');
   const district = DISTRICT_SPECS[site.district]?.name;
   const anchor = businessAtSite(s, site.id);
+  const energy = isRegional(site.cityId);
   return (
     <Panel
       title={e.name}
@@ -56,9 +58,15 @@ export function EmployerPanel(p: { siteId: string }) {
             <BusinessCard s={s} b={anchor} />
           </>
         )}
-        <SectionTitle>{mine ? 'Yours' : 'Payroll deal'}</SectionTitle>
-        <DealCard site={site} kind="payroll" people={e.employees} />
-        {isRegional(site.cityId) && <EnergySiteCard siteId={site.id} />}
+        {/* Energy sites sign power deals; a payroll deal signed before C8a runs on. */}
+        {(!energy || mine) && (
+          <>
+            <SectionTitle>{mine ? 'Yours' : 'Payroll deal'}</SectionTitle>
+            <DealCard site={site} kind="payroll" people={e.employees} />
+          </>
+        )}
+        {energy && <PowerDealCard site={site} />}
+        {energy && <EnergySiteCard siteId={site.id} />}
       </div>
     </Panel>
   );

@@ -575,6 +575,14 @@ If `L > liqTarget + 0.05`: repay central bank window borrowing first, then overn
 - **Student partnership (universities):** students by city size S 6,000 / M 10,000 / L 16,000 / XL 24,000; fee $30 × students × incomeIndex; ARR $80 per participating student (`STUDENT_PARTNERSHIP.arrPerStudent`); same curve, health and term rules. A university has one payroll and one student deal at a time.
 - **Graduate program (universities):** $120,000 × city wageIndex a year, charged up front and every 52 weeks; +10 skill for manager candidates and +1 hire a week at branches and HQ floors.
 
+### 13.7a Data-centre and power deals (stage C8a, `src/sim/powerDeals.ts`)
+The payroll partnership reworked for regional energy sites (a regional employer site). Energy sites no longer sign payroll partnerships; one signed before C8a runs on.
+- **Signing:** you must be in the site's city. Fee = `employees × POWER_DEAL.feePerEmployee (500) × listLevel`, paid from corporate cash and amortized over the 364-week contract like a partnership fee (an intangible). The take-or-pay price per GPU-week is fixed at signing: `POWER_DEAL.pricePerGpuWeek (20) × listLevel` (spot is $40 × the compute index). Blocked during a mandated pause.
+- **Contracted GPUs:** target = `employees × gpusPerEmployee (1.5) × participation(t, L) × (0.5 + 0.6 × health/100)`, the §13.7 curve, moving 0.15 of the gap a week. They count as owned compute (`compute.ownedGpus`) and serve customers before lots and spot. Each week the lab pays `gpus × price` on the company compute line, used or not.
+- **Cheaper power:** while a deal is active, your data centers in the site's country pay `POWER_DEAL.powerDiscount (0.75) ×` their §9.9 power bill.
+- **Health:** target = `healthBase (50) + dataCenterBonus (20)` with an open data center of yours in the country, `− tierPenalty[safety tier]` (0 / 0 / 10 / 25 / 40 from Strong to Critical), eased at 0.05. Termination, renewal (fee × (1.5 − health/100), re-priced at today's list), lapse and release follow §13.7, with a 12-week runoff of the GPUs.
+- **Tick:** step 4, after the offices and contracts and before the compute tally.
+
 ### 13.8 Bank runs
 - **Trigger:**
   - Condition: average overall rating < 2.6 AND (capital tier Restricted or Critical OR LR < 0.08).

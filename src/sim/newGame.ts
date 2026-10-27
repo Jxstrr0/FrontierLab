@@ -210,6 +210,7 @@ export function newGame(opts: NewGameOptions): GameState {
     marketing: { campaigns: [], packages: [], cityBonus: {} },
     risk: { losses: [], reviews: [] },
     partnerships: {},
+    powerDeals: {},
     corporateDebt: emptyCorporateDebt(),
     incidents: { active: [], cooldowns: {}, effects: [] },
     news: { issues: [], lastTemplate: {} },

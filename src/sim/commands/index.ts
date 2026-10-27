@@ -12,6 +12,7 @@ export * from './treasury';
 export * from './underwriting';
 export * from './hq';
 export * from './partnerships';
+export * from './powerDeals';
 export * from './corporate';
 export * from './incidents';
 export * from './executives';
