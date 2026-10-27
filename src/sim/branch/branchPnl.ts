@@ -2,6 +2,7 @@
 // BranchWeek into the branch's income statement row and posts the real
 // (non-transfer) items to the company ledger and corporate cash.
 import {
+  COMPUTE,
   ATM_FEE,
   BRANCH_OVERHEAD,
   BRANCH_PNL_WEEKS,
@@ -12,6 +13,7 @@ import {
 } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { EQUIPMENT, isFitout, BUILD_SLOTS } from '../../data/equipment';
+import { computePriceFactor } from '../compute';
 import { earn, postPnl, spend } from '../ledger';
 import { listLevel } from '../nominal';
 import type { Branch, BranchPnl, GameState } from '../state';
@@ -47,6 +49,10 @@ export function addBranchCosts(
 
 /** Records the office P&L row (C3b: revenue by product line, then the compute bill) and posts company lines. */
 export function closeBranchWeek(state: GameState, branch: Branch, wk: BranchWeek): BranchPnl {
+  // C4a (§13.0): compute so far is at base spot prices; count it in GPU-weeks,
+  // then pay only for what your data centers didn't cover, at the price index.
+  const gpus = wk.compute / COMPUTE.spotPerGpuWeek;
+  wk.compute *= computePriceFactor(state);
   const otherIncome = wk.atmFees;
   const servicing = wk.servicing + wk.underwriting;
   const lines = {
@@ -81,6 +87,7 @@ export function closeBranchWeek(state: GameState, branch: Branch, wk: BranchWeek
     revenue,
     income: revenue - expenses,
     lines,
+    gpus,
   };
   branch.pnl.push(row);
   if (branch.pnl.length > BRANCH_PNL_WEEKS)

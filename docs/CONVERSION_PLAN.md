@@ -282,7 +282,10 @@ Follows the brief's map structure (1–2 main offices worldwide, one sales offic
 - **C3c — Bank leftovers removed: done (v0.1.12, schema 8).** Foreclosed homes (REO), government bonds, covered bonds and mortgage cover, the old deposit, term-deposit, mortgage, card and wealth book paths, the rivals' bank-only price offsets, the charter floor and the HQ treasury transfer are gone. The lending fund's Top up (`topUpLendingFund`) is the one cash-to-reserves path. Migration 7 → 8 sells REO into cash and bonds into reserves at unchanged equity. **Next: C4.**
 - **Accept:** the balance identity holds every tick. A 10-year steady run is profitable within the new targets. Old C2 saves load.
 
-### C4 — Compute
+### C4 — Compute (split into C4a–C4c)
+- **C4a — Compute price index and pool: done (v0.1.13, schema 9).** A global chip cycle (glut, normal, shortage) moves a compute price index. Office compute is counted in GPU-weeks; data-center GPUs serve it first and the rest is bought at spot × index. A Compute card on the Company screen and each data center's panel shows the price, the chart, GPUs used and owned, and the spot bill. **Next: C4b.**
+- **C4b:** the Treasury floor becomes the Compute floor; the funding market sells GPU lots; headroom gauge, auto spot-buy and emergency burst.
+- **C4c:** capacity crunch (waitlist) and outages.
 - **Build:**
   - Compute floor (Treasury relabelled and re-pointed)
   - Compute price index (§3.6)

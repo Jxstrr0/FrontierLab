@@ -14,6 +14,7 @@ import { RealEstateCard } from '../realEstate/RealEstateCard';
 import { closePanel, openPanel, useGame } from '../store';
 import { CapitalFixes } from './CapitalFixes';
 import { LIQUIDITY_STATUS, liquidityGauge } from '../hq/treasury/treasuryView';
+import { ComputeCard } from './ComputeCard';
 import { CapitalMeter, TIER_LABEL, TIER_TONE } from './CapitalMeter';
 import { ShareSummary } from './ShareSummary';
 import { Statements } from './Statements';
@@ -24,6 +25,10 @@ const EXPLAINERS: { title: string; body: string }[] = [
   {
     title: 'Revenue recurs, compute bills',
     body: 'Plans and apps bill every month and the API bills for what it uses, so annual recurring revenue (ARR) is the number to grow. Every seat and every million tokens runs on compute, the biggest cost under revenue.',
+  },
+  {
+    title: 'Compute: own it or rent it',
+    body: 'GPUs in your data centers serve customers first, for the price of their power and lease. Everything else is rented at the spot price, which follows the chip market: cheap in a glut, dear in a shortage.',
   },
   {
     title: 'Capital limits growth',
@@ -148,6 +153,8 @@ export function CompanyPanel() {
             </p>
           </Card>
         )}
+
+        <ComputeCard />
 
         <div>
           <SectionTitle>Totals</SectionTitle>
