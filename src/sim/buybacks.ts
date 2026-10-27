@@ -1,15 +1,15 @@
-// Share buybacks (SIMULATION §19.6a): a listed bank buys shares back from the
+// Share buybacks (SIMULATION §19.6a): a listed lab buys shares back from the
 // public at the market price plus BUYBACK.premium, pays a broker's fee and
 // retires them. The cost leaves cash (financing) and retained earnings, like a
 // dividend, so earnings, book value and votes are spread over fewer shares.
-// One programme a quarter; the public keeps BUYBACK.minFloat of the bank and
-// capital must stay Adequate or better afterwards.
-import { BUYBACK } from '../config/balance';
-import { capitalBufferPp, capitalSnapshot, tierFor } from './capital';
+// One programme a quarter; the public keeps BUYBACK.minFloat of the lab and
+// runway must stay Comfortable or better afterwards (runway.ts).
+import { BUYBACK, RUNWAY } from '../config/balance';
 import { PUBLIC_HOLDER } from './equityIpo';
 import { pushEvent } from './events';
 import { postCash } from './ledger';
 import { clamp } from './math';
+import { runwayHealthy, runwaySnapshot, type RunwaySnapshot } from './runway';
 import { retireShares, sharesHeld } from './shares';
 import type { GameState } from './state';
 
@@ -21,8 +21,8 @@ export interface BuybackQuote {
   fee: number;
   /** Cash spent, fee included. */
   cost: number;
-  /** Capital ratio once the cost has left equity. */
-  crAfter: number;
+  /** Runway once the cost has left corporate cash. */
+  runwayAfter: RunwaySnapshot;
 }
 
 /** The most shares one programme may buy: maxPct of the bank, keeping the public's minFloat. */
@@ -43,9 +43,8 @@ export function buybackQuote(state: GameState, pct: number): BuybackQuote {
   const gross = shares * price;
   const fee = gross * BUYBACK.fee;
   const cost = gross + fee;
-  const snap = capitalSnapshot(state);
-  const crAfter = (snap.cet1 - cost) / Math.max(1, snap.rwa);
-  return { shares, price, gross, fee, cost, crAfter };
+  const runwayAfter = runwaySnapshot(state, -cost);
+  return { shares, price, gross, fee, cost, runwayAfter };
 }
 
 /** §19.6a: price lift +1% to +4%, scaled by size up to the largest programme. */
@@ -68,9 +67,8 @@ export function buybackBlocker(state: GameState, q: BuybackQuote): string | unde
   if (q.shares <= 0) return `The public must keep at least ${BUYBACK.minFloat * 100}% of the lab.`;
   if (q.price <= 0) return 'Your shares are not trading.';
   if (state.company.cash < q.cost) return 'Not enough cash.';
-  const tier = tierFor(q.crAfter, capitalBufferPp(state));
-  if (tier !== 'strong' && tier !== 'adequate')
-    return 'Credit ratio would fall below the Adequate tier.';
+  if (!runwayHealthy(q.runwayAfter.tier))
+    return `Runway would fall under ${RUNWAY.gateMonths} months.`;
   return undefined;
 }
 

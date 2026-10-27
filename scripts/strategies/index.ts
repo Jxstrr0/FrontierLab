@@ -14,6 +14,7 @@ import { cityFull, growableOffice, hasRoom, nextExpansionLot } from './expansion
 import type { Strategy } from './types';
 import * as cmd from '../../src/sim/commands';
 import { weeklyCosts } from '../../src/sim/cashCover';
+import { runwaySnapshot } from '../../src/sim/runway';
 import type { GameState } from '../../src/sim/state';
 
 /** Weeks of running costs aggressive keeps in cash before it expands (C5a). */
@@ -28,45 +29,51 @@ const AGGRESSIVE_TRAINING_SHARE = 0.015;
 
 const DELEGATE_OPS = { staffing: true, loans: true, marketing: true, products: false };
 
+/** True when the lab is not burning cash or has more than `months` of runway. */
+function runwayClears(state: GameState, months: number): boolean {
+  const { months: left } = runwaySnapshot(state);
+  return left === null || left > months;
+}
+
 function firstBranch(state: GameState, lending: boolean, delegate = DELEGATE_OPS): void {
   const lot = averageLot(state);
   if (lot) openBranch(state, lot, { lending, delegate });
 }
 
 /**
- * Opens a branch when cash > mult × build cost and the capital ratio clears
- * minCr. With `travel`, it builds only on good lots and flies on to the next
+ * Opens a branch when cash > mult × build cost and runway clears minRunway
+ * months (runwayClears). With `travel`, it builds only on good lots and flies on to the next
  * city once the current one has none (expansion.ts); without, it stays home.
  */
 function expand(
   state: GameState,
   mult: number,
-  minCr: number,
+  minRunway: number,
   lending: boolean,
-  opts: { hq?: boolean; travel?: boolean; growCr?: number; reserveWeeks?: number } = {},
+  opts: { hq?: boolean; travel?: boolean; growRunway?: number; reserveWeeks?: number } = {},
 ): void {
-  const { hq = true, travel = true, growCr = minCr, reserveWeeks = 0 } = opts;
+  const { hq = true, travel = true, growRunway = minRunway, reserveWeeks = 0 } = opts;
   if (hq && !hqReady(state)) return;
   // Cash kept back for running costs (aggressive keeps a few weeks, C5a).
   const reserve = reserveWeeks * weeklyCosts(state);
-  if (growOffice(state, mult, growCr, Infinity, reserve)) return;
-  if (travel && cityFull(state) && state.company.capitalRatio <= minCr) return;
+  if (growOffice(state, mult, growRunway, Infinity, reserve)) return;
+  if (travel && cityFull(state) && !runwayClears(state, minRunway)) return;
   if (!travel && !hasRoom(state, state.world.currentCityId)) return;
   const lot = travel ? nextExpansionLot(state) : bestLot(state);
   if (!lot) return;
   if (
     state.company.cash > mult * buildCost(state, lot) + reserve &&
-    state.company.capitalRatio > minCr
+    runwayClears(state, minRunway)
   ) {
     openBranch(state, lot, { lending, delegate: DELEGATE_OPS });
   }
 }
 
-/** Grows the busiest office a size when cash > mult × the cost and capital clears minCr (C2a). */
+/** Grows the busiest office a size when cash > mult × the cost and runway clears minRunway (C2a). */
 function growOffice(
   state: GameState,
   mult: number,
-  minCr: number,
+  minRunway: number,
   maxSize = Infinity,
   reserve = 0,
 ): boolean {
@@ -74,7 +81,7 @@ function growOffice(
   if (office && (office.size ?? 0) >= maxSize) return false;
   const quote = office ? cmd.upgradeQuote(state, office.id) : undefined;
   if (!office || !quote) return false;
-  if (state.company.cash <= mult * quote.total + reserve || state.company.capitalRatio <= minCr)
+  if (state.company.cash <= mult * quote.total + reserve || !runwayClears(state, minRunway))
     return true;
   return cmd.upgradeOffice(state, office.id).ok;
 }
@@ -91,8 +98,8 @@ export const steady: Strategy = {
   weekly: (s) => {
     followDefaults(s);
     manageHq(s);
-    manageEquity(s, 0.12, 2);
-    expand(s, 2, 0.12, true, { reserveWeeks: STEADY_RESERVE_WEEKS });
+    manageEquity(s, 6, 2);
+    expand(s, 2, 6, true, { reserveWeeks: STEADY_RESERVE_WEEKS });
     maybeBuildDataCenter(s, 4);
     manageCompute(s);
     manageTraining(s, STEADY_TRAINING_SHARE);
@@ -138,7 +145,7 @@ export const aggressive: Strategy = {
     // Cheapest prices: savers get 0.5pp more, borrowers pay 0.5pp less.
     followDefaults(s, 0.005, -0.005);
     manageHq(s);
-    expand(s, 1.2, 0.085, true, { growCr: 0.075, reserveWeeks: AGGRESSIVE_RESERVE_WEEKS });
+    expand(s, 1.2, 3, true, { growRunway: 2, reserveWeeks: AGGRESSIVE_RESERVE_WEEKS });
     maybeBuildDataCenter(s, 3);
     manageCompute(s);
     manageTraining(s, AGGRESSIVE_TRAINING_SHARE);
@@ -160,7 +167,7 @@ export const nohq: Strategy = {
   setup: steady.setup,
   weekly: (s) => {
     followDefaults(s);
-    expand(s, 2, 0.12, true, { hq: false, travel: false });
+    expand(s, 2, 6, true, { hq: false, travel: false });
   },
 };
 

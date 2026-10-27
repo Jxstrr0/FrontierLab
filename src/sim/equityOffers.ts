@@ -11,6 +11,7 @@ import { hashSeed, rngFromState } from './rng';
 import type { GameState } from './state';
 import { homeCountry } from './treasury';
 import { companyArr } from './arr';
+import { runwaySnapshot } from './runway';
 import { fundamentalPerShare, privateValuation } from './valuation';
 
 export interface EquityQuote {
@@ -94,7 +95,7 @@ export function ipoChecklist(state: GameState): EligibilityRule[] {
   const kPrime = state.hq.coverage.finance?.kPrime ?? 1;
   const tier = state.company.tier;
   const recession = homeCountry(state).phase === 'recession';
-  const cr = state.company.capitalRatio;
+  const runway = runwaySnapshot(state);
   return [
     {
       id: 'arr',
@@ -122,9 +123,11 @@ export function ipoChecklist(state: GameState): EligibilityRule[] {
     },
     {
       id: 'recession',
-      label: `No recession at home, unless the credit ratio is ${Math.round(IPO.minRecessionCr * 100)}% or more`,
-      ok: !recession || cr >= IPO.minRecessionCr,
-      detail: recession ? `Recession, ${(cr * 100).toFixed(1)}%` : 'No recession',
+      label: 'No recession at home, unless runway is Strong',
+      ok: !recession || runway.tier === 'strong',
+      detail: recession
+        ? `Recession, ${runway.tier.charAt(0).toUpperCase()}${runway.tier.slice(1)} runway`
+        : 'No recession',
     },
   ];
 }

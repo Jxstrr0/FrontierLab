@@ -48,10 +48,12 @@
 .meter-restricted {
   background: var(--oxblood);
 }
-.meter-watch {
+.meter-watch,
+.meter-tight {
   background: var(--brass);
 }
 .meter-adequate,
+.meter-comfortable,
 .meter-strong {
   background: var(--jade);
 }

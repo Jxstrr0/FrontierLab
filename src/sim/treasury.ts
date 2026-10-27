@@ -23,6 +23,7 @@ import { matureLots, payLotInterest } from './fundingLots';
 import { treasuryPenalty } from './hq';
 import { earn, spend } from './ledger';
 import { stream } from './rng';
+import { runwaySnapshot } from './runway';
 import type { CountryState, GameState } from './state';
 
 /** The country whose central bank the treasury deals with (the home city's). */
@@ -32,17 +33,14 @@ export function homeCountry(state: GameState): CountryState {
   return c;
 }
 
-export function ratingSpread(capitalRatio: number): number {
-  for (const r of RATING_SPREADS) if (capitalRatio >= r.minCr) return r.spread;
-  return 0;
+/** Funding spread for your runway tier (§13.6, §15). */
+export function ratingSpread(state: GameState): number {
+  return RATING_SPREADS[runwaySnapshot(state).tier];
 }
 
 export function overnightRate(state: GameState): number {
   return (
-    homeCountry(state).policyRate +
-    OVERNIGHT_SPREAD +
-    ratingSpread(state.company.capitalRatio) +
-    treasuryPenalty(state)
+    homeCountry(state).policyRate + OVERNIGHT_SPREAD + ratingSpread(state) + treasuryPenalty(state)
   );
 }
 

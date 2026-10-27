@@ -3,11 +3,12 @@
 // tier thresholds, a fast-track relaxes the M&A city share limit for one deal,
 // and a stall makes the pending capital buffer bill fail its vote.
 import { describe, expect, it } from 'vitest';
-import { LOBBYING, MERGERS } from '../../src/config/balance';
+import { LOBBYING, MERGERS, SAFETY_TIER_THRESHOLDS } from '../../src/config/balance';
 import { LOBBY_CAMPAIGNS } from '../../src/data/lobbying';
 import { CAPITAL_BUFFER_POLICY } from '../../src/data/newsWorld';
 import { planDeal, regulatorChecks } from '../../src/sim/acquisitionPlan';
-import { capitalBufferPp, tierFor } from '../../src/sim/capital';
+import { capitalBufferPp } from '../../src/sim/capital';
+import { safetyTierFor, tierLift } from '../../src/sim/safety';
 import * as cmd from '../../src/sim/commands';
 import { advanceWeeks } from '../../src/sim/engine';
 import { runLobbying } from '../../src/sim/lobbying';
@@ -120,8 +121,9 @@ describe('outcomes', () => {
       untilWeek: s.clock.week + LOBBYING.bufferReliefWeeks,
     });
     expect(capitalBufferPp(s)).toBe(-LOBBYING.bufferReliefPp);
-    // A ratio half a point under a threshold now makes that tier.
-    expect(tierFor(0.1, capitalBufferPp(s))).not.toBe(tierFor(0.1, 0));
+    // A safety ratio just under a tier line now makes that tier.
+    const line = SAFETY_TIER_THRESHOLDS[1]!.minSr - 0.01;
+    expect(safetyTierFor(line, tierLift(s))).not.toBe(safetyTierFor(line, 0));
     s.clock.week += LOBBYING.bufferReliefWeeks;
     runLobbying(s);
     expect(capitalBufferPp(s)).toBe(0);
@@ -154,7 +156,7 @@ describe('outcomes', () => {
     const { s } = outcomes('fastTrack').find((r) => r.c.status === 'won')!;
     expect(s.lobbying.fastTrack).toBe(true);
     const plan = {
-      proFormaCr: 0.2,
+      proFormaRunway: { cash: 1, burn: 0, months: null, tier: 'strong' },
       cityShares: [{ cityId: 'cal', share: (MERGERS.maxCityShare + MERGERS.fastTrackShare) / 2 }],
       shareLimit: MERGERS.fastTrackShare,
       fastTrack: true,

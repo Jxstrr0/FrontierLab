@@ -1,10 +1,9 @@
 // Currencies (SIMULATION §19.10): levels drift with growth, rates and the
 // cycle; HK follows the US; trades move cash and positions; company positions
-// tie out to the balance sheet and RWA and keep the balance identity.
+// tie out to the balance sheet and keep the balance identity.
 import { describe, expect, it } from 'vitest';
-import { FX, FX_RISK_WEIGHT, FX_START_INDEX } from '../../src/config/balance';
+import { FX, FX_START_INDEX } from '../../src/config/balance';
 import { balanceSheet } from '../../src/sim/balanceSheet';
-import { capitalSnapshot } from '../../src/sim/capital';
 import { tradeFx } from '../../src/sim/commands';
 import { advanceWeeks } from '../../src/sim/engine';
 import { fxRate, fxValue, runFx } from '../../src/sim/fx';
@@ -54,20 +53,17 @@ describe('currency trades', () => {
     expect(tradeFx(s, 'personal', 'US', s.personal.cash * 2).ok).toBe(false);
   });
 
-  it('company positions tie out to the balance sheet and RWA, with the identity held', () => {
+  it('company positions tie out to the balance sheet, with the identity held', () => {
     const s = game();
     const cash = s.company.cash;
     expect(tradeFx(s, 'company', 'US', 100_000).ok).toBe(true);
     expect(tradeFx(s, 'personal', 'EA', 50_000).ok).toBe(true);
     expect(s.company.cash).toBeCloseTo(cash - 100_000 * (1 + FX.spread), 6);
-    const rwaWithout = (x: ReturnType<typeof game>) =>
-      capitalSnapshot(x).rwa - balanceSheet(x).currencies * FX_RISK_WEIGHT;
     for (let w = 0; w < 26; w++) {
       advanceWeeks(s, 1);
       const bs = balanceSheet(s);
       expect(bs.currencies).toBeCloseTo(fxValue(s, 'company'), 6);
       expect(portfolioBreakdown(s, 'personal').currencies).toBeCloseTo(fxValue(s, 'personal'), 6);
-      expect(capitalSnapshot(s).rwa).toBeCloseTo(rwaWithout(s) + bs.currencies * FX_RISK_WEIGHT, 3);
       expect(gap(s)).toBeLessThan(1);
     }
     expect(tradeFx(s, 'company', 'US', -1e12).ok).toBe(true);

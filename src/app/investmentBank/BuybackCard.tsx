@@ -12,7 +12,7 @@ import {
 } from '../../sim/buybacks';
 import { FOUNDER_ID, sharesHeld } from '../../sim/shares';
 import { Card, Confirm, Row, Stepper } from '../components';
-import { count, gameDate, money, pct } from '../format/format';
+import { count, gameDate, money, pct, runwayText } from '../format/format';
 import { act, toast, useGame } from '../store';
 import { sharePrice } from './marketView';
 
@@ -62,7 +62,7 @@ export function BuybackCard() {
       <Row label={`Broker's fee (${pct(BUYBACK.fee)})`} value={money(q.fee, sym)} />
       <Row label="Total cost" value={money(q.cost, sym)} strong />
       <Row label="Your stake after" value={pct(stakeAfter, 1)} />
-      <Row label="Credit ratio after" value={pct(q.crAfter, 1)} tone="dim" />
+      <Row label="Runway after" value={runwayText(q.runwayAfter.months)} tone="dim" />
       {capped && (
         <p class="muted small">
           Capped so the public keeps at least {pctText(BUYBACK.minFloat)} of the lab.

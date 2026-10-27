@@ -3,13 +3,33 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.33, save schema 23). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
+**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.34, save schema 24). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `10188f73131935` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `1311ec96765325` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-27 — Runway replaces the credit ratio (v0.1.34, schema 24)
+
+The owner's pick after the credit-ratio review: the bank-era credit ratio never limited anything (it never fell below 17%), so it is gone, and **runway** takes its place.
+
+**What changed.**
+- **Runway** (new module `src/sim/runway.ts`, SIMULATION §15) is how many months your cash lasts at your net burn: the average weekly loss over the last 13 weeks. A lab that is making money is not burning cash and reads **Strong**. Tiers: Strong 24+ months, Comfortable 12–24, Tight 6–12, Critical under 6 (or cash below zero). All numbers are in `RUNWAY` in `balance.ts`.
+- **What it gates.** A buyback, and the CFO's Investing and Buying switches, must leave at least 12 months of runway. An acquisition paid in cash can't leave you under 12 months. A home recession blocks an IPO unless runway is Strong.
+- **The CFO.** Capital sells the lab's stocks at Tight or Critical runway; Share sales raises new shares under 12 months, sized to reach 18 months. The old risk-appetite step is gone.
+- **Debt pricing.** The funding-market spread now follows the runway tier, and venture-debt rates follow runway and ARR.
+- **Screens.** The Company panel's Cash card and the Finance floor show runway months, a tier badge, a four-band meter and net burn. The credit ratio row is gone; the safety ratio is unchanged.
+- **Cleanup.** The bank's risk weights, `TIER_THRESHOLDS` and the credit-ratio code in `capital.ts` are removed (it keeps only the safety buffer).
+- **Save schema 24.** Migration 23 → 24 drops `company.capitalRatio` and the weekly `capitalRatio` and `totals.rwa`. Runway is worked out fresh from cash and history, so nothing new is stored.
+- **Determinism snapshot** `10188f73131935` → `1311ec96765325`: the CFO and the gates now follow runway; intended.
+
+**Balance (seed 42, 10 years, weeks in each runway tier).** Steady: Strong 507, Comfortable 9, Tight 4. Aggressive: Critical 8, Tight 4. Turtle: Comfortable 72, Tight 24, Critical 24. The balance strategies now gate expansion on runway.
+
+**Checked.** `npm run lint`, `npx vitest run` (1056 tests) and `npm run build` pass. `npm run balance` steady, aggressive, nohq and stress are in range. Turtle fails one check ("Corporate cash never < 0", −$23.6k); the same failure shows on `main` before this change, so it is not new. Left for a later tuning pass.
+
+**Dependencies:** none added.
 
 ### 2026-10-27 — Rival labs keep AI books (v0.1.33, schema 23)
 

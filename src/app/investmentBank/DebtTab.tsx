@@ -48,8 +48,8 @@ export function DebtTab(p: { siteId: string }) {
       <SectionTitle>Venture debt</SectionTitle>
       {near && (
         <p class="muted small">
-          Fixed-rate term loans, priced on your credit ratio and paid back weekly. Corporate debt is
-          capped at {CORPORATE_LENDING.maxEquityShare * 100}% of equity: room for{' '}
+          Fixed-rate term loans, priced on your runway and ARR and paid back weekly. Corporate debt
+          is capped at {CORPORATE_LENDING.maxEquityShare * 100}% of equity: room for{' '}
           {money(loanRoom(s), sym)} more. New offers every {CORPORATE_LENDING.refreshWeeks} weeks.
         </p>
       )}

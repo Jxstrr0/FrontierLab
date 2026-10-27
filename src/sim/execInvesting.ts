@@ -8,22 +8,16 @@
 //   3. backs one startup from the Investment floor pipeline: the best average
 //      scorecard (at least investMinScore) the account doesn't already hold,
 //      taking one offer lot of its open round
-// Bank: never at a restricted tier; stocks stay under investStockCap and
+// Lab: never at a restricted tier; stocks stay under investStockCap and
 // startup stakes under investVentureCap of total assets; one stock buy is at
-// most investStockLot of total assets; the capital ratio stays at or above
-// buyMinCr after each buy; expansionReserveWeeks of costs stay in cash.
+// most investStockLot of total assets; RUNWAY.gateMonths of runway stay after
+// each buy (runway.ts); expansionReserveWeeks of costs stay in cash.
 // You: keeps buyReserveYears of CEO salary; one purchase spends at most
 // investSpareShare of the cash above that.
 // Rival banks' shares are never bought or sold here. nextStock and
 // nextStartup are also what the CFO's profile shows.
-import {
-  COMMISSION,
-  EXEC_DELEGATION as X,
-  STOCK_RISK_WEIGHT,
-  VENTURE_RISK_WEIGHT,
-} from '../config/balance';
+import { COMMISSION, EXEC_DELEGATION as X, RUNWAY } from '../config/balance';
 import { balanceSheet } from './balanceSheet';
-import { capitalSnapshot } from './capital';
 import { maxBuy, trade } from './commands/markets';
 import { buyStartupLot, ventureTierBlock } from './commands/ventures';
 import { expansionReserve } from './execDelegationsGrowth';
@@ -34,6 +28,7 @@ import type { GameState } from './state';
 import { accessBlock } from './ventureAccess';
 import { isPrivate } from './ventureGen';
 import { pentagonAvg } from './ventureModel';
+import { spendableCash } from './runway';
 
 export type Plan<T> = { pick: T; blocker?: undefined } | { pick?: undefined; blocker: string };
 
@@ -70,6 +65,7 @@ export function weeksToInvest(state: GameState): number {
 const SPARE_CASH =
   'Waiting for spare cash: the chief keeps a year of your salary and spends at most a quarter of the rest at a time.';
 const RESERVE = 'Waiting for spare cash: the chief keeps 8 weeks of costs in reserve.';
+const RUNWAY_SHORT = `Runway would fall under ${RUNWAY.gateMonths} months.`;
 
 /** The most one purchase may spend from your own cash. */
 export function personalInvestLimit(state: GameState): number {
@@ -104,12 +100,9 @@ function bankStockBudget(state: GameState): number | string {
   const room = X.investStockCap * bs.assets - holdingsValue(state, 'company');
   if (room <= 0)
     return `The lab's stocks are at ${Math.round(X.investStockCap * 100)}% of its assets.`;
-  const snap = capitalSnapshot(state);
-  // Cash (no risk weight) becomes stock at 2.5×; the commission comes off CET1.
-  const crRoom =
-    (snap.cet1 - X.buyMinCr * snap.rwa) / (X.buyMinCr * STOCK_RISK_WEIGHT + COMMISSION);
-  if (crRoom <= 0) return `The credit ratio would fall under ${Math.round(X.buyMinCr * 100)}%.`;
-  return Math.min(cash, room, crRoom, X.investStockLot * bs.assets);
+  const runwayRoom = spendableCash(state);
+  if (runwayRoom <= 0) return RUNWAY_SHORT;
+  return Math.min(cash, room, runwayRoom, X.investStockLot * bs.assets);
 }
 
 /** The stock the chief would buy for this account now, or why none. */
@@ -148,10 +141,7 @@ function bankStartupBlocker(state: GameState, price: number): string | undefined
   const bs = balanceSheet(state);
   if (bs.ventures + price > X.investVentureCap * bs.assets)
     return `The lab's startup stakes would pass ${Math.round(X.investVentureCap * 100)}% of its assets.`;
-  const snap = capitalSnapshot(state);
-  // The stake is marked at the price paid, so CET1 holds and RWA grows by 2.5×.
-  if (snap.cet1 / Math.max(1, snap.rwa + price * VENTURE_RISK_WEIGHT) < X.buyMinCr)
-    return `The credit ratio would fall under ${Math.round(X.buyMinCr * 100)}%.`;
+  if (price > spendableCash(state)) return RUNWAY_SHORT;
   return undefined;
 }
 
