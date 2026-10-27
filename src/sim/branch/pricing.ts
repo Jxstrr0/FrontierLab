@@ -15,15 +15,20 @@ import type { ProductSpec } from '../../data/products';
 import { SEGMENT_SPECS } from '../../data/segments';
 import type { SegmentId } from '../../data/types';
 import { clamp } from '../math';
+import { productSpec } from '../products';
 import type { Branch, GameState } from '../state';
-import { savingsBoost } from '../incident/effects';
+import { planCut } from '../incident/effects';
 
 const isFee = (spec: ProductSpec) => spec.priceType !== 'rate';
 const isDepositRate = (spec: ProductSpec) =>
   spec.priceType === 'rate' && spec.category === 'deposits';
 
-/** Denominator floor for fee comparisons: $ for $ fees, pp for % fees. */
-function feeFloor(spec: ProductSpec, table: { dollars: number; pct: number }): number {
+/** Denominator floor for fee comparisons: $ for $ fees, pp for % fees, $ per unit for API. */
+function feeFloor(
+  spec: ProductSpec,
+  table: { dollars: number; pct: number; unit: number },
+): number {
+  if (spec.priceType === 'perUnit') return table.unit;
   return spec.priceType === 'pctFee' ? table.pct : table.dollars;
 }
 
@@ -89,10 +94,11 @@ export function companyPrice(
   return country ? state.company.companyPrices[country]?.[productId] : undefined;
 }
 
-/** Savings boosts from incident choices: price-war match, bank-run raise (§23). */
+/** Plan price cuts from incident choices: price-war match, bank-run cut (§23). Negative or 0. */
 export function incidentBoost(state: GameState, branch: Branch, productId: string): number {
-  const base = state.products.catalog[productId]?.base ?? productId;
-  return base === 'savings' ? savingsBoost(state, branch.cityId) : 0;
+  const spec = productSpec(state, productId);
+  if (spec?.kind !== 'plan' || spec.category !== 'deposits') return 0;
+  return -planCut(state, branch.cityId) * basePrice(state, branch, productId);
 }
 
 export function isOffered(branch: Branch, productId: string): boolean {

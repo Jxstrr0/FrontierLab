@@ -124,12 +124,12 @@ export const RIVAL_TEMPLATES = {
   ],
   PRICE_WAR: [
     {
-      h: '{bank} lifts savings rate to {savingsRate} in {city}',
-      b: "The {bump} basis-point rise is aimed squarely at the city's best-rated savings accounts.",
+      h: '{bank} cuts Plus to {plusPrice} in {city}',
+      b: "The {bump} price cut is aimed squarely at the city's best-rated plans.",
     },
     {
-      h: 'Price war: {bank} fights for {city} savers',
-      b: 'Savings now pay {savingsRate} at {bank}, up {bump} basis points this week.',
+      h: 'Price war: {bank} fights for {city} subscribers',
+      b: 'Plus now costs {plusPrice} a month at {bank}, {bump} cheaper this week.',
     },
   ],
   RIVAL_EARNINGS_UP: [
@@ -196,16 +196,16 @@ export const RIVAL_TEMPLATES = {
   ],
   RATE_WATCH: [
     {
-      h: 'Rate watch: {leader} leads {city} savings',
-      b: 'The best easy-access rate in town is {leaderRate} at {leader}. {yours}',
+      h: 'Price watch: {leader} leads {city} on price',
+      b: 'The cheapest Plus plan in town is {leaderRate} a month at {leader}. {yours}',
     },
     {
-      h: 'Where savers in {city} get the most',
-      b: '{leader} pays {leaderRate} on savings. {yours}',
+      h: 'Where {city} subscribers pay least',
+      b: '{leader} charges {leaderRate} a month for Plus. {yours}',
     },
     {
-      h: '{city} savings rates under the lens',
-      b: 'Top of the table: {leader} at {leaderRate}. {yours}',
+      h: '{city} plan prices under the lens',
+      b: 'Cheapest on the table: {leader} at {leaderRate}. {yours}',
     },
   ],
 };

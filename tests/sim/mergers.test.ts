@@ -4,8 +4,6 @@
 // and closing with holdings of the target and corporate debt owed to it.
 import { describe, expect, it } from 'vitest';
 import { MERGERS, STOCK_RISK_WEIGHT } from '../../src/config/balance';
-import { ACQUIRED_LOAN_MIX } from '../../src/data/mergers';
-import { PRODUCTS } from '../../src/data/products';
 import { planDeal, regulatorBlock, regulatorChecks } from '../../src/sim/acquisitionPlan';
 import { capitalSnapshot } from '../../src/sim/capital';
 import { closeBranch } from '../../src/sim/commands';
@@ -118,14 +116,14 @@ describe('offer validation', () => {
 });
 
 describe('regulator checks', () => {
-  it('computes pro-forma capital from CET1 less goodwill over RWA plus the acquired loans', () => {
+  it('computes pro-forma capital from CET1 less goodwill over RWA less the stake it consumes', () => {
     const s = capitalisedBank();
     const bank = smallestRival(s);
     const plan = planDeal(s, bank, referencePrice(bank) * 1.5);
     const snap = capitalSnapshot(s);
-    let rwa = snap.rwa - plan.holdingValue * STOCK_RISK_WEIGHT;
-    for (const [pid, share] of Object.entries(ACQUIRED_LOAN_MIX))
-      rwa += plan.loans * share * PRODUCTS[pid]!.riskWeight;
+    // C3a: an AI lab's acquired books are customers, not loans, so only the consumed
+    // stake (if any) changes risk-weighted assets.
+    const rwa = snap.rwa - plan.holdingValue * STOCK_RISK_WEIGHT;
     expect(plan.goodwill).toBeCloseTo(plan.cash - bank.equity, 2);
     expect(plan.proFormaCr).toBeCloseTo((snap.cet1 - plan.goodwill) / rwa, 10);
     const weak = { ...plan, proFormaCr: MERGERS.minProFormaCr - 0.001 };
@@ -235,7 +233,10 @@ describe('closing', () => {
       advanceWeeks(s, 1);
       expect(identityGap(s)).toBeLessThan(1);
     }
-    expect(JSON.stringify(s)).not.toMatch(/NaN|null/);
+    // The liquidity ratio is null by design with no deposit book (treasury.ts); anything
+    // else null would be a NaN or Infinity that JSON turned into null.
+    const json = JSON.stringify({ ...s, company: { ...s.company, liquidityRatio: 0 } });
+    expect(json).not.toMatch(/NaN|null/);
     expect(s.branches[home]!.customers).toBeGreaterThan(0);
     // Closing the merged office works like any other.
     const r = closeBranch(s, home);

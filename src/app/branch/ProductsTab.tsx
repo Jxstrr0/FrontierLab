@@ -5,6 +5,7 @@
 // stack vertically so every product's toggle and price stay visible on a phone.
 import { useState } from 'preact/hooks';
 import { CITIES } from '../../data/cities';
+import { CATEGORY_NAMES } from '../../data/products';
 import type { CategoryId } from '../../data/types';
 import * as cmd from '../../sim/commands';
 import { theCountryName } from '../../sim/newsStory';
@@ -18,11 +19,7 @@ import { ModelRosette } from '../hq/products/ModelRosette';
 import { priceCountries } from '../hq/products/productSelectors';
 import { ProductCard } from './ProductCard';
 
-const CATEGORIES: { value: CategoryId; label: string }[] = [
-  { value: 'deposits', label: 'Deposits' },
-  { value: 'lending', label: 'Lending' },
-  { value: 'cards', label: 'Cards & Services' },
-];
+const CATEGORIES = CATEGORY_NAMES;
 
 export function ProductsTab(p: { branch: Branch; onLoanDesk: () => void }) {
   const s = useGame();

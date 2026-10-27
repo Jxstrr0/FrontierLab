@@ -6,13 +6,12 @@
 //   takeup        'company'; target a base product id (credit_card): take-up ×
 //   incidentP     branch id or 'company'; target an incident type: probability ×
 //   riskCoverage  'company': Risk coverage′ + value (capped at full coverage)
-//   savingsBoost  'company' or a city id: savings pay value more
+//   planCut       'company' or a city id: plan prices × (1 − value)
 import { BANK_RUN } from '../../config/balance';
 import type { RatingCategory } from '../../data/types';
 import type { Branch, GameState, TimedEffect } from '../state';
 
-export type EffectKind =
-  'rating' | 'closed' | 'takeup' | 'incidentP' | 'riskCoverage' | 'savingsBoost';
+export type EffectKind = 'rating' | 'closed' | 'takeup' | 'incidentP' | 'riskCoverage' | 'planCut';
 
 /** Adds an effect lasting `weeks` weekly ticks from now. */
 export function addEffect(
@@ -77,9 +76,9 @@ export function riskCoverageBonus(state: GameState): number {
   return sumOf(active(state, 'riskCoverage', ['company']));
 }
 
-/** Extra savings rate paid in a city (price-war match, bank-run raise). */
-export function savingsBoost(state: GameState, cityId: string): number {
-  return sumOf(active(state, 'savingsBoost', [cityId, 'company']));
+/** Share taken off plan prices in a city (price-war match, bank-run price cut). */
+export function planCut(state: GameState, cityId: string): number {
+  return Math.min(1, sumOf(active(state, 'planCut', [cityId, 'company'])));
 }
 
 /** Deposit churn multiplier during a bank run (§13.8). */

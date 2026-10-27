@@ -84,7 +84,7 @@ How a lot's values are derived:
 
 ## 4. Segments
 
-| id | Segment | sensDep | sensLoan | sensFee | Ticket mult: deposits | Ticket mult: lending | Ticket mult: cards |
+| id | Segment | sensDep | sensLoan | sensFee | Ticket mult: Plans (deposits) | Ticket mult: API (lending) | Ticket mult: Apps (cards) |
 |---|---|---|---|---|---|---|---|
 | STU | Students | 0.3 | 0.6 | 1.2 | 0.25 | 0.40 | 0.50 |
 | YP | Developers | 0.6 | 0.7 | 0.8 | 0.80 | 0.90 | 0.90 |
@@ -93,73 +93,75 @@ How a lot's values are derived:
 | BIZ | Small shops | 0.4 | 0.7 | 0.5 | 1.50 | 1.00 | 1.40 |
 
 ### Affinity matrix
-Base probability that a new customer in the segment opens the product, before modifiers.
+Base probability that a new customer in the segment opens the product, before modifiers (`AFFINITY` in `src/data/segments.ts`; stage C3a, raised about 1.4× from the first draft in tuning).
 
 | Product | STU | YP | FAM | RET | BIZ |
 |---|---|---|---|---|---|
-| chequing | .55 | .85 | .85 | .70 | .10 |
-| savings | .20 | .50 | .45 | .55 | .10 |
-| gic1y | .02 | .10 | .18 | .45 | .05 |
-| student | .80 | .05 | 0 | 0 | 0 |
-| business_acct | .02 | .05 | .03 | .02 | .90 |
-| personal_loan | .06 | .12 | .10 | .04 | 0 |
-| auto_loan | .03 | .10 | .12 | .05 | 0 |
-| mortgage | 0 | .05 | .09 | .02 | 0 |
-| loc | .04 | .12 | .12 | .06 | .20 |
-| credit_card | .35 | .45 | .40 | .25 | .30 |
-| wealth | 0 | .04 | .08 | .20 | .05 |
-| safe_box | 0 | .02 | .05 | .12 | .06 |
-| fx | .10 | .12 | .08 | .06 | .35 |
+| free_tier | .75 | .60 | .65 | .50 | .20 |
+| plus | .18 | .42 | .35 | .40 | .15 |
+| pro | .03 | .16 | .05 | .20 | .08 |
+| team | 0 | .08 | 0 | .07 | .60 |
+| campus_plan | .55 | 0 | 0 | .12 | 0 |
+| api | .08 | .45 | .03 | .28 | .30 |
+| batch_api | .02 | .14 | 0 | .20 | .15 |
+| fine_tuning | 0 | .08 | 0 | .10 | .12 |
+| code_assistant | .15 | .55 | .03 | .14 | .15 |
+| agent_studio | 0 | .08 | 0 | .05 | .30 |
+| creative_suite | .15 | .10 | .25 | .04 | .08 |
+| priority_support | 0 | .04 | 0 | .07 | .22 |
 
-The `business_acct` deposit ticket multiplier for BIZ is 1.0, since the base ticket is already business-sized.
+The segment ticket multipliers above apply to usage products only (a month of API usage scales with the segment and the lot's incomeIndex). Plans sign a fixed number of seats.
 
 ## 5. Products (v1 catalog)
 
-| id | Name | Category | Price type | Tenor | Default price | Range / step | Base ticket | Term (wk) | Base PD/yr | LGD | Risk weight | Base approval | Churn/yr | Servicing $/acct/wk | Notes |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| chequing | Everyday Chequing | deposits | fee $/mo | short | $12 | 0–30 / 1 | 3,000 | — | — | — | 0 | — | 8% | 0.45 | pays 0.05%; organic +3%/yr; rateChurnSens 0.1 |
-| savings | High-Interest Savings | deposits | rate | short | FTP − 1.00% (floor 0.10%) | 0–8% / 0.05 | 9,000 | — | — | — | 0 | — | 14% | 0.30 | rateChurnSens 0.6 |
-| gic1y | 1-Year GIC | deposits | rate | long | FTP_long − 0.15% | 0–9% / 0.05 | 16,000 | 52 | — | — | 0 | — | (maturity) | 0.20 | renewal base 72% |
-| student | Student Account | deposits | fee $/mo | short | $0 | 0–10 / 1 | 900 | — | — | — | 0 | — | 12% | 0.35 | 8%/yr convert to chequing |
-| business_acct | Business Account | deposits | fee $/mo | short | $25 | 0–80 / 1 | 15,000 | — | — | — | 0 | — | 9% | 0.90 | pays 0.25% |
-| personal_loan | Personal Loan | lending | rate | short | FTP + 6.00% | 3–25% / 0.05 | 11,000 | 156 | 3.0% | 0.70 | 0.75 | 0.62 | — | 0.40 | |
-| auto_loan | Auto Loan | lending | rate | long | FTP_long + 3.40% | 2–18% / 0.05 | 27,000 | 260 | 1.6% | 0.40 | 0.75 | 0.70 | — | 0.30 | prepay applies |
-| mortgage | Mortgage (5-yr fixed) | lending | rate | long | FTP_long + 1.45% | 1.5–12% / 0.05 | 340,000 | 1,300 amort. | 0.35% | 0.20 | 0.35 | 0.48 | — | 0.60 | origination fee 0.5%; reprices 1/260 per wk |
-| loc | Line of Credit | lending | rate | short | FTP + 5.00% | 3–20% / 0.05 | drawn 8,800 | revolving | 2.0% | 0.60 | 0.75 | 0.60 | 6% | 0.25 | limit 16,000 × incomeIndex |
-| sbl | Small Business Loan | lending | rate | short | FTP + 4.50% | 3–20% / 0.05 | Loan Desk | 52–364 | pentagon | collateral | 1.00 | — | — | 1.20 | individual loans |
-| credit_card | Credit Card | cards | rate (APR) | — | 20.99% | 9.99–29.99% / 0.25 | drawn 2,400 | revolving | 4.5% | 0.85 | 0.75 | 0.60 | 7% | 0.35 | spend 1,300/mo; annual fee $0 |
-| wealth | Wealth Advice | cards | fee %AUM | — | 1.00% | 0.25–2.5% / 0.05 | AUM 50,000 | — | — | — | 0 | — | 8% | 1.50 | needs ≥ 1 advisor office |
-| safe_box | Safe Deposit Box | cards | fee $/yr | — | $120 | 40–400 / 5 | — | — | — | — | 0 | — | 6% | 0.10 | capped by vault boxes |
-| fx | FX & Wires | cards | markup % | — | 2.50% | 0.5–5% / 0.1 | 1,800/customer/yr | — | — | — | 0 | — | — | 0 | volume-based |
+Stage C3a replaced the bank catalog. The three categories keep their ids (`deposits`, `lending`, `cards`) so every table keyed by category carries over; the screens call them **Plans**, **API** and **Apps & Services** (`CATEGORY_NAMES`).
 
-Starting quality: every v1 product starts at 2.5 stars, except chequing and savings at 3.0.
+- **Plan** products bill seats. A sign-up brings `ticket` seats; the book balance is ARR = seats × price × billing periods (12 for a monthly fee, 1 for an annual fee).
+- **Usage** products bill per million tokens. A sign-up brings `ticket × incomeIndex × segment ticket mult` million tokens a month; the book balance is a year of that usage at today's price.
+- The **Business Loan** (Loan Desk, `sbl`) is unchanged and still the only rate product.
 
-Lending approvals are tuned so company loans settle near 80% of deposits. If the balance report drifts, adjust mortgage approval first.
+| id | Name | Category | Kind | Price type | Default price | Range / step | Ticket | Churn/yr | Servicing $/acct/wk | Notes |
+|---|---|---|---|---|---|---|---|---|---|---|
+| free_tier | Free Tier | Plans | plan | fee $/mo | $0 | 0–5 / 1 | 1 seat | 25% | 0.05 | 12%/yr upgrade to Plus |
+| plus | Plus | Plans | plan | fee $/mo | $20 | 5–60 / 1 | 1 seat | 14% | 1.00 | rateChurnSens 0.3; starts 3.0★ |
+| pro | Pro | Plans | plan | fee $/mo | $60 | 20–250 / 5 | 1 seat | 12% | 3.00 | rateChurnSens 0.3 |
+| team | Team | Plans | plan | fee $/mo | $30 | 10–90 / 1 | 6 seats | 8% | 6.00 | rateChurnSens 0.2 |
+| campus_plan | Campus Plan | Plans | plan | fee $/mo | $8 | 0–20 / 1 | 1 seat | 20% | 0.60 | the student partnership package |
+| api | Standard API | API | usage | $ per M tokens | $3 | 0.5–15 / 0.25 | 40 M tok/mo | 10% | 0.50 | compute $1.00/unit; organic +25%/yr; starts 3.0★ |
+| batch_api | Batch API | API | usage | $ per M tokens | $1.50 | 0.25–6 / 0.25 | 80 M tok/mo | 9% | 0.50 | compute $0.50/unit; organic +20%/yr |
+| fine_tuning | Fine-tuning | API | usage | $ per M tokens | $8 | 2–30 / 0.5 | 5 M tok/mo | 10% | 1.50 | compute $3.00/unit; organic +15%/yr |
+| sbl | Business Loan | API | Loan Desk | rate | FTP + 4.50% | 3–20% / 0.05 | Loan Desk | — | 1.20 | individual loans (§21) |
+| code_assistant | Code Assistant | Apps & Services | plan | fee $/mo | $19 | 5–60 / 1 | 1 seat | 13% | 0.90 | rateChurnSens 0.3 |
+| agent_studio | Agent Studio | Apps & Services | plan | fee $/mo | $99 | 25–400 / 5 | 1 seat | 10% | 4.00 | rateChurnSens 0.2 |
+| creative_suite | Creative Suite | Apps & Services | plan | fee $/mo | $15 | 5–50 / 1 | 1 seat | 14% | 0.80 | rateChurnSens 0.3 |
+| priority_support | Priority Support | Apps & Services | plan | fee $/yr | $1,500 | 300–6,000 / 50 | 1 seat | 8% | 1.00 | billed yearly |
 
-Stage 1 tuning (2026-10-24): base tickets for savings (14,000 → 9,000), GIC (24,000 → 16,000), business account (38,000 → 15,000) and wealth AUM (120,000 → 50,000) were lowered so a mature branch lands near SIMULATION §12.1's deposit mix. Mortgage approval moved 0.42 → 0.48 to hold loans near 80% of deposits.
+Starting quality: every product starts at 2.5 stars, except Free Tier, Plus and the Standard API at 3.0. All plan and usage products carry risk weight 0. Servicing stands in for support and, until C3b's compute charge, inference; usage products also pay compute per unit used (`unitCost`).
+
+Plans and the Loan Desk start switched on in a new office; the API and Apps & Services wait for the player.
 
 ## 6. Product development templates
 
-| id | Name | Base | Effect | Tier effect (Low / Medium / Premium) |
-|---|---|---|---|---|
-| senior_saver | Senior Saver | savings | RET affinity +0.15 | default rate −0.10 / 0 / +0.15pp |
-| kids_savings | Kids Savings | savings | FAM affinity +0.10, ticket ×0.3 | |
-| notice_acct | 31-Day Notice | savings | churn ×0.6; tenor long | |
-| green_gic | Green GIC | gic1y | Branch +0.05 reputation; YP +0.05 | |
-| first_home | First-Home Mortgage | mortgage | YP/FAM affinity +0.04; base PD ×1.1 | |
-| green_mortgage | Green Mortgage | mortgage | reputation +; rate −0.10pp default | |
-| ev_auto | EV Auto Loan | auto_loan | YP +0.04; base PD ×0.9 | |
-| student_loc | Student Line of Credit | loc | STU affinity +0.10; base PD ×1.3 | |
-| consolidation | Debt Consolidation Loan | personal_loan | approval +0.05; base PD ×1.15 | |
-| cashback_card | Cashback Card | credit_card | take-up +15%; interchange share −0.3% | |
-| travel_card | Travel Rewards Card | credit_card | annual fee $120; spend ×1.6; YP/RET +0.05 | |
-| student_card | Student Card | credit_card | STU +0.15; limit ×0.4 | |
-| secured_card | Secured Card | credit_card | approval +0.25; base PD ×0.6; spend ×0.5 | |
-| business_card | Business Card | credit_card | BIZ +0.25; spend ×3 | |
-| robo_advisor | Robo-Advisor | wealth | no advisor office needed; fee 0.40% default; AUM ×0.25 | |
-| premium_pkg | Premium Banking Package | chequing | fee $30 default; Products +0.1 at branch; RET/high-income take-up +0.1 | |
-| mobile_app_v2 | Mobile App 2.0 (Digital) | — | app rating +0.3 (one-time) | requires IT floor |
-| instant_decisions | Instant Decisions (Digital) | — | model speed +2 | requires IT floor |
+Prices in the tier column are the default price × 0.85 / 1 / 1.25 for Low / Medium / Premium (`DEV_TIER.feeMult`); Premium also adds +0.05 Products rating where offered. A template that sets its own default price scales the market reference with it.
+
+| id | Name | Base | Effect |
+|---|---|---|---|
+| student_plus | Student Plus | plus | STU affinity +0.15; default $10 |
+| golden_years | Golden Years Plan | plus | RET affinity +0.15; default $12 |
+| family_plan | Family Plan | plus | FAM affinity +0.15; 4 seats per sign-up; default $12 per seat |
+| plus_annual | Plus Annual | plus | churn ×0.5; take-up ×0.85 |
+| carbon_neutral | Carbon-Neutral Plan | plus | reputation +0.05; YP +0.05 |
+| max_plan | Max | pro | default $200; Products +0.1 where offered; YP/BIZ +0.05 |
+| enterprise | Enterprise | team | BIZ +0.2; ticket ×5; churn ×0.6; default $45 |
+| realtime_api | Realtime API | api | default $6; take-up ×1.1; YP/BIZ +0.05 |
+| dedicated_capacity | Dedicated Capacity | api | BIZ +0.2; ticket ×4; churn ×0.5 |
+| research_credits | Research Credits | api | STU +0.15; default $1.50 |
+| embeddings_api | Embeddings API | batch_api | default $0.50; ticket ×3 |
+| study_buddy | Study Buddy | creative_suite | STU +0.2; default $8 |
+| voice_companion | Voice Companion | creative_suite | RET/FAM +0.1; take-up ×1.15 |
+| contract_copilot | Contract Copilot | agent_studio | BIZ +0.15; default $149; reputation +0.05 |
+| mobile_app_v2 | Mobile App 2.0 (Digital) | — | app rating +0.3 (one-time); requires IT floor |
+| instant_decisions | Instant Decisions (Digital) | — | model speed +2; requires IT floor |
 
 ## 7. Branch build options
 
@@ -392,7 +394,7 @@ Counterparty names: Harbor Clearing Bank · Meridian Treasury · Atlas Money Mar
 
 - **Signing fee:** employees × $160 × income mult × city.incomeIndex.
 - **Contract:** 364 weeks ("Year X of 7").
-- **Deposit per employee:** $4,500.
+- **ARR per participating employee:** $300 (`ARR_PER_EMPLOYEE`, C3a; about a Team seat). Student deals: $80 per participating student. The package is a plan (Team for staff, Campus Plan for students by default).
 - **Generation:** 2–4 employers per city.
 
 ## 15. Rivals
@@ -676,11 +678,11 @@ Default cooldown: 8 weeks per scope. Branch cases go to a manager trusted with B
 | VIRAL_COMPLAINT | branch | 0.01 | Service < 2.5 | Public apology + fix ($10k; Service +0.2) · Ignore (awareness −0.05; 30% news) |
 | EXEC_POACHED | company | §17.2 | per exec | Counter-offer (+25% salary, loyalty +10) · Let them go |
 | BRANCH_FLOOD | branch | 0.0005 | Waterfront ×3 | Fast repair ($80k; closed 1 wk) · Slow repair ($30k; closed 4 wk) |
-| BANK_RUN | company | §13.8 | — | Central bank window (liquidity +; stigma) · Raise savings rates +1.0pp everywhere for 8 wk · Public statement (success 30% + 5% per CR point above 8%; success ends the run) |
-| CARD_FRAUD | company with cards | 0.0015 | × (1.3 − fraudShield/10) | Absorb losses (0.5% of card balances) · Freeze cards 1 wk (card take-up −50% for 4 wk) · Open Credit Bureau (switch model) |
+| BANK_RUN | company | §13.8 | — | Central bank window (liquidity +; stigma) · Cut plan prices 10% everywhere for 8 wk (`planCut`, C3a) · Public statement (success 30% + 5% per CR point above 8%; success ends the run) |
+| CARD_FRAUD | company offering the API | 0.0015 | × (1.3 − fraudShield/10) | Abuse ring on API sign-ups (C3a). Absorb the losses (2% of API ARR) · Freeze API sign-ups 1 wk (API take-up −50% for 4 wk) · Absorb and call a fraud firm |
 | STAFF_WALKOUT | branch | 0.03 | morale < 25 | Raise wages 10% · Bonus $1,000 per staff (morale +20) · Wait it out (closed 1 wk, then morale +10) |
 | DIVIDEND_DUE | company | 3 weeks before payment | info | OK |
-| PRICE_WAR | city | §18.6 | — | Match (+0.15pp savings at all branches in the city) · Hold |
+| PRICE_WAR | city | §18.6 | — | Match (plan prices −10% at every office in the city for 26 wk, `planCut`) · Hold |
 | BIG_DEFAULT | branch | business default ≥ $500k | info | OK |
 | INSIDER_PROBE | personal | §22 | — | Settle (fine) · Fight (50%: cleared, or fine ×2 and news) |
 | REGULATOR_LETTER | company | on entering Restricted | info | OK (shows how to raise capital) |
@@ -764,7 +766,7 @@ Fill these per panel and state.
 - **HQ floors** (coverage ≥ 1 / short):
   - Finance: "Books are closed on time." / "We're short on finance staff. Statements are running late."
   - Treasury: "Liquidity's healthy." / "We're paying up for funding without more hands."
-- **Rival branch:** "This is {rival}'s branch. Their savings rate is {x}; ours is {y}."
+- **Rival branch:** "This is {rival}'s sales office. Their Plus plan is {x}; ours is {y}." (C3a: compares the Plus price.)
 - **Rival HQ:** "Welcome to {rival}. We lend to businesses — even competitors."
 - **Central bank:** "The governor's office. Rates are on everyone's mind."
 - **Investment bank:** "Welcome to {name}. Raising capital or buying a competitor?"

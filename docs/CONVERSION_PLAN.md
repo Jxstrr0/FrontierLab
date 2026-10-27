@@ -277,7 +277,7 @@ Follows the brief's map structure (1–2 main offices worldwide, one sales offic
 - **Accept (C2 as a whole):** a steady run opens several cities with one office each and grows them in size; the balance script stays inside the new targets.
 
 ### C3 — The money model (split into C3a–C3c)
-- **C3a:** new product catalog (Plans / API / Apps & Services) on the fee and volume book paths, and ARR books (§3.5).
+- **C3a — Product catalog and ARR books: done (v0.1.10, schema 6).** Plans (Free Tier, Plus, Pro, Team, Campus Plan), API (Standard, Batch, Fine-tuning, plus the Loan Desk) and Apps & Services (Code Assistant, Agent Studio, Creative Suite, Priority Support), on new `plan` (seats) and `usage` (per million tokens) book paths whose balance is ARR (§3.5), earned as ARR/52 a week. Free-tier seats upgrade to Plus. Partnerships, acquisitions, price wars, the tutorial, development templates and incidents point at the new products. Migration 5 → 6 settles old bank books into reserves and cash and starts old customers on the Free Tier. ARR shows on the Finance tab, Branches list and Products trend but stays off the balance sheet until C3b. **Next: C3b, then C3c.**
 - **C3b:** funds transfer pricing becomes the compute charge. New P&L lines, statements and a simpler balance sheet. Revenue goes to corporate cash.
 - **C3c:** remove REO, bonds, mortgage and GIC special cases, and the treasury transfer, with migrations.
 - **Accept:** the balance identity holds every tick. A 10-year steady run is profitable within the new targets. Old C2 saves load.

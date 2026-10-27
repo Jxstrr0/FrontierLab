@@ -15,7 +15,7 @@ import {
   type NewsContext,
   type Story,
 } from './newsStory';
-import { basisPoints, newsAbsPct, newsPct, newsMoney, newsRate } from './newsFormat';
+import { newsAbsPct, newsPct, newsMoney } from './newsFormat';
 import type { GameEvent } from './state';
 
 /** How a chartered bank's strategy reads in a headline. */
@@ -185,8 +185,8 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
         tokens: {
           bank: str(p.bank, 'A rival'),
           city: cityName(str(p.city)),
-          bump: basisPoints(num(p.bump)),
-          savingsRate: newsRate(num(p.savingsRate)),
+          bump: newsAbsPct(num(p.bump) * 100, 0),
+          plusPrice: newsMoney(num(p.plusPrice), ctx.sym),
         },
       };
     case 'BANK_FAILURE':
@@ -267,26 +267,26 @@ function listText(items: string[]): string {
   return `${items.slice(0, -1).join(', ')} and ${items.at(-1)}`;
 }
 
-/** The best savings rate among rivals in your busiest city (your home city before any branch), and yours. */
+/** The cheapest Plus price among rivals in your busiest city (your home city before any office), and yours. */
 export function rateWatchStory(ctx: NewsContext): Story | undefined {
   const s = ctx.state;
   const cityId = busiestCity(s) ?? s.meta.homeCityId;
   let leader: { name: string; rate: number } | undefined;
   for (const rival of Object.values(s.rivals)) {
     if (rival.status !== 'active' || !rival.branches.some((b) => b.cityId === cityId)) continue;
-    const rate =
-      (rivalPriceInCity(s, rival, 'savings', cityId) ?? 0) + (rival.priceWar[cityId] ?? 0);
-    if (!leader || rate > leader.rate) leader = { name: rival.name, rate };
+    const rate = rivalPriceInCity(s, rival, 'plus', cityId);
+    if (rate === undefined) continue;
+    if (!leader || rate < leader.rate) leader = { name: rival.name, rate };
   }
   if (!leader) return undefined;
   const mine = Object.values(s.branches).find((b) => b.cityId === cityId && b.status === 'open');
-  const myRate = mine && isOffered(mine, 'savings') ? branchPrice(s, mine, 'savings') : undefined;
+  const myRate = mine && isOffered(mine, 'plus') ? branchPrice(s, mine, 'plus') : undefined;
   const yours =
     myRate === undefined
-      ? `${ctx.bank} has yet to post a rate here.`
-      : myRate >= leader.rate
-        ? `${ctx.bank} matches or beats it at ${newsRate(myRate)}.`
-        : `${ctx.bank} pays ${newsRate(myRate)}.`;
+      ? `${ctx.bank} has yet to sell Plus here.`
+      : myRate <= leader.rate
+        ? `${ctx.bank} matches or beats it at ${newsMoney(myRate, ctx.sym)}.`
+        : `${ctx.bank} charges ${newsMoney(myRate, ctx.sym)}.`;
   return {
     key: 'RATE_WATCH',
     subject: cityId,
@@ -297,7 +297,7 @@ export function rateWatchStory(ctx: NewsContext): Story | undefined {
     tokens: {
       city: cityName(cityId),
       leader: leader.name,
-      leaderRate: newsRate(leader.rate),
+      leaderRate: newsMoney(leader.rate, ctx.sym),
       yours,
     },
   };

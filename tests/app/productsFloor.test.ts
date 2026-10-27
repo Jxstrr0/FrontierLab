@@ -104,11 +104,11 @@ describe('Finance floor risk appetite wording', () => {
 });
 
 describe('Products floor wording', () => {
-  it('describes the price tier for rate and fee products', () => {
-    expect(tierHint(DEV_TEMPLATES.senior_saver, 'low')).toBe('Default rate −0.10pp');
-    expect(tierHint(DEV_TEMPLATES.senior_saver, 'medium')).toBe('Standard rate');
-    expect(tierHint(DEV_TEMPLATES.premium_pkg, 'premium')).toBe(
-      'Fee ×1.25 · Products rating +0.05 where offered',
+  it('describes the price tier for priced products', () => {
+    expect(tierHint(DEV_TEMPLATES.golden_years, 'low')).toBe('Price ×0.85');
+    expect(tierHint(DEV_TEMPLATES.golden_years, 'medium')).toBe('Standard price');
+    expect(tierHint(DEV_TEMPLATES.max_plan, 'premium')).toBe(
+      'Price ×1.25 · Products rating +0.05 where offered',
     );
     expect(tierHint(DEV_TEMPLATES.mobile_app_v2, 'low')).toBe('');
   });
@@ -126,22 +126,22 @@ describe('Products floor wording', () => {
 describe('company lineup', () => {
   it('reads the first branch until Apply-to-all is on, then the HQ price', () => {
     const { s, branchId } = gameWithFloors();
-    const savings = PRODUCTS.savings!;
-    cmd.setPrice(s, branchId, 'savings', 0.031);
-    expect(companyPrice(s, savings)).toBeCloseTo(0.031);
+    const plus = PRODUCTS.plus!;
+    cmd.setPrice(s, branchId, 'plus', 24);
+    expect(companyPrice(s, plus)).toBeCloseTo(24);
     cmd.setApplyRatesToAll(s, true);
-    cmd.setCompanyPrice(s, 'savings', 0.025);
-    expect(companyPrice(s, savings)).toBeCloseTo(0.025);
+    cmd.setCompanyPrice(s, 'plus', 18);
+    expect(companyPrice(s, plus)).toBeCloseTo(18);
   });
 
   it('shows Offered from the HQ lineup, or from the branches until it is set', () => {
     const { s, branchId } = gameWithFloors();
-    expect(companyOffered(s, 'savings')).toBe(true);
-    expect(companyOffered(s, 'mortgage')).toBe(false);
-    cmd.setOffered(s, branchId, 'mortgage', true);
-    expect(companyOffered(s, 'mortgage')).toBe(true);
-    cmd.setCompanyOffered(s, 'mortgage', false);
-    expect(companyOffered(s, 'mortgage')).toBe(false);
+    expect(companyOffered(s, 'plus')).toBe(true);
+    expect(companyOffered(s, 'api')).toBe(false);
+    cmd.setOffered(s, branchId, 'api', true);
+    expect(companyOffered(s, 'api')).toBe(true);
+    cmd.setCompanyOffered(s, 'api', false);
+    expect(companyOffered(s, 'api')).toBe(false);
   });
 
   it('labels developed products with their template and tier', () => {
@@ -151,12 +151,12 @@ describe('company lineup', () => {
       stars: 4,
       developed: true,
       name: 'Golden Years',
-      base: 'savings',
-      templateId: 'senior_saver',
+      base: 'plus',
+      templateId: 'golden_years',
       tier: 'premium',
     };
-    expect(productSubtitle(s, productSpec(s, 'dev_x')!)).toBe('Senior Saver · Premium tier');
-    expect(productSubtitle(s, PRODUCTS.savings!)).toBeUndefined();
+    expect(productSubtitle(s, productSpec(s, 'dev_x')!)).toBe('Golden Years Plan · Premium tier');
+    expect(productSubtitle(s, PRODUCTS.plus!)).toBeUndefined();
   });
 });
 
@@ -186,10 +186,11 @@ describe('digital projects', () => {
 
 describe('charts', () => {
   it('trend series keeps the last weeks and the latest two snapshots', () => {
-    const snap = (week: number, deposits: number, loans: number) =>
-      ({ week, totals: { deposits, loans } }) as never;
-    const t = trendSeries([snap(1, 10, 1), snap(2, 20, 2), snap(3, 30, 3)], 2);
-    expect(t.deposits).toEqual([20, 30]);
+    const snap = (week: number, arr: number | undefined, loans: number) =>
+      ({ week, totals: { arr, loans } }) as never;
+    const t = trendSeries([snap(1, 10, 1), snap(2, undefined, 2), snap(3, 30, 3)], 2);
+    // A week closed before ARR was recorded (schema 5) reads as 0.
+    expect(t.arr).toEqual([0, 30]);
     expect(t.loans).toEqual([2, 3]);
     expect(t.weeks).toEqual([2, 3]);
   });

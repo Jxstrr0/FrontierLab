@@ -37,26 +37,26 @@ describe('per-office prices', () => {
     expect(cmd.setOwnPrices(s, branch.id, true).ok).toBe(false);
     cmd.setApplyRatesToAll(s, true);
     expect(followsHq(s, branch)).toBe(true);
-    expect(cmd.setPrice(s, branch.id, 'savings', 0.04).ok).toBe(false);
+    expect(cmd.setPrice(s, branch.id, 'plus', 30).ok).toBe(false);
 
-    const hq = cmd.setCompanyPrice(s, 'savings', 0.02);
+    const hq = cmd.setCompanyPrice(s, 'plus', 18);
     expect(hq.ok).toBe(true);
-    expect(basePrice(s, branch, 'savings')).toBeCloseTo(0.02, 6);
+    expect(basePrice(s, branch, 'plus')).toBeCloseTo(18, 6);
 
     // Its own sheet starts from the HQ price, then moves on its own.
     expect(cmd.setOwnPrices(s, branch.id, true).ok).toBe(true);
-    expect(basePrice(s, branch, 'savings')).toBeCloseTo(0.02, 6);
-    expect(cmd.setPrice(s, branch.id, 'savings', 0.04).ok).toBe(true);
-    cmd.setCompanyPrice(s, 'savings', 0.025);
-    expect(basePrice(s, branch, 'savings')).toBeCloseTo(0.04, 6);
+    expect(basePrice(s, branch, 'plus')).toBeCloseTo(18, 6);
+    expect(cmd.setPrice(s, branch.id, 'plus', 30).ok).toBe(true);
+    cmd.setCompanyPrice(s, 'plus', 22);
+    expect(basePrice(s, branch, 'plus')).toBeCloseTo(30, 6);
 
     // HQ lineup changes skip it until it follows HQ again.
-    const was = branch.offered.savings!.on;
-    cmd.setCompanyOffered(s, 'savings', !was);
-    expect(branch.offered.savings!.on).toBe(was);
+    const was = branch.offered.plus!.on;
+    cmd.setCompanyOffered(s, 'plus', !was);
+    expect(branch.offered.plus!.on).toBe(was);
     expect(cmd.setOwnPrices(s, branch.id, false).ok).toBe(true);
-    expect(branch.offered.savings!.on).toBe(!was);
-    expect(basePrice(s, branch, 'savings')).toBeCloseTo(0.025, 6);
+    expect(branch.offered.plus!.on).toBe(!was);
+    expect(basePrice(s, branch, 'plus')).toBeCloseTo(22, 6);
   });
 });
 

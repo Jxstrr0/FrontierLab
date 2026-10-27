@@ -2,10 +2,13 @@
 // reference numbers, a development completing into a working product, digital
 // projects, deleting a developed product, and command validation.
 import { describe, expect, it } from 'vitest';
-import { balanceSheet, totalDeposits } from '../../src/sim/balanceSheet';
+import { companyArr } from '../../src/sim/arr';
+import { balanceSheet } from '../../src/sim/balanceSheet';
 import * as cmd from '../../src/sim/commands';
 import { budgetScore, devOdds, devScore, starOdds } from '../../src/sim/development';
 import { normalCdf } from '../../src/sim/detmath';
+import { PRODUCTS } from '../../src/data/products';
+import { AFFINITY } from '../../src/data/segments';
 import { advanceWeeks } from '../../src/sim/engine';
 import { newGame } from '../../src/sim/newGame';
 import { allProducts, developedSpec, productSpec } from '../../src/sim/products';
@@ -15,8 +18,8 @@ import { activeModel, RADAR } from '../../src/sim/underwriting';
 import { gameWithFloors } from '../helpers/productsFloor';
 
 const devInput = {
-  name: 'Silver Saver',
-  templateId: 'senior_saver',
+  name: 'Silver Plan',
+  templateId: 'golden_years',
   tier: 'medium' as const,
   weeks: 4,
   weeklyBudget: 5_000,
@@ -74,7 +77,7 @@ describe('developments', () => {
     expect(entry).toBeDefined();
     expect(entry!.stars).toBeGreaterThanOrEqual(1);
     expect(entry!.stars).toBeLessThanOrEqual(5);
-    expect(entry!.base).toBe('savings');
+    expect(entry!.base).toBe('plus');
     const spent = s.history.weekly.reduce((sum, w) => sum + w.pnl.development, 0);
     expect(spent).toBeCloseTo(20_000, 6);
     expect(s.events.log.some((e) => e.type === 'PRODUCT_DEVELOPED')).toBe(true);
@@ -91,17 +94,17 @@ describe('developments', () => {
     const bs = balanceSheet(s);
     expect(Math.abs(bs.equity - bs.expectedEquity)).toBeLessThan(1);
 
-    // Deleting it moves its customers onto High-Interest Savings.
-    const deposits = totalDeposits(s);
-    const savings = branch.books.savings!.accounts;
+    // Deleting it moves its customers (and their ARR) onto Plus.
+    const arr = companyArr(s);
+    const plus = branch.books.plus!.accounts;
     const accounts = book.accounts;
     expect(cmd.deleteProduct(s, id).ok).toBe(true);
     expect(s.products.catalog[id]).toBeUndefined();
     expect(branch.books[id]).toBeUndefined();
     expect(branch.offered[id]).toBeUndefined();
-    expect(branch.books.savings!.accounts).toBeCloseTo(savings + accounts, 6);
-    expect(totalDeposits(s)).toBeCloseTo(deposits, 4);
-    expect(cmd.deleteProduct(s, 'savings')).toEqual({
+    expect(branch.books.plus!.accounts).toBeCloseTo(plus + accounts, 6);
+    expect(companyArr(s)).toBeCloseTo(arr, 4);
+    expect(cmd.deleteProduct(s, 'plus')).toEqual({
       ok: false,
       reason: 'Only products you developed can be deleted.',
     });
@@ -114,28 +117,40 @@ describe('developments', () => {
       id: 'dev_x',
       stars: 4,
       developed: true,
-      name: 'Gold Saver',
-      base: 'savings',
-      templateId: 'senior_saver',
+      name: 'Gold Plan',
+      base: 'plus',
+      templateId: 'golden_years',
       tier: 'premium',
     })!;
-    expect(spec.affinity!.RET).toBeCloseTo(0.7, 12);
-    expect(spec.defaultRule).toEqual({ base: 'ftpShort', spread: -0.01 + 0.0015, floor: 0.001 });
+    // Plus's RET affinity + 0.15; the template's $12 fee × the Premium 1.25.
+    expect(spec.affinity!.RET).toBeCloseTo(AFFINITY.plus!.RET + 0.15, 12);
+    expect(spec.defaultRule).toEqual({ base: 'fixed', value: 12 * 1.25 });
     expect(spec.productsBump).toBeCloseTo(0.05, 12);
     s.products.catalog.dev_r = {
       id: 'dev_r',
       stars: 3,
       developed: true,
-      name: 'Robo',
-      base: 'wealth',
-      templateId: 'robo_advisor',
+      name: 'Dedicated',
+      base: 'api',
+      templateId: 'dedicated_capacity',
       tier: 'medium',
     };
-    const robo = productSpec(s, 'dev_r')!;
-    expect(robo.noAdvisorOffice).toBe(true);
-    expect(robo.ticket).toBeCloseTo(12_500, 6);
+    const dedicated = productSpec(s, 'dev_r')!;
+    expect(dedicated.kind).toBe('usage');
+    expect(dedicated.ticket).toBeCloseTo(PRODUCTS.api!.ticket * 4, 6);
+    expect(dedicated.churn).toBeCloseTo(PRODUCTS.api!.churn * 0.5, 12);
+    s.products.catalog.dev_t = {
+      id: 'dev_t',
+      stars: 3,
+      developed: true,
+      name: 'Realtime',
+      base: 'api',
+      templateId: 'realtime_api',
+      tier: 'medium',
+    };
+    // A $6 template on a $3 base competes against a market reference twice as high.
     const cityId = s.world.currentCityId;
-    expect(marketRef(s, cityId, 'dev_r')).toBeCloseTo(marketRef(s, cityId, 'wealth') * 0.4, 12);
+    expect(marketRef(s, cityId, 'dev_t')).toBeCloseTo(marketRef(s, cityId, 'api') * 2, 12);
   });
 
   it('runs digital projects once, needing an IT floor', () => {

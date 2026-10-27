@@ -1,7 +1,6 @@
 // Branch Finance tab (SCREENS §5.5): last week's revenue and income with the
 // change, a 5-week bar chart, the branch income statement (SIMULATION §12 line
 // groups) for a week, quarter or year, balances, and Rename / Close branch.
-import { allProducts } from '../../sim/products';
 import { useState } from 'preact/hooks';
 import { BRANCH_NAME_MAX } from '../../config/balance';
 import * as cmd from '../../sim/commands';
@@ -39,7 +38,7 @@ export function FinanceTab({ branch }: { branch: Branch }) {
     revenue: r.revenue,
     income: r.income,
   }));
-  const bal = branchBalances(s, branch, allProducts(s));
+  const bal = branchBalances(s, branch);
 
   return (
     <div class="stack">
@@ -68,9 +67,8 @@ export function FinanceTab({ branch }: { branch: Branch }) {
 
       <SectionTitle>Balances</SectionTitle>
       <Card>
-        <Row label="Deposits" value={money(bal.deposits, sym)} />
-        <Row label="Loans" value={money(bal.loans, sym)} />
-        {bal.aum > 0 && <Row label="Assets under management" value={money(bal.aum, sym)} />}
+        <Row label="ARR" value={money(bal.arr, sym)} />
+        {bal.loans > 0 && <Row label="Loan Desk lending" value={money(bal.loans, sym)} />}
         <Row label="Customers" value={count(bal.customers)} />
       </Card>
 

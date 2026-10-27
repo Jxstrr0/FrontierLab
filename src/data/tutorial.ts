@@ -29,8 +29,8 @@ export type TutorialTarget =
   | 'tab-products'
   | 'tab-loandesk'
   | 'product-category'
-  | 'price-savings'
-  | 'offer-personal_loan'
+  | 'price-plus'
+  | 'offer-api'
   | 'hire-manager'
   | 'hire-pick'
   | 'play'
@@ -73,12 +73,12 @@ export const TUTORIAL_STEPS: Record<number, TutorialStepText> = {
     },
   },
   3: {
-    title: 'Set the savings rate',
+    title: 'Set the Plus price',
     idle: OPEN_BRANCH,
     lines: {
-      'price-savings':
-        'Savings accounts bring in the deposits we lend out. A higher rate wins customers but costs more. Nudge it with + or −.',
-      'product-category': 'Savings is under Deposits. Tap Deposits.',
+      'price-plus':
+        'Plus is our main subscription. A lower price wins more subscribers but earns less from each. Nudge it with + or −.',
+      'product-category': 'Plus is under Plans. Tap Plans.',
       'tab-products': 'Prices live on the Products tab. Tap it.',
       'my-branch': OPEN_BRANCH,
     },
@@ -106,13 +106,13 @@ export const TUTORIAL_STEPS: Record<number, TutorialStepText> = {
     },
   },
   6: {
-    title: 'Turn on Personal Loans',
+    title: 'Turn on the API',
     idle: OPEN_BRANCH,
     lines: {
-      'offer-personal_loan':
-        'Deposits cost us interest; loans earn it back. Switch on Personal Loans.',
-      'product-category': 'Personal Loans are under Lending. Tap Lending.',
-      'tab-products': 'Lending products are on the Products tab. Tap it.',
+      'offer-api':
+        'Developers pay for every token they use, and the bill grows as they build. Switch on the Standard API.',
+      'product-category': 'The Standard API is under API. Tap API.',
+      'tab-products': 'API products are on the Products tab. Tap it.',
       'my-branch': OPEN_BRANCH,
     },
   },
@@ -141,7 +141,7 @@ export const TUTORIAL_STEPS: Record<number, TutorialStepText> = {
     idle: 'Tap your lab’s cash, top left, to open the Company summary.',
     lines: {
       'capital-meter':
-        'This is the lab behind the sales offices. Deposits aren’t ours to spend: corporate cash, top left, pays the bills. Capital limits how much we can lend, so keep this ratio out of the red. Close this when you’re done.',
+        'This is the lab behind the sales offices. Corporate cash, top left, pays the bills. Capital limits how much we can lend, so keep this ratio out of the red. Close this when you’re done.',
       'hud-bank': 'Tap your lab’s cash, top left, to open the Company summary.',
       'panel-close': 'Close this panel first.',
     },

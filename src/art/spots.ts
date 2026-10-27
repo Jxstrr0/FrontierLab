@@ -7,38 +7,34 @@
 const COIN = 'M40 22a18 18 0 1 0 .1 0M40 28a12 12 0 1 0 .1 0M40 33v14M36 37h8';
 
 export const PRODUCT_SPOTS: Record<string, string> = {
-  // A cheque with a signature.
-  chequing: 'M14 28h52v26H14zM14 28l4-4h44l4 4M20 36h18M20 42h28M44 48c3-4 5-4 7 0s4 4 7 0M52 34h8',
-  // Stacked coins and a rising arrow.
-  savings:
-    'M18 58c0 3 9 5 20 5s20-2 20-5M18 51c0 3 9 5 20 5s20-2 20-5M18 44c0 3 9 5 20 5s20-2 20-5M18 37c0-3 9-5 20-5s20 2 20 5-9 5-20 5-20-2-20-5zM18 37v21M58 37v21M54 30l10-10M56 20h8v8',
-  // A certificate with a clock.
-  gic1y: 'M14 20h40v34H14zM20 28h28M20 34h20M20 40h24M58 48a10 10 0 1 0 .1 0M58 42v6l4 3',
-  // A mortarboard.
-  student: 'M14 32 40 20l26 12-26 12zM24 38v10c9 6 23 6 32 0V38M66 32v14',
-  // A briefcase.
-  business_acct: 'M16 32h48v26H16zM30 32v-6h20v6M16 42h48M37 40v6h6v-6',
-  // An open hand under a coin.
-  personal_loan:
-    'M14 50c6 0 10 2 14 6h16c3 0 3-4 0-4H34M66 46l-10 4-12 6M40 30a8 8 0 1 0 .1 0M40 26v8',
-  // A saloon car.
-  auto_loan:
-    'M14 52v-6l6-10h28l10 10h8v6zM24 56a4 4 0 1 0 .1 0M56 56a4 4 0 1 0 .1 0M22 46h44M32 36l-2 10M46 36v10',
-  // A house with a door.
-  mortgage: 'M14 40 40 18l26 22M20 35v25h40V35M34 60V46h12v14M50 26v-6h5v10',
-  // A dial: credit you can draw on.
-  loc: 'M18 54a22 22 0 0 1 44 0M40 54l12-14M22 54h36M26 40l3 3M40 32v4M54 40l-3 3',
+  // A speech bubble with an open door: try it free.
+  free_tier: 'M14 22h52v28H34l-10 10V50H14zM24 30h32M24 38h20M50 34h8v12h-8z',
+  // A speech bubble with a plus.
+  plus: 'M14 22h52v28H34l-10 10V50H14zM40 28v16M32 36h16',
+  // A speech bubble with a star.
+  pro: 'M14 22h52v28H34l-10 10V50H14zM40 26l3 7h7l-6 4 2 7-6-4-6 4 2-7-6-4h7z',
+  // Three people under one roof.
+  team: 'M14 34 40 18l26 16M28 44a5 5 0 1 0 .1 0M40 40a5 5 0 1 0 .1 0M52 44a5 5 0 1 0 .1 0M20 62c0-8 16-8 16 0M32 58c0-8 16-8 16 0M44 62c0-8 16-8 16 0',
+  // A mortarboard over a chat bubble.
+  campus_plan: 'M16 28 40 18l24 10-24 10zM26 32v8c8 5 20 5 28 0v-8M20 46h40v14H34l-6 6v-6h-8z',
+  // Angle brackets around a slash: code calls.
+  api: 'M28 26 14 40l14 14M52 26l14 14-14 14M46 22 34 58',
+  // Stacked trays of requests.
+  batch_api: 'M16 24h48v10H16zM16 38h48v10H16zM16 52h48v10H16zM22 29h14M22 43h14M22 57h14',
+  // A dial being tuned.
+  fine_tuning: 'M40 40a18 18 0 1 0 .1 0M40 40l10-10M40 22v4M58 40h-4M22 40h4M40 58v-4M60 20l6-6',
   // A shop front and a coin.
   sbl: 'M16 34h40v24H16zM14 34l6-10h32l6 10M24 58V44h10v14M40 42h10v8H40zM64 50a8 8 0 1 0 .1 0M64 46v8',
-  // A card with a chip.
-  credit_card: 'M14 26h52v32H14zM14 34h52M20 48h14M48 48h10M20 40h8v4h-8z',
-  // A rising chart.
-  wealth: 'M16 60h48M16 60V20M22 52l10-12 8 6 14-16M48 30h6v6',
-  // A safe-deposit box.
-  safe_box:
-    'M18 22h44v38H18zM24 28h32v26H24zM40 41a6 6 0 1 0 .1 0M40 35v2M40 45v2M34 41h2M44 41h2M22 60v4M58 60v4',
-  // Two coins and exchange arrows.
-  fx: 'M28 30a10 10 0 1 0 .1 0M52 50a10 10 0 1 0 .1 0M38 22h12l-3-3M42 58H30l3 3M28 26v8M52 46v8',
+  // A code window with a cursor.
+  code_assistant: 'M14 20h52v40H14zM14 28h52M22 38l6 5-6 5M34 50h12M58 24h2',
+  // Linked nodes: an agent's steps.
+  agent_studio:
+    'M22 24a6 6 0 1 0 .1 0M58 24a6 6 0 1 0 .1 0M40 56a6 6 0 1 0 .1 0M28 24h24M26 29l10 22M54 29 44 51',
+  // A brush over a frame.
+  creative_suite: 'M14 22h40v36H14zM20 52l10-12 8 8 6-6 6 10M60 18 44 40l-2 6 6-2 16-22z',
+  // A headset.
+  priority_support:
+    'M20 46v-8a20 20 0 0 1 40 0v8M16 44h8v14h-8zM56 44h8v14h-8zM60 58c0 4-6 6-14 6h-4',
 };
 
 export const CAMPAIGN_SPOTS: Record<string, string> = {

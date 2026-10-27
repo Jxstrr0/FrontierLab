@@ -106,7 +106,7 @@ export interface EventPayloads {
   /** Its unsold network is split among the other rivals (or closed). */
   RIVAL_NETWORK_SPLIT: { rivalId: Id; bank: string; n: number; takers: string[] };
   /** A rival raises deposit rates in a price war (§18.6). */
-  PRICE_WAR: { rivalId: Id; bank: string; city: Id; bump: Rate; savingsRate: Rate };
+  PRICE_WAR: { rivalId: Id; bank: string; city: Id; bump: Rate; plusPrice: Money };
   CORPORATE_LOAN: { lenderId: Id; lender: string; amount: Money; rate: Rate };
 
   // ─── Incidents (incidents.ts) ─────────────────────────────────────────────

@@ -266,11 +266,11 @@ export const PLACE_TIPS: Record<string, TipText> = {
   },
   employer: {
     title: 'Employer',
-    line: 'A payroll partnership pays this firm’s staff through one of our sales offices: a steady stream of deposits for years. Renew it before it lapses.',
+    line: 'A company partnership puts this firm’s staff on one of our plans through a sales office: steady seats for years. Renew it before it lapses.',
   },
   university: {
     title: 'University',
-    line: 'Student accounts bring young customers, and the graduate program improves who applies when we hire.',
+    line: 'Student plans bring young customers, and the graduate program improves who applies when we hire.',
   },
   investmentBank: {
     title: 'Investment bank',

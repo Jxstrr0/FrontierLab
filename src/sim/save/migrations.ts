@@ -5,6 +5,7 @@
 // Vault Street's 37 steps were dropped: its saves live in a separate store
 // and its export codes are turned away, so none can reach this chain.
 import { foldRivalCity } from '../rivalOffices';
+import { migrateCatalog } from './migrateCatalog';
 import { SCHEMA_VERSION, type GameState } from '../state';
 
 type RawSave = Record<string, unknown> & { schemaVersion: number };
@@ -41,6 +42,11 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
   4: (s) => {
     const branches = (s.branches ?? {}) as Record<string, Record<string, unknown>>;
     for (const b of Object.values(branches)) b.ownPrices ??= false;
+    return s;
+  },
+  // 5 → 6 (stage C3a): the AI catalog; bank books settle, customers go to the Free Tier.
+  5: (s) => {
+    migrateCatalog(s as unknown as GameState);
     return s;
   },
 };

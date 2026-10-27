@@ -17,7 +17,15 @@ import { SpotArt } from '../components/SpotArt';
 import { count, money } from '../format/format';
 import { act, useGame } from '../store';
 import { partnerTotals } from '../partners/partnerView';
-import { businessLoans, editPrice, parsePrice, priceText, rangeText, unitView } from './selectors';
+import {
+  businessLoans,
+  editPrice,
+  parsePrice,
+  priceText,
+  productWords,
+  rangeText,
+  unitView,
+} from './selectors';
 
 export function ProductCard(p: { branch: Branch; spec: ProductSpec; onLoanDesk: () => void }) {
   const s = useGame();
@@ -73,12 +81,12 @@ export function ProductCard(p: { branch: Branch; spec: ProductSpec; onLoanDesk: 
           size={68}
         />
         <Stepper
-          label={spec.priceType === 'rate' ? 'Rate' : 'Fee'}
+          label={productWords(spec).price}
           value={setPrice}
           min={spec.min}
           max={spec.max}
           step={spec.step}
-          format={fmt}
+          format={(v) => priceText(spec, v, sym, true)}
           parse={(t) => parsePrice(spec, t, sym)}
           editText={(v) => editPrice(spec, v, sym)}
           onChange={(v) => act(cmd.setPrice, branch.id, spec.id, v)}
@@ -105,7 +113,7 @@ function Figures(p: { branch: Branch; spec: ProductSpec; costLabel: string; cost
       ) : (
         <>
           <Row
-            label="New accounts last week"
+            label={productWords(spec).newAccounts}
             value={
               <>
                 {count(book?.last.newAccounts ?? 0)}{' '}
@@ -119,7 +127,7 @@ function Figures(p: { branch: Branch; spec: ProductSpec; costLabel: string; cost
             <Row label="Boxes rented" value={count(book?.accounts ?? 0)} />
           ) : (
             <Row
-              label={spec.kind === 'wealth' ? 'Assets under management' : 'Balance'}
+              label={productWords(spec).balance}
               value={money((book?.balance ?? 0) + partners.balance, sym)}
             />
           )}
