@@ -4,7 +4,7 @@
 // fit-out it opens; each week it pays power and rent. Until its compute joins
 // the pool (C4) its payoff is latency: sales offices in its city, or in cities
 // close to it, get a Service lift.
-import { DATA_CENTER } from '../config/balance';
+import { DATA_CENTER, POWER_DEAL } from '../config/balance';
 import { CITIES, isRegional } from '../data/cities';
 import { DC_PARTS, type DcBuild } from '../data/dataCenters';
 import { pushEvent } from './events';
@@ -35,6 +35,25 @@ export function powerIndex(cityId: string): number {
 /** Weekly power bill: running GPUs × the per-GPU price × PUE × the power index (§9.9). */
 export function powerBill(build: DcBuild, cityId: string): number {
   return usableGpus(build) * DATA_CENTER.powerPerGpuWeek * pueOf(build) * powerIndex(cityId);
+}
+
+/**
+ * Power-bill multiplier for a data center in `cityId`: POWER_DEAL.powerDiscount
+ * with an active power deal in its country (C8a, §13.7a), else 1.
+ */
+export function dealPowerMult(state: GameState, cityId: string): number {
+  const country = CITIES[cityId]?.country;
+  for (const d of Object.values(state.powerDeals)) {
+    const site = state.world.sites[d.siteId];
+    if (d.status === 'active' && site && CITIES[site.cityId]?.country === country)
+      return POWER_DEAL.powerDiscount;
+  }
+  return 1;
+}
+
+/** This week's power bill for one of your data centers, with any power-deal discount. */
+export function dataCenterPowerBill(state: GameState, dc: DataCenter): number {
+  return powerBill(dc.build, dc.cityId) * dealPowerMult(state, dc.cityId);
 }
 
 /** Weeks a hall takes to fit out. */
@@ -83,6 +102,6 @@ export function runDataCenters(state: GameState): void {
       );
     }
     // Fit-outs draw no power; only a running hall pays the bill.
-    if (dc.status === 'open') spend(state, 'equipment', powerBill(dc.build, dc.cityId));
+    if (dc.status === 'open') spend(state, 'equipment', dataCenterPowerBill(state, dc));
   }
 }

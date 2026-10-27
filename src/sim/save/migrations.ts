@@ -112,6 +112,11 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     migrateSafety(s as unknown as GameState);
     return s;
   },
+  // 17 → 18 (stage C8a): data-centre and power deals at energy sites.
+  17: (s) => {
+    (s as unknown as GameState).powerDeals ??= {};
+    return s;
+  },
 };
 
 /** Upgrades a raw save to the current schema, or throws if it can't. */

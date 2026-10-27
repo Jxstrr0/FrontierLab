@@ -215,6 +215,8 @@ After the wizard, the map opens with the tutorial (§27).
 - **Build data center:** three part tiles (GPU hall, Power, Cooling) with price and what each does; tapping one opens a sheet listing that slot's options. A **Running it** card (GPUs running, power bill and rent a week, fit-out weeks), a note when the power feed can't run the whole hall, then a summary (parts, deposit, first week's rent, total, cash available) and **Build for $X**.
 - **Data center panel:** header with the name, place and city; the advisor says how long the fit-out has left, or that its GPUs serve customers before spot and which cities get faster service. The Compute card (§24) sits under the status card (C4a). Status card (Online or Fit-out with weeks left, GPUs in the hall, GPUs running (red when power caps it), PUE). Parts as tiles with **Upgrade** (a sheet that greys out parts no better than the fitted one or that you can't afford; the hall is locked during fit-out; "Best fitted" on the top part). Weekly costs (rent, power). **Close data center** with a confirmation showing equipment sold, deposit back and cash back.
 
+- **Power deal (C8a):** on an energy site's employer panel, above the Energy site section, in place of the payroll deal. Before signing: what the deal brings (contracted GPUs in the pool, X% off power for your data centers in the country), signing fee, contract years, price per GPU-week, a take-or-pay note, the blocker line and **Sign · $X**. Once signed: health bar, "Year X of 7", contracted GPUs, weekly bill, price per GPU-week, a line on what moves health, **Renew · $X** (opens in the last year) and **Release** with a confirmation. The data center screens show the discounted power bill.
+
 ## 6. Rival branch
 
 - **Header:** rival brand + district, with the address.
@@ -590,36 +592,39 @@ Opened by tapping a business pin on the map (the **Businesses** layer, which als
 
 ## 27. Tutorial
 
-Led by your first branch manager in a bar with their portrait, name, step and line; each step lights its target with a brass ring and moves on when you do the thing, never on a timer. When the ring's target is low on the screen the bar docks at the top, under an open panel's header so its Close button stays reachable.
+Led by your first office manager in a bar with their portrait, name, step and line; each step lights its target with a brass ring and moves on when you do the thing, never on a timer. When the ring's target is low on the screen the bar docks at the top, under an open panel's header so its Close button stays reachable.
 
-### 27.1 Part 1: Opening week
-Steps (each skipped when there's nothing to do, e.g. every branch already has a manager):
-1. Tap a storefront
-2. Build a branch
-3. Set the Plus price
-4. Hire a manager
-5. Unpause and read the first weekly results
-6. Turn on the API
-7. Win your first contract (bid on the proposal request the tutorial sends)
-8. Run a campaign (Marketing tab: any campaign above Off; skipped where the manager runs marketing)
-9. Meet the lab (open the Company summary from your cash, top left: corporate cash and the capital ratio; done when you close it)
+### 27.1 Part 1: Seed to first contract
+Runs from the seed round (your starting cash) to the first enterprise contract, about five to eight minutes for a new player. Steps, in `TUTORIAL_ORDER` (each skipped when there's nothing to do, e.g. every sales office already has a manager):
+1. Find a storefront (the seed round is your cash, top left; tap a $)
+2. Build a sales office (one per city)
+3. Set the Plus price (the office's Products tab → Plans; monthly plans are ARR)
+4. Turn on the API (Products tab → API → Standard API; new offices open with it off)
+5. Hire a manager (Service tab)
+6. Run a campaign (Marketing tab: any campaign above Off; skipped where the manager runs marketing)
+7. Open the doors (tap play, read the first weekly results, Continue)
+8. Meet the lab (open the Company summary from your cash, top left: the safety ratio and tier, then cash, ARR and compute; done when you close it)
+9. Win your first contract (Deal Desk tab: bid on the proposal request the tutorial asks a local business for; a lost or declined bid brings another request at once; done when a contract is won)
 
-Then a closing card that says the guides will return as the bank grows. "Skip tutorial" sits in the bar; Settings → Replay tutorial starts it again.
+The first step and the contract step start paused. Then a closing card that says the guides will return as the lab grows. "Skip tutorial" sits in the bar; Settings → Replay tutorial starts it again.
 
-### 27.2 Part 2: Growing the bank
+### 27.2 Part 2: Growing the lab
 After Part 1 is finished or skipped, with Settings → Guides on (the default):
-- **Guides** start on the map, one at a time, when a mechanic opens up, and pause the clock. Each has a "Skip guide" button and a step count; a step that ends on reading shows "Got it".
+- **Guides** start on the map, one at a time in this order, when a mechanic opens up, and pause the clock. Each has a "Skip guide" button and a step count; a step that ends on reading shows "Got it".
 
   | Guide | Starts when | Steps |
   |---|---|---|
-  | Capital is slipping | capital tier Watch or worse | open the Company summary, read the capital fixes, close it (ends early if capital recovers) |
-  | Headquarters | the founder ramp begins (third branch) and you have no office | tap an office for lease; pick Finance and HR, Rent office; read Coverage on the HQ floor, close it |
+  | Safety is slipping | safety tier Watch or worse | open the Company summary, read the safety fixes, close it (ends early if the tier recovers) |
+  | Headquarters | the founder ramp begins (office units past FOUNDER_RAMP.fromBranches) and you have no office | tap an office for lease; pick Finance and HR, Rent office; read Coverage on the HQ floor, close it |
+  | Safety & Alignment | the founder ramp has begun, you lease an office, and have no Safety & Alignment floor | Menu → HQ → Add floor → Add on Safety & Alignment; read the floor, close it |
+  | Short of compute | a capacity crunch, an outage, or an emergency burst in the last few weeks | with a Compute floor: Menu → HQ → Compute floor, read the compute card, close it; without one: open the Company summary, read the compute card (add a Compute floor or build a data center), close it |
   | The executive suite | you have an Executive suite and no executives | Menu → HQ → Executive suite → an empty seat → Hire; then "Got it" on choosing their jobs |
-  | Going public | every IPO rule is met while private | tap an investment bank; read the IPO card on the Equity tab, close it (ends early once listed) |
+  | Train our own model | you have a Products floor and have never trained | Menu → HQ → Products floor → Start training; ends on a started run, or once you have seen the floor and left |
+  | Going public | every IPO rule is met while private (ARR of $100M and the rest) | tap an investment bank; read the IPO card on the Equity tab, close it (ends early once listed) |
   | A second city | the city you're in is well covered (§3) and you've never flown | tap the city name → Go to the airport; read the departures, fly or close |
   | Your own fortune | personal cash reaches GUIDES.wealthCash | Menu → Personal wealth; read it, close it |
 
-- **First-look tips** show once, the first time you open each HQ floor, each map place (rival branch and HQ, central bank, data vendor, agency, employer, university, investment bank and its M&A tab, startup, property, convention, lobbying firm, airport, vacation home, car dealer, auction house, sports club), Personal wealth, the Ledger, a branch's Finance tab, a board meeting and an incident. They end on "Got it" or when you move on. Popup tips dock at the top, clear of the choices. A finished guide marks the tips it already covered.
+- **First-look tips** show once, the first time you open each HQ floor, each map place (rival sales office and HQ, central bank, data vendor, agency, employer, business, data center, university, investment bank and its M&A tab, startup, property, conference, lobbying firm, airport, vacation home, car dealer, auction house, sports club), Personal wealth, the Inference, a sales office's Finance tab, a board meeting and an incident. They end on "Got it" or when you move on. Popup tips dock at the top, clear of the choices. A finished guide marks the tips it already covered (Safety & Alignment → that floor's tip, executives → the Executive suite's, training → the Products floor's, travel → the airport's, wealth → Personal wealth's).
 - **Settings:** a Guides switch, and "Show the guides again" to see every guide and tip once more.
 
 ## 28. Milestones (menu → Milestones)

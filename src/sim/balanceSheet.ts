@@ -62,10 +62,11 @@ export function totalDeposits(state: GameState): number {
   return total;
 }
 
-/** Unamortized partnership signing fees. */
+/** Unamortized partnership and power-deal signing fees. */
 export function intangibleAssets(state: GameState): number {
   let total = 0;
   for (const p of Object.values(state.partnerships)) total += p.unamortized;
+  for (const d of Object.values(state.powerDeals)) total += d.unamortized;
   return total;
 }
 

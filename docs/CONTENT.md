@@ -415,6 +415,7 @@ Researchers take names and portraits from the shared person generator (the same 
 - **Contract:** 364 weeks ("Year X of 7").
 - **ARR per participating employee:** $300 (`ARR_PER_EMPLOYEE`, C3a; about a Team seat). Student deals: $80 per participating student. The package is a plan (Team for staff, Campus Plan for students by default).
 - **Generation:** 2–4 employers per city.
+- **Energy sites (C8a):** the regional sites (the mine, camp and field rows) sign data-centre and power deals instead of payroll: fee employees × $500 × the price list, 1.5 contracted GPUs per employee at full participation, $20 per GPU-week fixed at signing, and 25% off power for your data centers in the country (`POWER_DEAL`, SIMULATION §13.7a).
 
 ## 15. Rivals
 

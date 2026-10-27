@@ -101,23 +101,20 @@ describe('rivals in cities generated later', () => {
 });
 
 describe('regional employers', () => {
-  it('signs a regional camp with a host branch elsewhere in the country', () => {
+  it('sign power deals rather than payroll partnerships (C8a)', () => {
     const s = game();
     const host = openScriptedBranch(s, 'midtown');
     advanceWeeks(s, 2);
     fly(s, 'fmm');
     const camp = siteOf(s, 'employer', 'fmm');
-    const r = cmd.signPartnership(s, camp.id, host, 'team');
-    expect(r.ok).toBe(true);
-    // A host in another country can't.
-    fly(s, 'nyc');
-    const nycBranch = openScriptedBranch(s, 'midtown');
-    advanceWeeks(s, 2);
+    expect(cmd.signBlocker(s, camp.id, host, 'team')).toMatch(/power deals/);
+    expect(cmd.signPowerDeal(s, camp.id).ok).toBe(true);
+    // Each energy site signs its own deal, in any country.
     fly(s, 'mid');
     const midland = siteOf(s, 'employer', 'mid');
-    expect(cmd.signBlocker(s, midland.id, host, 'team')).toMatch(/United States/);
-    expect(cmd.signPartnership(s, midland.id, nycBranch, 'team').ok).toBe(true);
+    expect(cmd.signPowerDeal(s, midland.id).ok).toBe(true);
     advanceWeeks(s, 4);
+    expect(Object.keys(s.powerDeals)).toHaveLength(2);
     expect(identityGap(s)).toBeLessThan(1);
   });
 });

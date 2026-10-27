@@ -6,6 +6,7 @@
 import { COMPUTE, OUTAGE, SPOT } from '../config/balance';
 import { ema } from './math';
 import { usableGpus } from './dataCenters';
+import { dealGpus } from './powerDeals';
 import { pushEvent } from './events';
 import { spend } from './ledger';
 import { stream } from './rng';
@@ -38,13 +39,14 @@ export function spotPrice(state: GameState): number {
   return COMPUTE.spotPerGpuWeek * state.compute.index;
 }
 
-/** GPUs running in open data centers. */
+/** GPUs you own: running in open data centers, plus power-deal GPUs. */
 export function ownedGpus(state: GameState): number {
   let gpus = 0;
   for (const dc of Object.values(state.dataCenters)) {
     if (dc.status === 'open') gpus += usableGpus(dc.build);
   }
-  return gpus;
+  // Contracted GPUs from power deals at energy sites (C8a, §13.7a).
+  return gpus + dealGpus(state);
 }
 
 /** GPUs you have outside the spot market: data centers plus rented lots. */

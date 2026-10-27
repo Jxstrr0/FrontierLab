@@ -5,7 +5,7 @@ import { DATA_CENTER } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { DC_PARTS, DC_SLOTS, DC_SLOT_NAMES, dcPartsFor, type DcSlot } from '../../data/dataCenters';
 import * as cmd from '../../sim/commands';
-import { hallGpus, powerBill, pueOf, usableGpus } from '../../sim/dataCenters';
+import { dataCenterPowerBill, hallGpus, pueOf, usableGpus } from '../../sim/dataCenters';
 import { Badge, Card, Confirm, Panel, Row, SectionTitle } from '../components';
 import { count, money, moneyFull } from '../format/format';
 import { act, closePanel, toast, useGame } from '../store';
@@ -98,7 +98,7 @@ export function DataCenterPanel(p: { dataCenterId: string }) {
             <Row label="Rent" value={moneyFull(dc.lease.weeklyRent, sym)} />
             <Row
               label="Power"
-              value={open ? moneyFull(powerBill(dc.build, dc.cityId), sym) : 'None during fit-out'}
+              value={open ? moneyFull(dataCenterPowerBill(s, dc), sym) : 'None during fit-out'}
             />
           </Card>
 
