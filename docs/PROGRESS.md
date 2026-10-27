@@ -3,13 +3,48 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C8 in progress (polish and relaunch). C8a done (v0.1.23, save schema 18): data-centre and power deals at energy sites. Next: the tutorial rewrite, art pass, balance pass and docs sweep.
+**Current stage:** C8 in progress (polish and relaunch). C8a–C8d done (v0.1.23–v0.1.24, save schema 18): power deals at energy sites, the tutorial rewrite, the art pass and the balance pass. Next: C8e, the docs sweep and relaunch.
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `1e244412c59c8a` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `0c381894b44017` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-27 — Stages C8b–C8d: tutorial, art and balance (v0.1.24)
+
+**What changed.**
+- **New tutorial (C8b).** Part 1 is now "Seed to first contract", nine steps from the seed round to winning your first enterprise contract:
+  1. Find a storefront.
+  2. Build a sales office.
+  3. Set the Plus price.
+  4. Turn on the Standard API.
+  5. Hire a manager.
+  6. Run a campaign.
+  7. Open the doors and read the first weekly results.
+  8. Meet the lab on the Company screen: cash, ARR, safety and compute.
+  9. Bid on a proposal request at the Deal Desk.
+
+  It should take a new player about 5–8 minutes.
+  - Three new guides: Safety & Alignment, Short of compute, and Train our own model. The capital guide is now "Safety is slipping".
+  - The first-look tips are rewritten in AI terms.
+  - Fixed: a lost bid in the tutorial used to leave you stuck. Another business now asks right away.
+- **Art pass (C8c).**
+  - Data centers have their own low, wide engraved hall on the map, with chillers on the roof and a transformer yard. Energy sites draw a substation and pylon.
+  - The data center screen has a picture with an Outside / Inside switch. Inside shows the GPU racks lit for the GPUs that run, and the cooling you chose.
+  - The sales office interior swaps the vault and ATMs for a machine room and demo kiosks.
+  - New and redrawn icons.
+  - A cooler navy palette with a teal "signal" accent for compute. Text contrast still passes accessibility checks.
+- **Balance pass (C8d).**
+  - Listed rival labs are now valued on their revenue, like yours: about 1–8× book value instead of near book. Buying one costs more.
+  - The two recession checks that read "n/a" now test the safety tier and cash:
+    - The aggressive lab must slip to Watch at some point.
+    - In a forced recession, the aggressive lab must slip to Watch and keep its cash at $0 or more.
+  - Results on seeds 42 and 7: steady, turtle, aggressive and stress meet every target. The 20-city median passes every first-office checkpoint.
+
+**What was checked.** Lint, all tests and the build are clean. The tutorial was walked end to end at phone size with no console errors. The determinism snapshot changed because rival share prices now follow revenue.
+
+**Left for later (noted by the helpers):** some build options still have bank names ("Teller line", "Vault", "ATM"). The browser-tab colour and favicon still use the old navy.
 
 ### 2026-10-27 — Stage C8a: power deals at energy sites (v0.1.23)
 

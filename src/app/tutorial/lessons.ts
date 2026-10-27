@@ -1,6 +1,7 @@
 // Tutorial Part 2's machine (SCREENS §27.2), pure so it can be unit-tested.
-// Guides ("chapters") start on the map when a later mechanic opens up, one at
-// a time, and each step moves on when you do the thing or have been to the
+// Guides ("chapters") start on the map when a later mechanic opens up (HQ,
+// safety, compute, executives, training, going public, travel, your own
+// money), one at a time, and each step moves on when you do the thing or have been to the
 // screen it is about and left it. First-look tips show the first time you
 // open an HQ floor, a map place or a decision popup, and end on "Got it" or
 // when you leave. Neither runs while Part 1 is going or with guides switched off.
@@ -42,6 +43,10 @@ export interface LessonObs {
   cityCovered: boolean;
   flights: number;
   personalCash: number;
+  /** Compute is short: a capacity crunch, an outage, or a recent emergency burst. */
+  computeShort: boolean;
+  /** A training run is under way or has finished. */
+  trainingStarted: boolean;
 }
 
 /** What a guide step remembers from when it began. */
@@ -75,8 +80,14 @@ export function chapterDue(id: ChapterId, o: LessonObs): boolean {
       return WEAK_TIERS.includes(o.tier);
     case 'hq':
       return o.hqRamp > 0 && o.offices === 0;
+    case 'safetyFloor':
+      return o.hqRamp > 0 && o.offices > 0 && !o.depts.includes('risk');
+    case 'compute':
+      return o.computeShort;
     case 'exec':
       return o.depts.includes('executive') && o.execs === 0;
+    case 'training':
+      return o.depts.includes('products') && !o.trainingStarted;
     case 'ipo':
       return o.ipoReady && !o.listed;
     case 'travel':
@@ -105,6 +116,14 @@ export function enterChapterStep(id: ChapterId, step: number, o: LessonObs): Cha
   return { id, step, offices: o.offices, execs: o.execs, flights: o.flights, saw: false };
 }
 
+/** The compute guide goes to the Compute floor when you have one, else to the Company summary. */
+const computeByFloor = (o: LessonObs): boolean => o.depts.includes('treasury');
+
+/** Whether a step says its `alt` text instead (CHAPTERS in data/lessons.ts). */
+function saysAlt(m: ChapterMemo, o: LessonObs): boolean {
+  return m.id === 'compute' && !computeByFloor(o);
+}
+
 /** The screen a step is about, for steps that end once you have seen it and left. */
 function atScreen(m: ChapterMemo, o: LessonObs): boolean | undefined {
   const key = `${m.id}:${m.step}`;
@@ -113,6 +132,12 @@ function atScreen(m: ChapterMemo, o: LessonObs): boolean | undefined {
       return o.panelType === 'company';
     case 'hq:2':
       return o.panelType === 'hq';
+    case 'safetyFloor:1':
+      return o.hqDept === 'risk';
+    case 'compute:0':
+      return computeByFloor(o) ? o.hqDept === 'treasury' : o.panelType === 'company';
+    case 'training:0':
+      return o.hqDept === 'products';
     case 'ipo:1':
       return o.panelType === 'investmentBank' && o.panelTab === 'equity';
     case 'travel:1':
@@ -135,8 +160,12 @@ export function chapterStepDone(m: ChapterMemo, o: LessonObs): boolean {
       return o.panelType === 'office' || o.offices > m.offices;
     case 'hq:1':
       return o.offices > m.offices;
+    case 'safetyFloor:0':
+      return o.depts.includes('risk');
     case 'exec:0':
       return o.execs > m.execs;
+    case 'training:0':
+      return o.trainingStarted || (m.saw && !atScreen(m, o));
     case 'ipo:0':
       return o.panelType === 'investmentBank';
     case 'travel:0':
@@ -148,7 +177,7 @@ export function chapterStepDone(m: ChapterMemo, o: LessonObs): boolean {
   }
 }
 
-/** A guide that no longer has a point ends early: capital recovered, or the bank went public. */
+/** A guide that no longer has a point ends early: safety recovered, or the lab went public. */
 export function chapterObsolete(id: ChapterId, o: LessonObs): boolean {
   if (id === 'capital') return !WEAK_TIERS.includes(o.tier);
   if (id === 'ipo') return o.listed;
@@ -161,12 +190,14 @@ export function chapterGuidance(
   o: LessonObs,
 ): { title: string; targets: LessonTargetLine[]; idle: string; ack: boolean } {
   const chapter = CHAPTERS[m.id];
-  const text = chapter.steps[m.step]!;
+  const step = chapter.steps[m.step]!;
+  const text = step.alt && saysAlt(m, o) ? step.alt : step;
   const here = text.here && atScreen(m, o) ? text.here : undefined;
-  const targets = (Object.entries(text.lines) as [LessonTarget, string][]).map(([key, line]) => ({
-    key,
-    line,
-  }));
+  // On the step's own screen, only the targets that say its `here` line are ringed
+  // (the way there, e.g. the floor's own tab, would otherwise talk over it).
+  const targets = (Object.entries(text.lines) as [LessonTarget, string][])
+    .filter(([, line]) => !here || line === here)
+    .map(([key, line]) => ({ key, line }));
   return { title: chapter.title, targets, idle: here ?? text.idle, ack: !!text.ack };
 }
 

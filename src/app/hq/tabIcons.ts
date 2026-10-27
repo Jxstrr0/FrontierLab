@@ -20,8 +20,8 @@ export const TAB_LABEL: Record<DeptId, string> = {
 export const TAB_ICON: Record<DeptId, IconName> = {
   finance: 'ledger',
   hr: 'people',
-  products: 'card',
-  treasury: 'server',
+  products: 'model',
+  treasury: 'gpu',
   marketing: 'agency',
   it: 'monitor',
   risk: 'shield',

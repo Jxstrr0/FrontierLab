@@ -27,7 +27,7 @@ export function ComputeCard() {
   const history = c.history.length > 1 ? c.history : [c.index, c.index];
   const pool = poolCostFactor(s);
   return (
-    <Card>
+    <Card tutorial="compute-card">
       <div class="cap-head">
         <div>
           <div class="muted small">Spot compute</div>

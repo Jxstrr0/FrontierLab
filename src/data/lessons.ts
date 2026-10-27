@@ -1,9 +1,12 @@
-// Tutorial Part 2, "Growing the bank" (SCREENS §27.2, DESIGN §5.20): the
+// Tutorial Part 2, "Growing the lab" (SCREENS §27.2, DESIGN §5.20): the
 // guides that start when a later mechanic opens up, and the one-time tips the
 // first time you open each HQ floor, map place and decision popup. Same guide,
 // same bar and brass ring as Part 1 (tutorial.ts). Lines are keyed by the
 // target the ring is on; `here` is said once you are on the screen a step is
-// about. When each guide starts is decided in src/app/tutorial/lessons.ts.
+// about, and `alt` replaces the whole step when lessons.ts says so (e.g. the
+// compute guide without a Compute floor). When each guide starts is decided in
+// src/app/tutorial/lessons.ts. Guide ids keep their saved names ('capital' is
+// the safety guide).
 import type { DeptId } from './types';
 
 /** Every data-tutorial target the guides point at. */
@@ -19,6 +22,13 @@ export type LessonTarget =
   | 'office-rent'
   | 'hq-coverage'
   | 'tab-executive'
+  | 'tab-treasury'
+  | 'tab-products'
+  | 'tab-risk'
+  | 'tab-add'
+  | 'add-floor-risk'
+  | 'training-start'
+  | 'compute-card'
   | 'exec-seat'
   | 'exec-open'
   | 'exec-pick'
@@ -37,6 +47,8 @@ export interface LessonStepText {
   lines: Partial<Record<LessonTarget, string>>;
   /** Ends on "Got it" rather than on something you do. */
   ack?: boolean;
+  /** Said instead of this step when lessons.ts picks the other route. */
+  alt?: Omit<LessonStepText, 'alt'>;
 }
 
 export interface ChapterText {
@@ -44,22 +56,34 @@ export interface ChapterText {
   steps: LessonStepText[];
 }
 
-export type ChapterId = 'capital' | 'hq' | 'exec' | 'ipo' | 'travel' | 'wealth';
+export type ChapterId =
+  'capital' | 'hq' | 'safetyFloor' | 'compute' | 'exec' | 'training' | 'ipo' | 'travel' | 'wealth';
 
 const CLOSE_FIRST = 'Close this panel first.';
 const OPEN_MENU = 'Open the menu, top right.';
+const SAFETY_FIXES =
+  'The regulator weighs our Safety & Alignment team against the risk our model carries. Below Adequate it slows our sign-ups, and long in Critical it orders a pause. These are the ways back up. Close this when you’ve read them.';
+const COMPUTE_FLOOR =
+  'Demand has outgrown our compute. Clouds only sell so much at spot: past that we pay an emergency premium, then new customers wait and outages follow. Reserve GPUs in the GPU market below, or build a data center. Close HQ when you’re ready.';
+const COMPUTE_NO_FLOOR =
+  'Demand has outgrown our compute. Clouds only sell so much at spot: past that we pay an emergency premium, then new customers wait and outages follow. For a lasting fix, add a Compute floor at HQ to reserve GPUs, or build a data center on a storefront. Close this when you’ve read it.';
+const TRAINING_HERE =
+  'Training starts from the model we use now and lifts every measure, most of all the focus you pick. A longer run, a bigger budget and a skilled research team make a great result likelier. Start a run, or close HQ to wait.';
+const IPO_HERE =
+  'An IPO sells part of the lab on the stock market for fresh money. Investors price us on ARR and how fast it grows. After it, the board votes on your pay and dividends. There’s no rush. Close this when you’ve had a look.';
+const SAFETY_FLOOR_HERE =
+  'This is the regulator’s view of us: the safety ratio, our tier and the next safety audit. Raise the staff target as we grow; a model far ahead of the pack needs a bigger team. Close HQ when you’re ready.';
 
 export const CHAPTERS: Record<ChapterId, ChapterText> = {
   capital: {
-    title: 'Capital is slipping',
+    title: 'Safety is slipping',
     steps: [
       {
-        idle: 'Our capital ratio is slipping. Tap your lab’s cash, top left, to see it.',
-        here: 'Capital is our own money set against risky loans. Under 10.5% the regulator starts to hold us back. These are the ways back up. Close this when you’ve read them.',
+        idle: 'Our safety ratio is slipping. Tap your lab’s cash, top left, to see it.',
+        here: SAFETY_FIXES,
         lines: {
-          'capital-fixes':
-            'Capital is our own money set against risky loans. Under 10.5% the regulator starts to hold us back. These are the ways back up. Close this when you’ve read them.',
-          'hud-bank': 'Our capital ratio is slipping. Tap your lab’s cash, top left, to see it.',
+          'capital-fixes': SAFETY_FIXES,
+          'hud-bank': 'Our safety ratio is slipping. Tap your lab’s cash, top left, to see it.',
           'panel-close': CLOSE_FIRST,
         },
       },
@@ -69,10 +93,10 @@ export const CHAPTERS: Record<ChapterId, ChapterText> = {
     title: 'Headquarters',
     steps: [
       {
-        idle: 'From the third sales office we need a head office. Offices for lease are tags on the map: open Layers and switch on Offices if you can’t see them.',
+        idle: 'Our sales offices have outgrown a founder’s spare room: we need a head office. Offices for lease are tags on the map: open Layers and switch on Offices if you can’t see them.',
         lines: {
           'pin-office':
-            'From the third sales office the lab needs a head office: Finance, HR and the teams behind the sales offices. Tap an office for lease.',
+            'Our sales offices have outgrown a founder’s spare room: the lab needs a head office for Finance, HR and the teams behind the offices. Tap an office for lease.',
           'panel-close': CLOSE_FIRST,
         },
       },
@@ -94,6 +118,59 @@ export const CHAPTERS: Record<ChapterId, ChapterText> = {
             'Each floor hires towards the staff the lab needs. Coverage shows how close a team is: under 100%, things start to slip. Add floors from the last tab as we grow. Close HQ when you’re ready.',
           'menu-hq': 'Tap HQ.',
           'hud-menu': OPEN_MENU,
+        },
+      },
+    ],
+  },
+  safetyFloor: {
+    title: 'Safety & Alignment',
+    steps: [
+      {
+        idle: 'The regulator expects a safety team now. Open HQ from the menu and add a Safety & Alignment floor.',
+        lines: {
+          'add-floor-risk':
+            'The safety ratio weighs this team against the risk our model carries, and the regulator watches it. Tap Add.',
+          'tab-add':
+            'Now we’re growing, the regulator expects a Safety & Alignment team. Tap Add floor.',
+          'menu-hq': 'Tap HQ.',
+          'hud-menu':
+            'Now we’re growing, the regulator expects a Safety & Alignment team. Open the menu, top right.',
+          'panel-close': CLOSE_FIRST,
+        },
+      },
+      {
+        idle: 'Open HQ from the menu, then the Safety & Alignment floor.',
+        here: SAFETY_FLOOR_HERE,
+        lines: {
+          'tab-risk': 'Open the Safety & Alignment floor.',
+          'menu-hq': 'Tap HQ.',
+          'hud-menu': OPEN_MENU,
+          'hq-coverage': SAFETY_FLOOR_HERE,
+        },
+      },
+    ],
+  },
+  compute: {
+    title: 'Short of compute',
+    steps: [
+      {
+        idle: 'We’re short of GPUs. Open HQ from the menu, then the Compute floor.',
+        here: COMPUTE_FLOOR,
+        lines: {
+          'compute-card': COMPUTE_FLOOR,
+          'tab-treasury': 'Open the Compute floor.',
+          'menu-hq': 'Tap HQ.',
+          'hud-menu': 'We’re short of GPUs. Open the menu, top right.',
+        },
+        alt: {
+          idle: 'We’re short of GPUs. Tap your lab’s cash, top left, to see the compute pool.',
+          here: COMPUTE_NO_FLOOR,
+          lines: {
+            'compute-card': COMPUTE_NO_FLOOR,
+            'hud-bank':
+              'We’re short of GPUs. Tap your lab’s cash, top left, to see the compute pool.',
+            'panel-close': CLOSE_FIRST,
+          },
         },
       },
     ],
@@ -123,23 +200,37 @@ export const CHAPTERS: Record<ChapterId, ChapterText> = {
       },
     ],
   },
+  training: {
+    title: 'Train our own model',
+    steps: [
+      {
+        idle: 'Our Products team can train a model of our own. Open HQ from the menu, then the Products floor.',
+        here: TRAINING_HERE,
+        lines: {
+          'training-start': TRAINING_HERE,
+          'tab-products': 'Open the Products floor.',
+          'menu-hq': 'Tap HQ.',
+          'hud-menu': 'Our Products team can train a model of our own. Open the menu, top right.',
+        },
+      },
+    ],
+  },
   ipo: {
     title: 'Going public',
     steps: [
       {
-        idle: 'We qualify to go public. Find an investment bank on the map: open Layers and switch on Investment Banks.',
+        idle: 'Our ARR is big enough to go public. Find an investment bank on the map: open Layers and switch on Investment Banks.',
         lines: {
           'pin-investmentBank':
-            'We qualify to go public. Investment banks handle it: tap one on the map.',
+            'Our ARR is big enough to go public. Investment banks handle it: tap one on the map.',
           'panel-close': CLOSE_FIRST,
         },
       },
       {
         idle: 'Tap an investment bank on the map.',
-        here: 'An IPO sells part of the lab on the stock market for fresh capital. After it, the board votes on your pay and dividends, and the share price follows our results. There’s no rush. Close this when you’ve had a look.',
+        here: IPO_HERE,
         lines: {
-          'ipo-card':
-            'An IPO sells part of the lab on the stock market for fresh capital. After it, the board votes on your pay and dividends, and the share price follows our results. There’s no rush. Close this when you’ve had a look.',
+          'ipo-card': IPO_HERE,
           'tab-equity': 'Open the Equity tab.',
           'pin-investmentBank': 'Tap an investment bank on the map.',
         },
@@ -182,7 +273,9 @@ export const CHAPTERS: Record<ChapterId, ChapterText> = {
 
 /** First-look tips a finished guide has already said, so they don't repeat it. */
 export const CHAPTER_COVERS: Partial<Record<ChapterId, readonly string[]>> = {
+  safetyFloor: ['floor-risk'],
   exec: ['floor-executive'],
+  training: ['floor-products'],
   travel: ['place-airport'],
   wealth: ['place-wealth'],
 };
@@ -191,7 +284,10 @@ export const CHAPTER_COVERS: Partial<Record<ChapterId, readonly string[]>> = {
 export const CHAPTER_ORDER: readonly ChapterId[] = [
   'capital',
   'hq',
+  'safetyFloor',
+  'compute',
   'exec',
+  'training',
   'ipo',
   'travel',
   'wealth',
@@ -206,7 +302,7 @@ export interface TipText {
 export const FLOOR_TIPS: Record<DeptId, TipText> = {
   finance: {
     title: 'Finance floor',
-    line: 'Finance keeps the books: full statements, the capital summary and our risk appetite. Short-staffed, the statements run late, and once we’re public that costs fines and share price.',
+    line: 'Finance keeps the books: full statements, the credit ratio our lenders watch, and our risk appetite. Short-staffed, the statements run late, and once we’re public that costs fines and share price.',
   },
   hr: {
     title: 'HR floor',
@@ -214,11 +310,11 @@ export const FLOOR_TIPS: Record<DeptId, TipText> = {
   },
   products: {
     title: 'Products floor',
-    line: 'Set rates for every sales office at once, tune the lab’s AI model, and develop new products. A better model lifts every sales office’s Model rating, lets prices sit higher and wins contracts.',
+    line: 'Set prices for every sales office at once, with a city’s own prices where you need them. Manage and train the lab’s AI model, hire researchers and develop new products. A better model lets prices sit higher and wins contracts.',
   },
   treasury: {
     title: 'Compute floor',
-    line: 'Every customer runs on GPUs. Watch the chip market, reserve GPUs below spot before a shortage hits, and remember reserved GPUs are billed whether you use them or not.',
+    line: 'Every customer runs on GPUs. Watch the chip market, reserve GPUs below spot before a shortage hits, and remember reserved GPUs are billed whether you use them or not. Clouds only sell so much at spot.',
   },
   marketing: {
     title: 'Marketing floor',
@@ -230,7 +326,7 @@ export const FLOOR_TIPS: Record<DeptId, TipText> = {
   },
   risk: {
     title: 'Safety & Alignment floor',
-    line: 'Safety reviews, loss rates, late payers and how the regulator sees us. Short-staffed, defaults and fines go up.',
+    line: 'How the regulator sees us: the safety ratio, our tier and the next safety audit. Short-staffed, the ratio falls, sign-ups slow and audits find more.',
   },
   executive: {
     title: 'Executive suite',
@@ -246,15 +342,15 @@ export const FLOOR_TIPS: Record<DeptId, TipText> = {
 export const PLACE_TIPS: Record<string, TipText> = {
   rivalBranch: {
     title: 'Rival sales office',
-    line: 'Rivals publish their rates and reviews. Beat their rates or their service and customers drift our way.',
+    line: 'Rivals publish their prices and reviews. Beat their prices, their model or their service and customers drift our way.',
   },
   rivalHq: {
     title: 'Rival lab HQ',
-    line: 'Rival labs lend to our company: business loans and a credit line. That’s corporate cash for building, never our customers’ deposits.',
+    line: 'A rival lab’s model, researchers and results. Rival labs also lend to us: business loans and a credit line, priced on our credit ratio, as corporate cash for building.',
   },
   centralBank: {
     title: 'Central bank',
-    line: 'The central bank sets the base rate. When it moves, loan demand, defaults and what savers expect all follow. Its meetings make the Inference.',
+    line: 'The central bank sets the base rate. When it moves, borrowing costs and the economy follow, and so do businesses’ AI budgets. Its meetings make the Inference.',
   },
   bureau: {
     title: 'Data vendor',
@@ -266,7 +362,15 @@ export const PLACE_TIPS: Record<string, TipText> = {
   },
   employer: {
     title: 'Employer',
-    line: 'A company partnership puts this firm’s staff on one of our plans through a sales office: steady seats for years. Renew it before it lapses.',
+    line: 'A big employer is an anchor account: its AI contract comes through the Deal Desk. A company partnership also puts its staff on one of our plans: steady seats for years. Renew it before it lapses.',
+  },
+  business: {
+    title: 'Business',
+    line: 'A local business and its AI budget. Ones without a vendor ask our sales office for proposals on the Deal Desk; ones with a rival come up at the quarter’s renewal season.',
+  },
+  dataCenter: {
+    title: 'Data center',
+    line: 'Our own GPUs: they serve customers before anything bought at spot, and cost less. Cheap power at an energy site keeps the bill down.',
   },
   university: {
     title: 'University',
@@ -330,7 +434,7 @@ export const OTHER_TIPS = {
   },
   'ib-mna': {
     title: 'Mergers & acquisitions',
-    line: 'Make an offer for a rival lab. A higher premium is likelier to be accepted, and the regulator checks our capital afterwards. Their sales offices take our name over eight weeks.',
+    line: 'Make an offer for a rival lab. A higher premium is likelier to be accepted, and the regulator checks our safety afterwards. Their sales offices take our name over eight weeks.',
   },
   'modal-board': {
     title: 'Board meeting',
@@ -338,7 +442,7 @@ export const OTHER_TIPS = {
   },
   'modal-incident': {
     title: 'Incidents',
-    line: 'Something has gone wrong. Each choice has a cost and a consequence; pick one. A office manager can handle sales office troubles for you.',
+    line: 'Something has gone wrong. Each choice has a cost and a consequence; pick one. An office manager can handle sales office troubles for you.',
   },
 } satisfies Record<string, TipText>;
 

@@ -1,5 +1,6 @@
-// Build data center (SCREENS §5b): pick a GPU hall, a power feed and cooling,
-// see the itemized cost and the weekly running costs, then build. Opened from a
+// Build data center (SCREENS §5b): pick a GPU hall, a power feed and cooling
+// (the engraved hall above previews them, C8c), see the itemized cost and the
+// weekly running costs, then build. Opened from a
 // free storefront or a regional energy site.
 import { useState } from 'preact/hooks';
 import { CITIES } from '../../data/cities';
@@ -16,6 +17,7 @@ import { dealPowerMult, powerBill, usableGpus } from '../../sim/dataCenters';
 import { Card, Panel, Row, SectionTitle } from '../components';
 import { count, moneyFull } from '../format/format';
 import { act, closePanel, openPanel, toast, useGame } from '../store';
+import { DataCenterHero } from './DataCenterHero';
 import { DcPartSheet } from './DcPartSheet';
 import { partFact } from './dcView';
 import '../build/build.css';
@@ -63,6 +65,18 @@ export function BuildDataCenterPanel(p: { lotId?: string; siteId?: string }) {
             ? 'Power out here costs half what it does in town. Offices within reach still get faster answers.'
             : 'A data center in town makes your sales office here quicker for customers, and helps nearby cities a little.',
         }}
+        hero={
+          <DataCenterHero
+            build={build}
+            gpus={DC_PARTS[build.hall]?.gpus ?? 0}
+            running={usableGpus(build)}
+            brandInk={s.meta.brandInk}
+            monogram={s.meta.monogram}
+            logoShape={s.meta.logoShape}
+            energySite={energy}
+            ink={CITIES[cityId]?.ink}
+          />
+        }
         footer={
           <div class="stack">
             {blocker && <p class="build-blocker small">{blocker}</p>}

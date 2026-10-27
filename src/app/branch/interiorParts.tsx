@@ -1,7 +1,8 @@
-// Floor pieces of the branch interior (ART_DIRECTION §3, "Branch interior"):
-// the teller line in each fit-out's own shape, glass advisor offices along the
-// left wall, the ATMs, rope lines and a fit-out's ladder, in grid cells on the
-// interior's Iso projection. Wall pieces live in interiorWall.tsx.
+// Floor pieces of the sales office interior (ART_DIRECTION §3, "Sales office
+// interior"): the sales counter in each fit-out's own shape, glass meeting
+// rooms along the left wall, the self-serve demo kiosks (C8c, once the bank's
+// ATMs), rope lines and a fit-out's ladder, in grid cells on the interior's
+// Iso projection. Wall pieces live in interiorWall.tsx.
 import { IsoBox, Pane, isoPt, placeAt, type Iso } from '../components/isoKit';
 import {
   SeatedBack,
@@ -193,21 +194,46 @@ export function AdvisorOffice(p: {
   );
 }
 
-/** An ATM standing against the left wall at j, its screen lit. */
-export function Atm(p: { g: Iso; j: number; smart?: boolean }) {
+/**
+ * A self-serve demo kiosk against the left wall at j (C8c, in place of the
+ * bank's ATM): a slim pedestal whose screen shows a chat; the smart one glows.
+ */
+export function Kiosk(p: { g: Iso; j: number; smart?: boolean }) {
   const { g } = p;
   const scr = [
-    isoPt(g, 0.36, p.j + 0.08, 0.78),
-    isoPt(g, 0.36, p.j + 0.42, 0.78),
-    isoPt(g, 0.36, p.j + 0.42, 0.98),
-    isoPt(g, 0.36, p.j + 0.08, 0.98),
+    isoPt(g, 0.36, p.j + 0.08, 0.72),
+    isoPt(g, 0.36, p.j + 0.42, 0.72),
+    isoPt(g, 0.36, p.j + 0.42, 1.04),
+    isoPt(g, 0.36, p.j + 0.08, 1.04),
   ];
   const d =
     scr.map(([x, y], n) => `${n ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)}`).join('') + 'Z';
+  // Two chat lines on the screen: a question, then a longer answer.
+  const line = (z: number, from: number, to: number) => {
+    const [ax, ay] = isoPt(g, 0.36, p.j + from, z);
+    const [bx, by] = isoPt(g, 0.36, p.j + to, z);
+    return `M${ax.toFixed(1)} ${ay.toFixed(1)}L${bx.toFixed(1)} ${by.toFixed(1)}`;
+  };
   return (
     <g>
-      <IsoBox g={g} i={0} j={p.j} w={0.36} d={0.5} h={1.15} left="medium" right="light" fine />
+      <IsoBox
+        g={g}
+        i={0.06}
+        j={p.j + 0.1}
+        w={0.24}
+        d={0.3}
+        h={0.62}
+        left="medium"
+        right="light"
+        fine
+      />
+      <IsoBox g={g} i={0} j={p.j} w={0.36} d={0.5} h={0.12} z={0.62} left="light" fine />
+      <IsoBox g={g} i={0.3} j={p.j + 0.04} w={0.06} d={0.42} h={0.36} z={0.7} left="none" fine />
       <path d={d} class={p.smart ? 'in-glow' : 'in-screen is-live'} />
+      <path
+        d={`${line(0.96, 0.24, 0.38)}${line(0.86, 0.12, 0.34)}${line(0.8, 0.12, 0.28)}`}
+        class="art-line art-fine"
+      />
       <path d={d} class="art-line art-fine" />
     </g>
   );

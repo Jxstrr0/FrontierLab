@@ -4,7 +4,8 @@
 // look comes only from its art seed, so a city draws the same way every
 // session and in every chunk. Storefront lots get a glazed ground floor; the
 // player's lots fly a brand-ink roof flag and rivals' lots carry an awning in
-// their ink.
+// their ink. Your data centers stand as a low, wide hall instead
+// (buildingsDataCenter.ts).
 import { FLAG_PX, STOREY_PX } from '../config/map';
 import { frontageAt } from './blockRows';
 import { downtownMidrise, financialTower, waterfrontGlass, type Shell } from './buildingsTall';
@@ -15,6 +16,7 @@ import type { LotOccupant } from './mapRenderer';
 import { artRng, mixSeed, type ArtRng } from './prng';
 import { gableHouse } from './gables';
 import { spire } from './rooftop';
+import { drawDataCenterLot, isDataCenter } from './buildingsDataCenter';
 import { castShadow, onFace, type Face } from './solids';
 import { styledHouse } from './styleHouses';
 import { barrelShed, grainElevator } from './styleIndustry';
@@ -43,6 +45,10 @@ export function drawBuilding(
   occupant: LotOccupant | undefined,
   map: CityMap,
 ): void {
+  if (t.kind === 'lot' && occupant && isDataCenter(occupant)) {
+    drawDataCenterLot(e, t, occupant);
+    return;
+  }
   e.origin(t.x, t.y);
   const rng = artRng(t.seed);
   const lot = t.kind === 'lot';
