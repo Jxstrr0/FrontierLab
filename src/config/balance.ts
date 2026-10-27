@@ -2337,6 +2337,14 @@ export const INCIDENT_PRICE_SEVERITY: Record<string, number> = {
   DATA_BREACH: 0.85,
   BANK_RUN: 1,
   RECAP_OFFER: 1,
+  // AI-native cases (2026-10-27)
+  DEEPFAKE: 0.2,
+  GRID_FAILURE: 0.25,
+  DC_FIRE: 0.35,
+  JAILBREAK: 0.45,
+  HALLUCINATION_SUIT: 0.5,
+  COPYRIGHT_SUIT: 0.6,
+  WEIGHTS_LEAK: 0.85,
 };
 /** Listed and public: Finance k′ below minKPrime files late, fined fineRate × quarterly revenue (CONTENT §9). */
 export const LATE_FILING = { minKPrime: 0.6, fineRate: 0.0002 } as const;
@@ -2627,15 +2635,25 @@ export const MILESTONE_GOALS = {
   /** ARR for 'A billion in ARR' (C8f; id deposits_1b). */
   arr: 1_000_000_000,
   countries: 5,
-  assets: 10_000_000_000,
+  /** Company valuation (§19.2) for the three valuation milestones (ids assets_10b/100b/1t kept for saves). */
+  valuation: 10_000_000_000,
   acquisitions: 5,
   founderWorth: 1_000_000_000,
   allCities: 20,
   allCountries: 10,
   manyAcquisitions: 10,
-  bigAssets: 100_000_000_000,
+  bigValuation: 100_000_000_000,
   richFounder: 10_000_000_000,
-  hugeAssets: 1_000_000_000_000,
+  hugeValuation: 1_000_000_000_000,
+  // ─ AI milestones (2026-10-27) ─
+  /** Trained model generation for 'Fifth generation'. */
+  modelGeneration: 5,
+  /** Weeks in a row at the Strong safety tier for 'Two years of Strong safety'. */
+  strongTierWeeks: 104,
+  /** Weeks in a row with every GPU-week of demand served from owned GPUs (a quarter). */
+  ownedComputeWeeks: 13,
+  /** Yearly value of one enterprise contract for 'A million-dollar contract'. */
+  bigContract: 1_000_000,
 } as const;
 /** Departments that must all be fully staffed (coverage k′ ≥ 1) for "HQ fully staffed". */
 export const MILESTONE_HQ_DEPTS = [

@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { checksum, serialize } from '../../src/sim/save/serialize';
 import { runScript } from '../helpers/scenario';
 
-const SNAPSHOT = '1450001cc8011a';
+const SNAPSHOT = '057e043201ebad';
 
 describe('determinism', () => {
   it('produces identical state for the same seed and commands', () => {

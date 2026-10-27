@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { advanceWeeks } from '../../src/sim/engine';
 import { MILESTONES } from '../../src/data/milestones';
 import { checkMilestones } from '../../src/sim/milestones';
+import { companyValuation } from '../../src/sim/valuation';
 import { newGame } from '../../src/sim/newGame';
 import { openScriptedBranch } from '../helpers/scenario';
 
@@ -32,7 +33,7 @@ describe('late-game milestones', () => {
     const s = newGame({ seed: 3, cityId: 'cal' });
     checkMilestones(s);
     expect(new Set(MILESTONES.map((m) => m.id)).size).toBe(MILESTONES.length);
-    expect(MILESTONES.length).toBe(25);
+    expect(MILESTONES.length).toBe(32);
     expect(Object.keys(s.milestones)).toEqual([]);
   });
 
@@ -50,15 +51,17 @@ describe('late-game milestones', () => {
     expect(s.milestones.rich_list_1).toBe(s.clock.week);
   });
 
-  it('reaches the trillion-range goals from assets, net worth, deals, cities and countries', () => {
+  it('reaches the trillion-range goals from valuation, net worth, deals, cities and countries', () => {
     const s = newGame({ seed: 3, cityId: 'cal' });
     const deal = {} as (typeof s.mergers.deals)[number];
     s.mergers.deals = Array.from({ length: 10 }, () => deal);
-    // Treasury reserves are an asset with no liability, so they lift total assets alone.
+    // Treasury reserves are an asset with no liability, so they lift book value (the valuation floor).
     s.treasury.reserves += 100e9;
     s.personal.cash += 10e9;
     checkMilestones(s);
+    expect(companyValuation(s)).toBeGreaterThanOrEqual(100e9);
     expect(s.milestones.ten_acquisitions).toBe(s.clock.week);
+    expect(s.milestones.assets_10b).toBe(s.clock.week);
     expect(s.milestones.assets_100b).toBe(s.clock.week);
     expect(s.milestones.assets_1t).toBeUndefined();
     expect(s.milestones.worth_10b).toBe(s.clock.week);
@@ -67,6 +70,16 @@ describe('late-game milestones', () => {
     s.treasury.reserves += 900e9;
     checkMilestones(s);
     expect(s.milestones.assets_1t).toBe(s.clock.week);
+  });
+
+  it('reads the valuation as market cap once listed', () => {
+    const s = newGame({ seed: 3, cityId: 'cal' });
+    expect(s.milestones.assets_10b).toBeUndefined();
+    s.stock.status = 'public';
+    s.stock.price = 20e9 / s.company.sharesOutstanding;
+    checkMilestones(s);
+    expect(s.milestones.assets_10b).toBe(s.clock.week);
+    expect(s.milestones.assets_100b).toBeUndefined();
   });
 
   it('counts five closed deals for the fifth acquisition', () => {

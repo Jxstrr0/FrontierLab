@@ -73,3 +73,14 @@ export function fundamentalPerShare(
 export function privateValuation(state: GameState): number {
   return fundamentalPerShare(state, undefined, PRIVATE_VALUATION.discount);
 }
+
+/**
+ * What the whole company is worth today: market capitalisation once listed,
+ * else the undiscounted fundamental value (ARR × multiple, book value as the
+ * floor) across every share. The valuation milestones read this (DESIGN §5.18).
+ */
+export function companyValuation(state: GameState): number {
+  const shares = Math.max(1, state.company.sharesOutstanding);
+  const perShare = state.stock.status === 'public' ? state.stock.price : fundamentalPerShare(state);
+  return perShare * shares;
+}

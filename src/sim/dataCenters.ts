@@ -9,6 +9,7 @@ import { CITIES, isRegional } from '../data/cities';
 import { DC_PARTS, type DcBuild } from '../data/dataCenters';
 import { pushEvent } from './events';
 import { cityDistanceKm } from './geo';
+import { gpuDerate } from './incident/effects';
 import { spend } from './ledger';
 import type { DataCenter, GameState } from './state';
 
@@ -20,6 +21,11 @@ export function hallGpus(build: DcBuild): number {
 /** GPUs that run: the hall, capped by the power feed (§9.9). */
 export function usableGpus(build: DcBuild): number {
   return Math.min(hallGpus(build), DC_PARTS[build.power]?.gpus ?? 0);
+}
+
+/** GPUs really running today: the usable count less any fire derate (CONTENT §22, DC_FIRE). */
+export function runningGpus(state: GameState, dc: DataCenter): number {
+  return Math.round(usableGpus(dc.build) * (1 - gpuDerate(state, dc.id)));
 }
 
 export function pueOf(build: DcBuild): number {
@@ -51,9 +57,10 @@ export function dealPowerMult(state: GameState, cityId: string): number {
   return 1;
 }
 
-/** This week's power bill for one of your data centers, with any power-deal discount. */
+/** This week's power bill for one of your data centers: only the GPUs running, with any power-deal discount. */
 export function dataCenterPowerBill(state: GameState, dc: DataCenter): number {
-  return powerBill(dc.build, dc.cityId) * dealPowerMult(state, dc.cityId);
+  const share = usableGpus(dc.build) > 0 ? runningGpus(state, dc) / usableGpus(dc.build) : 0;
+  return powerBill(dc.build, dc.cityId) * share * dealPowerMult(state, dc.cityId);
 }
 
 /** Weeks a hall takes to fit out. */
