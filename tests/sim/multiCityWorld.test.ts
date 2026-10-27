@@ -79,18 +79,24 @@ describe('rivals in cities generated later', () => {
     fly(s, 'lon');
     const fizz = s.rivals.fizz!;
     const uk = s.world.countries.UK!;
-    const savings = PRODUCTS.savings!;
-    const inLondon = rivalPriceIn(s, fizz, 'savings', 'UK')!;
-    expect(inLondon).toBeCloseTo(rivalTargetPrice(savings, fizz.strategy, uk), 10);
-    expect(rivalPriceIn(s, fizz, 'savings', 'US')).toBe(fizz.prices.savings);
+    // C3a: business loans are the rate product left, priced off the short FTP.
+    const sbl = PRODUCTS.sbl!;
+    const inLondon = rivalPriceIn(s, fizz, 'sbl', 'UK')!;
+    expect(inLondon).toBeCloseTo(rivalTargetPrice(sbl, fizz.strategy, uk), 10);
+    expect(rivalPriceIn(s, fizz, 'sbl', 'US')).toBe(fizz.prices.sbl);
     // A UK hike reaches Fizz's London prices at once; a US hike doesn't touch them.
-    const usBefore = fizz.prices.savings!;
+    const usBefore = fizz.prices.sbl!;
     uk.policyRate += 0.01;
-    expect(rivalPriceIn(s, fizz, 'savings', 'UK')).toBeCloseTo(inLondon + 0.01, 10);
+    expect(rivalPriceIn(s, fizz, 'sbl', 'UK')).toBeCloseTo(inLondon + 0.01, 10);
     s.world.countries.US!.policyRate += 0.01;
-    expect(rivalPriceIn(s, fizz, 'savings', 'UK')).toBeCloseTo(inLondon + 0.01, 10);
-    expect(fizz.prices.savings).toBe(usBefore);
-    expect(defaultPrice(savings, uk)).toBeGreaterThan(0);
+    expect(rivalPriceIn(s, fizz, 'sbl', 'UK')).toBeCloseTo(inLondon + 0.01, 10);
+    expect(fizz.prices.sbl).toBe(usBefore);
+    expect(defaultPrice(sbl, uk)).toBeGreaterThan(0);
+    // Plan prices abroad sit at the strategy's fee multiple of that country's list price.
+    expect(rivalPriceIn(s, fizz, 'plus', 'UK')).toBeCloseTo(
+      rivalTargetPrice(PRODUCTS.plus!, fizz.strategy, uk),
+      10,
+    );
   });
 });
 
@@ -101,7 +107,7 @@ describe('regional employers', () => {
     advanceWeeks(s, 2);
     fly(s, 'fmm');
     const camp = siteOf(s, 'employer', 'fmm');
-    const r = cmd.signPartnership(s, camp.id, host, 'savings');
+    const r = cmd.signPartnership(s, camp.id, host, 'team');
     expect(r.ok).toBe(true);
     // A host in another country can't.
     fly(s, 'nyc');
@@ -109,8 +115,8 @@ describe('regional employers', () => {
     advanceWeeks(s, 2);
     fly(s, 'mid');
     const midland = siteOf(s, 'employer', 'mid');
-    expect(cmd.signBlocker(s, midland.id, host, 'savings')).toMatch(/United States/);
-    expect(cmd.signPartnership(s, midland.id, nycBranch, 'savings').ok).toBe(true);
+    expect(cmd.signBlocker(s, midland.id, host, 'team')).toMatch(/United States/);
+    expect(cmd.signPartnership(s, midland.id, nycBranch, 'team').ok).toBe(true);
     advanceWeeks(s, 4);
     expect(identityGap(s)).toBeLessThan(1);
   });
@@ -189,16 +195,16 @@ describe('HQ for several countries', () => {
     expect(cmd.setApplyRatesToAll(s, true).ok).toBe(true);
     expect(Object.keys(s.company.companyPrices).sort()).toEqual(['CA', 'UK', 'US']);
     const us = s.company.companyPrices.US!;
-    expect(us.savings).toBe(s.branches[branches.nyc]!.offered.savings!.price);
-    expect(cmd.setCompanyPrice(s, 'savings', 0.05, 'US').ok).toBe(true);
-    expect(s.company.companyPrices.US!.savings).toBe(0.05);
-    expect(s.company.companyPrices.CA!.savings).not.toBe(0.05);
+    expect(us.plus).toBe(s.branches[branches.nyc]!.offered.plus!.price);
+    expect(cmd.setCompanyPrice(s, 'plus', 24, 'US').ok).toBe(true);
+    expect(s.company.companyPrices.US!.plus).toBe(24);
+    expect(s.company.companyPrices.CA!.plus).not.toBe(24);
     // An acquired branch in a country with no list yet seeds one from its own sheet.
     fly(s, 'tor');
     fly(s, 'par');
     const bank = Object.values(s.rivals).find((r) => r.cities.includes('par'))!;
     const rb = bank.branches.find((b) => b.cityId === 'par')!;
-    convertRivalBranch(s, bank, rb, 1, stream(s, 'test:acq'));
+    convertRivalBranch(s, bank, rb, stream(s, 'test:acq'));
     expect(s.company.companyPrices.EA).toBeDefined();
   });
 });

@@ -37,8 +37,8 @@ describe('partnership cards', () => {
 
   it('lists active deals with the people, term and panel route, runoffs last', () => {
     const { s, branchId, employer, university } = partnerGame();
-    const pay = cmd.signPartnership(s, employer.id, branchId, 'savings');
-    const stu = cmd.signPartnership(s, university.id, branchId, 'savings', 'student');
+    const pay = cmd.signPartnership(s, employer.id, branchId, 'plus');
+    const stu = cmd.signPartnership(s, university.id, branchId, 'plus', 'student');
     if (!pay.ok) throw new Error(pay.reason);
     if (!stu.ok) throw new Error(stu.reason);
     s.partnerships[pay.partnershipId]!.balance = 1_000;
@@ -51,13 +51,13 @@ describe('partnership cards', () => {
     expect(cards.map((c) => c.id)).toEqual([pay.partnershipId, stu.partnershipId]);
     const [a, b] = cards as [(typeof cards)[0], (typeof cards)[0]];
     expect(a.name).toBe(employer.employer!.name);
-    expect(a.kindLabel).toBe('Staff payroll');
+    expect(a.kindLabel).toBe('Staff plans');
     expect(a.people).toBe(employer.employer!.employees);
     expect(a.peopleLabel).toBe('Employees');
     expect(a.termText).toMatch(/^Year 1 of \d+$/);
     expect(a.route).toEqual({ type: 'employer', siteId: employer.id });
     expect(b.active).toBe(false);
-    expect(b.kindLabel).toBe('Student accounts');
+    expect(b.kindLabel).toBe('Student plans');
     expect(b.peopleLabel).toBe('Students');
     expect(b.termText).toBe('Running off · 1 week left');
     expect(b.route).toEqual({ type: 'university', siteId: university.id });

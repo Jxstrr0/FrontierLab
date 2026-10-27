@@ -21,8 +21,8 @@ export function observe(
     .map((b) => ({
       id: b.id,
       lotId: b.lotId,
-      savings: basePrice(s, b, 'savings'),
-      personalLoan: isOffered(b, 'personal_loan'),
+      plus: basePrice(s, b, 'plus'),
+      api: isOffered(b, 'api'),
       managerId: b.managerId,
       campaigns: Object.entries(b.campaigns)
         .map(([id, level]) => `${id}:${level}`)

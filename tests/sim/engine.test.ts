@@ -2,6 +2,7 @@
 // every week of a scripted run (SIMULATION §1, §14.3).
 import { describe, expect, it } from 'vitest';
 import { START_CASH } from '../../src/config/balance';
+import { branchArr } from '../../src/sim/arr';
 import { balanceSheet } from '../../src/sim/balanceSheet';
 import { FEE_INCOME, NON_CASH, summarize } from '../../src/sim/ledger';
 import { runScript } from '../helpers/scenario';
@@ -44,7 +45,8 @@ describe('engine', () => {
     expect(b.status).toBe('open');
     expect(b.openedWeek).toBe(1);
     expect(b.customers).toBeGreaterThan(500);
-    expect(b.books.savings!.balance).toBeGreaterThan(1_000_000);
+    expect(b.books.plus!.balance).toBeGreaterThan(0);
+    expect(branchArr(s, b)).toBeGreaterThan(250_000);
     expect(b.pnl).toHaveLength(30);
   });
 });

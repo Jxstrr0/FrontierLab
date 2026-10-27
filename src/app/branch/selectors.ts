@@ -13,7 +13,8 @@ import {
   WEEKS_PER_YEAR,
 } from '../../config/balance';
 import type { CampaignCost } from '../../data/campaigns';
-import { isDeposit, isLoan, type ProductSpec } from '../../data/products';
+import { isDeposit, isLoan, isRecurring, type ProductSpec } from '../../data/products';
+import { branchArr } from '../../sim/arr';
 import { deskWeek } from '../../sim/branch/loanDesk';
 import { marketWage, staffNeeded } from '../../sim/branch/staff';
 import { managerMarketSalary, managerSalaryBounds } from '../../sim/payReviews';
@@ -146,8 +147,8 @@ export function managerPayView(s: GameState, mgr: Manager): ManagerPayView {
   return { market, standing };
 }
 
-/** Formats a product price: a rate, a monthly or annual fee, or a % fee. */
-export function priceText(spec: ProductSpec, v: number, sym: string): string {
+/** Formats a product price: a rate, a monthly or annual fee, a % fee, or a price per million tokens (`compact` drops the word "tokens" for the stepper). */
+export function priceText(spec: ProductSpec, v: number, sym: string, compact = false): string {
   switch (spec.priceType) {
     case 'rate':
     case 'pctFee':
@@ -156,6 +157,8 @@ export function priceText(spec: ProductSpec, v: number, sym: string): string {
       return `${sym}${Math.round(toCurrency(v, sym)).toLocaleString('en-US')}/mo`;
     case 'feeAnnual':
       return `${sym}${Math.round(toCurrency(v, sym)).toLocaleString('en-US')}/yr`;
+    case 'perUnit':
+      return `${sym}${toCurrency(v, sym).toFixed(2)}/M${compact ? '' : ' tokens'}`;
   }
 }
 
@@ -163,6 +166,10 @@ export function priceText(spec: ProductSpec, v: number, sym: string): string {
 export function rangeText(spec: ProductSpec, sym: string): string {
   if (spec.priceType === 'rate' || spec.priceType === 'pctFee') {
     return `${(spec.min * 100).toFixed(2)}–${pct(spec.max)}`;
+  }
+  if (spec.priceType === 'perUnit') {
+    const cents = (v: number) => toCurrency(v, sym).toFixed(2);
+    return `${sym}${cents(spec.min)}–${sym}${cents(spec.max)}`;
   }
   const whole = (v: number) => Math.round(toCurrency(v, sym)).toLocaleString('en-US');
   return `${sym}${whole(spec.min)}–${sym}${whole(spec.max)}`;
@@ -175,7 +182,11 @@ export function rangeText(spec: ProductSpec, sym: string): string {
 /** Reads a typed price: rates and % fees are typed as percents ("3.25"), fees as whole money. */
 export function parsePrice(spec: ProductSpec, s: string, sym = '$'): number {
   const n = Number(s.replace(/[^0-9.]/g, ''));
-  if (spec.priceType === 'feeMonthly' || spec.priceType === 'feeAnnual')
+  if (
+    spec.priceType === 'feeMonthly' ||
+    spec.priceType === 'feeAnnual' ||
+    spec.priceType === 'perUnit'
+  )
     return fromCurrency(n, sym);
   return n / 100;
 }
@@ -184,6 +195,7 @@ export function parsePrice(spec: ProductSpec, s: string, sym = '$'): number {
 export function editPrice(spec: ProductSpec, v: number, sym = '$'): string {
   if (spec.priceType === 'feeMonthly' || spec.priceType === 'feeAnnual')
     return String(Math.round(toCurrency(v, sym)));
+  if (spec.priceType === 'perUnit') return toCurrency(v, sym).toFixed(2);
   return percentText(v);
 }
 
@@ -210,6 +222,26 @@ export function unitView(
   const perYear = spec.servicing * WEEKS_PER_YEAR;
   const avg = book && book.accounts > 0 ? book.balance / book.accounts : spec.ticket;
   const ratio = (keep: number, rev: number) => (rev > 0 ? keep / rev : 0);
+  if (spec.kind === 'usage') {
+    // Per unit of usage: the price less the compute behind it (C3a).
+    const cost = spec.unitCost ?? 0;
+    return {
+      margin: ratio(price - cost, price),
+      caption: `Price ${priceText(spec, price, sym)}`,
+      costLabel: 'Compute cost',
+      costText: `${exactMoney(cost, sym)}/M tokens`,
+    };
+  }
+  if (spec.kind === 'plan') {
+    // Per seat: a year of the fee less a year of serving it.
+    const rev = price * (spec.priceType === 'feeAnnual' ? 1 : MONTHS_PER_YEAR);
+    return {
+      margin: ratio(rev - perYear, rev),
+      caption: price > 0 ? `Fee ${priceText(spec, price, sym)}` : 'Free',
+      costLabel: 'Cost per seat',
+      costText: `${exactMoney(perYear / MONTHS_PER_YEAR, sym)}/mo`,
+    };
+  }
   if (spec.priceType === 'rate' && isDeposit(spec)) {
     const spread = ftp - price;
     return {
@@ -266,19 +298,10 @@ function signed(r: number): string {
   return `${r >= 0 ? '+' : '−'}${pct(Math.abs(r))}`;
 }
 
-/** Deposits, loans (including Loan Desk business loans) and customers at a branch. */
-export function branchBalances(state: GameState, branch: Branch, specs: readonly ProductSpec[]) {
-  let deposits = 0;
-  let loans = 0;
-  let aum = 0;
-  for (const spec of specs) {
-    const b = branch.books[spec.id]?.balance ?? 0;
-    if (isDeposit(spec)) deposits += b;
-    else if (isLoan(spec)) loans += b;
-    else if (spec.kind === 'wealth') aum += b;
-  }
+/** An office's ARR (plan and usage books), Loan Desk lending and customers. */
+export function branchBalances(state: GameState, branch: Branch) {
   const sbl = businessLoans(state, branch.id);
-  return { deposits, loans: loans + sbl.balance, aum, customers: branch.customers };
+  return { arr: branchArr(state, branch), loans: sbl.balance, customers: branch.customers };
 }
 
 /** Current Loan Desk loans and pending applications for a branch. */
@@ -391,3 +414,21 @@ export function campaignCostText(
 
 /** Game day at the close of a sim week, for dates on week-indexed records. */
 export const dayOfWeek = (week: number) => week * DAYS_PER_WEEK;
+
+/** Product card words (C3a): plan and usage books show ARR, seats or sign-ups, and a price. */
+export function productWords(spec: ProductSpec) {
+  return {
+    price: spec.priceType === 'rate' ? 'Rate' : isRecurring(spec) ? 'Price' : 'Fee',
+    balance: isRecurring(spec)
+      ? 'ARR'
+      : spec.kind === 'wealth'
+        ? 'Assets under management'
+        : 'Balance',
+    newAccounts:
+      spec.kind === 'plan'
+        ? 'New seats last week'
+        : spec.kind === 'usage'
+          ? 'New sign-ups last week'
+          : 'New accounts last week',
+  };
+}

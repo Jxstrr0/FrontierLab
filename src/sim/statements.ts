@@ -1,5 +1,6 @@
 // Company statements (SIMULATION §14): depreciation, tax, the weekly close
 // (P&L, cash flow, balance sheet snapshot) and quarter-end reporting.
+import { companyArr } from './arr';
 import { CRITICAL_FINE_RWA, WEEKLY_HISTORY } from '../config/balance';
 import { COUNTRIES } from '../data/countries';
 import { balanceSheet, totalDeposits, loanTotals } from './balanceSheet';
@@ -52,6 +53,7 @@ export function closeWeek(state: GameState): WeeklySnapshot {
     },
     totals: {
       assets: bs.assets,
+      arr: companyArr(state),
       deposits: totalDeposits(state),
       loans: loanTotals(state).total,
       equity: bs.equity,

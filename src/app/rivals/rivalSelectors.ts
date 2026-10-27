@@ -43,13 +43,10 @@ export function rivalTier(bank: RivalBank): Tier {
   return tierFor(bank.capitalRatio);
 }
 
-/** Products on the rate sheet, deposits first. */
+/** Products on the price sheet, plans first (C3a). */
 export const RATE_SHEET: { title: string; ids: string[] }[] = [
-  { title: 'Deposits', ids: ['savings', 'gic1y', 'chequing', 'business_acct'] },
-  {
-    title: 'Lending and cards',
-    ids: ['mortgage', 'personal_loan', 'auto_loan', 'loc', 'credit_card'],
-  },
+  { title: 'Plans', ids: ['plus', 'pro', 'team'] },
+  { title: 'API and apps', ids: ['api', 'batch_api', 'code_assistant', 'agent_studio'] },
 ];
 
 /** Our open branch nearest to a rival branch, in the same city. */

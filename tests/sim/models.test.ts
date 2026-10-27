@@ -105,28 +105,28 @@ describe('company lineup', () => {
   it('applies HQ prices and lineup to every branch while Apply-to-all is on', () => {
     const { s, branchId } = gameWithFloors([]);
     const branch = s.branches[branchId]!;
-    expect(cmd.setCompanyPrice(s, 'savings', 0.03).ok).toBe(false);
-    const own = branch.offered.savings!.price;
+    expect(cmd.setCompanyPrice(s, 'plus', 25).ok).toBe(false);
+    const own = branch.offered.plus!.price;
     expect(cmd.setApplyRatesToAll(s, true).ok).toBe(true);
-    expect(s.company.companyPrices.CA!.savings).toBe(own);
-    expect(cmd.setCompanyPrice(s, 'savings', 0.0312)).toEqual({ ok: true, price: 0.031 });
-    expect(branchPrice(s, branch, 'savings')).toBe(0.031);
-    expect(cmd.setOffered(s, branchId, 'mortgage', true)).toEqual({
+    expect(s.company.companyPrices.CA!.plus).toBe(own);
+    expect(cmd.setCompanyPrice(s, 'plus', 24.4)).toEqual({ ok: true, price: 24 });
+    expect(branchPrice(s, branch, 'plus')).toBe(24);
+    expect(cmd.setOffered(s, branchId, 'api', true)).toEqual({
       ok: false,
       reason: 'Set at HQ.',
     });
-    expect(cmd.setCompanyOffered(s, 'mortgage', true).ok).toBe(true);
-    expect(branch.offered.mortgage!.on).toBe(true);
-    expect(s.company.companyOffered!.mortgage).toBe(true);
+    expect(cmd.setCompanyOffered(s, 'api', true).ok).toBe(true);
+    expect(branch.offered.api!.on).toBe(true);
+    expect(s.company.companyOffered!.api).toBe(true);
     expect(cmd.setApplyRatesToAll(s, false).ok).toBe(true);
-    expect(branchPrice(s, branch, 'savings')).toBe(own);
+    expect(branchPrice(s, branch, 'plus')).toBe(own);
   });
 });
 
 describe('Products floor saves', () => {
   it('round-trips developments, developed products and custom models', () => {
     const { s, branchId } = gameWithFloors(['products', 'it']);
-    const input = { name: 'Silver', templateId: 'senior_saver', tier: 'low' as const };
+    const input = { name: 'Silver', templateId: 'golden_years', tier: 'low' as const };
     expect(cmd.startDevelopment(s, { ...input, weeks: 4, weeklyBudget: 5_000 }).ok).toBe(true);
     expect(cmd.startDevelopment(s, { ...input, weeks: 48, weeklyBudget: 9_000 }).ok).toBe(true);
     advanceWeeks(s, 4);

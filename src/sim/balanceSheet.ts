@@ -53,22 +53,15 @@ export function assetBookValue(a: { cost: number; lifeWeeks: number; ageWeeks: n
   return a.cost * Math.max(0, 1 - a.ageWeeks / a.lifeWeeks);
 }
 
-/** Branch deposit books plus partnership mini-books (§13.7). */
+/** Branch deposit books (partnership mini-books hold ARR since C3a). */
 export function totalDeposits(state: GameState): number {
-  let total = partnershipDeposits(state);
+  let total = 0;
   for (const b of Object.values(state.branches)) {
     for (const [pid, book] of Object.entries(b.books)) {
       const spec = productSpec(state, pid);
       if (spec && isDeposit(spec)) total += book.balance;
     }
   }
-  return total;
-}
-
-/** Balances held in payroll and student partnership mini-books. */
-export function partnershipDeposits(state: GameState): number {
-  let total = 0;
-  for (const p of Object.values(state.partnerships)) total += p.balance;
   return total;
 }
 

@@ -1,6 +1,6 @@
 // The tutorial's step machine (SCREENS §27), pure so it can be unit-tested.
 // Each step watches what the player actually does: entering a step records a
-// baseline (branch count, savings rates, managers, Personal Loans, loans
+// baseline (branch count, Plus prices, managers, the API, loans
 // booked, campaigns) and the step is done when the game moves past it. Nothing advances
 // on a timer. guidance() says where the brass ring should go, as an ordered
 // list of targets (closest to done first); the overlay rings the first one
@@ -25,8 +25,8 @@ export interface TutorialObs {
 export interface BranchObs {
   id: string;
   lotId: string;
-  savings: number;
-  personalLoan: boolean;
+  plus: number;
+  api: boolean;
   managerId?: string;
   /** Campaign levels as one comparable string, e.g. "mail:1,social:0". */
   campaigns: string;
@@ -39,8 +39,8 @@ export interface StepMemo {
   step: number;
   week: number;
   branchCount: number;
-  savings: Record<string, number>;
-  personalLoan: Record<string, boolean>;
+  plus: Record<string, number>;
+  api: Record<string, boolean>;
   managers: Record<string, string | undefined>;
   loansBooked: number;
   campaigns: Record<string, string>;
@@ -68,13 +68,13 @@ export const isActiveStep = (step: number | undefined): step is number =>
   step !== undefined && step >= TUTORIAL.first && step <= TUTORIAL.last;
 
 export function enterStep(step: number, obs: TutorialObs): StepMemo {
-  const savings: Record<string, number> = {};
-  const personalLoan: Record<string, boolean> = {};
+  const plus: Record<string, number> = {};
+  const api: Record<string, boolean> = {};
   const managers: Record<string, string | undefined> = {};
   const campaigns: Record<string, string> = {};
   for (const b of obs.branches) {
-    savings[b.id] = b.savings;
-    personalLoan[b.id] = b.personalLoan;
+    plus[b.id] = b.plus;
+    api[b.id] = b.api;
     managers[b.id] = b.managerId;
     campaigns[b.id] = b.campaigns;
   }
@@ -82,8 +82,8 @@ export function enterStep(step: number, obs: TutorialObs): StepMemo {
     step,
     week: obs.week,
     branchCount: obs.branches.length,
-    savings,
-    personalLoan,
+    plus,
+    api,
     managers,
     loansBooked: obs.loansBooked,
     campaigns,
@@ -103,12 +103,12 @@ export function updateMemo(memo: StepMemo, obs: TutorialObs): StepMemo {
 
 /**
  * Steps with nothing to do are skipped: every branch already has a manager or
- * Personal Loans, or every manager runs the branch's marketing.
+ * the API, or every manager runs the branch's marketing.
  */
 export function alreadyDone(memo: StepMemo, obs: TutorialObs): boolean {
   if (obs.branches.length === 0) return false;
   if (memo.step === 4) return obs.branches.every((b) => b.managerId);
-  if (memo.step === 6) return obs.branches.every((b) => b.personalLoan);
+  if (memo.step === 6) return obs.branches.every((b) => b.api);
   if (memo.step === 8) return obs.branches.every((b) => b.marketingDelegated);
   return false;
 }
@@ -121,13 +121,13 @@ export function isDone(memo: StepMemo, obs: TutorialObs): boolean {
     case 2:
       return obs.branches.length > memo.branchCount;
     case 3:
-      return obs.branches.some((b) => b.id in memo.savings && b.savings !== memo.savings[b.id]);
+      return obs.branches.some((b) => b.id in memo.plus && b.plus !== memo.plus[b.id]);
     case 4:
       return obs.branches.some((b) => b.managerId && b.managerId !== memo.managers[b.id]);
     case 5:
       return memo.sawWeekly && obs.modalType !== 'weekly';
     case 6:
-      return obs.branches.some((b) => b.personalLoan && memo.personalLoan[b.id] === false);
+      return obs.branches.some((b) => b.api && memo.api[b.id] === false);
     case 7:
       return obs.loansBooked > memo.loansBooked;
     case 8:

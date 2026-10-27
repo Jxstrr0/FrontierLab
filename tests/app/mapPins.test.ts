@@ -237,7 +237,7 @@ describe('Stage 5 pins', () => {
     const employer = sites.find((x) => x.kind === 'employer')!;
     const before = buildPins(s, map, lots, STAGE5).find((p) => p.id === employer.id)!;
     expect(before.partner).toBeUndefined();
-    expect(cmd.signPartnership(s, employer.id, branchId, 'savings').ok).toBe(true);
+    expect(cmd.signPartnership(s, employer.id, branchId, 'plus').ok).toBe(true);
     const after = buildPins(s, map, lots, STAGE5).find((p) => p.id === employer.id)!;
     expect(after.partner).toBe(true);
     expect(after.ink).toBe(s.meta.brandInk);

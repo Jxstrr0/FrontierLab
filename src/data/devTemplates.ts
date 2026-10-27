@@ -13,7 +13,7 @@ export interface TemplateMods {
   pdMult?: number;
   /** × annual churn. */
   churnMult?: number;
-  /** × ticket (balance per new account; AUM for wealth). */
+  /** × ticket (seats per plan sign-up, or monthly usage for API products). */
   ticketMult?: number;
   /** × credit limit, which scales the drawn balance of revolving products. */
   limitMult?: number;
@@ -29,7 +29,7 @@ export interface TemplateMods {
   interchangeAdd?: number;
   /** Added to the default rate (rate products), e.g. −0.001 = −0.10pp. */
   defaultRateAdd?: number;
-  /** Replaces the default fee (fee products). The market reference scales with it. */
+  /** Replaces the default price (plans, API, apps). The market reference scales with it. */
   defaultFee?: number;
   tenor?: 'short' | 'long';
   /** Branch rating bump at branches that offer it ("reputation"). */
@@ -57,102 +57,93 @@ export interface DevTemplate {
 }
 
 export const DEV_TEMPLATES: Record<string, DevTemplate> = {
-  senior_saver: {
-    id: 'senior_saver',
-    name: 'Senior Saver',
-    base: 'savings',
-    mods: { affinity: { RET: 0.15 } },
+  // ─── Plans ──────────────────────────────────────────────────────────────────
+  student_plus: {
+    id: 'student_plus',
+    name: 'Student Plus',
+    base: 'plus',
+    mods: { affinity: { STU: 0.15 }, defaultFee: 10 },
   },
-  kids_savings: {
-    id: 'kids_savings',
-    name: 'Kids Savings',
-    base: 'savings',
-    mods: { affinity: { FAM: 0.1 }, ticketMult: 0.3 },
+  golden_years: {
+    id: 'golden_years',
+    name: 'Golden Years Plan',
+    base: 'plus',
+    mods: { affinity: { RET: 0.15 }, defaultFee: 12 },
   },
-  notice_acct: {
-    id: 'notice_acct',
-    name: '31-Day Notice',
-    base: 'savings',
-    mods: { churnMult: 0.6, tenor: 'long' },
+  family_plan: {
+    id: 'family_plan',
+    name: 'Family Plan',
+    base: 'plus',
+    // Priced per seat; a family signs up four at once.
+    mods: { affinity: { FAM: 0.15 }, ticketMult: 4, defaultFee: 12 },
   },
-  green_gic: {
-    id: 'green_gic',
-    name: 'Green GIC',
-    base: 'gic1y',
+  plus_annual: {
+    id: 'plus_annual',
+    name: 'Plus Annual',
+    base: 'plus',
+    mods: { churnMult: 0.5, takeUpMult: 0.85 },
+  },
+  carbon_neutral: {
+    id: 'carbon_neutral',
+    name: 'Carbon-Neutral Plan',
+    base: 'plus',
     mods: { reputation: 0.05, affinity: { YP: 0.05 } },
   },
-  first_home: {
-    id: 'first_home',
-    name: 'First-Home Mortgage',
-    base: 'mortgage',
-    mods: { affinity: { YP: 0.04, FAM: 0.04 }, pdMult: 1.1 },
+  max_plan: {
+    id: 'max_plan',
+    name: 'Max',
+    base: 'pro',
+    mods: { defaultFee: 200, productsBump: 0.1, affinity: { YP: 0.05, BIZ: 0.05 } },
   },
-  green_mortgage: {
-    id: 'green_mortgage',
-    name: 'Green Mortgage',
-    base: 'mortgage',
-    mods: { reputation: 0.05, defaultRateAdd: -0.001 },
+  enterprise: {
+    id: 'enterprise',
+    name: 'Enterprise',
+    base: 'team',
+    mods: { affinity: { BIZ: 0.2 }, ticketMult: 5, churnMult: 0.6, defaultFee: 45 },
   },
-  ev_auto: {
-    id: 'ev_auto',
-    name: 'EV Auto Loan',
-    base: 'auto_loan',
-    mods: { affinity: { YP: 0.04 }, pdMult: 0.9 },
+  // ─── API ────────────────────────────────────────────────────────────────────
+  realtime_api: {
+    id: 'realtime_api',
+    name: 'Realtime API',
+    base: 'api',
+    mods: { defaultFee: 6, takeUpMult: 1.1, affinity: { YP: 0.05, BIZ: 0.05 } },
   },
-  student_loc: {
-    id: 'student_loc',
-    name: 'Student Line of Credit',
-    base: 'loc',
-    mods: { affinity: { STU: 0.1 }, pdMult: 1.3 },
+  dedicated_capacity: {
+    id: 'dedicated_capacity',
+    name: 'Dedicated Capacity',
+    base: 'api',
+    mods: { affinity: { BIZ: 0.2 }, ticketMult: 4, churnMult: 0.5 },
   },
-  consolidation: {
-    id: 'consolidation',
-    name: 'Debt Consolidation Loan',
-    base: 'personal_loan',
-    mods: { approvalAdd: 0.05, pdMult: 1.15 },
+  research_credits: {
+    id: 'research_credits',
+    name: 'Research Credits',
+    base: 'api',
+    mods: { affinity: { STU: 0.15 }, defaultFee: 1.5 },
   },
-  cashback_card: {
-    id: 'cashback_card',
-    name: 'Cashback Card',
-    base: 'credit_card',
-    mods: { takeUpMult: 1.15, interchangeAdd: -0.003 },
+  embeddings_api: {
+    id: 'embeddings_api',
+    name: 'Embeddings API',
+    base: 'batch_api',
+    mods: { defaultFee: 0.5, ticketMult: 3 },
   },
-  travel_card: {
-    id: 'travel_card',
-    name: 'Travel Rewards Card',
-    base: 'credit_card',
-    mods: { annualFee: 120, spendMult: 1.6, affinity: { YP: 0.05, RET: 0.05 } },
+  // ─── Apps & Services ────────────────────────────────────────────────────────
+  study_buddy: {
+    id: 'study_buddy',
+    name: 'Study Buddy',
+    base: 'creative_suite',
+    mods: { affinity: { STU: 0.2 }, defaultFee: 8 },
   },
-  student_card: {
-    id: 'student_card',
-    name: 'Student Card',
-    base: 'credit_card',
-    mods: { affinity: { STU: 0.15 }, limitMult: 0.4 },
+  voice_companion: {
+    id: 'voice_companion',
+    name: 'Voice Companion',
+    base: 'creative_suite',
+    mods: { affinity: { RET: 0.1, FAM: 0.1 }, takeUpMult: 1.15 },
   },
-  secured_card: {
-    id: 'secured_card',
-    name: 'Secured Card',
-    base: 'credit_card',
-    mods: { approvalAdd: 0.25, pdMult: 0.6, spendMult: 0.5 },
-  },
-  business_card: {
-    id: 'business_card',
-    name: 'Business Card',
-    base: 'credit_card',
-    mods: { affinity: { BIZ: 0.25 }, spendMult: 3 },
-  },
-  robo_advisor: {
-    id: 'robo_advisor',
-    name: 'Robo-Advisor',
-    base: 'wealth',
-    mods: { noAdvisorOffice: true, defaultFee: 0.004, ticketMult: 0.25 },
-  },
-  premium_pkg: {
-    id: 'premium_pkg',
-    name: 'Premium Banking Package',
-    base: 'chequing',
-    // "RET/high-income take-up +0.1": modelled as RET affinity +0.1.
-    mods: { defaultFee: 30, productsBump: 0.1, affinity: { RET: 0.1 } },
+  contract_copilot: {
+    id: 'contract_copilot',
+    name: 'Contract Copilot',
+    base: 'agent_studio',
+    mods: { affinity: { BIZ: 0.15 }, defaultFee: 149, reputation: 0.05 },
   },
   mobile_app_v2: {
     id: 'mobile_app_v2',

@@ -3,13 +3,58 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C2 done. C2d2 (v0.1.9, save schema 5): at most two main offices (the second abroad) and a per-office "Set prices here" override. C2d1 (v0.1.8): "sales office" everywhere on screen, and Sales Offices / Data Centers / Energy Sites map layers. C2c (v0.1.7): data centers, on a storefront or at a regional energy site. C2b (v0.1.6): rival labs also hold one sizable sales office per city. C2a (v0.1.5): one sales office per city, grown in place through four sizes. Before that, C1 (v0.1.4): floors, executives, segments, campaigns, benefits, conferences, incidents, stock sector, map layers, rival labs, "the lab" wording and the newspaper. Next is C3 (see CONVERSION_PLAN), waiting on the owner's go-ahead. The owner's decisions are in the design brief and CONVERSION_PLAN §5.
+**Current stage:** C3a done (v0.1.10, save schema 6): the AI product catalog. Offices sell Plans, API usage and Apps & Services, measured in ARR. Next are C3b (compute charge, new P&L lines, a simpler balance sheet) and C3c (removing the leftover bank machinery). C2 (v0.1.5–v0.1.9) and C1 (v0.1.4) are done. The owner's decisions are in the design brief and CONVERSION_PLAN §5.
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `08cc5af209932f` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `02c9cc6ca6a823` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-27 — Stage C3a: the AI product catalog (v0.1.10)
+
+**What you asked for:** "go for C3". C3 is the biggest stage, so it's split into three parts that each ship on their own. This is part 1: what your offices sell.
+
+**What changed.**
+- **New products.** The bank products are gone. Each office's Products tab has three groups:
+  - **Plans:** Free Tier, Plus, Pro, Team and Campus plans, billed per seat each month.
+  - **API:** Standard, Batch and Fine-tuning API, priced per million tokens.
+  - **Apps:** Code Assistant, Agent Studio, Creative Suite and Priority Support.
+  - Some Free Tier users upgrade to Plus each week.
+- **ARR is the headline number.** A product's figure is now its **ARR** (annual recurring revenue). For a plan that's seats × price × 12; for usage, it's a year of usage at today's price. Each week an office earns 1/52 of its ARR. ARR now shows on:
+  - the product cards, the office's Finance tab and the Sales offices list (you can sort by ARR or Customers);
+  - the Products floor trend, which shows ARR and lending.
+- **Product cards** say "Price", "New seats" or "New sign-ups" and "Cost per seat" or "Compute cost". The category switch reads Plans / API / Apps so it fits on a phone.
+- **What else follows the new products:**
+  - **Rivals** set plan and token prices, and the rival screen shows a "Price sheet".
+  - **Price wars** now cut rival plan prices.
+  - **Incidents:** a bank run's "raise" option cuts your plan prices, and fraud hits the API.
+  - **Partnerships** sign staff or student plans that earn ARR.
+  - **Buying a rival** brings its customers over as plan seats.
+  - **New ideas:** the Products floor offers 16 fresh product templates (Golden Years plan, Enterprise, Realtime API, Voice Companion and more).
+  - **The tutorial** now asks you to set the Plus price and turn on the API.
+- **Not changed yet (on purpose).** The Loan Desk, the balance sheet, capital tiers and the treasury still work the bank way. C3b and C3c replace them, so some advisor tips still mention deposits.
+
+**Old saves.** Schema 5 → 6. The migration settles each office's old bank books into cash (deposits are paid out of reserves, loans are sold) and starts every office's old customers on Free Tier. Old bank developments, prices and effects are cleared. A new test checks that an old save loads, balances to the cent and keeps playing.
+
+**Balance.** Checked across 20 cities over 6 years (the median city):
+- Every office checkpoint passes. ARR at weeks 26 / 52 / 104 / 156 / 208 / 260 reads $1.6M / $3.7M / $10.8M / $17.7M / $20.8M / $23.8M.
+- Weekly revenue and income stay inside the old bands.
+- Cash never goes below zero in any city.
+- Two targets changed, with the reasons in SIMULATION §25:
+  - **Payback** is now 44 weeks or less (was 40). A subscription office has to build up seats before it earns, so the median reads 41.5 weeks. Lower churn and faster upgrades didn't move it without one city running out of cash.
+  - **The aggressive and stress tier checks** read n/a until C7. A lab with no deposits barely binds on bank capital, so those bank tiers no longer mean much.
+- Seed 42 steady reaches $1.0B ARR by year 10 and lists in week 209.
+
+**Tests.** About 55 tests that used bank products were moved to the new products. Bank-only mechanics that no longer apply were narrowed rather than removed (the list is in the PR). The CFO capital and governance tests now use a scenario that suits a lab.
+
+**Known for C3b.** With no deposits, Loan Desk lending is now funded from the central bank window. C3b fixes this when revenue moves to corporate cash and the Loan Desk gets its own funding. Some customer reviews and the Finance tab's first-look tip still mention mortgages and deposits; they'll be reworded with C3b.
+
+**Checked in the browser** at iPhone size: a week-30 save loaded through Load (Products: Plans and API tabs; Finance: ARR), with no console errors.
+
+**Checks.** `npm run lint`, all 884 tests and `npm run build` pass. The **determinism snapshot** moved from `08cc5af209932f` to `02c9cc6ca6a823` (intended: the new catalog).
+
+**Next:** C3b, when you say go.
 
 ### 2026-10-26 — Stage C2d2: main offices and per-office prices (v0.1.9)
 

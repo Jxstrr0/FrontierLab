@@ -1,5 +1,5 @@
 // A partnership deal at an employer or university (SCREENS §14): the signing
-// fee and contract length, the expected-deposits curve, the package and host
+// fee and contract length, the expected-ARR curve, the package and host
 // branch pickers and Sign, with the reason shown when it can't be signed. Once
 // signed it shows the Yours card instead (YoursCard.tsx). Used for payroll at
 // employers and universities, and for the university's student partnership.
@@ -62,17 +62,17 @@ function Deal(p: { site: Site; kind: PartnershipKind; people: number }) {
   return (
     <Card class="pt-deal">
       <div class="pt-deal-head">
-        <div class="pt-deal-name">{kind === 'student' ? 'Student accounts' : 'Staff payroll'}</div>
+        <div class="pt-deal-name">{kind === 'student' ? 'Student plans' : 'Staff plans'}</div>
         <span class="small muted">
           {count(p.people)} {kind === 'student' ? 'students' : 'staff'}
         </span>
       </div>
       <Row label="Signing fee" value={money(fee, sym)} strong />
       <Row label="Contract" value={`${years} years`} />
-      <Row label="Peak deposits" value={money(Math.max(...curve), sym)} tone="good" />
+      <Row label="Peak ARR" value={money(Math.max(...curve), sym)} tone="good" />
       <LineChart
-        label="Expected deposits over the contract"
-        series={[{ label: 'Expected deposits', values: curve, tone: 'brass' }]}
+        label="Expected ARR over the contract"
+        series={[{ label: 'Expected ARR', values: curve, tone: 'brass' }]}
         startLabel="Year 1"
         endLabel={`Year ${years}`}
         markerIndex={0}
@@ -96,7 +96,7 @@ function Deal(p: { site: Site; kind: PartnershipKind; people: number }) {
               onChange={setPkg}
             />
           ) : (
-            <p class="small tone-bad">This sales office offers no deposit accounts to package.</p>
+            <p class="small tone-bad">This sales office offers no plans to package.</p>
           )}
         </>
       )}

@@ -274,7 +274,7 @@ export interface Incident { id: Id; type: string; scope: Id; createdWeek: Week; 
 export interface LedgerIssue { week: Week; date: string; articles: { tab: string; icon: string; headline: string; body: string; priority: number }[] }
 export interface WeeklySnapshot {
   week: Week; revenue: Money; netIncome: Money; cashFlow: { ops: Money; investing: Money; financing: Money; net: Money };
-  totals: { assets: Money; deposits: Money; loans: Money; equity: Money; rwa: Money };
+  totals: { assets: Money; arr?: Money; deposits: Money; loans: Money; equity: Money; rwa: Money };  // arr from schema 6
   pnl: Record<string, Money>; delayed: boolean;
 }
 export interface QuarterReport { year: number; q: 1|2|3|4; revenue: Money; netIncome: Money; eps: number; roe: number }
@@ -338,7 +338,7 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 | Personal | `offerHome`, `rebuildHome`, `sellHome`, `buyCar`, `sellCar`, `placeBid`, `clearBid`, `appraiseCollectible`, `consignCollectible`, `withdrawConsignment`, `buyJet`, `sellJet`, `buyClub`, `sellClub`, `setKit`, `setKitSponsor`, `signPlayer`, `releasePlayer` |
 | Settings and saves | `setSettings`, `setFounderAvatar`, `moveHqTab`, `resetHqTabOrder`; saves are not commands: `saveToSlot`, `loadFromSlot` (`src/sim/save/storage.ts`), `exportCode`, `importCode` (`serialize.ts`) |
 
-## 12. Implemented so far (schema v4)
+## 12. Implemented so far (schema v6)
 
 `src/sim/state.ts` is the source of truth; this section records how it differs from the guide above. Later stages add the rest with a schema bump and a migration.
 
@@ -347,6 +347,15 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 **Frontier Lab schema 4 (stage C2c, data centers):** `dataCenters: Record<Id, DataCenter>` (`id`, `cityId`, `lotId?` or `siteId?`, `name`, `status` fitout/open, `weeksLeft`, `builtWeek`, `openedWeek?`, `build { hall, power, cooling }` part ids, `lease { weeklyRent, deposit }`). A data center on a storefront sets that lot's occupant to `{ type: 'player', id: <data center id> }`, so code that reads a player occupant checks `dataCenters` before `branches`. Its parts are fixed assets owned by its id. Migration 3 → 4 adds an empty table. Events `DATA_CENTER_STARTED { dataCenterId, name, city, site, weeks }`, `DATA_CENTER_OPENED { …, gpus, refit }`, `DATA_CENTER_UPGRADED { …, slot, part }`, `DATA_CENTER_CLOSED`. Commands `buildDataCenter`, `upgradeDataCenter`, `renameDataCenter`, `closeDataCenter`.
 
 **Frontier Lab schema 5 (stage C2d2, main offices and company-wide prices):** `Branch.ownPrices: boolean`, true when a sales office sets its own prices and lineup while Apply-to-all is on. Migration 4 → 5 sets it false everywhere. Commands `setOwnPrices(branchId, on)` and `mainOfficeBlocker(cityId)` (the two-office cap, MAIN_OFFICES_MAX).
+
+**Frontier Lab schema 6 (stage C3a, the AI product catalog):** the product ids change to the new catalog (CONTENT §5: Plans, API, Apps & Services; category ids unchanged). Plan and usage books hold ARR in `balance` (plans count seats in `accounts`). New `ProductKind`s `plan` and `usage`, `PriceType` `perUnit`, and optional `ProductSpec.unitCost`, `convertsTo`, `conversion`. `WeeklySnapshot.totals.arr` (optional: weeks closed before schema 6 have none and read as 0). `Partnership.balance` is now the mini-book's ARR and `productId` a plan. `IncidentEffect` kind `savingsBoost` is renamed `planCut` (a share cut off plan prices). Migration 5 → 6 (`src/sim/save/migrateCatalog.ts`) keeps equity unchanged:
+- Each office's bank books are settled where they stand: deposits are paid out of treasury reserves, loans are sold into reserves at book value, and wealth, safe-box and FX books simply close. This includes developed products built on a bank base.
+- The new catalog's offered entries and empty books are seeded (Plans and the Loan Desk on, the rest off, at default prices). Each office's old customers start on the Free Tier.
+- Partnership balances come out of reserves and reset to 0. The package becomes Team (staff) or Campus Plan (students).
+- Any negative reserves left over come out of corporate cash.
+- Old ids are dropped from the catalog, company price lists and lineup, and from rival prices and price lags. Developments on old bank templates are dropped, and rival price-war bumps are reset.
+- `savingsBoost` effects, and effects targeting an old product, are removed.
+- Business loans (the Loan Desk) carry over untouched.
 
 **Frontier Lab schema 3 (stage C2b, rival sales offices):** `RivalBranch.size` (0–3). Migration 2 → 3 folds each rival's branches in a city into one office of the nearest size (`foldRivalCity`: books added, quality blended, the other lots freed). Events `RIVAL_OFFICE_GROWN` and `RIVAL_OFFICE_SHRUNK { rivalId, bank, city, size }`.
 

@@ -45,7 +45,7 @@ Wealth · Company · Branches · Portfolio · The Ledger (archive) · Milestones
 |---|---|
 | `Stepper` | − value +. Long-press accelerates. Tap the value to type. Shows a min/max hint. |
 | `Toggle` | On/off with a label. |
-| `Segmented` | Category switch (Deposits / Lending / Cards & Services; Week / Quarter / Year). |
+| `Segmented` | Category switch (Plans / API / Apps (the full name of the last is Apps & Services); Week / Quarter / Year). |
 | `CoinRating` | Five brass coins with fractional fill, plus a number. |
 | `StatBar` | Label, bar, value (Skill 93). |
 | `RingGauge` | Margin ring with a % in the center and a caption (spread). |
@@ -166,14 +166,14 @@ After the wizard, the map opens with the tutorial (§27).
 
 ### 5.2 Products
 - **House model card:** name, rosette, cost per application, "Manage models" (opens the HQ Products floor if it exists, otherwise a tip pointing to credit bureaus).
-- **Segmented control:** Deposits | Lending | Cards & Services.
+- **Segmented control:** Plans | API | Apps (C3a; `CATEGORY_NAMES`: "Apps & Services" in full, shortened to fit the switch at 390 px).
 - **Product card carousel:**
   - icon, name, coins (product stars), Offered toggle
   - "New accounts last week" with the count and delta
-  - Balance (or AUM)
+  - Balance (ARR for plans and usage products, C3a)
   - Funding cost (FTP) or unit cost
   - Margin ring (%) with a spread caption (`Spread +2.40%`)
-  - Price stepper (rate or fee)
+  - Price stepper (fee per seat a month or a year, $ per million tokens, or the Loan Desk rate)
   - trash icon on developed variants
   - The SBL card shows totals and "Managed on the Loan Desk →".
 - **HQ lock:** when "Apply rates to all sales offices" is on at HQ, a **Set prices here** toggle card sits above the products (hint: which HQ list the office follows, or that it sets its own). Off, steppers and offer toggles lock and show "Set at HQ"; on, the office sets its own prices and lineup (C2d2).
@@ -202,7 +202,7 @@ After the wizard, the map opens with the tutorial (§27).
 - **Headline figures:** Branch revenue (with weekly change in $ and %) and Branch income (with change).
 - **Chart:** paired bars for the last 5 weeks.
 - **Branch income statement** (Week | Quarter | Year), with the line groups from SIMULATION §12.
-- **Balances box:** Deposits, Loans, Customers.
+- **Balances box:** ARR, Loan Desk lending (when there is any), Customers (C3a).
 - **Office size card (C2a):** the size (Starter, Standard, Large or Flagship), the cost to grow to the next one and its new weekly rent, and a **Grow office** button (confirm, showing fit-out, extra lease deposit, total and new rent; the reason shows under the button when it can't). At Flagship the card says it is the largest size.
 - **Footer:** Rename branch, Close branch (confirm, showing what you get back; with one office per city, accounts go to the office in the nearest city).
 
@@ -215,9 +215,9 @@ After the wizard, the map opens with the tutorial (§27).
 ## 6. Rival branch
 
 - **Header:** rival brand + district, with the address.
-- **Advisor:** "This is {Rival}'s branch. Their savings rate is {x}; ours is {y}."
+- **Advisor:** "This is {Rival}'s sales office. Their Plus plan is {x}; ours is {y}." (C3a)
 - **Reviews:** same block as §5.1.
-- **Rate sheet:** two columns of products with prices, plus a "vs our nearest branch" column (jade/oxblood) when you have a branch in the city.
+- **Price sheet** (C3a): two groups, Plans (Plus, Pro, Team) and API and apps (Standard API, Batch API, Code Assistant, Agent Studio), with prices, plus a "vs our nearest branch" column (jade/oxblood) when you have a branch in the city. The rival sheet on the city list shows Plus, Pro, Team and the Standard API.
 
 ## 7. Rival bank HQ (Banks layer)
 
@@ -273,7 +273,7 @@ Tabs: Overview · Loans · Credit.
   - "Close HR floor" (release the floor)
 - **Products:**
   - house model (rosette, cost/app, model name) and Manage models (sliders for each data input that sum to 100%, with a live rosette and cost)
-  - company deposits and loans line chart with week-over-week changes
+  - company ARR and Loan Desk lending line chart with week-over-week changes (C3a; weeks closed before schema 6 read ARR as 0)
   - **Product lineup** (category Segmented + product cards like §5.2, at company level) and the "Apply rates to all branches" toggle
   - Product developments list (progress bar, weeks left) and New product
   - **New product form:**
@@ -413,12 +413,12 @@ Tabs: Overview · Loans · Credit.
 - **Stats:** employees, average income, current banking partner (a rival or none).
 - **Deal:**
   - signing fee and contract length
-  - expected deposits curve chart
-  - package selector (deposit product)
+  - expected ARR curve chart, with peak ARR (C3a)
+  - package selector (a plan the host offers; Team for staff, Campus Plan for students by default)
   - host branch selector
   - Sign partnership
 - **Yours:**
-  - health bar, "Year X of 7", deposits and accounts
+  - health bar, "Year X of 7", ARR, package price and accounts
   - curve with a "you are here" marker
   - Renew (shows the fee) / Release
 
@@ -537,7 +537,7 @@ Tabs: Overview · Loans · Credit.
 
 ## 25. Branches list
 
-- Sortable rows: name, city, coins, deposits, loans, weekly income, issues badge.
+- Sortable rows: name, city, coins, ARR, customers, weekly income, issues badge (C3a; sort by Name, Rating, ARR, Customers or Income).
 - Filter by city (sideways-scrolling chips, hidden with one city). Once the bank spans several countries, chips and rows show the country code and "All cities" groups rows under country headings, home first.
 - Tap a row to open the branch panel (works from any city).
 
@@ -565,13 +565,13 @@ Led by your first branch manager in a bar with their portrait, name, step and li
 Steps (each skipped when there's nothing to do, e.g. every branch already has a manager):
 1. Tap a storefront
 2. Build a branch
-3. Set the savings rate
+3. Set the Plus price
 4. Hire a manager
 5. Unpause and read the first weekly results
-6. Turn on Personal Loans
+6. Turn on the API
 7. Approve your first business loan
 8. Run a campaign (Marketing tab: any campaign above Off; skipped where the manager runs marketing)
-9. Meet the bank (open the Company summary from your cash, top left: corporate cash versus deposits, and the capital ratio; done when you close it)
+9. Meet the lab (open the Company summary from your cash, top left: corporate cash and the capital ratio; done when you close it)
 
 Then a closing card that says the guides will return as the bank grows. "Skip tutorial" sits in the bar; Settings → Replay tutorial starts it again.
 

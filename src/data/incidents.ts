@@ -241,8 +241,8 @@ export const INCIDENT_SPECS: Record<string, IncidentSpec> = {
       },
       {
         id: 'raise',
-        label: 'Raise savings rates',
-        effect: 'Savings +1.00% at every sales office for 8 weeks.',
+        label: 'Cut plan prices',
+        effect: 'Plans −10% at every sales office for 8 weeks.',
       },
       {
         id: 'statement',
@@ -258,19 +258,19 @@ export const INCIDENT_SPECS: Record<string, IncidentSpec> = {
     scope: 'company',
     trigger: 'rolled',
     baseP: 0.0015,
-    text: 'An abuse ring is running stolen card numbers through our accounts. Losses so far: about {loss}.',
+    text: 'An abuse ring is signing up for the API with stolen card numbers. Losses so far: about {loss}.',
     money: ['loss'],
     options: [
       { id: 'absorb', label: 'Absorb the losses', effect: 'We eat the fraud.' },
       {
         id: 'freeze',
-        label: 'Freeze cards for a week',
-        effect: 'No losses, but card take-up −50% for 4 weeks.',
+        label: 'Freeze API sign-ups for a week',
+        effect: 'No losses, but API take-up −50% for 4 weeks.',
         penaltyWeeks: 1,
       },
       {
         id: 'bureau',
-        label: 'Absorb and see a credit bureau',
+        label: 'Absorb and call a fraud firm',
         effect: 'We eat the fraud, then look at a model with a stronger fraud shield.',
       },
     ],
@@ -312,19 +312,19 @@ export const INCIDENT_SPECS: Record<string, IncidentSpec> = {
     title: 'Price war',
     scope: 'city',
     trigger: 'triggered',
-    text: '{bank} just raised its savings rate by {bump} in {city} to win depositors back from us.',
+    text: '{bank} just cut its plan prices by {bump} in {city} to win subscribers back from us.',
     pct: ['bump'],
     options: [
       {
         id: 'match',
         label: 'Match it',
-        effect: 'Savings +0.15% at every sales office in {city} for 26 weeks.',
+        effect: 'Plans −10% at every sales office in {city} for 26 weeks.',
         penaltyWeeks: 1,
       },
       {
         id: 'hold',
-        label: 'Hold our rates',
-        effect: 'Keep our margin and risk some outflows.',
+        label: 'Hold our prices',
+        effect: 'Keep our margin and risk some cancellations.',
         penaltyWeeks: 1.5,
       },
     ],

@@ -5,10 +5,9 @@
 // median city rather than any single seed.
 import type { Check } from './strategyTargets';
 
-/** The first branch at one week: balances, customers and 4-week average earnings. */
+/** The first office at one week: ARR, customers and 4-week average earnings. */
 export interface BranchSnap {
-  dep: number;
-  loans: number;
+  arr: number;
   cust: number;
   rev: number;
   inc: number;
@@ -20,27 +19,30 @@ export interface BranchMetrics {
   positiveWeek?: number;
   paybackWeek?: number;
   at: Record<number, BranchSnap>;
-  /** Whether a week's earnings and loan-ratio checks are excused by a recession. */
+  /** Whether a week's earnings checks are excused by a recession. */
   exempt: (week: number) => boolean;
 }
 
-/** Weeks with deposit, customer and earnings checkpoints. */
+/** Weeks with ARR, customer and earnings checkpoints. */
 export const CHECK_WEEKS = [26, 52, 104, 156, 208, 260] as const;
 
-/** §25 home-office bands from year 2 (C2a): [low, high] deposits, revenue and income a week. */
+/** §25 home-office bands from year 2 (C2a, C3a): [low, high] ARR, revenue and income a week. */
 const OFFICE_BANDS: Record<
   number,
-  { dep: [number, number]; rev: [number, number]; inc: [number, number] }
+  { arr: [number, number]; rev: [number, number]; inc: [number, number] }
 > = {
-  104: { dep: [70e6, 180e6], rev: [160e3, 380e3], inc: [55e3, 140e3] },
-  156: { dep: [110e6, 260e6], rev: [250e3, 520e3], inc: [85e3, 190e3] },
-  208: { dep: [140e6, 340e6], rev: [320e3, 700e3], inc: [110e3, 260e3] },
-  260: { dep: [140e6, 360e6], rev: [320e3, 720e3], inc: [110e3, 260e3] },
+  104: { arr: [8e6, 20e6], rev: [160e3, 380e3], inc: [55e3, 140e3] },
+  156: { arr: [12e6, 28e6], rev: [250e3, 520e3], inc: [85e3, 190e3] },
+  208: { arr: [16e6, 36e6], rev: [320e3, 700e3], inc: [110e3, 260e3] },
+  260: { arr: [16e6, 38e6], rev: [320e3, 720e3], inc: [110e3, 260e3] },
 };
+
+/** §25 first-year ARR bands (C3a). */
+const W26_ARR: [number, number] = [1e6, 2.5e6];
+const W52_ARR: [number, number] = [3e6, 6.5e6];
 
 const M = (x: number) => `${(x / 1e6).toFixed(1)}M`;
 const K = (x: number) => `${(x / 1e3).toFixed(1)}k`;
-const P = (x: number) => `${(x * 100).toFixed(1)}%`;
 const inRange = (x: number | undefined, lo: number, hi: number) =>
   x !== undefined && x >= lo && x <= hi;
 
@@ -65,10 +67,10 @@ export function branchCheckpoints(m: BranchMetrics): Check[] {
   if (w26) {
     checks.push(
       {
-        label: 'Week 26 deposits',
-        value: M(w26.dep),
-        ok: inRange(w26.dep, 15e6, 30e6),
-        target: '$15–30M',
+        label: 'Week 26 ARR',
+        value: M(w26.arr),
+        ok: inRange(w26.arr, W26_ARR[0], W26_ARR[1]),
+        target: `$${W26_ARR[0] / 1e6}–${W26_ARR[1] / 1e6}M`,
       },
       { label: 'Week 26 income', value: K(w26.inc), ok: w26.inc > 0, target: 'positive' },
     );
@@ -77,16 +79,10 @@ export function branchCheckpoints(m: BranchMetrics): Check[] {
   if (w52) {
     checks.push(
       {
-        label: 'Week 52 deposits',
-        value: M(w52.dep),
-        ok: inRange(w52.dep, 35e6, 80e6),
-        target: '$35–80M',
-      },
-      {
-        label: 'Week 52 loans / deposits',
-        value: P(w52.loans / w52.dep),
-        ok: inRange(w52.loans / w52.dep, 0.65, 0.9),
-        target: '65–90%',
+        label: 'Week 52 ARR',
+        value: M(w52.arr),
+        ok: inRange(w52.arr, W52_ARR[0], W52_ARR[1]),
+        target: `$${W52_ARR[0] / 1e6}–${W52_ARR[1] / 1e6}M`,
       },
       {
         label: 'Week 52 customers',
@@ -110,21 +106,12 @@ export function branchCheckpoints(m: BranchMetrics): Check[] {
     // Set from the 20-city median on 2026-10-26.
     const band = OFFICE_BANDS[wk]!;
     checks.push({
-      label: `Week ${wk} deposits`,
-      value: M(s.dep),
-      ok: inRange(s.dep, band.dep[0], band.dep[1]),
-      target: `$${band.dep[0] / 1e6}–${band.dep[1] / 1e6}M`,
+      label: `Week ${wk} ARR`,
+      value: M(s.arr),
+      ok: inRange(s.arr, band.arr[0], band.arr[1]),
+      target: `$${band.arr[0] / 1e6}–${band.arr[1] / 1e6}M`,
     });
     checks.push(
-      na(
-        {
-          label: `Week ${wk} loans / deposits`,
-          value: P(s.loans / s.dep),
-          ok: inRange(s.loans / s.dep, 0.65, 0.9),
-          target: '65–90%',
-        },
-        wk,
-      ),
       na(
         {
           label: `Week ${wk} revenue / week`,
@@ -148,8 +135,8 @@ export function branchCheckpoints(m: BranchMetrics): Check[] {
   checks.push({
     label: 'Payback from opening',
     value: String(m.paybackWeek ?? '—'),
-    ok: inRange(m.paybackWeek, 1, 40),
-    target: '≤ 40 weeks',
+    ok: inRange(m.paybackWeek, 1, 44),
+    target: '≤ 44 weeks',
   });
   return checks;
 }
@@ -165,9 +152,9 @@ export function median(xs: (number | undefined)[]): number | undefined {
 }
 
 /**
- * The median city: every checkpoint is the median across runs. Earnings and
- * loan ratios at a week only count runs that week isn't excused for; if every
- * run is excused, the week reads n/a.
+ * The median city: every checkpoint is the median across runs. Earnings at a
+ * week only count runs that week isn't excused for; if every run is excused,
+ * the week reads n/a.
  */
 export function medianMetrics(runs: BranchMetrics[]): BranchMetrics {
   const at: Record<number, BranchSnap> = {};
@@ -177,11 +164,8 @@ export function medianMetrics(runs: BranchMetrics[]): BranchMetrics {
     if (snaps.length === 0) continue;
     const live = runs.filter((r) => r.at[wk] && !r.exempt(wk)).map((r) => r.at[wk]!);
     if (live.length === 0) excused.add(wk);
-    const dep = median(snaps.map((s) => s.dep))!;
-    const ratio = median(live.map((s) => s.loans / s.dep)) ?? 0;
     at[wk] = {
-      dep,
-      loans: ratio * dep,
+      arr: median(snaps.map((s) => s.arr))!,
       cust: median(snaps.map((s) => s.cust))!,
       rev: median(live.map((s) => s.rev)) ?? 0,
       inc: median(live.map((s) => s.inc)) ?? 0,
