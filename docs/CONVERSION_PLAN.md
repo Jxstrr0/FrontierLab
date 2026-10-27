@@ -336,7 +336,7 @@ Follows the brief's map structure (1–2 main offices worldwide, one sales offic
 ### C8 — Polish and relaunch
 - **Build:**
   - Tutorial rewrite
-  - Data-centre and power deals on the regional energy sites (the payroll partnerships, moved from C4)
+  - Data-centre and power deals on the regional energy sites (the payroll partnerships, moved from C4). **C8a done (v0.1.23, schema 18):** SIMULATION §13.7a.
   - Art pass (campus and GPU-hall vignettes, icons)
   - Balance pass across every strategy
   - Docs sweep: DESIGN, SIMULATION, SCREENS and CONTENT fully in AI terms, and this file archived

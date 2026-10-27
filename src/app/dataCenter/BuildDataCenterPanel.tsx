@@ -12,7 +12,7 @@ import {
   type DcSlot,
 } from '../../data/dataCenters';
 import * as cmd from '../../sim/commands';
-import { powerBill, usableGpus } from '../../sim/dataCenters';
+import { dealPowerMult, powerBill, usableGpus } from '../../sim/dataCenters';
 import { Card, Panel, Row, SectionTitle } from '../components';
 import { count, moneyFull } from '../format/format';
 import { act, closePanel, openPanel, toast, useGame } from '../store';
@@ -98,7 +98,10 @@ export function BuildDataCenterPanel(p: { lotId?: string; siteId?: string }) {
           <SectionTitle>Running it</SectionTitle>
           <Card>
             <Row label="GPUs running" value={count(usableGpus(build))} />
-            <Row label="Power bill" value={`${moneyFull(powerBill(build, cityId), sym)} /week`} />
+            <Row
+              label="Power bill"
+              value={`${moneyFull(powerBill(build, cityId) * dealPowerMult(s, cityId), sym)} /week`}
+            />
             <Row label="Rent" value={`${moneyFull(quote.rent, sym)} /week`} />
             <Row label="Fit-out" value={`${quote.weeks} weeks`} />
           </Card>

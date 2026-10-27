@@ -46,6 +46,8 @@ export function signBlocker(
   const site = state.world.sites[siteId];
   if (!site || (site.kind !== 'employer' && site.kind !== 'university') || !site.employer)
     return 'That employer is no longer on the map.';
+  if (site.kind === 'employer' && CITIES[site.cityId]?.regional)
+    return 'Energy sites sign data-centre and power deals, not payroll partnerships.';
   if (kind === 'student' && site.kind !== 'university')
     return 'Only universities offer student partnerships.';
   if (activePartnership(state, siteId, kind)) return 'You already have this partnership.';
