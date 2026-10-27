@@ -87,7 +87,7 @@ export function signRival(
   quarters: readonly [number, number],
 ): void {
   b.vendor = { type: 'rival', id: rivalId };
-  b.contractValue = Math.round((b.budget * rng.range(...BUSINESS.contractShare)) / 1000) * 1000;
+  b.contractValue = Math.round((b.budget * rng.range(...BUSINESS.contractShare)) / 100) * 100;
   b.renewalWeek = quarterStartWeek(state.meta.startDate, state.clock.week, rng.int(...quarters));
   delete b.startWeek;
 }
@@ -157,8 +157,8 @@ function rollLotBusiness(
         sector.budgetMult *
         rng.lognormal(1, BUSINESS.budgetSigma) *
         listLevel(state, lot.cityId)) /
-        1000,
-    ) * 1000;
+        100,
+    ) * 100;
   return {
     name: uniqueName(rng, sector.types, used),
     sector: sector.id,
@@ -207,8 +207,8 @@ function seedAnchor(state: GameState, rng: Rng, site: Site, n: number): Business
         e.incomeMult *
         rng.lognormal(1, BUSINESS.budgetSigma) *
         listLevel(state, site.cityId)) /
-        1000,
-    ) * 1000;
+        100,
+    ) * 100;
   return newBusiness(state, site.cityId, n, {
     name: e.name,
     sector: ANCHOR_SECTOR.id,

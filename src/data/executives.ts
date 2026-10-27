@@ -193,8 +193,9 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
       },
       {
         id: 'loanPolicy',
-        label: 'Loan Desk policy',
-        description: 'Decides Loan Desk applications at sales offices without a delegated manager.',
+        label: 'Deal Desk policy',
+        description:
+          'Bids on proposal requests at sales offices without a delegated manager, within each office’s discount limit.',
       },
       {
         id: 'guidance',
