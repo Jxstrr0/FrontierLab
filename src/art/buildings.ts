@@ -51,7 +51,7 @@ export function drawBuilding(
   const shell = styled(e, t, floors, rng, lot, map) ?? classic(e, t, floors, rng, lot);
   if (!lot) return;
   for (const face of ['left', 'right'] as const) shopfront(e, face, shell);
-  if (occupant?.type === 'rival') {
+  if (occupant?.type === 'rival' || occupant?.type === 'business') {
     for (const face of ['left', 'right'] as const) awning(e, face, shell, occupant.ink);
   }
   if (occupant?.type === 'player') roofFlag(e, shell.roof, occupant.ink);

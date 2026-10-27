@@ -22,6 +22,7 @@ export type MarkShape = 'crest' | 'coin' | 'medallion' | 'tag' | 'landmark';
 export type MarkerId =
   | Exclude<MapLayerId, 'branches' | 'banks' | 'dataCenters'>
   | 'vacationHomes'
+  | 'businesses'
   | 'centralBank'
   | 'airport';
 
@@ -111,6 +112,13 @@ export const MARKERS: Record<MarkerId, MarkerStyle> = {
     caption: 'Employer',
     shape: 'medallion',
   },
+  // Stage C5a: customer businesses on storefronts, on the Businesses layer with the employers.
+  businesses: {
+    icon: 'handshake',
+    ink: 'var(--type-business)',
+    caption: 'Business',
+    shape: 'medallion',
+  },
   energySites: {
     icon: 'bolt',
     ink: 'var(--type-energy)',
@@ -141,6 +149,7 @@ const KIND_MARKER: Partial<Record<PinKind, MarkerId>> = {
   auctionHouse: 'auctionHouses',
   university: 'universities',
   employer: 'employers',
+  business: 'businesses',
   energySite: 'energySites',
   stadium: 'sportsTeams',
   centralBank: 'centralBank',

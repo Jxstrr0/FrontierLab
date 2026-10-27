@@ -9,6 +9,7 @@ import { migrateCatalog } from './migrateCatalog';
 import { migrateBankCleanup } from './migrateBankCleanup';
 import { migrateCompute } from './migrateCompute';
 import { migrateGpuLots } from './migrateGpuLots';
+import { migrateBusinesses } from './migrateBusinesses';
 import { migrateSpotLimits } from './migrateSpotLimits';
 import { migrateMoney } from './migrateMoney';
 import { SCHEMA_VERSION, type GameState } from '../state';
@@ -77,6 +78,11 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
   // 10 → 11 (stage C4c): spot limits, emergency burst, capacity crunch and outages.
   10: (s) => {
     migrateSpotLimits(s as unknown as GameState);
+    return s;
+  },
+  // 11 → 12 (stage C5a): customer businesses on spare storefronts and anchor employers.
+  11: (s) => {
+    migrateBusinesses(s as unknown as GameState);
     return s;
   },
 };

@@ -12,7 +12,11 @@ import { hqReady, manageHq } from './hq';
 import { cityFull, growableOffice, hasRoom, nextExpansionLot } from './expansion';
 import type { Strategy } from './types';
 import * as cmd from '../../src/sim/commands';
+import { weeklyCosts } from '../../src/sim/cashCover';
 import type { GameState } from '../../src/sim/state';
+
+/** Weeks of running costs aggressive keeps in cash before it expands (C5a). */
+const AGGRESSIVE_RESERVE_WEEKS = 3;
 
 const DELEGATE_OPS = { staffing: true, loans: true, marketing: true, products: false };
 
@@ -31,27 +35,39 @@ function expand(
   mult: number,
   minCr: number,
   lending: boolean,
-  opts: { hq?: boolean; travel?: boolean; growCr?: number } = {},
+  opts: { hq?: boolean; travel?: boolean; growCr?: number; reserveWeeks?: number } = {},
 ): void {
-  const { hq = true, travel = true, growCr = minCr } = opts;
+  const { hq = true, travel = true, growCr = minCr, reserveWeeks = 0 } = opts;
   if (hq && !hqReady(state)) return;
-  if (growOffice(state, mult, growCr)) return;
+  // Cash kept back for running costs (aggressive keeps a few weeks, C5a).
+  const reserve = reserveWeeks * weeklyCosts(state);
+  if (growOffice(state, mult, growCr, Infinity, reserve)) return;
   if (travel && cityFull(state) && state.company.capitalRatio <= minCr) return;
   if (!travel && !hasRoom(state, state.world.currentCityId)) return;
   const lot = travel ? nextExpansionLot(state) : bestLot(state);
   if (!lot) return;
-  if (state.company.cash > mult * buildCost(state, lot) && state.company.capitalRatio > minCr) {
+  if (
+    state.company.cash > mult * buildCost(state, lot) + reserve &&
+    state.company.capitalRatio > minCr
+  ) {
     openBranch(state, lot, { lending, delegate: DELEGATE_OPS });
   }
 }
 
 /** Grows the busiest office a size when cash > mult × the cost and capital clears minCr (C2a). */
-function growOffice(state: GameState, mult: number, minCr: number, maxSize = Infinity): boolean {
+function growOffice(
+  state: GameState,
+  mult: number,
+  minCr: number,
+  maxSize = Infinity,
+  reserve = 0,
+): boolean {
   const office = growableOffice(state);
   if (office && (office.size ?? 0) >= maxSize) return false;
   const quote = office ? cmd.upgradeQuote(state, office.id) : undefined;
   if (!office || !quote) return false;
-  if (state.company.cash <= mult * quote.total || state.company.capitalRatio <= minCr) return true;
+  if (state.company.cash <= mult * quote.total + reserve || state.company.capitalRatio <= minCr)
+    return true;
   return cmd.upgradeOffice(state, office.id).ok;
 }
 
@@ -110,7 +126,7 @@ export const aggressive: Strategy = {
     // Cheapest prices: savers get 0.5pp more, borrowers pay 0.5pp less.
     followDefaults(s, 0.005, -0.005);
     manageHq(s);
-    expand(s, 1.2, 0.085, true, { growCr: 0.075 });
+    expand(s, 1.2, 0.085, true, { growCr: 0.075, reserveWeeks: AGGRESSIVE_RESERVE_WEEKS });
     maybeBuildDataCenter(s, 3);
     manageCompute(s);
   },

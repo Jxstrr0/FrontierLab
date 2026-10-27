@@ -47,7 +47,8 @@ export const MAP_LAYERS: readonly MapLayerSpec[] = [
   { id: 'autoDealers', label: 'Auto Dealers', feature: 'personalEmpire' },
   { id: 'auctionHouses', label: 'Auction Houses', feature: 'personalEmpire' },
   { id: 'universities', label: 'Universities', feature: 'competition' },
-  { id: 'employers', label: 'Employers', feature: 'competition' },
+  // C5a: customer businesses and the anchor employers. Id kept for saved toggles.
+  { id: 'employers', label: 'Businesses', feature: 'competition' },
   { id: 'energySites', label: 'Energy Sites', feature: 'multiCity' },
 ];
 

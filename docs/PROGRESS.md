@@ -3,13 +3,37 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C4 done (C4c is v0.1.15, save schema 11): compute has a price, a pool, a floor, GPU lots, spot limits, a capacity crunch and outages. C3 (v0.1.10–v0.1.12) turned the money model into a lab's. Next is C5 (businesses and the Deal Desk).
+**Current stage:** C5a done (v0.1.16, save schema 12): named customer businesses on the map, some already on rival contracts. C4 (v0.1.13–v0.1.15) gave compute a price, a pool, a floor, GPU lots, spot limits, a crunch and outages. Next is C5b (the Deal Desk: RFPs, contracts, the renewal season).
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `031bda2c522626` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `1897f86dd7744b` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-27 — Stage C5a: customer businesses on the map (v0.1.16)
+
+**What you asked for:** start C5. C5 is big, so I split it like C4: **C5a** puts the businesses on the map (this one), and **C5b** adds the Deal Desk that lets you win and lose their contracts.
+
+**What changed.**
+- **Businesses on spare storefronts.** When a city is made, about half of each district's free storefronts become named businesses (for example "Meridian Health" or "Ashgrove Hotel"). Every district keeps at least one storefront free, so you can still open offices and data centers anywhere. A business holds its storefront for good: it isn't for lease.
+- **Employers are anchor accounts.** Each employer (City Hall, the hospital, the port…) is now also a big customer, with a budget that grows with its headcount (around $1–4M a year).
+- **Each business has:** a sector (12, from cafés to finance), a size (small, mid-size, large), a yearly AI budget, and a five-point profile: AI readiness, Budget, Data sensitivity, Switching cost and Financial health. The Deal Desk will use these in C5b.
+- **Rivals already serve some.** In a city with rival labs, about half the businesses (and 70% of anchors) start on a rival's contract, worth 70–100% of their budget. A rival that held an employer's payroll deal holds its AI contract too.
+- **The renewal season.** Contracts come up at the start of a quarter, as you decided (A7). For now a due contract simply renews with the same lab; a lab that has left the city loses it, and a lab bought by another hands its contracts to the buyer. C5b turns this into real bidding.
+- **On the map:** the Employers layer is now **Businesses**. Each business has a teal handshake pin, captioned with its lab's short name. Its storefront wears an **awning in its lab's colours**, and in yours once you win it (with your seal on the pin). Tapping a pin opens the new **business panel**: budget, vendor, contract, renewal month and the profile. An employer's panel shows its anchor account too.
+
+**Old saves.** Schema 11 → 12. Every city you've already visited gets its businesses from its own random stream, on the storefronts that are still free. A test checks a migrated city gets exactly the businesses a new one would.
+
+**Balance.** All 20 cities still pass every checkpoint, and seed 42 steady passes all of its own. The aggressive test strategy's cash dipped to −$475k: with fewer free storefronts it built on different lots and ran its cash to zero right before a tick. It now keeps three weeks of running costs before it expands, like a sensible player, and its low is +$86k (seeds 7 and 99 are +$83k and +$79k). Rivals still count business storefronts as room in a city, so their growth is unchanged.
+
+**Tests.** New `businesses.test.ts`: businesses per district (one storefront always free), anchors for every employer, rival contracts renewing at a quarter start, the same businesses whatever order you visit cities, the renewal season, and the migration. `mapPins.test.ts` checks the business pins, awnings in the vendor's ink and the layer switch.
+
+**Checked in the browser** at iPhone size: business pins on the map, the business panel and the Layers sheet. No console errors.
+
+**Checks.** `npm run lint`, all tests and `npm run build` pass. The **determinism snapshot** moved from `031bda2c522626` to `1897f86dd7744b` (intended: businesses take storefronts and draw from their own streams).
+
+**Next:** C5b, the Deal Desk: businesses send requests for proposals to your sales office, you sign contracts at a price, and at each renewal season they stay, leave for a rival or go without.
 
 ### 2026-10-27 — Stage C4c: spot limits, capacity crunch and outages (v0.1.15)
 

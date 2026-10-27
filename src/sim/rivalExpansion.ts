@@ -18,7 +18,7 @@ import {
 import { CITIES } from '../data/cities';
 import { DISTRICT_SPECS } from '../data/districts';
 import { RIVALS, STRATEGY_PROFILES } from '../data/rivals';
-import { tileDistance } from './citygen';
+import { roomLot, tileDistance } from './citygen';
 import { difficultyOf } from './difficulty';
 import { pushEvent } from './events';
 import { newId } from './ids';
@@ -210,7 +210,8 @@ export function entryCity(state: GameState, bank: RivalBank, allLots: Lot[]): st
     if (!abroad && !home.includes(city.country)) continue;
     const lots = allLots.filter((l) => l.cityId === cityId);
     if (!cityHasRoom(state, cityId, lots)) continue;
-    const free = lots.filter((l) => !l.occupant).length;
+    // Storefronts held by businesses (C5a) still count as the city's room.
+    const free = lots.filter(roomLot).length;
     if (free > bestFree) {
       bestFree = free;
       best = cityId;

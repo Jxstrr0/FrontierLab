@@ -674,6 +674,28 @@ Pentagon order: Management, Track record, Market, Competitiveness, Financial hea
 - Prefixes: Northline, Maple, Riverside, Summit, Harbour, Golden Prairie, Blue Spruce, Ironwood, Lakeside, Cedar, Union, Granite, Bright Path, Old Mill, Copper Kettle, Westbrook.
 - Types match the sector: Bakery, Café, Logistics, Dental, Construction, Brewing Co., Auto Repair, Design Studio, Clinic, Outfitters, Farms, Robotics, Hotel, Law Group.
 
+## 21b. Deal sectors (stage C5a)
+
+Customer businesses on spare storefronts (`src/data/dealSectors.ts`). Pentagon order: AI readiness, Budget, Data sensitivity, Switching cost, Financial health. Names are a prefix (28 invented words such as the ones in the file) plus one of the sector's business words.
+
+| Sector | Budget mult | Term (quarters) | Pentagon profile | Districts |
+|---|---|---|---|---|
+| Café & restaurant | 0.5 | 2–4 | 3, 3, 3, 3, 4 | Downtown, University |
+| Retail | 0.8 | 2–4 | 5, 5, 4, 4, 5 | Downtown, Midtown |
+| Construction | 0.9 | 4–8 | 3, 5, 4, 5, 5 | Suburbs, Industrial |
+| Logistics | 1.3 | 4–8 | 6, 6, 4, 6, 5 | Industrial |
+| Health care | 1.2 | 4–8 | 5, 6, 9, 7, 7 | Midtown, Suburbs |
+| Software | 1.6 | 2–4 | 9, 6, 5, 3, 4 | University, Financial |
+| Manufacturing | 1.4 | 4–8 | 5, 6, 6, 7, 6 | Industrial |
+| Farm & agri (S/M cities only) | 0.7 | 4–8 | 3, 4, 3, 5, 5 | Suburbs |
+| Professional services | 1.1 | 4–6 | 7, 7, 8, 5, 7 | Financial |
+| Finance & insurance | 2.0 | 4–8 | 6, 8, 9, 7, 7 | Financial, Downtown |
+| Media & design | 0.9 | 2–4 | 8, 5, 3, 3, 4 | Downtown, University, Waterfront |
+| Hotel & hospitality | 1.0 | 4–6 | 4, 5, 5, 5, 4 | Waterfront, Downtown |
+| Major employer (anchor) | 1 | 8–12 | 5, 8, 7, 8, 7 | employer sites |
+
+Sizes (`BUSINESS.sizes` in balance.ts): small, mid and large weigh 0.55 / 0.33 / 0.12 with base budgets of $30k / $120k / $450k a year; anchors start at $1.8M scaled by headcount (per 2,500 staff) and pay.
+
 ## 22. Incidents
 Implemented in `src/data/incidents.ts` (texts and options) and `src/data/incidentParams.ts` (numbers).
 

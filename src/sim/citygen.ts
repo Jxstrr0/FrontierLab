@@ -111,3 +111,10 @@ export function rollLot(
 export function tileDistance(a: Lot, b: Lot): number {
   return dhypot(a.tile.x - b.tile.x, a.tile.y - b.tile.y);
 }
+
+/**
+ * A storefront that counts as a city's spare room for rival growth (§18.4):
+ * a free one, or one a business holds (C5a), so businesses don't shrink the
+ * city's measure. Only free storefronts can actually be leased.
+ */
+export const roomLot = (l: Lot): boolean => !l.occupant || l.occupant.type === 'business';
