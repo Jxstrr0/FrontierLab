@@ -4,7 +4,7 @@
 //   crest     — banks: your branches and HQ (brand ink), rival branches and head offices (ivory, their ink).
 //               Every place you own (HQ, property, vacation home, club) is a brand-ink crest
 //               with its own glyph in place of the monogram.
-//   coin      — open branch locations: a small, quiet "$"
+//   coin      — open locations to build on: a small, quiet "+"
 //   medallion — places you deal with: a round coin in the type's ink with an ivory glyph
 //   tag       — buildings you rent or buy: a price tag in the type's ink
 //   landmark  — the central bank, airport and stadium: a larger scalloped seal

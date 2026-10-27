@@ -49,25 +49,36 @@ export function CreditLineCard(p: { siteId: string; near: boolean }) {
         {CORPORATE_LENDING.lineEquityShare * 100}% of your equity and moves with it; interest is
         charged weekly on what you use.
       </p>
-      <Segmented
-        label="Draw or repay"
-        options={[
-          { value: 'draw', label: 'Draw' },
-          { value: 'repay', label: 'Repay' },
-        ]}
-        value={mode}
-        onChange={setMode}
-      />
-      <AmountSlider
-        label={mode === 'draw' ? 'Draw' : 'Repay'}
-        value={value}
-        max={max}
-        onChange={setAmount}
-        sym={sym}
-      />
-      <button type="button" class="btn btn-primary btn-block" disabled={value <= 0} onClick={go}>
-        {mode === 'draw' ? `Draw ${money(value, sym)}` : `Repay ${money(value, sym)}`}
-      </button>
+      {!p.near && used === 0 ? (
+        <p class="muted small">You can draw on it once you have a sales office here.</p>
+      ) : (
+        <>
+          <Segmented
+            label="Draw or repay"
+            options={[
+              { value: 'draw', label: 'Draw' },
+              { value: 'repay', label: 'Repay' },
+            ]}
+            value={mode}
+            onChange={setMode}
+          />
+          <AmountSlider
+            label={mode === 'draw' ? 'Draw' : 'Repay'}
+            value={value}
+            max={max}
+            onChange={setAmount}
+            sym={sym}
+          />
+          <button
+            type="button"
+            class="btn btn-primary btn-block"
+            disabled={value <= 0}
+            onClick={go}
+          >
+            {mode === 'draw' ? `Draw ${money(value, sym)}` : `Repay ${money(value, sym)}`}
+          </button>
+        </>
+      )}
     </>
   );
 }

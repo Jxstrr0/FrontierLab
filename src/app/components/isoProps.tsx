@@ -185,20 +185,24 @@ export function Easel(p: { g: Iso; i: number; j: number }) {
   );
 }
 
-/** A strongbox with a dial (risk floor, a back-office safe). */
-export function Safe(p: { g: Iso; i: number; j: number }) {
+/** An air-gapped eval rack behind a wire cage (Safety floor: red-team sandbox). */
+export function SandboxRack(p: { g: Iso; i: number; j: number; seed: number }) {
   const { g } = p;
-  const [x, y] = isoPt(g, p.i + 0.3, p.j + 0.6, 0.35);
+  const front = p.j + 0.65;
+  const pt = (i: number, z: number) =>
+    isoPt(g, i, front, z)
+      .map((v) => v.toFixed(1))
+      .join(' ');
+  let bars = '';
+  for (let n = 0; n <= 4; n++) {
+    const i = p.i - 0.05 + n * 0.175;
+    bars += `M${pt(i, 0)}L${pt(i, 1.4)}`;
+  }
+  bars += `M${pt(p.i - 0.05, 1.4)}L${pt(p.i + 0.65, 1.4)}M${pt(p.i - 0.05, 0.7)}L${pt(p.i + 0.65, 0.7)}`;
   return (
     <g>
-      <IsoBox g={g} i={p.i} j={p.j} w={0.6} d={0.6} h={0.7} left="dense" right="light" />
-      <circle cx={x.toFixed(1)} cy={y.toFixed(1)} r={(2.2 * k(g)).toFixed(2)} class="art-paper" />
-      <circle
-        cx={x.toFixed(1)}
-        cy={y.toFixed(1)}
-        r={(2.2 * k(g)).toFixed(2)}
-        class="art-line art-fine"
-      />
+      <Rack g={g} i={p.i} j={p.j} seed={p.seed} />
+      <path d={bars} class="art-line art-fine" />
     </g>
   );
 }

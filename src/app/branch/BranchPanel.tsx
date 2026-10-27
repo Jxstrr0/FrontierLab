@@ -42,8 +42,8 @@ export function BranchPanel(p: { branchId: string; tab: BranchTab }) {
 
   return (
     <Panel
-      title={`${s.meta.bankName} — ${branch.name}`}
-      subtitle={[lot?.address, district !== branch.name ? district : undefined]
+      title={branch.name}
+      subtitle={[s.meta.bankName, lot?.address, district !== branch.name ? district : undefined]
         .filter(Boolean)
         .join(' · ')}
       icon={
