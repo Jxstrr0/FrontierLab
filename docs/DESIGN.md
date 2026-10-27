@@ -1,6 +1,6 @@
 # Frontier Lab — Game Design
 
-Source of truth for intent. Formulas and numbers live in `SIMULATION.md`, screens in `SCREENS.md`, data in `CONTENT.md`. Last updated 2026-10-27 (stage C8e docs sweep).
+Source of truth for intent. Formulas and numbers live in `SIMULATION.md`, screens in `SCREENS.md`, data in `CONTENT.md`. Last updated 2026-10-27 (stage C8f).
 
 > **About the code names.** Frontier Lab began as a fork of the bank tycoon Vault Street. The bank-to-AI conversion (stages C0–C8) is finished, and its plan is archived in `docs/archive/CONVERSION_PLAN.md`. Many code identifiers still carry bank names so that saves and tests keep working: a sales office is a `branch`, the lab's name is `bankName`, the Compute floor is `treasury`, the Safety & Alignment floor is `risk`, and so on. This document describes the game in AI terms and names the code identifier in backticks where it helps.
 
@@ -8,7 +8,7 @@ Source of truth for intent. Formulas and numbers live in `SIMULATION.md`, screen
 
 ## 1. Pitch
 
-You found an AI lab with a fresh seed round: $900,000 to spend, plus $2,000,000 held in treasury reserves that you can't spend. Open your first sales office, price your plans and API, hire a sales team and an office manager, and start signing up customers. Buy compute to serve them, train better models, keep the safety regulator happy, win enterprise contracts from businesses across the city, take the lab public, buy your rivals, and expand into the world's tech capitals. Your personal fortune grows alongside: homes, cars, collectibles, a jet, a sports franchise, and a climb up the rich list.
+You found an AI lab with a fresh seed round: $1,500,000, all of it yours to spend. Open your first sales office, price your plans and API, hire a sales team and an office manager, and start signing up customers. Buy compute to serve them, train better models, keep the safety regulator happy, win enterprise contracts from businesses across the city, take the lab public, buy your rivals, and expand into the world's tech capitals. Your personal fortune grows alongside: homes, cars, collectibles, a jet, a sports franchise, and a climb up the rich list.
 
 - **Title:** Frontier Lab (forked from the bank tycoon Vault Street).
 - **Repo:** `FrontierLab`; reference fork `VaultStreet` (remote `upstream`, read-only).
@@ -63,9 +63,9 @@ How each of the original game's systems appears in Frontier Lab. The code-name c
 | Understaffing warnings from floor advisors | Same, plus coverage % per floor | | |
 | HR employee benefits carousel | Same, plus Compute Allowance | `mortgage_disc` | |
 | Force the prices to all stores | Apply prices to all sales offices, with a per-office "Set prices here" | `applyRatesToAll`, `ownPrices` | |
-| Commercial bank: business loans, line of credit | Rival lab HQ: corporate loans and a credit line | `corporateDebt` | You borrow corporate cash |
+| Commercial bank: business loans, line of credit | Investment bank Debt tab: venture debt and a revolving credit line | `corporateDebt` | You borrow corporate cash |
 | Central bank rate headlines | Central bank building per country, plus headlines | | Rates drive the economy |
-| Investment bank: Market, Equity, M&A | Same | | Private placement and IPO added |
+| Investment bank: Market, Equity, M&A | Market, Equity, Debt, M&A | | Private placement, IPO and corporate debt added |
 | Secondary offering: shares, price, fees (4.55%), proceeds | Same | | |
 | Stock card: price chart, market cap, dividend, 52w range, P/E, top shareholders, trade | Same | | |
 | Coffee companies M&A | Rival lab M&A | | Regulator approval required |
@@ -128,7 +128,7 @@ There's no fixed ending. Milestones, the annual rich list and the "fastest growi
 - **New Game options:**
   - **Difficulty:** Easy, Normal, Hard or Expert. Harder levels mean fewer prospects and better-run rivals (SIMULATION §26 `DIFFICULTY`). Normal is the balance reference.
   - **Competitors:** 1–5 rival labs in each city, defaulting to the city's usual count (CONTENT §2).
-  - **Starting cash:** $600k, $900k (default), $1.2M or $1.5M of spendable cash. The $2M reserve stays the same.
+  - **Seed money:** $1M, $1.5M (default), $2M or $2.5M, all of it spendable.
   - **Currency:** $, C$, £, € or ¥, the symbol money is shown in (as in the original's start options). It changes display only and can be switched later in Settings.
 - Other cities open up through travel (§5.17).
 - **One global enterprise.** You can fly to any city at any time and buy anything there: sales offices, data centers, offices, buildings, stakes, rival labs. Everything you own in every city keeps running every week at once, so the lab grows into a single worldwide business. Start cities differ in market size, rents and rivals, and that difference stays.
@@ -216,7 +216,7 @@ Five tabs. Coffee Inc has four; the Deal Desk is the AI-lab addition.
 Shown to the player in one place, the Company summary:
 - **Revenue is cash.** Plans, API usage, apps and contracts are recurring revenue. The headline number is **ARR** (annual recurring revenue); each week a lab earns about ARR ÷ 52.
 - **Corporate cash** (top bar) pays for offices, data centers, compute, salaries, acquisitions and dividends.
-- **Treasury reserves.** The lab starts with $2M held in reserves (code `CHARTER_CAPITAL`, in `treasury.reserves`). It counts toward equity but can't be spent.
+- **Seed money.** The whole seed round is corporate cash from day one; nothing is locked away. Treasury reserves (`treasury.reserves`) start at $0 and matter only to old bank-era saves.
 - **Compute.** Every plan seat, API token and contract needs GPUs, counted in GPU-weeks.
   - Your own GPUs (data centers and power deals) serve demand first, then rented GPU lots, then the spot market.
   - The spot price follows a global **chip cycle** (glut, normal, shortage).
@@ -234,13 +234,13 @@ Shown to the player in one place, the Company summary:
   | Critical | < 55% | No new sign-ups, a fine each quarter |
 - **Mandated pause.** After eight weeks below 40%, the regulator offers an eight-week pause (no new customers, deals or training, for a fee) while its monitors work with your Safety team. Declining, or failing to recover, revokes the licence for 26 weeks, then a year of strict watch. It is never game over (`RECAP_OFFER` is the pause offer).
 - **Credit ratio.** The bank's old capital ratio (`capitalRatio`) lives on as the credit ratio lenders look at. It sets loan spreads and limits buybacks and acquisitions.
-- **Outage rumour.** Very poor ratings while the safety tier is Restricted or Critical can start a rumour that the lab is about to go dark: customers churn fast for a few weeks until you respond (code `BANK_RUN`).
+- **Outage rumour.** Very poor ratings while the safety tier is Restricted or Critical can start a rumour that the lab is about to go dark: customers cancel their plans fast for a few weeks until you respond with service credits, a price cut or a public statement (code `BANK_RUN`).
 
 ### 5.7 Macro and central banks
 - **Cycle.** Every country moves through expansion, slowdown, recession and recovery.
 - **Central bank.** Each country's central bank (real institution names, simulated decisions) meets eight times a year; some meet four times. Policy follows inflation and growth.
 - **Effects.** The cycle moves customer demand, business failures, house prices, the yield curve (which inverts before recessions), stock prices and lenders' rates.
-- **On the map.** The central bank building shows the country dashboard. Its standing lending facility is a bank-era leftover that lends into treasury reserves.
+- **On the map.** The central bank building shows the country dashboard: your sales offices sell into an economy its rate steers. Its standing lending facility shows only for old bank-era saves that still carry funding.
 - **The chip cycle** is separate and global: one compute price index for the world (§5.6).
 
 ### 5.8 HQ and offices
@@ -254,7 +254,8 @@ Shown to the player in one place, the Company summary:
 - **Founder mode:** with three or fewer office units nothing is required (a Starter office is one unit, a Flagship four). Requirements phase in fully by eight units, or at once when total assets reach $250M.
 
 #### 5.8.1 Finance
-- Company statements (income, balance sheet, cash flow; Week/Quarter/Year): Revenue → Compute → Gross profit, then running costs. A revenue and net income chart, and a credit and liquidity summary.
+- Company statements (income, balance sheet, cash flow; Week/Quarter/Year): Revenue → Compute → Gross profit, then running costs. A revenue and net income chart, and a credit summary (plus liquidity for old bank-era saves).
+- **Launch posture** (code `riskAppetite`): a 1–5 dial from Very cautious to Very bold. A bolder posture wins and keeps more Deal Desk contracts but adds to the model's safety exposure, and at Bold or Very bold capability over-claims are likelier. The Chief Safety Officer and the CFO can steer it.
 - Understaffed:
   - statements are delayed
   - an investor-relations discount hits your share price
@@ -303,7 +304,7 @@ Brand awareness by city, brand campaigns (TV, billboards, podcasts, creators, ar
 #### 5.8.8 Executive
 - Quarterly board meeting.
 - Senior executives: COO, CFO, CPO, CMO and CTO, as in the original, plus three more seats:
-  - **Chief Safety Officer** (CSO; seat id `cro`): runs safety policy and the Deal Desk policy.
+  - **Chief Safety Officer** (CSO; seat id `cro`): runs the Deal Desk policy and steers the launch posture by the safety tier (down at Watch or worse, up at Strong).
   - **Chief Infrastructure Officer** (CIO; seat id `creo`): manages the rents on the lab's buildings and on yours (to an occupancy you dial) and can buy buildings for either.
   - **Chief Scientist** (CSci): lifts training-run odds by expertise and can run routine training runs.
 - Each profile has skills (Leadership, Expertise, Loyalty), delegation toggles, salary, stock option and RSU grants with vesting, and a fire button. Delegations are on from the day of hire, and a seat remembers its last holder's toggles.
@@ -329,10 +330,10 @@ Brand awareness by city, brand campaigns (TV, billboards, podcasts, creators, ar
   - sign unserved businesses and take the contracts you lose
 - **They grow with the economy.** Every country's price-and-wealth level (the nominal index, SIMULATION §4.6) rises with its growth and inflation plus a trend, about 8–9% a year. Prices, wages and rival books are all quoted at that level, so a world whose cities are full keeps growing, rivals become real acquisition targets, and a long game runs into the hundreds of billions and beyond.
 - **Failures.** Weak rivals can fail in recessions; their office networks go up for distressed sale. New labs are founded during a game.
-- **Corporate lending.** Rival lab HQs (Rival Labs layer) lend to your company: business loans and a line of credit, priced on your credit ratio. This is corporate cash.
+- **Know your competition.** A rival lab's HQ (Rival Labs layer) shows who they are: model, researchers, cities, results. Rival labs don't lend to you; corporate borrowing is at the investment banks (§5.10).
 
 ### 5.10 Capital markets
-Investment banks on the map, with tabs Market / Equity / M&A:
+Investment banks on the map, with tabs Market / Equity / Debt / M&A:
 - **Market:**
   - sector tabs: AI labs, Technology, Energy, Auto, Retail, Real Estate
   - company cards: price chart, market cap, dividend and yield, 52-week range, P/E, top shareholders
@@ -341,6 +342,10 @@ Investment banks on the map, with tabs Market / Equity / M&A:
   - While private: private placements, selling up to 25% per round.
   - IPO once eligible: ARR ≥ $100M, four profitable quarters, a finance team in place, a safety tier of Adequate or Strong, and no recession at home unless the credit ratio is strong.
   - After listing: secondary offerings showing new shares, price per share, gross proceeds, underwriting fee and capital raised.
+- **Debt:** an investment bank lends to labs with a sales office in its city.
+  - **Venture debt:** 2–3 fixed-rate term loan offers every four weeks, priced on your credit ratio and paid back weekly. All corporate debt together is capped at 40% of equity.
+  - **Credit line:** a revolving line at each bank, up to 60% of equity, at the policy rate + 4%. Draw or repay any week.
+  - This is corporate cash, shown under "Your debt" with early repayment.
 - **M&A:**
   - Buy rival labs with an offer price and premium.
   - Acceptance depends on the premium and the target's health.
@@ -416,7 +421,7 @@ Investment banks on the map, with tabs Market / Equity / M&A:
 - **Private jet:** bought with personal cash (Corvid 600, 6,000 km range; Albatross 8000, global). Adds a "Fly now" option from any map, and its flights never cost a ticket (assumption); a hop beyond the jet's range flies by the normal rules.
 
 ### 5.18 Goals, milestones, failure
-- **Milestones:** first sales office, first contract, first profitable quarter, first Flagship, first data center, HQ fully staffed, IPO, first acquisition, Five Flagships, three data centers, ten cities, a billion in deposits (a bank-era leftover that a lab can no longer reach), five countries, $10B in assets, five acquisitions, club owner, twenty cities, ten countries, billionaire founder, on the rich list, ten acquisitions, $100B in assets, rich list #1, ten-billion founder, $1T in assets.
+- **Milestones:** first sales office, first contract, first profitable quarter, first Flagship, first data center, HQ fully staffed, IPO, first acquisition, Five Flagships, three data centers, ten cities, a billion in ARR, five countries, $10B in assets, five acquisitions, club owner, twenty cities, ten countries, billionaire founder, on the rich list, ten acquisitions, $100B in assets, rich list #1, ten-billion founder, $1T in assets.
 - **Failure:**
   - **Insolvency:** corporate cash below zero for four weeks with no credit available. This is the only game over.
   - **Licence revoked** is not failure: a 26-week pause, then a year of strict watch, with the personal fortune untouched (§5.6).
@@ -717,3 +722,9 @@ Add one dated line per decision. Never delete entries; supersede them.
 - 2026-10-27 (stage C8d): **Listed rival labs are priced on revenue like yours.** Target = max(book per share, trailing revenue × the §19.2 multiple from their own growth and model lead) × sentiment. The bank-era ROE clamp is gone. Buying a listed rival now costs more, which suits an AI market where labs trade far above book.
 - 2026-10-27 (stage C8d): **The recession balance targets are read in safety tiers and cash.** Aggressive must reach Watch or worse at some point; under the forced recession, aggressive must reach Watch or worse without its cash going negative. The old Restricted-or-Critical-in-a-recession target came from bank capital, which an AI lab doesn't hold.
 - 2026-10-27 (stage C8e): **The docs are swept into AI terms.** DESIGN, SIMULATION, SCREENS and CONTENT now describe the AI-lab game as it is, with bank-era code identifiers (`branch`, `bankName`, `treasury`, `risk`, `capitalRatio`, `RECAP_OFFER`, `tel_*` and so on) named once with their AI meaning. Removed systems (Loan Desk, bonds, mortgages, deposits as a funding book, REO, the regulator takeover) are deleted or reduced to one line saying what replaced them. This log keeps its history unchanged. `CONVERSION_PLAN.md` is archived to `docs/archive/`.
+- 2026-10-27 (stage C8f, owner's call): **A $1.5M seed round, all of it spendable.** The bank's $2M of locked charter capital (`CHARTER_CAPITAL`) is gone: seed money is $1M, $1.5M (default), $2M or $2.5M of corporate cash, and treasury reserves start at $0. This supersedes the $10–15M seed round of owner decision A12 (2026-10-26 entry above); the owner chose $1.5M to keep the first-year curve, where one sales office, maybe two, is what a founder can afford. The all-spendable seed gives a lasting head start of about 20% in income, so the later income ceilings in SIMULATION §25 rise to match. Saves from before (schema 19) move their reserves into cash when they have no deposits, wholesale lots or central bank borrowing left.
+- 2026-10-27 (stage C8f): **"A billion in deposits" becomes "A billion in ARR".** The milestone keeps the id `deposits_1b` so saves keep it, and now reads company ARR. Other bank wording in milestone lines goes too ("the first customers are in", "now sells in five countries").
+- 2026-10-27 (stage C8f): **Risk appetite becomes the launch posture.** With no loans left, the 1–5 dial (code `riskAppetite`, Very cautious to Very bold) now trades deals against safety: each level adds −4 to +6 points to every Deal Desk win and keep chance and −10% to +16% to the safety exposure; Bold and Very bold still make capability over-claims 1.5× as likely. The Chief Safety Officer steers it by the safety tier (down at Watch or worse, up at Strong, at most Bold); the CFO's Capital switch still steps it down at a weak credit tier. Approval no longer uses a volume multiplier.
+- 2026-10-27 (stage C8f): **Two incidents lose their bank leftovers.** Capability over-claim refunds are 2% of the sales office's ARR (they were 2% of deposits ÷ 10, which came to $0). The outage rumour's central bank window is replaced by service credits worth 2% of company ARR, which end the rumour outright.
+- 2026-10-27 (stage C8f): **Corporate borrowing moves from rival labs to investment banks.** A rival lending to its competitor was a bank idea; a lab raises venture debt. The investment bank gets a Debt tab (venture debt offers and a revolving credit line) and lends to labs with a sales office in its city; the rival lab HQ panel is just an overview. The credit line limit rises from 20% to 60% of equity, since a city has about one investment bank where it had about three rival lenders. Loans and lines from rival labs in old saves keep running and can be repaid from the Debt tab, but not drawn; stale rival offers are replaced on the next tick.
+- 2026-10-27 (stage C8f): **The last bank labels go.** Office manager toggles read "Products & prices" and "Deal approvals", the service review category "Price", the office P&L "Bad debts", the build picker counts meeting rooms and server racks, the wizard asks for a "Lab name", partner rows say "Plans partner" and "Staff plan deal", the HQ tabs read Platform and Safety, and M&A shows a rival's customers and customer share. The unused `EXEC_SUITE_DESKS` constant is removed.

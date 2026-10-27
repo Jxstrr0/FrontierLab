@@ -72,7 +72,7 @@ Company · HQ · Sales offices · Personal wealth · Portfolio · The Inference 
 
 **New Game wizard** (5 steps, with Back and Next):
 1. **Your lab:**
-   - name (max 24 characters; the field is still labelled "Bank name")
+   - "Lab name" (max 24 characters)
    - monogram (2 letters, auto-filled from the name)
    - **logo shape** (9 chips, each a small medallion in the shape: Coin, Shield, Lozenge, Hexagon, Plaque, Rosette, Tile, Pebble, Octagon; CONTENT §7b), with a one-line description
    - brand ink (12 swatches)
@@ -87,7 +87,7 @@ Company · HQ · Sales offices · Personal wealth · Portfolio · The Inference 
 4. **Game options:**
    - Difficulty: Segmented (Easy / Normal / Hard / Expert) with a one-line description of each
    - Competitors: Stepper 1–5 (defaults to the city's usual count)
-   - Starting cash: Segmented ($600K / $900K / $1.2M / $1.5M), shown in the chosen currency (¥90M / ¥135M / ¥180M / ¥225M)
+   - Seed money: Segmented ($1M / $1.5M / $2M / $2.5M, default $1.5M), shown in the chosen currency (¥150M / ¥225M / ¥300M / ¥375M), with the note "Your seed round: all of it is yours to spend."
    - Currency: Segmented ($ / C$ / £ / € / ¥), defaulting to the saved preference; the display symbol only, changeable later in Settings
 5. **Confirm:**
    - summary
@@ -131,7 +131,7 @@ After the wizard, the map opens with the tutorial (§27).
 - **Starting pick:** the fit-out you last built with (`company.lastBuild`), so the parts don't need choosing again; before your first build, the mid reference build if cash allows, then basic, then the cheapest parts.
 - **Hero:** the vignette updates live as you change parts. The same Inside / Outside switch as the sales office panel shows the inside the lobby, sales desks, machine room and demo kiosk picks make.
 - **Five tiles:** Exterior, Lobby, Sales desks, Machine room, Demo kiosks (slot ids `teller`, `vault`, `atm`). Each shows the current pick's thumbnail and price. Option names follow, e.g. Standard Sales Floor, Machine Room, Wall Kiosk (`src/app/build/builds.ts`).
-- **Tap a tile** to open a picker sheet: a carousel of options with name, one-line description, coins (Quality, Productivity, or Security for the machine room), extra facts (stations; the picker still says "advisor offices" and "safe deposit boxes" for the lobby's rooms and the machine room's capacity), price, and Select.
+- **Tap a tile** to open a picker sheet: a carousel of options with name, one-line description, coins (Quality, Productivity, or Security for the machine room), extra facts (stations, "meeting rooms" for the lobby, "server racks" for the machine room, kiosk traffic), price, and Select.
 - **Summary:**
   - itemized parts, lease deposit and first week's rent
   - total vs available cash
@@ -148,7 +148,7 @@ After the wizard, the map opens with the tutorial (§27).
 ### 5.1 Service
 - **Customer reviews:**
   - big overall number + coins + "n reviews"
-  - four rows: Rates, Products, Service, Sales office (coins + number)
+  - four rows: Price, Products, Service, Sales office (coins + number)
   - review card carousel: customer mini-portrait, coins, a short quote
 - **Staff:**
   - Staff stepper (shows "needed n")
@@ -161,7 +161,7 @@ After the wizard, the map opens with the tutorial (§27).
   - Manager skills bars: People, Product, Marketing, Ethics
   - "Manager since {date}"
   - Annual salary stepper, its hint showing market pay (SIMULATION §6.5) and the range, and a line under it: "Underpaid: rivals are more likely to poach them" (oxblood), "Paid about market" or "Well paid…", plus "Your COO reviews this pay once a quarter" while the COO's Pay reviews is on
-  - Delegation toggles: Staffing & wages · Products & rates · Office marketing · Office troubles · Deal Desk bids
+  - Delegation toggles: Staffing & wages · Products & prices · Sales office marketing · Sales office troubles · Deal approvals
   - Fire manager (confirm)
   - **With no manager:** "Hire a manager" opens a sheet of 3 candidate cards (skills, salary ask, Hire). Below the cards, "New candidates · $fee" pays a recruiter for 3 new ones (the fee doubles each time until the free refresh, which the note under it counts down); before your first hire, the tutorial guide stays as the first card.
 
@@ -205,7 +205,7 @@ After the wizard, the map opens with the tutorial (§27).
 ### 5.5 Finance
 - **Headline figures:** office revenue (with weekly change in $ and %) and office income (with change).
 - **Chart:** paired bars for the last 5 weeks.
-- **Office income statement** (Week | Quarter | Year), with the line groups from SIMULATION §12 (Other income is demo kiosk fees; the Loan losses row stays at $0).
+- **Office income statement** (Week | Quarter | Year), with the line groups from SIMULATION §12 (Other income is demo kiosk fees; Bad debts is the expense row for unpaid contracts).
 - **Balances box:** ARR (contracts included), Customers.
 - **Office size card:** the size (Starter, Standard, Large or Flagship), the cost to grow to the next one and its new weekly rent, and a **Grow office** button (confirm, showing fit-out, extra lease deposit, total and new rent; the reason shows under the button when it can't). At Flagship the card says it is the largest size.
 - **Footer:** Rename, Close sales office (confirm, showing what you get back; with one office per city, accounts go to the office in the nearest city).
@@ -227,11 +227,10 @@ After the wizard, the map opens with the tutorial (§27).
 
 ## 7. Rival lab HQ
 
-Tabs: Overview · Loans · Credit.
+No tabs: one overview page.
+- **Advisor:** "{Name} head office. Know your competition."
 - **Overview:** Sales offices, Cities, Shares (Listed · ticker, or Private), Share price, Credit ratio badge (Strong / Adequate / Watch / …), AI model (name · quality), Model released, Researchers, Chief executive, then recent quarters.
-- Rival lab HQs still lend to you (SIMULATION §19.9):
-- **Loans:** business loan offer cards with amount, interest rate, maturity, weekly payment, and Apply. Active loans show the balance and a "Repay early" option.
-- **Credit:** line of credit with available limit, used amount, rate, and a draw/repay slider.
+- Rival labs don't lend to you; corporate borrowing is on the investment bank's Debt tab (§12).
 
 ## 8. Central bank
 
@@ -240,7 +239,8 @@ Tabs: Overview · Loans · Credit.
 - **Big policy rate**, plus the last decision with its date and the next meeting date.
 - **Indicators:** GDP growth last quarter and forecast, inflation, unemployment, house price index trend.
 - **Yield curve mini-chart:** overnight / 2y / 5y / 10y.
-- **Standing lending facility:** in the home country, the bank-era facility card (rate, usage, Borrow / Repay with a stigma warning); elsewhere a note. It borrows nothing useful now (SIMULATION §13.5). The card text still mentions deposits, loans and a banking licence.
+- **Rate note:** in a country where you're licensed, "Your {n} sales offices in {country} sell into an economy this rate steers: customer budgets rise and fall with it."
+- **Standing lending facility:** only in the home country and only for a bank-era save that still carries funding (`hasLegacyFunding`): the facility card (rate, usage, Borrow / Repay with a stigma warning). Otherwise there is no card (SIMULATION §13.5).
 
 ## 9. Office for lease
 
@@ -255,7 +255,7 @@ Tabs: Overview · Loans · Credit.
 
 - **Header:** "{Lab} HQ" with the address, and an **Office** button. Shows an office switcher if you have more than one.
 - **Office sheet** (from the header button): address, floors in use, weekly rent, which department sits on each floor; a **Tab order** card listing the floors you have in the order their tabs run along the bottom bar, each with ▲ ▼ arrows (44 px) to move it past its neighbour, and **Reset order** once any has moved (the order is saved with the game; departments you add later slot in where the usual order puts them); then **Release floor · {department}** (the floor you're on; "Close HR floor" on HR) and **Release office**, each with its confirm.
-- **Bottom icon bar** (only departments you have): an icon over a short label for each floor, scrolling sideways when they don't fit. Finance (ledger) · HR (people) · Products (card) · Compute (server) · Marketing (megaphone) · IT (screen; the Platform & Security floor) · Risk (shield; the Safety & Alignment floor) · Executive (briefcase) · Investment (rising chart) · Add floor (plus). The short labels IT and Risk are kept to fit the bar.
+- **Bottom icon bar** (only departments you have): an icon over a short label for each floor, scrolling sideways when they don't fit. Finance (ledger) · HR (people) · Products (card) · Compute (server) · Marketing (megaphone) · Platform (screen; dept `it`) · Safety (shield; dept `risk`) · Executive (briefcase) · Investment (rising chart) · Add floor (plus). The Platform & Security floor's tab reads Platform and the Safety & Alignment floor's reads Safety, to fit the bar.
 
 **Every department floor shows:**
 - **hero:** engraved isometric office interior whose desk count reflects staffing, furnished per department (ART_DIRECTION §3)
@@ -269,8 +269,8 @@ Tabs: Overview · Loans · Credit.
 **Floor-specific content:**
 - **Finance:**
   - **Results:** total revenue and net income with weekly change, and the bar chart
-  - **Credit and liquidity:** the credit ratio (what lenders price on; credit-tier badge + meter with thresholds) and a liquidity ratio row ("No deposits yet")
-  - **Risk appetite:** Segmented (1–5), with the level's name, a hint (still worded as loan volumes and defaults) and a line naming who else steers it when a Chief Safety Officer (Risk appetite switch) or CFO (Capital switch) is seated
+  - **Credit and liquidity:** the credit ratio (what lenders price on; credit-tier badge + meter with thresholds); the liquidity ratio and target rows show only when there is a liquidity ratio (bank-era saves with deposits)
+  - **Launch posture** (code `riskAppetite`, SIMULATION §16.8): Segmented (1–5, "Launch posture, 1 very cautious to 5 very bold"), with the level's name (Very cautious, Cautious, Balanced, Bold, Very bold), a hint such as "Deal odds +6 pts, safety exposure +16%, and over-claims are likelier." ("Standard deal odds and safety risk." at Balanced) and a line naming who else steers it: the Chief Safety Officer ("tunes this to the safety tier every 4 weeks"; Risk appetite switch) or the CFO ("steps it down while the credit ratio is under …"; Capital switch)
   - **Statements:** Income / Balance sheet / Cash flow, each Week | Quarter | Year
   - "Delayed" placeholders when short-staffed
 - **HR:**
@@ -305,7 +305,7 @@ Tabs: Overview · Loans · Credit.
 - **Marketing:** brand awareness by city (bars), brand campaign cards (scope: city or country; level; cost), active agency packages.
 - **Platform & Security** (dept id `it`): Mobile app (rating coins with a 26-week trend), Security (posture summary), Digital projects (developments of type Digital).
 - **Safety & Alignment** (dept id `risk`):
-  - **Losses:** a loan delinquency card; with no loans it reads "No loans on the books yet" (a bank-era leftover)
+  - **Losses:** a loan delinquency card, shown only when a bank-era save still has loans to report
   - **Model performance:** predicted vs actual losses
   - **Regulator and safety:** safety ratio with tier badge and the safety meter, Safety cover, Model exposure, Next safety audit, Chance it fails, Last safety audit, Failed audits, and a notice during a mandated pause, a revoked licence or strict watch
 - **Executive:**
@@ -363,7 +363,8 @@ Tabs: Overview · Loans · Credit.
 
 - **Header:** name, "Investment bank".
 - **Hero:** trading floor vignette.
-- **Tabs:** Market · Equity · M&A.
+- **Tabs:** Market · Equity · Debt · M&A.
+- **Advisor:** "Welcome to {Bank}. Raising capital, borrowing or buying a competitor?"
 
 **Market:**
 - the Inference Composite index card (value, weekly change, sparkline)
@@ -395,8 +396,14 @@ Tabs: Overview · Loans · Credit.
   - a note when the minimum public float caps the size, and the date of the next allowed buyback
   - Buy back for $X (disabled with the reason when blocked)
 
+**Debt** (SIMULATION §19.9): borrowing for corporate cash. A bank lends to labs with a sales office in its city.
+- **Notice** when you have no sales office in the bank's city: "{Bank} lends to labs with a sales office in {city}. Open one here to borrow." The offers stay hidden and the credit line shows $0 available.
+- **Venture debt:** a blurb (fixed-rate term loans priced on your credit ratio, paid back weekly; corporate debt capped at 40% of equity, with the room left; new offers every 4 weeks), then offer cards: amount, Interest rate, Maturity ("2 years", "18 months"), Weekly payment and **Apply** (disabled with "More than your borrowing room right now." when too big). "No offers right now. Check back after the next refresh." when there are none.
+- **Credit line:** a card with Limit, Used, Available and Interest rate; a note (a revolving line, limit 60% of equity and moving with it, interest weekly on what you use); a Draw / Repay Segmented, an amount slider and a **Draw $X** / **Repay $X** button.
+- **Your debt** (when you owe any): a card per term loan (Term loan from, Balance, Interest rate, Weekly payment, Weeks left, **Repay early ($X)**, disabled with a note when cash is short) and a card per line drawn at another lender, including rival labs in old saves (Credit line with, Used, Interest rate, **Repay $X**).
+
 **M&A:**
-- **Labs:** rival lab cards, like Market cards, plus Sales offices, Cities and "Deposits" (the rival's book size, a bank-era label; SIMULATION §18.1); distressed sales get a special badge
+- **Labs:** rival lab cards, like Market cards, plus Sales offices, Cities and Customers (the rival's book ÷ `MERGERS.depositPerCustomer`; SIMULATION §19.8); distressed sales get a special badge
 - **Offer M&A sheet:**
   - offer price per share stepper and premium % (as the board sees it, after any share-part discount)
   - shares outstanding
@@ -420,7 +427,7 @@ Tabs: Overview · Loans · Credit.
 - **Header:** employer name with its type.
 - **Advisor** and **hero** vignette.
 - **Stats:** Employees, Average income, Plans partner (a rival or none), then the **Anchor account** card (§14b).
-- **Payroll deal** (the section keeps that title): the **Staff plans** deal card:
+- **Staff plan deal** ("Yours" once signed): the **Staff plans** deal card:
   - signing fee and contract length
   - Peak ARR and an Expected ARR curve chart
   - package selector (a plan the host offers; Team by default)
@@ -455,7 +462,7 @@ Opened by tapping a business pin on the map (the **Businesses** layer, which als
   - campaigns: "Ease the AI safety rules for 4 quarters", "Fast-track a merger review", "Stall the AI safety bill" (only while one is pending; there is no price-cap law to delay)
   - sections: In force, Under way (weeks left), Past campaigns
 - **University:**
-  - stats: Staff, Students, "Payroll partner" (still labelled so; the university's plans partner)
+  - stats: Staff, Students, Plans partner
   - Staff plans: the employer deal (§14)
   - Student partnership: the same deal card as **Student plans**, with Campus Plan by default
   - Graduate program: yearly cost ($120k × wageIndex); adds +10 to candidate skill and +1 hire a week
@@ -555,6 +562,7 @@ Opened by tapping a business pin on the map (the **Businesses** layer, which als
 - at Watch, Restricted or Critical, a "How to fix this" checklist under the meter (`src/data/capitalFixes.ts`): hire safety staff on the Safety & Alignment floor, pay them better, seat a Chief Safety Officer, train or switch to a safer model, grow the Safety team before shipping a model far ahead of the frontier; at Critical, a line on the mandated pause and the licence
 - **Cash** card: corporate cash, running costs a week and **cash cover** (weeks of running costs; red under `ATTENTION.cashCoverWeeks`)
 - a liquidity section (Target, Overnight borrowing), only while an older save still holds deposits or overnight borrowing
+- the **Treasury reserves** row (under the cash cover) shows only when reserves are above $0, which only bank-era saves have
 - **Compute** card (SIMULATION §13.0): spot price per GPU-week with the chip phase badge (Chip glut green, Normal market, Chip shortage red), a line chart of the price index over the last 104 weeks, GPUs your customers used last week, GPUs running in your data centers, the share they covered, and what the rest costs at spot a week, with a one-line note
   - a red **Waitlist** or **Outage** badge under the phase badge; "Bought at spot" reads "N of M max" against the spot limit; red "Emergency burst" and "Not served (waitlist)" rows when non-zero; "Spot and burst bill" a week; "Pool cost vs spot" (green under 100%) once the pool has paid anything. The Company explainer "Compute: own it or rent it" covers the internal charge and the limit.
 - **Totals:** Assets, ARR, Treasury reserves, Equity
