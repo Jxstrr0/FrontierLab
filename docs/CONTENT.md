@@ -623,6 +623,45 @@ Announced in the paper 4 weeks before. Active for 4 weeks (was 2 and 1 until 202
 | HK | HKD | Hong Kong dollar | 0.5% | pegged to USD |
 | RU | RUB | Russian ruble | 1.2% | the most volatile |
 
+### 19b. Milestones (`src/data/milestones.ts`, DESIGN §5.18)
+
+32 one-time goals, checked at the end of every weekly tick; thresholds in `MILESTONE_GOALS`. "News" marks those that make a Ledger story of their own. The three valuation goals keep their bank-era ids (`assets_*`) so saves keep them.
+
+| id | Title | Reached when | News |
+|---|---|---|---|
+| first_branch | First sales office | an office is open | |
+| first_loan | First contract | a Deal Desk contract is won | |
+| first_profit | First profitable quarter | a quarter closes with net income > 0 | ✓ |
+| ten_branches | First Flagship | an office reaches Flagship size | ✓ |
+| first_data_center | First data center | a data center opens | |
+| hq_staffed | HQ fully staffed | all seven operating departments at coverage′ ≥ 1 | |
+| ipo | Public company | listed | |
+| first_acquisition | First acquisition | a merger deal closes | |
+| hundred_branches | Five Flagships | 5 Flagship offices | ✓ |
+| three_data_centers | Three data centers | 3 data centers open | ✓ |
+| ten_cities | Ten cities | offices in 10 cities | ✓ |
+| deposits_1b | A billion in ARR | company ARR ≥ $1B | ✓ |
+| five_countries | Five countries | offices in 5 countries | ✓ |
+| assets_10b | A ten-billion lab | company valuation ≥ $10B (market cap once listed, else ARR × multiple with book value as the floor, §19.2) | ✓ |
+| five_acquisitions | Five acquisitions | 5 deals | |
+| club_owner | Club owner | a sports club owned by the lab or you | |
+| twenty_cities | Twenty cities | offices in 20 cities | ✓ |
+| ten_countries | Ten countries | offices in 10 countries | ✓ |
+| billionaire | Billionaire founder | net worth ≥ $1B | ✓ |
+| rich_list | On the rich list | ranked at a year end | |
+| ten_acquisitions | Ten acquisitions | 10 deals | |
+| assets_100b | A hundred-billion lab | valuation ≥ $100B | ✓ |
+| rich_list_1 | Top of the rich list | ranked first | |
+| worth_10b | Ten-billion founder | net worth ≥ $10B | ✓ |
+| assets_1t | A trillion-dollar lab | valuation ≥ $1T | ✓ |
+| first_model | First trained model | `training.generation` ≥ 1 | ✓ |
+| big_contract | A million-dollar contract | one of your enterprise contracts is worth ≥ $1M a year | |
+| full_research_team | A full research team | `RESEARCHERS.maxTeam` (8) researchers employed | |
+| leaderboard_top | Top of the leaderboard | your model's quality beats the best rival model's (§16.12) | ✓ |
+| owned_compute_quarter | Compute independence | 13 weeks in a row with owned GPUs (data centers and power deals) ≥ demand, demand > 0 (`compute.ownedStreak`) | ✓ |
+| model_gen_5 | Fifth generation | `training.generation` ≥ 5 | ✓ |
+| safety_strong_2y | Two years of Strong safety | Strong tier held 104 weeks in a row (`company.tierWeeks` + 1 ≥ 104) | ✓ |
+
 ## 20. Personal purchases
 
 **Homes:**
@@ -736,6 +775,15 @@ Default cooldown: 8 weeks per scope. Office cases go to a manager trusted with S
 | INSIDER_PROBE | Insider trading probe | personal | SIMULATION §22 | — | Settle (fine) · Fight it (50%: cleared, or fine ×2 and news) |
 | REGULATOR_LETTER | Letter from the regulator | company | on entering the Restricted safety tier | info | OK (explains how to lift the safety ratio) |
 | RECAP_OFFER | Mandated pause | company | SIMULATION §15 | — | Accept the pause (fee 2% of trailing revenue, at least $250k) · Decline (the licence is revoked) |
+| JAILBREAK | Jailbreak goes viral | company | 0.002 | customers > 0; × (1.3 − model Safety axis/10) | Patch it fast ($150k; Products −0.2 for 4 wk) · Let it blow over (Safety coverage′ −0.15 for 12 wk, Overall −0.2 for 8 wk; 50% news) · Fix it and publish a post-mortem ($250k; Safety coverage′ +0.1 for 26 wk) |
+| HALLUCINATION_SUIT | Hallucination lawsuit | company | 0.001 | customers > 0; × (1.3 − model Reasoning axis/10) | Settle (1% of company ARR, at least $50k) · Fight it in court (50%: nothing, or 2.5× the settlement, Overall −0.3 for 12 wk, `LAWSUIT_LOST` news) · Add disclaimers everywhere (Products −0.1 for good, coded as 5,200 wk) |
+| COPYRIGHT_SUIT | Training-data copyright suit | company | 0.0015 | a trained model exists | Licence the data ($400k × trained generations) · Fight it (win odds 25% + 35% × CSO expertise/100 + 30% × Safety coverage′; lose: 2× the licence, news) · Retrain without it (every trained model's Breadth −0.3) |
+| WEIGHTS_LEAK | Model weights leak | company | 0.001 | a trained model exists; × (1 + 2(1 − Platform & Security coverage′)) × (1.2 − CTO expertise/100) | Rotate every key and notify ($300k) · Stay quiet (35% it surfaces: Overall −0.4 for 12 wk, `WEIGHTS_LEAKED` news) |
+| DEEPFAKE | Deepfake misuse | office selling the Creative Suite with users on it | 0.002 | — | Add watermarking ($60k; Service +0.1 for 8 wk) · Pull the Creative Suite here (off sale in the city for 8 wk: nothing billed, no sign-ups; `pulled` effect) · Issue a statement (awareness −0.05; 40% news) |
+| DC_FIRE | Data-centre fire | company (names one open data center) | 0.0008 × open data centers | — | Emergency repair ($150 × usable GPUs) · Run on what is left (30% of that hall's GPUs out for 12 wk; `gpuDerate` effect, power bill falls with them) |
+| GRID_FAILURE | Grid failure | company (names one open data center at an energy site) | 0.002 × such data centers | — | Diesel backup ($25 × running GPUs) · Wait for the grid (1 week of compute outage, §13.0: churn ×1.8 and contracts may walk; `GRID_OUTAGE` news) |
+
+The seven AI-native cases (2026-10-27) live in `src/data/incidentsAi.ts` with two case texts each (one is picked when the case is raised); rules in `src/sim/incident/aiRules.ts` and `computeRules.ts`. Each also has two Ledger templates for the day it is raised (`INCIDENT_{id}`, `src/data/ledgerTemplatesIncidents.ts`).
 
 The outage rumour's text: "Rumours that we are about to go dark are spreading, and customers are cancelling their plans before it happens."
 

@@ -154,6 +154,13 @@ export interface EventPayloads {
   /** A press angle on an incident with no template of its own (ATM skim denial, viral complaint). */
   INCIDENT_NEWS: { bank: string; type: string; branchName: string; city: Id };
   BREACH: { bank: string; n: number };
+  // ─── AI-native cases (aiRules.ts, computeRules.ts; 2026-10-27) ───
+  /** A hallucination or copyright case fought and lost. */
+  LAWSUIT_LOST: { bank: string; amount: Money };
+  /** A weights leak kept quiet that surfaced later. */
+  WEIGHTS_LEAKED: { bank: string };
+  /** A grid failure at an energy site left unbacked: a week of outage (§13.0). */
+  GRID_OUTAGE: { bank: string; name: string };
   BANK_RUN: { bank: string };
   BANK_RUN_ENDED: { bank: string };
   // ─── Compute (compute.ts, C4c) ───

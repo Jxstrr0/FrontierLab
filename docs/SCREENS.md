@@ -637,7 +637,7 @@ After Part 1 is finished or skipped, with Settings → Guides on (the default):
 
 ## 28. Milestones (menu → Milestones)
 
-- Subtitle: "n of 11 reached".
+- Subtitle: "n of 32 reached" (the count is `MILESTONES.length`; 32 since the AI milestones of 2026-10-27, CONTENT §19b).
 - One row per milestone (data/milestones.ts) in order: a filled brass diamond ◆ when reached with "Reached {date}", an outline ◇ with the goal otherwise.
 - Read-only. Reaching one toasts "Milestone reached: …"; the big ones also make a Ledger story.
 

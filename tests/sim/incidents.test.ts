@@ -19,7 +19,7 @@ import {
 import { hashSeed } from '../../src/sim/rng';
 import { exportCode, importCode } from '../../src/sim/save/serialize';
 import { execGame, hire } from '../helpers/executives';
-import { openBank } from '../helpers/incidents';
+import { aiReady, openBank } from '../helpers/incidents';
 
 const ROLLED = Object.values(INCIDENT_SPECS)
   .filter((x) => x.trigger === 'rolled')
@@ -45,6 +45,14 @@ describe('incident catalog', () => {
       'INSIDER_PROBE',
       'REGULATOR_LETTER',
       'RECAP_OFFER',
+      // AI-native cases (2026-10-27)
+      'JAILBREAK',
+      'HALLUCINATION_SUIT',
+      'COPYRIGHT_SUIT',
+      'WEIGHTS_LEAK',
+      'DEEPFAKE',
+      'DC_FIRE',
+      'GRID_FAILURE',
     ];
     for (const id of ids) {
       const spec = INCIDENT_SPECS[id];
@@ -111,6 +119,7 @@ describe('rolled incidents', () => {
       b.ratings.service = 2;
       b.staff.morale = 10;
       (b.books.api ??= emptyBook()).balance = 1_000_000;
+      aiReady(s, b);
       const spec = INCIDENT_SPECS[type]!;
       const scope = spec.scope === 'branch' ? b.id : 'company';
       // A huge probability multiplier makes the roll certain.
