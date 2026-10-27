@@ -1,7 +1,8 @@
 // Executives (SIMULATION §17.2), tick step 8: candidate pools, weekly payroll
 // (P&L execPay, cash), equity grants (execGrants.ts), the delegations each
 // executive has switched on (execDelegations*.ts, payReviews.ts; the CREO's
-// rents in execDelegationsProperty.ts, the CFO's investing in execInvesting.ts), the CFO and
+// rents in execDelegationsProperty.ts, the CFO's investing in execInvesting.ts, the Chief
+// Scientist's training runs in execDelegationsResearch.ts), the CFO and
 // CRO's branch guidance (branchGuidance.ts) and resignations, which raise the
 // EXEC_POACHED incident. Hiring, firing and grants are player commands in
 // commands/executives.ts; seat lookups other systems read are in execSeats.ts.
@@ -29,6 +30,7 @@ import {
   croAppetite,
 } from './execDelegationsPeople';
 import { runBranchGuidance } from './branchGuidance';
+import { csciTraining } from './execDelegationsResearch';
 import { runGrants } from './execGrants';
 import { cooPayReviews } from './payReviews';
 import { delegationOn, execMarketSalary, resignChance, seatedExecs } from './execSeats';
@@ -59,6 +61,7 @@ const DELEGATIONS: [ExecSeat, string, (s: GameState) => void][] = [
   ['creo', 'privateRents', creoPrivateRents],
   ['creo', 'bankBuys', creoBankBuys],
   ['creo', 'privateBuys', creoPrivateBuys],
+  ['csci', 'training', csciTraining],
 ];
 
 /** Weekly cost of every seated executive's salary. */

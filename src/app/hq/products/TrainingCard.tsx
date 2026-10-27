@@ -7,6 +7,7 @@ import { DEV_TERMS, MODEL_NAME_MAX, TRAINING } from '../../../config/balance';
 import * as cmd from '../../../sim/commands';
 import { devSpeed } from '../../../sim/development';
 import type { TrainingRun } from '../../../sim/state';
+import { chiefScientistBonus, researchBonus } from '../../../sim/talent';
 import { trainingLift, trainingOdds, trainingWeeksLeft } from '../../../sim/training';
 import { Card, CoinRating, Confirm, Row, Stepper } from '../../components';
 import { moneyFull, moneyStepper } from '../../format/format';
@@ -34,7 +35,18 @@ function NewRun() {
   const [budget, setBudget] = useState<number>(TRAINING.minWeekly);
   const short = s.company.cash < budget;
   const pace = Math.ceil(weeks / devSpeed(s));
-  const rows = oddsRows(trainingOdds(s, weeks, budget));
+  const rows = oddsRows(trainingOdds(s, weeks, budget, focus));
+
+  const team = Math.round(researchBonus(s, focus) * 100);
+  const chief = Math.round(chiefScientistBonus(s) * 100);
+  const boostText =
+    team > 0 && chief > 0
+      ? `Your research team adds +${team}, the Chief Scientist +${chief}.`
+      : team > 0
+        ? `Your research team adds +${team}.`
+        : chief > 0
+          ? `The Chief Scientist adds +${chief}.`
+          : '';
 
   const start = () => {
     const r = act(cmd.startTrainingRun, { name, focus, weeks, weeklyBudget: budget });
@@ -118,6 +130,7 @@ function NewRun() {
           );
         })}
       </div>
+      {boostText && <p class="muted small hq-note">{boostText}</p>}
       {short && (
         <p class="hq-blocker small" role="status">
           You need {moneyFull(budget, sym)} in cash for the first week.

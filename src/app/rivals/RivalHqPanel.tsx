@@ -7,6 +7,7 @@ import { DISTRICT_SPECS } from '../../data/districts';
 import { RIVAL_BENCH_LABEL } from '../../data/rivals';
 import { previousQuarter } from '../../sim/calendar';
 import { rivalSharePrice } from '../../sim/rivalQuarter';
+import { rivalResearchers } from '../../sim/talent';
 import type { GameState, RivalBank } from '../../sim/state';
 import { Badge, Card, Medallion, Panel, Row, SectionTitle, type Tab } from '../components';
 import { capitalRatioText, count, money } from '../format/format';
@@ -95,6 +96,7 @@ function Overview(p: { s: GameState; bank: RivalBank }) {
   const tier = rivalTier(bank);
   const active = bank.status === 'active';
   const cities = bank.cities.map((id) => CITIES[id]?.name ?? id).join(', ');
+  const researchers = rivalResearchers(s, bank.id);
   const recent = bank.quarters.slice(-4);
   const labels = quarterLabels(s, recent.length);
   return (
@@ -135,6 +137,14 @@ function Overview(p: { s: GameState; bank: RivalBank }) {
             value={releasedText(s.clock.week - bank.model.releasedWeek)}
           />
         )}
+        <Row
+          label="Researchers"
+          value={
+            researchers.length === 0
+              ? 'None'
+              : `${researchers.length} · ${researchers.reduce((n, r) => n + r.stars, 0)} stars in total`
+          }
+        />
         <Row label="Chief executive" value={bank.ceo || '—'} />
         {bank.execs.map((e) => (
           <Row key={e.title} label={RIVAL_BENCH_LABEL[e.title] ?? e.title} value={e.name || '—'} />

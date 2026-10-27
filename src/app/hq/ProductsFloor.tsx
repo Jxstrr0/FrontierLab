@@ -8,6 +8,7 @@ import { Developments } from './products/Developments';
 import { HouseModelCard } from './products/HouseModelCard';
 import { LeaderboardCard } from './products/LeaderboardCard';
 import { ProductLineup } from './products/ProductLineup';
+import { ResearchTeamCard } from './products/ResearchTeamCard';
 import { TrainingCard } from './products/TrainingCard';
 import './products/products.css';
 
@@ -27,6 +28,9 @@ export function ProductsFloor() {
 
       <SectionTitle>Training run</SectionTitle>
       <TrainingCard />
+
+      <SectionTitle>Research team</SectionTitle>
+      <ResearchTeamCard />
 
       <SectionTitle>Leaderboard</SectionTitle>
       <LeaderboardCard />
