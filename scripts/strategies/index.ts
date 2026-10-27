@@ -8,7 +8,7 @@ import { manageTraining } from './training';
 import { maybeBuildDataCenter } from './dataCenter';
 import { forceRecession } from './stress';
 import { averageLot, bestLot, buildCost, followDefaults, openBranch } from './common';
-import { manageEquity } from './equity';
+import { manageEquity, topUpRunway } from './equity';
 import { hqReady, manageHq } from './hq';
 import { cityFull, growableOffice, hasRoom, nextExpansionLot } from './expansion';
 import type { Strategy } from './types';
@@ -112,6 +112,7 @@ export const turtle: Strategy = {
   weekly: (s) => {
     followDefaults(s);
     manageHq(s);
+    topUpRunway(s);
     for (const r of Object.values(s.dealDesk.rfps))
       if (r.kind === 'new') cmd.declineApplication(s, r.id);
     // A turtle stays a Standard office: a bigger one needs an HQ team its
