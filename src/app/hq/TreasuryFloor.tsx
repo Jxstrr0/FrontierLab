@@ -19,7 +19,6 @@ import { TreasuryPolicyCard } from './treasury/TreasuryPolicyCard';
 import { hasLegacyFunding } from './treasury/legacyFunding';
 import './treasury/treasury.css';
 
-
 export function TreasuryFloor() {
   const s = useGame();
   return (

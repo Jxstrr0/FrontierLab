@@ -39,9 +39,11 @@ export function EmployerPanel(p: { siteId: string }) {
       subtitle={[typeLabel(site), site.address, district].filter(Boolean).join(' · ')}
       icon={<LayerMedallion id="employers" size={32} />}
       onClose={closePanel}
-      advisor={{ text: energy
-            ? `${count(e.employees)} people work here, on a site with power to spare for a data center.`
-            : `${count(e.employees)} people work here, and their team could use our plans.` }}
+      advisor={{
+        text: energy
+          ? `${count(e.employees)} people work here, on a site with power to spare for a data center.`
+          : `${count(e.employees)} people work here, and their team could use our plans.`,
+      }}
       hero={<PartnerArt type={e.type} />}
     >
       <div class="stack">

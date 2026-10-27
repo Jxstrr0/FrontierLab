@@ -143,7 +143,6 @@ const ATM_SKIM: IncidentRule = {
   },
 };
 
-
 const MIS_SELLING: IncidentRule = {
   // × sign-up bonus level × (1.6 − ethics/100) × (appetite ≥ 4 ? 1.5 : 1)
   chance(state, scope) {

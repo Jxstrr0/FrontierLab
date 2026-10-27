@@ -23,7 +23,7 @@ export type PanelRoute =
   | { type: 'agency'; siteId: string }
   // Stage 5 (FEATURES.competition)
   | { type: 'rivalBranch'; lotId: string }
-  | { type: 'rivalHq'; siteId: string; tab?: 'overview' | 'loans' | 'credit' }
+  | { type: 'rivalHq'; siteId: string }
   | { type: 'centralBank'; countryId: CountryId }
   | { type: 'employer'; siteId: string }
   // Stage C5a: a customer business on a storefront.
@@ -56,7 +56,7 @@ export type PanelRoute =
   // Stage 10: the credits, opened from Settings in game (from the title it is a screen).
   | { type: 'credits' };
 
-export type InvestmentBankTab = 'market' | 'equity' | 'mna';
+export type InvestmentBankTab = 'market' | 'equity' | 'debt' | 'mna';
 
 export type BranchTab = 'service' | 'products' | 'loandesk' | 'marketing' | 'finance';
 

@@ -226,7 +226,6 @@ export const COMPANY_RULES: Record<string, IncidentRule> = {
   INSIDER_PROBE, // Stage 9 (insiderRule.ts)
 };
 
-
 /** This week's data-breach odds, for the IT floor's security posture (CONTENT §22). */
 export function breachChance(state: GameState): number {
   return DATA_BREACH.chance?.(state, 'company') ?? 0;

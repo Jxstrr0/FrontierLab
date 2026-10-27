@@ -1,7 +1,7 @@
-// Rival bank head office panel (SCREENS §7): tabs Overview · Loans · Credit.
-// Overview is who they are (strategy, sales offices, cities, listing, capital band,
-// CEO, recent quarters); Loans and Credit (RivalLending.tsx) are the business
-// loans and line of credit they offer your company (SIMULATION §19.9).
+// Rival lab head office panel (SCREENS §7): who they are (strategy, sales
+// offices, cities, listing, credit band, model, researchers, CEO, recent
+// quarters). Rival labs do not lend to you; corporate borrowing lives on the
+// investment bank Debt tab (SIMULATION §19.9).
 import { CITIES } from '../../data/cities';
 import { DISTRICT_SPECS } from '../../data/districts';
 import { RIVAL_BENCH_LABEL } from '../../data/rivals';
@@ -9,11 +9,10 @@ import { previousQuarter } from '../../sim/calendar';
 import { rivalSharePrice } from '../../sim/rivalQuarter';
 import { rivalResearchers } from '../../sim/talent';
 import type { GameState, RivalBank } from '../../sim/state';
-import { Badge, Card, Medallion, Panel, Row, SectionTitle, type Tab } from '../components';
+import { Badge, Card, Medallion, Panel, Row, SectionTitle } from '../components';
 import { capitalRatioText, count, money } from '../format/format';
-import { closePanel, openPanel, useGame } from '../store';
+import { closePanel, useGame } from '../store';
 import { RivalHqArt } from './RivalArt';
-import { RivalCreditTab, RivalLoansTab } from './RivalLending';
 import {
   failedText,
   rivalTier,
@@ -24,15 +23,7 @@ import {
 } from './rivalSelectors';
 import './rivals.css';
 
-type HqTab = 'overview' | 'loans' | 'credit';
-
-const TABS: Tab<HqTab>[] = [
-  { id: 'overview', label: 'Overview' },
-  { id: 'loans', label: 'Loans' },
-  { id: 'credit', label: 'Credit' },
-];
-
-export function RivalHqPanel(p: { siteId: string; tab: HqTab }) {
+export function RivalHqPanel(p: { siteId: string }) {
   const s = useGame();
   const site = s.world.sites[p.siteId];
   const bank = site ? s.rivals[site.refId] : undefined;
@@ -45,18 +36,14 @@ export function RivalHqPanel(p: { siteId: string; tab: HqTab }) {
   }
   const district = DISTRICT_SPECS[site.district]?.name;
   const failed = failedText(s, bank);
-  const setTab = (tab: HqTab) => openPanel({ type: 'rivalHq', siteId: site.id, tab });
   return (
     <Panel
       title={`${bank.name} head office`}
       subtitle={[site.address, district].filter(Boolean).join(' · ')}
       icon={<Medallion ink={bank.ink} monogram={bank.monogram} size={32} />}
       onClose={closePanel}
-      advisor={{ text: `Welcome to ${bank.name}. We lend to businesses — even competitors.` }}
+      advisor={{ text: `${bank.name} head office. Know your competition.` }}
       hero={<RivalHqArt bank={bank} />}
-      tabs={TABS}
-      tab={p.tab}
-      onTab={setTab}
     >
       <div class="stack">
         {failed && (
@@ -64,9 +51,7 @@ export function RivalHqPanel(p: { siteId: string; tab: HqTab }) {
             {failed}
           </p>
         )}
-        {p.tab === 'overview' && <Overview s={s} bank={bank} />}
-        {p.tab === 'loans' && <RivalLoansTab bank={bank} cityId={site.cityId} />}
-        {p.tab === 'credit' && <RivalCreditTab bank={bank} cityId={site.cityId} />}
+        <Overview s={s} bank={bank} />
       </div>
     </Panel>
   );
