@@ -2,8 +2,8 @@
 // how well the Safety & Alignment floor covers the risk your model carries,
 // the tier it sets (Strong → Critical), the pause that halts sales and
 // training, strict watch after a revoked licence, and the deal-win edge a
-// strong record gives with data-sensitive businesses. The bank's capital
-// ratio lives on in capital.ts as the lenders' credit ratio.
+// strong record gives with data-sensitive businesses. Lenders look at runway
+// instead (runway.ts).
 import {
   CAPITAL_GATE,
   HQ_COVERAGE,

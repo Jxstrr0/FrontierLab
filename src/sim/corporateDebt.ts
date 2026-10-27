@@ -7,11 +7,13 @@
 // the move may still hold rival lab ids, which keep accruing and can be repaid.
 import { CORPORATE_LENDING, WEEKS_PER_YEAR } from '../config/balance';
 import { INVESTMENT_BANKS } from '../data/investmentBanks';
+import { companyArr } from './arr';
 import { balanceSheet, corporateDebtTotal } from './balanceSheet';
 import { dpow } from './detmath';
 import { postCash, spend } from './ledger';
 import { clamp, roundToStep } from './math';
 import { stream } from './rng';
+import { runwaySnapshot } from './runway';
 import type { CorporateDebt, GameState, Site } from './state';
 import { homeCountry } from './treasury';
 
@@ -90,10 +92,17 @@ export function lenderName(state: GameState, lenderId: string): string {
   return state.rivals[lenderId]?.name ?? 'your lenders';
 }
 
-/** Rate spread by your credit ratio (capitalRatio): 2.5% at a strong CR, 5% at a weak one (§19.9). */
-function loanSpread(cr: number): number {
+/**
+ * Rate spread by runway and ARR (§19.9): the score averages runway (full at
+ * bestRunwayMonths, or with no burn) and ARR (full at bestArr), and moves the
+ * spread from spreadWorst (5%) at 0 to spreadBest (2.5%) at 1.
+ */
+export function loanSpread(state: GameState): number {
   const c = CORPORATE_LENDING;
-  const t = clamp((cr - c.crWorst) / (c.crBest - c.crWorst), 0, 1);
+  const { months } = runwaySnapshot(state);
+  const runway = months === null ? 1 : clamp(months / c.bestRunwayMonths, 0, 1);
+  const arr = clamp(companyArr(state) / c.bestArr, 0, 1);
+  const t = (runway + arr) / 2;
   return c.spreadWorst + t * (c.spreadBest - c.spreadWorst);
 }
 
@@ -110,7 +119,7 @@ function refreshOffers(state: GameState): void {
   const rng = stream(state, 'corporateDebt');
   const room = loanRoom(state);
   const policy = homeCountry(state).policyRate;
-  const spread = loanSpread(state.company.capitalRatio);
+  const spread = loanSpread(state);
   for (const lender of lendersNearYou(state)) {
     const n = rng.int(...c.offersPerLender);
     for (let i = 0; i < n; i++) {

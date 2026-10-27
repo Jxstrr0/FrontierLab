@@ -1,16 +1,11 @@
 // Portfolio ties out, ventures part (ROADMAP Stage 7 acceptance): company
 // venture stakes and venture debt sit on the balance sheet at the portfolio's
-// values, RWA carries them at their risk weights, the balance identity holds
+// values, the balance identity holds
 // every week through a new round, a failure, an acquisition and an IPO, and
 // personal stakes never touch the bank's books.
 import { describe, expect, it } from 'vitest';
-import {
-  VENTURE_DEBT,
-  VENTURE_DEBT_RISK_WEIGHT,
-  VENTURE_RISK_WEIGHT,
-} from '../../src/config/balance';
+import { VENTURE_DEBT } from '../../src/config/balance';
 import { balanceSheet } from '../../src/sim/balanceSheet';
-import { capitalSnapshot } from '../../src/sim/capital';
 import * as cmd from '../../src/sim/commands';
 import { advanceDay } from '../../src/sim/engine';
 import { ventureDebtValue, venturesValue } from '../../src/sim/portfolio';
@@ -51,11 +46,10 @@ const tieOut = (s: GameState) => {
 const pick = (s: GameState, i: number): Startup => s.ventures.startups[s.ventures.pipeline[i]!]!;
 
 describe('portfolio ties out (ventures)', () => {
-  it('books company lots and venture debt at their marks with their risk weights', () => {
+  it('books company lots and venture debt at their marks', () => {
     const s = setup();
     expect(s.ventures.pipeline.length).toBeGreaterThanOrEqual(3);
     const a = pick(s, 0);
-    const before = capitalSnapshot(s);
     const equity = balanceSheet(s).equity;
     const lot = a.round!.lots[0]!;
     expect(cmd.buyStartupLot(s, a.id, 0, 'company').ok).toBe(true);
@@ -67,11 +61,7 @@ describe('portfolio ties out (ventures)', () => {
     const r = cmd.offerVentureDebt(s, a.id, amount, rate, 'company');
     expect(r).toEqual({ ok: true, accepted: true });
     tieOut(s);
-    const after = capitalSnapshot(s);
-    expect(after.rwa - before.rwa).toBeCloseTo(
-      lot.price * VENTURE_RISK_WEIGHT + amount * VENTURE_DEBT_RISK_WEIGHT,
-      2,
-    );
+    expect(balanceSheet(s).ventureDebt).toBeCloseTo(amount, 2);
 
     // A second loan is refused; too high a rate is turned down.
     expect(cmd.offerVentureDebt(s, a.id, 1000, rate, 'company').ok).toBe(false);

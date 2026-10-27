@@ -1,12 +1,12 @@
 // Rival M&A rules (SIMULATION §19.8): the acceptance curve and required
 // premiums, reference prices, offer validation, the regulator's checks
-// (pro-forma capital and city customer share), rejections and the retry window,
+// (runway after the deal and city customer share), rejections and the retry window,
 // and closing with holdings of the target and corporate debt owed to it.
 import { describe, expect, it } from 'vitest';
-import { MERGERS, RIVAL_RUNWAY_TIERS, STOCK_RISK_WEIGHT } from '../../src/config/balance';
+import { MERGERS, RIVAL_RUNWAY_TIERS, RUNWAY } from '../../src/config/balance';
 import { rivalFairPerShare } from '../../src/sim/rivalFinance';
 import { planDeal, regulatorBlock, regulatorChecks } from '../../src/sim/acquisitionPlan';
-import { capitalSnapshot } from '../../src/sim/capital';
+import { runwaySnapshot } from '../../src/sim/runway';
 import { closeBranch } from '../../src/sim/commands';
 import { advanceWeeks } from '../../src/sim/engine';
 import {
@@ -119,20 +119,20 @@ describe('offer validation', () => {
 });
 
 describe('regulator checks', () => {
-  it('computes pro-forma capital from CET1 less goodwill over RWA less the stake it consumes', () => {
+  it('checks runway once the cash price has left corporate cash', () => {
     const s = capitalisedBank();
     const bank = smallestRival(s);
     const plan = planDeal(s, bank, referencePrice(bank) * 1.5);
-    const snap = capitalSnapshot(s);
-    // C3a: an AI lab's acquired books are customers, not loans, so only the consumed
-    // stake (if any) changes risk-weighted assets.
-    const rwa = snap.rwa - plan.holdingValue * STOCK_RISK_WEIGHT;
     // Net assets are the target's cash (less what you owe it and its lease deposits, both counted back).
     expect(plan.goodwill).toBeCloseTo(plan.cash - bank.cash, 2);
-    expect(plan.proFormaCr).toBeCloseTo((snap.cet1 - plan.goodwill) / rwa, 10);
-    const weak = { ...plan, proFormaCr: MERGERS.minProFormaCr - 0.001 };
+    expect(plan.proFormaRunway).toEqual(runwaySnapshot(s, -plan.cash));
+    const short = RUNWAY.gateMonths - 1;
+    const weak = {
+      ...plan,
+      proFormaRunway: { ...plan.proFormaRunway, months: short, tier: 'tight' as const },
+    };
     expect(regulatorChecks(weak, cityName)[0]!.ok).toBe(false);
-    expect(regulatorBlock(weak, cityName)).toMatch(/Credit after the deal/);
+    expect(regulatorBlock(weak, cityName)).toMatch(/Runway after the deal/);
     expect(regulatorBlock(plan, cityName)).toBeUndefined();
   });
 

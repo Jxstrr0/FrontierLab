@@ -1,9 +1,8 @@
-// Ratio meter (SCREENS §24): five tier bands (Critical, Restricted, Watch,
-// Adequate, Strong) with a marker at the current ratio. `kind="safety"` (the
-// default) shows the regulator's safety ratio on SAFETY_TIER_THRESHOLDS;
-// `kind="credit"` shows the lenders' credit ratio on TIER_THRESHOLDS. Band
-// edges come from the config so the meter always matches the rules.
-import { SAFETY_TIER_THRESHOLDS, TIER_THRESHOLDS } from '../../config/balance';
+// Safety ratio meter (SCREENS §24): five tier bands (Critical, Restricted,
+// Watch, Adequate, Strong) with a marker at the regulator's safety ratio, on
+// SAFETY_TIER_THRESHOLDS. Band edges come from the config so the meter always
+// matches the rules. (Runway has its own meter, RunwayMeter.tsx.)
+import { SAFETY_TIER_THRESHOLDS } from '../../config/balance';
 import type { Tier } from '../../data/types';
 import { safetyRatioText } from '../format/format';
 
@@ -23,7 +22,7 @@ export const TIER_TONE: Record<Tier, 'good' | 'warn' | 'bad'> = {
   critical: 'bad',
 };
 
-export type MeterKind = 'safety' | 'credit';
+export type MeterKind = 'safety';
 
 interface Scale {
   max: number;
@@ -39,12 +38,6 @@ const SCALES: Record<MeterKind, Scale> = {
     label: 'Safety ratio',
     edges: SAFETY_TIER_THRESHOLDS.map((t) => ({ tier: t.tier, min: t.minSr })),
     text: safetyRatioText,
-  },
-  credit: {
-    max: 0.18,
-    label: 'Credit ratio',
-    edges: TIER_THRESHOLDS.map((t) => ({ tier: t.tier, min: t.minCr })),
-    text: (x) => `${Number((x * 100).toFixed(1))}%`,
   },
 };
 
@@ -64,10 +57,10 @@ function bands(sc: Scale, lift: number): Band[] {
   }));
 }
 
-/** `lift` raises every tier line (safety only: policy buffer and strict watch). */
+/** `lift` raises every tier line (policy buffer and strict watch). */
 export function CapitalMeter(p: { ratio: number; tier: Tier; kind?: MeterKind; lift?: number }) {
   const sc = SCALES[p.kind ?? 'safety'];
-  const all = bands(sc, p.kind === 'credit' ? 0 : (p.lift ?? 0));
+  const all = bands(sc, p.lift ?? 0);
   const marker = Math.max(0, Math.min(1, p.ratio / sc.max));
   const edge = sc.text;
   return (

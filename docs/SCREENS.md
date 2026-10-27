@@ -269,8 +269,8 @@ No tabs: one overview page.
 **Floor-specific content:**
 - **Finance:**
   - **Results:** total revenue and net income with weekly change, and the bar chart
-  - **Credit and liquidity:** the credit ratio (what lenders price on; credit-tier badge + meter with thresholds); the liquidity ratio and target rows show only when there is a liquidity ratio (bank-era saves with deposits)
-  - **Launch posture** (code `riskAppetite`, SIMULATION §16.8): Segmented (1–5, "Launch posture, 1 very cautious to 5 very bold"), with the level's name (Very cautious, Cautious, Balanced, Bold, Very bold), a hint such as "Deal odds +6 pts, safety exposure +16%, and over-claims are likelier." ("Standard deal odds and safety risk." at Balanced) and a line naming who else steers it: the Chief Safety Officer ("tunes this to the safety tier every 4 weeks"; Launch posture switch) or the CFO ("steps it down while the credit ratio is under …"; Capital switch)
+  - **Runway and liquidity:** runway (SIMULATION §15, what lenders price on): months or "Not burning cash", the runway tier badge, a four-band meter (Critical under 6 months, Tight 6–12, Comfortable 12–24, Strong 24+) and a Net burn row; the liquidity ratio and target rows show only when there is a liquidity ratio (bank-era saves with deposits)
+  - **Launch posture** (code `riskAppetite`, SIMULATION §16.8): Segmented (1–5, "Launch posture, 1 very cautious to 5 very bold"), with the level's name (Very cautious, Cautious, Balanced, Bold, Very bold), a hint such as "Deal odds +6 pts, safety exposure +16%, and over-claims are likelier." ("Standard deal odds and safety risk." at Balanced) and a line naming who else steers it: the Chief Safety Officer ("tunes this to the safety tier every 4 weeks"; Launch posture switch)
   - **Statements:** Income / Balance sheet / Cash flow, each Week | Quarter | Year
   - "Delayed" placeholders when short-staffed
 - **HR:**
@@ -381,7 +381,7 @@ No tabs: one overview page.
 **Equity:**
 - **While private:**
   - Private placement card: new shares stepper (% of outstanding), price per share, gross, fee, capital raised, investor name, Raise
-  - IPO card: eligibility checklist (✓/✗ per rule: ARR ≥ $100M, 4 profitable quarters, Finance cover, safety tier, recession/credit ratio), float % stepper, indicative price, fee %, Launch IPO
+  - IPO card: eligibility checklist (✓/✗ per rule: ARR ≥ $100M, 4 profitable quarters, Finance cover, safety tier, recession unless runway is Strong), float % stepper, indicative price, fee %, Launch IPO
 - **While public:** Secondary offering card:
   - New shares stepper (with % of outstanding)
   - Price per share
@@ -392,13 +392,13 @@ No tabs: one overview page.
 - **While public:** Share buyback card (SIMULATION §19.6a):
   - shares stepper (% of outstanding, up to 10%)
   - shares retired, price per share (with the 2% premium), broker's fee, total cost
-  - your stake after, credit ratio after
+  - your stake after, runway after
   - a note when the minimum public float caps the size, and the date of the next allowed buyback
   - Buy back for $X (disabled with the reason when blocked)
 
 **Debt** (SIMULATION §19.9): borrowing for corporate cash. A bank lends to labs with a sales office in its city.
 - **Notice** when you have no sales office in the bank's city: "{Bank} lends to labs with a sales office in {city}. Open one here to borrow." The offers stay hidden and the credit line shows $0 available.
-- **Venture debt:** a blurb (fixed-rate term loans priced on your credit ratio, paid back weekly; corporate debt capped at 40% of equity, with the room left; new offers every 4 weeks), then offer cards: amount, Interest rate, Maturity ("2 years", "18 months"), Weekly payment and **Apply** (disabled with "More than your borrowing room right now." when too big). "No offers right now. Check back after the next refresh." when there are none.
+- **Venture debt:** a blurb (fixed-rate term loans priced on your runway and ARR, paid back weekly; corporate debt capped at 40% of equity, with the room left; new offers every 4 weeks), then offer cards: amount, Interest rate, Maturity ("2 years", "18 months"), Weekly payment and **Apply** (disabled with "More than your borrowing room right now." when too big). "No offers right now. Check back after the next refresh." when there are none.
 - **Credit line:** a card with Limit, Used, Available and Interest rate; a note (a revolving line, limit 60% of equity and moving with it, interest weekly on what you use); a Draw / Repay Segmented, an amount slider and a **Draw $X** / **Repay $X** button.
 - **Your debt** (when you owe any): a card per term loan (Term loan from, Balance, Interest rate, Weekly payment, Weeks left, **Repay early ($X)**, disabled with a note when cash is short) and a card per line drawn at another lender, including rival labs in old saves (Credit line with, Used, Interest rate, **Repay $X**).
 
@@ -410,7 +410,7 @@ No tabs: one overview page.
   - once listed, "Paid in your shares": Cash · 25% · 50% · 75% · All; with a share part, rows for paid in new shares, new shares issued (% of outstanding) and your stake after
   - paid in cash (total cost when all cash)
   - available cash
-  - regulator pre-check (✓/✗ with reasons): credit ratio after the deal, and "Customer share in {city}" ("{x}% of the city's AI customers (limit {y}%)"), or "Not tested for a distressed sale: the regulator wants the lab rescued"
+  - regulator pre-check (✓/✗ with reasons): "Runway after the deal" (months left once the cash price is paid, needs 12), and "Customer share in {city}" ("{x}% of the city's AI customers (limit {y}%)"), or "Not tested for a distressed sale: the regulator wants the lab rescued"
   - Offer merger
 - The response arrives the next week.
 - Below the cards: Integrations in progress (lab, sales offices converting, weeks left) and Completed deals.
@@ -557,10 +557,10 @@ Opened by tapping a business pin on the map (the **Businesses** layer, which als
 ## 24. Company summary (menu → Company)
 
 - **Where to look** at the top: the three things that most need you, worst first (Urgent / Watch / Note), each a tap to the right screen: a mandated pause or revoked licence, the safety tier, corporate cash below zero or under `ATTENTION.cashCoverWeeks` of running costs, open cases, a funding freeze or liquidity under the minimum (legacy saves only), expiring proposal requests, sales offices losing money for 4 weeks, ratings under 2.5, understaffing, loan losses over the Chief Safety Officer's ceiling (legacy), morale under 50, sales offices without a manager, empty executive seats, switched-off delegations, low awareness. "All clear" when nothing qualifies. Ranking in `src/sim/attention.ts`, thresholds in `ATTENTION`.
-- safety ratio (SIMULATION §15) with the regulator's tier badge, a meter with the tier lines, and a breakdown line (Safety cover, model exposure); the credit ratio below it as a secondary row ("Credit ratio (lenders)")
+- safety ratio (SIMULATION §15) with the regulator's tier badge, a meter with the tier lines, and a breakdown line (Safety cover, model exposure)
 - a notice during a mandated pause or a revoked licence (what is blocked and until when) or strict watch (until when, tier lines 10 points higher, audits twice as likely)
 - at Watch, Restricted or Critical, a "How to fix this" checklist under the meter (`src/data/capitalFixes.ts`): hire safety staff on the Safety & Alignment floor, pay them better, seat a Chief Safety Officer, train or switch to a safer model, grow the Safety team before shipping a model far ahead of the frontier; at Critical, a line on the mandated pause and the licence
-- **Cash** card: corporate cash, running costs a week and **cash cover** (weeks of running costs; red under `ATTENTION.cashCoverWeeks`)
+- **Cash** card: corporate cash with the runway tier badge, **Runway** (months, or "Not burning cash") with the runway meter and a line on what it gates, then running costs a week and **cash cover** (weeks of running costs; red under `ATTENTION.cashCoverWeeks`)
 - a liquidity section (Target, Overnight borrowing), only while an older save still holds deposits or overnight borrowing
 - **Compute** card (SIMULATION §13.0): spot price per GPU-week with the chip phase badge (Chip glut green, Normal market, Chip shortage red), a line chart of the price index over the last 104 weeks, GPUs your customers used last week, GPUs running in your data centers, the share they covered, and what the rest costs at spot a week, with a one-line note
   - a red **Waitlist** or **Outage** badge under the phase badge; "Bought at spot" reads "N of M max" against the spot limit; red "Emergency burst" and "Not served (waitlist)" rows when non-zero; "Spot and burst bill" a week; "Pool cost vs spot" (green under 100%) once the pool has paid anything. The Company explainer "Compute: own it or rent it" covers the internal charge and the limit.

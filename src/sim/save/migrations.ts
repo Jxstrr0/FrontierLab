@@ -156,6 +156,20 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     migrateRivalBooks(s as unknown as GameState);
     return s;
   },
+  // 23 → 24: runway (worked out from cash and the weekly closes) replaces the
+  // stored credit ratio, so the ratio and the risk-weighted assets go.
+  23: (s) => {
+    const state = s as unknown as {
+      company: { capitalRatio?: number };
+      history: { weekly: { capitalRatio?: number; totals: { rwa?: number } }[] };
+    };
+    delete state.company.capitalRatio;
+    for (const w of state.history.weekly) {
+      delete w.capitalRatio;
+      delete w.totals.rwa;
+    }
+    return s;
+  },
 };
 
 /** Upgrades a raw save to the current schema, or throws if it can't. */

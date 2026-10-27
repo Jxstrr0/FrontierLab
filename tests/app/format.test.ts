@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import {
-  capitalRatioText,
   delta,
   exactMoney,
   figure,
@@ -10,6 +9,7 @@ import {
   moneyStepper,
   pct,
   percentText,
+  runwayText,
   signedPct,
 } from '../../src/app/format/format';
 
@@ -65,7 +65,10 @@ describe('format', () => {
     expect(percentText(0.0325)).toBe('3.25');
     expect(percentText(0.07)).toBe('7');
     expect(percentText(0.1 + 0.2)).toBe('30');
-    expect(capitalRatioText(0.125)).toBe('12.5%');
-    expect(capitalRatioText(8.4)).toBe('100%+');
+    expect(runwayText(null)).toBe('Not burning cash');
+    expect(runwayText(1)).toBe('1 month');
+    expect(runwayText(7.46)).toBe('7.4 months');
+    expect(runwayText(18.9)).toBe('18 months');
+    expect(runwayText(400)).toBe('10 years+');
   });
 });
