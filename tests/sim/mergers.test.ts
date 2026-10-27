@@ -128,7 +128,7 @@ describe('regulator checks', () => {
     expect(plan.proFormaCr).toBeCloseTo((snap.cet1 - plan.goodwill) / rwa, 10);
     const weak = { ...plan, proFormaCr: MERGERS.minProFormaCr - 0.001 };
     expect(regulatorChecks(weak, cityName)[0]!.ok).toBe(false);
-    expect(regulatorBlock(weak, cityName)).toMatch(/Capital after the deal/);
+    expect(regulatorBlock(weak, cityName)).toMatch(/Credit after the deal/);
     expect(regulatorBlock(plan, cityName)).toBeUndefined();
   });
 

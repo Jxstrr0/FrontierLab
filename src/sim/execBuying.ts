@@ -89,7 +89,7 @@ function bankBlocker(state: GameState, c: BuyPick): string | undefined {
   const crAfter =
     (snap.cet1 + c.value - c.asking) / Math.max(1, snap.rwa + c.value * PROPERTY_RISK_WEIGHT);
   if (crAfter < d.buyMinCr)
-    return `The capital ratio would fall under ${Math.round(d.buyMinCr * 100)}%.`;
+    return `The credit ratio would fall under ${Math.round(d.buyMinCr * 100)}%.`;
   return undefined;
 }
 

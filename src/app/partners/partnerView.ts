@@ -56,7 +56,7 @@ export function averageIncome(site: Site): number {
 export function currentPartner(state: GameState, site: Site, mine: boolean): string {
   if (mine) return state.meta.bankName;
   const rival = site.employer?.partnerRivalId;
-  return rival ? (state.rivals[rival]?.name ?? 'Another bank') : 'None';
+  return rival ? (state.rivals[rival]?.name ?? 'Another lab') : 'None';
 }
 
 /** Default package: the Campus Plan for students, Team for payroll, else the first offered. */

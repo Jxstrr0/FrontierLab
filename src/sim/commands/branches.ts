@@ -17,7 +17,13 @@ import {
 } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { DISTRICT_SPECS } from '../../data/districts';
-import { BUILD_SLOTS, EQUIPMENT, isFitout, type BuildSpec } from '../../data/equipment';
+import {
+  BUILD_SLOTS,
+  EQUIPMENT,
+  isFitout,
+  type BuildSlot,
+  type BuildSpec,
+} from '../../data/equipment';
 import { isDeposit, isLoan } from '../../data/products';
 import { allProducts, productSpec } from '../products';
 import { assetBookValue } from '../balanceSheet';
@@ -45,6 +51,15 @@ import { countryOfCity, defaultPrice } from '../rates';
 import { seedCountryPrices } from './products';
 import type { Book, Branch, GameState } from '../state';
 import { fail, money, ok, type CommandResult } from './result';
+
+/** Player-facing names of the build slots (SCREENS §4), shared with the Build panel. */
+export const SLOT_LABEL: Record<BuildSlot, string> = {
+  exterior: 'Exterior',
+  lobby: 'Lobby',
+  teller: 'Sales desks',
+  vault: 'Machine room',
+  atm: 'Demo kiosks',
+};
 
 /**
  * Itemized cost of a build on a lot at a size (C2a): parts (interior slots ×
@@ -88,7 +103,8 @@ export function buildBlocker(
   }
   for (const slot of BUILD_SLOTS) {
     const item = EQUIPMENT[build[slot]];
-    if (!item || item.slot !== slot) return `Pick a valid ${slot} option.`;
+    if (!item || item.slot !== slot)
+      return `Pick a valid ${SLOT_LABEL[slot].toLowerCase()} option.`;
   }
   const tier = state.company.tier;
   if (tier === 'restricted' || tier === 'critical') {

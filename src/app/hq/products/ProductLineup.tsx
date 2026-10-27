@@ -29,7 +29,7 @@ export function ProductLineup() {
     <div class="stack">
       <Card>
         <Toggle
-          label="Apply rates to all sales offices"
+          label="Apply prices to all sales offices"
           hint={
             on
               ? 'HQ sets every sales office’s prices and lineup, except offices set to their own.'

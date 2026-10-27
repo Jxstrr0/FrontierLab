@@ -41,7 +41,7 @@ export function YoursCard(p: { site: Site; partnership: Partnership }) {
   const release = () => {
     setConfirm(false);
     const r = act(cmd.releasePartnership, ps.id);
-    if (r.ok) toast(`Released ${name}. Their accounts leave over 12 weeks.`, 'info');
+    if (r.ok) toast(`Released ${name}. Their seats leave over 12 weeks.`, 'info');
   };
 
   return (
@@ -56,7 +56,7 @@ export function YoursCard(p: { site: Site; partnership: Partnership }) {
       </div>
       <StatBar label="Health" value={ps.health} />
       <Row label="ARR" value={money(ps.balance, sym)} strong />
-      <Row label="Accounts" value={count(ps.accounts)} />
+      <Row label="Seats" value={count(ps.accounts)} />
       <Row
         label="Host sales office"
         value={
@@ -99,7 +99,7 @@ export function YoursCard(p: { site: Site; partnership: Partnership }) {
       {confirm && (
         <Confirm
           title={`Release ${name}?`}
-          body="Their accounts leave over the next 12 weeks and the rest of the signing fee is written off."
+          body="Their seats leave over the next 12 weeks and the rest of the signing fee is written off."
           confirmLabel="Release"
           danger
           onConfirm={release}

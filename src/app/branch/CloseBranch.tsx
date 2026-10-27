@@ -45,8 +45,8 @@ export function CloseBranch({ branch }: { branch: Branch }) {
               </div>
               <p class="small">
                 {quote.targetName
-                  ? `Loans move to ${quote.targetName}. About ${keep}% of customers and deposits follow; the rest leave the lab.`
-                  : 'Customers and their deposits leave the lab. This cannot be undone.'}
+                  ? `Contracts move to ${quote.targetName}. About ${keep}% of customers follow; the rest leave the lab.`
+                  : 'Customers and their plans leave the lab. This cannot be undone.'}
               </p>
             </div>
           }

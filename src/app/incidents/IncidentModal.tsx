@@ -157,7 +157,7 @@ function tellerName(s: GameState, inc: Incident): string {
   if (inc.scopeKind !== 'branch') return 'Your chief of staff';
   const b = s.branches[inc.scope];
   const mgr = b?.managerId ? s.people.managers[b.managerId] : undefined;
-  if (!mgr) return 'Head teller';
+  if (!mgr) return 'Office lead';
   return troublesDelegated(s, inc.scope) ? `${mgr.name}, office manager` : mgr.name;
 }
 

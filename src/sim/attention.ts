@@ -156,9 +156,9 @@ export function attentionItems(state: GameState): AttentionItem[] {
       id: 'liquidity',
       tone: 'bad',
       weight: 85,
-      title: 'Lending frozen',
+      title: 'Spending frozen',
       detail:
-        'Liquid assets are under the minimum and auto-funding is off, so sales offices cannot make new loans.',
+        'Liquid assets are under the minimum and auto-funding is off, so new spending is on hold.',
       route: liqRoute,
     });
   } else if (liq !== null && liq < LIQ_MIN) {
@@ -167,8 +167,7 @@ export function attentionItems(state: GameState): AttentionItem[] {
       tone: 'warn',
       weight: 70,
       title: 'Liquidity under the minimum',
-      detail:
-        'Treasury is borrowing from the central bank window to cover it, which costs reputation.',
+      detail: 'Drawing on the emergency credit line to cover it, which costs reputation.',
       route: liqRoute,
     });
   } else if (liq !== null && !t.autoFunding && liq < t.liqTarget - ATTENTION.liqBand) {
@@ -262,8 +261,8 @@ export function attentionItems(state: GameState): AttentionItem[] {
       id: 'lossRate',
       tone: 'warn',
       weight: 48,
-      title: `Loan losses at ${(loss * 100).toFixed(1)}% a year`,
-      detail: 'Above the 1.2% ceiling. Turn risk appetite down or buy a better bureau model.',
+      title: `Bad debts at ${(loss * 100).toFixed(1)}% a year`,
+      detail: 'Above the 1.2% ceiling. Turn launch posture down or license a better data package.',
       route: { kind: 'hq', dept: state.departments.risk ? 'risk' : undefined },
     });
   }
