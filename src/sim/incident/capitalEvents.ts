@@ -1,11 +1,8 @@
-// Bank runs (SIMULATION §13.8) and the emergency recapitalisation (§15): the
-// run's trigger condition, start and end, the public statement's odds, the
-// recapitalisation quote, accepting it, and the regulator takeover.
-import { BANK_RUN, FAILURE, RECAP, RECAP_DISCOUNT } from '../../config/balance';
-import { capitalSnapshot } from '../capital';
-import { issueShares } from '../shares';
+// Bank runs (SIMULATION §13.8): the run's trigger condition, start and end,
+// and the public statement's odds. (The emergency recapitalisation became the
+// mandated pause in stage C7a: mandatedPause.ts.)
+import { BANK_RUN } from '../../config/balance';
 import { pushEvent } from '../events';
-import { postCash } from '../ledger';
 import type { GameState } from '../state';
 
 // ─── Bank runs ────────────────────────────────────────────────────────────────
@@ -41,63 +38,4 @@ export function statementOdds(state: GameState): number {
     BANK_RUN.statementMax,
     BANK_RUN.statementBase + BANK_RUN.statementPerPoint * points,
   );
-}
-
-// ─── Emergency recapitalisation ───────────────────────────────────────────────
-
-export interface RecapQuote {
-  /** New capital raised (cash in). */
-  amount: number;
-  /** Price per new share: 50% of book value per share. */
-  price: number;
-  shares: number;
-}
-
-/** Shares worth enough to lift the capital ratio to 10.5%, at half of book value per share. */
-export function recapQuote(state: GameState): RecapQuote {
-  const snap = capitalSnapshot(state);
-  // New cash carries no risk weight, so CR′ = (CET1 + amount) / RWA.
-  const need = Math.max(0, RECAP.targetCr * snap.rwa - snap.cet1);
-  const amount = Math.ceil(need / RECAP.roundTo) * RECAP.roundTo;
-  const bookPerShare = snap.equity / Math.max(1, state.company.sharesOutstanding);
-  const price = Math.max(RECAP.minPrice, RECAP_DISCOUNT * bookPerShare);
-  return { amount, price, shares: Math.ceil(amount / price) };
-}
-
-/** Accepts the forced share issue: cash and paid-in capital rise together. */
-export function acceptRecap(state: GameState): RecapQuote {
-  const q = recapQuote(state);
-  const c = state.company;
-  postCash(state, q.amount, 'financing');
-  c.paidInCapital += q.amount;
-  issueShares(
-    state,
-    { id: 'regulator', name: 'Deposit Protection Fund', kind: 'regulator' },
-    q.shares,
-  );
-  c.capitalRatio = capitalSnapshot(state).capitalRatio;
-  c.lowCapitalWeeks = 0;
-  const week = state.clock.week;
-  state.incidents.recap = {
-    offeredWeek: state.incidents.recap?.offeredWeek ?? week,
-    acceptedWeek: week,
-  };
-  pushEvent(state, 'RECAP', { bank: state.meta.bankName, amount: q.amount, shares: q.shares }, 1);
-  return q;
-}
-
-/** The regulator seizes the bank: game over. */
-export function takeover(state: GameState): void {
-  if (state.flags.gameOver) return;
-  state.flags.gameOver = 'takeover';
-  pushEvent(state, 'GAME_OVER', { reason: 'takeover' }, 3);
-}
-
-/** Tick step 10: after a recap is accepted, the ratio must be back over 4.5% in 5 weeks. */
-export function checkRecapGrace(state: GameState): void {
-  const r = state.incidents.recap;
-  if (r?.acceptedWeek === undefined) return;
-  if (state.clock.week < r.acceptedWeek + RECAP.graceWeeks) return;
-  if (state.company.capitalRatio < FAILURE.takeoverCr) takeover(state);
-  else delete state.incidents.recap;
 }

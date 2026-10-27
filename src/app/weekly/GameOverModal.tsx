@@ -1,8 +1,7 @@
-// Game over (DESIGN §5.18): a Ledger front page announcing insolvency or a
-// regulator takeover, with the bank's final numbers in a short news story.
-import { FAILURE } from '../../config/balance';
+// Game over (DESIGN §5.18): a Ledger front page announcing insolvency (or, in
+// old saves only, a regulator takeover), with the lab's final numbers.
 import { Medallion, Modal } from '../components';
-import { gameDate, money, pct } from '../format/format';
+import { gameDate, money } from '../format/format';
 import { Masthead } from './LedgerCard';
 import { screen, setGame, useGame } from '../store';
 import './weekly.css';
@@ -17,9 +16,9 @@ export function GameOverModal() {
   const branches = Object.values(s.branches).filter((b) => b.status === 'open').length;
   const weeks = s.clock.week;
 
-  const headline = takeover ? `Regulator seizes ${bank}` : `${bank} fails as the cash runs out`;
+  const headline = takeover ? `Regulator takes over ${bank}` : `${bank} fails as the cash runs out`;
   const standfirst = takeover
-    ? 'Capital stayed below the safety floor for too long, and supervisors stepped in.'
+    ? 'The lab stayed below the safety line for too long, and supervisors stepped in.'
     : 'Depositors are told to expect delays as the doors close for good.';
 
   const leave = (to: 'saves' | 'title') => {
@@ -70,7 +69,7 @@ export function GameOverModal() {
           </p>
           <p>
             {takeover
-              ? `Its capital ratio had sat under ${pct(FAILURE.takeoverCr, 1)} for ${s.company.lowCapitalWeeks} weeks, at ${pct(s.company.capitalRatio, 1)} on the final count.`
+              ? 'Its safety record had sat too low for too long.'
               : `Corporate cash had been below zero for ${s.company.negativeCashWeeks} weeks, standing at ${money(s.company.cash, sym)} at the end.`}
           </p>
           <p>{s.meta.founderName} could not be reached for comment.</p>

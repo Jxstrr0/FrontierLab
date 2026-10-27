@@ -2,7 +2,7 @@
 // your attention, for a player who runs the top of the bank and leaves the
 // branches to managers. Each item names the problem, how bad it is and the
 // screen to open. Pure: reads state, mutates nothing. Thresholds in
-// ATTENTION (balance.ts); the capital tiers and the CRO's loss target are the
+// ATTENTION (balance.ts); the safety tiers and the CRO's loss target are the
 // ones the rest of the sim already uses.
 import { ATTENTION, EXEC_DELEGATION, GRAND_OPENING_WEEKS, LIQ_MIN, SPOT } from '../config/balance';
 import { CITIES } from '../data/cities';
@@ -13,6 +13,7 @@ import { cashCoverWeeks } from './cashCover';
 import { averageMorale, companyLossRate } from './execDelegationsPeople';
 import { hasExecFloor } from './execSeats';
 import type { Branch, GameState } from './state';
+import { pauseBlock } from './safety';
 
 export type AttentionTone = 'bad' | 'warn' | 'info';
 
@@ -44,7 +45,18 @@ export function attentionItems(state: GameState): AttentionItem[] {
   const items: AttentionItem[] = [];
   const open = openBranches(state);
 
-  // Capital tier.
+  // Safety tier (C7a) and a mandated pause.
+  const block = pauseBlock(state);
+  if (block) {
+    items.push({
+      id: 'pause',
+      tone: 'bad',
+      weight: 110,
+      title: state.company.pause?.reason === 'revoked' ? 'Licence revoked' : 'Mandated pause',
+      detail: block,
+      route: { kind: 'company' },
+    });
+  }
   const tier = state.company.tier;
   if (tier === 'watch' || tier === 'restricted' || tier === 'critical') {
     const bad = tier !== 'watch';
@@ -52,10 +64,10 @@ export function attentionItems(state: GameState): AttentionItem[] {
       id: 'capital',
       tone: bad ? 'bad' : 'warn',
       weight: bad ? 100 : 70,
-      title: `Capital ratio at ${tier[0]!.toUpperCase()}${tier.slice(1)}`,
+      title: `Safety ratio at ${tier[0]!.toUpperCase()}${tier.slice(1)}`,
       detail: bad
-        ? 'Lending and growth are throttled until the ratio recovers.'
-        : 'Funding costs more and dividends are capped while it stays here.',
+        ? 'The regulator is throttling growth. Staff up the Safety & Alignment floor.'
+        : 'Dividends are capped and audits get likelier. Staff up the Safety & Alignment floor.',
       route: { kind: 'company' },
     });
   }

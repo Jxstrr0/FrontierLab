@@ -21,7 +21,7 @@ import { startupShares } from '../../src/sim/portfolio';
 import { holdingsValue, withMarks } from '../../src/sim/securities';
 import { type GameState } from '../../src/sim/state';
 import { refreshPipeline } from '../../src/sim/ventures';
-import { execGame, hire, identityGap } from '../helpers/executives';
+import { execGame, hire, identityGap, staffSafety } from '../helpers/executives';
 
 function fund(s: GameState, amount: number) {
   postCash(s, amount, 'financing');
@@ -118,6 +118,7 @@ describe('investing the bank’s money', () => {
   it('runs by itself every 4 weeks', () => {
     const s = cfoGame({ bankInvests: true });
     fund(s, 1_000_000_000);
+    staffSafety(s); // past founder mode the regulator wants a Safety floor (C7a)
     advanceWeeks(s, X.investEveryWeeks * 2);
     expect(Object.keys(s.market.holdings.company).length).toBeGreaterThanOrEqual(2);
     expect(Object.keys(s.market.holdings.personal)).toHaveLength(0);

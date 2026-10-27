@@ -4,7 +4,6 @@
 import {
   APPROVAL_INCLUSION,
   AWARENESS_FLOOR,
-  CAPITAL_GATE,
   CATCHMENT_MULT,
   DEMAND_NOISE,
   DISTANCE_FALLOFF,
@@ -38,6 +37,7 @@ import { affinityOf, allProducts, baseId, starsOf } from '../products';
 import { cityRoom } from './cityMarket';
 import { officeTraffic } from './officeSize';
 import { rivalOverall } from '../rivalMarketing';
+import { salesGate } from '../safety';
 
 export interface Origination {
   newAccounts: number;
@@ -115,8 +115,7 @@ export function approvalOf(state: GameState, spec: ProductSpec): number {
     (spec.baseApproval ?? 0) *
     (RISK_APPETITE.volumeMult[appetite] ?? 1) *
     (APPROVAL_INCLUSION.base + APPROVAL_INCLUSION.slope * model.radar[RADAR.breadth]) *
-    fundingGate *
-    CAPITAL_GATE[state.company.tier]
+    fundingGate
   );
 }
 
@@ -165,6 +164,8 @@ export function runDemand(state: GameState, branch: Branch, fx: CampaignEffects)
   const waitlist = waitlisted(state);
   // §16.7 (C6a): a better model lets plan and usage prices sit above market.
   const headroom = priceHeadroom(state);
+  // §15 (C7a): the regulator's tier gates every new sign-up; a pause stops them.
+  const regulator = salesGate(state);
   for (const spec of allProducts(state)) {
     if (spec.kind === 'sbl' || spec.kind === 'fx' || !isOffered(branch, spec.id)) continue;
     const price = branchPrice(state, branch, spec.id);
@@ -178,7 +179,8 @@ export function runDemand(state: GameState, branch: Branch, fx: CampaignEffects)
     const boost =
       (spec.category === 'deposits' ? fx.depositTakeUp : 1) *
       takeupMult(state, baseId(spec)) *
-      gate;
+      gate *
+      regulator;
     let accounts = 0;
     let volume = 0;
     for (const s of SEGMENTS) {

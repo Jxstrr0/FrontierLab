@@ -1,24 +1,15 @@
-// Bank runs (SIMULATION §13.8), the regulator's letter and the emergency
-// recapitalisation (§15): triggers, deposit churn during a run, its end, and the
-// accept / decline / grace paths with the balance identity intact.
+// Bank runs (SIMULATION §13.8) and the regulator's letter (§15): triggers,
+// deposit churn during a run and its end. The mandated pause that replaced the
+// emergency recapitalisation is tested in safety.test.ts.
 import { describe, expect, it } from 'vitest';
-import { BANK_RUN, FAILURE, RECAP } from '../../src/config/balance';
-import { balanceSheet } from '../../src/sim/balanceSheet';
-import { capitalSnapshot, evaluateCapital } from '../../src/sim/capital';
+import { BANK_RUN } from '../../src/config/balance';
 import * as cmd from '../../src/sim/commands';
 import { advanceWeeks } from '../../src/sim/engine';
-import { checkFailure } from '../../src/sim/failure';
 import { bankRunMult } from '../../src/sim/incident/effects';
 import { runIncidents } from '../../src/sim/incidents';
-import { spend } from '../../src/sim/ledger';
 import type { GameState } from '../../src/sim/state';
 import { openBank } from '../helpers/incidents';
 import { bankWithFloors } from '../helpers/scenario';
-
-const identityGap = (s: GameState) => {
-  const bs = balanceSheet(s);
-  return Math.abs(bs.equity - bs.expectedEquity);
-};
 
 describe('bank runs', () => {
   /** Ticks incidents week by week until a run starts. */
@@ -121,71 +112,5 @@ describe('regulator letter', () => {
     s.company.tierWeeks = 0;
     runIncidents(s);
     expect(s.incidents.active.map((i) => i.type)).toContain('REGULATOR_LETTER');
-  });
-});
-
-describe('emergency recapitalisation', () => {
-  /** A bank whose capital ratio sits at 2%, eight weeks running below 4.5%. */
-  function sinking(): GameState {
-    const s = bankWithFloors([], { weeks: 30 });
-    const snap = capitalSnapshot(s);
-    spend(s, 'fines', snap.cet1 - 0.02 * snap.rwa);
-    evaluateCapital(s);
-    expect(s.company.capitalRatio).toBeLessThan(FAILURE.takeoverCr);
-    s.company.lowCapitalWeeks = RECAP.offerWeeks - 1;
-    checkFailure(s);
-    expect(s.flags.gameOver).toBeUndefined();
-    return s;
-  }
-  const offer = (s: GameState) => s.incidents.active.find((i) => i.type === 'RECAP_OFFER')!;
-
-  it('is offered after eight weeks below 4.5% instead of a takeover', () => {
-    const s = sinking();
-    expect(offer(s)).toBeDefined();
-    expect(s.incidents.recap?.offeredWeek).toBe(s.clock.week);
-  });
-
-  it('accepting issues shares at half of book value and lifts the ratio to 10.5%', () => {
-    const s = sinking();
-    const shares = s.company.sharesOutstanding;
-    const paidIn = s.company.paidInCapital;
-    const cash = s.company.cash;
-    const bookPerShare = capitalSnapshot(s).equity / shares;
-    expect(cmd.resolveIncident(s, offer(s).id, 'accept').ok).toBe(true);
-    const raised = s.company.paidInCapital - paidIn;
-    expect(raised).toBeGreaterThan(0);
-    expect(s.company.cash - cash).toBeCloseTo(raised);
-    const newShares = s.company.sharesOutstanding - shares;
-    expect(raised / newShares).toBeCloseTo(bookPerShare * 0.5, 0);
-    expect(capitalSnapshot(s).capitalRatio).toBeGreaterThanOrEqual(RECAP.targetCr);
-    expect(identityGap(s)).toBeLessThan(1);
-    expect(s.events.log.some((e) => e.type === 'RECAP')).toBe(true);
-  });
-
-  it('declining ends the game in a takeover', () => {
-    const s = sinking();
-    cmd.resolveIncident(s, offer(s).id, 'decline');
-    expect(s.flags.gameOver).toBe('takeover');
-  });
-
-  it('still below 4.5% five weeks after accepting means a takeover', () => {
-    const s = sinking();
-    cmd.resolveIncident(s, offer(s).id, 'accept');
-    const snap = capitalSnapshot(s);
-    spend(s, 'fines', snap.cet1 - 0.02 * snap.rwa);
-    evaluateCapital(s);
-    s.clock.week += RECAP.graceWeeks - 1;
-    checkFailure(s);
-    expect(s.flags.gameOver).toBeUndefined();
-    s.clock.week += 1;
-    checkFailure(s);
-    expect(s.flags.gameOver).toBe('takeover');
-  });
-
-  it('unanswered, the deadline declines it', () => {
-    const s = sinking();
-    s.clock.week = offer(s).deadlineWeek;
-    runIncidents(s);
-    expect(s.flags.gameOver).toBe('takeover');
   });
 });

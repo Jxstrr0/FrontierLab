@@ -152,7 +152,7 @@ function simulate(args: Args) {
           M(companyArr(state)).padStart(9),
           M(bs.loans).padStart(9),
           M(bs.equity).padStart(8),
-          P(state.company.capitalRatio).padStart(7),
+          P(state.company.safetyRatio).padStart(7),
           P(yearly.gross / Math.max(1, yearly.rev)).padStart(6),
           P(yearly.losses / Math.max(1, yearly.loans / n)).padStart(6),
           P(yearly.ni / Math.max(1, yearly.equity / n)).padStart(7),
@@ -195,7 +195,7 @@ function run(): void {
       `${args.difficulty}, ${state.meta.competitors} competitors, ${args.years} years\n`,
   );
   console.log(
-    'Year Branches       ARR     Loans   Equity      CR     GM   Loss     ROE     Cash       Tier       Policy HQ ppl  Min k′  Index',
+    'Year Branches       ARR     Loans   Equity  Safety     GM   Loss     ROE     Cash       Tier       Policy HQ ppl  Min k′  Index',
   );
   for (const r of rows) console.log(r);
 

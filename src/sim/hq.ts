@@ -118,7 +118,7 @@ export function requiredStaff(state: GameState, id: HqDeptId): number {
     case 'it':
       return r.it.base + r.it.perBranch * branches + r.it.perAssets * assets;
     case 'risk':
-      return r.risk.base + r.risk.perBranch * branches + r.risk.perLoans * (last?.loans ?? 0);
+      return r.risk.base + r.risk.perBranch * branches + r.risk.perArr * (last?.arr ?? 0);
   }
 }
 

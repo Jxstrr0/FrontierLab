@@ -3,13 +3,58 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C6 done (v0.1.18–v0.1.20, save schema 16): the AI model's radar counts (C6a); training runs, rival model releases, a rising frontier and a leaderboard (C6b); and the Chief Scientist seat with the talent war over named researchers (C6c). Next: C7 (safety, regulation and valuation).
+**Current stage:** C7a done (v0.1.21, save schema 17): the safety ratio, the AI regulator's tiers, safety audits, the mandated pause and a revoked licence. Next: C7b (revenue-multiple valuation, IPO rules, AI policy lobbying).
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `00077caa138f05` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `1c51dcb74fc7e0` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-27 — Stage C7a: the safety ratio and the AI regulator (v0.1.21)
+
+**What you asked for:** finish C6, then move on to C7. C7 comes in two parts; this is the first.
+
+**What changed.**
+- **The capital ratio becomes the safety ratio.** It measures how well your Safety & Alignment floor covers the risk your model carries.
+  - Staffing the Safety floor raises it. Staff above the requirement add a little more.
+  - A model far ahead of the market's bar carries more risk and lowers it; a model with a high Safety score lowers the risk.
+  - Tiers run Strong, Adequate, Watch, Restricted, Critical, as before. A policy buffer still raises every line.
+- **What the tier does.**
+  - A weak tier now slows **all** new customers, not only loans as in the bank game.
+  - Data-sensitive businesses on the Deal Desk prefer a lab with a strong record: up to +4 points to win or keep a contract at Strong, down to −8 at Critical.
+  - At Critical you pay a fine of 0.5% of a quarter's revenue each quarter.
+  - Quarterly safety audits fail more often when your model carries more risk.
+- **The mandated pause replaces the bank rescue.** After 8 weeks below 40%, the regulator offers a pause.
+  - **Accept:** you pay its monitors (2% of a quarter's revenue, at least $250k). They lift your Safety coverage for 8 weeks.
+  - During those weeks there are no new customers, no new deal requests and no training. Existing customers and contracts carry on.
+  - If the ratio is still below 40% when the pause ends, the licence is revoked.
+  - **Decline, or let the deadline pass:** the licence is revoked.
+  - **Revoked:** 26 weeks with no new business, then a year of strict watch, with higher tier lines and twice as many failed audits.
+  - **It is never game over.** Only running out of money ends the game now.
+- **The lenders' credit ratio stays.** The old capital ratio lives on in Finance and Mergers as the "credit ratio". It decides what lenders and your CFO's buybacks will do.
+- **Screens.**
+  - The Company panel shows the safety ratio with its tier, plus a credit row.
+  - The Safety floor has a "Regulator and safety" section.
+  - A banner shows during a pause or strict watch.
+
+**Balance.**
+- The Safety floor requirement now grows with ARR rather than loans.
+- The scripted steady player now leases a Safety floor on its own before it can afford a full office. It also keeps two weeks of costs back before it expands. Without that, one city in twenty dipped $152k below zero at a quarter end that also brought an audit fine.
+- 20-city panel: every check passes. ARR is $4.0M at week 52 and $25.0M at week 260, payback takes 39 weeks, and the lowest cash in any city is $179k.
+- Seed 42: aggressive and turtle pass every check. Steady lists in year 5 (week 209). Its first office earns $23.3k a week at week 52, just under the $24k band. The panel's median city is inside the band, so I left it.
+
+**Checks.**
+- New tests cover:
+  - the ratio and its tiers, strict watch, the deal edge;
+  - cutting Safety staff mid-run (worse tier, slower sales, likelier audits, the pause offer);
+  - every path through the pause (accept, end, revoke, decline, deadline, restore);
+  - the save upgrade.
+- Saves from v0.1.20 load: the ratio and tier are set, and an old rescue offer is dropped.
+- The determinism snapshot changed as intended.
+- Not done this session: a quick check of the new banner and Safety floor section on an iPhone-sized screen. That is still to do.
+
+**Next:** C7b, valuation by revenue multiple, IPO rules and AI policy lobbying.
 
 ### 2026-10-27 — Stage C6c: the Chief Scientist and the talent war (v0.1.20)
 

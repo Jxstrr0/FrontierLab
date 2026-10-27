@@ -92,7 +92,7 @@ export function buildBlocker(
   }
   const tier = state.company.tier;
   if (tier === 'restricted' || tier === 'critical') {
-    return `The regulator won't allow new sales offices at the ${tier} capital tier.`;
+    return `The regulator won't allow new sales offices at the ${tier} safety tier.`;
   }
   const quote = buildQuote(state, lotId, build, size);
   if (state.company.cash < quote.total) return `Not enough cash: you need ${money(quote.total)}.`;
@@ -276,7 +276,7 @@ export function upgradeBlocker(state: GameState, branchId: string): string | und
   if (!quote) return 'This office is already the largest size.';
   const tier = state.company.tier;
   if (tier === 'restricted' || tier === 'critical') {
-    return `The regulator won't allow expansion at the ${tier} capital tier.`;
+    return `The regulator won't allow expansion at the ${tier} safety tier.`;
   }
   if (state.company.cash < quote.total) return `Not enough cash: you need ${money(quote.total)}.`;
   return undefined;

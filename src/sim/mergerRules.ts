@@ -1,6 +1,6 @@
 // Who you may make an M&A offer to right now (SIMULATION §19.8, §15): a rival
 // still active or on distressed sale, with branches, no offer of yours pending
-// and no rejection inside the retry window, while your capital tier allows
+// and no rejection inside the retry window, while your safety tier allows
 // acquisitions. Shared by the offer command, the answer and the split rule.
 import { MERGERS } from '../config/balance';
 import { CITIES } from '../data/cities';
@@ -32,7 +32,7 @@ export function targetBlocker(state: GameState, rivalId: string): string | undef
   if (bank.branches.length === 0) return `${bank.name} has no sales offices left to buy.`;
   const tier = state.company.tier;
   if (tier === 'restricted' || tier === 'critical')
-    return `The regulator won't allow acquisitions at the ${tier} capital tier.`;
+    return `The regulator won't allow acquisitions at the ${tier} safety tier.`;
   if (pendingOffer(state, rivalId)) return `Your offer for ${bank.name} is awaiting an answer.`;
   const retry = retryWeek(state, rivalId);
   if (retry !== undefined) {

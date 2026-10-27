@@ -15,7 +15,7 @@ import { rentPricingPower } from '../../src/sim/execSeats';
 import { postCash } from '../../src/sim/ledger';
 import { bestRent, occupancyTarget, rentForOccupancy } from '../../src/sim/propertyMath';
 import { type GameState } from '../../src/sim/state';
-import { execGame, hire, identityGap } from '../helpers/executives';
+import { execGame, hire, identityGap, staffSafety } from '../helpers/executives';
 
 function fund(s: GameState, amount: number) {
   postCash(s, amount, 'financing');
@@ -75,6 +75,7 @@ describe('buying for the bank', () => {
   it('buys the best-yield listing at asking every 4 weeks, in any city', () => {
     const s = chiefGame({ bankRents: true, bankBuys: true });
     fund(s, 1_000_000_000);
+    staffSafety(s); // past founder mode the regulator wants a Safety floor (C7a)
     const before = owned(s, 'company').length;
     const plan = nextPurchase(s, 'company');
     expect(plan.pick).toBeDefined();

@@ -1,9 +1,11 @@
-// Capital ratio meter (SCREENS §24): five tier bands (Critical, Restricted,
-// Watch, Adequate, Strong) with a marker at the current ratio. Band edges come
-// from TIER_THRESHOLDS so the meter always matches the regulator rules.
-import { TIER_THRESHOLDS } from '../../config/balance';
+// Ratio meter (SCREENS §24): five tier bands (Critical, Restricted, Watch,
+// Adequate, Strong) with a marker at the current ratio. `kind="safety"` (the
+// default) shows the regulator's safety ratio on SAFETY_TIER_THRESHOLDS;
+// `kind="credit"` shows the lenders' credit ratio on TIER_THRESHOLDS. Band
+// edges come from the config so the meter always matches the rules.
+import { SAFETY_TIER_THRESHOLDS, TIER_THRESHOLDS } from '../../config/balance';
 import type { Tier } from '../../data/types';
-import { capitalRatioText } from '../format/format';
+import { safetyRatioText } from '../format/format';
 
 export const TIER_LABEL: Record<Tier, string> = {
   strong: 'Strong',
@@ -21,11 +23,30 @@ export const TIER_TONE: Record<Tier, 'good' | 'warn' | 'bad'> = {
   critical: 'bad',
 };
 
-/** Upper end of the meter. The Strong band stretches from its threshold to here. */
-const METER_MAX = 0.18;
+export type MeterKind = 'safety' | 'credit';
 
-/** A band edge as a short percentage: 0.105 → "10.5%", 0.06 → "6%". */
-const edge = (x: number) => `${Number((x * 100).toFixed(1))}%`;
+interface Scale {
+  max: number;
+  label: string;
+  edges: { tier: Tier; min: number }[];
+  text: (x: number) => string;
+}
+
+/** Upper end of each meter. The Strong band stretches from its threshold to here. */
+const SCALES: Record<MeterKind, Scale> = {
+  safety: {
+    max: 1.4,
+    label: 'Safety ratio',
+    edges: SAFETY_TIER_THRESHOLDS.map((t) => ({ tier: t.tier, min: t.minSr })),
+    text: safetyRatioText,
+  },
+  credit: {
+    max: 0.18,
+    label: 'Credit ratio',
+    edges: TIER_THRESHOLDS.map((t) => ({ tier: t.tier, min: t.minCr })),
+    text: (x) => `${Number((x * 100).toFixed(1))}%`,
+  },
+};
 
 interface Band {
   tier: Tier;
@@ -33,38 +54,37 @@ interface Band {
   to: number;
 }
 
-/** Bands from low to high, derived from the thresholds (listed high to low). */
-function bands(): Band[] {
-  const edges = [...TIER_THRESHOLDS].reverse();
+/** Bands from low to high, derived from the thresholds (listed high to low), raised by `lift`. */
+function bands(sc: Scale, lift: number): Band[] {
+  const edges = [...sc.edges].reverse();
   return edges.map((t, i) => ({
     tier: t.tier,
-    from: Number.isFinite(t.minCr) ? t.minCr : 0,
-    to: edges[i + 1]?.minCr ?? METER_MAX,
+    from: Number.isFinite(t.min) ? t.min + lift : 0,
+    to: edges[i + 1] ? edges[i + 1]!.min + lift : sc.max,
   }));
 }
 
-export function CapitalMeter(p: { ratio: number; tier: Tier }) {
-  const all = bands();
-  const marker = Math.max(0, Math.min(1, p.ratio / METER_MAX));
+/** `lift` raises every tier line (safety only: policy buffer and strict watch). */
+export function CapitalMeter(p: { ratio: number; tier: Tier; kind?: MeterKind; lift?: number }) {
+  const sc = SCALES[p.kind ?? 'safety'];
+  const all = bands(sc, p.kind === 'credit' ? 0 : (p.lift ?? 0));
+  const marker = Math.max(0, Math.min(1, p.ratio / sc.max));
+  const edge = sc.text;
   return (
     <div class="meter">
-      <div
-        class="meter-bar"
-        role="img"
-        aria-label={`Capital ratio ${capitalRatioText(p.ratio)}, ${p.tier}`}
-      >
+      <div class="meter-bar" role="img" aria-label={`${sc.label} ${edge(p.ratio)}, ${p.tier}`}>
         {all.map((b) => (
           <span
             key={b.tier}
             class={`meter-band meter-${b.tier}${b.tier === p.tier ? ' is-current' : ''}`}
-            style={{ width: `${((b.to - b.from) / METER_MAX) * 100}%` }}
+            style={{ width: `${((b.to - b.from) / sc.max) * 100}%` }}
           />
         ))}
         <span class="meter-marker" style={{ left: `${marker * 100}%` }} />
       </div>
       <div class="meter-ticks" aria-hidden="true">
         {all.slice(1).map((b) => (
-          <span key={b.tier} style={{ left: `${(b.from / METER_MAX) * 100}%` }}>
+          <span key={b.tier} style={{ left: `${(b.from / sc.max) * 100}%` }}>
             {edge(b.from)}
           </span>
         ))}
