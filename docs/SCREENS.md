@@ -180,6 +180,7 @@ After the wizard, the map opens with the tutorial (§27).
 
 ### 5.3 Loan Desk
 - **Summary strip:** applications this week · approved · declined · approval rate · business loan balance · delinquent count.
+- **Lending fund card (C3b):** the treasury reserves the desk lends from, a line saying repayments flow back and larger applications can't be approved until it grows, and a full-width "Add $250k from company cash" button (`LOANDESK.fundTopUp`, capped at the cash you have).
 - **Application cards:**
   - sector icon, business name, sector
   - amount · term · collateral
@@ -528,11 +529,12 @@ Tabs: Overview · Loans · Credit.
 - capital ratio with tier badge and a meter with thresholds
 - at Watch, Restricted or Critical, a "How to fix this" checklist under the meter (`src/data/capitalFixes.ts`): sell new shares at an investment bank (Private placement, or Secondary offering once listed), sell company stocks and startup stakes, turn risk appetite down (Finance floor), hold off on growth and dividends; at Critical, a line on the emergency rescue
 - **Cash** card: corporate cash, running costs a week and **cash cover** (weeks of running costs; red under `ATTENTION.cashCoverWeeks`)
-- liquidity ratio with the Treasury gauge's status badge, the target, overnight borrowing when any, and a line saying whether auto-funding is holding the target
-- totals: assets, deposits, loans, equity
+- liquidity ratio with the Treasury gauge's status badge, the target, overnight borrowing when any, and a line saying whether auto-funding is holding the target (C3b: only while an older save still holds deposits or overnight borrowing)
+- totals: assets, ARR, lending fund (treasury reserves), Loan Desk loans, equity (C3b)
 - share price or private valuation, with the 52-week range, market cap, your stake and top shareholders
 - a Personal line: personal cash plus holdings
-- one-line explanations ("Deposits fund loans; capital limits growth") with a "Learn more" sheet
+- one-line explanations ("Grow recurring revenue; watch the compute bill") with a "Learn more" sheet (revenue and compute, capital, the lending fund, cash cover)
+- statements (C3b): the income statement runs Plans, API, Apps & services, Loan Desk interest, Other income → Revenue → Compute → Gross profit → Operating expenses → Interest expense (when any) → Loan losses → Depreciation → Pre-tax → Tax → Net income. The balance sheet shows reserves, bonds, foreclosed property, deposits, wholesale funding and unrealised bond gains only when non-zero.
 - links to the full statements (Finance floor, or a simplified view without an HQ)
 
 ## 25. Branches list

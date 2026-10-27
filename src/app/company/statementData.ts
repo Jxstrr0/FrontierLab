@@ -36,14 +36,24 @@ function sumPnl(snaps: WeeklySnapshot[]): Record<PnlLine, number> {
   return out;
 }
 
+/** C3b: revenue by product line, the compute bill and gross profit, then the rest. */
 export function incomeStatement(snaps: WeeklySnapshot[]): StatementLine[] {
-  const x = summarize(sumPnl(snaps));
+  const pnl = sumPnl(snaps);
+  const x = summarize(pnl);
+  const product = pnl.accountFees + pnl.serviceFees + pnl.cardFees + pnl.loanInterest;
+  const optional = (label: string, value: number): StatementLine[] =>
+    Math.abs(value) >= 0.5 ? [{ label, value }] : [];
   return [
-    { label: 'Interest income', value: x.interestIncome, kind: 'sub' },
-    { label: 'Interest expense', value: -x.interestExpense, kind: 'sub' },
-    { label: 'Net interest income', value: x.netInterestIncome, kind: 'total' },
-    { label: 'Fee and other income', value: x.feeIncome },
-    { label: 'Operating expenses', value: -x.opex },
+    { label: 'Plans', value: pnl.accountFees, kind: 'sub' },
+    { label: 'API', value: pnl.serviceFees, kind: 'sub' },
+    { label: 'Apps & services', value: pnl.cardFees, kind: 'sub' },
+    { label: 'Loan Desk interest', value: pnl.loanInterest, kind: 'sub' },
+    { label: 'Other income', value: x.revenue - product, kind: 'sub' },
+    { label: 'Revenue', value: x.revenue, kind: 'total' },
+    { label: 'Compute', value: -x.compute },
+    { label: 'Gross profit', value: x.grossProfit, kind: 'total' },
+    { label: 'Operating expenses', value: -(x.opex - x.compute) },
+    ...optional('Interest expense', -x.interestExpense),
     { label: 'Loan losses', value: -x.loanLosses },
     { label: 'Depreciation', value: -x.depreciation },
     { label: 'Pre-tax income', value: x.preTax, kind: 'total' },
@@ -69,12 +79,14 @@ export function balanceSheetLines(s: GameState): StatementLine[] {
   // Lines that only appear once something is in them (later-stage assets and liabilities).
   const optional = (label: string, value: number): StatementLine[] =>
     Math.abs(value) >= 0.5 ? [{ label, value, kind: 'sub' }] : [];
+  // C3b: bank-only lines (reserves, bonds, foreclosed property, deposits,
+  // wholesale funding) show only while an older save still holds them.
   return [
     { label: 'Cash', value: b.cash, kind: 'sub' },
-    { label: 'Reserves', value: b.reserves, kind: 'sub' },
-    { label: 'Government bonds', value: b.bonds, kind: 'sub' },
-    { label: 'Loans', value: b.loans, kind: 'sub' },
-    { label: 'Foreclosed property', value: b.reo, kind: 'sub' },
+    ...optional('Treasury reserves', b.reserves),
+    ...optional('Government bonds', b.bonds),
+    ...optional('Loan Desk loans', b.loans),
+    ...optional('Foreclosed property', b.reo),
     ...optional('Stocks', b.investments),
     ...optional('Ventures', b.ventures),
     ...optional('Compute credits', b.ventureDebt),
@@ -85,15 +97,15 @@ export function balanceSheetLines(s: GameState): StatementLine[] {
     ...optional('Partnership fees', b.intangibles),
     ...optional('Goodwill', b.goodwill),
     { label: 'Total assets', value: b.assets, kind: 'total' },
-    { label: 'Deposits', value: b.deposits, kind: 'sub' },
-    { label: 'Wholesale funding', value: b.wholesale, kind: 'sub' },
+    ...optional('Deposits', b.deposits),
+    ...optional('Wholesale funding', b.wholesale),
     ...optional('Corporate debt', b.corporateDebt),
     ...optional('Dividends payable', b.dividendsPayable),
     { label: 'Taxes payable', value: b.taxPayable, kind: 'sub' },
     { label: 'Total liabilities', value: b.liabilities, kind: 'total' },
     { label: 'Paid-in capital', value: s.company.paidInCapital, kind: 'sub' },
     { label: 'Retained earnings', value: retained, kind: 'sub' },
-    { label: 'Unrealised bond gains', value: b.aoci, kind: 'sub' },
+    ...optional('Unrealised bond gains', b.aoci),
     { label: 'Total equity', value: b.equity, kind: 'total' },
   ];
 }

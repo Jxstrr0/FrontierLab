@@ -427,31 +427,33 @@ A book's balance is its **ARR** (annual recurring revenue).
 - **Booked loans** become a `BusinessLoan`:
   - Each one amortizes and defaults on its own each week (default draw: `rng < pd × creditCycle / 52`).
   - On default: `loss = balance × lgd` and the recovery goes to the liquid pool.
+- **Lending fund (C3b, 2026-10-27):** loans are paid out of treasury reserves and repayments and recoveries flow back in. The desk no longer borrows: an approval (yours or a delegated one) needs `reserves ≥ amount`, otherwise it fails with "Treasury reserves cannot cover this loan". The Loan Desk tab shows the fund and a button that moves `LOANDESK.fundTopUp` ($250k) of company cash into reserves (the existing treasury transfer). Business loans carry no internal funding charge any more.
   - Defaults of $500k or more emit a Ledger event.
 - The SBL product card on the Products tab shows totals across business loans.
 
-## 12. Branch P&L (funds transfer pricing)
+## 12. Sales office P&L
 
-- **Branch revenue (shown):** loan and card interest + deposit funding credit (`Σ deposit balance × FTP_tenor/52`) + fees + wealth fees + services + ATM fees (`atm.productivity × 0.25 × $2.50`).
-- **Branch expenses:**
-  - deposit interest paid
-  - loan funding charge (`Σ loan balance × FTP_tenor/52`)
+**C3b (2026-10-27):** funds transfer pricing is gone from the office P&L; the compute bill takes its place. Revenue goes straight to corporate cash, as before.
+
+- **Office revenue:** plan fees (Plans) + API usage (API) + Apps & services + Loan Desk interest + other income (origination and kiosk fees from older saves).
+- **Office expenses:**
+  - **compute:** each plan seat's weekly compute cost (`spec.servicing` per seat) plus API usage (`units × unitCost`, units = ARR / (price × 52)). Posted to the company `compute` line.
   - loan losses
   - staff wages (`staff × wage × 40`)
   - manager salary / 52
   - rent
   - campaigns
-  - equipment maintenance: EQUIP_MAINT (6%/yr) × the cost of the teller line, vault and ATM / 52
+  - equipment maintenance: EQUIP_MAINT (6%/yr) × the cost of the build slots / 52
   - fit-out upkeep: 2%/yr × the cost of the exterior and lobby / 52
   - overhead: BRANCH_OVERHEAD ($450) × city.costIndex
-  - servicing and underwriting
-- **Branch income** = revenue − expenses. Keep 52 weeks of history (`BRANCH_PNL_WEEKS`) so the branch Finance tab can show a full year.
-- Depreciation is a company-level item, not part of branch income.
+  - support and underwriting (Loan Desk servicing, applications; deposit interest on any legacy bank book until C3c)
+- **Office income** = revenue − expenses. Keep 52 weeks of history (`BRANCH_PNL_WEEKS`) so the Finance tab can show a full year.
+- Depreciation is a company-level item, not part of office income.
 - **Statement line groups:**
-  - Revenues: Loan interest, Deposit funding credit, Fees, Wealth & services
-  - Expenses: Deposit interest, Loan funding charge, Loan losses, Staff, Manager, Rent, Marketing, Equipment & upkeep, Servicing & underwriting, Overhead
+  - Revenues: Plans, API, Apps & services, Loan Desk interest, Other income
+  - Expenses: Compute, Loan losses, Staff, Manager, Rent, Marketing, Equipment & upkeep, Support & underwriting, Overhead
 
-### 12.1 Worked example (mature branch, policy 3.25%, term premium +0.40%)
+### 12.1 Worked example (bank era, kept for history; mature branch, policy 3.25%, term premium +0.40%)
 The balance script should land near this; §25 targets match it. Treat it as calibration, not as test truth.
 
 **Superseded in Stage 1 (2026-10-24):** the deposit and loan sizes still hold, but with CONTENT's fee table the "fees and other" line comes to about $1.4M a year rather than $0.75M, and policy rates sit nearer 3.75–4%. A mature branch therefore earns about $50–65k a week; §25 was updated to match.
@@ -568,13 +570,15 @@ Shown in the top bar. Moves only with cash items:
 - transfers to Treasury
 
 ### 14.2 Weekly company P&L
+**C3b (2026-10-27):** the statement now reads like a software company's: Plans, API, Apps & services, Loan Desk interest and Other income add up to **Revenue**; **Compute** comes off to give **Gross profit**; then operating expenses (excluding compute), interest expense (only when there is any), loan losses, depreciation, pre-tax income, tax and net income. The internal groups below still drive the sums (compute is an operating expense line).
+
 | Line | Contents |
 |---|---|
 | Interest income | loans and cards, reserves, bond coupons, venture debt |
 | Interest expense | deposits, wholesale funding, corporate debt |
 | **Net interest income** | |
 | Fee & other income | account fees, card fees and interchange, wealth, services, ATM, real estate rent, dividends received, realized gains/losses |
-| Operating expenses | branch staff, managers, rents (branches and offices), HQ salaries, executive pay (including grant expense), marketing (branch and brand), equipment and upkeep, overheads, servicing, underwriting, benefits, development spend, fines, incident costs |
+| Operating expenses | compute (C3b), branch staff, managers, rents (branches and offices), HQ salaries, executive pay (including grant expense), marketing (branch and brand), equipment and upkeep, overheads, servicing, underwriting, benefits, development spend, fines, incident costs |
 | Loan losses | non-cash |
 | Depreciation & amortization | non-cash: branch fit-outs over 10 years, equipment over 5 years, office fit-outs over 10 years, partnership fees over the contract; goodwill is not amortized |
 | Pre-tax income | |

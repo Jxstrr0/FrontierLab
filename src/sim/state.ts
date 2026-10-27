@@ -55,7 +55,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState } from './personalTypes';
 
-export const SCHEMA_VERSION = 6;
+export const SCHEMA_VERSION = 7;
 
 export interface GameState {
   schemaVersion: number;
@@ -539,13 +539,14 @@ export interface Book {
   };
 }
 
+/** An office P&L row's lines (C3b: AI revenue lines and the compute bill). */
 export type BranchPnlLine =
-  | 'loanInterest'
-  | 'fundingCredit'
-  | 'fees'
-  | 'wealthServices'
-  | 'depositInterest'
-  | 'fundingCharge'
+  | 'plans'
+  | 'api'
+  | 'apps'
+  | 'loanDesk'
+  | 'otherIncome'
+  | 'compute'
   | 'losses'
   | 'staff'
   | 'manager'
@@ -944,6 +945,7 @@ export type PnlLine =
   | 'equipment'
   | 'overhead'
   | 'servicing'
+  | 'compute'
   | 'underwriting'
   | 'hqStaff'
   | 'benefits'

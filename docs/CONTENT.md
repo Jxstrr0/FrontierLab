@@ -717,38 +717,38 @@ Tokens are in {braces}. Write 2–4 variants per type in code. The full set live
 
 ## 24. Review card templates
 
-Pick by category and sentiment. Use campaign-specific lines when the campaign is active.
+Pick by category and sentiment. Use campaign-specific lines when the campaign is active. The full lists live in `src/data/reviews.ts` (rewritten for the lab in C3b; examples below).
 
-- **Rates +**
-  - "Best savings rate in town. Moved everything over."
-  - "Got a better mortgage rate here than my parents' bank."
-- **Rates −**
-  - "Their mortgage rate is way above the bank across the street."
-  - "Twelve bucks a month for chequing? Pass."
+- **Price +**
+  - "Pro costs less here than anywhere else I tried. Switched the whole team."
+  - "API pricing is cheap enough to leave a batch job running all night."
+- **Price −**
+  - "Forty a month for Plus? The lab across the street charges half."
+  - "Ran one big job and the API bill made me sit down."
 - **Service +**
-  - "In and out in five minutes. Teller remembered my name."
-  - "My advisor actually explained everything."
+  - "Support answered in five minutes and fixed it in ten."
+  - "Someone at the office walked me through the whole setup."
 - **Service −**
-  - "Forty minutes in line for a deposit."
-  - "Nobody at the desk for ages."
-- **Branch +**
-  - "Feels like a proper bank. Marble floors and all."
-  - "Bright, clean, quiet. Nice place to sign a mortgage."
-- **Branch −**
-  - "Looks like it hasn't been redone since the 90s."
-  - "The ATM ate my card. Again."
+  - "Three days waiting on a support ticket."
+  - "Nobody at the front desk for ages."
+- **Office +**
+  - "Beautiful office. Felt like visiting the future."
+  - "Bright, quiet demo room. Nice place to try the new model."
+- **Office −**
+  - "Office looks like it hasn't been redone since the 90s."
+  - "The demo kiosk froze. Again."
 - **Products +**
-  - "Finally a card with decent cashback."
-  - "They had exactly the account my business needed."
+  - "The code assistant writes half my pull requests now."
+  - "They had exactly the plan my startup needed."
 - **Products −**
-  - "No student account? Come on."
-  - "Couldn't get a line of credit here."
+  - "No campus plan? Come on."
+  - "The model got my simple question confidently wrong."
 - **Campaigns:**
-  - Lobby coffee: "Free espresso while I signed my mortgage papers? Fine, you win."
-  - Charging station: "Charged my phone while I waited. Small thing, big difference."
+  - Lobby coffee: "Free espresso while they set up my account? Fine, you win."
+  - Charging station: "Charged my laptop while I waited. Small thing, big difference."
   - Saturday hours: "Open Saturday mornings. Thank you!"
-  - Sign-up bonus: "Came for the $300 bonus. Might stay."
-  - Money workshops: "The money workshop helped me finally make a budget."
+  - Sign-up bonus: "Came for the free credits. Might stay."
+  - Money workshops: "The prompting workshop finally made it click for me."
 
 ## 25. Advisor lines (contextual)
 

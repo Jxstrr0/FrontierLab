@@ -26,6 +26,7 @@ export const PNL_LINES: readonly PnlLine[] = [
   'equipment',
   'overhead',
   'servicing',
+  'compute',
   'underwriting',
   'hqStaff',
   'benefits',
@@ -84,6 +85,7 @@ export const OPEX: readonly PnlLine[] = [
   'equipment',
   'overhead',
   'servicing',
+  'compute',
   'underwriting',
   'hqStaff',
   'benefits',
@@ -148,6 +150,10 @@ export interface IncomeSummary {
   netInterestIncome: number;
   feeIncome: number;
   opex: number;
+  /** Compute bill (part of opex; C3b): plan seats and API usage. */
+  compute: number;
+  /** Revenue less the compute bill. */
+  grossProfit: number;
   loanLosses: number;
   depreciation: number;
   preTax: number;
@@ -170,6 +176,8 @@ export function summarize(pnl: Record<PnlLine, number>): IncomeSummary {
     netInterestIncome: interestIncome - interestExpense,
     feeIncome,
     opex,
+    compute: pnl.compute,
+    grossProfit: interestIncome + feeIncome - pnl.compute,
     loanLosses: pnl.loanLosses,
     depreciation: pnl.depreciation,
     preTax,

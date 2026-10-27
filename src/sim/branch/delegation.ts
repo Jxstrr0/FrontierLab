@@ -133,12 +133,9 @@ function delegateMarketing(state: GameState, branch: Branch): void {
   const country = countryOfCity(state, branch.cityId);
   const priceLevel = listLevel(state, branch.cityId);
   const customers = Math.max(branch.customers, 1);
-  // Contribution per customer per week: revenue less interest, funding and losses.
+  // Contribution per customer per week: revenue less compute and loan losses.
   const l = last.lines;
-  const perCustomer = Math.max(
-    0,
-    (last.revenue - l.depositInterest - l.fundingCharge - l.losses) / customers,
-  );
+  const perCustomer = Math.max(0, (last.revenue - l.compute - l.losses) / customers);
   const mult = marketingMult(state, branch);
   const b = state.world.cities[branch.cityId]?.brandAwareness ?? 0;
   const pen = clamp(branch.customers / (lot.footTraffic * CATCHMENT_MULT), 0, 1);

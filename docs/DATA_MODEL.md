@@ -135,7 +135,8 @@ export interface Book {
 }
 export interface BranchPnl {
   week: Week; revenue: Money; income: Money;
-  lines: Record<'loanInterest'|'fundingCredit'|'fees'|'wealthServices'|'depositInterest'|'fundingCharge'
+  // C3b (schema 7): AI revenue lines and the compute bill; funding transfers dropped.
+  lines: Record<'plans'|'api'|'apps'|'loanDesk'|'otherIncome'|'compute'
               |'losses'|'staff'|'manager'|'rent'|'marketing'|'equipment'|'servicing'|'overhead', Money>;
 }
 export interface ReviewCard { week: Week; category: 'rates'|'products'|'service'|'branch'; stars: number; text: string; portraitSeed: number }
@@ -347,6 +348,11 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 **Frontier Lab schema 4 (stage C2c, data centers):** `dataCenters: Record<Id, DataCenter>` (`id`, `cityId`, `lotId?` or `siteId?`, `name`, `status` fitout/open, `weeksLeft`, `builtWeek`, `openedWeek?`, `build { hall, power, cooling }` part ids, `lease { weeklyRent, deposit }`). A data center on a storefront sets that lot's occupant to `{ type: 'player', id: <data center id> }`, so code that reads a player occupant checks `dataCenters` before `branches`. Its parts are fixed assets owned by its id. Migration 3 → 4 adds an empty table. Events `DATA_CENTER_STARTED { dataCenterId, name, city, site, weeks }`, `DATA_CENTER_OPENED { …, gpus, refit }`, `DATA_CENTER_UPGRADED { …, slot, part }`, `DATA_CENTER_CLOSED`. Commands `buildDataCenter`, `upgradeDataCenter`, `renameDataCenter`, `closeDataCenter`.
 
 **Frontier Lab schema 5 (stage C2d2, main offices and company-wide prices):** `Branch.ownPrices: boolean`, true when a sales office sets its own prices and lineup while Apply-to-all is on. Migration 4 → 5 sets it false everywhere. Commands `setOwnPrices(branchId, on)` and `mainOfficeBlocker(cityId)` (the two-office cap, MAIN_OFFICES_MAX).
+
+**Frontier Lab schema 7 (stage C3b, the money model):** new company P&L line `compute` (an operating expense; plan seats and API usage). `BranchPnl.lines` move to `plans`, `api`, `apps`, `loanDesk`, `otherIncome`, `compute`, `losses`, `staff`, `manager`, `rent`, `marketing`, `equipment`, `servicing`, `overhead` (the funding credit and charge, deposit interest and wealth lines are gone). Migration 6 → 7 (`src/sim/save/migrateMoney.ts`) keeps equity unchanged:
+- `compute: 0` is added to the running ledger and every weekly snapshot's P&L.
+- Old office rows map fees → plans, wealth & services → API, loan interest → Loan Desk, and deposit interest into servicing; revenue drops the funding credit, and each row keeps the income it closed with.
+- Overnight and central bank window borrowing is repaid from reserves, then corporate cash, since the Loan Desk now lends only what reserves hold.
 
 **Frontier Lab schema 6 (stage C3a, the AI product catalog):** the product ids change to the new catalog (CONTENT §5: Plans, API, Apps & Services; category ids unchanged). Plan and usage books hold ARR in `balance` (plans count seats in `accounts`). New `ProductKind`s `plan` and `usage`, `PriceType` `perUnit`, and optional `ProductSpec.unitCost`, `convertsTo`, `conversion`. `WeeklySnapshot.totals.arr` (optional: weeks closed before schema 6 have none and read as 0). `Partnership.balance` is now the mini-book's ARR and `productId` a plan. `IncidentEffect` kind `savingsBoost` is renamed `planCut` (a share cut off plan prices). Migration 5 → 6 (`src/sim/save/migrateCatalog.ts`) keeps equity unchanged:
 - Each office's bank books are settled where they stand: deposits are paid out of treasury reserves, loans are sold into reserves at book value, and wealth, safe-box and FX books simply close. This includes developed products built on a bank base.
