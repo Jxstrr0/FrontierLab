@@ -47,6 +47,8 @@ export const START_CASH = 1_500_000;
 export const START_CASH_OPTIONS = [1_000_000, 1_500_000, 2_000_000, 2_500_000] as const;
 /** The Settings developer tools' one-tap payment into corporate cash (SCREENS §26). */
 export const DEV_PAYMENT = 10_000_000;
+/** The Settings developer tools' "Top staff" switch: the floor it holds every team's skill and morale at (SCREENS §26). */
+export const DEV_STAFF = { skill: 95, morale: 95 } as const;
 /** Rival banks in each city (the wizard's competitor count); clamped to the rivals available. */
 export const COMPETITORS = { min: 1, max: 5 } as const;
 

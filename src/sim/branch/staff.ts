@@ -11,6 +11,7 @@ import {
 } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { EQUIPMENT } from '../../data/equipment';
+import { holdTopStaff } from '../devStaff';
 import { hiresPerWeek, staffMods } from '../hq';
 import { clamp, ema } from '../math';
 import { nominalIndex } from '../nominal';
@@ -86,6 +87,7 @@ export function updateStaff(state: GameState, branch: Branch): void {
       s.count += hires;
     }
   }
+  holdTopStaff(state, s);
 }
 
 /** Customer interactions per week C (§6.4). */

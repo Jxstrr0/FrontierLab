@@ -153,6 +153,10 @@ export interface GameState {
     tutorialStep?: number;
     lesson?: { id: string; step: number };
     lessonsDone: string[];
+    /** Developer tools: hold every team's skill and morale at DEV_STAFF or better (optional, no schema bump). */
+    devStaff?: boolean;
+    /** Developer tools: insolvency never ends the game (optional, no schema bump). */
+    devNoBankruptcy?: boolean;
   };
   /** Monotonic counter for generated ids. */
   nextId: number;
