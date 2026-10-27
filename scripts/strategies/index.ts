@@ -20,6 +20,8 @@ import type { GameState } from '../../src/sim/state';
 const AGGRESSIVE_RESERVE_WEEKS = 3;
 /** Steady keeps two weeks back, enough for a quarter's tax and a regulator fine (C7a). */
 const STEADY_RESERVE_WEEKS = 2;
+/** Weeks of running costs turtle keeps back before it grows its office (C8f). */
+const TURTLE_RESERVE_WEEKS = 26;
 /** Share of cash a week each strategy spends on a training run (C6b). */
 const STEADY_TRAINING_SHARE = 0.01;
 const AGGRESSIVE_TRAINING_SHARE = 0.015;
@@ -107,7 +109,9 @@ export const turtle: Strategy = {
       if (r.kind === 'new') cmd.declineApplication(s, r.id);
     // A turtle stays a Standard office: a bigger one needs an HQ team its
     // deposit-only income can't pay for.
-    if (hqReady(s)) growOffice(s, 2, 0, 1);
+    // C8f: a turtle grows its office only once the last quarter made money, with half a year of costs in hand.
+    const profitable = (s.history.quarterly.at(-1)?.netIncome ?? 0) > 0;
+    if (hqReady(s) && profitable) growOffice(s, 2, 0, 1, TURTLE_RESERVE_WEEKS * weeklyCosts(s));
     const lot = hasRoom(s, s.world.currentCityId) ? bestLot(s) : undefined;
     if (lot && hqReady(s) && s.company.cash > 2 * buildCost(s, lot)) {
       const id = openBranchTurtle(s, lot.id);

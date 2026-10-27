@@ -3,13 +3,62 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C8 in progress (polish and relaunch). C8a–C8d done (v0.1.23–v0.1.24, save schema 18): power deals at energy sites, the tutorial rewrite, the art pass and the balance pass. Next: C8e, the docs sweep and relaunch.
+**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.25, save schema 19). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `0c381894b44017` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `15c9b9a3361bdb` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-27 — Stages C8e–C8f: docs sweep and the last bank leftovers (v0.1.25). Conversion complete.
+
+**What changed.**
+- **Docs in AI terms (C8e).** DESIGN, SIMULATION, SCREENS and CONTENT now describe the AI lab throughout. Bank-era code names (`branch`, `bankName`, `treasury` = Compute, `risk` = Safety) are explained once at the top of DESIGN and in a glossary in SIMULATION. The conversion plan is archived in `docs/archive/CONVERSION_PLAN.md`. While rewriting, the helpers found places where the docs and the code disagreed (tick order, the Executive suite's 8 desks, the founder ramp); the docs now follow the code.
+- **On-screen polish (C8e).**
+  - The default lab is "Frontier Lab" with an "FL" monogram, and the app icon and theme colour match the new palette.
+  - Build options have AI names: Sales desks, Machine room and Demo kiosks.
+- **Seed money (C8f).** The locked $2M "charter capital" is gone. A new lab starts with a $1.5M seed round, and all of it is spendable; the New Game options are $1M, $1.5M, $2M and $2.5M. Old saves get their locked reserve moved into cash when they load (save schema 19).
+- **"A billion in ARR" (C8f).** This milestone replaces "A billion in deposits", which no lab could ever reach.
+- **Launch posture (C8f).** The Finance floor's old "Risk appetite" dial is now **Launch posture**, from Very cautious to Very bold.
+  - Bolder levels win more deals: up to +6 points on every Deal Desk bid.
+  - They also carry more safety risk: up to +16% safety exposure.
+  - Levels 4–5 still make capability over-claims more likely.
+  - A Chief Safety Officer with the switch on steps the posture down while the safety tier is weak and back up while it's Strong.
+- **Incidents that cost $0 now cost money (C8f).**
+  - Capability over-claim: refunds are 2% of the sales office's ARR.
+  - Outage rumour: the old "Central bank window" choice is now **Service credits**, worth 2% of your ARR, which end the rumour on the spot. Its text now talks about customers cancelling plans, not depositors.
+- **Borrowing moved to investment banks (C8f).** The Investment Bank has a new **Debt** tab: venture-debt offers and a credit line. A bank lends if you run a sales office in its city. Rival labs no longer lend to you. Loans already taken from a rival keep running and can be repaid from the Debt tab. A city usually has one investment bank where it had about three rival lenders, so each credit line is now 60% of equity (it was 20%). That keeps your emergency borrowing room about the same.
+- **Bank words on screen (C8f).**
+  - Manager toggles now read "Products & prices" and "Deal approvals". The review category is "Price", and the office P&L line is "Bad debts".
+  - The office advisor now says "The pipeline's warm…".
+  - The wizard field is "Lab name", and the HQ tabs are "Platform" and "Safety".
+  - The M&A card shows "Customers", and the merger test checks "Customer share".
+  - The university and employer panels say "Plans partner" and "Staff plan deal".
+  - The central bank's standing facility, the liquidity row and the Safety floor's Losses card show only in old saves that still have bank money to manage.
+
+**Balance.** A bigger seed you can spend makes the first year faster. The early targets moved:
+- Week 26 ARR: $1.5–5M.
+- Week 52 ARR: $3–8M.
+- Week 52 customers: up to 9,000.
+- Late-game income ceilings rose about 20%, while ARR stays inside its old bands.
+
+The turtle test lab now grows its office only after a profitable quarter, with half a year of costs in hand. A bug in the strategy checker meant Restricted didn't count as "Watch or worse"; it's fixed. Every strategy (steady, turtle, aggressive, stress) passes on seeds 42 and 7, and the 20-seed median passes.
+
+**Launch check (ROADMAP Stage 10).**
+- Lighthouse mobile: performance 95, accessibility 95, best practices 96, SEO 91.
+- The new tutorial takes about 5–8 minutes.
+- No known blocking bugs.
+
+**Checked.** `npm run lint`, `npx vitest run` (157 files, 996 tests) and `npm run build` all pass. The determinism snapshot changed from `0c381894b44017` to `15c9b9a3361bdb`. That's intended: the new default name, the seed money, the launch posture and the move to investment-bank lending all change the scripted run.
+
+**Dependencies:** none added.
+
+**Open items, not blocking.**
+- The cover print still draws data centers as storefronts.
+- `src/app/map/pins.ts` is 495 lines and should be split.
+- The Safety floor art still has a safe and "$" lot pins.
+- Long company names can crowd the company bar.
 
 ### 2026-10-27 — Stages C8b–C8d: tutorial, art and balance (v0.1.24)
 

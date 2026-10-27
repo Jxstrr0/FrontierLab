@@ -43,8 +43,8 @@ export const START_DATE = '2027-01-04';
  * Default seed money, all spendable; the New Game wizard offers START_CASH_OPTIONS.
  * Stage C8f folded the bank's locked $2M charter capital into it (DESIGN log).
  */
-export const START_CASH = 2_900_000;
-export const START_CASH_OPTIONS = [2_600_000, 2_900_000, 3_200_000, 3_500_000] as const;
+export const START_CASH = 1_500_000;
+export const START_CASH_OPTIONS = [1_000_000, 1_500_000, 2_000_000, 2_500_000] as const;
 /** The Settings developer tools' one-tap payment into corporate cash (SCREENS §26). */
 export const DEV_PAYMENT = 10_000_000;
 /** Rival banks in each city (the wizard's competitor count); clamped to the rivals available. */
@@ -1324,7 +1324,7 @@ export const CORPORATE_LENDING = {
   spreadNoise: 0.004,
   terms: [52, 78, 104, 130, 156] as const,
   /** Line of credit: limit share of equity per lender, rate = policy + lineSpread. */
-  lineEquityShare: 0.2,
+  lineEquityShare: 0.6,
   lineSpread: 0.04,
   /** Balances below this count as repaid. */
   dust: 0.5,
