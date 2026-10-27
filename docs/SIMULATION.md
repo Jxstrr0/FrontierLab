@@ -49,6 +49,7 @@ How the economy works, step by step. Every CAPS name is a key in `src/config/bal
     - ventures report and raise (§20)
     - regulator review (§15)
     - partnership reviews
+    - the renewal season for business contracts (§11.0, stage C5a)
     - the quarter's report sums the weeks whose last day falls in it, so when this tick lands on the quarter's first day the week just closed still counts for the old quarter
 14. **Year-end** (first tick of a new year):
     - rankings: Fastest Growing Banks, Rich List
@@ -399,6 +400,18 @@ A book's balance is its **ARR** (annual recurring revenue).
 - **Free-tier conversion:** each week, `conversion_p / 52` of a free tier's seats move to the plan it `convertsTo` (Free Tier → Plus, 12% a year), if that office offers it.
 - **Customers** = all accounts and seats ÷ PRODUCTS_PER_CUSTOMER, as before.
 - **Not on the balance sheet.** ARR is a run-rate, not an asset: revenue reaches the books week by week. Company ARR (`companyArr`) sums every office that isn't closed plus partnership mini-books, and is stored in each weekly snapshot (`totals.arr`) for the trend chart and the balance script.
+
+## 11.0 Customer businesses (stage C5a)
+
+- **Seeding** (when a city is generated, after rivals and employers; old saves at migration 11 → 12), from the city's own `businesses:{cityId}` stream:
+  - **Storefronts:** district by district (in id order), `round(free × BUSINESS.lotShare (0.5))` of the free storefronts become businesses, leaving at least `keepFreePerDistrict` (1) free. A business sets `lot.occupant = {type:'business'}`; it is never for lease. Rival growth still counts these storefronts as the city's room (`roomLot`).
+  - **Sector:** weighted by district like the Loan Desk (`SECTOR_DISTRICT_WEIGHT`), from CONTENT §21b; farms only in S/M cities.
+  - **Size:** small 55%, mid 33%, large 12% (`BUSINESS.sizes`).
+  - **Budget (a year):** `size.budget (30k / 120k / 450k) × lot.incomeIndex × sector.budgetMult × lognormal(1, 0.3) × list level`, rounded to $1k.
+  - **Pentagon** (AI readiness, Budget, Data sensitivity, Switching cost, Financial health): `round(normal(sector.profile, 1.2))` clamped 1–10; Budget +size.budgetPip (−1/0/+1) and Switching cost +size.switchPip.
+  - **Anchors:** every employer site (not regional energy sites) becomes an anchor: `1.8M × employees / 2,500 × incomeMult × lognormal(1, 0.3) × list level`, the anchor profile (5, 8, 7, 8, 7) with +2 Budget and Switching cost.
+  - **Rival contracts:** in a city with rival offices, a business starts with a rival with chance `rivalHeld` (50%; anchors `anchorRivalHeld` 70%), the rival picked by office size + 1 (an anchor keeps its payroll partner if that rival is there). Contract value = budget × U(0.7, 1), renewing at the `U{1, termMax}`-th quarter start from now.
+- **Renewal season** (tick step 13): a contract whose `renewalWeek` has come renews with the same vendor for `termQuarters[0]` quarters. A vendor that was bought by another rival hands it to the buyer; one no longer active in the city loses it (the business has no vendor). C5b replaces the roll-over with the Deal Desk's bidding.
 
 ## 11. Loan Desk
 
@@ -1083,6 +1096,8 @@ Run `npm run balance` with seed 42 and the start city Calgary, unless noted. Bra
 **Updated 2026-10-26 (stage C2c, data centers):** steady (cash over 4× the cost) and aggressive (3×) build one Row-hall data center from year 5 on the busiest free lot of a city with their office; stress follows steady. Seed 42 builds in weeks 260–300. Every strategy target and the 20-city median still pass; seed 42 steady's year-10 real assets read $8.4B (was $8.6B: about $5M to build and $35–40k a week of rent and power).
 
 **Updated 2026-10-27 (stage C3a, the AI product catalog):** offices sell Plans, API usage and Apps & Services (§10.7) instead of deposits and loans, so the office checkpoints measure ARR, and year 10 measures company ARR in start-of-game money instead of total assets. The ARR bands were set from the 20-city median (week 26 $1.6M; week 52 $3.7M / 5,028 customers / $28k income; week 104 $10.8M / $207k / $86k; week 156 $17.7M / $343k / $158k; week 208 $20.8M / $405k / $196k; week 260 $23.8M / $453k / $233k); the revenue and income bands did not move. Payback moved to ≤ 44 weeks: a subscription office earns nothing until its seats build up, where a bank branch earned a margin on deposits from its first week, so the median reads 41.5 weeks and neither lower churn nor faster Free-tier upgrades moved it without pushing a seed's cash below zero. Seed 42 steady is a weak city (week 52 ARR $3.0M, payback 46 weeks, IPO week 209) and reads $1.0B ARR in year 10; aggressive's year-3 check compares ARR with steady's. The two recession-tier checks (aggressive at Watch or worse, stress-aggressive at Restricted or Critical) read n/a until C7: with no deposit book a lab's risk-weighted assets are small, so bank capital tiers no longer bind (seed 42 aggressive and stress both stay Strong).
+
+**Updated 2026-10-27 (stage C5a, customer businesses):** businesses take about half of each district's free storefronts, so the strategies' average and expansion lots shift. The 20-city median still passes every band (week 52 ARR $3.3M / income $26.0k, week 260 ARR $23.2M, payback 41.5 weeks) and seed 42 steady passes its own checks (IPO week 196, year-10 ARR $1.0B real). Aggressive ran its cash to −$475k on the new lots, so it now keeps 3 weeks of running costs (`weeklyCosts`) before it expands or grows an office; its low is +$86k (seeds 7 and 99: +$83k, +$79k).
 
 **Updated 2026-10-27 (stage C4c, spot limits and the internal compute charge):** offices are charged spot for every GPU-week again and the pool books the saving at company level, so the first-office checkpoints are the spot-price numbers (20-city median week 52 income $24.5k, week 260 ARR $23.0M, payback 42.5 weeks). Steady and aggressive now reserve GPU lots once demand passes 60% of the spot limit (`scripts/strategies/compute.ts`); with them, seed 42 never hits a crunch, and aggressive's cash low is +$20k (it dipped to −$546k in C4a). The same strategies with the GPU market emptied every week hit the 20,000-GPU spot ceiling in year 4 and run in crunch and outage for most of the rest of the game, which is the C4 acceptance.
 

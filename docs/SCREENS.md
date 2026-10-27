@@ -429,6 +429,20 @@ Tabs: Overview · Loans · Credit.
   - curve with a "you are here" marker
   - Renew (shows the fee) / Release
 
+## 14b. Business (stage C5a)
+
+Opened by tapping a business pin on the map (the **Businesses** layer, which also shows employers).
+- **Header:** business name, with "sector · size · address · district" under it and the Businesses medallion.
+- **Advisor:** one line on who serves them, or that they have no AI vendor yet.
+- **Card:**
+  - AI budget (a year)
+  - AI vendor (a rival lab, you, or None)
+  - Contract value and Renews (month and year), shown only while under contract
+  - a pentagon: AI readiness, Budget, Data sensitivity, Switching cost, Financial health
+- An employer's panel (§14) shows the same card under **Anchor account**.
+- **Map:** business pins are handshake medallions. A business served by you or a rival gets that lab's colour on its awning, and a partner seal on the pin when it is yours.
+- The Deal Desk actions (bid, renew, release) arrive in C5b.
+
 ## 15. Marketing agency · Lobbying firm · University
 
 - **Marketing agency:** package cards (name, cities, weeks, cost, awareness boost) with Buy.

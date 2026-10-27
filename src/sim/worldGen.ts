@@ -5,6 +5,7 @@
 // newGame for the start city and by travelTo for every other destination.
 import { LATEST_LAYOUT, type LayoutVersion } from '../config/cityGeo';
 import { CITIES } from '../data/cities';
+import { seedBusinesses } from './businesses';
 import { generateCapitalMarketSites } from './capitalSites';
 import { generateLots, lotCount } from './citygen';
 import { generateCompetitionSites } from './competitionSites';
@@ -57,6 +58,8 @@ export function generateCity(
   generateCapitalMarketSites(state, cityId);
   generateInvestmentSites(state, cityId);
   generatePersonalSites(state, cityId);
+  // C5a: spare storefronts become businesses and employers anchor accounts.
+  seedBusinesses(state, cityId);
   updateMarketRefs(state);
   refreshManagerPool(state, cityId, true);
   if (opts.firstListings) refreshListings(state, cityId);

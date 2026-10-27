@@ -396,6 +396,36 @@ export const SPOT = {
 } as const;
 /** Outages (stage C4c, §13.0): after afterWeeks of crunch, churn × churnMult until weeks after it ends. */
 export const OUTAGE = { afterWeeks: 3, weeks: 2, churnMult: 1.8 } as const;
+/**
+ * Customer businesses (stage C5a, SIMULATION §11.0): when a city is generated,
+ * `lotShare` of each district's free storefronts become named businesses
+ * (keeping at least `keepFreePerDistrict` open for offices), and its
+ * employers become anchor accounts.
+ * Yearly AI budget = size budget × lot income × sector mult × noise, at today's
+ * price list. In a city with rival offices, `rivalHeld` of businesses (and
+ * `anchorRivalHeld` of anchors) start with a rival contract worth
+ * `contractShare` of the budget, renewing at a quarter start every
+ * `termQuarters` of its sector.
+ */
+export const BUSINESS = {
+  lotShare: 0.5,
+  keepFreePerDistrict: 1,
+  sizes: {
+    small: { weight: 0.55, budget: 30_000, budgetPip: -1, switchPip: -1 },
+    mid: { weight: 0.33, budget: 120_000, budgetPip: 0, switchPip: 0 },
+    large: { weight: 0.12, budget: 450_000, budgetPip: 1, switchPip: 1 },
+    anchor: { weight: 0, budget: 1_800_000, budgetPip: 2, switchPip: 2 },
+  },
+  /** Anchor budget scales with headcount against this reference. */
+  anchorEmployeesRef: 2500,
+  budgetSigma: 0.3,
+  pentagonSigma: 1.2,
+  rivalHeld: 0.5,
+  anchorRivalHeld: 0.7,
+  contractShare: [0.7, 1] as [number, number],
+  /** Names are retried this many times for one not yet used in the city. */
+  nameTries: 6,
+} as const;
 export const TAKEUP_CAP = 0.95;
 export const STARS_TAKEUP = { base: 0.6, slope: 0.2 } as const;
 export const MORTGAGE_SPECIAL = {
