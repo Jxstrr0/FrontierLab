@@ -53,7 +53,7 @@ export function borrowOffer(
   offerId: string,
   amount: number,
 ): CommandResult<{ lotId: string }> {
-  if (!hasTreasuryFloor(state)) return fail('The funding market needs a Treasury floor at HQ.');
+  if (!hasTreasuryFloor(state)) return fail('The funding market needs a Compute floor at HQ.');
   const t = state.treasury;
   const offer = t.offers.find((o) => o.id === offerId);
   if (!offer) return fail('That offer is no longer available.');

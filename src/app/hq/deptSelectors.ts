@@ -78,7 +78,7 @@ const LINES: Record<HqDeptId, [ok: string, short: string]> = {
     'Models and launches are on schedule.',
     "We're stretched thin. Developments are crawling.",
   ],
-  treasury: ["Liquidity's healthy.", "We're paying up for funding without more hands."],
+  treasury: ["Compute's under control.", "We're paying more for GPUs without more hands."],
   marketing: [
     'Every campaign is landing at full strength.',
     'Campaigns land half as hard without more people.',

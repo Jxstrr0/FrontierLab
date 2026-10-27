@@ -35,7 +35,7 @@ describe('funding market offers', () => {
     expect(s.treasury.offers).toEqual([]);
     expect(cmd.borrowOffer(s, 'fo_1', 1_000_000)).toEqual({
       ok: false,
-      reason: 'The funding market needs a Treasury floor at HQ.',
+      reason: 'The funding market needs a Compute floor at HQ.',
     });
   });
 
