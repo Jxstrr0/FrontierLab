@@ -225,7 +225,7 @@ export interface RivalBank {
   cities: Id[]; branches: RivalBranch[]; cash: Money; equity: Money; capitalRatio: number;
   listed: boolean; ticker?: string; shares: number; price: Money; execs: { title: string; name: string }[];
   status: 'active'|'distressed'|'seized'|'acquired'|'merged'; priceLags: Record<string, { target: number; weeksLeft: number }>;
-  home?: CountryId[]; charteredWeek?: Week;      // chartered banks (v37)
+  home?: CountryId[]; charteredWeek?: Week;      // labs founded during play (v37)
   mergedInto?: Id;                               // set with status 'merged' (v37)
   campaigns?: Record<Id /*city*/, { boost: number; weeksLeft: number }>;   // rival ads (v37)
 }
@@ -267,7 +267,7 @@ export interface Governance {
   pendingDividend?: { perShare: Money; total: Money; payWeek: Week };
 }
 export interface Personal {
-  cash: Money; shares: number /* own bank */;
+  cash: Money; shares: number /* own lab */;
   homes: { id: Id; homeId: string; price: Money; value: Money; rebuildDoneWeek?: Week }[];
   cars: { id: Id; carId: string; price: Money; value: Money }[];
   collectibles: { id: Id; itemId: string; price: Money; value: Money; genuine: boolean; appraised: boolean; consigned?: boolean }[];
