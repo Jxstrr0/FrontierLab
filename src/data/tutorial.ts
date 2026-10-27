@@ -10,7 +10,7 @@ export const TUTORIAL = {
   /** Returning players are asked first. */
   offer: 0,
   first: 1,
-  /** "Approve a business loan": the step that asks for a tutorial application. */
+  /** "Win your first contract": the step that asks for a tutorial proposal request. */
   loan: 7,
   last: 9,
   /** The closing card, shown until dismissed. */
@@ -117,13 +117,13 @@ export const TUTORIAL_STEPS: Record<number, TutorialStepText> = {
     },
   },
   7: {
-    title: 'Approve a business loan',
-    idle: 'A local business has applied for a loan. Tap your sales office on the map.',
+    title: 'Win your first contract',
+    idle: 'A local business wants a proposal for its AI work. Tap your sales office on the map.',
     lines: {
       'loan-approve':
-        'The rosette scores the business. Offer a rate at or below what they’ll pay, then tap Approve.',
-      'tab-loandesk': 'A local business has applied. Open the Loan Desk tab.',
-      'my-branch': 'A local business has applied for a loan. Tap your sales office to see it.',
+        'The rosette scores the business. A bigger discount off its AI budget wins more often but earns less. Pick one, then tap Bid.',
+      'tab-loandesk': 'A local business has asked for a proposal. Open the Deal Desk tab.',
+      'my-branch': 'A local business has asked for a proposal. Tap your sales office to see it.',
     },
   },
   8: {

@@ -22,9 +22,9 @@ export const MILESTONES: MilestoneSpec[] = [
   },
   {
     id: 'first_loan',
-    title: 'First loan',
-    goal: 'Lend to your first customer.',
-    line: 'The first loan is on the books.',
+    title: 'First contract',
+    goal: 'Win your first business contract on the Deal Desk.',
+    line: 'The first business contract is signed.',
     news: false,
   },
   {

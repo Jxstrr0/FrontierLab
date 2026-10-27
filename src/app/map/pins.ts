@@ -28,6 +28,7 @@ import { LEASE_ONLY_KEY, layerOn, type MapLayerId } from '../../data/mapLayers';
 import { rivalShortName } from './markers';
 import type { Business, GameState, Lot, OfficeListing, Site } from '../../sim/state';
 import { vendorCaption, vendorInk, vendorName } from '../business/businessView';
+import { newRfpsByBranch } from '../branch/dealDeskSelectors';
 
 export type PinKind =
   | 'mine'
@@ -63,7 +64,7 @@ export interface PinSpec {
   label: string;
   ink: string;
   monogram: string;
-  /** Brass dot: Loan Desk applications waiting (SCREENS §0.2). */
+  /** Brass dot: Deal Desk proposal requests waiting (SCREENS §0.2). */
   badge: boolean;
   /** Oxblood dot: an unresolved incident at this branch (SCREENS §0.2). */
   alert?: boolean;
@@ -120,12 +121,8 @@ const KIND_ORDER: Record<PinKind, number> = {
   lot: 20,
 };
 
-export function pendingByBranch(s: GameState): Record<string, number> {
-  const out: Record<string, number> = {};
-  for (const a of Object.values(s.loanDesk.applications))
-    out[a.branchId] = (out[a.branchId] ?? 0) + 1;
-  return out;
-}
+/** New proposal requests waiting at each of your offices (the pin's badge). */
+export const pendingByBranch = (s: GameState): Record<string, number> => newRfpsByBranch(s);
 
 function anchor(map: CityMap, tile: { x: number; y: number }) {
   const floors = map.floors[tile.y * map.tiles + tile.x] ?? 0;
@@ -160,7 +157,7 @@ function lotPin(s: GameState, map: CityMap, lot: Lot, pending: Record<string, nu
     const pin: PinSpec = {
       ...base,
       kind: 'mine',
-      label: `Your sales office, ${name}${conv ? `, converting from ${conv.name}, ${weeks}` : ''}${alert ? ', open incident' : ''}${waiting ? `, ${waiting} loan applications waiting` : ''}`,
+      label: `Your sales office, ${name}${conv ? `, converting from ${conv.name}, ${weeks}` : ''}${alert ? ', open incident' : ''}${waiting ? `, ${waiting} proposal requests waiting` : ''}`,
       // An acquired branch keeps the old bank's colours until its conversion finishes.
       ink: conv?.ink ?? s.meta.brandInk,
       monogram: conv?.monogram ?? s.meta.monogram,

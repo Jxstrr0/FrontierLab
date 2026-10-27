@@ -1,13 +1,14 @@
 // Tutorial commands (SCREENS §27): store the Part 1 step the player is on and
 // the Part 2 guide in progress and the ones seen, and the
-// tutorial-only nudge that makes sure a business applies at the Loan Desk for
-// step 7 "Approve your first business loan". The nudge draws from the normal
-// loanDesk RNG stream like any weekly application, so a game stays deterministic
-// for the same seed and commands; games that never run the tutorial never call it.
+// tutorial-only nudge that makes sure a business asks the Deal Desk for a
+// proposal for step 7 "Win your first contract". The nudge picks the first
+// business without a vendor in the office's city, with no randomness, so a game
+// stays deterministic; games that never run the tutorial never call it.
 import { CHAPTERS, isChapterId, isLessonId } from '../../data/lessons';
 import { TUTORIAL } from '../../data/tutorial';
-import { generateApplication } from '../branch/loanDesk';
-import { stream } from '../rng';
+import { DEAL } from '../../config/balance';
+import { businessesIn } from '../businesses';
+import { newId } from '../ids';
 import type { GameState } from '../state';
 import { fail, ok, type CommandResult } from './result';
 
@@ -21,9 +22,9 @@ export function setTutorialStep(state: GameState, step: number): CommandResult {
 }
 
 /**
- * Step 7 only: when none of your branches has an application waiting, one
- * local business applies now at `branchId` (otherwise applications arrive with
- * the weekly tick, which can take a few weeks for a new branch).
+ * Step 7 only: when none of your offices has a new RFP waiting, the first
+ * business in the city without an AI vendor asks `branchId` for a proposal now
+ * (otherwise RFPs arrive with the weekly tick, which can take a few weeks).
  */
 export function requestTutorialApplication(
   state: GameState,
@@ -32,15 +33,21 @@ export function requestTutorialApplication(
   if (state.flags.tutorialStep !== TUTORIAL.loan) return fail('The tutorial is not at that step.');
   const branch = state.branches[branchId];
   if (!branch || branch.status === 'closed') return fail('That sales office is not open.');
-  if (state.treasury.freeze) return fail('Lending is frozen until liquidity recovers.');
-  const ownBranches = new Set(Object.keys(state.branches));
-  const waiting = Object.values(state.loanDesk.applications).some((a) =>
-    ownBranches.has(a.branchId),
-  );
-  if (waiting) return fail('An application is already waiting.');
-  const app = generateApplication(state, branch, stream(state, 'loanDesk'));
-  state.loanDesk.applications[app.id] = app;
-  return ok({ appId: app.id });
+  const waiting = Object.values(state.dealDesk.rfps).some((r) => r.kind === 'new');
+  if (waiting) return fail('A request is already waiting.');
+  const taken = new Set(Object.values(state.dealDesk.rfps).map((r) => r.businessId));
+  const b = businessesIn(state, branch.cityId).find((x) => !x.vendor && !taken.has(x.id));
+  if (!b) return fail('Every business in the city already has an AI vendor.');
+  const id = newId(state, 'rfp');
+  state.dealDesk.rfps[id] = {
+    id,
+    branchId,
+    businessId: b.id,
+    kind: 'new',
+    createdWeek: state.clock.week,
+    dueWeek: state.clock.week + DEAL.expiryWeeks,
+  };
+  return ok({ appId: id });
 }
 
 /** Part 2 (SCREENS §27.2): starts a guide, or moves it to `step`. */

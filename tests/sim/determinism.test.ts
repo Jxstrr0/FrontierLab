@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { checksum, serialize } from '../../src/sim/save/serialize';
 import { runScript } from '../helpers/scenario';
 
-const SNAPSHOT = '1897f86dd7744b';
+const SNAPSHOT = '19488695a0bca7';
 
 describe('determinism', () => {
   it('produces identical state for the same seed and commands', () => {
@@ -15,7 +15,9 @@ describe('determinism', () => {
   });
 
   it('matches the stored 260-week snapshot', () => {
-    const hash = checksum(serialize(runScript(260)));
-    expect(hash).toBe(SNAPSHOT);
+    const s = runScript(260);
+    // The script must stay solvent: a game-over run would stop ticking and hash a frozen world.
+    expect(s.flags.gameOver).toBeUndefined();
+    expect(checksum(serialize(s))).toBe(SNAPSHOT);
   }, 60_000);
 });

@@ -1,11 +1,12 @@
 // Your bank in The Weekly Ledger (SIMULATION §24, priority 1): stories from
-// your company's events (branches, loans, defaults, the central bank window,
+// your company's events (branches, contracts won and lost, the central bank window,
 // fines, incidents, partnerships, launches). The weekly close's stories are
 // in newsWeek.ts.
 import { NEWS_PRIORITY as P } from '../config/balance';
 import { COUNTRIES } from '../data/countries';
 import { LEDGER_TEMPLATES, type TemplateKey } from '../data/ledgerTemplates';
-import { LOAN_SECTORS } from '../data/loanSectors';
+import { DEAL } from '../config/balance';
+import { DEAL_SECTOR_BY_ID } from '../data/dealSectors';
 import { MILESTONES } from '../data/milestones';
 import { PARTNERSHIP_END_COPY } from '../data/newsWorld';
 import { grouped, newsMoney, newsRate } from './newsFormat';
@@ -22,8 +23,8 @@ export function companyStories(ctx: NewsContext): Story[] {
     const s = fromEvent(ctx, e);
     if (s) out.push(s);
   }
-  const loans = loanStory(ctx);
-  if (loans) out.push(loans);
+  const deals = contractStory(ctx);
+  if (deals) out.push(deals);
   return out;
 }
 
@@ -126,18 +127,35 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
         priority: P.company,
         tokens: { bank, name: str(p.name, 'a data center'), city: cityName(str(p.city)) },
       });
-    case 'BIG_DEFAULT': {
-      const sector = LOAN_SECTORS.find((x) => x.id === str(p.sector))?.name.toLowerCase();
+    case 'CONTRACT_WON': {
+      if (num(p.value) < DEAL.bigDeal || !p.from) return undefined;
       return business({
-        key: 'BIG_DEFAULT',
-        subject: str(p.business),
+        key: 'CONTRACT_WON_BIG',
+        subject: str(p.businessId),
+        icon: 'coin',
+        priority: P.company,
+        tokens: {
+          bank,
+          business: str(p.business, 'A business'),
+          sector: sectorWord(p.sector),
+          amount: m(p.value),
+          rival: str(p.from, 'a rival lab'),
+        },
+      });
+    }
+    case 'CONTRACT_LOST': {
+      if (num(p.value) < DEAL.bigDeal) return undefined;
+      return business({
+        key: 'CONTRACT_LOST_BIG',
+        subject: str(p.businessId),
         icon: 'alert',
         priority: P.company,
         tokens: {
           bank,
-          business: str(p.business, 'A borrower'),
-          sector: sector ?? 'local',
-          amount: m(p.amount),
+          business: str(p.business, 'A business'),
+          sector: sectorWord(p.sector),
+          amount: m(p.value),
+          why: lossWhy(str(p.reason), str(p.to)),
         },
       });
     }
@@ -357,25 +375,39 @@ function bankNamed(ctx: NewsContext, e: GameEvent): Story | undefined {
   }
 }
 
-/** One story for the issue's booked loans, however many there were. */
-function loanStory(ctx: NewsContext): Story | undefined {
-  const loans = ctx.events.filter((e) => e.type === 'LOAN_BOOKED');
-  if (loans.length === 0) return undefined;
-  const total = loans.reduce((sum, e) => sum + num(e.payload.amount), 0);
-  const largest = loans.reduce((a, b) => (num(b.payload.amount) > num(a.payload.amount) ? b : a));
+/** The sector as a lower-case word for headlines. */
+function sectorWord(id: unknown): string {
+  return DEAL_SECTOR_BY_ID[str(id)]?.name.toLowerCase() ?? 'local';
+}
+
+/** Why a contract ended, as the end of a sentence. */
+function lossWhy(reason: string, to: string): string {
+  if (reason === 'failed') return 'ended when the business closed its doors';
+  if (reason === 'outage')
+    return to ? `walked to ${to} after this week’s outage` : 'walked after this week’s outage';
+  if (reason === 'office') return 'ended when the local sales office closed';
+  return to ? `went to ${to} at its renewal` : 'was not renewed';
+}
+
+/** One story for the issue's new contracts (not the big switches, which have their own), however many. */
+function contractStory(ctx: NewsContext): Story | undefined {
+  const won = ctx.events.filter((e) => e.type === 'CONTRACT_WON' && !e.payload.from);
+  if (won.length === 0) return undefined;
+  const total = won.reduce((sum, e) => sum + num(e.payload.value), 0);
+  const largest = won.reduce((a, b) => (num(b.payload.value) > num(a.payload.value) ? b : a));
   return business({
-    key: loans.length === 1 ? 'LOAN_ONE' : 'LOAN_MANY',
+    key: won.length === 1 ? 'CONTRACT_ONE' : 'CONTRACT_MANY',
     subject: 'you',
     icon: 'coin',
     priority: P.companyRoutine,
     group: 'youRoutine',
     tokens: {
       bank: ctx.bank,
-      n: String(loans.length),
+      n: String(won.length),
       total: newsMoney(total, ctx.sym),
       lead: str(largest.payload.business, 'A local firm'),
-      leadAmount: newsMoney(num(largest.payload.amount), ctx.sym),
-      rate: newsRate(num(largest.payload.rate)),
+      leadAmount: newsMoney(num(largest.payload.value), ctx.sym),
+      sector: sectorWord(largest.payload.sector),
     },
   });
 }

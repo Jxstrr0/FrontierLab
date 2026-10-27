@@ -108,8 +108,8 @@ export function SettingsScreen(p: { inGame?: boolean }) {
             />
           </Setting>
           <Toggle
-            label="Pause for expiring applications"
-            hint="Stops time when a loan application is about to lapse."
+            label="Pause for expiring proposal requests"
+            hint="Stops time when a business's request for a proposal is about to lapse."
             checked={s.autoPauseApplications}
             onChange={(autoPauseApplications) => change({ autoPauseApplications })}
           />

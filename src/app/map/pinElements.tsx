@@ -1,7 +1,7 @@
 // Builds the DOM for one map pin or one far-zoom cluster (ART_DIRECTION §2;
 // shapes in markers.ts, marks in PinMarks.tsx). Each is a real <button> with
 // its accessible label; the mark sits in `.pin-body`, which also holds the
-// badges (loan applications, incidents, partner seal, conversion ring) so they
+// badges (proposal requests, incidents, partner seal, conversion ring) so they
 // follow the mark's size and shape. Notes and captions stack under the mark in
 // `.pin-under`. Called only when the pin set changes (PinLayer), never per frame.
 import { render, type VNode } from 'preact';
@@ -218,7 +218,7 @@ export function clusterLabel(group: string, members: PinSpec[]): string {
     what = `Your ${parts.length > 1 ? `${parts.slice(0, -1).join(', ')} and ${parts.at(-1)}` : parts[0]}`;
   } else if (group === 'rival') what = `${n} rival lab buildings: ${names}`;
   else what = `${n} places: ${names}`;
-  const waiting = members.some((m) => m.badge) ? ', loan applications waiting' : '';
+  const waiting = members.some((m) => m.badge) ? ', proposal requests waiting' : '';
   const alert = members.some((m) => m.alert) ? ', open incident' : '';
   return `${what}${waiting}${alert}. Zoom in`;
 }

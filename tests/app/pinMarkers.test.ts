@@ -207,7 +207,7 @@ describe('clustering like with like', () => {
     expect(clusterLabel('lot', lots)).toBe('2 open sales office locations. Zoom in');
     const yours = [pin('a', 'mine', 0, { badge: true }), pin('b', 'hq', 0)];
     expect(clusterLabel('yours', yours)).toBe(
-      'Your 1 sales office and HQ, loan applications waiting. Zoom in',
+      'Your 1 sales office and HQ, proposal requests waiting. Zoom in',
     );
     const rivals = [
       pin('a', 'rival', 0, { caption: 'Fizz' }),

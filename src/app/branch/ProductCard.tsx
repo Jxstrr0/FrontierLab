@@ -1,6 +1,7 @@
 // One product card on the Products tab (SCREENS §5.2): stars, Offered toggle,
 // last week's new accounts, balance, funding or unit cost, the margin ring and
-// the price stepper. The small business loan card points to the Loan Desk.
+// the price stepper. The Enterprise contracts card (id 'sbl') shows the
+// office's contracts and points to the Deal Desk instead; it has no price.
 import type { ProductSpec } from '../../data/products';
 import {
   basePrice,
@@ -17,17 +18,10 @@ import { SpotArt } from '../components/SpotArt';
 import { count, money } from '../format/format';
 import { act, useGame } from '../store';
 import { partnerTotals } from '../partners/partnerView';
-import {
-  businessLoans,
-  editPrice,
-  parsePrice,
-  priceText,
-  productWords,
-  rangeText,
-  unitView,
-} from './selectors';
+import { contractTotals, newRfpsByBranch } from './dealDeskSelectors';
+import { editPrice, parsePrice, priceText, productWords, rangeText, unitView } from './selectors';
 
-export function ProductCard(p: { branch: Branch; spec: ProductSpec; onLoanDesk: () => void }) {
+export function ProductCard(p: { branch: Branch; spec: ProductSpec; onDealDesk: () => void }) {
   const s = useGame();
   const { branch, spec } = p;
   const sym = s.settings.currency;
@@ -69,31 +63,33 @@ export function ProductCard(p: { branch: Branch; spec: ProductSpec; onLoanDesk: 
         </div>
       </div>
       {spec.kind === 'sbl' ? (
-        <SblFigures branchId={branch.id} onLoanDesk={p.onLoanDesk} />
+        <SblFigures branchId={branch.id} onDealDesk={p.onDealDesk} />
       ) : (
         <Figures branch={branch} spec={spec} costLabel={unit.costLabel} costText={unit.costText} />
       )}
-      <div class="br-product-price" data-tutorial={`price-${spec.id}`}>
-        <RingGauge
-          value={unit.margin}
-          label={`${Math.round(unit.margin * 100)}%`}
-          caption={unit.caption}
-          size={68}
-        />
-        <Stepper
-          label={productWords(spec).price}
-          value={setPrice}
-          min={spec.min}
-          max={spec.max}
-          step={spec.step}
-          format={(v) => priceText(spec, v, sym, true)}
-          parse={(t) => parsePrice(spec, t, sym)}
-          editText={(v) => editPrice(spec, v, sym)}
-          onChange={(v) => act(cmd.setPrice, branch.id, spec.id, v)}
-          hint={priceHint}
-          disabled={atHq || delegated}
-        />
-      </div>
+      {spec.kind !== 'sbl' && (
+        <div class="br-product-price" data-tutorial={`price-${spec.id}`}>
+          <RingGauge
+            value={unit.margin}
+            label={`${Math.round(unit.margin * 100)}%`}
+            caption={unit.caption}
+            size={68}
+          />
+          <Stepper
+            label={productWords(spec).price}
+            value={setPrice}
+            min={spec.min}
+            max={spec.max}
+            step={spec.step}
+            format={(v) => priceText(spec, v, sym, true)}
+            parse={(t) => parsePrice(spec, t, sym)}
+            editText={(v) => editPrice(spec, v, sym)}
+            onChange={(v) => act(cmd.setPrice, branch.id, spec.id, v)}
+            hint={priceHint}
+            disabled={atHq || delegated}
+          />
+        </div>
+      )}
     </Card>
   );
 }
@@ -145,16 +141,16 @@ function Figures(p: { branch: Branch; spec: ProductSpec; costLabel: string; cost
   );
 }
 
-function SblFigures(p: { branchId: string; onLoanDesk: () => void }) {
+function SblFigures(p: { branchId: string; onDealDesk: () => void }) {
   const s = useGame();
-  const sbl = businessLoans(s, p.branchId);
+  const held = contractTotals(s, p.branchId);
   return (
     <div class="br-product-figures">
-      <Row label="Business loans" value={count(sbl.count)} />
-      <Row label="Balance" value={money(sbl.balance, s.settings.currency)} />
-      <Row label="Applications waiting" value={count(sbl.pending)} />
-      <button type="button" class="btn btn-secondary btn-small br-link" onClick={p.onLoanDesk}>
-        Managed on the Loan Desk →
+      <Row label="Contracts" value={count(held.count)} />
+      <Row label="Contract ARR" value={money(held.arr, s.settings.currency)} />
+      <Row label="Requests waiting" value={count(newRfpsByBranch(s)[p.branchId] ?? 0)} />
+      <button type="button" class="btn btn-secondary btn-small br-link" onClick={p.onDealDesk}>
+        Managed on the Deal Desk →
       </button>
     </div>
   );

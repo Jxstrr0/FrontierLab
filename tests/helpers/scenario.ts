@@ -3,8 +3,12 @@ import { REFERENCE_BUILDS } from '../../src/data/equipment';
 import type { DeptId } from '../../src/data/types';
 import * as cmd from '../../src/sim/commands';
 import { advanceDay, advanceWeeks } from '../../src/sim/engine';
+import { postCash } from '../../src/sim/ledger';
 import { newGame } from '../../src/sim/newGame';
 import type { GameState } from '../../src/sim/state';
+
+/** Paid-in capital added to the scripted run so it survives the HQ lease (see runScript). */
+const SCRIPT_CAPITAL = 5_000_000;
 
 export const LENDING = ['personal_loan', 'auto_loan', 'mortgage', 'loc', 'credit_card'];
 
@@ -52,6 +56,10 @@ export function leaseScriptedOffice(state: GameState): string | undefined {
 export function runScript(weeks: number, onWeek?: (s: GameState, week: number) => void): GameState {
   const s = newGame({ seed: 42, cityId: 'cal', bankName: 'Test Bank' });
   const first = openScriptedBranch(s, 'midtown');
+  // C5b: contracts with Calgary's few dozen businesses do not carry the week-80 HQ
+  // lease, so the script is funded with paid-in capital and stays solvent for 6 years.
+  postCash(s, SCRIPT_CAPITAL, 'financing');
+  s.company.paidInCapital += SCRIPT_CAPITAL;
   for (let day = 1; day <= weeks * 7; day++) {
     advanceDay(s);
     if (day % 7 !== 0) continue;

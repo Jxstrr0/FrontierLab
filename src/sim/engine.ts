@@ -8,7 +8,7 @@ import { runBooks } from './branch/books';
 import { addBranchCosts, closeBranchWeek } from './branch/branchPnl';
 import { runDelegation } from './branch/delegation';
 import { runDemand } from './branch/demand';
-import { loansByBranch, pruneLoans, runLoanDesk } from './branch/loanDesk';
+import { dealIndex, runDealDesk, type DealIndex } from './branch/dealDesk';
 import { campaignEffects, updateAwareness, updateBrandAwareness } from './branch/marketing';
 import { addReviews, updateRatings } from './branch/ratings';
 import { updateStaff } from './branch/staff';
@@ -54,9 +54,9 @@ import { runManagerPoaching } from './payReviews';
 import { ftpLong, ftpShort, updateMarketRefs } from './rates';
 import { regulatorReview } from './riskFloor';
 import { repriceRivalFees, updateRivalPrices } from './rivalPrices';
-import type { Branch, BusinessLoan, GameState } from './state';
+import type { Branch, GameState } from './state';
 import { closeWeek, depreciate, quarterEnd } from './statements';
-import { renewContracts } from './businesses';
+import { renewalSeason, runContracts } from './contracts';
 import { runTreasury } from './treasury';
 import { updateModels } from './underwriting';
 import { productSpec } from './products';
@@ -98,10 +98,11 @@ export function weeklyTick(state: GameState): void {
   updateMarketRefs(state); // 2
   runRivals(state); // 3 (books, financials, expansion, price wars)
   runDataCenters(state); // 4 (data centers, C2c: before the offices they lift)
-  const deskLoans = loansByBranch(state);
+  const deals = dealIndex(state);
   for (const branch of Object.values(state.branches)) {
-    if (branch.status === 'open') runBranch(state, branch, deskLoans.get(branch.id) ?? []); // 4
+    if (branch.status === 'open') runBranch(state, branch, deals); // 4
   }
+  runContracts(state); // 4 (business failures and outage losses, C5b)
   tallyCompute(state); // 4 (the compute pool, C4a)
   settleCompute(state); // 4 (pay the pool; spot trail, crunch and outages, C4c)
   retireGpuLots(state); // 4 (rented GPU lots, C4b)
@@ -141,7 +142,7 @@ export function weeklyTick(state: GameState): void {
     quarterEnd(state); // 13
     regulatorReview(state); // 13 (§15)
     rivalsQuarter(state); // 13 (rival earnings and failures)
-    renewContracts(state); // 13 (the renewal season for business contracts, C5a)
+    renewalSeason(state); // 13 (the renewal season for business contracts, C5b)
     marketsQuarter(state); // 13 (listed earnings, IPO listing)
     governanceQuarter(state); // 13 (board meeting unlocks)
     venturesQuarter(state); // 13 (ventures report and raise, §20.2)
@@ -161,12 +162,11 @@ export function weeklyTick(state: GameState): void {
     c.prevFtpShort = ftpShort(c);
     c.prevFtpLong = ftpLong(c);
   }
-  pruneLoans(state);
   trimEvents(state);
 }
 
 /** Tick step 4 for one open branch, in the documented order. */
-function runBranch(state: GameState, branch: Branch, loans: BusinessLoan[]): void {
+function runBranch(state: GameState, branch: Branch, deals: DealIndex): void {
   runDelegation(state, branch);
   updateStaff(state, branch); // 4.1
   const fx = campaignEffects(state, branch);
@@ -183,7 +183,7 @@ function runBranch(state: GameState, branch: Branch, loans: BusinessLoan[]): voi
   };
   const wk = emptyWeek();
   runBooks(state, branch, demand, fx, wk); // 4.6
-  runLoanDesk(state, branch, fx, wk, loans); // 4.7
+  runDealDesk(state, branch, fx, wk, deals); // 4.7
   let newDepositAccounts = 0;
   for (const [pid, o] of Object.entries(demand.byProduct)) {
     if (productSpec(state, pid)?.category === 'deposits') newDepositAccounts += o.newAccounts;

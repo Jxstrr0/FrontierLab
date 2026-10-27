@@ -17,9 +17,9 @@ export function nextReviewWeek(startDate: string, week: number): number {
   return week + MAX_QUARTER_WEEKS;
 }
 
-/** Display name for a loss-table product ("sbl" is the Loan Desk's business lending). */
+/** Display name for a loss-table product ("sbl" is the Deal Desk's enterprise contracts). */
 export function lossProductName(state: GameState, productId: string): string {
-  if (productId === 'sbl') return 'Business loans (Loan Desk)';
+  if (productId === 'sbl') return 'Enterprise contracts';
   return productSpec(state, productId)?.name ?? productId;
 }
 

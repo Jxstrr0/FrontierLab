@@ -103,42 +103,44 @@ const BANK_TEMPLATES = {
       b: '{bank} is closing its {city} data center and selling the equipment.',
     },
   ],
-  LOAN_ONE: [
+  CONTRACT_ONE: [
     {
-      h: '{lead} secures {leadAmount} loan',
-      b: '{bank} priced the facility at {rate}. The owners plan to put the money to work straight away.',
+      h: '{lead} signs with {bank}',
+      b: 'The {sector} business agreed a {leadAmount}-a-year contract for {bank}’s models this week.',
     },
     {
-      h: '{bank} backs {lead} with {leadAmount}',
-      b: 'The loan, at {rate}, was signed this week. Local trade groups welcomed the vote of confidence.',
-    },
-  ],
-  LOAN_MANY: [
-    {
-      h: '{bank} writes {n} business loans',
-      b: '{total} went out the door this week, the largest to {lead} at {rate}. Main Street is borrowing.',
-    },
-    {
-      h: 'Local firms line up for {bank} credit',
-      b: '{n} businesses signed loans worth {total} in all. {lead} took the biggest, {leadAmount} at {rate}.',
-    },
-    {
-      h: '{bank} lends {total} to local business',
-      b: 'Loan officers closed {n} deals this week, led by {leadAmount} for {lead}.',
+      h: '{bank} lands {lead}',
+      b: 'A {leadAmount} yearly deal brings the {sector} firm onto {bank}’s platform.',
     },
   ],
-  BIG_DEFAULT: [
+  CONTRACT_MANY: [
     {
-      h: '{business} defaults on {amount} loan',
-      b: 'The {sector} business owed {bank} {amount}. Recoveries are expected to cover only part of it.',
+      h: '{bank} signs {n} business contracts',
+      b: 'Deals worth {total} a year closed this week, the largest with {lead} at {leadAmount}.',
     },
     {
-      h: '{bank} hit by {amount} default',
-      b: '{business}, a {sector} firm, has stopped paying. Analysts call it a reminder to read the small print on collateral.',
+      h: 'Local firms sign up with {bank}',
+      b: '{n} businesses agreed contracts worth {total} a year in all. {lead} took the biggest, {leadAmount}.',
+    },
+  ],
+  CONTRACT_WON_BIG: [
+    {
+      h: '{bank} wins {business} from {rival}',
+      b: 'The {sector} account, worth {amount} a year, switched at its renewal, leaving {rival}.',
     },
     {
-      h: 'Collapse of {business} leaves {bank} out of pocket',
-      b: 'The {sector} borrower missed its payments on a {amount} loan. The lab is working with receivers.',
+      h: '{business} picks {bank} in {amount} deal',
+      b: 'The {sector} business chose {bank}’s models over {rival} for its next contract.',
+    },
+  ],
+  CONTRACT_LOST_BIG: [
+    {
+      h: '{business} drops {bank}',
+      b: 'The {sector} account, worth {amount} a year, {why}.',
+    },
+    {
+      h: '{bank} loses {amount} account',
+      b: '{business}, a {sector} firm, {why}.',
     },
   ],
   WINDOW_USE: [

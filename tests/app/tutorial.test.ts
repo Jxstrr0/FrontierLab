@@ -102,16 +102,16 @@ function playThrough(): { s: GameState; trail: number[] } {
   expect(isDone(memo, look(s))).toBe(true);
   advance(memo);
 
-  // 7. Approve a business loan: the tutorial asks for an application when none waits.
+  // 7. Win your first contract: the tutorial asks for a proposal request when none waits.
   memo = enterStep(7, look(s));
   for (let tries = 0; !isDone(memo, look(s)); tries++) {
-    if (tries > 10) throw new Error('No loan booked');
+    if (tries > 10) throw new Error('No contract won');
     if (needsApplication(memo, look(s))) {
       expect(cmd.requestTutorialApplication(s, branchId).ok).toBe(true);
     }
     expect(needsApplication(memo, look(s))).toBe(false);
-    const app = Object.values(s.loanDesk.applications)[0]!;
-    cmd.decideApplication(s, app.id, Math.min(app.maxRate, 0.2));
+    const rfp = Object.values(s.dealDesk.rfps).find((r) => r.kind === 'new')!;
+    cmd.bidOnRfp(s, rfp.id, 0.3);
   }
   advance(memo);
 
@@ -222,7 +222,7 @@ describe('tutorial commands', () => {
     cmd.setTutorialStep(s, TUTORIAL.loan);
     expect(cmd.requestTutorialApplication(s, r.branchId).ok).toBe(true);
     expect(cmd.requestTutorialApplication(s, r.branchId).ok).toBe(false);
-    expect(Object.keys(s.loanDesk.applications)).toHaveLength(1);
+    expect(Object.keys(s.dealDesk.rfps)).toHaveLength(1);
   });
 
   it('keeps the step through a save, and older saves without it load as never offered', () => {

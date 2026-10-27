@@ -45,7 +45,7 @@ export interface GameState {
   underwriting: UnderwritingState;
   treasury: Treasury;
   partnerships: Record<Id, Partnership>;
-  loanDesk: { applications: Record<Id, LoanApplication>; loans: Record<Id, BusinessLoan> };
+  dealDesk: { rfps: Record<Id, Rfp> };      // C5b (schema 13); was loanDesk { applications, loans }
   rivals: Record<Id, RivalBank>;
   market: MarketState;
   ventures: Record<Id, Startup>;
@@ -198,14 +198,11 @@ export interface Partnership {
   startWeek: Week; lengthWeeks: number; fee: Money; health: Score; lowHealthWeeks: number;
   balance: Money; accounts: number; status: 'active'|'terminating'|'lapsed'; runoffWeeksLeft?: number;
 }
-export interface LoanApplication {
-  id: Id; branchId: Id; business: string; sector: string; amount: Money; termWeeks: number;
-  collateral: 'none'|'partial'|'full'; maxRate: Rate; pentagon: Pentagon; // Mgmt, Track, Market, Comp, FinHealth
-  hiddenPd: Rate; lgd: Pct; createdWeek: Week; expiresWeek: Week;
-}
-export interface BusinessLoan {
-  id: Id; branchId: Id; business: string; sector: string; principal: Money; balance: Money;
-  rate: Rate; pd: Rate; lgd: Pct; termWeeks: number; weeksLeft: number; status: 'current'|'defaulted'|'repaid';
+// C5b: LoanApplication and BusinessLoan are gone. Contracts live on Business (schema 12/13).
+export interface Rfp {
+  id: Id; branchId: Id; businessId: Id; kind: 'new'|'renewal'; createdWeek: Week;
+  dueWeek: Week;          // new: last week to bid; renewal: the quarter-start week it is settled
+  offer?: number;         // renewals: your discount off the budget (none = no bid on a rival's contract)
 }
 ```
 
@@ -354,6 +351,8 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 **Frontier Lab schema 11 (stage C4c, spot limits):** `ComputeState` gains `autoSpotBuy` (default true), `spotTrail`, `crunchWeeks`, `outageWeeksLeft`, `burstStigmaWeeks`, `weekCharge` and `weekCost` (SIMULATION §13.0). Office P&L `compute` is now the internal charge at spot. Migration 10 → 11 (`src/sim/save/migrateSpotLimits.ts`) turns auto spot-buy on and seeds the trail with today's gap, so an old save isn't squeezed by a limit it never built up.
 
 **Frontier Lab schema 12 (stage C5a, customer businesses):** new `GameState.businesses: Record<Id, Business>`, where `Business` = `{ id, cityId, name, sector, size: 'small'|'mid'|'large'|'anchor', lotId? or siteId?, pentagon, budget, vendor?: { type: 'player'|'rival', id }, contractValue?, renewalWeek? }` (SIMULATION §11.0). A business on a storefront sets that lot's occupant to `{ type: 'business', id }`; anchors sit on employer sites. Each city draws from its own `businesses:{cityId}` stream. Migration 11 → 12 (`src/sim/save/migrateBusinesses.ts`) seeds businesses in every generated city.
+
+**Frontier Lab schema 13 (stage C5b, the Deal Desk):** `GameState.loanDesk` is replaced by `dealDesk: { rfps: Record<Id, Rfp> }` (SIMULATION §11). `Business` gains `startWeek?` (when your contract began) and `quietUntil?` (no new RFP before this week); a `vendor` of type `player` now names your sales office. `Branch.discountLimit` (a delegated manager's most generous discount, default `DEAL.defaultLimit`) is new, and `DeskWeek` counts `arrived`, `won`, `lost`, `declined`, `expired`. Events `LOAN_BOOKED` and `BIG_DEFAULT` give way to `CONTRACT_WON { branchId, businessId, business, sector, value, from? }` and `CONTRACT_LOST { …, reason: 'renewal'|'outage'|'failed'|'office', to? }`. The `dealDesk` and `contracts` RNG streams are created on first use. Commands `bidOnRfp`, `declineApplication` (now for RFPs), `setRenewalOffer`, `setDiscountLimit`; `decideApplication` is gone. Migration 12 → 13 (`src/sim/save/migrateDealDesk.ts`) repays current business loans into treasury reserves (equity unchanged), drops the applications, renames the desk tally, adds the discount limit and rescales business budgets to the C5b size bases.
 
 **Frontier Lab schema 8 (stage C3c, bank leftovers removed):** `GameState.reo` and the `ReoPool` type are gone, and `Treasury` loses `bondsMarket`, `bondsBook`, `bondBookYield` and `bondShare`. The `covered_bond` funding type is gone. The command `transferToTreasury` is renamed `topUpLendingFund`. Migration 7 → 8 (`src/sim/save/migrateBankCleanup.ts`) keeps equity unchanged:
 - Each REO pool's value is added to company cash, and `reo` is deleted.

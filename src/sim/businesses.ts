@@ -2,9 +2,9 @@
 // a city is generated, part of its spare storefronts become named businesses
 // that hold their lot for good, and its employers become anchor accounts. Each
 // has a sector, size, pentagon and yearly AI budget; some start with a rival
-// lab's contract. Contracts come up at the quarterly renewal season. Draws come
-// from the city's own `businesses:{cityId}` stream, so a city's businesses are
-// the same whenever it is first visited.
+// lab's contract. Contracts and the renewal season are in contracts.ts (C5b).
+// Seeding draws from the city's own `businesses:{cityId}` stream, so a city's
+// businesses are the same whenever it is first visited.
 import { BUSINESS, SECTOR_DISTRICT_WEIGHT } from '../config/balance';
 import { CITIES } from '../data/cities';
 import {
@@ -43,7 +43,7 @@ export function businessAtSite(state: GameState, siteId: string): Business | und
 }
 
 /** Rival labs with an open office in the city, weighted by office size (bigger offices win more). */
-function rivalsIn(state: GameState, cityId: string): { item: string; weight: number }[] {
+export function rivalsIn(state: GameState, cityId: string): { item: string; weight: number }[] {
   const out: { item: string; weight: number }[] = [];
   for (const bank of Object.values(state.rivals).sort((a, b) => (a.id < b.id ? -1 : 1))) {
     if (bank.status !== 'active') continue;
@@ -75,6 +75,23 @@ function uniqueName(rng: Rng, words: string[], used: Set<string>): string {
   return name;
 }
 
+/**
+ * Signs `b` with a rival lab: value budget × U(contractShare), renewing at the
+ * U{quarters}-th quarter start from now.
+ */
+export function signRival(
+  state: GameState,
+  rng: Rng,
+  b: Business,
+  rivalId: string,
+  quarters: readonly [number, number],
+): void {
+  b.vendor = { type: 'rival', id: rivalId };
+  b.contractValue = Math.round((b.budget * rng.range(...BUSINESS.contractShare)) / 100) * 100;
+  b.renewalWeek = quarterStartWeek(state.meta.startDate, state.clock.week, rng.int(...quarters));
+  delete b.startWeek;
+}
+
 /** Signs a starting rival contract, renewing at one of the next `term` quarter starts. */
 function maybeRivalContract(
   state: GameState,
@@ -86,15 +103,8 @@ function maybeRivalContract(
 ): void {
   const pick = preferred && rivals.some((r) => r.item === preferred) ? preferred : undefined;
   if (rivals.length === 0 || !rng.chance(odds)) return;
-  const sector = sectorOf(b);
   const id = pick ?? rng.pickWeighted(rivals);
-  b.vendor = { type: 'rival', id };
-  b.contractValue = Math.round((b.budget * rng.range(...BUSINESS.contractShare)) / 1000) * 1000;
-  b.renewalWeek = quarterStartWeek(
-    state.meta.startDate,
-    state.clock.week,
-    rng.int(1, sector.termQuarters[1]),
-  );
+  signRival(state, rng, b, id, [1, sectorOf(b).termQuarters[1]]);
 }
 
 /**
@@ -120,14 +130,13 @@ function newBusiness(
   return b;
 }
 
-/** A storefront business: sector by district, size by weight, budget by lot income. */
-function seedLotBusiness(
+/** A storefront business's fields: sector by district, size by weight, budget by lot income. */
+function rollLotBusiness(
   state: GameState,
   rng: Rng,
   lot: Lot,
-  n: number,
   used: Set<string>,
-): Business {
+): Pick<Business, 'name' | 'sector' | 'size' | 'pentagon' | 'budget'> {
   const city = CITIES[lot.cityId]!;
   const small = city.size === 'S' || city.size === 'M';
   const sector = rng.pickWeighted(
@@ -148,18 +157,44 @@ function seedLotBusiness(
         sector.budgetMult *
         rng.lognormal(1, BUSINESS.budgetSigma) *
         listLevel(state, lot.cityId)) /
-        1000,
-    ) * 1000;
-  const b = newBusiness(state, lot.cityId, n, {
+        100,
+    ) * 100;
+  return {
     name: uniqueName(rng, sector.types, used),
     sector: sector.id,
     size,
     pentagon: rollPentagon(rng, sector, size),
     budget,
+  };
+}
+
+function seedLotBusiness(
+  state: GameState,
+  rng: Rng,
+  lot: Lot,
+  n: number,
+  used: Set<string>,
+): Business {
+  const b = newBusiness(state, lot.cityId, n, {
+    ...rollLotBusiness(state, rng, lot, used),
     lotId: lot.id,
   });
   lot.occupant = { type: 'business', id: b.id };
   return b;
+}
+
+/**
+ * A storefront business that failed (C5b): a new business moves into the same
+ * storefront under the same id, with no AI vendor. Anchors don't fail.
+ */
+export function replaceBusiness(state: GameState, rng: Rng, b: Business): void {
+  const lot = b.lotId ? state.world.lots[b.lotId] : undefined;
+  if (!lot) return;
+  const used = new Set(businessesIn(state, b.cityId).map((x) => x.name));
+  const fresh = rollLotBusiness(state, rng, lot, used);
+  for (const key of ['vendor', 'contractValue', 'renewalWeek', 'startWeek', 'quietUntil'] as const)
+    delete b[key];
+  Object.assign(b, fresh);
 }
 
 /** An employer becomes an anchor account: budget by headcount and pay. */
@@ -172,8 +207,8 @@ function seedAnchor(state: GameState, rng: Rng, site: Site, n: number): Business
         e.incomeMult *
         rng.lognormal(1, BUSINESS.budgetSigma) *
         listLevel(state, site.cityId)) /
-        1000,
-    ) * 1000;
+        100,
+    ) * 100;
   return newBusiness(state, site.cityId, n, {
     name: e.name,
     sector: ANCHOR_SECTOR.id,
@@ -225,32 +260,5 @@ export function seedBusinesses(state: GameState, cityId: string): void {
       BUSINESS.anchorRivalHeld,
       site.employer!.partnerRivalId,
     );
-  }
-}
-
-/**
- * The renewal season (tick step 13, a quarter start). Until the Deal Desk
- * arrives (C5b), contracts that come due roll over with the same vendor for
- * another term, and a vendor that has left the city or failed loses them.
- */
-export function renewContracts(state: GameState): void {
-  const week = state.clock.week;
-  for (const b of Object.values(state.businesses).sort((a, c) => (a.id < c.id ? -1 : 1))) {
-    if (!b.vendor || b.renewalWeek === undefined || b.renewalWeek > week) continue;
-    let rival = b.vendor.type === 'rival' ? state.rivals[b.vendor.id] : undefined;
-    // A rival bought by another rival hands its contracts to the buyer.
-    if (rival?.status === 'merged' && rival.mergedInto && state.rivals[rival.mergedInto]) {
-      rival = state.rivals[rival.mergedInto]!;
-      b.vendor = { type: 'rival', id: rival.id };
-    }
-    const present = rival?.status === 'active' && rival.branches.some((r) => r.cityId === b.cityId);
-    if (b.vendor.type === 'rival' && !present) {
-      delete b.vendor;
-      delete b.contractValue;
-      delete b.renewalWeek;
-      continue;
-    }
-    const sector = sectorOf(b);
-    b.renewalWeek = quarterStartWeek(state.meta.startDate, week, sector.termQuarters[0]);
   }
 }

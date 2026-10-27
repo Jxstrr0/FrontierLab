@@ -2,6 +2,7 @@
 // holds one office of yours, so the branches of a rival you buy join your
 // office there. The keeper takes every book, customer and loan, grows to the
 // size that holds both, and adds the other's lease; the other's lot is freed.
+import { moveOfficeContracts } from '../contracts';
 import { emptyBook } from './books';
 import { MAX_OFFICE_SIZE, sizeMult, sizeMultOf } from './officeSize';
 import { staffNeeded } from './staff';
@@ -31,12 +32,7 @@ export function foldIntoOffice(state: GameState, keeper: Branch, other: Branch):
     addBook((keeper.books[pid] ??= emptyBook()), from);
   }
   keeper.customers += other.customers;
-  for (const loan of Object.values(state.loanDesk.loans)) {
-    if (loan.branchId === other.id) loan.branchId = keeper.id;
-  }
-  for (const app of Object.values(state.loanDesk.applications)) {
-    if (app.branchId === other.id) delete state.loanDesk.applications[app.id];
-  }
+  moveOfficeContracts(state, other.id, keeper.id);
   for (const a of state.company.fixedAssets) if (a.ownerId === other.id) a.ownerId = keeper.id;
   keeper.size = Math.max(keeper.size, sizeFor(sizeMult(keeper) + sizeMult(other)));
   keeper.lease.weeklyRent += other.lease.weeklyRent;

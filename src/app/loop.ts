@@ -1,7 +1,7 @@
 // The real-time game loop (DESIGN §5.1). At 1× one game day passes per second
 // (DAY_MS); 2× and 4× scale that. After each weekly tick it autosaves, shows the
 // weekly results when settings ask for it, and pauses for game over, expiring
-// loan applications and new incidents (the incident modal opens once the weekly
+// proposal requests and new incidents (the incident modal opens once the weekly
 // results are closed), and once a quarter for the board meeting reminder when
 // there is an Executive floor (after any other modal). Hidden tabs hold time,
 // and so does any open panel, sheet or modal: the clock runs only on the map,
@@ -153,9 +153,9 @@ function afterWeek(s: GameState): void {
   }
   autosave(s, reportSaveError);
 
-  if (s.settings.autoPauseApplications && expiringApplications(s) > 0) {
-    pause('Loan applications expire this week');
-    toast('Loan applications expire this week.', 'info');
+  if (s.settings.autoPauseApplications && expiringRfps(s) > 0) {
+    pause('Proposal requests expire this week');
+    toast('Proposal requests expire this week.', 'info');
   }
   const quarter = isQuarterStart(s.meta.startDate, s.clock.day);
   const due = resultsDue(s.settings.weeklyResults, s.meta.startDate, s.clock.day);
@@ -206,10 +206,11 @@ function promptIncidents(s: GameState): void {
   else modal.value = { type: 'incident' };
 }
 
-/** Applications the next weekly tick will expire (it drops those with expiresWeek ≤ week). */
-function expiringApplications(s: GameState): number {
-  return Object.values(s.loanDesk.applications).filter((a) => a.expiresWeek <= s.clock.week + 1)
-    .length;
+/** New RFPs the next weekly tick will expire (it drops those with dueWeek ≤ week). */
+function expiringRfps(s: GameState): number {
+  return Object.values(s.dealDesk.rfps).filter(
+    (r) => r.kind === 'new' && r.dueWeek <= s.clock.week + 1,
+  ).length;
 }
 
 const EVENT_TEXT: Record<string, (p: Record<string, unknown>) => string> = {
