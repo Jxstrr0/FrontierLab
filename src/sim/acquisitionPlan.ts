@@ -192,9 +192,9 @@ export function regulatorChecks(
   const pct = (x: number) => `${(x * 100).toFixed(1)}%`;
   const checks: RegulatorCheck[] = [
     {
-      label: 'Capital after the deal',
+      label: 'Credit after the deal',
       ok: plan.proFormaCr >= MERGERS.minProFormaCr,
-      detail: `Pro-forma capital ratio ${pct(plan.proFormaCr)} (needs ${pct(MERGERS.minProFormaCr)})`,
+      detail: `Pro-forma credit ratio ${pct(plan.proFormaCr)} (needs ${pct(MERGERS.minProFormaCr)})`,
     },
   ];
   if (plan.distressed && MERGERS.distressedShareExempt) {

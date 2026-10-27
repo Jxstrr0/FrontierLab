@@ -66,7 +66,8 @@ export const DEV_TEMPLATES: Record<string, DevTemplate> = {
   },
   golden_years: {
     id: 'golden_years',
-    name: 'Golden Years Plan',
+    // Keeps its bank-era id; the RET segment is now Researchers.
+    name: 'Researcher Plan',
     base: 'plus',
     mods: { affinity: { RET: 0.15 }, defaultFee: 12 },
   },
@@ -153,9 +154,57 @@ export const DEV_TEMPLATES: Record<string, DevTemplate> = {
   },
   instant_decisions: {
     id: 'instant_decisions',
-    name: 'Instant Decisions',
+    name: 'Fast Inference',
     mods: {},
     digital: { modelSpeed: 2 },
+  },
+  model_playground: {
+    id: 'model_playground',
+    name: 'Model Playground',
+    mods: {},
+    digital: { appRating: 0.1 },
+  },
+  usage_dashboard: {
+    id: 'usage_dashboard',
+    name: 'Usage Dashboard',
+    mods: {},
+    digital: { appRating: 0.1 },
+  },
+  status_page: {
+    id: 'status_page',
+    name: 'Status Page',
+    mods: {},
+    digital: { appRating: 0.05 },
+  },
+  prompt_library: {
+    id: 'prompt_library',
+    name: 'Prompt Library',
+    mods: {},
+    digital: { appRating: 0.1 },
+  },
+  sso_audit: {
+    id: 'sso_audit',
+    name: 'SSO & Audit Logs',
+    mods: {},
+    digital: { appRating: 0.1 },
+  },
+  developer_console: {
+    id: 'developer_console',
+    name: 'Developer Console',
+    mods: {},
+    digital: { appRating: 0.15 },
+  },
+  agent_marketplace: {
+    id: 'agent_marketplace',
+    name: 'Agent Marketplace',
+    mods: {},
+    digital: { appRating: 0.1 },
+  },
+  streaming_runtime: {
+    id: 'streaming_runtime',
+    name: 'Streaming Runtime',
+    mods: {},
+    digital: { modelSpeed: 1 },
   },
 };
 

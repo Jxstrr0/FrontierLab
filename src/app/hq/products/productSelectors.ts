@@ -47,8 +47,8 @@ export function tierHint(template: DevTemplate | undefined, tier: DevTier): stri
       ? 'Standard price'
       : `Price ×${DEV_TIER.feeMult[tier]}`
     : DEV_TIER.rateAdd[tier] === 0
-      ? 'Standard rate'
-      : `Default rate ${pp(DEV_TIER.rateAdd[tier])}`;
+      ? 'Standard price'
+      : `Default price ${pp(DEV_TIER.rateAdd[tier])}`;
   const bump = DEV_TIER.productsBump[tier];
   return bump > 0 ? `${price} · Products rating +${bump.toFixed(2)} where offered` : price;
 }

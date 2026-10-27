@@ -356,7 +356,7 @@ No tabs: one overview page.
   - round name and Company | Private toggle
   - available cash for the chosen account
   - two offer-lot cards: "{Name} stock — n shares (15.00%) $price — Invest"
-- **Compute credits** (venture debt): amount and rate steppers, Offer loan; the profile shows the balance as Compute credits.
+- **Compute credits** (venture debt): amount and fee steppers, Offer credits; the profile shows the balance as Compute credits.
 - **Funding history:** round, amount, date.
 - **Top shareholders:** names with %.
 
@@ -637,7 +637,7 @@ After Part 1 is finished or skipped, with Settings → Guides on (the default):
 
 ## 28. Milestones (menu → Milestones)
 
-- Subtitle: "n of 11 reached".
+- Subtitle: "n of 25 reached" (one per milestone in CONTENT §19).
 - One row per milestone (data/milestones.ts) in order: a filled brass diamond ◆ when reached with "Reached {date}", an outline ◇ with the goal otherwise.
 - Read-only. Reaching one toasts "Milestone reached: …"; the big ones also make a Ledger story.
 

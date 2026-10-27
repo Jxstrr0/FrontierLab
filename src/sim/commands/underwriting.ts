@@ -30,7 +30,7 @@ export function buyBureauModel(
   packageId: string,
 ): CommandResult<{ modelId: string }> {
   const pkg = BUREAU_PACKAGES[packageId];
-  if (!pkg) return fail('Unknown bureau package.');
+  if (!pkg) return fail('Unknown data package.');
   if (!bureausIn(state.world.currentCityId).includes(pkg.bureau))
     return fail(`${pkg.bureau} has no office in this city.`);
   const u = state.underwriting;

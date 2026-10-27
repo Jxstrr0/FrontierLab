@@ -183,11 +183,11 @@ const BANK_RUN: IncidentRule = {
     } else if (optionId === 'raise') {
       addEffect(state, 'planCut', 'company', BANK_RUN_P.planCut, BANK_RUN_P.boostWeeks);
     } else if (state.incidents.bankRunWeeksLeft === undefined) {
-      return 'The run had already ended.';
+      return 'The rumour had already died down.';
     } else if (rng.chance(num(inc.data, 'odds'))) {
       endBankRun(state);
-      return 'The statement worked. The queues have gone.';
-    } else return 'Nobody believed the statement. The run goes on.';
+      return 'The statement worked. Cancellations have stopped.';
+    } else return 'Nobody believed the statement. The rumour keeps spreading.';
   },
 };
 

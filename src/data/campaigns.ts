@@ -69,7 +69,7 @@ export const CAMPAIGNS: Record<string, CampaignSpec> = {
   signup_bonus: {
     id: 'signup_bonus',
     name: 'Sign-Up Credits',
-    effectHint: 'New deposits ++ · Churn +',
+    effectHint: 'New sign-ups ++ · Churn +',
     levels: [
       {
         label: '$50',

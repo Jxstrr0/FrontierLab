@@ -8,17 +8,17 @@ import { tierFor } from '../../sim/capital';
 import type { Branch, GameState, RivalBank, RivalBranch } from '../../sim/state';
 
 export const STRATEGY_LABEL: Record<RivalBank['strategy'], string> = {
-  incumbent: 'Incumbent bank',
+  incumbent: 'Incumbent lab',
   disruptor: 'Disruptor',
-  premium: 'Premium bank',
-  community: 'Community bank',
+  premium: 'Premium lab',
+  community: 'Open-model lab',
 };
 
 export const STRATEGY_BLURB: Record<RivalBank['strategy'], string> = {
   incumbent: 'Big, steady and pricey. Sales offices everywhere and fees to match.',
-  disruptor: 'App-first, thin on sales offices, generous on savings. Runs on thin capital.',
-  premium: 'Marble lobbies for wealthy clients. Low savings rates, high service.',
-  community: 'Local and friendly. Fair rates, modest sales offices.',
+  disruptor: 'App-first, thin on sales offices, generous free tier. Runs on thin cash.',
+  premium: 'Polished offices for big clients. High prices, high service.',
+  community: 'Local and friendly. Fair prices, modest sales offices.',
 };
 
 export const TIER_LABEL: Record<Tier, string> = {
@@ -106,18 +106,27 @@ export function rivalHqSite(s: GameState, rivalId: string, cityId: string): stri
   )?.id;
 }
 
+/** Player-facing label for a rival's status. */
+export const STATUS_LABEL: Record<RivalBank['status'], string> = {
+  active: 'Active',
+  distressed: 'In administration',
+  seized: 'Failed',
+  acquired: 'Acquired',
+  merged: 'Merged',
+};
+
 /** Status line for a failed rival. */
 export function failedText(s: GameState, bank: RivalBank): string | undefined {
   if (bank.status === 'distressed') {
     const weeks = Math.max(0, (bank.distressedUntil ?? s.clock.week) - s.clock.week);
-    return `Regulators seized ${bank.name}. Its network is for sale at any investment bank's M&A desk for ${weeks} more week${weeks === 1 ? '' : 's'}; then other labs take its sales offices.`;
+    return `${bank.name} went into administration. Its network is for sale at any investment bank's M&A desk for ${weeks} more week${weeks === 1 ? '' : 's'}; then other labs take its sales offices.`;
   }
   if (bank.status === 'seized')
     return `${bank.name} failed. Its sales offices now belong to other labs.`;
   if (bank.status === 'acquired') return `${bank.name} has been acquired.`;
   if (bank.status === 'merged') {
     const buyer = bank.mergedInto ? s.rivals[bank.mergedInto]?.name : undefined;
-    return `${bank.name} was bought by ${buyer ?? 'another bank'}. Its sales offices now carry the buyer's name.`;
+    return `${bank.name} was bought by ${buyer ?? 'another lab'}. Its sales offices now carry the buyer's name.`;
   }
   return undefined;
 }

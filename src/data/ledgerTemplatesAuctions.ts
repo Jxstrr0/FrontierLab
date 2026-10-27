@@ -41,7 +41,7 @@ export const AUCTIONS_TEMPLATES = {
       b: 'The {bank} founder bought it at {house} for {price}, premium included.',
     },
     {
-      h: 'Banker {founder} wins {item} at {house}',
+      h: 'AI founder {founder} wins {item} at {house}',
       b: 'The winning bid, with the buyer’s premium, came to {price}.',
     },
   ],

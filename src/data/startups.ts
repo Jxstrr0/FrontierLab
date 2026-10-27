@@ -192,6 +192,19 @@ export const STARTUP_SECTORS: Record<string, StartupSectorSpec> = {
     marketSector: 'technology',
     blurbs: ['Phishing drills for small offices', 'Fraud scoring for online checkouts'],
   }),
+  aiTools: sector({
+    id: 'aiTools',
+    label: 'AI & dev tools',
+    mu: 0.09,
+    margin: 0.2,
+    psMultiple: 16,
+    marketSector: 'technology',
+    blurbs: [
+      'An eval harness that grades models overnight',
+      'A vector store that bills by the query',
+      'Prompt version control for product teams',
+    ],
+  }),
 };
 
 export interface SeedStartup {

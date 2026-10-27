@@ -186,11 +186,17 @@ export const MOVER_REASONS: Record<SectorId, { up: string[]; down: string[] }> =
     down: ['as a major tenant leaves', 'after writing down its offices', 'as rents soften'],
   },
   banking: {
-    up: ['on talk of a takeover', 'after lifting its dividend', 'as lending margins widen'],
+    up: [
+      'on talk of a takeover',
+      'as inference costs fall',
+      'after a model eval tops the leaderboard',
+      'as enterprise renewals come in early',
+    ],
     down: [
-      'after setting aside more for bad loans',
-      'on a regulator’s rebuke',
-      'as deposit costs rise',
+      'after a model eval goes badly',
+      'as enterprise renewals slip',
+      'as a chip shortage bites',
+      'on a regulator’s rebuke over safety',
     ],
   },
 };
@@ -203,8 +209,9 @@ export const LAUNCH_PRODUCTS: Record<SectorId, string[]> = {
   retail: ['a same-hour delivery service', 'a store with no checkouts', 'a budget own-brand range'],
   realEstate: ['a 70-storey tower plan', 'a car-free housing quarter', 'a waterfront market hall'],
   banking: [
-    'an app with instant loans',
-    'a card made from recycled plastic',
-    'a no-fee savings account',
+    'an agent that files expenses',
+    'a cheaper batch tier',
+    'an on-device model',
+    'a voice assistant for call centres',
   ],
 };

@@ -24,7 +24,7 @@ export function acceptCorporateLoan(
   if (state.world.sites[offer.lenderId]?.kind !== 'investmentBank')
     return fail('That offer has expired.');
   if (!isLenderNearYou(state, offer.lenderId))
-    return fail('That bank lends to labs with a sales office in its city.');
+    return fail('That investment bank lends to labs with a sales office in its city.');
   if (offer.amount > loanRoom(state) + CORPORATE_LENDING.dust) {
     return fail(
       `Corporate debt is capped at ${CORPORATE_LENDING.maxEquityShare * 100}% of equity. You can borrow up to ${money(loanRoom(state))} more.`,

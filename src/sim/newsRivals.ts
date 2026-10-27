@@ -20,10 +20,10 @@ import type { GameEvent } from './state';
 
 /** How a chartered bank's strategy reads in a headline. */
 const STRATEGY_WORD: Record<string, string> = {
-  incumbent: 'high-street bank',
-  premium: 'private bank',
-  community: 'community bank',
-  disruptor: 'app-only bank',
+  incumbent: 'established lab',
+  premium: 'premium lab',
+  community: 'open-model lab',
+  disruptor: 'app-first lab',
 };
 
 /** True when the rival has a branch in one of your cities. */
@@ -111,7 +111,7 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
         tokens: {
           bank: str(p.bank, 'A new lab'),
           city: cityName(str(p.city)),
-          kind: STRATEGY_WORD[str(p.strategy)] ?? 'bank',
+          kind: STRATEGY_WORD[str(p.strategy)] ?? 'lab',
           n: String(num(p.branches)),
         },
       };
@@ -139,7 +139,7 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
         priority: buyerLocal ? P.rivalLocal + 8 : P.rivalAbroad + 8,
         tokens: {
           buyer: str(p.buyer, 'A rival'),
-          bank: str(p.bank, 'a smaller bank'),
+          bank: str(p.bank, 'a smaller lab'),
           price: newsMoney(num(p.price), ctx.sym),
           n: String(num(p.branches)),
           cities: String(num(p.cities)),

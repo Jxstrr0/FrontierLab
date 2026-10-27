@@ -88,7 +88,7 @@ function Networking(p: { cityId: string }) {
       {employer && (
         <Card class="cv-lead">
           <p class="cv-lead-text">
-            HR leads from {employer.employer!.name} are asking about payroll banking.
+            HR leads from {employer.employer!.name} are asking about staff AI plans.
           </p>
           <button
             type="button"

@@ -137,7 +137,7 @@ export const MILESTONES: MilestoneSpec[] = [
     id: 'ten_countries',
     title: 'Ten countries',
     goal: 'Run sales offices in ten countries.',
-    line: '{bank} now banks customers in ten countries.',
+    line: '{bank} now serves customers in ten countries.',
     news: true,
   },
   {

@@ -118,7 +118,7 @@ export function setCompanyPrice(
   const spec = productSpec(state, productId);
   if (!spec) return fail('Unknown product.');
   if (!state.company.applyRatesToAll)
-    return fail('Turn on "Apply rates to all sales offices" to set HQ prices.');
+    return fail('Turn on "Apply prices to all sales offices" to set HQ prices.');
   if (!state.world.countries[country]) return fail('Unknown country.');
   if (!Number.isFinite(price)) return fail('Enter a number.');
   const p = clamp(roundToStep(price, spec.step), spec.min, spec.max);

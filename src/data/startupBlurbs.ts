@@ -315,4 +315,22 @@ export const STARTUP_BLURBS: Record<string, BlurbParts> = {
       'credit unions',
     ],
   },
+  aiTools: {
+    offers: [
+      'Model evals on a schedule',
+      'A hosted vector database',
+      'Prompt version control',
+      'GPU scheduling',
+      'Agent tracing and replay',
+      'Synthetic training data',
+    ],
+    customers: [
+      'product teams',
+      'indie developers',
+      'research labs',
+      'enterprise IT',
+      'game studios',
+      'data teams',
+    ],
+  },
 };

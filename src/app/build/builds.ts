@@ -11,13 +11,7 @@ import {
 import { buildQuote } from '../../sim/commands';
 import type { GameState } from '../../sim/state';
 
-export const SLOT_LABEL: Record<BuildSlot, string> = {
-  exterior: 'Exterior',
-  lobby: 'Lobby',
-  teller: 'Sales desks',
-  vault: 'Machine room',
-  atm: 'Demo kiosks',
-};
+export { SLOT_LABEL } from '../../sim/commands/branches';
 
 /** Options for one slot, cheapest first. */
 export function optionsFor(slot: BuildSlot): EquipmentSpec[] {

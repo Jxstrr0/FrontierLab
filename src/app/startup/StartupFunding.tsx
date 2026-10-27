@@ -1,7 +1,7 @@
 // The startup panel's money sections (SCREENS §11): Funding (the round name,
 // a Company | Private toggle, available cash, the two offer-lot cards with
-// Invest) and Venture debt (amount and rate steppers, Offer loan, or the
-// outstanding loan). The account toggle is shared by both.
+// Invest) and Compute credits (amount and fee steppers, Offer credits, or the
+// outstanding credits). The account toggle is shared by both.
 import { useState } from 'preact/hooks';
 import * as cmd from '../../sim/commands';
 import type { Account } from '../../sim/portfolio';
@@ -84,9 +84,9 @@ function VentureDebtCard(p: { startup: Startup; account: Account; block?: string
       <Card>
         {d ? (
           <>
-            <Row label="Lender" value={d.lender === 'company' ? s.meta.bankName : 'You'} />
+            <Row label="Provider" value={d.lender === 'company' ? s.meta.bankName : 'You'} />
             <Row label="Balance" value={moneyFull(d.balance, sym)} strong />
-            <Row label="Rate" value={pct(d.rate)} />
+            <Row label="Fee" value={pct(d.rate)} />
             <Row label="Weekly payment" value={money(d.payment, sym)} />
             <Row label="Weeks left" value={String(d.weeksLeft)} />
           </>
@@ -103,7 +103,7 @@ function VentureDebtCard(p: { startup: Startup; account: Account; block?: string
               hint={`Up to ${money(b.maxAmount, sym)}`}
             />
             <Stepper
-              label="Annual rate"
+              label="Annual fee"
               value={rate}
               min={b.rateMin}
               max={b.rateMax}
@@ -123,13 +123,13 @@ function VentureDebtCard(p: { startup: Startup; account: Account; block?: string
                 if (r.ok)
                   toast(
                     r.accepted
-                      ? `${st.name} accepted the loan.`
-                      : `${st.name} turned the loan down at that rate.`,
+                      ? `${st.name} accepted the credits.`
+                      : `${st.name} turned the credits down at that fee.`,
                     r.accepted ? 'good' : 'bad',
                   );
               }}
             >
-              Offer loan
+              Offer credits
             </button>
           </>
         )}

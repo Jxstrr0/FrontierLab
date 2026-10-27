@@ -159,7 +159,7 @@ describe('company lineup', () => {
       templateId: 'golden_years',
       tier: 'premium',
     };
-    expect(productSubtitle(s, productSpec(s, 'dev_x')!)).toBe('Golden Years Plan · Premium tier');
+    expect(productSubtitle(s, productSpec(s, 'dev_x')!)).toBe('Researcher Plan · Premium tier');
     expect(productSubtitle(s, PRODUCTS.plus!)).toBeUndefined();
   });
 });

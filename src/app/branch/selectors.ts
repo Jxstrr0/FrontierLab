@@ -75,7 +75,7 @@ export function moodTone(morale: number): 'good' | 'warn' | 'bad' {
 export function advisorLines(state: GameState, branch: Branch, openingDate: string): string[] {
   const sym = state.settings.currency;
   if (branch.status === 'fitout') {
-    return [`We open on ${openingDate}. Set our rates and staff before the doors open.`];
+    return [`We open on ${openingDate}. Set our prices and staff before the doors open.`];
   }
   const lines: string[] = [];
   const needed = staffNeeded(branch);
@@ -86,7 +86,7 @@ export function advisorLines(state: GameState, branch: Branch, openingDate: stri
   if (branch.waitIndex > WAIT_LABELS.long) lines.push("We're slammed. The line's out the door.");
   if (s.morale < ADVISOR.lowMorale) lines.push("The team's frustrated about pay.");
   if (branch.ratings.rates < ADVISOR.weakRates) {
-    lines.push('Customers keep quoting better rates from down the street.');
+    lines.push('Customers keep quoting better prices from down the street.');
   }
   const [prev, last] = branch.pnl.slice(-2);
   if (last && last.income < 0) {
@@ -101,7 +101,7 @@ export function advisorLines(state: GameState, branch: Branch, openingDate: stri
       `${waiting} proposal request${waiting === 1 ? ' is' : 's are'} waiting at the Deal Desk.`,
     );
   }
-  if (branch.waitIndex < ADVISOR.quietWait) lines.push('Quiet week. Want to sharpen our rates?');
+  if (branch.waitIndex < ADVISOR.quietWait) lines.push('Quiet week. Want to sharpen our prices?');
   if (lines.length === 0) lines.push("Morning, boss. The pipeline's warm and the coffee's on.");
   return lines;
 }
@@ -357,7 +357,7 @@ export function campaignCostText(
 ): string {
   if (cost.type === 'weekly') return `${money(cost.amount * costIndex * level, sym)}/wk`;
   if (cost.type === 'perNewDepositAccount') {
-    return `${money(cost.amount * level, sym)} per new deposit account`;
+    return `${money(cost.amount * level, sym)} per new plan sign-up`;
   }
   return `${exactMoney(cost.amount * level, sym)} per account a week`;
 }
@@ -379,6 +379,6 @@ export function productWords(spec: ProductSpec) {
         ? 'New seats last week'
         : spec.kind === 'usage'
           ? 'New sign-ups last week'
-          : 'New accounts last week',
+          : 'New sign-ups last week',
   };
 }

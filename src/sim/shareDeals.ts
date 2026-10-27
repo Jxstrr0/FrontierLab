@@ -44,7 +44,7 @@ export function shareDealBlocker(
   asked: number,
 ): string | undefined {
   if (!(asked > 0)) return undefined;
-  if (state.stock.status !== 'public') return 'Paying in shares needs a listed bank.';
+  if (state.stock.status !== 'public') return 'Paying in shares needs a listed lab.';
   const cap = SHARE_DEALS.maxNewSharePct;
   if (split.newShares > state.company.sharesOutstanding * cap)
     return `One deal can add at most ${cap * 100}% new shares.`;
