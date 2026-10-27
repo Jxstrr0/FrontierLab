@@ -124,9 +124,9 @@ describe('risk view', () => {
     expect(nextReviewWeek(s.meta.startDate, next)).toBeGreaterThan(next);
   });
 
-  it('names loss-table products, with Loan Desk lending spelled out', () => {
+  it('names loss-table products, with Enterprise contracts spelled out', () => {
     const s = newGame({ seed: 42, cityId: 'cal' });
-    expect(lossProductName(s, 'sbl')).toMatch(/Loan Desk/);
+    expect(lossProductName(s, 'sbl')).toMatch(/Enterprise contracts/);
     expect(lossProductName(s, 'api')).not.toBe('api');
     expect(lossProductName(s, 'nope')).toBe('nope');
   });

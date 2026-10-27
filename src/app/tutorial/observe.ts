@@ -39,7 +39,9 @@ export function observe(
     week: s.clock.week,
     branches,
     loansBooked: s.underwriting.loansBooked,
-    pendingApps: Object.values(s.loanDesk.applications).filter((a) => own.has(a.branchId)).length,
+    pendingApps: Object.values(s.dealDesk.rfps).filter(
+      (r) => r.kind === 'new' && own.has(r.branchId),
+    ).length,
   };
 }
 

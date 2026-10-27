@@ -1,8 +1,8 @@
 // The tutorial's step machine (SCREENS §27), pure so it can be unit-tested.
 // Each step watches what the player actually does: entering a step records a
-// baseline (branch count, Plus prices, managers, the API, loans
-// booked, campaigns) and the step is done when the game moves past it. Nothing advances
-// on a timer. guidance() says where the brass ring should go, as an ordered
+// baseline (branch count, Plus prices, managers, the API, contracts won,
+// campaigns) and the step is done when the game moves past it. Nothing
+// advances on a timer. guidance() says where the brass ring should go, as an ordered
 // list of targets (closest to done first); the overlay rings the first one
 // that is on screen.
 import { TUTORIAL, TUTORIAL_STEPS, TUTORIAL_TEXT, type TutorialTarget } from '../../data/tutorial';
@@ -17,8 +17,9 @@ export interface TutorialObs {
   week: number;
   /** Your branches, oldest first. */
   branches: BranchObs[];
+  /** Contracts won so far (underwriting.loansBooked, the AI model's Internal History). */
   loansBooked: number;
-  /** Loan Desk applications waiting at any of your branches. */
+  /** New Deal Desk proposal requests waiting at any of your offices. */
   pendingApps: number;
 }
 
@@ -180,7 +181,7 @@ export function guidance(memo: StepMemo, obs: TutorialObs): Guidance {
   return { title, targets, idle };
 }
 
-/** Step 7 needs an application on the desk; true when the tutorial should ask for one. */
+/** Step 7 needs a proposal request on the desk; true when the tutorial should ask for one. */
 export function needsApplication(memo: StepMemo, obs: TutorialObs): boolean {
   return memo.step === TUTORIAL.loan && obs.pendingApps === 0 && obs.branches.length > 0;
 }

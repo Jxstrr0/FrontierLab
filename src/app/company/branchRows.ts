@@ -5,6 +5,7 @@ import { CITIES } from '../../data/cities';
 import type { CountryId } from '../../data/types';
 import { branchArr } from '../../sim/arr';
 import { staffNeeded } from '../../sim/branch/staff';
+import { officeRfps } from '../branch/dealDeskSelectors';
 import type { Branch, GameState } from '../../sim/state';
 
 export type SortKey = 'name' | 'rating' | 'arr' | 'customers' | 'income';
@@ -34,11 +35,9 @@ function issuesOf(s: GameState, branch: Branch): Issue[] {
   if (branch.status !== 'open') return issues;
   if (branch.staff.count < staffNeeded(branch)) issues.push({ text: 'Understaffed', tone: 'warn' });
   if (!branch.managerId) issues.push({ text: 'No manager', tone: 'info' });
-  const pending = Object.values(s.loanDesk.applications).filter(
-    (a) => a.branchId === branch.id,
-  ).length;
+  const pending = officeRfps(s, branch.id).fresh.length;
   if (pending > 0) {
-    issues.push({ text: `${pending} loan application${pending === 1 ? '' : 's'}`, tone: 'warn' });
+    issues.push({ text: `${pending} proposal request${pending === 1 ? '' : 's'}`, tone: 'warn' });
   }
   return issues;
 }

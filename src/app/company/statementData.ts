@@ -47,7 +47,7 @@ export function incomeStatement(snaps: WeeklySnapshot[]): StatementLine[] {
     { label: 'Plans', value: pnl.accountFees, kind: 'sub' },
     { label: 'API', value: pnl.serviceFees, kind: 'sub' },
     { label: 'Apps & services', value: pnl.cardFees, kind: 'sub' },
-    { label: 'Loan Desk interest', value: pnl.loanInterest, kind: 'sub' },
+    { label: 'Enterprise contracts', value: pnl.loanInterest, kind: 'sub' },
     { label: 'Other income', value: x.revenue - product, kind: 'sub' },
     { label: 'Revenue', value: x.revenue, kind: 'total' },
     { label: 'Compute', value: -x.compute },

@@ -3,6 +3,7 @@ import { REFERENCE_BUILDS } from '../../src/data/equipment';
 import type { DeptId } from '../../src/data/types';
 import * as cmd from '../../src/sim/commands';
 import { advanceDay, advanceWeeks } from '../../src/sim/engine';
+import { postCash } from '../../src/sim/ledger';
 import { newGame } from '../../src/sim/newGame';
 import type { GameState } from '../../src/sim/state';
 
@@ -57,7 +58,7 @@ export function runScript(weeks: number, onWeek?: (s: GameState, week: number) =
   const first = openScriptedBranch(s, 'midtown');
   // C5b: contracts with Calgary's few dozen businesses do not carry the week-80 HQ
   // lease, so the script is funded with paid-in capital and stays solvent for 6 years.
-  s.company.cash += SCRIPT_CAPITAL;
+  postCash(s, SCRIPT_CAPITAL, 'financing');
   s.company.paidInCapital += SCRIPT_CAPITAL;
   for (let day = 1; day <= weeks * 7; day++) {
     advanceDay(s);

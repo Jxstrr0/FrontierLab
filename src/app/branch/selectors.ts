@@ -15,7 +15,7 @@ import {
 import type { CampaignCost } from '../../data/campaigns';
 import { isDeposit, isLoan, isRecurring, type ProductSpec } from '../../data/products';
 import { branchArr } from '../../sim/arr';
-import { deskWeek } from '../../sim/branch/loanDesk';
+import { contractTotals, officeRfps } from './dealDeskSelectors';
 import { marketWage, staffNeeded } from '../../sim/branch/staff';
 import { managerMarketSalary, managerSalaryBounds } from '../../sim/payReviews';
 export { managerRerollFee } from '../../sim/candidateRerolls';
@@ -95,12 +95,10 @@ export function advisorLines(state: GameState, branch: Branch, openingDate: stri
   if (last && prev && last.income > prev.income * (1 + ADVISOR.strongWeekGain) && prev.income > 0) {
     lines.push(`Strong week: income up ${delta(last.income, prev.income, sym).text}.`);
   }
-  const waiting = Object.values(state.loanDesk.applications).filter(
-    (a) => a.branchId === branch.id,
-  ).length;
+  const waiting = officeRfps(state, branch.id).fresh.length;
   if (waiting > 0) {
     lines.push(
-      `${waiting} loan application${waiting === 1 ? ' is' : 's are'} waiting at the Loan Desk.`,
+      `${waiting} proposal request${waiting === 1 ? ' is' : 's are'} waiting at the Deal Desk.`,
     );
   }
   if (branch.waitIndex < ADVISOR.quietWait) lines.push('Quiet week. Want to sharpen our rates?');
@@ -298,58 +296,10 @@ function signed(r: number): string {
   return `${r >= 0 ? '+' : '−'}${pct(Math.abs(r))}`;
 }
 
-/** An office's ARR (plan and usage books), Loan Desk lending and customers. */
+/** An office's ARR (plan and usage books), enterprise contract value and customers. */
 export function branchBalances(state: GameState, branch: Branch) {
-  const sbl = businessLoans(state, branch.id);
-  return { arr: branchArr(state, branch), loans: sbl.balance, customers: branch.customers };
-}
-
-/** Current Loan Desk loans and pending applications for a branch. */
-export function businessLoans(state: GameState, branchId: string) {
-  let balance = 0;
-  let count = 0;
-  for (const l of Object.values(state.loanDesk.loans)) {
-    if (l.branchId !== branchId || l.status !== 'current') continue;
-    balance += l.balance;
-    count += 1;
-  }
-  const pending = Object.values(state.loanDesk.applications).filter(
-    (a) => a.branchId === branchId,
-  ).length;
-  return { balance, count, pending };
-}
-
-export interface LoanDeskStrip {
-  /** Applications that arrived this week (DeskWeek.arrived). */
-  arrived: number;
-  approved: number;
-  declined: number;
-  /** Approved ÷ decided (approved, refused by the business, declined); undefined before any. */
-  approvalRate?: number;
-  /** Balance of the branch's current business loans. */
-  balance: number;
-  /** Business loans that defaulted in the last weekly close, and their balance. */
-  defaultedLoans: number;
-  defaulted: number;
-  /** Applications waiting for a decision now. */
-  waiting: number;
-}
-
-/** The Loan Desk summary strip (SCREENS §5.3). */
-export function loanDeskStrip(state: GameState, branch: Branch): LoanDeskStrip {
-  const desk = deskWeek(state, branch);
-  const decided = desk.approved + desk.refused + desk.declined;
-  const loans = businessLoans(state, branch.id);
-  return {
-    arrived: desk.arrived,
-    approved: desk.approved,
-    declined: desk.declined,
-    approvalRate: decided > 0 ? desk.approved / decided : undefined,
-    balance: loans.balance,
-    defaultedLoans: branch.books.sbl?.last.defaultedLoans ?? 0,
-    defaulted: branch.books.sbl?.last.defaulted ?? 0,
-    waiting: loans.pending,
-  };
+  const deals = contractTotals(state, branch.id);
+  return { arr: branchArr(state, branch), contractArr: deals.arr, customers: branch.customers };
 }
 
 export type Period = 'week' | 'quarter' | 'year';
@@ -380,7 +330,7 @@ export const REVENUE_LINES: [BranchPnlLine, string][] = [
   ['plans', 'Plans'],
   ['api', 'API'],
   ['apps', 'Apps & services'],
-  ['loanDesk', 'Loan Desk interest'],
+  ['loanDesk', 'Enterprise contracts'],
   ['otherIncome', 'Other income'],
 ];
 export const EXPENSE_LINES: [BranchPnlLine, string][] = [

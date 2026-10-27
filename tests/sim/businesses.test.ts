@@ -4,7 +4,8 @@
 import { describe, expect, it } from 'vitest';
 import { BUSINESS } from '../../src/config/balance';
 import { DEAL_SECTOR_BY_ID } from '../../src/data/dealSectors';
-import { businessesIn, businessLotCount, renewContracts } from '../../src/sim/businesses';
+import { businessesIn, businessLotCount } from '../../src/sim/businesses';
+import { renewalSeason } from '../../src/sim/contracts';
 import { isQuarterStart, quarterStartWeek } from '../../src/sim/calendar';
 import { newGame } from '../../src/sim/newGame';
 import { migrations } from '../../src/sim/save/migrations';
@@ -83,7 +84,7 @@ describe('the renewal season', () => {
     s.clock.week = stay.renewalWeek = leave.renewalWeek = due;
     const gone = s.rivals[leave.vendor!.id]!;
     gone.branches = gone.branches.filter((r) => r.cityId !== 'cal');
-    renewContracts(s);
+    renewalSeason(s);
     expect(stay.renewalWeek).toBeGreaterThan(due);
     expect(isQuarterStart(s.meta.startDate, stay.renewalWeek! * 7)).toBe(true);
     expect(leave.vendor).toBeUndefined();

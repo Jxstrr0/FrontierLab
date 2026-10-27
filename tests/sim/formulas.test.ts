@@ -1,12 +1,10 @@
 // Formula checks against the worked examples in SIMULATION.md.
 import { describe, expect, it } from 'vitest';
 import { shareFormula } from '../../src/sim/branch/demand';
-import { acceptanceProb, pdFromScore, pentagonScore } from '../../src/sim/branch/loanDesk';
 import { competitiveness, priceFactor } from '../../src/sim/branch/pricing';
 import { PRODUCTS } from '../../src/data/products';
 import { isQuarterStart, isYearStart, weekOfYear } from '../../src/sim/calendar';
 import { tierFor } from '../../src/sim/capital';
-import type { LoanApplication } from '../../src/sim/state';
 
 describe('share of prospects (§9.3)', () => {
   it('matches the calibration example', () => {
@@ -45,26 +43,6 @@ describe('pricing (§8, §9.7)', () => {
     expect(priceFactor(plus, 'RET', 15, 20)).toBeGreaterThan(1);
     expect(priceFactor(sbl, 'FAM', 0.12, 0.1)).toBeLessThan(1);
     expect(priceFactor(plus, 'STU', 60, 20)).toBeCloseTo(0.2);
-  });
-});
-
-describe('Loan Desk (§11)', () => {
-  it('weights the pentagon with financial health heaviest', () => {
-    expect(pentagonScore([5, 5, 5, 5, 5])).toBeCloseTo(5);
-    expect(pentagonScore([5, 5, 5, 5, 10])).toBeCloseTo(6.5);
-  });
-
-  it('sets PD from score and collateral', () => {
-    expect(pdFromScore(5, 'partial')).toBeCloseTo(0.025);
-    expect(pdFromScore(5, 'none')).toBeCloseTo(0.03);
-    expect(pdFromScore(7, 'partial')).toBeLessThan(0.025);
-  });
-
-  it('accepts offers at or under the max rate 97% of the time, less above it', () => {
-    const app = { maxRate: 0.09 } as LoanApplication;
-    expect(acceptanceProb(app, 0.08)).toBeCloseTo(0.97);
-    expect(acceptanceProb(app, 0.1)).toBeCloseTo(0.37);
-    expect(acceptanceProb(app, 0.2)).toBe(0);
   });
 });
 
