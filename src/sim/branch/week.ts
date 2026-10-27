@@ -3,6 +3,7 @@
 
 export interface BranchWeek {
   loanInterest: number;
+  /** Internal bank transfer pricing, still run by the legacy deposit/loan books (removed in C3c); not in the office P&L. */
   fundingCredit: number;
   accountFees: number;
   cardFees: number;
@@ -20,6 +21,8 @@ export interface BranchWeek {
   equipment: number;
   overhead: number;
   servicing: number;
+  /** Compute behind plan seats and API usage (C3b). */
+  compute: number;
   underwriting: number;
 }
 
@@ -43,6 +46,7 @@ export function emptyWeek(): BranchWeek {
     equipment: 0,
     overhead: 0,
     servicing: 0,
+    compute: 0,
     underwriting: 0,
   };
 }

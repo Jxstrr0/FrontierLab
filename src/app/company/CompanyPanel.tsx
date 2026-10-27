@@ -4,6 +4,7 @@
 // the full statements on the HQ Finance floor once you have one.
 import { useState } from 'preact/hooks';
 import { ATTENTION, FEATURES, LIQ_MIN, LIQ_REPAY_BUFFER } from '../../config/balance';
+import { companyArr } from '../../sim/arr';
 import { balanceSheet } from '../../sim/balanceSheet';
 import { capitalSnapshot } from '../../sim/capital';
 import { cashCoverWeeks, weeklyCosts } from '../../sim/cashCover';
@@ -21,16 +22,16 @@ import './company.css';
 
 const EXPLAINERS: { title: string; body: string }[] = [
   {
-    title: 'Deposits fund loans',
-    body: 'Every deposit your sales offices take in becomes money Treasury can lend or hold. More deposits mean more room to lend.',
+    title: 'Revenue recurs, compute bills',
+    body: 'Plans and apps bill every month and the API bills for what it uses, so annual recurring revenue (ARR) is the number to grow. Every seat and every million tokens runs on compute, the biggest cost under revenue.',
   },
   {
     title: 'Capital limits growth',
     body: 'Capital is what the lab owns after its debts. The regulator compares it with your risky assets, and the tier decides how freely you can grow.',
   },
   {
-    title: 'Liquidity keeps the doors open',
-    body: 'Reserves and government bonds are cash you can reach quickly. With auto-funding on, Treasury borrows overnight to hold your target; only a fall under the 10% minimum costs reputation.',
+    title: 'The lending fund',
+    body: 'The Loan Desk lends out of your treasury reserves and repayments flow back in. Add company cash from the Loan Desk tab when you want it to lend more.',
   },
   {
     title: 'Cash cover',
@@ -72,7 +73,7 @@ export function CompanyPanel() {
         />
       }
       onClose={closePanel}
-      advisor={{ text: 'Deposits fund loans; capital limits growth.' }}
+      advisor={{ text: 'Grow recurring revenue; watch the compute bill.' }}
     >
       <div class="stack co-stack">
         <WhereToLook s={s} />
@@ -121,32 +122,40 @@ export function CompanyPanel() {
           </p>
         </Card>
 
-        <Card>
-          <div class="cap-head">
-            <div>
-              <div class="muted small">Liquidity ratio</div>
-              <div class="hero-number">{liq === null ? '—' : pct(Math.max(0, liq), 1)}</div>
+        {/* C3b: liquidity only matters while an older save still holds deposits or borrowing. */}
+        {(liq !== null || s.treasury.overnight > 0) && (
+          <Card>
+            <div class="cap-head">
+              <div>
+                <div class="muted small">Liquidity ratio</div>
+                <div class="hero-number">{liq === null ? '—' : pct(Math.max(0, liq), 1)}</div>
+              </div>
+              <Badge tone={liqStatus.tone}>{liqStatus.label}</Badge>
             </div>
-            <Badge tone={liqStatus.tone}>{liqStatus.label}</Badge>
-          </div>
-          <Row label="Target" value={pct(s.treasury.liqTarget, 1)} tone="dim" />
-          {s.treasury.overnight > 0 && (
-            <Row label="Overnight borrowing" value={money(s.treasury.overnight, sym)} tone="dim" />
-          )}
-          <p class="muted small cap-note">
-            Reserves and bonds as a share of deposits: the cash you can reach in a hurry.{' '}
-            {s.treasury.autoFunding
-              ? 'Auto-funding holds the target by borrowing overnight, so it looks after itself.'
-              : 'Auto-funding is off, so nothing tops it up when it slips.'}
-          </p>
-        </Card>
+            <Row label="Target" value={pct(s.treasury.liqTarget, 1)} tone="dim" />
+            {s.treasury.overnight > 0 && (
+              <Row
+                label="Overnight borrowing"
+                value={money(s.treasury.overnight, sym)}
+                tone="dim"
+              />
+            )}
+            <p class="muted small cap-note">
+              Reserves and bonds as a share of deposits: the cash you can reach in a hurry.{' '}
+              {s.treasury.autoFunding
+                ? 'Auto-funding holds the target by borrowing overnight, so it looks after itself.'
+                : 'Auto-funding is off, so nothing tops it up when it slips.'}
+            </p>
+          </Card>
+        )}
 
         <div>
           <SectionTitle>Totals</SectionTitle>
           <Card>
             <Row label="Assets" value={money(bs.assets, sym)} />
-            <Row label="Deposits" value={money(bs.deposits, sym)} />
-            <Row label="Loans" value={money(bs.loans, sym)} />
+            <Row label="ARR" value={money(companyArr(s), sym)} />
+            <Row label="Lending fund" value={money(s.treasury.reserves, sym)} />
+            <Row label="Loan Desk loans" value={money(bs.loans, sym)} />
             <Row label="Equity" value={money(bs.equity, sym)} strong />
           </Card>
         </div>

@@ -375,23 +375,23 @@ export function sumPnl(rows: BranchPnl[], weeks: number) {
   return { weeks: slice.length, revenue, income, expenses: revenue - income, lines };
 }
 
-/** SIMULATION §12 statement line groups. */
+/** SIMULATION §12 statement line groups (C3b: AI revenue lines and compute). */
 export const REVENUE_LINES: [BranchPnlLine, string][] = [
-  ['loanInterest', 'Loan interest'],
-  ['fundingCredit', 'Deposit funding credit'],
-  ['fees', 'Fees'],
-  ['wealthServices', 'Wealth & services'],
+  ['plans', 'Plans'],
+  ['api', 'API'],
+  ['apps', 'Apps & services'],
+  ['loanDesk', 'Loan Desk interest'],
+  ['otherIncome', 'Other income'],
 ];
 export const EXPENSE_LINES: [BranchPnlLine, string][] = [
-  ['depositInterest', 'Deposit interest'],
-  ['fundingCharge', 'Loan funding charge'],
+  ['compute', 'Compute'],
   ['losses', 'Loan losses'],
   ['staff', 'Staff'],
   ['manager', 'Manager'],
   ['rent', 'Rent'],
   ['marketing', 'Marketing'],
   ['equipment', 'Equipment & upkeep'],
-  ['servicing', 'Servicing & underwriting'],
+  ['servicing', 'Support & underwriting'],
   ['overhead', 'Overhead'],
 ];
 
