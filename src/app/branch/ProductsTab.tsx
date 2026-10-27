@@ -1,17 +1,18 @@
-// Branch Products tab (SCREENS §5.2): the house underwriting model (its radar,
+// Sales office Products tab (SCREENS §5.2): the house underwriting model (its radar,
 // cost per application and Manage models, which opens the HQ Products floor
 // or, without one, points to the credit bureaus), a category switch and one
-// card per product. Cards stack vertically rather than in a
-// carousel so every product's toggle and price stay visible on a phone.
+// card per product, plus "Set prices here" while HQ sets prices (C2d2). Cards
+// stack vertically so every product's toggle and price stay visible on a phone.
 import { useState } from 'preact/hooks';
 import { CITIES } from '../../data/cities';
 import type { CategoryId } from '../../data/types';
+import * as cmd from '../../sim/commands';
 import { theCountryName } from '../../sim/newsStory';
 import { allProducts } from '../../sim/products';
 import { activeModel } from '../../sim/underwriting';
 import type { Branch, GameState } from '../../sim/state';
-import { Card, Segmented } from '../components';
-import { openPanel, useGame } from '../store';
+import { Card, Segmented, Toggle } from '../components';
+import { act, openPanel, useGame } from '../store';
 import { hqDepts } from '../hq/officeSelectors';
 import { ModelRosette } from '../hq/products/ModelRosette';
 import { priceCountries } from '../hq/products/productSelectors';
@@ -59,7 +60,20 @@ export function ProductsTab(p: { branch: Branch; onLoanDesk: () => void }) {
       <div data-tutorial="product-category">
         <Segmented label="Product category" options={CATEGORIES} value={cat} onChange={setCat} />
       </div>
-      {s.company.applyRatesToAll && <p class="muted small">{hqPriceNotice(s, p.branch)}</p>}
+      {s.company.applyRatesToAll && (
+        <Card>
+          <Toggle
+            label="Set prices here"
+            hint={
+              p.branch.ownPrices
+                ? 'This office sets its own prices and lineup. Turn off to follow HQ again.'
+                : hqPriceNotice(s, p.branch)
+            }
+            checked={p.branch.ownPrices}
+            onChange={(v) => act(cmd.setOwnPrices, p.branch.id, v)}
+          />
+        </Card>
+      )}
       {p.branch.delegation.products && (
         <p class="muted small">Your manager sets products and prices here.</p>
       )}

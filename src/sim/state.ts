@@ -55,7 +55,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState } from './personalTypes';
 
-export const SCHEMA_VERSION = 4;
+export const SCHEMA_VERSION = 5;
 
 export interface GameState {
   schemaVersion: number;
@@ -447,6 +447,8 @@ export interface Branch {
   ratings: Ratings;
   reviewCards: ReviewCard[];
   offered: Record<string, { on: boolean; price: number }>;
+  /** Sets its own prices and lineup while HQ prices apply everywhere else (schema 5, stage C2d2). */
+  ownPrices: boolean;
   books: Record<string, Book>;
   campaigns: Record<string, number>;
   signupChurn: { mult: number; weeksLeft: number; weeksTotal: number };

@@ -272,7 +272,7 @@ Follows the brief's map structure (1–2 main offices worldwide, one sales offic
 - **C2c — Data centers: done (v0.1.7, schema 4).** A second building kind, on a free lot or a regional energy site, with GPU hall, power and cooling slots and an 8–16 week fit-out. In C2 it adds a Service (latency) lift to its city and nearby cities and counts toward milestones; its compute joins the pool in C4.
 - **C2d — Main offices and the screens**, in two parts:
   - **C2d1 — Screens: done (v0.1.8, no schema change).** "Branch" → "sales office" in every player-facing string (UI, news, incidents, tutorial, lessons, command errors; ids, CSS classes and save keys keep `branch`). Map layers Sales Offices (id `branches`), Data Centers and Energy Sites (16 layers).
-  - **C2d2 — Main offices and company-wide settings:** HQ as the first main office, at most a second in another country adding floors; company-wide prices and marketing at HQ with per-city overrides.
+  - **C2d2 — Main offices and company-wide settings: done (v0.1.9, schema 5).** At most two main offices (MAIN_OFFICES_MAX), the second in another country, adding floors; old saves keep extra offices. Company-wide HQ prices and lineup with a per-office **Set prices here** override (`Branch.ownPrices`). Marketing already had HQ brand campaigns with per-office campaigns on top. **C2 done.**
 - **Moved to C5:** the customer account screen (it needs the businesses and contracts built there).
 - **Accept (C2 as a whole):** a steady run opens several cities with one office each and grows them in size; the balance script stays inside the new targets.
 

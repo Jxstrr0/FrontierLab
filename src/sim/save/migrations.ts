@@ -37,6 +37,12 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     s.dataCenters ??= {};
     return s;
   },
+  // 4 → 5 (stage C2d2): every sales office follows HQ prices until told otherwise.
+  4: (s) => {
+    const branches = (s.branches ?? {}) as Record<string, Record<string, unknown>>;
+    for (const b of Object.values(branches)) b.ownPrices ??= false;
+    return s;
+  },
 };
 
 /** Upgrades a raw save to the current schema, or throws if it can't. */

@@ -60,14 +60,19 @@ export function churnGap(spec: ProductSpec, price: number, m: number): number {
   return Math.max(0, -competitiveness(spec, price, m));
 }
 
-/** The price a branch actually charges: the HQ price when Apply-to-all is on. */
+/** Whether HQ sets this office's prices and lineup: Apply-to-all on and no override (C2d2). */
+export function followsHq(state: GameState, branch: Branch): boolean {
+  return state.company.applyRatesToAll && !branch.ownPrices;
+}
+
+/** The price a branch actually charges: the HQ price when it follows HQ. */
 export function branchPrice(state: GameState, branch: Branch, productId: string): number {
   return basePrice(state, branch, productId) + incidentBoost(state, branch, productId);
 }
 
 /** The price the player (or the manager) set, before incident boosts. */
 export function basePrice(state: GameState, branch: Branch, productId: string): number {
-  if (state.company.applyRatesToAll) {
+  if (followsHq(state, branch)) {
     const p = companyPrice(state, branch.cityId, productId);
     if (p !== undefined) return p;
   }

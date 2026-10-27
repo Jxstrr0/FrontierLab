@@ -5,6 +5,7 @@ import {
   FEATURES,
   FLOOR_FITOUT,
   FLOOR_FITOUT_LIFE_WEEKS,
+  MAIN_OFFICES_MAX,
   SEVERANCE_WEEKS,
   WEEKS_PER_YEAR,
 } from '../../config/balance';
@@ -70,6 +71,21 @@ function fitFloor(state: GameState, office: Office, floor: number, dept: DeptId)
   if (dept === 'executive') refreshExecCandidates(state, true);
 }
 
+/**
+ * Why a new main office can't be leased in a city, or null (stage C2d2): at most
+ * MAIN_OFFICES_MAX buildings, and a second one must be in another country from
+ * the first. Saves from before the cap keep any extra offices they hold.
+ */
+export function mainOfficeBlocker(state: GameState, cityId: string): string | null {
+  const held = Object.values(state.offices);
+  if (held.length >= MAIN_OFFICES_MAX)
+    return `You can run ${MAIN_OFFICES_MAX} main offices at most. Add floors to one you have, or release one first.`;
+  const country = CITIES[cityId]?.country;
+  if (held.some((o) => CITIES[o.cityId]?.country === country))
+    return 'Your second main office has to be in another country.';
+  return null;
+}
+
 /** Leases a whole office building and fits out a floor for each chosen department. */
 export function leaseOffice(
   state: GameState,
@@ -81,6 +97,8 @@ export function leaseOffice(
   if (listing.officeId) return fail('You already lease this office.');
   if (listing.cityId !== state.world.currentCityId)
     return fail("You can only lease offices in the city you're in.");
+  const capped = mainOfficeBlocker(state, listing.cityId);
+  if (capped) return fail(capped);
   if (new Set(depts).size !== depts.length) return fail('Pick each department once.');
   if (depts.length > listing.floors) return fail(`This building has ${listing.floors} floors.`);
   const unavailable = depts.find((d) => !DEPARTMENTS[d] || !deptAvailable(d));

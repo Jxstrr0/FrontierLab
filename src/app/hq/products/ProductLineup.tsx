@@ -35,7 +35,7 @@ export function ProductLineup() {
           label="Apply rates to all sales offices"
           hint={
             on
-              ? 'HQ sets every sales office’s prices and lineup.'
+              ? 'HQ sets every sales office’s prices and lineup, except offices set to their own.'
               : 'Sales offices set their own prices. Turn on to set them here.'
           }
           checked={on}
@@ -53,7 +53,7 @@ export function ProductLineup() {
           <Row label={`${COUNTRIES[country].centralBank} policy rate`} value={pct(policy)} />
           <p class="muted small pf-note">
             {on
-              ? `Every sales office in ${theCountryName(country)} uses this list.`
+              ? `Every sales office in ${theCountryName(country)} uses this list unless it sets its own.`
               : `Showing your first sales office's prices in ${theCountryName(country)}.`}
           </p>
         </Card>
