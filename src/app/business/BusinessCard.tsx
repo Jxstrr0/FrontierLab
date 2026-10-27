@@ -4,18 +4,10 @@
 // anchor account.
 import { DAYS_PER_WEEK } from '../../config/balance';
 import type { Business, GameState } from '../../sim/state';
-import { PentagonRosette, type RosetteAxes } from '../branch/loandesk/PentagonRosette';
+import { PentagonRosette } from './PentagonRosette';
 import { Card, Row } from '../components';
 import { money, monthYear } from '../format/format';
 import { vendorName } from './businessView';
-
-const AXES: RosetteAxes = [
-  ['AI readiness'],
-  ['Budget'],
-  ['Data', 'sensitivity'],
-  ['Switching', 'cost'],
-  ['Financial', 'health'],
-];
 
 export function BusinessCard(p: { s: GameState; b: Business }) {
   const { s, b } = p;
@@ -33,7 +25,7 @@ export function BusinessCard(p: { s: GameState; b: Business }) {
           <Row label="Renews" value={monthYear(s.meta.startDate, b.renewalWeek * DAYS_PER_WEEK)} />
         )}
       </Card>
-      <PentagonRosette scores={b.pentagon} axes={AXES} label={`${b.name} profile`} />
+      <PentagonRosette scores={b.pentagon} label={`${b.name} profile`} />
     </div>
   );
 }

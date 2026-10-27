@@ -6,7 +6,7 @@ import { useState } from 'preact/hooks';
 import { DAYS_PER_WEEK } from '../../config/balance';
 import type { Startup } from '../../sim/state';
 import { sectorOf } from '../../sim/ventureModel';
-import { PentagonRosette, type RosetteAxes } from '../branch/loandesk/PentagonRosette';
+import { PentagonRosette, type RosetteAxes } from '../business/PentagonRosette';
 import { Card, Panel, Row, SectionTitle, Segmented, Portrait } from '../components';
 import { gameDate, money, pct } from '../format/format';
 import { closePanel, useGame } from '../store';
