@@ -29,3 +29,4 @@ export * from './franchise';
 export * from './tutorial';
 export * from './dev';
 export * from './dataCenters';
+export * from './training';

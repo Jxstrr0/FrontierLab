@@ -18,7 +18,7 @@ import { fail, ok, type CommandResult } from './result';
 export function activateModel(state: GameState, modelId: string): CommandResult {
   const u = state.underwriting;
   if (!u.models[modelId]) return fail('Unknown model.');
-  if (u.activeModelId === modelId) return fail("That's already your house model.");
+  if (u.activeModelId === modelId) return fail("That's already your AI model.");
   u.switching = { fromId: u.activeModelId, weeksLeft: MODEL_SWITCH_WEEKS };
   u.activeModelId = modelId;
   return ok();
@@ -34,7 +34,7 @@ export function buyBureauModel(
   if (!bureausIn(state.world.currentCityId).includes(pkg.bureau))
     return fail(`${pkg.bureau} has no office in this city.`);
   const u = state.underwriting;
-  if (u.activeModelId === pkg.id) return fail("That's already your house model.");
+  if (u.activeModelId === pkg.id) return fail("That's already your AI model.");
   u.models[pkg.id] ??= packagedModel(pkg.id);
   const r = activateModel(state, pkg.id);
   return r.ok ? ok({ modelId: pkg.id }) : r;

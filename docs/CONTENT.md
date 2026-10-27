@@ -388,6 +388,10 @@ Provider names (fictional GPU clouds): Northbeam Cloud · Halcyon Compute · Str
 - Sentinel Data: San Francisco, Frankfurt, Singapore.
 - TrueMark: every XL city plus Sydney.
 
+## 13b. Model names (C6b)
+
+Rival model families (one per lab, numbered by generation, starting at 2): Wren, Lantern, Cobalt, Kestrel, Fathom, Juniper, Halyard, Tessel, Sable, Quarry, Marlin, Ember. Your trained models take the name you give them (the strategies use "Gen N").
+
 ## 14. Employers (payroll partnerships)
 
 | Type | Employees | Income mult | Notes |

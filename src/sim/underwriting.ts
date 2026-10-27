@@ -18,6 +18,7 @@ import { BUREAU_PACKAGES, DATA_INPUTS } from '../data/bureaus';
 import type { Pentagon } from '../data/types';
 import { shortfall } from './hq';
 import { digitalBonus } from './products';
+import { frontierRise } from './rivalModels';
 import type { Business, GameState, UnderwritingModel } from './state';
 
 /** Radar index constants: Reasoning, Speed, Breadth, Safety, Efficiency. */
@@ -148,12 +149,20 @@ export function previewModel(
   };
 }
 
-/** Weekly: custom models track the Products team and Customer Feedback; a switch counts down. */
+/** Radar of a trained model now (C6b): its mix at today's Products team plus its lift, capped at 10. */
+export function trainedRadar(state: GameState, m: UnderwritingModel): Pentagon {
+  const base = customFigures(state, m.mix, 'custom').radar;
+  const lift = m.lift ?? [0, 0, 0, 0, 0];
+  return base.map((v, i) => Math.min(MODEL_RADAR_MAX, v + lift[i]!)) as Pentagon;
+}
+
+/** Weekly: custom and trained models track the Products team and Customer Feedback; a switch counts down. */
 export function updateModels(state: GameState): void {
   const u = state.underwriting;
   for (const m of Object.values(u.models)) {
-    if (m.source !== 'custom') continue;
-    m.radar = customFigures(state, m.mix, m.hostedBy ? 'hosted' : 'custom').radar;
+    if (m.source === 'trained') m.radar = trainedRadar(state, m);
+    else if (m.source === 'custom')
+      m.radar = customFigures(state, m.mix, m.hostedBy ? 'hosted' : 'custom').radar;
   }
   if (u.switching) {
     u.switching.weeksLeft -= 1;
@@ -208,22 +217,29 @@ export function inferenceMult(state: GameState): number {
   return 1 - e.efficiencySlope * (eff - e.efficiencyRef);
 }
 
-/** §16.7: price headroom, the market price multiplier customers accept, 1 + 0.04 × (quality − 5.8). */
+/**
+ * §16.12 (C6b): the quality bar a model is judged against, 5.8 plus 0.6 of
+ * how far the frontier (the best rival model) has risen since the game began.
+ */
+export function qualityBar(state: GameState): number {
+  return MODEL_EFFECTS.qualityRef + MODEL_EFFECTS.frontierWeight * frontierRise(state);
+}
+
+/** §16.7: price headroom, the market price multiplier customers accept, 1 + 0.04 × (quality − bar). */
 export function priceHeadroom(state: GameState): number {
-  const e = MODEL_EFFECTS;
   const q = modelQuality(activeModel(state));
-  return 1 + e.headroomSlope * (q - e.qualityRef);
+  return 1 + MODEL_EFFECTS.headroomSlope * (q - qualityBar(state));
 }
 
 /**
  * §11.3: the model's pull on a contract, added to win and keep chances:
- * 0.05 × (quality − 5.8) + 0.03 × (Safety − 5) × (Data sensitivity − 5) / 5.
+ * 0.05 × (quality − bar) + 0.03 × (Safety − 5) × (Data sensitivity − 5) / 5.
  */
 export function modelDealEdge(state: GameState, b: Business): number {
   const e = MODEL_EFFECTS;
   const m = activeModel(state);
   return (
-    e.dealQuality * (modelQuality(m) - e.qualityRef) +
+    e.dealQuality * (modelQuality(m) - qualityBar(state)) +
     (e.dealSafety * (m.radar[RADAR.safety] - 5) * (b.pentagon[2] - 5)) / 5
   );
 }

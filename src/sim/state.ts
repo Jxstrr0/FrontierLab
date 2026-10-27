@@ -57,7 +57,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState } from './personalTypes';
 
-export const SCHEMA_VERSION = 14;
+export const SCHEMA_VERSION = 15;
 
 export interface GameState {
   schemaVersion: number;
@@ -82,6 +82,8 @@ export interface GameState {
   people: People;
   products: ProductsState;
   underwriting: UnderwritingState;
+  /** Training runs and the frontier (stage C6b). */
+  training: TrainingState;
   treasury: Treasury;
   /** Open RFPs on the Deal Desk (stage C5b; schema 13). Contracts live on the businesses. */
   dealDesk: { rfps: Record<Id, Rfp> };
@@ -812,7 +814,8 @@ export interface ProductsState {
 export interface UnderwritingModel {
   id: Id;
   name: string;
-  source: 'bureau' | 'custom';
+  /** 'trained' is a model from a training run (C6b): its mix plus `lift`. */
+  source: 'bureau' | 'custom' | 'trained';
   /** Data vendor hosting a custom model (no Products floor needed, §16.7). */
   hostedBy?: string;
   mix: Record<string, number>;
@@ -820,6 +823,44 @@ export interface UnderwritingModel {
   radar: Pentagon;
   /** Data licence per customer a year (C6a; was cost per loan application). */
   costPerCustomer: Money;
+  /** Trained models: what training added to each radar value on top of the mix (C6b). */
+  lift?: Pentagon;
+  /** Trained models: the generation number and the week training finished. */
+  generation?: number;
+  trainedWeek?: Week;
+}
+
+/** A training run on the Products floor (C6b, SIMULATION §16.12). */
+export interface TrainingRun {
+  id: Id;
+  name: string;
+  /** The radar axis given extra weight (RADAR index 0–4). */
+  focus: number;
+  weeks: 4 | 8 | 12 | 24 | 48;
+  weeklyBudget: Money;
+  spent: Money;
+  /** Progress in nominal weeks; done at `weeks`. */
+  progress: number;
+  /** Star odds [1★..5★] fixed at the start. */
+  odds: number[];
+  startWeek: Week;
+}
+
+export interface TrainingState {
+  run?: TrainingRun;
+  /** Models trained so far. */
+  generation: number;
+  /** The best rival model's quality when the game began; the frontier rises from here (C6b). */
+  frontierBase: number;
+}
+
+/** A rival lab's current model (C6b). */
+export interface RivalModel {
+  name: string;
+  generation: number;
+  /** Mean radar quality, 1–10. */
+  quality: number;
+  releasedWeek: Week;
 }
 
 export interface UnderwritingState {
@@ -924,6 +965,8 @@ export interface RivalBank {
   sentiment: number;
   /** Last quarter's dividend per share (0 when it skipped one). */
   dps?: Money;
+  /** Its current AI model (C6b); set when it is founded, or at its first quarter. */
+  model?: RivalModel;
 }
 
 /** A rival lab's sales office: one per city (C2b), sized like yours. */

@@ -219,6 +219,7 @@ export function openInputs(s: GameState): string[] {
 
 export function modelSourceText(m: UnderwritingModel): string {
   if (m.source === 'bureau') return 'Data vendor package';
+  if (m.source === 'trained') return `Trained · Gen ${m.generation ?? 1}`;
   return m.hostedBy ? `Hosted by ${m.hostedBy}` : 'Built on the Products floor';
 }
 

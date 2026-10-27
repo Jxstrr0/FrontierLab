@@ -251,6 +251,46 @@ const BANK_TEMPLATES = {
       b: 'A {amount} capital injection shores up the balance sheet at the cost of {shares} new shares.',
     },
   ],
+  MODEL_TRAINED: [
+    {
+      h: '{bank} finishes training {name}',
+      b: 'The new model scores {score} on the benchmark board and is ready to switch on in Manage Models.',
+    },
+    {
+      h: 'Meet {name}, from {bank}',
+      b: 'After weeks on the cluster, {bank}’s latest model posts a {score} benchmark score.',
+    },
+  ],
+  MODEL_TRAINED_LEADS: [
+    {
+      h: '{name} tops the leaderboard',
+      b: '{bank}’s new model scores {score}, ahead of every rival lab’s release.',
+    },
+    {
+      h: '{bank} takes the top spot with {name}',
+      b: 'A {score} benchmark score puts the new model first on the board. Rival labs are expected to answer.',
+    },
+  ],
+  RIVAL_MODEL_RELEASED: [
+    {
+      h: '{bank} ships {model}',
+      b: 'The new release scores {score} on the benchmark board.',
+    },
+    {
+      h: 'New model from {bank}: {model}',
+      b: 'Early users report gains across the board; it scores {score}.',
+    },
+  ],
+  RIVAL_MODEL_LEADS: [
+    {
+      h: '{model} raises the bar',
+      b: '{bank}’s release scores {score}, the best rival model yet. Older models look tired next to it.',
+    },
+    {
+      h: '{bank} leads the board with {model}',
+      b: 'At {score}, the new release beats every model on the market. Customers will expect more for their money.',
+    },
+  ],
   PRODUCT_DEVELOPED: [
     {
       h: '{bank} launches {name}',

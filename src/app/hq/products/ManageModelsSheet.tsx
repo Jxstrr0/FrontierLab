@@ -67,7 +67,7 @@ export function ManageModelsSheet(p: { onClose: () => void }) {
                     aria-label={`Use ${m.name} as the lab's AI model`}
                     onClick={() => act(cmd.activateModel, m.id)}
                   >
-                    Use
+                    {m.source === 'trained' ? 'Use as AI model' : 'Use'}
                   </button>
                 )}
               </li>
