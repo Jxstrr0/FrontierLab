@@ -12,7 +12,7 @@ export interface EquipmentSpec {
   cost: number;
   /** Lobby: advisor offices. */
   advisorOffices?: number;
-  /** Teller line: stations and interactions per station per week. */
+  /** Sales desks (`teller` slot): stations and interactions per station per week. */
   stations?: number;
   perStation?: number;
   productivityCoins?: number;
@@ -88,7 +88,7 @@ export const EQUIPMENT: Record<string, EquipmentSpec> = {
     id: 'lob_comfort',
     slot: 'lobby',
     name: 'Comfort Lobby',
-    description: 'Soft seating and one advisor office.',
+    description: 'Soft seating and one meeting room.',
     quality: 2.5,
     cost: 145000,
     advisorOffices: 1,
@@ -96,8 +96,8 @@ export const EQUIPMENT: Record<string, EquipmentSpec> = {
   lob_advice: e({
     id: 'lob_advice',
     slot: 'lobby',
-    name: 'Advice Centre',
-    description: 'Two glass-walled advisor offices.',
+    name: 'Demo Lounge',
+    description: 'Two glass-walled meeting rooms.',
     quality: 3.5,
     cost: 220000,
     advisorOffices: 2,
@@ -105,8 +105,8 @@ export const EQUIPMENT: Record<string, EquipmentSpec> = {
   lob_marble: e({
     id: 'lob_marble',
     slot: 'lobby',
-    name: 'Marble Hall',
-    description: 'Marble floors and three private offices.',
+    name: 'Showcase Hall',
+    description: 'Marble floors and three private meeting rooms.',
     quality: 4.5,
     cost: 340000,
     advisorOffices: 3,
@@ -114,8 +114,8 @@ export const EQUIPMENT: Record<string, EquipmentSpec> = {
   lob_private: e({
     id: 'lob_private',
     slot: 'lobby',
-    name: 'Private Banking Suite',
-    description: 'Four suites for your best clients.',
+    name: 'Executive Briefing Suite',
+    description: 'Four briefing rooms for your biggest customers.',
     quality: 5.0,
     cost: 520000,
     advisorOffices: 4,
@@ -124,8 +124,8 @@ export const EQUIPMENT: Record<string, EquipmentSpec> = {
   tel_counter: e({
     id: 'tel_counter',
     slot: 'teller',
-    name: 'Two-Window Counter',
-    description: 'Two windows behind glass.',
+    name: 'Two-Seat Counter',
+    description: 'Two sales seats at a counter.',
     quality: 2,
     productivityCoins: 2,
     stations: 2,
@@ -135,8 +135,8 @@ export const EQUIPMENT: Record<string, EquipmentSpec> = {
   tel_standard: e({
     id: 'tel_standard',
     slot: 'teller',
-    name: 'Standard Teller Line',
-    description: 'Three stations and a queue.',
+    name: 'Standard Sales Floor',
+    description: 'Three sales desks and a queue.',
     quality: 3,
     productivityCoins: 3,
     stations: 3,
@@ -157,8 +157,8 @@ export const EQUIPMENT: Record<string, EquipmentSpec> = {
   tel_express: e({
     id: 'tel_express',
     slot: 'teller',
-    name: 'Express Line',
-    description: 'Five fast stations for quick visits.',
+    name: 'Express Desks',
+    description: 'Five quick desks for fast sign-ups.',
     quality: 3,
     productivityCoins: 5,
     stations: 5,
@@ -180,8 +180,8 @@ export const EQUIPMENT: Record<string, EquipmentSpec> = {
   vlt_safe: e({
     id: 'vlt_safe',
     slot: 'vault',
-    name: 'Back-Office Safe',
-    description: 'A heavy safe in the back room.',
+    name: 'Floor Rack',
+    description: 'One server rack in the back room.',
     quality: 1,
     security: 1,
     boxes: 0,
@@ -190,8 +190,8 @@ export const EQUIPMENT: Record<string, EquipmentSpec> = {
   vlt_steel: e({
     id: 'vlt_steel',
     slot: 'vault',
-    name: 'Steel Vault',
-    description: 'A walk-in vault with 150 boxes.',
+    name: 'Machine Room',
+    description: 'A small machine room with one rack.',
     quality: 3,
     security: 3,
     boxes: 150,
@@ -200,8 +200,8 @@ export const EQUIPMENT: Record<string, EquipmentSpec> = {
   vlt_timelock: e({
     id: 'vlt_timelock',
     slot: 'vault',
-    name: 'Time-Lock Vault',
-    description: 'A round door on a time lock, 300 boxes.',
+    name: 'Glazed Machine Room',
+    description: 'Two racks behind a glass wall.',
     quality: 4,
     security: 4,
     boxes: 300,
@@ -210,8 +210,8 @@ export const EQUIPMENT: Record<string, EquipmentSpec> = {
   vlt_fortress: e({
     id: 'vlt_fortress',
     slot: 'vault',
-    name: 'Fortress Vault',
-    description: 'Two-foot steel and 600 boxes.',
+    name: 'Showcase Machine Room',
+    description: 'Three racks behind a wide glass wall.',
     quality: 5,
     security: 5,
     boxes: 600,
@@ -221,8 +221,8 @@ export const EQUIPMENT: Record<string, EquipmentSpec> = {
   atm_none: e({
     id: 'atm_none',
     slot: 'atm',
-    name: 'No ATM',
-    description: 'Customers queue for cash.',
+    name: 'No Kiosk',
+    description: 'Customers wait for a desk.',
     quality: 0,
     atmProductivity: 0,
     cost: 0,
@@ -230,8 +230,8 @@ export const EQUIPMENT: Record<string, EquipmentSpec> = {
   atm_wall: e({
     id: 'atm_wall',
     slot: 'atm',
-    name: 'Wall ATM',
-    description: 'One machine in the wall.',
+    name: 'Wall Kiosk',
+    description: 'One demo screen in the wall.',
     quality: 2,
     atmProductivity: 120,
     cost: 14000,
@@ -239,8 +239,8 @@ export const EQUIPMENT: Record<string, EquipmentSpec> = {
   atm_dual: e({
     id: 'atm_dual',
     slot: 'atm',
-    name: 'Dual ATM',
-    description: 'Two machines side by side.',
+    name: 'Dual Kiosk',
+    description: 'Two demo screens side by side.',
     quality: 3,
     atmProductivity: 240,
     cost: 28000,
@@ -248,8 +248,8 @@ export const EQUIPMENT: Record<string, EquipmentSpec> = {
   atm_smart: e({
     id: 'atm_smart',
     slot: 'atm',
-    name: 'Smart ATM (deposits)',
-    description: 'Takes cheques and cash deposits.',
+    name: 'Self-Serve Kiosk',
+    description: 'Signs customers up on the spot.',
     quality: 4,
     atmProductivity: 300,
     cost: 46000,
@@ -257,7 +257,7 @@ export const EQUIPMENT: Record<string, EquipmentSpec> = {
   atm_lobby: e({
     id: 'atm_lobby',
     slot: 'atm',
-    name: '24/7 ATM Lobby',
+    name: '24/7 Demo Lobby',
     description: 'A lit vestibule open all night.',
     quality: 5,
     atmProductivity: 480,
