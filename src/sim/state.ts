@@ -101,7 +101,7 @@ export interface GameState {
   partnerships: Record<Id, Partnership>;
   /** Data-centre and power deals at regional energy sites (C8a, SIMULATION §13.7a). */
   powerDeals: Record<Id, PowerDeal>;
-  /** Business loans and lines of credit from rival banks (§19.9). */
+  /** Venture debt and credit lines from investment banks (§19.9). */
   corporateDebt: CorporateDebt;
   /** Open incidents, cooldowns and timed effects (§23). */
   incidents: IncidentsState;

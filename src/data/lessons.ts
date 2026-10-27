@@ -346,7 +346,7 @@ export const PLACE_TIPS: Record<string, TipText> = {
   },
   rivalHq: {
     title: 'Rival lab HQ',
-    line: 'A rival lab’s model, researchers and results. Rival labs also lend to us: business loans and a credit line, priced on our credit ratio, as corporate cash for building.',
+    line: 'A rival lab’s model, researchers, cities and results. Know who we are up against before we pick a fight.',
   },
   centralBank: {
     title: 'Central bank',
@@ -378,7 +378,7 @@ export const PLACE_TIPS: Record<string, TipText> = {
   },
   investmentBank: {
     title: 'Investment bank',
-    line: 'Trade shares and currencies here, raise capital by selling shares, and buy rival labs on the M&A tab.',
+    line: 'Trade shares and currencies here, raise capital by selling shares, borrow venture debt or draw a credit line on the Debt tab, and buy rival labs on the M&A tab.',
   },
   startup: {
     title: 'Startup',
