@@ -60,6 +60,7 @@ export function AddFloorSheet(p: { office: Office; onClose: () => void }) {
                 disabled={full || short}
                 aria-label={`Add a ${spec.name} floor`}
                 onClick={() => add(d)}
+                data-tutorial={d === 'risk' ? 'add-floor-risk' : undefined}
               >
                 Add
               </button>

@@ -14,16 +14,21 @@ Spend the boldness on the map and the illustrations, the way a banknote's engrav
 
 | Token | Hex | Use |
 |---|---|---|
-| `--vault` | #18233A | App background, panel base |
-| `--vault-deep` | #0F1828 | Headers, tab bar, modal scrim base |
-| `--vault-raised` | #22304A | Cards on navy |
-| `--ivory` | #EEE7D3 | Primary text on navy; newspaper paper |
-| `--ivory-dim` | #B9B3A2 | Secondary text |
+| `--vault` | #131D33 | App background, panel base (a deeper ink-navy since C8c) |
+| `--vault-deep` | #0A1222 | Headers, tab bar, modal scrim base |
+| `--vault-raised` | #1C2943 | Cards on navy |
+| `--vault-band` | #182540 | The advisor bar's band |
+| `--vault-pressed` | #263655 | A card or row being pressed |
+| `--ivory` | #ECE8DA | Primary text on navy; newspaper paper |
+| `--ivory-dim` | #B3B5AE | Secondary text |
 | `--brass` | #B8913D | Accent: buttons, coins, active tab, focus ring |
 | `--brass-light` | #D9BE7A | Hover/pressed, highlights, chart income bars |
 | `--jade` | #3E8A73 | Positive deltas, healthy states |
 | `--oxblood` | #9E3D3D | Negative deltas, warnings, counterfeit stamp |
-| `--paper` | #E3E9DF | Map paper (pale sage security paper) |
+| `--jade-text` / `--oxblood-text` | #6CC3A6 / #E07A7A | Jade and oxblood as text on navy |
+| `--signal` | #3AAFBF | The AI accent (C8c): live compute only, as a fill or line (rack and status lights, glowing screens, info badges). Small and sparing; brass stays the lead |
+| `--signal-text` | #6FD0DB | The signal as text on navy |
+| `--paper` | #DFE7E7 | Map paper (pale blue-grey security paper, cooler since C8c) |
 
 **City inks.** Each city's map is printed in its own ink, like a banknote denomination. Use the ink for linework, with 3 hatch densities derived from it.
 
@@ -55,7 +60,7 @@ Spend the boldness on the map and the illustrations, the way a banknote's engrav
 
 The brand ink is the sixth wash: awning stripes, the tympanum of the Classic Columns pediment, the canopy of the Modern Glass front and the spandrels and crown of the Deco tower take it, so your colour shows on the building itself and not only on the flag and the door.
 
-**Contrast:** text on `--vault` must reach WCAG AA. `--ivory` on `--vault` ≈ 12:1. `--ivory-dim` is for ≥ 14 px text only.
+**Contrast:** text on `--vault` must reach WCAG AA. Measured on #131D33: `--ivory` 13.7:1, `--ivory-dim` 8.1:1, `--brass` 5.7:1, `--jade-text` 8.0:1, `--oxblood-text` 5.8:1, `--signal-text` 9.4:1; brass on `--vault-raised` 4.9:1 and `--vault-deep` on a brass button 6.4:1. `--ivory-dim` is for ≥ 14 px text only. UI CSS takes every colour from these tokens; no hex values in component styles.
 
 ### 1.2 Type
 - **Display:** Bodoni Moda (@fontsource/bodoni-moda), weights 500/700/900. Used for panel titles, big hero numbers (≥ 28 px), the Ledger masthead and headlines, and the title logo. It uses lining figures.
@@ -103,6 +108,8 @@ The brand ink is the sixth wash: awning stripes, the tympanum of the Classic Col
 - **Parks:** stipple dots plus lollipop trees drawn with spiral strokes.
 - **Streets:** paper-coloured, with dashed centrelines in the ink at 30%.
 - **Your branches** add a small brand-ink flag on the roof.
+- **Data centers** (C8c, `src/art/buildingsDataCenter.ts`): a low, wide engraved hall instead of a storefront, about 1.2–1.5 storeys with a long parapet roofline, precast wall panels (ribs), a dense louvre band under the parapet, a loading door on the lit face, and a row of rooftop chillers with fan rings (round vents at close zoom). A small fenced substation yard with two transformers sits in front of it, and your brand flag stands on the roof.
+- **Energy sites** draw a substation yard (fence, three transformers with bushings, a lattice pylon with cross-arms) beside a small control house; once you build a data center there, the hall replaces the control house. Both looks come only from the tile's art seed and stay inside the tile's draw bounds (tested), so chunk pre-rendering is unchanged; a build only repaints the chunks that tile touches.
 - **Pins** (DOM; SCREENS §2). Silhouette first, then colour, then glyph, so a pin reads at a glance and without relying on hue:
   - **Crest** (shield): banks. Yours filled with your brand ink and monogram; rivals ivory with their ink ring and monogram; head offices add a brass crown.
   - **Coin**: open branch locations. A small ivory "$" coin with a milled edge at close zoom; nearer out, a quiet brass dot on the roof with no stem.
@@ -163,12 +170,15 @@ The title screen leads with the map, the game's boldest art ("Living skyline", d
   - Workers sit at screens facing away from the viewer, each with their own hair and desk clutter, tinted by team mood; empty desks are dashed with the chair pushed in.
   - Each department furnishes its floor: Finance cabinets and certificates, HR a water cooler and pinboard, Products a whiteboard sketch, Treasury and IT a live ticker (IT also blinking server racks), Marketing posters and an easel, Risk a safe and a chart, the Executive suite books, a sofa, a painting and a huddle table.
   - Busy floors come alive: someone walks the front aisle with a folder, two colleagues chat at the back, and a well-staffed floor's huddle table has people at it.
-- **Branch interior** (the Inside view on a branch or the build preview): an isometric cut-away banking hall drawn from the fit-out.
+- **Data center** (C8c, the hero on the data center panel and the build preview, with an Outside / Inside toggle):
+  - **Exterior** (`dataCenter/DataCenterArt.tsx`): a low precast hall that widens with the hall size (a split line on twin halls, a second hall behind a campus), a louvre band, a glazed entrance with a brand-ink canopy and your seal, roller doors, and rooftop units by cooling (air: fan rings; liquid: dry coolers and a pipe run; immersion: three low units). A fenced transformer yard stands to the left; at an energy site a pylon and faint wind turbines behind it. During fit-out a crane lowers the last chiller.
+  - **GPU hall interior** (`dataCenter/GpuHallArt.tsx`): an isometric cut-away on a raised tile floor with no windows. Rows of rack cabinets (2×6, 3×7 or 3×9 by hall) under a ladder cable tray; lit racks show running GPUs with signal-cyan lights, idle racks stay dark and dense, so the share running reads at a glance (the caption says "X of Y GPUs running"). Cooling dresses the room (air grilles and a CRAH unit, liquid hoses and pipes, or immersion tanks instead of racks), and the switchgear on the left wall grows with the power option. A technician walks the front aisle; fit-out shows dashed empty rack outlines and a ladder.
+- **Sales office interior** (the Inside view on a sales office or the build preview; re-skinned from the bank's hall in C8c): an isometric cut-away lab storefront and workspace drawn from the fit-out.
   - The teller line takes its option's shape: a glazed counter (Two-Window, Standard), an open express counter, separate service pods, or concierge desks with seated staff and clients.
   - The lobby sets the floor (tiles, planks, carpet, a marble checker) and the number of glass advisor offices along the left wall.
-  - The vault sits on the back wall in its style (steel door; round time-lock with a dial; fortress door with bolts) beside a safe-deposit wall that grows with the box count, or a strongbox for the back-office safe. ATMs stand by the left wall, and the bank's monogram plaque hangs over the counter in the brand ink.
+  - The secure-room option puts a machine room on the back wall (one rack cabinet; a glazed room of two racks with a badge reader; a wider glazed room of three) beside a wall of server units that grows with the box count, or a single floor-standing rack for the back-office option. Demo kiosks with a chat screen stand by the left wall, and the lab's monogram plaque hangs over the counter in the brand ink. The build options keep their ids (`vlt_*`, `atm_*`), so saves are unaffected.
   - Live figures fill it: tellers first, then advisors, then a greeter, tinted by staff morale, and a queue as long as the wait behind brass posts and a rope, with a sofa of waiting customers when it is busy. A branch in fit-out shows a ladder and boxes and nobody inside.
-- **Interior motion:** quiet and small. People breathe and type (under a pixel), screens flicker, IT lights blink, plants sway, clock hands turn, and a walker or arriving customer crosses the room. All of it stops with reduced motion (system or in-game setting).
+- **Interior motion:** quiet and small. People breathe and type (under a pixel), screens flicker, rack and IT lights blink in `--signal`, plants sway, clock hands turn, and a walker or arriving customer crosses the room. All of it stops with reduced motion (system or in-game setting).
 - **Other buildings:** one composition each — investment bank (trading floor), central bank (dome and steps), credit bureau (server racks and filing cabinets), airport (terminal and tail fins), auction house (gallery with podium), car dealer (showroom), convention (hall with booths), university (quad), employer (by type), stadium.
 - **Products, campaigns and benefits:** small spot illustrations (80×80) in a single ink.
 
@@ -214,8 +224,9 @@ The title screen leads with the map, the game's boldest art ("Living skyline", d
 ## 7. Icons
 
 - **Style:** custom set on a 24 px grid, 1.5 px stroke, rounded caps and joins. Drawn in brass on navy and ink on ivory, and ivory on the type inks in map pins (§2).
-- **Distinct at a glance:** no two glyphs share a silhouette at 20 px (credit bureau = score dial, lobbying firm = podium with microphone, convention = lanyard badge, vacation home = palm on an island).
-- **Starter list:** branch, office, real estate, bureau, bank, investment bank, agency, convention, lobby, stadium, car, gavel, university, employer, airport, plane, coin, vault, ATM, teller, chart, shield, warning, person, people, settings, save, menu, layers, close, pause, play, fast, trade, handshake, key, leaf.
+- **Distinct at a glance:** no two glyphs share a silhouette at 20 px (data vendor = database cylinder, rival lab = shopfront with a beacon mast, lobbying firm = podium with microphone, convention = lanyard badge, vacation home = palm on an island).
+- **AI re-skin (C8c), ids kept:** `branch` is a shopfront with a scalloped awning (sales office), `bureau` a database (data vendor), `bank` a rival lab with a beacon mast, `vault` a lockable rack cabinet, `atm` a kiosk with a chat screen, `teller` a counter with a person. New: `gpu` (a chip with pins; the Compute floor tab) and `model` (a radar rosette; the Products floor tab).
+- **Starter list:** gpu, model, branch, office, real estate, bureau, bank, investment bank, agency, convention, lobby, stadium, car, gavel, university, employer, airport, plane, coin, vault, ATM, teller, chart, shield, warning, person, people, settings, save, menu, layers, close, pause, play, fast, trade, handshake, key, leaf.
 
 ## 8. Sound (optional, Stage 10)
 - coin clink on positive weekly results
@@ -235,6 +246,6 @@ Keep everything under 30 KB each, off by default on first launch, and toggleable
 **Don't:**
 - use browns or coffee palettes
 - copy the original's icons or layouts pixel-for-pixel
-- use drop-shadowed SaaS cards, gradients or neon accents
+- use drop-shadowed SaaS cards, gradients or neon accents (the one cool `--signal` accent is for small status lights and screens only, never large fills or glows)
 - use all-caps eyebrow labels
 - use generic stock illustrations

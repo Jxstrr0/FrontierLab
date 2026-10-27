@@ -46,7 +46,7 @@ export function observe(
 }
 
 /**
- * The guide (DESIGN §5.20: the first branch manager): your first branch's
+ * The guide (DESIGN §5.20: the first office manager): your first office's
  * manager once hired, else the first candidate in this city's pool.
  */
 export function guideOf(s: GameState): Manager | undefined {
@@ -86,6 +86,9 @@ export function observeLessons(
     cityCovered: FEATURES.multiCity && cover.ours > 0 && cover.full,
     flights: s.world.travel.flights,
     personalCash: FEATURES.personalEmpire ? s.personal.cash : 0,
+    computeShort:
+      s.compute.crunchWeeks > 0 || s.compute.outageWeeksLeft > 0 || s.compute.burstStigmaWeeks > 0,
+    trainingStarted: !!s.training.run || s.training.generation > 0,
   };
 }
 

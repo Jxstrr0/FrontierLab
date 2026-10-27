@@ -155,7 +155,7 @@
   border: 1px dashed var(--oxblood);
   border-radius: var(--radius-pill);
   font-size: var(--text-12);
-  color: #e07a7a;
+  color: var(--oxblood-text);
 }
 
 /* ─── HR benefits ──────────────────────────────────────────────────────── */

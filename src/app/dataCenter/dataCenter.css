@@ -8,3 +8,25 @@
   border-color: var(--brass-light);
   opacity: 1;
 }
+
+/* The hero's Outside / Inside switch (C8c), as on a sales office. */
+.dc-hero {
+  position: relative;
+}
+.dc-hero-toggle {
+  position: absolute;
+  right: var(--space-3);
+  bottom: var(--space-3);
+  min-height: var(--tap-min);
+  min-width: 88px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--brass);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--ivory) 90%, transparent);
+  color: var(--vault-deep);
+  font: 600 var(--text-14) / 1 var(--font-ui);
+  cursor: pointer;
+}
+.dc-hero-toggle:active {
+  background: var(--ivory);
+}

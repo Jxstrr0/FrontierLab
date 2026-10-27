@@ -4,14 +4,20 @@
 import type { CityMap } from './citygen';
 
 /**
- * Who occupies a storefront lot (or leases an office building), for roof flags
- * and awnings. A 'business' (stage C5a) wears its AI vendor's awning: a rival
- * lab's ink or your brand ink once you win the contract.
+ * Who occupies a storefront lot (or leases an office building, or stands at a
+ * site), for roof flags and awnings. A 'business' (stage C5a) wears its AI
+ * vendor's awning: a rival lab's ink or your brand ink once you win the
+ * contract. A 'site' is a place drawn as its own kind of building (C8c).
  */
 export interface LotOccupant {
-  type: 'player' | 'rival' | 'business';
-  /** Brand ink of the occupying lab, or of the business's vendor. */
+  type: 'player' | 'rival' | 'business' | 'site';
+  /** Brand ink of the occupying lab, or of the business's vendor ('' for a site). */
   ink: string;
+  /**
+   * What stands there in place of the tile's usual building (C8c): your data
+   * center's low hall, or an energy site's substation yard.
+   */
+  building?: 'dataCenter' | 'energySite';
 }
 
 export interface MapStyle {

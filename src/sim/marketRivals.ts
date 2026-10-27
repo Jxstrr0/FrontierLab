@@ -1,18 +1,20 @@
-// Rival bank shares (SIMULATION §19.5 applied to rivals, §18.1): a listed
-// rival's price follows book value per share × clamp(ROE_ttm / COE) × a
-// mean-reverting sentiment that also carries the banking sector's weekly
+// Rival lab shares (SIMULATION §19.5 applied to rivals, §18.1; stage C8d): a
+// listed rival's price follows its revenue × the §19.2 multiple (growth and its
+// model's lead over the bar), never below book, × a mean-reverting sentiment that also carries the banking sector's weekly
 // shock, eased in with an EMA plus noise; quarterly earnings growth nudges
 // sentiment. A private rival is priced at book every week and a seized one is
 // worth nothing. Randomness from the `market` stream.
-import { COE, PUBLIC_PRICE, QUARTERS_PER_YEAR, WEEKS_PER_YEAR } from '../config/balance';
+import { PUBLIC_PRICE, QUARTERS_PER_YEAR, WEEKS_PER_YEAR } from '../config/balance';
 import { CITIES } from '../data/cities';
 import { SECTOR_BETA, SECTOR_MU } from '../data/stocks';
 import type { Phase } from '../data/types';
 import { clampSentiment, earningsShock, walkSentiment } from './equityModel';
-import { clamp, ema } from './math';
+import { ema } from './math';
 import { recordClose } from './marketStocks';
 import type { Rng } from './rng';
 import type { GameState, RivalBank } from './state';
+import { qualityBar } from './underwriting';
+import { multipleFor, quarterlyGrowth } from './valuation';
 
 /** Trailing four quarters' net income, annualised when fewer have been reported. */
 export function rivalNetIncomeTtm(bank: RivalBank): number {
@@ -26,15 +28,28 @@ export function rivalBookPerShare(bank: RivalBank): number {
   return Math.max(0, bank.equity) / Math.max(1, bank.shares);
 }
 
+/** Trailing four quarters' revenue, annualised when fewer have been reported. */
+export function rivalRevenueTtm(bank: RivalBank): number {
+  const recent = bank.quarters.slice(-QUARTERS_PER_YEAR);
+  if (recent.length === 0) return 0;
+  return (recent.reduce((x, q) => x + q.revenue, 0) * QUARTERS_PER_YEAR) / recent.length;
+}
+
+/** The rival's model quality over today's bar (0 without a model). */
+export function rivalModelLead(state: GameState, bank: RivalBank): number {
+  return bank.model ? bank.model.quality - qualityBar(state) : 0;
+}
+
 /**
- * §19.5 without the IR penalty: BVPS × clamp(ROE_ttm / COE, 0.3, 3) × sentiment.
- * Before a rival's first report the market assumes it earns its cost of equity
- * (trades at book), rather than reading the empty record as zero earnings.
+ * §19.2 and §19.5 without the IR penalty: max(BVPS, revenue_ttm × multiple ÷
+ * shares) × sentiment. Before a rival's first report it trades at book.
  */
-export function rivalTargetPrice(bank: RivalBank): number {
-  const roe =
-    bank.quarters.length === 0 ? COE : bank.equity > 0 ? rivalNetIncomeTtm(bank) / bank.equity : 0;
-  return rivalBookPerShare(bank) * clamp(roe / COE, ...PUBLIC_PRICE.roeClamp) * bank.sentiment;
+export function rivalTargetPrice(bank: RivalBank, lead = 0): number {
+  const book = rivalBookPerShare(bank);
+  if (bank.quarters.length === 0) return book * bank.sentiment;
+  const multiple = multipleFor(quarterlyGrowth(bank.quarters), lead);
+  const byRevenue = (rivalRevenueTtm(bank) * multiple) / Math.max(1, bank.shares);
+  return Math.max(book, byRevenue) * bank.sentiment;
 }
 
 /** The phase of the rival's home country (its first city), or the fallback. */
@@ -74,7 +89,8 @@ export function priceRivalShares(state: GameState, rng: Rng, phase: Phase, shock
     const noise = rng.normal(0, PUBLIC_PRICE.noise);
     bank.price = Math.max(
       0,
-      ema(bank.price, rivalTargetPrice(bank), PUBLIC_PRICE.ema) * (1 + noise),
+      ema(bank.price, rivalTargetPrice(bank, rivalModelLead(state, bank)), PUBLIC_PRICE.ema) *
+        (1 + noise),
     );
     recordClose(bank, bank.price);
   }
