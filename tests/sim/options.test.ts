@@ -4,6 +4,7 @@ import { advanceWeeks } from '../../src/sim/engine';
 import { companyArr } from '../../src/sim/arr';
 import { creditAvailable, lendersNearYou } from '../../src/sim/corporateDebt';
 import { newGame, type NewGameOptions } from '../../src/sim/newGame';
+import { officeContractArr } from '../../src/sim/contracts';
 import { openScriptedBranch } from '../helpers/scenario';
 
 const base: NewGameOptions = { seed: 7, cityId: 'cal' };
@@ -12,7 +13,10 @@ function arrAfter(opts: Partial<NewGameOptions>, weeks: number): number {
   const s = newGame({ ...base, ...opts });
   openScriptedBranch(s, 'midtown');
   advanceWeeks(s, weeks);
-  return companyArr(s);
+  // Difficulty scales customer demand; a few lumpy enterprise contracts (C5b)
+  // would drown that out, so they are left out.
+  const contracts = Object.keys(s.branches).reduce((t, id) => t + officeContractArr(s, id), 0);
+  return companyArr(s) - contracts;
 }
 
 describe('new game options', () => {

@@ -75,12 +75,7 @@ const clampChance = (p: number) => clamp(p, DEAL.winClamp[0], DEAL.winClamp[1]);
  * renewal) the incumbent's stars count and Switching cost works against you;
  * otherwise the best rival in the city is the competition.
  */
-export function winChance(
-  state: GameState,
-  branch: Branch,
-  b: Business,
-  discount: number,
-): number {
+export function winChance(state: GameState, branch: Branch, b: Business, discount: number): number {
   const incumbent = incumbentStars(state, b);
   const rival = incumbent ?? bestRival(state, b.cityId)?.stars;
   let p = DEAL.winBase + DEAL.discountSlope * discount;

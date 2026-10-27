@@ -54,7 +54,7 @@ export function incomeStatement(snaps: WeeklySnapshot[]): StatementLine[] {
     { label: 'Gross profit', value: x.grossProfit, kind: 'total' },
     { label: 'Operating expenses', value: -(x.opex - x.compute) },
     ...optional('Interest expense', -x.interestExpense),
-    { label: 'Loan losses', value: -x.loanLosses },
+    { label: 'Bad debts', value: -x.loanLosses },
     { label: 'Depreciation', value: -x.depreciation },
     { label: 'Pre-tax income', value: x.preTax, kind: 'total' },
     { label: 'Tax', value: -x.tax },
@@ -84,7 +84,7 @@ export function balanceSheetLines(s: GameState): StatementLine[] {
   return [
     { label: 'Cash', value: b.cash, kind: 'sub' },
     ...optional('Treasury reserves', b.reserves),
-    ...optional('Loan Desk loans', b.loans),
+    ...optional('Loans', b.loans),
     ...optional('Stocks', b.investments),
     ...optional('Ventures', b.ventures),
     ...optional('Compute credits', b.ventureDebt),

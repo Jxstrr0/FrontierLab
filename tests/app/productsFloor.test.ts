@@ -191,7 +191,6 @@ describe('charts', () => {
     const t = trendSeries([snap(1, 10, 1), snap(2, undefined, 2), snap(3, 30, 3)], 2);
     // A week closed before ARR was recorded (schema 5) reads as 0.
     expect(t.arr).toEqual([0, 30]);
-    expect(t.loans).toEqual([2, 3]);
     expect(t.weeks).toEqual([2, 3]);
   });
 

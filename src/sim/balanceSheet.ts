@@ -1,7 +1,7 @@
 // The company balance sheet (SIMULATION §14.4), computed from state on demand.
 // Equity is assets minus liabilities; `expectedEquity` rolls paid-in capital,
 // retained earnings and AOCI forward, and the two must agree (balance identity).
-import { isDeposit, isLoan, PRODUCTS } from '../data/products';
+import { isDeposit, isLoan } from '../data/products';
 import { totalWholesale } from './fundingLots';
 import { summarize } from './ledger';
 import { fxValue } from './fx';

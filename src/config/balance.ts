@@ -457,7 +457,7 @@ export const INTERCHANGE = 0.015;
 /** Enterprise contracts with the businesses on the map (SIMULATION §11). */
 export const DEAL = {
   /** Weekly chance an unserved business asks your office for a proposal, before awareness and readiness. */
-  rfpWeekly: 0.04,
+  rfpWeekly: 0.07,
   /** RFP odds × (1 + readinessSlope × (AI readiness − 5)). */
   readinessSlope: 0.12,
   /** A new RFP waits this many weeks for your bid. */

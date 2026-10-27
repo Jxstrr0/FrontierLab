@@ -383,7 +383,8 @@ function sectorWord(id: unknown): string {
 /** Why a contract ended, as the end of a sentence. */
 function lossWhy(reason: string, to: string): string {
   if (reason === 'failed') return 'ended when the business closed its doors';
-  if (reason === 'outage') return to ? `walked to ${to} after this week’s outage` : 'walked after this week’s outage';
+  if (reason === 'outage')
+    return to ? `walked to ${to} after this week’s outage` : 'walked after this week’s outage';
   if (reason === 'office') return 'ended when the local sales office closed';
   return to ? `went to ${to} at its renewal` : 'was not renewed';
 }
