@@ -4,6 +4,7 @@
 // floor at HQ. Also the COO's growth cities and "Open a branch now" (§17.2),
 // and the delegation dials: pay review cadence, morale target, brand target.
 import {
+  CPO_TRAINING,
   CTO_COMPUTE,
   EXEC_DELEGATION,
   EXEC_PAY,
@@ -26,7 +27,7 @@ import { payReviewsOn, runPayReview } from '../payReviews';
 import { spend } from '../ledger';
 import { roundToStep } from '../math';
 import type { EquityGrant, ExecSeat, Executive, GameState } from '../state';
-import type { PayReviewCadence } from '../marketsTypes';
+import type { PayReviewCadence, TrainingStyle } from '../marketsTypes';
 import { fail, money, ok, type CommandResult } from './result';
 
 const NO_FLOOR = 'Executives work from the Executive floor. Add one at HQ first.';
@@ -161,6 +162,13 @@ export function setComputeCover(state: GameState, cover: number): CommandResult 
   if (match === undefined)
     return fail(`Pick a cover of ${stops.map((t) => `${Math.round(t * 100)}%`).join(', ')}.`);
   state.executives.computeCover = match;
+  return ok();
+}
+
+/** How the CPO's Routine training runs trade quality for quantity (a key of CPO_TRAINING.styles). */
+export function setTrainingStyle(state: GameState, style: TrainingStyle): CommandResult {
+  if (!(style in CPO_TRAINING.styles)) return fail('Pick Quantity, Balanced or Quality.');
+  state.executives.trainingStyle = style;
   return ok();
 }
 
