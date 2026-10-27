@@ -4,6 +4,7 @@ import { DEV_TERMS, MODEL_NAME_MAX, TRAINING } from '../../config/balance';
 import type { DevTerm } from '../development';
 import { newId } from '../ids';
 import { roundToStep } from '../math';
+import { pauseBlock } from '../safety';
 import type { GameState } from '../state';
 import { trainingOdds } from '../training';
 import { fail, money, ok, type CommandResult } from './result';
@@ -22,6 +23,8 @@ export function startTrainingRun(
 ): CommandResult<{ runId: string; odds: number[] }> {
   if (!state.departments.products) return fail('Training runs need a Products floor at HQ.');
   if (state.training.run) return fail('A training run is already under way.');
+  const paused = pauseBlock(state);
+  if (paused) return fail(paused);
   const name = input.name.trim();
   if (!name) return fail('Give the new model a name.');
   if (name.length > MODEL_NAME_MAX) return fail(`Names can be up to ${MODEL_NAME_MAX} characters.`);

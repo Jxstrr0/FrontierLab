@@ -128,3 +128,8 @@ export function percentText(v: number): string {
 export function capitalRatioText(ratio: number): string {
   return ratio > 1 ? '100%+' : pct(ratio, 1);
 }
+
+/** A safety ratio as a whole percent: 0.963 → "96%". */
+export function safetyRatioText(ratio: number): string {
+  return `${Math.round(ratio * 100)}%`;
+}

@@ -224,7 +224,7 @@
   border-top: 1px solid var(--hairline);
 }
 
-/* ─── How to fix a weak capital ratio ──────────────────────────────────── */
+/* ─── How to fix a weak safety ratio ──────────────────────────────────── */
 .cap-fixes {
   margin-top: var(--space-3);
   padding: var(--space-3);
@@ -312,4 +312,25 @@
 }
 .attn-more {
   margin: var(--space-2) 0 0;
+}
+
+/* ─── Pause and strict-watch notice (C7a) ──────────────────────────────── */
+.safety-notice {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border-radius: var(--radius-card);
+  border: 1px solid currentColor;
+  font-size: 0.875rem;
+  margin-top: var(--space-3);
+}
+.safety-notice.is-pause {
+  color: var(--oxblood-text);
+}
+.safety-notice.is-watch {
+  color: var(--brass);
+}
+.safety-notice span {
+  color: inherit;
 }

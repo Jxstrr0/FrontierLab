@@ -3,7 +3,7 @@
 // building, in any city, at its asking price (which the seller always takes).
 // It picks the listing with the best net yield (a year's rent less upkeep at
 // the rent the chief would set, ÷ asking) that the budget allows:
-//   bank: never at a restricted capital tier; its buildings stay under
+//   bank: never at a restricted safety tier; its buildings stay under
 //         buyAssetCap of total assets; the capital ratio stays at or above
 //         buyMinCr after the purchase; expansionReserveWeeks of costs stay in cash
 //   you:  keeps buyReserveYears of CEO salary; a building costs at most

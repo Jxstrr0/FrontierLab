@@ -167,8 +167,9 @@ describe('CFO capital', () => {
     );
     expect(identityGap(steered)).toBeLessThan(1);
 
+    // Since C7a the regulator no longer takes over a lab short of capital
+    // (only safety can cost the licence, and never the game).
     advanceWeeks(adrift, 48);
-    // Takeover or insolvency, whichever comes first: this lab is short of both.
-    expect(['takeover', 'insolvency']).toContain(adrift.flags.gameOver);
+    expect(adrift.flags.gameOver).not.toBe('takeover');
   });
 });

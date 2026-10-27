@@ -17,11 +17,11 @@ import { takeLot } from '../ventureRounds';
 import { accountCash } from './markets';
 import { fail, money, ok, type CommandResult } from './result';
 
-/** Why the company's capital tier forbids new investments, if it does. */
+/** Why the company's safety tier forbids new investments, if it does. */
 export function ventureTierBlock(state: GameState): string | undefined {
   const tier = state.company.tier;
   if (tier === 'restricted' || tier === 'critical')
-    return `The regulator won't allow new investments at the ${tier} capital tier.`;
+    return `The regulator won't allow new investments at the ${tier} safety tier.`;
   return undefined;
 }
 

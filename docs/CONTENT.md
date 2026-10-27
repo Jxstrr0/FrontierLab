@@ -294,7 +294,7 @@ Content trim (2026-10-25): each campaign now has its own job. Coffee & Live Demo
 | treasury | 24 | 95,000 | 1 + 1 per $1B (deposits + wholesale) | funding spread +(1 − k′) × 0.50%; fewer market offers |
 | marketing | 24 | 72,000 | 1 + 0.15 × branches + 2 per active brand campaign | all campaign effects ×(0.5 + 0.5k′) |
 | it | 24 | 98,000 | 2 + 0.25 × branches + 1 per $5B assets | app rating target ×k′; breach and outage odds ×(1 + 2(1 − k′)) |
-| risk | 24 | 88,000 | 2 + 0.15 × branches + 1 per $750M loans | PD ×(1 + 1.5(1 − k′)); fine odds ×(1 + 3(1 − k′)); weaker loan estimates |
+| risk | 24 | 88,000 | 2 + 0.15 × branches + 1 per $50M of ARR (C7a) | Sets the safety ratio's strength (SIMULATION §15); audit odds ×(1 + 3(1 − k′)); PD ×(1 + 1.5(1 − k′)) |
 | executive | 8 (suite) | (per exec) | — | enables executives: COO, CFO, CPO, CMO, CTO, CSO, CIO |
 | investment | 32 | 120,000 | optional | ventures shown = 1 + floor(staff / 4), max 8 |
 

@@ -11,6 +11,7 @@ import { migrateCompute } from './migrateCompute';
 import { migrateGpuLots } from './migrateGpuLots';
 import { migrateBusinesses } from './migrateBusinesses';
 import { migrateModel } from './migrateModel';
+import { migrateSafety } from './migrateSafety';
 import { migrateTalent } from './migrateTalent';
 import { migrateTraining } from './migrateTraining';
 import { migrateDealDesk } from './migrateDealDesk';
@@ -105,6 +106,10 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
   },
   15: (s) => {
     migrateTalent(s as unknown as GameState);
+    return s;
+  },
+  16: (s) => {
+    migrateSafety(s as unknown as GameState);
     return s;
   },
 };

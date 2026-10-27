@@ -55,7 +55,7 @@ Wealth · Company · Branches · Portfolio · The Ledger (archive) · Milestones
 | `Donut` | Engraved ring segments with a legend. |
 | `Carousel` | Horizontal snap with page dots, as in the original. |
 | `Card` | Certificate-style card: double hairline and corner rosettes. |
-| `Badge` | Capital tier, risk band, status. |
+| `Badge` | Safety tier, risk band, status. |
 | `Toast` | Small transient notice above the bottom bar. |
 
 ---
@@ -267,7 +267,7 @@ Tabs: Overview · Loans · Credit.
   - total revenue and net income with weekly change
   - bar chart
   - Statements: Income / Balance sheet / Cash flow, each Week | Quarter | Year
-  - capital ratio (tier badge + meter with thresholds) and liquidity ratio; at Watch or worse, a "How to fix this" checklist under the meter (as §24)
+  - credit ratio (C7a: what lenders price on; credit-tier badge + meter with thresholds) and liquidity ratio; at Watch or worse, a "How to fix this" checklist under the meter (as §24)
   - risk appetite Segmented (1–5), with the level's name, its effect on loan volume and defaults, and a line naming who else steers it when a CRO (Risk appetite switch) or CFO (Capital switch) is seated
   - "Delayed" placeholders when short-staffed
 - **HR:**
@@ -311,7 +311,7 @@ Tabs: Overview · Loans · Credit.
   - loss-rate table by product (annualized, 13-week)
   - delinquency
   - model performance: predicted vs actual default rate
-  - regulator status and last review result
+  - regulator status (C7a): safety ratio with tier badge and the safety meter, its breakdown (Safety cover, model exposure), the next safety audit's fail chance and the last audit's result, and a notice during a mandated pause, a revoked licence or strict watch
 - **Executive:**
   - Board meeting card: explanation, last meeting date, Hold meeting (enabled once per quarter)
   - Senior executives grid: nine seats (CEO, COO, CFO, CPO, CMO, CTO, CSO, CIO, CSci; the Chief Scientist joined in C6c, and on a phone the last cell spans both columns) with portrait, name and title; empty seats show Hire, which opens a sheet of the seat's candidates with a paid "New candidates · $fee" button at the bottom (as for branch managers)
@@ -551,9 +551,10 @@ Opened by tapping a business pin on the map (the **Businesses** layer, which als
 
 ## 24. Company summary (menu → Company)
 
-- **Where to look** at the top: the three things that most need you, worst first (Urgent / Watch / Note), each a tap to the right screen: capital tier, corporate cash below zero or under `ATTENTION.cashCoverWeeks` of running costs, open cases, a lending freeze or liquidity under the minimum (or under target with auto-funding off), expiring proposal requests, branches losing money for 4 weeks, ratings under 2.5, understaffing, loan losses over the CRO ceiling, morale under 50, branches without a manager, empty executive seats, switched-off delegations, low awareness. "All clear" when nothing qualifies. Ranking in `src/sim/attention.ts`, thresholds in `ATTENTION`.
-- capital ratio with tier badge and a meter with thresholds
-- at Watch, Restricted or Critical, a "How to fix this" checklist under the meter (`src/data/capitalFixes.ts`): sell new shares at an investment bank (Private placement, or Secondary offering once listed), sell company stocks and startup stakes, turn risk appetite down (Finance floor), hold off on growth and dividends; at Critical, a line on the emergency rescue
+- **Where to look** at the top: the three things that most need you, worst first (Urgent / Watch / Note), each a tap to the right screen: a mandated pause or revoked licence, the safety tier, corporate cash below zero or under `ATTENTION.cashCoverWeeks` of running costs, open cases, a lending freeze or liquidity under the minimum (or under target with auto-funding off), expiring proposal requests, branches losing money for 4 weeks, ratings under 2.5, understaffing, loan losses over the CRO ceiling, morale under 50, branches without a manager, empty executive seats, switched-off delegations, low awareness. "All clear" when nothing qualifies. Ranking in `src/sim/attention.ts`, thresholds in `ATTENTION`.
+- safety ratio (C7a, SIMULATION §15) with the regulator's tier badge, a meter with the tier lines, and a breakdown line (Safety cover, model exposure); the credit ratio below it as a secondary row ("Credit ratio (lenders)")
+- a notice during a mandated pause or a revoked licence (what is blocked and until when) or strict watch (until when, tier lines 10 points higher, audits twice as likely)
+- at Watch, Restricted or Critical, a "How to fix this" checklist under the meter (`src/data/capitalFixes.ts`): hire safety staff on the Safety & Alignment floor, pay them better, seat a Chief Safety Officer, train or switch to a safer model, grow the Safety team before shipping a model far ahead of the frontier; at Critical, a line on the mandated pause and the licence
 - **Cash** card: corporate cash, running costs a week and **cash cover** (weeks of running costs; red under `ATTENTION.cashCoverWeeks`)
 - liquidity ratio with the Treasury gauge's status badge, the target, overnight borrowing when any, and a line saying whether auto-funding is holding the target (C3b: only while an older save still holds deposits or overnight borrowing)
 - **Compute** card (C4a, SIMULATION §13.0): spot price per GPU-week with the chip phase badge (Chip glut green, Normal market, Chip shortage red), a line chart of the price index over the last 104 weeks, GPUs your customers used last week, GPUs running in your data centers, the share they covered, and what the rest costs at spot a week, with a one-line note

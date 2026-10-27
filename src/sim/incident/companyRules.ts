@@ -2,7 +2,12 @@
 // regulator's audit and letter, price wars, bank runs and the emergency
 // recapitalisation, the governance cases (executives poached, dividends due;
 // rules in execRules.ts), plus the insider probe (Stage 9, insiderRule.ts).
-import { BANK_RUN as BANK_RUN_P, FAILURE, RECAP, WEEKS_PER_YEAR } from '../../config/balance';
+import {
+  BANK_RUN as BANK_RUN_P,
+  LICENCE,
+  MANDATED_PAUSE,
+  WEEKS_PER_YEAR,
+} from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { INCIDENT_PARAMS, INCIDENT_SPECS } from '../../data/incidents';
 import { totalDeposits } from '../balanceSheet';
@@ -12,13 +17,13 @@ import { spend } from '../ledger';
 import { baseId, productSpec } from '../products';
 import type { GameState } from '../state';
 import { applyWindowStigma } from '../treasury';
-import { acceptRecap, endBankRun, recapQuote, statementOdds, takeover } from './capitalEvents';
+import { endBankRun, statementOdds } from './capitalEvents';
+import { acceptPause, pauseFee, revokeLicence } from '../mandatedPause';
 import { addEffect, incidentPMult } from './effects';
 import { DIVIDEND_DUE, EXEC_POACHED } from './execRules';
 import { RESEARCHER_POACHED } from './talentRules';
 import { fraudShield, num, ratingHit, type IncidentRule } from './helpers';
 import { INSIDER_PROBE } from './insiderRule';
-import { newsExact } from '../newsFormat';
 import { compactMoney } from './text';
 
 const P = INCIDENT_PARAMS;
@@ -190,21 +195,20 @@ const BANK_RUN: IncidentRule = {
 
 const RECAP_OFFER: IncidentRule = {
   prepare(state, _scope, data) {
-    const q = recapQuote(state);
-    data.amount = q.amount;
-    data.price = newsExact(q.price, state.settings.currency);
-    data.shares = q.shares;
-    data.floor = FAILURE.takeoverCr;
-    data.weeks = Math.max(RECAP.offerWeeks, state.company.lowCapitalWeeks);
+    data.amount = pauseFee(state);
+    data.floor = MANDATED_PAUSE.revokeLine;
+    data.weeks = Math.max(MANDATED_PAUSE.offerWeeks, state.company.lowCapitalWeeks);
+    data.pauseWeeks = MANDATED_PAUSE.weeks;
+    data.revokeWeeks = LICENCE.pauseWeeks;
   },
-  costs: () => ({ accept: 0, decline: 0 }),
-  apply(state, _inc, optionId) {
+  costs: (_state, _scope, data) => ({ accept: num(data, 'amount'), decline: 0 }),
+  apply(state, inc, optionId) {
     if (optionId === 'decline') {
-      takeover(state);
-      return 'The regulator has taken control of the lab.';
+      revokeLicence(state);
+      return 'The regulator has revoked our licence.';
     }
-    const q = acceptRecap(state);
-    return `New shareholders put in ${compactMoney(q.amount, state.settings.currency)}.`;
+    acceptPause(state, num(inc.data, 'amount'));
+    return 'The pause begins. The monitors arrive on Monday.';
   },
 };
 

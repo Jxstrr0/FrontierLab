@@ -1,5 +1,7 @@
-// Capital and the regulator (SIMULATION §15): CET1, risk-weighted assets, the
-// capital ratio and its tier.
+// The credit ratio (SIMULATION §15, from the bank's capital ratio): CET1 over
+// risk-weighted assets, the balance-sheet strength lenders price on, and its
+// credit tier, which the CFO's capital routines watch. Since stage C7a the
+// regulator's tier comes from the safety ratio instead (safety.ts).
 import {
   FIXED_ASSET_RISK_WEIGHT,
   FRANCHISE,
@@ -21,19 +23,21 @@ export interface CapitalSnapshot {
   cet1: number;
   rwa: number;
   capitalRatio: number;
+  /** Credit tier (the CFO's routines); the regulator's tier is the safety tier. */
   tier: Tier;
   equity: number;
 }
 
-/** The tier for a capital ratio; a policy capital buffer raises every threshold (§24 Politics). */
+/** The credit tier for a credit ratio; a policy buffer raises every threshold (§24 Politics). */
 export function tierFor(cr: number, bufferPp = 0): Tier {
   for (const t of TIER_THRESHOLDS) if (cr >= t.minCr + bufferPp / 100) return t.tier;
   return 'critical';
 }
 
 /**
- * Capital buffer in force in your home country, in percentage points: a passed
- * buffer policy adds, a won lobbying campaign ("Ease the capital buffer") subtracts.
+ * Policy buffer in force in your home country, in points: a passed buffer
+ * policy adds, a won lobbying campaign subtracts. It raises the credit tier
+ * lines by a point each and the safety tier lines by SAFETY.bufferPerPp.
  */
 export function capitalBufferPp(state: GameState): number {
   const home = homeCountry(state);
@@ -69,15 +73,9 @@ export function capitalSnapshot(state: GameState): CapitalSnapshot {
   return { cet1, rwa, capitalRatio, tier, equity: bs.equity };
 }
 
-/** Tick step 10: updates the company's capital ratio, tier and liquidity ratio. */
+/** Tick step 10: updates the company's credit ratio. */
 export function evaluateCapital(state: GameState): CapitalSnapshot {
   const snap = capitalSnapshot(state);
-  const c = state.company;
-  if (snap.tier === c.tier) c.tierWeeks += 1;
-  else {
-    c.tier = snap.tier;
-    c.tierWeeks = 0;
-  }
-  c.capitalRatio = snap.capitalRatio;
+  state.company.capitalRatio = snap.capitalRatio;
   return snap;
 }

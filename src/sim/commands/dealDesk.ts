@@ -1,6 +1,7 @@
 // Deal Desk commands (SIMULATION §11, stage C5b): bid on a new RFP, decline it,
 // set or withdraw a renewal offer, and set an office's discount limit.
 import { DEAL } from '../../config/balance';
+import { pauseBlock } from '../safety';
 import { bidRfp, cleanDiscount, declineRfp, isOwnRenewal } from '../branch/dealDesk';
 import type { GameState } from '../state';
 import { fail, ok, type CommandResult } from './result';
@@ -14,6 +15,8 @@ export function bidOnRfp(
   const rfp = state.dealDesk.rfps[rfpId];
   if (!rfp) return fail('That request has expired.');
   if (rfp.kind !== 'new') return fail('Renewals are settled at the quarter start: set an offer.');
+  const paused = pauseBlock(state);
+  if (paused) return fail(paused);
   return ok({ won: bidRfp(state, rfp, cleanDiscount(discount)) });
 }
 

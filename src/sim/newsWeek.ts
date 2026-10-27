@@ -2,7 +2,7 @@
 // week's revenue and net income (the same figures as the weekly results) when
 // the week is news (a loss, a swing back to profit, a record) or once every
 // NEWS_ROUTINE_EVERY_WEEKS weeks otherwise; quarter results on the first tick
-// of a quarter; and a weak capital tier with what to do about it (Watch on a
+// of a quarter; and a weak safety tier with what to do about it (Watch on a
 // change of tier or every few weeks, worse tiers every week).
 import {
   NEWS_PRIORITY as P,
@@ -19,7 +19,7 @@ import type { NewsContext, Story } from './newsStory';
 const banking = (s: Omit<Story, 'tab'>): Story => ({ ...s, tab: 'banking' });
 const business = (s: Omit<Story, 'tab'>): Story => ({ ...s, tab: 'business' });
 
-/** Stories from the weekly close: the week's figures, quarter results and a weak capital tier. */
+/** Stories from the weekly close: the week's figures, quarter results and a weak safety tier. */
 export function closeStories(ctx: NewsContext): Story[] {
   const s = ctx.state;
   const snap = s.history.weekly.at(-1);
@@ -82,7 +82,7 @@ export function closeStories(ctx: NewsContext): Story[] {
         group: snap.tier === 'watch' ? 'youRoutine' : undefined,
         tokens: {
           bank: ctx.bank,
-          cr: newsRate(snap.capitalRatio, 1),
+          cr: newsRate(snap.safetyRatio ?? s.company.safetyRatio, 0),
           tier,
           fix: CAPITAL_FIX_NEWS[s.stock.status],
         },

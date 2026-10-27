@@ -18,6 +18,8 @@ import type { GameState } from '../../src/sim/state';
 
 /** Weeks of running costs aggressive keeps in cash before it expands (C5a). */
 const AGGRESSIVE_RESERVE_WEEKS = 3;
+/** Steady keeps two weeks back, enough for a quarter's tax and a regulator fine (C7a). */
+const STEADY_RESERVE_WEEKS = 2;
 /** Share of cash a week each strategy spends on a training run (C6b). */
 const STEADY_TRAINING_SHARE = 0.01;
 const AGGRESSIVE_TRAINING_SHARE = 0.015;
@@ -88,7 +90,7 @@ export const steady: Strategy = {
     followDefaults(s);
     manageHq(s);
     manageEquity(s, 0.12, 2);
-    expand(s, 2, 0.12, true);
+    expand(s, 2, 0.12, true, { reserveWeeks: STEADY_RESERVE_WEEKS });
     maybeBuildDataCenter(s, 4);
     manageCompute(s);
     manageTraining(s, STEADY_TRAINING_SHARE);

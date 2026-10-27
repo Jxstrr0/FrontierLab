@@ -394,6 +394,30 @@ function bankNamed(ctx: NewsContext, e: GameEvent): Story | undefined {
           shares: grouped(num(p.shares)),
         },
       });
+    case 'SAFETY_PAUSE':
+      return banking({
+        key: 'SAFETY_PAUSE',
+        subject: name,
+        icon: 'alert',
+        priority: priority(true),
+        tokens: { ...tokens, weeks: String(num(p.weeks)), fee: newsMoney(num(p.fee), ctx.sym) },
+      });
+    case 'LICENCE_REVOKED':
+      return banking({
+        key: 'LICENCE_REVOKED',
+        subject: name,
+        icon: 'alert',
+        priority: priority(true),
+        tokens: { ...tokens, weeks: String(num(p.weeks)) },
+      });
+    case 'LICENCE_RESTORED':
+      return banking({
+        key: 'LICENCE_RESTORED',
+        subject: name,
+        icon: 'shield',
+        priority: priority(false),
+        tokens,
+      });
     default:
       return undefined;
   }

@@ -39,7 +39,7 @@ How the economy works, step by step. Every CAPS name is a key in `src/config/bal
 7. `hq.weekly`: floors, coverage, benefits, then developments (§16.6), the training run (§16.12) and the AI model (custom model refresh, switch countdown, §16.7)
 8. Corporate items: offices, executives, brand marketing, corporate debt, M&A, real estate, ventures (venture debt payments, rounds closing, the pipeline), conventions, lobbying outcomes, depreciation (§14, §20, §21)
 9. `statements.close`: P&L, cash flow, balance sheet, tax (§14)
-10. `capital.evaluate` and regulator tier (§15)
+10. `capital.evaluate` (the credit ratio), then `safety.evaluate`: the safety ratio and the regulator tier, then the pause and failure checks (§15, stage C7a)
 11. `personal.weekly` (§22), then `travel.weekly`: reset the km allowance, jet upkeep and depreciation (§22)
 12. `market.weekly`: listed prices, your valuation, portfolios (§19), then currencies (§19.10)
 13. **Quarter-end** (first weekly tick after Mar 31, Jun 30, Sep 30, Dec 31):
@@ -47,7 +47,7 @@ How the economy works, step by step. Every CAPS name is a key in `src/config/bal
     - dividends declared, paid 3 weeks later
     - board meeting unlocks
     - ventures report and raise (§20)
-    - regulator review (§15)
+    - the safety audit (§15)
     - partnership reviews
     - the renewal season for business contracts (§11.3, stage C5b; rival signings follow)
     - the talent war (§16.13, stage C6c), then rival model releases (§16.12, stage C6b)
@@ -646,30 +646,47 @@ Week, Quarter and Year sum the weekly records.
 ### 14.6 Finance delays
 If Finance coverage' < 0.9, the newest `ceil((0.9 − k') × 10)` weeks show as "Delayed" in the statements and the weekly results. The simulation runs normally underneath.
 
-## 15. Capital and the regulator
+## 15. Safety and the regulator
 
-- `CET1 = equity − goodwill − intangibles`
-- `RWA = Σ loans × rw_p + realEstate × 1.0 + (stocks + ventures) × 2.5 + ventureDebt × 1.5 + fixedAssets × 1.0 + OP_RISK_MULT (1.0) × trailing-52-week net revenue (net interest income + fee & other income)`
-- `CR = CET1 / max(RWA, 1)`
-- (C3c: the charter floor, Critical whenever equity fell under $2M, is gone. The tier follows CR alone.)
+Since stage C7a the AI regulator watches a **safety ratio**, not the bank's capital ratio. The bank's ratio lives on as the **credit ratio**, what lenders price on.
 
-**Tiers** (badge shown everywhere capital matters):
+**Safety ratio** (`safety.ts`):
+- `strength = min(1, safetyCoverage′) + clamp(k − 1, 0, kMax − 1)`: the Safety & Alignment floor's coverage′ (§16.4, so founder mode reads 1 and audit consultants or the regulator's monitors count), plus staffing above the requirement, up to k = 1.2.
+- `exposure = max(SAFETY.minExposure 0.8, 1 + frontierWeight (0.15) × max(0, modelQuality − qualityBar) − modelSafetyWeight (0.05) × (Safety axis − 5))`: a model ahead of the frontier carries more risk; a safer model less (§16.7, §16.12).
+- `SR = strength ÷ exposure`, shown as a percent.
+- The Safety floor's requirement (CONTENT §9) is `2 + 0.15 × office units + 1 per $50M of ARR`, so a bigger lab needs a bigger Safety team.
 
-| Tier | CR | Effects |
+**Tiers** (badge shown everywhere the regulator matters):
+
+| Tier | SR | Effects |
 |---|---|---|
-| Strong | ≥ 14% | Funding spread −0.10% |
-| Adequate | 10.5–14% | None |
-| Watch | 8–10.5% | Dividends capped at 50% of trailing-4-quarter net income; advisor warnings |
-| Restricted | 6–8% | No dividends, branches or acquisitions; `capitalGate` 0.5; a regulator letter (incident) |
-| Critical | < 6% | `capitalGate` 0; fine 0.1% of RWA per quarter; after 8 consecutive weeks below 4.5%, an emergency recapitalisation offer |
+| Strong | ≥ 105% | Data-sensitive businesses favour you: Deal Desk win and keep chance +4 points × (sensitivity − 5)/5 |
+| Adequate | 85–105% | None |
+| Watch | 70–85% | Dividends capped at 50% of trailing-4-quarter net income; advisor warnings; deal edge −2 points |
+| Restricted | 55–70% | No dividends, sales offices or acquisitions; new sign-ups × 0.5 (`CAPITAL_GATE`); a regulator letter (incident); deal edge −5 |
+| Critical | < 55% | No new sign-ups; fine of 0.5% of trailing annual revenue each quarter; deal edge −8 |
 
-**Emergency recapitalisation:**
-- Mechanics: forced new shares worth enough to reach a 10.5% capital ratio, priced at 50% of book value per share.
-- If declined, or if the ratio is still below 4.5% after 5 more weeks: regulator takeover and game over.
+- A policy buffer (§24 Politics) raises every line by `SAFETY.bufferPerPp` (5 points) per point; strict watch raises them by `LICENCE.watchBuffer` (10 points).
+- The regulator's gate now applies to every new sign-up (plans and API), not only loans.
 
-**Quarterly regulator review:**
-- Failure probability: `0.02 × (1 + 3 × (1 − riskCoverage')) × (1.6 − avgManagerEthics/100)`.
-- On failure: a fine of 0.05–0.3% of trailing annual revenue, plus the `REGULATOR_AUDIT` incident and news.
+**Mandated pause** (`mandatedPause.ts`, the `RECAP_OFFER` case, which replaced the emergency recapitalisation):
+- After `MANDATED_PAUSE.offerWeeks` (8) weeks in a row below `revokeLine` (40%), the regulator offers an 8-week pause: no new sign-ups, no new or rival-renewal RFPs and no training (a run in progress waits), while its monitors lift Safety coverage′ by 0.5. The fee is 2% of trailing annual revenue, at least $250k.
+- If the ratio is still under the line when the pause ends, or the offer is declined (or its deadline passes), the **licence is revoked**.
+
+**Licence revoked** (owner decision A11, never game over):
+- `LICENCE.pauseWeeks` (26) weeks paused as above; your own customers and contracts stay.
+- Then the licence is restored under **strict watch** for 52 weeks: tier lines sit 10 points higher and the safety audit fails twice as often.
+- The founder's personal fortune is untouched.
+
+**Quarterly safety audit** (`riskFloor.ts`):
+- Failure probability: `0.02 × (1 + 3 × (1 − safetyCoverage′)) × (1.6 − avgManagerEthics/100) × exposure`, × 2 under strict watch.
+- On failure: a fine of 0.05–0.3% of trailing annual revenue, plus the `REGULATOR_AUDIT` incident (Safety audit) and news.
+
+**Credit ratio** (`capital.ts`, the bank's capital ratio):
+- `CET1 = equity − goodwill − intangibles`
+- `RWA = fixedAssets × 1.0 + realEstate × 1.0 + (stocks + ventures) × 2.5 + compute credits × 1.5 + OP_RISK_MULT (1.0) × trailing-52-week net revenue`
+- `CR = CET1 / max(RWA, 1)`. It sets lenders' spreads (§13, §19.9), the CFO's Capital and Share-sales routines, buyback and acquisition limits, and the IPO's recession exception. Its credit tier uses the old lines (Strong ≥ 14%, Adequate ≥ 10.5%, Watch ≥ 8%, Restricted ≥ 6%).
+- (C3c: the charter floor is gone. C7a: the regulator takeover is gone; a lab short of capital can only fail by running out of cash.)
 
 ## 16. HQ
 

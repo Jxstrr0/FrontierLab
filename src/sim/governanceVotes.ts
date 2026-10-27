@@ -1,5 +1,5 @@
 // The board's arithmetic (DESIGN §5.13, SIMULATION §15): the regulator's
-// dividend cap by capital tier, how outside shareholders vote on a dividend and
+// dividend cap by safety tier, how outside shareholders vote on a dividend and
 // on the CEO's pay (BOARD_VOTE; the docs give no formula, decision log), and the
 // CFO's dividend proposal. Pure functions of the state; nothing is mutated.
 import {
@@ -32,9 +32,9 @@ export function dividendCapPerShare(state: GameState): number | null {
 export function dividendCapNote(state: GameState): string | undefined {
   const tier = state.company.tier;
   if (tier === 'restricted' || tier === 'critical')
-    return 'The regulator forbids dividends while capital is in the Restricted or Critical tier.';
+    return 'The regulator forbids dividends while the safety tier is Restricted or Critical.';
   if (tier === 'watch')
-    return `Capital is on Watch: dividends are capped at ${GOVERNANCE.watchCap * 100}% of trailing net income.`;
+    return `The safety tier is Watch: dividends are capped at ${GOVERNANCE.watchCap * 100}% of trailing net income.`;
   return undefined;
 }
 
