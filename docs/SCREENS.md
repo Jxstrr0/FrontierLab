@@ -211,7 +211,7 @@ After the wizard, the map opens with the tutorial (§27).
 
 - **Entry points:** a **Build data center** button under Build branch on an available storefront (§3), with its own blocker line; an **Energy site** section on a regional employer's panel (§14) listing your data centers there with a **Build data center** button; your data center's pin on the map (your crest, noted "Data center" or "Fit-out"), its row on the city list, and a **Data centers** list under the Branches screen (§25).
 - **Build data center:** three part tiles (GPU hall, Power, Cooling) with price and what each does; tapping one opens a sheet listing that slot's options. A **Running it** card (GPUs running, power bill and rent a week, fit-out weeks), a note when the power feed can't run the whole hall, then a summary (parts, deposit, first week's rent, total, cash available) and **Build for $X**.
-- **Data center panel:** header with the name, place and city; the advisor says how long the fit-out has left or which cities get faster service. Status card (Online or Fit-out with weeks left, GPUs in the hall, GPUs running (red when power caps it), PUE). Parts as tiles with **Upgrade** (a sheet that greys out parts no better than the fitted one or that you can't afford; the hall is locked during fit-out; "Best fitted" on the top part). Weekly costs (rent, power). **Close data center** with a confirmation showing equipment sold, deposit back and cash back.
+- **Data center panel:** header with the name, place and city; the advisor says how long the fit-out has left, or that its GPUs serve customers before spot and which cities get faster service. The Compute card (§24) sits under the status card (C4a). Status card (Online or Fit-out with weeks left, GPUs in the hall, GPUs running (red when power caps it), PUE). Parts as tiles with **Upgrade** (a sheet that greys out parts no better than the fitted one or that you can't afford; the hall is locked during fit-out; "Best fitted" on the top part). Weekly costs (rent, power). **Close data center** with a confirmation showing equipment sold, deposit back and cash back.
 
 ## 6. Rival branch
 
@@ -529,10 +529,11 @@ Tabs: Overview · Loans · Credit.
 - at Watch, Restricted or Critical, a "How to fix this" checklist under the meter (`src/data/capitalFixes.ts`): sell new shares at an investment bank (Private placement, or Secondary offering once listed), sell company stocks and startup stakes, turn risk appetite down (Finance floor), hold off on growth and dividends; at Critical, a line on the emergency rescue
 - **Cash** card: corporate cash, running costs a week and **cash cover** (weeks of running costs; red under `ATTENTION.cashCoverWeeks`)
 - liquidity ratio with the Treasury gauge's status badge, the target, overnight borrowing when any, and a line saying whether auto-funding is holding the target (C3b: only while an older save still holds deposits or overnight borrowing)
+- **Compute** card (C4a, SIMULATION §13.0): spot price per GPU-week with the chip phase badge (Chip glut green, Normal market, Chip shortage red), a line chart of the price index over the last 104 weeks, GPUs your customers used last week, GPUs running in your data centers, the share they covered, and what the rest costs at spot a week, with a one-line note
 - totals: assets, ARR, lending fund (treasury reserves), Loan Desk loans, equity (C3b)
 - share price or private valuation, with the 52-week range, market cap, your stake and top shareholders
 - a Personal line: personal cash plus holdings
-- one-line explanations ("Grow recurring revenue; watch the compute bill") with a "Learn more" sheet (revenue and compute, capital, the lending fund, cash cover)
+- one-line explanations ("Grow recurring revenue; watch the compute bill") with a "Learn more" sheet (revenue and compute, owning or renting compute, capital, the lending fund, cash cover)
 - statements (C3b): the income statement runs Plans, API, Apps & services, Loan Desk interest, Other income → Revenue → Compute → Gross profit → Operating expenses → Interest expense (when any) → Loan losses → Depreciation → Pre-tax → Tax → Net income. The balance sheet shows reserves, bonds, foreclosed property, deposits, wholesale funding and unrealised bond gains only when non-zero.
 - links to the full statements (Finance floor, or a simplified view without an HQ)
 

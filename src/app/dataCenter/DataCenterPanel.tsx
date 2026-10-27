@@ -1,5 +1,5 @@
-// Data center panel (SCREENS §5b): status, the three parts with an Upgrade
-// button each, weekly costs, which cities get faster service, and Close.
+// Data center panel (SCREENS §5b): status, the compute pool (C4a), the three
+// parts with an Upgrade button each, weekly costs, which cities get faster service, and Close.
 import { useState } from 'preact/hooks';
 import { DATA_CENTER } from '../../config/balance';
 import { CITIES } from '../../data/cities';
@@ -9,6 +9,7 @@ import { hallGpus, powerBill, pueOf, usableGpus } from '../../sim/dataCenters';
 import { Badge, Card, Confirm, Panel, Row, SectionTitle } from '../components';
 import { count, money, moneyFull } from '../format/format';
 import { act, closePanel, toast, useGame } from '../store';
+import { ComputeCard } from '../company/ComputeCard';
 import { DcPartSheet } from './DcPartSheet';
 import { partFact } from './dcView';
 import '../build/build.css';
@@ -34,7 +35,7 @@ export function DataCenterPanel(p: { dataCenterId: string }) {
   const open = dc.status === 'open';
   const quote = cmd.closeDataCenterQuote(s, dc.id)!;
   const advice = open
-    ? `${count(usableGpus(dc.build))} GPUs are running. Your sales office in ${city} gets a Service lift, and offices within ${count(DATA_CENTER.nearKm)} km get a smaller one.`
+    ? `${count(usableGpus(dc.build))} GPUs are running. They serve your customers before any compute is bought at spot. Your sales office in ${city} gets a Service lift, and offices within ${count(DATA_CENTER.nearKm)} km get a smaller one.`
     : `Fit-out has ${dc.weeksLeft} week${dc.weeksLeft === 1 ? '' : 's'} to go. It pays rent meanwhile but no power.`;
 
   return (
@@ -63,6 +64,8 @@ export function DataCenterPanel(p: { dataCenterId: string }) {
             />
             <Row label="PUE" value={pueOf(dc.build).toFixed(2)} />
           </Card>
+
+          <ComputeCard />
 
           <SectionTitle>Parts</SectionTitle>
           {DC_SLOTS.map((slot) => {

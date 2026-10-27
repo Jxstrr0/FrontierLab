@@ -15,6 +15,7 @@ import { updateStaff } from './branch/staff';
 import { emptyWeek } from './branch/week';
 import { isQuarterStart, isYearStart } from './calendar';
 import { evaluateCapital } from './capital';
+import { tallyCompute, updateComputeIndex } from './compute';
 import { runDataCenters } from './dataCenters';
 import { runExecutives } from './executives';
 import { hrFillVacancies } from './hrHiring';
@@ -90,6 +91,7 @@ function resolveScheduled(state: GameState): void {
 
 export function weeklyTick(state: GameState): void {
   updateMacro(state); // 1
+  updateComputeIndex(state); // 1 (chip cycle, C4a)
   updateRivalPrices(state); // 3 (before references so m(p) is this week's)
   updateMarketRefs(state); // 2
   runRivals(state); // 3 (books, financials, expansion, price wars)
@@ -98,6 +100,7 @@ export function weeklyTick(state: GameState): void {
   for (const branch of Object.values(state.branches)) {
     if (branch.status === 'open') runBranch(state, branch, deskLoans.get(branch.id) ?? []); // 4
   }
+  tallyCompute(state); // 4 (the compute pool, C4a)
   updateBrandAwareness(state);
   runPartnerships(state); // 5
   runTreasury(state); // 6
