@@ -8,6 +8,7 @@ import { DEV_MAX_STARS, TRAINING } from '../config/balance';
 import type { Pentagon } from '../data/types';
 import { devScore, devSpeed, starOdds } from './development';
 import { pushEvent } from './events';
+import { frontierCostMult } from './frontier';
 import { newId } from './ids';
 import { spend } from './ledger';
 import { bestRivalModel } from './rivalModels';
@@ -19,7 +20,8 @@ import { activeModel, customFigures, modelQuality, trainedRadar } from './underw
 
 /**
  * Star odds [1★..5★] for a run of `weeks` at `weeklyBudget` with today's team,
- * plus the CPO's and your researchers' lift (§16.13, C6c).
+ * plus the CPO's and your researchers' lift (§16.13, C6c). Past the frontier's
+ * fromQuality the budget counts as budget ÷ frontierCostMult (§16.12).
  */
 export function trainingOdds(
   state: GameState,
@@ -28,10 +30,21 @@ export function trainingOdds(
   focus?: number,
 ): number[] {
   return starOdds(
-    devScore(state, weeks, weeklyBudget, TRAINING.minWeekly, TRAINING.maxBudgetScoreAt) +
+    devScore(
+      state,
+      weeks,
+      weeklyBudget / frontierCostMult(state),
+      TRAINING.minWeekly,
+      TRAINING.maxBudgetScoreAt,
+    ) +
       cpoTrainingBonus(state) +
       researchBonus(state, focus),
   );
+}
+
+/** The budget that earns the full budget score at today's frontier cost (the slider's top). */
+export function trainingBudgetTop(state: GameState): number {
+  return TRAINING.maxBudgetScoreAt * frontierCostMult(state);
 }
 
 /** The lift a run of `stars` gives: starLift on every axis, plus focusLift on the focus axis. */

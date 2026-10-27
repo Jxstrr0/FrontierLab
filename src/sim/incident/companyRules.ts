@@ -21,7 +21,7 @@ import { acceptPause, pauseFee, revokeLicence } from '../mandatedPause';
 import { addEffect, incidentPMult } from './effects';
 import { DIVIDEND_DUE, EXEC_POACHED } from './execRules';
 import { RESEARCHER_POACHED } from './talentRules';
-import { fraudShield, num, ratingHit, type IncidentRule } from './helpers';
+import { fraudShield, incidentScale, num, ratingHit, type IncidentRule } from './helpers';
 import { INSIDER_PROBE } from './insiderRule';
 import { compactMoney } from './text';
 
@@ -58,10 +58,10 @@ const DATA_BREACH: IncidentRule = {
     );
     return { affected, fine: P.DATA_BREACH.quietFineShare * Math.max(0, trailingRevenue(state)) };
   },
-  costs: (_s, _scope, data) => ({
+  costs: (state, _scope, data) => ({
     notify: num(data, 'affected') * P.DATA_BREACH.notifyPerCustomer,
     quiet: 0,
-    forensic: P.DATA_BREACH.forensicCost,
+    forensic: P.DATA_BREACH.forensicCost * incidentScale(state),
   }),
   expected: (_s, inc, optionId) =>
     optionId === 'quiet' ? P.DATA_BREACH.quietDiscover * num(inc.data, 'fine') : 0,

@@ -299,7 +299,7 @@ Targets are computed each week. Displayed ratings follow them with `ema(rating, 
 A second building kind beside the sales office (`src/sim/dataCenters.ts`, commands in `src/sim/commands/dataCenters.ts`, parts in CONTENT §7c). Any number per city, on a free storefront lot (lot rent and deposit, like a sales office) or at a regional energy site's employer (`DATA_CENTER.energySiteRent` ($3,000) × the city's cost index a week, no deposit, at most `DATA_CENTER.perEnergySite` (3) per site). You build only in the city you're in, never at a restricted or critical tier. Prices go through the price list (§4.6).
 
 - **Parts:** a GPU hall (GPUs it holds and fit-out weeks), a power feed (GPUs it can run) and cooling (PUE). `usableGpus = min(hall GPUs, power GPUs)`.
-- **Fit-out:** the hall's weeks (8, 12 or 16), counted down in tick step 5, before the sales offices. A fitting-out data center pays rent but no power.
+- **Fit-out:** the hall's weeks (8, 12, 16 or 26), counted down in tick step 5, before the sales offices. A fitting-out data center pays rent but no power.
 - **Weekly costs (open):** rent to the Rent line; power `usableGpus × DATA_CENTER.powerPerGpuWeek (12) × PUE × powerIndex` to the Equipment line, where `powerIndex` is `DATA_CENTER.energySitePower` (0.5) at an energy site and the city's cost index elsewhere (× `POWER_DEAL.powerDiscount` with a power deal in the country, §13.7a). Worked example: a Twin hall on a Grid feed with Liquid loops at an energy site runs 3,000 GPUs for 3,000 × 12 × 1.25 × 0.5 = $22,500 a week.
 - **Latency lift:** each sales office's Service target (§8) gains `DATA_CENTER.liftSameCity` (+0.25 stars) when an open data center is in its city, else `DATA_CENTER.liftNear` (+0.1) when one is within `DATA_CENTER.nearKm` (1,200 km). Not additive across data centers. Its GPUs join the compute pool (§13.0).
 - **Accounts:** the hall is a fit-out asset (`FITOUT_LIFE_WEEKS`), power and cooling equipment (`EQUIPMENT_LIFE_WEEKS`), owned by the data center id; the deposit goes to lease deposits.
@@ -707,6 +707,7 @@ The Finance floor's 1–5 dial (code `company.riskAppetite`, set by `setRiskAppe
 ### 16.12 Training runs and the frontier
 - **Training runs** (Products floor required; one at a time; `startTrainingRun`, `cancelTrainingRun`). The player names the model, picks a focus axis, a term from `DEV_TERMS` and a weekly budget (≥ `TRAINING.minWeekly` $20k, step $5k).
   - Odds use §16.6's `devScore`/`starOdds` with the budget scored from $20k (B 0) to $2M (B 1).
+  - **Frontier cost curve** (`FRONTIER_COST`, `src/sim/frontier.ts`): past house model quality `fromQuality` (7), training gets `perPoint` (2.5×) dearer a point: `frontierCostMult = 2.5^max(0, quality − 7)`, and the budget is scored as `budget ÷ frontierCostMult`. The budget slider's top is `$2M × frontierCostMult`. Worked example: at quality 9, mult 6.25, so a $1.25M week scores like $200k did at quality 7. Once every axis is at the ceiling (10) a run can't lift the model; the card says so.
   - The run pays `weeklyBudget × devSpeed` a week (P&L line `development`) and progresses at `devSpeed`; it pauses without a Products floor or during a mandated pause. Cancelling loses what was spent.
   - On finishing, stars are drawn from the odds (`training` stream). The new **trained model** copies the active model's mix and adds a lift: `TRAINING.starLift[stars−1]` on every axis plus `focusLift[stars−1]` on the focus axis, on top of the active model's own lift (so generations stack when you train from a trained model). Its radar = mix radar + lift, capped at 10; cost = the custom mix's cost. It is not switched on: use it in Manage Models (the usual 2-week switch).
 - **Rival models.** Every rival lab has a model (`RivalBank.model`) starting at `5.8 + U(−0.5, 0.1)`, generation 2. A lab that appears later starts `lateGap` (0.3) under the best rival model.
@@ -720,7 +721,7 @@ The Finance floor's 1–5 dial (code `company.riskAppetite`, set by `setRiskAppe
   - `cpoTrainingBonus = CPO_TRAINING.scoreMax (0.15) × expertise/100` with a CPO seated, else 0 (the Chief Scientist's lift until schema 22).
   - `researchBonus = min(0.2, Σ 0.012 × stars × (2 on the researcher's specialty = the run's focus, else 1))` over your researchers.
 - **Researchers** (`state.talent.researchers`): name, portrait, specialty axis, 1–5 stars (weights 30/30/20/12/8), salary, employer (you, a rival, or none).
-  - Market salary a year = `220,000 × (1 + 0.4 × (stars − 1)) × home city wage level`, rounded to $5k.
+  - Market salary a year = `220,000 × (1 + 0.4 × (stars − 1)) × home city wage level × (1 + RESEARCHERS.frontierPay (0.6) × frontierPoints)`, rounded to $5k, where `frontierPoints = max(0, best model anywhere (yours or a rival's) − FRONTIER_COST.fromQuality (7))`. As the frontier climbs the going rate rises, and so does the poaching chance on anyone paid below it.
   - A new game seeds 16, each at a random active rival with chance 0.6, otherwise on the market.
   - **Hiring** (`hireResearcher`, Products floor required, team of up to 8): a free researcher at the higher of their salary and the market salary. From a rival: that × 1.3, plus a signing bonus of 13 weeks of it (P&L `hqStaff`). Cash must cover the bonus and a week's pay.
   - **Letting go** (`releaseResearcher`): back on the market, no cost.
@@ -731,7 +732,7 @@ The Finance floor's 1–5 dial (code `company.riskAppetite`, set by `setRiskAppe
   - Each free researcher signs with a random rival with chance 0.2.
   - New graduates join until at least 3 are on the market.
 - **The CPO's Routine training runs** delegation (`training`, `CPO_TRAINING`): when no run is under way and there's a Products floor, starts a run on the active model's weakest axis, shaped by the **training style** you dial (`executives.trainingStyle`, `CPO_TRAINING.styles`, default Balanced): Quantity 8-week runs at ×0.6 budget, Balanced 12 weeks at ×1, Quality 24 weeks at ×1.5. Quantity ships more generations with weaker star odds; Quality fewer, stronger ones.
-  - That run's budget is `cashShare` (1%) × the style's `budgetMult` of cash a week, between $20k and `maxWeekly` ($150k) × `budgetMult` (step $5k), and needs `cashFloorRuns` (40) weeks of it in cash.
+  - That run's budget is `cashShare` (1%) × the style's `budgetMult` of cash a week, between $20k and `maxWeekly` ($150k) × `budgetMult` × `frontierCostMult` (§16.12, step $5k), and needs `cashFloorRuns` (40) weeks of it in cash. With every axis at the ceiling the CPO starts no run.
   - It never switches models: the CPO's **Models** delegation (§17.2) switches to a trained model when its quality less licence cost beats the active model's by `MODEL_DELEGATE.minGain`, the same test it applies to data-vendor packages.
 
 ## 17. People AI

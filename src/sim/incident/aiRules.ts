@@ -11,7 +11,7 @@ import { safetyStrength } from '../safety';
 import type { GameState } from '../state';
 import { RADAR, activeModel, trainedRadar } from '../underwriting';
 import { addEffect, incidentPMult } from './effects';
-import { maybeNews, num, ratingHit, type IncidentRule } from './helpers';
+import { incidentScale, maybeNews, num, ratingHit, type IncidentRule } from './helpers';
 import { compactMoney } from './text';
 
 const P = INCIDENT_PARAMS;
@@ -32,14 +32,14 @@ const JAILBREAK: IncidentRule = {
       incidentPMult(state, 'JAILBREAK', 'company')
     );
   },
-  prepare(_s, _scope, data) {
-    data.patch = P.JAILBREAK.patchCost;
-    data.postMortem = P.JAILBREAK.postMortemCost;
+  prepare(state, _scope, data) {
+    data.patch = P.JAILBREAK.patchCost * incidentScale(state);
+    data.postMortem = P.JAILBREAK.postMortemCost * incidentScale(state);
   },
-  costs: () => ({
-    patch: P.JAILBREAK.patchCost,
+  costs: (_s, _scope, data) => ({
+    patch: num(data, 'patch'),
     ignore: 0,
-    postmortem: P.JAILBREAK.postMortemCost,
+    postmortem: num(data, 'postMortem'),
   }),
   apply(state, _inc, optionId, rng) {
     const j = P.JAILBREAK;
@@ -147,10 +147,10 @@ const WEIGHTS_LEAK: IncidentRule = {
       incidentPMult(state, 'WEIGHTS_LEAK', 'company')
     );
   },
-  prepare(_s, _scope, data) {
-    data.rotate = P.WEIGHTS_LEAK.rotateCost;
+  prepare(state, _scope, data) {
+    data.rotate = P.WEIGHTS_LEAK.rotateCost * incidentScale(state);
   },
-  costs: () => ({ rotate: P.WEIGHTS_LEAK.rotateCost, quiet: 0 }),
+  costs: (_s, _scope, data) => ({ rotate: num(data, 'rotate'), quiet: 0 }),
   apply(state, _inc, optionId, rng) {
     if (optionId !== 'quiet') return;
     const w = P.WEIGHTS_LEAK;

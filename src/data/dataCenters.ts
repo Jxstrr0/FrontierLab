@@ -56,6 +56,15 @@ const parts: DcPart[] = [
     weeks: 16,
   },
   {
+    id: 'hall_hyperscale',
+    slot: 'hall',
+    name: 'Hyperscale hall',
+    blurb: 'Rows of halls the size of an airfield.',
+    cost: 140_000_000,
+    gpus: 60_000,
+    weeks: 26,
+  },
+  {
     id: 'power_grid',
     slot: 'power',
     name: 'Grid feed',
@@ -80,6 +89,14 @@ const parts: DcPart[] = [
     gpus: 20_000,
   },
   {
+    id: 'power_plant',
+    slot: 'power',
+    name: 'Own power plant',
+    blurb: 'A generating plant built for this site alone.',
+    cost: 38_000_000,
+    gpus: 80_000,
+  },
+  {
     id: 'cool_air',
     slot: 'cooling',
     name: 'Air handlers',
@@ -102,6 +119,14 @@ const parts: DcPart[] = [
     blurb: 'Racks sunk in cooling fluid.',
     cost: 5_000_000,
     pue: 1.1,
+  },
+  {
+    id: 'cool_twophase',
+    slot: 'cooling',
+    name: 'Two-phase cooling',
+    blurb: 'Coolant that boils off the chips and condenses overhead.',
+    cost: 18_000_000,
+    pue: 1.04,
   },
 ];
 

@@ -22,9 +22,15 @@ const LAYOUT: Record<string, { rows: number; racks: number }> = {
   hall_row: { rows: 2, racks: 6 },
   hall_twin: { rows: 3, racks: 7 },
   hall_campus: { rows: 3, racks: 9 },
+  hall_hyperscale: { rows: 4, racks: 9 },
 };
 /** Switchgear cabinets on the left wall by power feed. */
-const SWITCHGEAR: Record<string, number> = { power_grid: 1, power_substation: 2, power_tie: 3 };
+const SWITCHGEAR: Record<string, number> = {
+  power_grid: 1,
+  power_substation: 2,
+  power_tie: 3,
+  power_plant: 4,
+};
 /** Rack size and spacing, in cells. */
 const RACK = { w: 0.5, d: 0.55, h: 1.35, i0: 1.2, rowGap: 1.45, j0: 1.0 } as const;
 const TRAY_Z = 1.85;
@@ -40,7 +46,7 @@ export const GpuHallArt = memo(function GpuHallArt(p: {
   ink?: string;
 }) {
   const lay = LAYOUT[p.hall] ?? LAYOUT.hall_row!;
-  const tanks = p.cooling === 'cool_immersion';
+  const tanks = p.cooling === 'cool_immersion' || p.cooling === 'cool_twophase';
   const w = RACK.i0 + lay.racks * RACK.w + 1.6;
   const d = RACK.j0 + lay.rows * RACK.rowGap + 0.9;
   const span = w + d;
