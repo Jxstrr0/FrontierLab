@@ -1107,7 +1107,7 @@ export const RIVAL_BOOKS = {
   /** Compute spend as a share of revenue at a compute index of 1. */
   computeShare: 0.25,
   /** Weekly staff and rent of one office unit, × city cost index × the price list. */
-  officeCost: 35_000,
+  officeCost: 45_000,
   /** Model training spend as a share of revenue. */
   trainingShare: 0.08,
   /** Cash a rival keeps, in weeks of running costs, before it pays dividends. */
@@ -1117,7 +1117,7 @@ export const RIVAL_BOOKS = {
     incumbent: [78, 104],
     premium: [78, 104],
     community: [52, 78],
-    disruptor: [30, 52],
+    disruptor: [20, 40],
   } as Record<'incumbent' | 'disruptor' | 'premium' | 'community', [number, number]>,
   /**
    * Strategy multipliers: on office costs, compute, training, how hard a
@@ -1172,7 +1172,7 @@ export const RIVAL_RUNWAY_TIERS: { tier: Tier; minWeeks: number }[] = [
  */
 export const RIVAL_RAISE = {
   maxRunwayWeeks: 26,
-  chance: 0.2,
+  chance: 0.05,
   weeks: 78,
   discount: 0.2,
   minPrice: 1,
@@ -1181,7 +1181,7 @@ export const RIVAL_RAISE = {
 export const RIVAL_EXPANSION = {
   everyWeeks: 4,
   /** An eligible rival keeps this many weeks of running costs in cash after a build. */
-  minRunwayWeeks: 52,
+  minRunwayWeeks: 39,
   /**
    * Chance per monthly check, in each city it serves, that an eligible rival
    * grows its office there, divided by the units the next size adds (C2b).
