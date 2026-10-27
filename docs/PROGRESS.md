@@ -3,13 +3,23 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.34, save schema 24). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
+**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.35, save schema 24). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
 **Determinism snapshot:** `1311ec96765325` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-27 — Turtle tops up its runway (v0.1.35)
+
+The balance bot "turtle" (one office, never lists) ran out of cash in year 10 on seed 42 (−$23.6k). The game wasn't wrong: a lone office with fixed prices slowly loses money as wages and rent rise, runway shows Critical, and four weeks in the red ends the game. The bot simply ignored all of that.
+
+**What changed.** Scripts only, no game change. New `topUpRunway` in `scripts/strategies/equity.ts`: once runway leaves Comfortable (under 12 months), turtle sells a private placement of half the largest size (or a secondary once listed), as a careful player or the CFO's Share sales switch would. SIMULATION's strategy list says so.
+
+**Checked.** `npm run lint`, `npx vitest run` (1056 tests) and `npm run build` pass. Determinism snapshot unchanged (it doesn't run the bots). `npm run balance` turtle and steady on seed 42: all checks in range. Turtle across seeds 1–20: cash never below zero (lowest $189k).
+
+**Dependencies:** none added.
 
 ### 2026-10-27 — Runway replaces the credit ratio (v0.1.34, schema 24)
 
