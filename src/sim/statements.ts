@@ -1,11 +1,13 @@
 // Company statements (SIMULATION §14): depreciation, tax, the weekly close
 // (P&L, cash flow, balance sheet snapshot) and quarter-end reporting.
 import { companyArr } from './arr';
-import { CRITICAL_FINE_RWA, WEEKLY_HISTORY } from '../config/balance';
+import { SAFETY, WEEKLY_HISTORY } from '../config/balance';
 import { COUNTRIES } from '../data/countries';
 import { balanceSheet, totalDeposits, loanTotals } from './balanceSheet';
 import { isFirstDayOfQuarter, previousQuarter } from './calendar';
 import { capitalSnapshot } from './capital';
+import { trailingRevenue } from './riskFloor';
+import { safetySnapshot } from './safety';
 import { emptyLedger, postCash, postPnl, spend, summarize } from './ledger';
 import type { GameState, WeeklySnapshot } from './state';
 import { homeCountry } from './treasury';
@@ -39,6 +41,7 @@ export function closeWeek(state: GameState): WeeklySnapshot {
   state.company.retainedEarnings += sum.netIncome;
   const bs = balanceSheet(state);
   const cap = capitalSnapshot(state);
+  const safety = safetySnapshot(state);
   const cash = state.ledger.cash;
   const snap: WeeklySnapshot = {
     week: state.clock.week,
@@ -63,7 +66,8 @@ export function closeWeek(state: GameState): WeeklySnapshot {
     },
     pnl: { ...state.ledger.pnl },
     capitalRatio: cap.capitalRatio,
-    tier: cap.tier,
+    safetyRatio: safety.ratio,
+    tier: safety.tier,
     appRating: state.company.appRating,
   };
   state.history.weekly.push(snap);
@@ -101,5 +105,6 @@ export function quarterEnd(state: GameState): void {
     postCash(state, -c.taxPayable, 'ops');
     c.taxPayable = 0;
   }
-  if (c.tier === 'critical') spend(state, 'fines', capitalSnapshot(state).rwa * CRITICAL_FINE_RWA);
+  // §15: at Critical the regulator fines a share of trailing annual revenue each quarter.
+  if (c.tier === 'critical') spend(state, 'fines', trailingRevenue(state) * SAFETY.criticalFine);
 }

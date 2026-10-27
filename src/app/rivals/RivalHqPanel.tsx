@@ -116,7 +116,7 @@ function Overview(p: { s: GameState; bank: RivalBank }) {
           <Row label="Share price" value={money(rivalSharePrice(bank), sym)} />
         )}
         <Row
-          label="Capital"
+          label="Credit ratio"
           value={
             active ? (
               <span class="rv-capital">

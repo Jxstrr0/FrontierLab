@@ -1,39 +1,42 @@
-// How to lift a weak capital ratio (SIMULATION §15), in plain words. Shown as
-// a checklist under the capital meter at Watch or worse, and folded into the
-// Weekly Ledger's capital story so the warning says what to do about it.
+// How to lift a weak safety ratio (SIMULATION §15, stage C7a), in plain words.
+// Shown as a checklist under the safety meter at Watch or worse, and folded
+// into the Weekly Inference's safety story so the warning says what to do.
+// (File name kept from the bank game's capital fixes.)
 import type { Tier } from './types';
 
 export type ListingStatus = 'private' | 'public';
 
-/** The fastest fix: new shares add straight to equity. */
+/** The fastest fix, the same whether private or listed. */
 export const RAISE_FIX: Record<ListingStatus, string> = {
-  private: 'Sell new shares: tap an investment bank on the map, then Equity → Private placement.',
-  public: 'Sell new shares: tap an investment bank on the map, then Equity → Secondary offering.',
+  private:
+    'Hire safety staff: raise the staff target on the HQ Safety & Alignment floor (lease one if you have none).',
+  public:
+    'Hire safety staff: raise the staff target on the HQ Safety & Alignment floor (lease one if you have none).',
 };
 
 /** The other levers, in the order worth trying. */
 export const OTHER_FIXES: readonly string[] = [
-  'Sell stocks and startup stakes the company holds. They count 2.5× against your capital.',
-  'Turn risk appetite down on the HQ Finance floor so new loans are safer.',
-  'Hold off on new sales offices, property and dividends while profits rebuild capital.',
-  'Or seat a CFO on the Executive floor and switch on Capital: they will do all of this for you.',
+  'Pay the Safety team better: skill and morale count as much as headcount.',
+  'Seat a Chief Safety Officer on the Executive floor: their expertise lifts the Safety team.',
+  'Train a model with a Safety focus, or switch to a safer one in Manage Models.',
+  'A model far ahead of the frontier carries more risk: grow the Safety team before you ship it.',
 ];
 
-/** The extra warning at Critical (SIMULATION §15, emergency recapitalisation). */
+/** The extra warning at Critical (SIMULATION §15, the mandated pause). */
 export const CRITICAL_FIX_NOTE =
-  'Below 4.5% for 8 weeks, the regulator offers an emergency rescue. Accept it, or it takes over the lab.';
+  'Below 40% for 8 weeks, the regulator orders a pause. Refuse it, or stay below, and it revokes the licence for 26 weeks.';
 
-/** The target a struggling bank should climb back to. */
+/** The target a struggling lab should climb back to. */
 export const CAPITAL_FIX_TITLE: Partial<Record<Tier, string>> = {
-  watch: 'How to get back above 10.5%',
-  restricted: 'How to fix this: aim for 10.5% or more',
-  critical: 'How to fix this: aim for 10.5% or more',
+  watch: 'How to get back above 85%',
+  restricted: 'How to fix this: aim for 85% or more',
+  critical: 'How to fix this: aim for 85% or more',
 };
 
-/** The newspaper's one-line version, completing "To recover, the bank can …". */
+/** The newspaper's one-line version, completing "To recover, the lab can …". */
 export const CAPITAL_FIX_NEWS: Record<ListingStatus, string> = {
   private:
-    'sell new shares through an investment bank (Equity → Private placement), sell the stocks it holds, or turn risk appetite down on the HQ Finance floor',
+    'hire safety staff on its HQ Safety & Alignment floor, seat a Chief Safety Officer, or train a safer model',
   public:
-    'sell new shares through an investment bank (Equity → Secondary offering), sell the stocks it holds, or turn risk appetite down on the HQ Finance floor',
+    'hire safety staff on its HQ Safety & Alignment floor, seat a Chief Safety Officer, or train a safer model',
 };

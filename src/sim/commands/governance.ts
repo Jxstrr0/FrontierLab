@@ -39,7 +39,7 @@ export function proposalProblem(
   const cap = dividendCapPerShare(state);
   if (cap !== null && dps > cap + 1e-9)
     return cap <= 0
-      ? 'The regulator forbids dividends in this capital tier.'
+      ? 'The regulator forbids dividends in this safety tier.'
       : `The regulator caps this quarter's dividend at $${cap.toFixed(2)} a share.`;
   if (dps > 0 && state.governance.pendingDividend)
     return 'The last dividend has not been paid yet. Propose no dividend this time.';

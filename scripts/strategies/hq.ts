@@ -1,5 +1,6 @@
 // HQ upkeep for scripted strategies (SIMULATION §25 "HQ floors staffed to 100%"):
-// lease an office once requirements start phasing in, add a floor per
+// a Safety floor as soon as requirements start phasing in (the regulator's
+// tier, C7a), a full office once they are half phased in, then a floor per
 // department in priority order as cash allows (leasing another building when
 // the first is full), and keep every department's staff target at what full
 // coverage needs.
@@ -35,10 +36,13 @@ const MIN_FLOORS = 7;
 
 export function manageHq(state: GameState): void {
   const ramp = founderRamp(state);
-  if (ramp < LEASE_AT_RAMP && Object.keys(state.offices).length === 0) return;
+  if (ramp <= 0 && Object.keys(state.offices).length === 0) return;
   // Only the uncovered share counts at a partial ramp: k needed for k′ = TARGET_K.
   const kNeeded = ramp > 0 ? Math.max(0, 1 - (1 - TARGET_K) / ramp) : 0;
-  ensureFloors(state);
+  // Before the full HQ, a Safety floor alone keeps the regulator's tier up (C7a).
+  if (ramp < LEASE_AT_RAMP && Object.keys(state.offices).length === 0) {
+    if (kNeeded > 0) addFloorFor(state, 'risk');
+  } else ensureFloors(state);
   for (const id of HQ_DEPTS) {
     const d = state.departments[id];
     if (!d) continue;

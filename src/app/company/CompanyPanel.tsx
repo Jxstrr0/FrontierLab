@@ -1,4 +1,5 @@
-// Company summary (SCREENS §24): "Where to look", capital ratio and tier, cash cover, liquidity, the main
+// Company summary (SCREENS §24): "Where to look", safety ratio and tier (with
+// the lenders' credit ratio beneath), cash cover, liquidity, the main
 // totals, your share price or private valuation with the cap table and your
 // personal line (ShareSummary.tsx), and simplified statements, with a link to
 // the full statements on the HQ Finance floor once you have one.
@@ -8,8 +9,9 @@ import { companyArr } from '../../sim/arr';
 import { balanceSheet } from '../../sim/balanceSheet';
 import { capitalSnapshot } from '../../sim/capital';
 import { cashCoverWeeks, weeklyCosts } from '../../sim/cashCover';
+import { safetySnapshot, tierLift } from '../../sim/safety';
 import { Badge, Card, Medallion, Panel, Row, SectionTitle, Sheet } from '../components';
-import { capitalRatioText, money, pct } from '../format/format';
+import { capitalRatioText, money, pct, safetyRatioText } from '../format/format';
 import { RealEstateCard } from '../realEstate/RealEstateCard';
 import { closePanel, openPanel, useGame } from '../store';
 import { CapitalFixes } from './CapitalFixes';
@@ -17,6 +19,7 @@ import { LIQUIDITY_STATUS, liquidityGauge } from '../hq/treasury/treasuryView';
 import { ComputeCard } from './ComputeCard';
 import { CapitalMeter, TIER_LABEL, TIER_TONE } from './CapitalMeter';
 import { ShareSummary } from './ShareSummary';
+import { SafetyNotice } from './SafetyNotice';
 import { Statements } from './Statements';
 import { WhereToLook } from './WhereToLook';
 import './company.css';
@@ -31,8 +34,8 @@ const EXPLAINERS: { title: string; body: string }[] = [
     body: 'Offices are charged the spot price for the GPUs they use. GPUs in your data centers and reserved lots serve customers first and cost less; the rest is bought at spot, which follows the chip market. Clouds only sell so much at spot: past that you pay an emergency premium, then new customers wait, then outages start.',
   },
   {
-    title: 'Capital limits growth',
-    body: 'Capital is what the lab owns after its debts. The regulator compares it with your risky assets, and the tier decides how freely you can grow.',
+    title: 'Safety limits growth',
+    body: 'The regulator compares your Safety & Alignment floor with the risk your model carries. That safety ratio sets your tier, and the tier decides how freely you can sign new customers. Lenders price on a separate credit ratio.',
   },
   {
     title: 'Treasury reserves',
@@ -57,6 +60,7 @@ export function CompanyPanel() {
   const [learn, setLearn] = useState(false);
   const sym = s.settings.currency;
   const cap = capitalSnapshot(s);
+  const safe = safetySnapshot(s);
   const bs = balanceSheet(s);
   const liq = s.company.liquidityRatio;
   const gauge = liquidityGauge(liq, LIQ_MIN, s.treasury.liqTarget, LIQ_REPAY_BUFFER);
@@ -85,19 +89,24 @@ export function CompanyPanel() {
         <Card>
           <div class="cap-head" data-tutorial="capital-meter">
             <div>
-              <div class="muted small">Capital ratio</div>
-              <div class="hero-number">{capitalRatioText(cap.capitalRatio)}</div>
+              <div class="muted small">Safety ratio</div>
+              <div class="hero-number">{safetyRatioText(safe.ratio)}</div>
             </div>
-            <Badge tone={TIER_TONE[cap.tier]}>{TIER_LABEL[cap.tier]}</Badge>
+            <Badge tone={TIER_TONE[safe.tier]}>{TIER_LABEL[safe.tier]}</Badge>
           </div>
-          <CapitalMeter ratio={cap.capitalRatio} tier={cap.tier} />
+          <SafetyNotice s={s} />
+          <CapitalMeter ratio={safe.ratio} tier={safe.tier} kind="safety" lift={tierLift(s)} />
           <p class="muted small cap-note">
-            Capital divided by risk-weighted assets. Higher tiers cost less to fund; the lowest
-            tiers stop growth.
-            {cap.capitalRatio > 1 &&
-              ' Almost nothing the lab holds carries risk yet, so the ratio is off the scale.'}
+            Safety cover {safetyRatioText(safe.strength)}, exposure ×{safe.exposure.toFixed(2)}. The
+            regulator compares your Safety &amp; Alignment floor with the risk your model carries;
+            the tier decides how many new customers it lets in.
           </p>
-          <CapitalFixes tier={cap.tier} listing={s.stock.status} />
+          <Row
+            label="Credit ratio (lenders)"
+            value={`${capitalRatioText(cap.capitalRatio)} · ${TIER_LABEL[cap.tier]}`}
+            tone="dim"
+          />
+          <CapitalFixes tier={safe.tier} listing={s.stock.status} />
         </Card>
 
         <Card>

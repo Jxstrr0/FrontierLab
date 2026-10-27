@@ -12,6 +12,7 @@ import { newId } from './ids';
 import { spend } from './ledger';
 import { bestRivalModel } from './rivalModels';
 import { stream } from './rng';
+import { isPaused } from './safety';
 import { chiefScientistBonus, researchBonus } from './talent';
 import type { GameState, TrainingRun, UnderwritingModel } from './state';
 import { activeModel, customFigures, modelQuality, trainedRadar } from './underwriting';
@@ -49,7 +50,8 @@ export function trainingWeeksLeft(state: GameState, run: TrainingRun): number {
 /** Tick step 7: the run pays for the progress it makes and finishes at its term. Pauses without a Products floor. */
 export function runTraining(state: GameState): void {
   const run = state.training.run;
-  if (!run || !state.departments.products) return;
+  // No Products floor, or a mandated pause (C7a): the run waits.
+  if (!run || !state.departments.products || isPaused(state)) return;
   const step = Math.min(devSpeed(state), run.weeks - run.progress);
   const cost = run.weeklyBudget * step;
   spend(state, 'development', cost);

@@ -251,6 +251,36 @@ const BANK_TEMPLATES = {
       b: 'A {amount} capital injection shores up the balance sheet at the cost of {shares} new shares.',
     },
   ],
+  SAFETY_PAUSE: [
+    {
+      h: '{bank} agrees to a {weeks}-week safety pause',
+      b: 'Regulators will sit alongside the lab’s safety team. No new customers or training runs until they leave, and the lab pays their {fee} bill.',
+    },
+    {
+      h: 'Regulator puts {bank} on hold',
+      b: 'After weeks of thin safety cover the lab has accepted a {weeks}-week pause and {fee} in monitoring fees.',
+    },
+  ],
+  LICENCE_REVOKED: [
+    {
+      h: 'Regulator revokes {bank}’s licence',
+      b: 'The lab may not sign new customers or train models for {weeks} weeks, then faces a year of strict watch.',
+    },
+    {
+      h: '{bank} loses its licence',
+      b: 'Safety cover fell too far for too long. Existing customers stay, but nothing new for {weeks} weeks.',
+    },
+  ],
+  LICENCE_RESTORED: [
+    {
+      h: '{bank} gets its licence back',
+      b: 'The pause is over. The regulator will keep a close eye on the lab for the next year.',
+    },
+    {
+      h: 'Back in business: {bank}',
+      b: 'Its licence restored, the lab can sign customers again, under strict watch for a year.',
+    },
+  ],
   MODEL_TRAINED: [
     {
       h: '{bank} finishes training {name}',
@@ -440,11 +470,11 @@ const BANK_TEMPLATES = {
   CAPITAL_WEAK: [
     {
       h: 'Regulator puts {bank} on watch',
-      b: 'With a capital ratio of {cr}, the lab shows {tier}. To recover, it can {fix}.',
+      b: 'With a safety ratio of {cr}, the lab shows {tier}. To recover, it can {fix}.',
     },
     {
-      h: 'Thin cushion at {bank}',
-      b: 'A capital ratio of {cr} leaves {tier}. Analysts say the lab should {fix}.',
+      h: 'Thin safety cover at {bank}',
+      b: 'A safety ratio of {cr} leaves {tier}. Analysts say the lab should {fix}.',
     },
   ],
   INCIDENT_ROBBERY: [

@@ -320,6 +320,8 @@ Follows the brief's map structure (1–2 main offices worldwide, one sales offic
   - A ninth executive seat, the **Chief Scientist** (owner's ask, 2026-10-26): lifts the Research floor and training-run star odds, with delegation over routine training runs
 - **Accept:** a better model visibly lifts the Model rating, win rates and price headroom.
 
+- **C7a — Safety ratio and the AI regulator: done (v0.1.21, schema 17).** The regulator's tier now follows a safety ratio: Safety & Alignment coverage over the risk your model carries (more when it leads the frontier, less when its Safety axis is high). The tier gates every new sign-up, Strong wins data-sensitive businesses, Critical fines a share of revenue each quarter, and the quarterly safety audit grows likelier with thin cover, a frontier model or strict watch. The emergency recapitalisation became a mandated pause (8 weeks without new customers, deals or training, with the regulator's monitors); declining it or failing to recover revokes the licence for 26 weeks, then a year of strict watch, never game over. The bank's capital ratio stays as the lenders' credit ratio. **Next: C7b** (revenue-multiple valuation, IPO rules re-keyed, lobbying becomes AI policy).
+
 ### C7 — Safety, regulation and valuation
 - **Build:**
   - Safety ratio and AI regulator tiers, with today's gates and fines

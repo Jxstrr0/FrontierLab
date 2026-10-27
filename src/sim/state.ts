@@ -57,7 +57,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState } from './personalTypes';
 
-export const SCHEMA_VERSION = 16;
+export const SCHEMA_VERSION = 17;
 
 export interface GameState {
   schemaVersion: number;
@@ -388,9 +388,16 @@ export interface Company {
   tierWeeks: number;
   /** Consecutive weeks with corporate cash below zero (insolvency check). */
   negativeCashWeeks: number;
-  /** Consecutive weeks with the capital ratio below FAILURE.takeoverCr. */
+  /** Consecutive weeks with the safety ratio below MANDATED_PAUSE.revokeLine (C7a). */
   lowCapitalWeeks: number;
+  /** Credit ratio: CET1 ÷ risk-weighted assets, what lenders price on (§15). */
   capitalRatio: number;
+  /** Safety ratio (C7a, §15): it sets `tier`, the AI regulator's tier. */
+  safetyRatio: number;
+  /** A mandated pause: no new customers, deals or training until untilWeek (C7a). */
+  pause?: { reason: 'voluntary' | 'revoked'; untilWeek: Week };
+  /** Strict watch after a revoked licence ends this week (C7a). */
+  watchUntilWeek?: Week;
   /** Liquid assets ÷ deposits; null while there are no deposits. */
   liquidityRatio: number | null;
   appRating: Stars;
@@ -1103,6 +1110,8 @@ export interface WeeklySnapshot {
   };
   pnl: Record<PnlLine, Money>;
   capitalRatio: number;
+  /** Safety ratio at the close (C7a); absent in weeks closed before schema 17. */
+  safetyRatio?: number;
   tier: Tier;
   /** Mobile app rating at the week's close (IT floor trend). Missing in older saves. */
   appRating?: Stars;

@@ -90,7 +90,7 @@ function RivalCard(p: { s: GameState; bank: RivalBank; onOffer: () => void }) {
       <Row label="Cities" value={rivalCities(bank) || '—'} />
       <Row label="Deposits" value={money(rivalDeposits(bank), sym)} />
       <Row
-        label="Capital"
+        label="Credit ratio"
         value={
           distressed ? (
             <Badge tone="bad">Failed</Badge>

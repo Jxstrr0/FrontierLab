@@ -62,7 +62,7 @@ export function BuybackCard() {
       <Row label={`Broker's fee (${pct(BUYBACK.fee)})`} value={money(q.fee, sym)} />
       <Row label="Total cost" value={money(q.cost, sym)} strong />
       <Row label="Your stake after" value={pct(stakeAfter, 1)} />
-      <Row label="Capital ratio after" value={pct(q.crAfter, 1)} tone="dim" />
+      <Row label="Credit ratio after" value={pct(q.crAfter, 1)} tone="dim" />
       {capped && (
         <p class="muted small">
           Capped so the public keeps at least {pctText(BUYBACK.minFloat)} of the lab.

@@ -240,7 +240,7 @@ export interface MergerOffer {
   madeWeek: Week;
   /** The answer arrives at this week's tick. */
   respondWeek: Week;
-  /** 'lapsed': accepted, but your cash or capital tier no longer allowed closing. */
+  /** 'lapsed': accepted, but your cash or safety tier no longer allowed closing. */
   status: 'pending' | 'accepted' | 'rejected' | 'blocked' | 'lapsed';
   distressed: boolean;
   /** Why it was blocked or rejected, for the UI. */
