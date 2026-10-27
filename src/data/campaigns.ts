@@ -176,7 +176,7 @@ export const CAMPAIGNS: Record<string, CampaignSpec> = {
   search: {
     id: 'search',
     name: 'Local Paid Search',
-    effectHint: 'Awareness ++ · Loan Desk +',
+    effectHint: 'Awareness ++ · Proposal requests +',
     levels: [
       {
         label: 'Moderate',

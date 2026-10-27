@@ -43,6 +43,8 @@ describe('RFPs arrive', () => {
     setRivals(s);
     cmd.setOffered(s, id, 'sbl', false);
     expect(s.branches[id]!.offered.sbl!.on).toBe(false);
+    // Requests that arrived before it was switched off may still be open.
+    for (const r of newRfps(s)) delete s.dealDesk.rfps[r.id];
     for (let w = 0; w < 40; w++) {
       advanceWeeks(s, 1);
       expect(newRfps(s)).toHaveLength(0);

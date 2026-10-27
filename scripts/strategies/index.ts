@@ -96,7 +96,8 @@ export const turtle: Strategy = {
   weekly: (s) => {
     followDefaults(s);
     manageHq(s);
-    for (const r of Object.values(s.dealDesk.rfps)) if (r.kind === 'new') cmd.declineApplication(s, r.id);
+    for (const r of Object.values(s.dealDesk.rfps))
+      if (r.kind === 'new') cmd.declineApplication(s, r.id);
     // A turtle stays a Standard office: a bigger one needs an HQ team its
     // deposit-only income can't pay for.
     if (hqReady(s)) growOffice(s, 2, 0, 1);

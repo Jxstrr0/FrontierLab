@@ -419,7 +419,7 @@ The Loan Desk is gone (C5b, 2026-10-27). The Deal Desk sells enterprise contract
 
 ### 11.1 RFPs
 - **Where:** each open sales office takes requests from the businesses in its city (one office per city, C2b). The **Enterprise contracts** product (id `sbl`) must be on for new requests and bids on rival renewals; your own renewals always show.
-- **New RFP:** each week a business with no AI vendor, no open RFP and past its `quietUntil` asks with chance `rfpWeekly (0.04) × (0.25 + 0.75 × awareness) × (1 + 0.12 × (AI readiness − 5)) × campaign loanDesk effect`. It waits `expiryWeeks` (3) for a bid; an expired, declined or lost request makes the business wait `cooldownWeeks` (13).
+- **New RFP:** each week a business with no AI vendor, no open RFP and past its `quietUntil` asks with chance `rfpWeekly (0.07) × (0.25 + 0.75 × awareness) × (1 + 0.12 × (AI readiness − 5)) × campaign loanDesk effect`. It waits `expiryWeeks` (3) for a bid; an expired, declined or lost request makes the business wait `cooldownWeeks` (13). (Tuned 0.04 → 0.07 so a lone office sees a request every few weeks.)
 - **Renewal RFP (A7):** a contract whose `renewalWeek` (always a quarter start) is within `renewalNoticeWeeks` (4) gets a renewal RFP. Your own carries an offer that starts at the contract's current discount; a rival's has no offer until you make one.
 - **Bid:** a discount `d` (0–40%, 1% steps) off the business's budget. Contract value = `budget × (1 − d)`, rounded to $100.
 

@@ -87,7 +87,8 @@ export function endOfficeContracts(state: GameState, branchId: string): void {
 /** Moves an office's contracts and RFPs to another office in the same city (offices folding, C2b). */
 export function moveOfficeContracts(state: GameState, fromId: string, toId: string): void {
   for (const b of Object.values(state.businesses))
-    if (b.vendor?.type === 'player' && b.vendor.id === fromId) b.vendor = { type: 'player', id: toId };
+    if (b.vendor?.type === 'player' && b.vendor.id === fromId)
+      b.vendor = { type: 'player', id: toId };
   for (const r of Object.values(state.dealDesk.rfps)) if (r.branchId === fromId) r.branchId = toId;
 }
 
@@ -142,7 +143,11 @@ function settleRival(state: GameState, rng: Rng, b: Business, rfp: Rfp | undefin
     recordDesk(state, branch.id, 'lost');
   }
   if (b.vendor)
-    b.renewalWeek = quarterStartWeek(state.meta.startDate, state.clock.week, sectorOf(b).termQuarters[0]);
+    b.renewalWeek = quarterStartWeek(
+      state.meta.startDate,
+      state.clock.week,
+      sectorOf(b).termQuarters[0],
+    );
 }
 
 /**
@@ -179,7 +184,8 @@ export function runContracts(state: GameState): void {
     if (!b.vendor) continue;
     if (b.size !== 'anchor') {
       const cycle = creditCycle(countryOfCity(state, b.cityId));
-      const p = (DEAL.failYear * dexp(-DEAL.failSlope * (b.pentagon[4] - 5)) * cycle) / WEEKS_PER_YEAR;
+      const p =
+        (DEAL.failYear * dexp(-DEAL.failSlope * (b.pentagon[4] - 5)) * cycle) / WEEKS_PER_YEAR;
       if (rng.chance(p)) {
         loseContract(state, rng, b, 'failed');
         dropRfps(state, b.id);
@@ -201,4 +207,3 @@ export function officeContractArr(state: GameState, branchId: string): number {
     if (b.vendor?.type === 'player' && b.vendor.id === branchId) total += b.contractValue ?? 0;
   return total;
 }
-

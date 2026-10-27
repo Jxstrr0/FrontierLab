@@ -1,6 +1,6 @@
 // Read-only views for the Products floor, the credit bureau and the IT floor's
 // digital projects (SCREENS §10, §13): the company lineup's price and Offered
-// state, company totals per product, the ARR and lending trend, development
+// state, company totals per product, the ARR trend, development
 // status and model labels. Nothing here mutates GameState.
 import { DEV_TIER, DEV_TERMS } from '../../../config/balance';
 import { DATA_INPUTS } from '../../../data/bureaus';
@@ -161,15 +161,13 @@ export function companyTotals(s: GameState, productId: string) {
 
 // ─── Company trend ────────────────────────────────────────────────────────────
 
-/** ARR and Loan Desk lending over the last `weeks` closed weeks, with the latest two values. */
+/** ARR over the last `weeks` closed weeks, with the latest two values. */
 export function trendSeries(history: WeeklySnapshot[], weeks: number) {
   const recent = history.slice(-weeks);
   const arr = recent.map((w) => w.totals.arr ?? 0);
-  const loans = recent.map((w) => w.totals.loans);
   return {
     weeks: recent.map((w) => w.week),
     arr,
-    loans,
     last: recent[recent.length - 1],
     prev: recent[recent.length - 2],
   };

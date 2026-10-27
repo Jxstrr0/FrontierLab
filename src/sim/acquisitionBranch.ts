@@ -6,7 +6,13 @@
 // customers (C3a: its book deposits ÷ MERGERS.depositPerCustomer, split by
 // ACQUIRED_PLAN_MIX). Plan ARR is not on the balance sheet, so nothing is
 // paired with reserves.
-import { DEAL, MERGERS, PRODUCTS_PER_CUSTOMER, START_STAFF_MORALE, WAGE_STEP } from '../config/balance';
+import {
+  DEAL,
+  MERGERS,
+  PRODUCTS_PER_CUSTOMER,
+  START_STAFF_MORALE,
+  WAGE_STEP,
+} from '../config/balance';
 import { EQUIPMENT } from '../data/equipment';
 import { ACQUIRED_BUILDS, ACQUIRED_PLAN_MIX } from '../data/mergers';
 import { PRODUCTS, type ProductSpec } from '../data/products';
