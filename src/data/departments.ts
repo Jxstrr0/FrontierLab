@@ -35,7 +35,7 @@ export const DEPARTMENTS: Record<DeptId, DepartmentSpec> = {
   products: {
     id: 'products',
     name: 'Products',
-    description: 'House underwriting models, the company lineup and product development.',
+    description: 'The AI model and its training data, the company lineup and product development.',
     marketSalary: 90_000,
     feature: 'hq',
   },

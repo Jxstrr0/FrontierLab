@@ -36,7 +36,7 @@ How the economy works, step by step. Every CAPS name is a key in `src/config/bal
    8. branch P&L (§12)
 5. `partnerships.weekly` (§13.7)
 6. `treasury.weekly` (§13)
-7. `hq.weekly`: floors, coverage, benefits, then developments (§16.6) and underwriting models (custom model refresh, switch countdown, §16.7)
+7. `hq.weekly`: floors, coverage, benefits, then developments (§16.6) and the AI model (custom model refresh, switch countdown, §16.7)
 8. Corporate items: offices, executives, brand marketing, corporate debt, M&A, real estate, ventures (venture debt payments, rounds closing, the pipeline), conventions, lobbying outcomes, depreciation (§14, §20, §21)
 9. `statements.close`: P&L, cash flow, balance sheet, tax (§14)
 10. `capital.evaluate` and regulator tier (§15)
@@ -722,16 +722,25 @@ If Finance coverage' < 0.9, the newest `ceil((0.9 − k') × 10)` weeks show as 
 - **Digital templates** (IT floor required) run once each and create no product: Mobile App 2.0 adds 0.3 to the app rating now and to its target for good (`digitalProjectBonus`, §16.9); Instant Decisions adds 2 to the house model's Speed (capped at 10).
 - **Deleting** a developed product moves its accounts and balances onto the base product's book at each branch.
 
-### 16.7 Underwriting models
-- **Radar** (1–10 each): Accuracy, Speed, Inclusion, FraudShield, Fairness. Plus `costPerApp`.
-- **Packaged models** are bought from credit bureaus: fixed mixes at fixed prices.
-- **Custom models** (Products floor required): weights over data inputs (CONTENT).
+### 16.7 The AI model (stage C6a; was underwriting models)
+- **Radar** (1–10 each): Reasoning, Speed, Breadth, Safety, Efficiency (the bank-era Accuracy, Speed, Inclusion, FraudShield, Fairness slots, same numbers). Plus `costPerCustomer`, the data licence per customer a year.
+- **Packaged models** are licensed from data vendors: fixed data mixes at fixed prices.
+- **Custom models** (Products floor required): weights over training datasets (CONTENT §13).
   - `radar = Σ w × profile × qualityMult`, where `qualityMult = 0.9 + 0.2 × productsCoverage' × avgSkill/100`
-  - `cost = Σ w × cost`
-  - The Internal History input needs ≥ 5,000 loans booked. Its accuracy = `4 + min(5, loansBooked/20,000 × 5)`.
-- **Bureau-hosted custom model:** like the original's custom blend at a roaster. No Products floor needed; same mix rules, with `qualityMult = 0.95` and cost × 1.15.
-- **Switching models** takes 2 weeks; old and new blend linearly over that time: the old model's weight is `weeksLeft / (MODEL_SWITCH_WEEKS + 1)`, so 2/3 then 1/3, then fully new. Radar and cost per application both blend.
-- Custom models' radars are recomputed every week, so they follow the Products team's coverage and skill and Internal History's growing accuracy. Radar values cap at 10.
+  - `costPerCustomer = Σ w × cost`
+  - The Customer Feedback dataset needs ≥ `INTERNAL_HISTORY.minCustomers` (5,000) customers across the lab. Its Reasoning = `4 + min(5, customers/50,000 × 5)`.
+- **Vendor-hosted custom model:** like the original's custom blend at a roaster. No Products floor needed; same mix rules, with `qualityMult = 0.95` and cost × 1.15.
+- **Switching models** takes 2 weeks; old and new blend linearly over that time: the old model's weight is `weeksLeft / (MODEL_SWITCH_WEEKS + 1)`, so 2/3 then 1/3, then fully new. Radar and licence cost both blend.
+- Custom models' radars are recomputed every week, so they follow the Products team's coverage and skill and Customer Feedback's growing Reasoning. Radar values cap at 10.
+- **What the model does** (`MODEL_EFFECTS`; quality = the radar mean):
+  - **Data licences:** each office pays `customers × costPerCustomer × (1 + 0.3 × Products shortfall) / 52` a week (P&L line `underwriting`).
+  - **Inference cost:** every compute cost behind plans, usage and contracts × `1 − 0.05 × (Efficiency − 7)` (0.85–1.35 over the radar).
+  - **Price headroom:** plan and usage demand and churn compare your price with `market × (1 + 0.04 × (quality − 5.8))`.
+  - **Model rating:** `+ 0.1 × (quality − 5)` on the Model (Products) rating (§8).
+  - **Contracts:** win and keep chances (§11.3) `+ 0.05 × (quality − 5.8) + 0.03 × (Safety − 5) × (Data sensitivity − 5) / 5`.
+  - **Speed** lifts the Service rating and **Safety** the fraud shield, as Speed and FraudShield did.
+  - The starting package (Clearline Web Base, radar 6, 8, 4, 4, 7) sits exactly at the reference points, so a new game is unchanged.
+- **CPO delegation:** switches to the local package whose `quality − 0.02 × costPerCustomer` beats the house model's by ≥ 0.3.
 
 ### 16.8 Risk appetite
 Levels 1–5 (Very conservative to Very aggressive):

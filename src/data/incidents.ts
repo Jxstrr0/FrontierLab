@@ -271,7 +271,7 @@ export const INCIDENT_SPECS: Record<string, IncidentSpec> = {
       {
         id: 'bureau',
         label: 'Absorb and call a fraud firm',
-        effect: 'We eat the fraud, then look at a model with a stronger fraud shield.',
+        effect: 'We eat the fraud, then look at a model with stronger Safety.',
       },
     ],
     worst: 'absorb',

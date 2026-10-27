@@ -176,7 +176,7 @@ export interface Development {
 }
 export interface UnderwritingState {
   activeModelId: Id; switchingTo?: { id: Id; weeksLeft: number };
-  models: Record<Id, { id: Id; name: string; source: 'bureau'|'custom'; mix: Record<string, number>; radar: Pentagon; costPerApp: Money }>;
+  models: Record<Id, { id: Id; name: string; source: 'bureau'|'custom'; mix: Record<string, number>; radar: Pentagon; costPerCustomer: Money }>; // C6a (schema 14): radar Reasoning, Speed, Breadth, Safety, Efficiency; was costPerApp
   loansBooked: number;
 }
 ```
@@ -353,6 +353,8 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 **Frontier Lab schema 12 (stage C5a, customer businesses):** new `GameState.businesses: Record<Id, Business>`, where `Business` = `{ id, cityId, name, sector, size: 'small'|'mid'|'large'|'anchor', lotId? or siteId?, pentagon, budget, vendor?: { type: 'player'|'rival', id }, contractValue?, renewalWeek? }` (SIMULATION §11.0). A business on a storefront sets that lot's occupant to `{ type: 'business', id }`; anchors sit on employer sites. Each city draws from its own `businesses:{cityId}` stream. Migration 11 → 12 (`src/sim/save/migrateBusinesses.ts`) seeds businesses in every generated city.
 
 **Frontier Lab schema 13 (stage C5b, the Deal Desk):** `GameState.loanDesk` is replaced by `dealDesk: { rfps: Record<Id, Rfp> }` (SIMULATION §11). `Business` gains `startWeek?` (when your contract began) and `quietUntil?` (no new RFP before this week); a `vendor` of type `player` now names your sales office. `Branch.discountLimit` (a delegated manager's most generous discount, default `DEAL.defaultLimit`) is new, and `DeskWeek` counts `arrived`, `won`, `lost`, `declined`, `expired`. Events `LOAN_BOOKED` and `BIG_DEFAULT` give way to `CONTRACT_WON { branchId, businessId, business, sector, value, from? }` and `CONTRACT_LOST { …, reason: 'renewal'|'outage'|'failed'|'office', to? }`. The `dealDesk` and `contracts` RNG streams are created on first use. Commands `bidOnRfp`, `declineApplication` (now for RFPs), `setRenewalOffer`, `setDiscountLimit`; `decideApplication` is gone. Migration 12 → 13 (`src/sim/save/migrateDealDesk.ts`) repays current business loans into treasury reserves (equity unchanged), drops the applications, renames the desk tally, adds the discount limit and rescales business budgets to the C5b size bases.
+
+**Frontier Lab schema 14 (stage C6a, the AI model):** `UnderwritingModel.costPerApp` becomes `costPerCustomer` (the data licence per customer a year), and the radar's five slots now read Reasoning, Speed, Breadth, Safety, Efficiency (same numbers). `DataInputSpec.minLoansBooked` becomes `minCustomers`. Migration 13 → 14 (`src/sim/save/migrateModel.ts`) multiplies each model's cost by 10 (`COST_PER_CUSTOMER_FROM_APP`) and gives packaged models their data vendor's new name. `underwriting.loansBooked` stays and counts contracts won.
 
 **Frontier Lab schema 8 (stage C3c, bank leftovers removed):** `GameState.reo` and the `ReoPool` type are gone, and `Treasury` loses `bondsMarket`, `bondsBook`, `bondBookYield` and `bondShare`. The `covered_bond` funding type is gone. The command `transferToTreasury` is renamed `topUpLendingFund`. Migration 7 → 8 (`src/sim/save/migrateBankCleanup.ts`) keeps equity unchanged:
 - Each REO pool's value is added to company cash, and `reo` is deleted.
