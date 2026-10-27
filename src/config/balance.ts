@@ -2163,21 +2163,33 @@ export const BOARD_VOTE = {
 // ─── MARKETS (SIMULATION §19) ─────────────────────────────────────────────────
 /** Cost of equity (§19.2). */
 export const COE = 0.1;
-/** Private valuation: P/B = clamp(ROE/COE, pb) × discount (§19.2). */
-export const PRIVATE_VALUATION = { pb: [0.5, 2.5] as [number, number], discount: 0.8 } as const;
+/**
+ * Revenue-multiple valuation (§19.2, stage C7b): value = ARR × multiple, with
+ * multiple = clamp(base + growthSlope × clamp(growth, 0, growthCap) +
+ * qualitySlope × (model quality − bar), range); book value is the floor.
+ * Growth is the latest quarter's revenue against a year earlier.
+ */
+export const VALUATION = {
+  base: 3,
+  growthSlope: 6,
+  growthCap: 2,
+  qualitySlope: 2,
+  range: [1.5, 16] as [number, number],
+} as const;
+/** Private valuation: the revenue multiple value × discount, at least book (§19.2). */
+export const PRIVATE_VALUATION = { discount: 0.8 } as const;
 /** Private placement (§19.3). */
 export const PLACEMENT = { maxPct: 0.25, discount: 0.9, maxRounds: 3, gapWeeks: 26 } as const;
 /** IPO (§19.4). */
 export const IPO = {
-  minEquity: 25_000_000,
+  /** ARR needed to list (C7b; was equity ≥ $25M). */
+  minArr: 100_000_000,
   profitableQuarters: 4,
   minFinanceCoverage: 0.8,
   minRecessionCr: 0.14,
   floatPct: [0.1, 0.4] as [number, number],
-  roeClamp: [0.5, 3] as [number, number],
   discount: 0.9,
 } as const;
-export const IPO_MIN_EQUITY = IPO.minEquity;
 /** Your bank and listed rivals while public (§19.5). */
 export const PUBLIC_PRICE = {
   roeClamp: [0.3, 3] as [number, number],

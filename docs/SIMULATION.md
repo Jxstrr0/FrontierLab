@@ -924,9 +924,18 @@ Levels 1–5 (Very conservative to Very aggressive):
 - **Listed rivals** follow the §19.5 model (with the banking sector's shock folded into their sentiment); before their first report they're priced at book. Private rivals trade at book value; a seized rival's shares go to 0.
 - **Company holdings** are marked to market every week through the non-cash P&L line `investmentGains`; they carry the 2.5× risk weight. You and your company together may own at most 30% of a listed company or rival.
 
-### 19.2 Your bank while private
-- `valuation/share = BVPS × PB_priv`
-- `PB_priv = clamp(ROE_ttm / COE (0.10), 0.5, 2.5) × 0.8`
+### 19.2 Your lab while private (revenue multiple, stage C7b)
+- `value/share = max(BVPS, ARR × multiple ÷ shares)`: book value is the floor.
+- `multiple = clamp(3 + 6 × clamp(growth, 0, 2) + 2 × (model quality − quality bar), 1.5, 16)` (`VALUATION`).
+- `growth` = the latest quarter's revenue ÷ the same quarter a year earlier − 1. With fewer than five quarters reported it is the growth since the first quarter, scaled to a year (`(last/first)^(4/n) − 1`). It is 0 before two quarters.
+- Private: `valuation/share = max(BVPS, ARR × multiple × 0.8 ÷ shares)`.
+- **Worked numbers:** 10M shares, BVPS $5, ARR $50M, a model at the bar.
+  - Flat revenue: 3× → $12.00.
+  - Revenue doubled in a year: 9× → $36.00.
+  - Growth of 200% or more: 15× → $60.00.
+  - No ARR: $5.00, the book floor.
+- ROE_ttm stays for board votes and the CEO pay vote.
+- Listed rivals still price at book × clamp(ROE/COE): they keep a bank-style balance sheet until the C8 balance pass.
 
 ### 19.3 Private placement
 - Sell new shares up to 25% of outstanding per round at `PB_priv` valuation × 0.9.
@@ -935,18 +944,18 @@ Levels 1–5 (Very conservative to Very aggressive):
 
 ### 19.4 IPO
 - **Eligibility:**
-  - equity ≥ $25M
+  - ARR ≥ $100M (C7b; was equity ≥ $25M)
   - last 4 quarters profitable
   - Finance coverage' ≥ 0.8
-  - tier Adequate or better
-  - not in a Recession, unless CR ≥ 14%
+  - safety tier Adequate or better
+  - not in a Recession, unless the credit ratio ≥ 14%
 - **Choices:** float 10–40% as new shares, and the investment bank (fee 4.0–6.5%; quality sets the first-day pop of 0–25%).
-- **Offer price:** `BVPS × clamp(ROE_ttm/COE, 0.5, 3.0) × 0.9`.
+- **Offer price:** `max(BVPS, ARR × multiple ÷ shares) × 0.9` (§19.2).
 - **Listing:** at the next quarter-end tick, with a news event. Eligibility is checked again then; if it fails the IPO is withdrawn.
 - **Float:** the float % is the public's share after listing: new shares = outstanding × f ÷ (1 − f). The ticker comes from your monogram; the exchange is your home country's.
 
-### 19.5 Your bank while public
-- `target = BVPS × clamp(ROE_ttm/COE, 0.3, 3.0) × sentiment × irPenalty`
+### 19.5 Your lab while public
+- `target = max(BVPS, ARR × multiple ÷ shares) × sentiment × irPenalty` (§19.2, no private discount)
 - `irPenalty = 1 − 0.15 × (1 − financeCoverage')`
 - **Sentiment:**
   - mean-reverting random walk: σ = 2% per week, reverting at 5% per week toward 1
@@ -1084,7 +1093,10 @@ A deliberately simple "country up or down" investment (DESIGN §5.12a). Your boo
   - Rent can be set from 50% to 160% of market rent in steps of 5 per m². Turning For Sale off cancels a pending sale. A sold building returns to the listable pool.
   - Deals of $10M or more make the paper.
 - **21.6 Lobbying** (DESIGN §5.8.10, `src/data/lobbying.ts`, `LOBBYING`):
-  - Campaigns: **Ease the capital buffer** ($2.5M, 55% success, 12% exposure): tier thresholds in that country drop 1pp for 52 weeks. **Fast-track a merger review** ($1.5M, 60%, 10%): the next deal that closes may reach 65% of a city's deposits (MERGERS.fastTrackShare). **Stall the capital buffer bill** ($1.2M, 50%, 15%): only while a capital-buffer bill is pending there; a win makes it fail its vote.
+  - Campaigns (AI policy since C7b; ids unchanged):
+    - **Ease the AI safety rules** (`easeBuffer`; $2.5M, 55% success, 12% exposure): the buffer in that country drops 1pp for 52 weeks, so every safety tier line drops 0.05 (`SAFETY.bufferPerPp`, §15).
+    - **Fast-track a merger review** ($1.5M, 60%, 10%): the next deal that closes may reach 65% of a city's market (MERGERS.fastTrackShare).
+    - **Stall the AI safety bill** (`stallBuffer`; $1.2M, 50%, 15%): only while an AI safety buffer bill is pending there. A win makes it fail its vote.
   - The fee is paid at the start (`lobbying`, opex); the outcome arrives in 4–8 weeks (a stall no later than the vote). One pending campaign per type; a fast-track can't be bought while one is unused.
   - Exposure is rolled win or lose: a fine of 50% of the fee and −0.03 brand awareness in your cities in that country, plus a Ledger exposé.
 
@@ -1144,7 +1156,7 @@ A deliberately simple "country up or down" investment (DESIGN §5.12a). Your boo
 - **24.6 World calendar.** Fixtures (`src/data/worldCalendar.ts`) fire on their week of the year. The **Nations Cup** (years ≡ 2 mod 4, week 25) and **World Games** (years ≡ 0 mod 4, week 30) are announced 4 weeks ahead in a random game city; the whole event is played at once from the `news` stream and stored as a script of weekly stories (`desk.scheduled`). Cup: two groups of five, round robin, top two to the semi-finals; goals per side ~ Poisson(1.3 + 1.5 × strength gap, ≥ 0.2), host +0.1 strength, level knockout games go to penalties (0.5 + 0.5 × gap). Games: golds, silvers and bronzes per nation ~ Poisson(3 + 30 × strength, host +8). Stories: announcement, opening (or opening ceremony), groups (or halfway leader), semi-finals, final (or closing table). The **World Expo** (years ≡ 0 mod 5, week 18) opens and closes 26 weeks later. Every year: film awards (week 10), New Year fireworks (week 1), a science prize (week 41) and the Grand Sale Weekend (week 47; a record in an expansion or recovery at home, quiet otherwise). Priority 46 (finals and closing days 52, annual 38), cap 2 per issue. Flavour only.
 - **Sports abroad:** each week one league from a country you don't operate in takes its turn in the Sports tab (priority 22, cap 1), and every league's season finish reports at year end (yours rank higher).
 - **Archive:** keep the last 52 issues.
-- **Politics:** fictional, neutral parties. Policy proposals (fee caps, capital buffers) can become regulatory events, e.g. CAPITAL_BUFFER +1pp for 4 quarters in that country. Bills and votes draw from their own `politics` stream, so news changes never change which laws pass.
+- **Politics:** fictional, neutral parties. Policy proposals (fee caps, AI safety buffers) can become regulatory events, e.g. a passed AI safety buffer (`CAPITAL_BUFFER`, +1pp: every safety tier line +0.05) for 4 quarters in that country. Bills and votes draw from their own `politics` stream, so news changes never change which laws pass.
 - **Polls and elections:** every `NEWS_POLL_EVERY_WEEKS` (6) weeks every country's poll drifts (σ 1.2 points, floor 8%) and renormalises; the home poll makes a story. Every country votes every `NEWS_ELECTIONS.termWeeks` (208), the first votes staggered `staggerWeeks` (21) apart by country. The campaign is announced `campaignWeeks` (6) ahead with the latest poll; on the day the poll leader wins with `leaderWinP` (70%), otherwise the runner-up, and the winner gains `winnerBounce` (8) poll points. Priority 60 where you operate, 42 elsewhere; cap 2. Who governs is flavour only.
 
 ## 25. Balance targets

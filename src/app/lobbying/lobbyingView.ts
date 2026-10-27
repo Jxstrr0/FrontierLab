@@ -2,6 +2,7 @@
 // campaign with its cost, odds and whether it can start here now (and why
 // not), campaigns under way with weeks left, past outcomes, and the wins in
 // force (buffer relief, a fast-tracked merger review, a stalled bill).
+import { SAFETY } from '../../config/balance';
 import { LOBBY_CAMPAIGNS, LOBBY_FIRMS, type LobbyCampaignSpec } from '../../data/lobbying';
 import { lobbyBlock } from '../../sim/commands';
 import type { GameState, LobbyCampaign } from '../../sim/state';
@@ -58,12 +59,12 @@ export function winsInForce(s: GameState): string[] {
   if (lob.bufferRelief && lob.bufferRelief.untilWeek > week) {
     const weeks = lob.bufferRelief.untilWeek - week;
     out.push(
-      `Safety tier lines ${lob.bufferRelief.pp}pp lower for ${weeks} more week${weeks === 1 ? '' : 's'}.`,
+      `Safety tier lines ${Math.round(lob.bufferRelief.pp * SAFETY.bufferPerPp * 100)} points lower for ${weeks} more week${weeks === 1 ? '' : 's'}.`,
     );
   }
   if (lob.fastTrack) out.push('Your next merger review is fast-tracked.');
   if (lob.blockBill && lob.blockBill.untilWeek >= week) {
-    out.push('The capital buffer bill before lawmakers will fail its vote.');
+    out.push('The AI safety bill before lawmakers will fail its vote.');
   }
   return out;
 }

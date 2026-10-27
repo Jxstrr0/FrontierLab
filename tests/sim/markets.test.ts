@@ -2,7 +2,7 @@
 // cap-weighted index, rival bank pricing, the private valuation's worked
 // numbers and dividends paid to holdings.
 import { describe, expect, it } from 'vitest';
-import { STOCK_MARKET, WEEKS_PER_YEAR } from '../../src/config/balance';
+import { STOCK_MARKET, VALUATION, WEEKS_PER_YEAR } from '../../src/config/balance';
 import { SECTOR_MU } from '../../src/data/stocks';
 import { advanceWeeks } from '../../src/sim/engine';
 import { earningsShock, incidentShock, irPenalty, publicTarget } from '../../src/sim/equityModel';
@@ -13,9 +13,10 @@ import { topHolders } from '../../src/sim/marketHolders';
 import * as cmd from '../../src/sim/commands';
 import { newGame } from '../../src/sim/newGame';
 import { rngFromState, hashSeed } from '../../src/sim/rng';
-import { privateValuation } from '../../src/sim/valuation';
+import { activeModel } from '../../src/sim/underwriting';
+import { privateValuation, revenueGrowth, revenueMultiple } from '../../src/sim/valuation';
 import { balanceSheet } from '../../src/sim/balanceSheet';
-import { addCapital, identityGap, setQuarters } from '../helpers/markets';
+import { addCapital, giveArr, identityGap, setQuarters } from '../helpers/markets';
 
 const game = () => newGame({ seed: 42, cityId: 'cal', bankName: 'Test Bank' });
 
@@ -80,17 +81,46 @@ describe('the index (§19.1)', () => {
   });
 });
 
-describe('your bank while private (§19.2 worked numbers)', () => {
-  // Equity $50M on 10M shares: BVPS $5.
-  const valued = (roe: number) => {
+describe('your lab while private (§19.2 worked numbers)', () => {
+  // Equity $50M on 10M shares: BVPS $5. ARR $50M; quarterly revenue `revs`.
+  const lab = (arr: number, revs?: number[]) => {
     const s = game();
+    if (arr > 0) giveArr(s, arr);
     addCapital(s, 50_000_000 - balanceSheet(s).equity);
-    setQuarters(s, roe);
-    return privateValuation(s);
+    setQuarters(s, 0.15, revs?.length ?? 4);
+    revs?.forEach((r, i) => (s.history.quarterly[i]!.revenue = r));
+    return s;
   };
-  it('ROE 15%: $5 × clamp(1.5) × 0.8 = $6.00', () => expect(valued(0.15)).toBeCloseTo(6, 6));
-  it('ROE 3%: clamps to 0.5 → $2.00', () => expect(valued(0.03)).toBeCloseTo(2, 6));
-  it('ROE 40%: clamps to 2.5 → $10.00', () => expect(valued(0.4)).toBeCloseTo(10, 6));
+  it('flat revenue: ARR × 3 × 0.8 ÷ shares = $12.00', () => {
+    const s = lab(50_000_000);
+    expect(revenueGrowth(s)).toBe(0);
+    expect(revenueMultiple(s)).toBeCloseTo(VALUATION.base, 6);
+    expect(privateValuation(s)).toBeCloseTo(12, 6);
+  });
+  it('revenue doubled in a year: multiple 3 + 6 × 1 = 9 → $36.00', () => {
+    const s = lab(50_000_000, [1e6, 1.2e6, 1.4e6, 1.7e6, 2e6]);
+    expect(revenueGrowth(s)).toBeCloseTo(1, 9);
+    expect(privateValuation(s)).toBeCloseTo(36, 6);
+  });
+  it('growth counts up to 200%: tripling-plus clamps the multiple at 15 → $60.00', () => {
+    const s = lab(50_000_000, [1e6, 2e6, 3e6, 4e6, 5e6]);
+    expect(revenueMultiple(s)).toBeCloseTo(VALUATION.base + VALUATION.growthSlope * 2, 6);
+    expect(privateValuation(s)).toBeCloseTo(60, 6);
+  });
+  it('a young lab’s growth is scaled to a year', () => {
+    const s = lab(50_000_000, [1e6, 2e6]);
+    expect(revenueGrowth(s)).toBeCloseTo(15, 9); // doubling a quarter: 2⁴ − 1
+  });
+  it('book value is the floor: no ARR → BVPS $5.00', () => {
+    expect(privateValuation(lab(0))).toBeCloseTo(5, 6);
+  });
+  it('a model ahead of the bar earns a higher multiple', () => {
+    const s = lab(50_000_000);
+    const before = revenueMultiple(s);
+    const m = activeModel(s);
+    m.radar = m.radar.map((v) => v + 1) as typeof m.radar;
+    expect(revenueMultiple(s)).toBeCloseTo(before + VALUATION.qualitySlope, 6);
+  });
 });
 
 describe('public price model (§19.5)', () => {
@@ -98,10 +128,10 @@ describe('public price model (§19.5)', () => {
     expect(irPenalty(1)).toBe(1);
     expect(irPenalty(0.6)).toBeCloseTo(0.94, 12);
   });
-  it('target = BVPS × clamp(ROE/COE, 0.3, 3) × sentiment × irPenalty', () => {
-    expect(publicTarget(10, 0.12, 1.1, 1)).toBeCloseTo(10 * 1.2 * 1.1, 9);
-    expect(publicTarget(10, -0.05, 1, 1)).toBeCloseTo(3, 9);
-    expect(publicTarget(10, 0.5, 1, 0.8)).toBeCloseTo(30 * 0.97, 9);
+  it('target = value per share × sentiment × irPenalty', () => {
+    expect(publicTarget(10, 1.1, 1)).toBeCloseTo(11, 9);
+    expect(publicTarget(-3, 1, 1)).toBe(0);
+    expect(publicTarget(30, 1, 0.8)).toBeCloseTo(30 * 0.97, 9);
   });
   it('earnings growth moves sentiment ±(0–8%)', () => {
     expect(earningsShock(125, 100)).toBeCloseTo(0.08, 12);

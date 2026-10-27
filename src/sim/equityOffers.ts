@@ -3,16 +3,15 @@
 // fee, plus the IPO eligibility checklist. Read by the Equity tab (as
 // selectors) and by the commands in commands/marketsEquity.ts, so the screen
 // and the action always agree.
-import { COE, IPO, PLACEMENT, SECONDARY } from '../config/balance';
+import { IPO, PLACEMENT, SECONDARY } from '../config/balance';
 import { INVESTMENT_BANKS } from '../data/investmentBanks';
 import { FUND_NAMES } from '../data/names';
-import { balanceSheet } from './balanceSheet';
 import { clamp } from './math';
 import { hashSeed, rngFromState } from './rng';
-import { bookValuePerShare } from './shares';
 import type { GameState } from './state';
 import { homeCountry } from './treasury';
-import { privateValuation, roeTtm } from './valuation';
+import { companyArr } from './arr';
+import { fundamentalPerShare, privateValuation } from './valuation';
 
 export interface EquityQuote {
   shares: number;
@@ -78,7 +77,7 @@ export function investorPool(state: GameState): readonly string[] {
 // ─── IPO (§19.4) ──────────────────────────────────────────────────────────────
 
 export interface EligibilityRule {
-  id: 'equity' | 'profitable' | 'finance' | 'tier' | 'recession';
+  id: 'arr' | 'profitable' | 'finance' | 'tier' | 'recession';
   label: string;
   ok: boolean;
   /** Where you stand, e.g. "$18.2M" or "3 of 4". */
@@ -89,7 +88,7 @@ const money = (x: number) => `$${(x / 1e6).toFixed(1)}M`;
 
 /** §19.4 eligibility, one row per rule. */
 export function ipoChecklist(state: GameState): EligibilityRule[] {
-  const equity = balanceSheet(state).equity;
+  const arr = companyArr(state);
   const recent = state.history.quarterly.slice(-IPO.profitableQuarters);
   const profitable = recent.filter((q) => q.netIncome > 0).length;
   const kPrime = state.hq.coverage.finance?.kPrime ?? 1;
@@ -98,10 +97,10 @@ export function ipoChecklist(state: GameState): EligibilityRule[] {
   const cr = state.company.capitalRatio;
   return [
     {
-      id: 'equity',
-      label: `Equity of at least ${money(IPO.minEquity)}`,
-      ok: equity >= IPO.minEquity,
-      detail: money(equity),
+      id: 'arr',
+      label: `ARR of at least ${money(IPO.minArr)}`,
+      ok: arr >= IPO.minArr,
+      detail: money(arr),
     },
     {
       id: 'profitable',
@@ -117,13 +116,13 @@ export function ipoChecklist(state: GameState): EligibilityRule[] {
     },
     {
       id: 'tier',
-      label: 'Capital tier Adequate or Strong',
+      label: 'Safety tier Adequate or Strong',
       ok: tier === 'adequate' || tier === 'strong',
       detail: tier.charAt(0).toUpperCase() + tier.slice(1),
     },
     {
       id: 'recession',
-      label: `No recession at home, unless capital is ${Math.round(IPO.minRecessionCr * 100)}% or more`,
+      label: `No recession at home, unless the credit ratio is ${Math.round(IPO.minRecessionCr * 100)}% or more`,
       ok: !recession || cr >= IPO.minRecessionCr,
       detail: recession ? `Recession, ${(cr * 100).toFixed(1)}%` : 'No recession',
     },
@@ -133,11 +132,9 @@ export function ipoChecklist(state: GameState): EligibilityRule[] {
 /** True when every rule passes. */
 export const ipoEligible = (state: GameState): boolean => ipoChecklist(state).every((r) => r.ok);
 
-/** §19.4: offer price = BVPS × clamp(ROE_ttm / COE, 0.5, 3.0) × 0.9. */
+/** §19.4: offer price = value per share (ARR × multiple, at least book) × 0.9. */
 export function ipoOfferPrice(state: GameState): number {
-  const equity = balanceSheet(state).equity;
-  const pb = clamp(roeTtm(state, equity) / COE, ...IPO.roeClamp);
-  return Math.max(0, bookValuePerShare(state, equity) * pb * IPO.discount);
+  return fundamentalPerShare(state, undefined, IPO.discount);
 }
 
 /**

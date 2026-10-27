@@ -384,7 +384,7 @@ Tabs: Overview · Loans · Credit.
 **Equity:**
 - **While private:**
   - Private placement card: new shares stepper (% of outstanding), price per share, gross, fee, capital raised, investor name, Raise
-  - IPO card: eligibility checklist (✓/✗ per rule), float % stepper, indicative price, fee %, Launch IPO
+  - IPO card: eligibility checklist (✓/✗ per rule: ARR ≥ $100M, 4 profitable quarters, Finance cover, safety tier, recession/credit ratio), float % stepper, indicative price, fee %, Launch IPO
 - **While public:** Secondary offering card:
   - New shares stepper (with % of outstanding)
   - Price per share

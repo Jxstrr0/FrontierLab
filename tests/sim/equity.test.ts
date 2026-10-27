@@ -27,7 +27,6 @@ import {
   publicBank,
   setQuarters,
 } from '../helpers/markets';
-import { openScriptedBranch } from '../helpers/scenario';
 
 const fee = INVESTMENT_BANKS[BANK]!.fee;
 
@@ -90,7 +89,7 @@ describe('IPO eligibility (§19.4)', () => {
   });
 
   it('flags each rule on its own', () => {
-    expect(failing(eligibleBank(42, 10_000_000))).toEqual(['equity']);
+    expect(failing(eligibleBank(42, 40_000_000, 50_000_000))).toEqual(['arr']);
     const s = eligibleBank();
     s.history.quarterly[1]!.netIncome = -1;
     expect(failing(s)).toEqual(['profitable']);
@@ -112,7 +111,7 @@ describe('IPO eligibility (§19.4)', () => {
   });
 
   it('refuses to launch when not eligible', () => {
-    const s = eligibleBank(42, 10_000_000);
+    const s = eligibleBank(42, 40_000_000, 50_000_000);
     expect(cmd.launchIpo(s, BANK, 0.25).ok).toBe(false);
     expect(s.stock.ipo).toBeUndefined();
   });
@@ -176,7 +175,7 @@ describe('IPO (§19.4)', () => {
     const s = eligibleBank();
     const before = requiredStaff(s, 'finance');
     s.stock.status = 'public';
-    expect(requiredStaff(s, 'finance') - before).toBe(4);
+    expect(requiredStaff(s, 'finance') - before).toBeCloseTo(4, 9);
   });
 });
 
@@ -217,8 +216,7 @@ describe('public-company hooks', () => {
   });
 
   it('costs the Employee Stock Plan only once listed', () => {
-    const s = eligibleBank();
-    openScriptedBranch(s, 'midtown');
+    const s = eligibleBank(); // its office carries the payroll
     expect(annualPayroll(s)).toBeGreaterThan(0);
     expect(benefitWeeklyCost(s, 'espp', 0.1)).toBe(0);
     s.stock.status = 'public';

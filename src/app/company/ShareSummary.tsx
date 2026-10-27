@@ -2,12 +2,13 @@
 // valuation) with its 52-week range, market cap, your stake, the top
 // shareholders, and your personal line: cash plus your holdings, totalling
 // netWorth() like the Personal Wealth screen.
-import { COE } from '../../config/balance';
+import { PRIVATE_VALUATION } from '../../config/balance';
 import { topHolders } from '../../sim/marketHolders';
 import { netWorth } from '../../sim/netWorth';
 import { holdingsValue } from '../../sim/securities';
 import { founderStake, sharesHeld, FOUNDER_ID } from '../../sim/shares';
 import type { GameState } from '../../sim/state';
+import { revenueMultiple } from '../../sim/valuation';
 import { Card, Row, SectionTitle } from '../components';
 import { money, pct } from '../format/format';
 import { sharePrice } from '../investmentBank/marketView';
@@ -47,8 +48,9 @@ export function ShareSummary(p: { s: GameState }) {
         </div>
         {!listed && (
           <p class="muted small cap-note">
-            Investors value a private bank at book value, scaled by how its return on equity
-            compares with a {pct(COE, 0)} cost of equity.
+            Investors value a private lab at {revenueMultiple(s).toFixed(1)}× its ARR (faster
+            revenue growth and a model ahead of the market raise the multiple), less a{' '}
+            {pct(1 - PRIVATE_VALUATION.discount, 0)} private discount, and never below book value.
           </p>
         )}
       </Card>
