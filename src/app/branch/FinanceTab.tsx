@@ -68,7 +68,9 @@ export function FinanceTab({ branch }: { branch: Branch }) {
       <SectionTitle>Balances</SectionTitle>
       <Card>
         <Row label="ARR" value={money(bal.arr, sym)} />
-        {bal.loans > 0 && <Row label="Loan Desk lending" value={money(bal.loans, sym)} />}
+        {bal.contractArr > 0 && (
+          <Row label="Enterprise contracts" value={`${money(bal.contractArr, sym)} a year`} />
+        )}
         <Row label="Customers" value={count(bal.customers)} />
       </Card>
 

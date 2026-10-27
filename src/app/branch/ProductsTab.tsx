@@ -21,7 +21,7 @@ import { ProductCard } from './ProductCard';
 
 const CATEGORIES = CATEGORY_NAMES;
 
-export function ProductsTab(p: { branch: Branch; onLoanDesk: () => void }) {
+export function ProductsTab(p: { branch: Branch; onDealDesk: () => void }) {
   const s = useGame();
   const [cat, setCat] = useState<CategoryId>('deposits');
   const model = activeModel(s);
@@ -75,7 +75,7 @@ export function ProductsTab(p: { branch: Branch; onLoanDesk: () => void }) {
         <p class="muted small">Your manager sets products and prices here.</p>
       )}
       {specs.map((spec) => (
-        <ProductCard key={spec.id} branch={p.branch} spec={spec} onLoanDesk={p.onLoanDesk} />
+        <ProductCard key={spec.id} branch={p.branch} spec={spec} onDealDesk={p.onDealDesk} />
       ))}
     </div>
   );

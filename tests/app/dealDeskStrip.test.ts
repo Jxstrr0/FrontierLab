@@ -1,76 +1,102 @@
-// Loan Desk summary strip (SCREENS §5.3): this week's arrivals, approved,
-// declined, approval rate over decided applications, the business loan
-// balance, last week's defaults and the waiting queue.
+// Deal Desk summary strip and selectors (SCREENS §5.3, stage C5b): this week's
+// RFPs, won, lost, win rate over settled bids, contracts held and their yearly
+// value, and the requests waiting at each office.
 import { describe, expect, it } from 'vitest';
-import { loanDeskStrip } from '../../src/app/branch/selectors';
+import {
+  dealDeskStrip,
+  newRfpsByBranch,
+  officeRfps,
+  rfpWaiting,
+} from '../../src/app/branch/dealDeskSelectors';
 import { REFERENCE_BUILDS } from '../../src/data/equipment';
 import * as cmd from '../../src/sim/commands';
 import { newGame } from '../../src/sim/newGame';
-import type { BusinessLoan, GameState } from '../../src/sim/state';
+import type { Business, GameState, Rfp } from '../../src/sim/state';
 
 function withBranch(): { s: GameState; id: string } {
-  const s = newGame({ seed: 42, cityId: 'cal', bankName: 'Desk Bank' });
+  const s = newGame({ seed: 42, cityId: 'cal', bankName: 'Desk Lab' });
   const lot = Object.values(s.world.lots).find((l) => !l.occupant && l.cityId === 'cal')!;
   const r = cmd.buildBranch(s, { lotId: lot.id, build: REFERENCE_BUILDS.basic });
   if (!r.ok) throw new Error(r.reason);
+  s.dealDesk.rfps = {};
   return { s, id: r.branchId };
 }
 
-describe('loan desk strip', () => {
-  it('starts empty, with no approval rate', () => {
+const rfp = (
+  id: string,
+  branchId: string,
+  businessId: string,
+  kind: Rfp['kind'],
+  dueWeek: number,
+) => ({ id, branchId, businessId, kind, createdWeek: 0, dueWeek }) as Rfp;
+
+/** Signs the first `n` businesses to office `id` at `value` a year each. */
+function sign(s: GameState, id: string, n: number, value: number): Business[] {
+  const list = Object.values(s.businesses).slice(0, n);
+  for (const b of list) {
+    b.vendor = { type: 'player', id };
+    b.contractValue = value;
+  }
+  return list;
+}
+
+describe('deal desk strip', () => {
+  it('starts empty, with no win rate', () => {
     const { s, id } = withBranch();
-    const strip = loanDeskStrip(s, s.branches[id]!);
-    expect(strip).toEqual({
+    for (const b of Object.values(s.businesses)) if (b.vendor?.type === 'player') delete b.vendor;
+    expect(dealDeskStrip(s, s.branches[id]!)).toEqual({
       arrived: 0,
-      approved: 0,
-      declined: 0,
-      approvalRate: undefined,
-      balance: 0,
-      defaultedLoans: 0,
-      defaulted: 0,
+      won: 0,
+      lost: 0,
+      winRate: undefined,
+      contracts: 0,
+      arr: 0,
       waiting: 0,
     });
   });
 
-  it("reads this week's desk counts, current loans and the queue", () => {
+  it("reads this week's desk counts, contracts and the waiting requests", () => {
     const { s, id } = withBranch();
     const b = s.branches[id]!;
-    b.desk = { week: s.clock.week, arrived: 7, approved: 3, refused: 1, declined: 2, expired: 0 };
-    const loan = (n: number, status: BusinessLoan['status'], branchId = id) =>
-      ({ id: `L${n}`, branchId, balance: 1000 * n, status }) as BusinessLoan;
-    s.loanDesk.loans = {
-      L1: loan(1, 'current'),
-      L2: loan(2, 'current'),
-      L3: loan(3, 'repaid'),
-      L4: loan(4, 'current', 'elsewhere'),
+    b.desk = { week: s.clock.week, arrived: 7, won: 3, lost: 1, declined: 2, expired: 0 };
+    const [b1, b2, b3] = Object.values(s.businesses);
+    sign(s, id, 2, 12_000);
+    s.dealDesk.rfps = {
+      R1: rfp('R1', id, b3!.id, 'new', s.clock.week + 2),
+      R2: rfp('R2', 'elsewhere', b3!.id, 'new', s.clock.week + 2),
+      R3: rfp('R3', id, b1!.id, 'renewal', s.clock.week + 4),
     };
-    s.loanDesk.applications = {
-      A1: { id: 'A1', branchId: id } as never,
-      A2: { id: 'A2', branchId: 'elsewhere' } as never,
-    };
-    if (b.books.sbl) Object.assign(b.books.sbl.last, { defaulted: 2500, defaultedLoans: 2 });
-    const strip = loanDeskStrip(s, b);
+    const strip = dealDeskStrip(s, b);
     expect(strip.arrived).toBe(7);
-    expect(strip.approved).toBe(3);
-    expect(strip.declined).toBe(2);
-    expect(strip.approvalRate).toBeCloseTo(3 / 6);
-    expect(strip.balance).toBe(3000);
+    expect(strip.won).toBe(3);
+    expect(strip.lost).toBe(1);
+    expect(strip.winRate).toBeCloseTo(3 / 4);
+    expect(strip.contracts).toBe(2);
+    expect(strip.arr).toBe(24_000);
     expect(strip.waiting).toBe(1);
-    expect(strip.defaulted).toBe(b.books.sbl ? 2500 : 0);
-    expect(strip.defaultedLoans).toBe(b.books.sbl ? 2 : 0);
+    expect(newRfpsByBranch(s)).toEqual({ [id]: 1, elsewhere: 1 });
+    expect(officeRfps(s, id).renewals.map((r) => r.id)).toEqual(['R3']);
+    expect(b2).toBeDefined();
   });
 
   it("ignores last week's desk counts", () => {
     const { s, id } = withBranch();
     const b = s.branches[id]!;
-    b.desk = {
-      week: s.clock.week - 1,
-      arrived: 9,
-      approved: 4,
-      refused: 0,
-      declined: 1,
-      expired: 0,
-    };
-    expect(loanDeskStrip(s, b).arrived).toBe(0);
+    b.desk = { week: s.clock.week - 1, arrived: 9, won: 4, lost: 0, declined: 1, expired: 0 };
+    expect(dealDeskStrip(s, b).arrived).toBe(0);
+  });
+
+  it('counts a rival renewal as waiting until you make or skip an offer', () => {
+    const { s, id } = withBranch();
+    const [own, theirs] = Object.values(s.businesses);
+    own!.vendor = { type: 'player', id };
+    theirs!.vendor = { type: 'rival', id: Object.keys(s.rivals)[0] ?? 'r1' };
+    const mine = rfp('R1', id, own!.id, 'renewal', 13);
+    mine.offer = 0.05;
+    const rival = rfp('R2', id, theirs!.id, 'renewal', 13);
+    expect(rfpWaiting(s, mine)).toBe(false);
+    expect(rfpWaiting(s, rival)).toBe(true);
+    rival.offer = 0.1;
+    expect(rfpWaiting(s, rival)).toBe(false);
   });
 });

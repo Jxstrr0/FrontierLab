@@ -1,128 +1,118 @@
-// Loan Desk tab of the branch panel (SCREENS §5.3, SIMULATION §11): a summary
-// strip (this week's applications, approved, declined, approval rate, business
-// loan balance, last week's defaults), the applications waiting for a decision
-// and the branch's booked business loans.
-import { LOANDESK } from '../../config/balance';
+// Deal Desk tab of the sales office panel (SCREENS §5.3, SIMULATION §11, stage
+// C5b): a summary strip (this week's RFPs, won, lost, win rate, contracts held
+// and their yearly value), the office's discount limit, new requests for
+// proposal to bid on, renewals due at the next quarter start, and the
+// office's contracts.
+import { DEAL } from '../../config/balance';
+import { contractsOf, dealsOffered, deskDelegated } from '../../sim/branch/dealDesk';
 import * as cmd from '../../sim/commands';
 import { act, useGame } from '../store';
-import { Badge, Card, SectionTitle } from '../components';
+import { Card, SectionTitle } from '../components';
 import { count, money, pct } from '../format/format';
-import { branchPrice } from '../../sim/branch/pricing';
-import { riskBandVisible } from '../../sim/branch/loanDesk';
-import { ActiveLoans } from './loandesk/ActiveLoans';
-import { ApplicationCard } from './loandesk/ApplicationCard';
-import { loanDeskStrip } from './selectors';
-import './loandesk/loandesk.css';
+import { ContractList } from './dealdesk/ContractList';
+import { DiscountStepper } from './dealdesk/dealParts';
+import { RenewalCard } from './dealdesk/RenewalCard';
+import { RfpCard } from './dealdesk/RfpCard';
+import { dealDeskStrip, officeRfps } from './dealDeskSelectors';
+import './dealdesk/dealdesk.css';
 
-export function LoanDeskTab({ branchId }: { branchId: string }) {
+export function DealDeskTab({ branchId }: { branchId: string }) {
   const s = useGame();
   const branch = s.branches[branchId];
   if (!branch) return <p class="muted">This sales office no longer exists.</p>;
 
   const sym = s.settings.currency;
-  const week = s.clock.week;
-  const apps = Object.values(s.loanDesk.applications)
-    .filter((a) => a.branchId === branchId)
-    .sort((a, b) => a.expiresWeek - b.expiresWeek || b.amount - a.amount);
-  const loans = Object.values(s.loanDesk.loans).filter(
-    (l) => l.branchId === branchId && l.status === 'current',
-  );
-  const strip = loanDeskStrip(s, branch);
-  const delegated = branch.delegation.loans && branch.managerId !== undefined;
-  const defaultRate = branchPrice(s, branch, 'sbl');
-  const showBand = riskBandVisible(s, branch);
+  const { fresh, renewals } = officeRfps(s, branchId);
+  const strip = dealDeskStrip(s, branch);
+  const limit = branch.discountLimit;
+  const withBusiness = <T extends { businessId: string }>(list: T[]) =>
+    list.flatMap((rfp) => {
+      const b = s.businesses[rfp.businessId];
+      return b ? [{ rfp, b }] : [];
+    });
 
   return (
-    <div class="stack loandesk">
-      {delegated && (
+    <div class="stack dealdesk">
+      {deskDelegated(s, branch) && (
         <Card>
-          <p class="loandesk-note">
-            Your manager is deciding loan applications for you, so most are settled during the
-            weekly close. You can still step in on any that remain.
+          <p class="dealdesk-note">
+            Your {branch.managerId && branch.delegation.loans ? 'manager' : 'CRO'} is bidding on
+            proposal requests for you, within the discount limit below, so most are settled during
+            the weekly close. You can still step in on any that remain.
           </p>
         </Card>
       )}
-      {s.treasury.freeze && <Badge tone="bad">Lending is frozen until liquidity recovers.</Badge>}
-      {!s.treasury.freeze && s.company.tier === 'critical' && (
-        <Badge tone="bad">No new lending at the Critical capital tier.</Badge>
+
+      <div class="deal-summary">
+        <Stat label="RFPs this week" value={count(strip.arrived)} />
+        <Stat label="Won" value={count(strip.won)} />
+        <Stat label="Lost" value={count(strip.lost)} />
+        <Stat label="Win rate" value={strip.winRate === undefined ? '–' : pct(strip.winRate, 0)} />
+        <Stat label="Contracts" value={count(strip.contracts)} />
+        <Stat label="Contract ARR" value={money(strip.arr, sym)} />
+      </div>
+
+      <Card class="deal-limit">
+        <DiscountStepper
+          label="Discount limit"
+          value={limit}
+          onChange={(v) => act(cmd.setDiscountLimit, branch.id, v)}
+        />
+        <p class="muted small dealdesk-foot">
+          Managers bid within this discount off a business's AI budget, and your offers start from
+          it.
+        </p>
+      </Card>
+
+      {!dealsOffered(branch) && (
+        <Card>
+          <p class="dealdesk-note">
+            New proposal requests need Enterprise contracts switched on in Products.
+          </p>
+        </Card>
       )}
 
-      <div class="loan-summary">
-        <Stat label="Applications this week" value={count(strip.arrived)} />
-        <Stat label="Approved" value={count(strip.approved)} />
-        <Stat label="Declined" value={count(strip.declined)} />
-        <Stat
-          label="Approval rate"
-          value={strip.approvalRate === undefined ? '–' : pct(strip.approvalRate, 0)}
-        />
-        <Stat label="Business loans" value={money(strip.balance, sym)} />
-        <Stat
-          label="Defaulted last week"
-          value={
-            strip.defaultedLoans > 0
-              ? `${count(strip.defaultedLoans)} · ${money(strip.defaulted, sym)}`
-              : 'None'
-          }
-        />
-      </div>
-      <LendingFund reserves={s.treasury.reserves} cash={s.company.cash} sym={sym} />
-      <p class="muted small loandesk-foot">
-        Each offer starts at {pct(defaultRate)}, your Small Business Loan rate.
-      </p>
-
-      <SectionTitle>Waiting for a decision · {count(strip.waiting)}</SectionTitle>
-      {apps.length === 0 ? (
+      <SectionTitle>Proposal requests · {count(fresh.length)}</SectionTitle>
+      {fresh.length === 0 ? (
         <Card>
-          <p class="loandesk-empty">
-            No applications right now. Local businesses apply every week, and more when your name is
-            well known in a district with plenty of businesses.
+          <p class="dealdesk-empty">
+            No requests right now. Businesses without an AI vendor ask for proposals every week, and
+            more often when your name is well known in the city.
           </p>
         </Card>
       ) : (
-        apps.map((app) => (
-          <ApplicationCard
-            key={app.id}
-            app={app}
-            week={week}
-            currency={sym}
-            defaultRate={defaultRate}
-            showRiskBand={showBand}
-          />
+        withBusiness(fresh).map(({ rfp, b }) => (
+          <RfpCard key={rfp.id} s={s} rfp={rfp} b={b} startDiscount={limit} />
         ))
       )}
 
-      <ActiveLoans loans={loans} currency={sym} />
-    </div>
-  );
-}
+      {renewals.length > 0 && (
+        <>
+          <SectionTitle>Renewals due · {count(renewals.length)}</SectionTitle>
+          <p class="muted small dealdesk-foot">
+            Contracts renew at the start of a quarter. Offers here are settled then, up to{' '}
+            {DEAL.renewalNoticeWeeks} weeks from now.
+          </p>
+          {withBusiness(renewals).map(({ rfp, b }) => (
+            <RenewalCard key={rfp.id} s={s} rfp={rfp} b={b} startDiscount={limit} />
+          ))}
+        </>
+      )}
 
-/** C3b: the desk lends from treasury reserves, topped up from company cash. */
-function LendingFund(p: { reserves: number; cash: number; sym: string }) {
-  const step = Math.min(LOANDESK.fundTopUp, Math.max(0, Math.floor(p.cash)));
-  return (
-    <Card>
-      <p class="loandesk-note">
-        <strong>Lending fund {money(p.reserves, p.sym)}.</strong> Loans are paid out of your
-        treasury reserves, and repayments flow back in. Applications larger than the fund cannot be
-        approved until you add to it.
-      </p>
-      <button
-        type="button"
-        class="btn btn-secondary btn-block"
-        disabled={step <= 0}
-        onClick={() => act(cmd.topUpLendingFund, step)}
-      >
-        Add {money(step, p.sym)} from company cash
-      </button>
-    </Card>
+      <ContractList
+        contracts={contractsOf(s, branchId)}
+        currency={sym}
+        startDate={s.meta.startDate}
+      />
+    </div>
   );
 }
 
 function Stat(p: { label: string; value: string }) {
   return (
-    <div class="loan-stat">
-      <span class="loan-stat-value">{p.value}</span>
-      <span class="loan-stat-label">{p.label}</span>
+    <div class="deal-stat">
+      <span class="deal-stat-value">{p.value}</span>
+      <span class="deal-stat-label">{p.label}</span>
     </div>
   );
 }

@@ -10,7 +10,8 @@ describe('milestones', () => {
     const s = newGame({ seed: 3, cityId: 'cal' });
     expect(s.milestones).toEqual({});
     openScriptedBranch(s, 'midtown');
-    advanceWeeks(s, 6);
+    // The first contract comes from a weekly RFP, so give it a few quarters.
+    for (let w = 0; w < 40 && s.milestones.first_loan === undefined; w++) advanceWeeks(s, 1);
     expect(s.milestones.first_branch).toBeTypeOf('number');
     expect(s.milestones.first_loan).toBeTypeOf('number');
     const first = s.milestones.first_branch;

@@ -1,51 +1,59 @@
-/* Loan Desk tab (SCREENS §5.3). */
-.loandesk .card + .card {
+/* Deal Desk tab (SCREENS §5.3, stage C5b). */
+.dealdesk .card + .card {
   margin-top: 0;
 }
-.loandesk-note,
-.loandesk-empty {
+.dealdesk-note,
+.dealdesk-empty {
   margin: 0;
   font-size: var(--text-14);
   color: var(--ivory-dim);
 }
-.loandesk-foot {
-  margin: calc(var(--space-2) * -1) 0 0;
+.dealdesk-foot {
+  margin: 0;
 }
 
-.loan-summary {
+.deal-summary {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   border: 1px solid var(--hairline);
   border-radius: var(--radius-card);
   background: var(--vault-deep);
 }
-.loan-stat {
+.deal-stat {
   display: flex;
   flex-direction: column;
   align-items: center;
   /* Top-aligned so values line up across a row when a label wraps. */
   justify-content: flex-start;
   gap: 2px;
+  min-width: 0;
   padding: var(--space-3) var(--space-2);
   text-align: center;
   border-right: 1px solid rgb(184 145 61 / 18%);
   border-bottom: 1px solid rgb(184 145 61 / 18%);
 }
-.loan-stat:nth-child(3n) {
+.deal-stat:nth-child(3n) {
   border-right: 0;
 }
-.loan-stat:nth-child(n + 4) {
+.deal-stat:nth-child(n + 4) {
   border-bottom: 0;
 }
-.loan-stat-value {
+.deal-stat-value {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: var(--text-20);
   line-height: 1.15;
+  overflow-wrap: anywhere;
 }
-.loan-stat-label {
+.deal-stat-label {
   font-size: var(--text-12);
   color: var(--ivory-dim);
+}
+
+.deal-limit {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
 }
 
 .chip {
@@ -62,18 +70,22 @@
   color: var(--brass-light);
   border-color: var(--brass);
 }
+.chip-own {
+  color: var(--ivory);
+  border-color: var(--brass);
+}
 
-.loan-app {
+.deal-card {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
 }
-.loan-app-head {
+.deal-head {
   display: flex;
   align-items: flex-start;
   gap: var(--space-3);
 }
-.loan-app-icon {
+.deal-icon {
   flex: none;
   display: grid;
   place-items: center;
@@ -84,40 +96,41 @@
   background: var(--vault-deep);
   color: var(--brass-light);
 }
-.loan-app-title {
+.deal-title {
   flex: 1;
   min-width: 0;
 }
-.loan-app-name {
+.deal-name {
   margin: 0;
   font-family: var(--font-display);
   font-weight: 700;
   font-size: var(--text-16);
   line-height: 1.25;
 }
-.loan-app-ask {
+.deal-ask {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   gap: var(--space-1) var(--space-3);
 }
-.loan-app-amount {
+.deal-amount {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: var(--text-24);
 }
-.loan-app-pay {
+.deal-sub,
+.deal-value {
   font-size: var(--text-14);
   color: var(--ivory-dim);
 }
-.loan-app-pay strong {
+.deal-value strong {
   color: var(--ivory);
 }
-.loan-app-actions {
+.deal-actions {
   margin-top: var(--space-1);
 }
 
-.loan-list-toggle {
+.deal-list-toggle {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -127,42 +140,57 @@
   padding: 0;
   border: 0;
   background: transparent;
+  color: inherit;
   text-align: left;
   cursor: pointer;
 }
-.loan-list-toggle > span:first-child {
+.deal-list-toggle:disabled {
+  cursor: default;
+}
+.deal-list-toggle > span:first-child {
   display: flex;
   flex-direction: column;
 }
-.loan-list-title {
+.deal-list-title {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: var(--text-16);
 }
-.loan-list-caret {
+.deal-list-caret {
   color: var(--brass-light);
 }
-.loan-rows {
+.deal-rows-list {
   list-style: none;
   margin: var(--space-3) 0 0;
   padding: 0;
 }
-.loan-row {
+.deal-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  min-height: var(--tap-min);
   padding: var(--space-2) 0;
+  border: 0;
   border-top: 1px solid rgb(184 145 61 / 14%);
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
 }
-.loan-row-main,
-.loan-row-sub {
+.deal-row-main,
+.deal-row-sub {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: var(--space-2);
 }
-.loan-row-name {
+.deal-row-name {
   font-size: var(--text-14);
   font-weight: 600;
 }
-.loan-row-balance {
+.deal-row-value {
   font-weight: 700;
   font-size: var(--text-14);
+  white-space: nowrap;
 }
