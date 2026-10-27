@@ -259,6 +259,10 @@ const EVENT_TEXT: Record<string, (p: Record<string, unknown>) => string> = {
   },
   BANK_RUN: () => 'Depositors are queueing to withdraw: a bank run has started.',
   BANK_RUN_ENDED: () => 'The bank run is over.',
+  COMPUTE_BURST: () => 'Spot ran out, so we bought emergency burst GPUs at a premium.',
+  COMPUTE_CRUNCH: () => 'Capacity crunch: new customers are on a waitlist until we add GPUs.',
+  COMPUTE_CRUNCH_ENDED: () => 'The waitlist has cleared.',
+  COMPUTE_OUTAGE: () => 'Outage: too little compute for too long. Customers are leaving.',
 };
 
 /** Events about a country toast only when it is your home country (nine central banks meet). */
@@ -267,6 +271,9 @@ const BAD_EVENTS = new Set([
   'WINDOW_USE',
   'MANAGER_POACHED',
   'BANK_RUN',
+  'COMPUTE_BURST',
+  'COMPUTE_CRUNCH',
+  'COMPUTE_OUTAGE',
   ...MNA_BAD_EVENTS,
   ...VENTURE_BAD_EVENTS,
   ...AUCTION_BAD_EVENTS,

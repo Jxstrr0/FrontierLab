@@ -28,7 +28,7 @@ const EXPLAINERS: { title: string; body: string }[] = [
   },
   {
     title: 'Compute: own it or rent it',
-    body: 'GPUs in your data centers serve customers first, for the price of their power and lease. Everything else is rented at the spot price, which follows the chip market: cheap in a glut, dear in a shortage.',
+    body: 'Offices are charged the spot price for the GPUs they use. GPUs in your data centers and reserved lots serve customers first and cost less; the rest is bought at spot, which follows the chip market. Clouds only sell so much at spot: past that you pay an emergency premium, then new customers wait, then outages start.',
   },
   {
     title: 'Capital limits growth',

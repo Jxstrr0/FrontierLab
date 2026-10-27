@@ -286,7 +286,8 @@ Tabs: Overview · Loans · Credit.
     - probability table (5★ … 1★ with %)
     - Start development
 - **Compute** (C4b; was Treasury):
-  - **Compute pool:** the Compute card (§24), with a "GPUs rented in lots" row when you have any
+  - An **Outage** or **Capacity crunch** banner at the top while either runs (C4c)
+  - **Compute pool:** the Compute card (§24), with a "GPUs rented in lots" row when you have any, then the **Compute policy** card (C4c): spot limit this week, emergency burst on top, the "GPU offers +8%" stigma row while it lasts, a note on how the limit moves, and the **Auto spot-buy** toggle (hint: buys at spot then burst / runs on your own GPUs only, with a waitlist)
   - **Rented GPUs:** totals card (GPUs rented, weekly bill), then lot cards with provider, reservation type, price per GPU-week, GPUs, end date, weeks left and a rosette (Cost, Term, Reliability, Flexibility, Latency). No early cancel.
   - **GPU market:** offer cards with provider, type, price per GPU-week, "Up to" GPUs, term, price vs spot and rosette, a GPU slider (step 50+) with Max, **Rent N GPUs**, the weekly bill under it, and when the next offers arrive
   - **Partnerships** (below)
@@ -536,6 +537,7 @@ Tabs: Overview · Loans · Credit.
 - **Cash** card: corporate cash, running costs a week and **cash cover** (weeks of running costs; red under `ATTENTION.cashCoverWeeks`)
 - liquidity ratio with the Treasury gauge's status badge, the target, overnight borrowing when any, and a line saying whether auto-funding is holding the target (C3b: only while an older save still holds deposits or overnight borrowing)
 - **Compute** card (C4a, SIMULATION §13.0): spot price per GPU-week with the chip phase badge (Chip glut green, Normal market, Chip shortage red), a line chart of the price index over the last 104 weeks, GPUs your customers used last week, GPUs running in your data centers, the share they covered, and what the rest costs at spot a week, with a one-line note
+  - C4c: a red **Waitlist** or **Outage** badge under the phase badge; "Bought at spot" reads "N of M max" against the spot limit; red "Emergency burst" and "Not served (waitlist)" rows when non-zero; "Spot and burst bill" a week; "Pool cost vs spot" (green under 100%) once the pool has paid anything. The Company explainer "Compute: own it or rent it" covers the internal charge and the limit.
 - totals: assets, ARR, lending fund (treasury reserves), Loan Desk loans, equity (C3b)
 - share price or private valuation, with the 52-week range, market cap, your stake and top shareholders
 - a Personal line: personal cash plus holdings

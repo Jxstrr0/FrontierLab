@@ -9,6 +9,7 @@ import { migrateCatalog } from './migrateCatalog';
 import { migrateBankCleanup } from './migrateBankCleanup';
 import { migrateCompute } from './migrateCompute';
 import { migrateGpuLots } from './migrateGpuLots';
+import { migrateSpotLimits } from './migrateSpotLimits';
 import { migrateMoney } from './migrateMoney';
 import { SCHEMA_VERSION, type GameState } from '../state';
 
@@ -71,6 +72,11 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
   // 9 → 10 (stage C4b): GPU lots and the GPU market on the Compute floor.
   9: (s) => {
     migrateGpuLots(s as unknown as GameState);
+    return s;
+  },
+  // 10 → 11 (stage C4c): spot limits, emergency burst, capacity crunch and outages.
+  10: (s) => {
+    migrateSpotLimits(s as unknown as GameState);
     return s;
   },
 };

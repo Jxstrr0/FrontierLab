@@ -5,9 +5,9 @@ import { describe, expect, it } from 'vitest';
 import { GPU_MARKET } from '../../src/config/balance';
 import { GPU_LOT_TYPES } from '../../src/data/gpuLots';
 import * as cmd from '../../src/sim/commands';
-import { computePriceFactor, ownedShare, spotPrice } from '../../src/sim/compute';
+import { ownedShare, spotCost, spotPrice } from '../../src/sim/compute';
 import { advanceWeeks } from '../../src/sim/engine';
-import { billGpuLots, gpuLotPrice, refreshGpuOffers } from '../../src/sim/gpuMarket';
+import { gpuLotPrice, refreshGpuOffers, retireGpuLots } from '../../src/sim/gpuMarket';
 import { offerCount } from '../../src/sim/fundingMarket';
 import { migrations } from '../../src/sim/save/migrations';
 import type { GameState } from '../../src/sim/state';
@@ -56,7 +56,7 @@ describe('renting GPUs', () => {
   it('adds capacity at once, lowers the spot bill and shrinks the offer', () => {
     const s = withMarket();
     const offer = s.compute.offers[0]!;
-    const before = computePriceFactor(s);
+    const before = spotCost(s);
     const take = GPU_MARKET.sizeStep;
     const left = offer.gpus - take;
     const r = cmd.rentGpus(s, offer.id, take);
@@ -66,7 +66,7 @@ describe('renting GPUs', () => {
     if (left >= GPU_MARKET.sizeStep) expect(offer.gpus).toBe(left);
     else expect(s.compute.offers.find((o) => o.id === offer.id)).toBeUndefined();
     expect(ownedShare(s)).toBeGreaterThan(0);
-    expect(computePriceFactor(s)).toBeLessThan(before);
+    expect(spotCost(s)).toBeLessThan(before);
   });
 
   it('bills each lot exactly termWeeks times, then retires it, keeping the books balanced', () => {
@@ -81,7 +81,7 @@ describe('renting GPUs', () => {
     for (let w = start; w < start + offer.termWeeks + 3; w++) {
       const before = probe.compute.lots.length;
       probe.clock.week = w;
-      billGpuLots(probe);
+      retireGpuLots(probe);
       if (before > 0) bills += 1;
     }
     expect(bills).toBe(offer.termWeeks);

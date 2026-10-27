@@ -38,3 +38,9 @@ export function rentGpus(
   if (offer.gpus < GPU_MARKET.sizeStep) c.offers = c.offers.filter((o) => o.id !== offerId);
   return ok({ lotId });
 }
+
+/** Turns auto spot-buy (spot, then emergency burst) on or off (C4c). */
+export function setAutoSpotBuy(state: GameState, on: boolean): CommandResult {
+  state.compute.autoSpotBuy = on;
+  return ok();
+}

@@ -2,7 +2,7 @@
 // provider, reservation type, fixed price, size, end date and rosette, plus
 // the total GPUs rented and their weekly bill. Lots can't be cancelled early.
 import { GPU_LOT_TYPES } from '../../../data/gpuLots';
-import { lotsWeeklyCost } from '../../../sim/gpuMarket';
+import { lotsWeeklyCost } from '../../../sim/compute';
 import type { GpuLot } from '../../../sim/state';
 import { Card, Row } from '../../components';
 import { dayOfWeek } from '../../branch/selectors';
