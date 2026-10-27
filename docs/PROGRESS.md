@@ -3,13 +3,37 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.39, save schema 26). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
+**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.40, save schema 26). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `133b7b9121d061` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `17f6a4f80a983b` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-27 — Late game, part 1: costs that grow with the lab (v0.1.40)
+
+The owner asked for a late-game audit. By year 5 every city has an office, and the lab then piles up cash with nothing worth buying: $5B by year 10, $15B by year 15 (seed 42, steady). The owner picked four changes. This is the first, **costs that grow with the company**; frontier projects, a yearly board decision on surplus cash, and new regions follow in their own PRs.
+
+**What changed.**
+- **The frontier gets expensive.** Past model quality 7, each point makes training 2.5× dearer. A run's budget counts for less, and the budget slider's top and the CPO's weekly cap grow by the same factor, so a delegated CPO keeps pace by spending more. On seed 42 the CPO's runs go from $150k a week to about $1.7M a week by year 7. The training card notes how much dearer each step is.
+- **No pointless runs at the ceiling.** Once every axis of the model is at 10, the CPO (and the scripted strategies) stop starting runs, which used to cost money and lift nothing. The card and the CPO's dial say so. The next PR, frontier projects, adds a way to raise that ceiling.
+- **Researchers ask more as the frontier climbs.** The going salary rises 60% for each point the best model anywhere stands past 7. Anyone you pay below the going rate is more likely to be poached, so keeping a top team costs real money late on.
+- **A bigger lab pays more for its incidents.** The jailbreak fix and post-mortem, the weights-leak rotation and the breach forensics used to cost the same flat few hundred thousand at any size. They now scale with ARR (×(ARR ÷ $50M)^0.8), so a $2.5B lab pays about 23×.
+- **Hyperscale data centers.** A fourth option in each slot: Hyperscale hall ($140M, 60,000 GPUs, 26 weeks), Own power plant ($38M, runs 80,000), Two-phase cooling ($18M, PUE 1.04). The exterior and hall art draw them.
+
+**Not changed.** Save shape (still schema 26).
+
+**Checked.**
+- `npm run lint`, `npx vitest run` (new `tests/sim/frontier.test.ts`) and `npm run build` pass.
+- Balance on seed 42 is in range for all five strategies.
+- The determinism snapshot changed on purpose to `17f6a4f80a983b`: training budgets now follow the frontier.
+
+**Seeds 1–20 balance (before this change), for the record.**
+- The median first branch is in range on every check. Steady, aggressive, stress and no-HQ are in range on most seeds.
+- **Turtle:** misses its "profitable in year 5" target on 11 of 20 seeds by under $0.3M, and seed 13 runs out of cash (−$74k).
+- **Aggressive seed 20:** stalls at one office.
+- Both are noted for a later balance pass.
 
 ### 2026-10-27 — Compute cover tagline wording (v0.1.39)
 

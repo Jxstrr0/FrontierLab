@@ -8,6 +8,7 @@
 // Scientist's until schema 22).
 import { CPO_TRAINING, RESEARCHERS, WEEKS_PER_YEAR } from '../config/balance';
 import { CITIES } from '../data/cities';
+import { frontierPoints } from './frontier';
 import { raiseIncident } from './incidents';
 import { newId } from './ids';
 import { spend } from './ledger';
@@ -42,12 +43,16 @@ export function rivalResearchers(state: GameState, rivalId: string): Researcher[
   );
 }
 
-/** §16.13: the going salary a year for a researcher with this many stars. */
+/** §16.13: the going salary a year for a researcher with this many stars, × the frontier pay premium. */
 export function researcherMarketSalary(state: GameState, stars: number): number {
   const cityId = state.meta.homeCityId;
   const wage = (CITIES[cityId]?.wageIndex ?? 1) * nominalIndex(state, cityId);
   const r = RESEARCHERS;
-  return roundToStep(r.salaryBase * (1 + r.salaryPerStar * (stars - 1)) * wage, r.salaryStep);
+  const frontier = 1 + r.frontierPay * frontierPoints(state);
+  return roundToStep(
+    r.salaryBase * (1 + r.salaryPerStar * (stars - 1)) * wage * frontier,
+    r.salaryStep,
+  );
 }
 
 /** What hiring `r` costs: their salary (with the poaching premium from a rival) and a signing bonus. */

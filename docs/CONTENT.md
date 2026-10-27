@@ -261,12 +261,15 @@ Reference builds (Starter size):
 | GPU hall | Row hall | $4M | holds 2,000 GPUs | 8 weeks |
 | GPU hall | Twin hall | $11M | holds 6,000 GPUs | 12 weeks |
 | GPU hall | Campus hall | $26M | holds 15,000 GPUs | 16 weeks |
+| GPU hall | Hyperscale hall | $140M | holds 60,000 GPUs | 26 weeks |
 | Power | Grid feed | $0.8M | runs 3,000 GPUs | — |
 | Power | Own substation | $2.5M | runs 8,000 GPUs | — |
 | Power | Plant tie-in | $6M | runs 20,000 GPUs | — |
+| Power | Own power plant | $38M | runs 80,000 GPUs | — |
 | Cooling | Air handlers | $0.5M | PUE 1.5 | — |
 | Cooling | Liquid loops | $2M | PUE 1.25 | — |
 | Cooling | Immersion tanks | $5M | PUE 1.1 | — |
+| Cooling | Two-phase cooling | $18M | PUE 1.04 | — |
 
 The default (and cheapest) build is Row hall, Grid feed, Air handlers. Default name "{City} Data Center", numbered when taken.
 
@@ -832,7 +835,7 @@ Sizes (`BUSINESS.sizes` in balance.ts): small, mid and large weigh 0.55 / 0.33 /
 ## 22. Incidents
 Implemented in `src/data/incidents.ts` (texts and options) and `src/data/incidentParams.ts` (numbers). The case ids are bank-era; the title column is what the player sees.
 
-Default cooldown: 8 weeks per scope. Office cases go to a manager trusted with Sales office troubles; company and city cases to a COO trusted with Company troubles (SIMULATION §17.2), except those marked **yours** below (EXEC_POACHED, RESEARCHER_POACHED, BANK_RUN, RECAP_OFFER), which always reach you. `penaltyWeeks` on an option is how a delegated decider values its non-cash effects, in weeks of revenue.
+Default cooldown: 8 weeks per scope. The flat costs of the jailbreak fix and post-mortem, the weights rotation and the breach's forensic firm grow with the lab: × `max(1, company ARR ÷ $50M)^0.8` (`INCIDENT_SCALE`), so a $2.5B lab pays about 23× the listed price. Office cases go to a manager trusted with Sales office troubles; company and city cases to a COO trusted with Company troubles (SIMULATION §17.2), except those marked **yours** below (EXEC_POACHED, RESEARCHER_POACHED, BANK_RUN, RECAP_OFFER), which always reach you. `penaltyWeeks` on an option is how a delegated decider values its non-cash effects, in weeks of revenue.
 
 | id | Title | Scope | Weekly base p | Condition / multiplier | Options (cost → effect) |
 |---|---|---|---|---|---|

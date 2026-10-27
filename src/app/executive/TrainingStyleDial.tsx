@@ -28,8 +28,10 @@ export function TrainingStyleDial(p: { s: GameState }) {
   const axis = MODEL_AXES[plan.focus]?.[0] ?? '';
   const hint = !plan.active
     ? 'Needs a Products floor at HQ.'
-    : `${plan.weeks}-week runs at ${money(plan.weeklyBudget, sym)}/wk on ${axis} · ${pct(strong, 0)} chance of ${STRONG_FROM}★ or better` +
-      (plan.affordable ? '' : ' · waits for more cash');
+    : plan.atCeiling
+      ? 'Every axis is at the ceiling: no runs until a breakthrough lifts it.'
+      : `${plan.weeks}-week runs at ${money(plan.weeklyBudget, sym)}/wk on ${axis} · ${pct(strong, 0)} chance of ${STRONG_FROM}★ or better` +
+        (plan.affordable ? '' : ' · waits for more cash');
   return (
     <div class="exec-dial">
       <StepSlider

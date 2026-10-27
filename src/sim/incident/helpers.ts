@@ -1,10 +1,12 @@
 // Shared pieces for incident rules: the rule interface, fraudShield, rating hits
 // with their timed modifiers, morale bumps, the press-angle roll and the
 // scope's display name.
-import { FRAUD_SHIELD, INCIDENTS } from '../../config/balance';
+import { FRAUD_SHIELD, INCIDENT_SCALE, INCIDENTS } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { EQUIPMENT } from '../../data/equipment';
 import type { RatingCategory } from '../../data/types';
+import { companyArr } from '../arr';
+import { dpow } from '../detmath';
 import { pushEvent } from '../events';
 import { clamp } from '../math';
 import type { Rng } from '../rng';
@@ -32,6 +34,11 @@ export interface IncidentRule {
   expected?(state: GameState, inc: Incident, optionId: string): number;
   /** Applies the option after its cost is paid; may return an outcome sentence. */
   apply(state: GameState, inc: Incident, optionId: string, rng: Rng): string | void;
+}
+
+/** Flat company-incident costs × max(1, ARR ÷ refArr)^exp: a bigger lab pays more (post-C8). */
+export function incidentScale(state: GameState): number {
+  return dpow(Math.max(1, companyArr(state) / INCIDENT_SCALE.refArr), INCIDENT_SCALE.exp);
 }
 
 /** 0–10: IT coverage′, the AI model's Safety and the ATM (decision log). */
