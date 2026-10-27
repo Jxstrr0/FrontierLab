@@ -108,7 +108,7 @@ function bankStockBudget(state: GameState): number | string {
   // Cash (no risk weight) becomes stock at 2.5×; the commission comes off CET1.
   const crRoom =
     (snap.cet1 - X.buyMinCr * snap.rwa) / (X.buyMinCr * STOCK_RISK_WEIGHT + COMMISSION);
-  if (crRoom <= 0) return `The capital ratio would fall under ${Math.round(X.buyMinCr * 100)}%.`;
+  if (crRoom <= 0) return `The credit ratio would fall under ${Math.round(X.buyMinCr * 100)}%.`;
   return Math.min(cash, room, crRoom, X.investStockLot * bs.assets);
 }
 
@@ -151,7 +151,7 @@ function bankStartupBlocker(state: GameState, price: number): string | undefined
   const snap = capitalSnapshot(state);
   // The stake is marked at the price paid, so CET1 holds and RWA grows by 2.5×.
   if (snap.cet1 / Math.max(1, snap.rwa + price * VENTURE_RISK_WEIGHT) < X.buyMinCr)
-    return `The capital ratio would fall under ${Math.round(X.buyMinCr * 100)}%.`;
+    return `The credit ratio would fall under ${Math.round(X.buyMinCr * 100)}%.`;
   return undefined;
 }
 

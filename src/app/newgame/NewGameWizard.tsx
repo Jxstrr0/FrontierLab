@@ -106,7 +106,7 @@ export function NewGameWizard() {
           <spec.View draft={draft} patch={patch} />
           {step === 0 && (
             <button type="button" class="link-btn" onClick={quickStart}>
-              Quick start with a ready-made bank in Calgary
+              Quick start with a ready-made lab in Calgary
             </button>
           )}
         </div>

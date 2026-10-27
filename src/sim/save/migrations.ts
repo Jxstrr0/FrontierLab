@@ -20,6 +20,7 @@ import { migrateSpotLimits } from './migrateSpotLimits';
 import { migrateMoney } from './migrateMoney';
 import { SCHEMA_VERSION, type GameState } from '../state';
 import { migrateSeedMoney } from './migrateSeedMoney';
+import { generatePersonalSites } from '../personalSites';
 
 type RawSave = Record<string, unknown> & { schemaVersion: number };
 
@@ -127,6 +128,16 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
   // 19 → 20 (post-C8): the CTO's Compute delegation and its cover dial.
   19: (s) => {
     (s as unknown as GameState).executives.computeCover ??= CTO_COMPUTE.coverTarget;
+    return s;
+  },
+  // 20 → 21: new vacation homes (CONTENT §20) get their map sites in cities
+  // already generated. Existing sites keep their tiles: the generator skips ids
+  // it already has before drawing from the city's stream.
+  20: (s) => {
+    const state = s as unknown as GameState;
+    for (const city of Object.values(state.world.cities)) {
+      if (city.generated) generatePersonalSites(state, city.id);
+    }
     return s;
   },
 };

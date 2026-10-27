@@ -69,6 +69,10 @@ function resolve(state: GameState, c: LobbyCampaign): void {
 function applyWin(state: GameState, c: LobbyCampaign): void {
   const lob = state.lobbying;
   const week = state.clock.week;
+  // SIMULATION §21.6: the newer campaigns pay a one-off grant, booked as a refund
+  // on the lobbying line so the year's lobbying cost nets down.
+  const grant = campaignSpec(c.campaignId)?.grant;
+  if (grant) spend(state, 'lobbying', -grant);
   if (c.campaignId === 'easeBuffer') {
     lob.bufferRelief = {
       country: c.country,

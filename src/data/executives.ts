@@ -44,7 +44,7 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
         id: 'troubles',
         label: 'Company troubles',
         description:
-          'Settles company and city cases the way a trusted manager would. Bank runs, rescues and your executives still come to you.',
+          'Settles company and city cases the way a trusted manager would. Outage rumours, safety pauses and your executives still come to you.',
       },
       {
         id: 'hrBenefits',
@@ -85,7 +85,7 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
         id: 'capital',
         label: 'Capital',
         description:
-          'Keeps the capital ratio safe without selling shares: below 10.5% sells company stocks and trims risk appetite, alongside a CSO if you have one.',
+          'Keeps the credit ratio safe without selling shares: below 10.5% sells company stocks and trims the launch posture, alongside a CSO if you have one.',
       },
       {
         id: 'shares',
@@ -97,7 +97,7 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
         id: 'bankInvests',
         label: "Investing: the lab's money",
         description:
-          "Every 4 weeks buys a stock, spread across the market by company size, and backs the best-scoring startup on the Investment floor's list. Sells stocks 25% under cost. Stocks stay under 5% of assets, startups under 3%, the capital ratio at 12% or more.",
+          "Every 4 weeks buys a stock, spread across the market by company size, and backs the best-scoring startup on the Investment floor's list. Sells stocks 25% under cost. Stocks stay under 5% of assets, startups under 3%, the credit ratio at 12% or more.",
       },
       {
         id: 'privateInvests',
@@ -127,7 +127,7 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
       {
         id: 'pricing',
         label: 'Pricing',
-        description: 'Prices the company lineup like a office manager while Apply to all is on.',
+        description: 'Prices the company lineup like an office manager while Apply to all is on.',
       },
       {
         id: 'developments',
@@ -235,7 +235,7 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
         id: 'bankBuys',
         label: "Buying: the lab's buildings",
         description:
-          'Every 4 weeks buys the listed building with the best rent yield, in any city, at its asking price. Keeps the lab’s buildings under 5% of its assets, capital at 12% or more and 8 weeks of costs in cash.',
+          'Every 4 weeks buys the listed building with the best rent yield, in any city, at its asking price. Keeps the lab’s buildings under 5% of its assets, the credit ratio at 12% or more and 8 weeks of costs in cash.',
       },
       {
         id: 'privateBuys',

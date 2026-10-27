@@ -58,7 +58,7 @@ const ROBBERY: IncidentRule = {
   prepare(state, scope, data) {
     const b = branchOf(state, scope);
     const next = b && nextVault(b);
-    data.nextVault = next ? (EQUIPMENT[next]?.name ?? next) : 'stronger vault';
+    data.nextVault = next ? (EQUIPMENT[next]?.name ?? next) : 'stronger secure room';
     data.leave = (b?.staff.count ?? 0) * P.ROBBERY.leavePerStaff;
   },
   onRaise(state, inc) {
@@ -78,7 +78,7 @@ const ROBBERY: IncidentRule = {
   blocked(state, inc, optionId) {
     const b = branchOf(state, inc.scope);
     if (optionId === 'upgrade' && (!b || !nextVault(b)))
-      return 'The vault is already the strongest we can fit.';
+      return 'The secure room is already the strongest we can fit.';
     return undefined;
   },
   apply(state, inc, optionId) {

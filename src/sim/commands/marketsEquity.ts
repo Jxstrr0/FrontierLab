@@ -34,7 +34,7 @@ export function privatePlacement(
 ): CommandResult<{ investor: string; raised: number }> {
   if (!INVESTMENT_BANKS[bankId]) return fail('Choose an investment bank.');
   if (state.stock.status !== 'private')
-    return fail('Listed banks raise money with a secondary offering.');
+    return fail('Listed labs raise money with a secondary offering.');
   if (state.stock.ipo) return fail('Your IPO is under way.');
   if (!validPct(pct) || pct > PLACEMENT.maxPct + 1e-9)
     return fail(`A round can sell up to ${PLACEMENT.maxPct * 100}% of the lab.`);
@@ -109,7 +109,7 @@ export function secondaryOffering(
   pct: number,
 ): CommandResult<{ raised: number }> {
   if (!INVESTMENT_BANKS[bankId]) return fail('Choose an investment bank.');
-  if (state.stock.status !== 'public') return fail('A secondary offering needs a listed bank.');
+  if (state.stock.status !== 'public') return fail('A secondary offering needs a listed lab.');
   if (!validPct(pct) || pct > SECONDARY.maxPct + 1e-9)
     return fail(`One offering can add up to ${SECONDARY.maxPct * 100}% new shares.`);
   const q = secondaryQuote(state, bankId, pct);

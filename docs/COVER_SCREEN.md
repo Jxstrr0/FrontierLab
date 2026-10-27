@@ -16,7 +16,7 @@
 
 ## 1. What we're building, in one paragraph
 
-Swap the title screen's top half (now a faint brass rosette behind the wordmark) for a **live engraving of a real Vault Street city**, drawn by the game's own map renderer and printed in that city's ink. The engraving pans slowly left and right. A **returning player** sees the city they're in, with **their bank's flags on the rooftops** of the lots they own. A **new player** sees a different city on each launch. The wordmark, tagline and menu sit underneath on the navy vault background. The cover is the game showing you its best art (the map) before you've even tapped.
+Swap the title screen's top half (now a faint brass rosette behind the wordmark) for a **live engraving of a real Vault Street city**, drawn by the game's own map renderer and printed in that city's ink. The engraving pans slowly left and right. A **returning player** sees the city they're in, with **their lab's flags on the rooftops** of the lots they own. A **new player** sees a different city on each launch. The wordmark, tagline and menu sit underneath on the navy vault background. The cover is the game showing you its best art (the map) before you've even tapped.
 
 ## 2. Why this one
 
@@ -33,9 +33,9 @@ Top to bottom, inside the existing safe-area padding (16 px gutters):
 |---|---|
 | **Skyline panel** | Full width (358 px), **420 px tall** (about half the screen; on short phones scale it with `clamp(300px, 50svh, 440px)`). Radius 6. Paper `--paper` #E3E9DF. Shows the city render (§5). |
 | Panel frame | A 1 px outer rule and a 0.4 px inner rule in the city ink, inset 6 px and 18 px, like the map's microprint border. Top and bottom strips of the frame carry the city name in tiny caps repeated (microprint, 5.5 px, letter-spacing ~1.3), `aria-hidden`. |
-| Caption row | 10 px below the panel. Left: "Now showing Saskatoon" (12 px, `--ivory-dim`). Right: 5 small brass dots, the first filled (a quiet hint that it changes; decorative, `aria-hidden`). Returning player: "Northgate Trust · Saskatoon" instead (bank name · current city). |
+| Caption row | 10 px below the panel. Left: "Now showing Saskatoon" (12 px, `--ivory-dim`). Right: 5 small brass dots, the first filled (a quiet hint that it changes; decorative, `aria-hidden`). Returning player: "Northgate Labs · Saskatoon" instead (lab name · current city). |
 | Wordmark | "VAULT STREET", **one line**, Bodoni Moda 900, 38 px, letter-spacing 0.08em, uppercase (the one place caps are allowed). |
-| Tagline | "Found a bank. Build an empire." 14 px `--ivory-dim`. |
+| Tagline | "Found a lab. Build an empire." 14 px `--ivory-dim`. |
 | Menu | Continue (primary brass) and New game (secondary), full width, 48 px tall, 10 px gap. Then **Load / Settings / Credits** in one row of three 44 px pills (secondary, 14 px). With no save: New game is primary and there's no Continue. |
 | Footer | One line: "A Longlight Interactive game · v{version}" left (12 px dim), **Check for updates** button right (min 44 px tall, brass-light). Keep the existing `UpdateButton` logic. |
 
@@ -80,7 +80,7 @@ Fill it in `slotMetaFor()`. On the title screen, build the map like the map lab 
 
 Don't decompress the save on the title screen. Measure `newGame()` on an iPhone-class CPU. If it costs more than ~40 ms, find the lighter world/lot generator it calls and use that directly.
 
-**Old slots** (no `cover` field): show the brand ink and bank name in the caption, and use the "no save" rotation city for the art. The next autosave fills it in.
+**Old slots** (no `cover` field): show the brand ink and lab name in the caption, and use the "no save" rotation city for the art. The next autosave fills it in.
 
 ### 4.3 Rendering approach (keep it cheap)
 
@@ -121,7 +121,7 @@ Don't run a live pannable map on the title screen. Instead:
 
 ## 6. Accessibility
 
-- The skyline panel is decorative but meaningful. Wrap it in a `role="img"` with an `aria-label` such as: "An engraved map of Saskatoon printed in prairie ochre, with your bank's flags on three rooftops." For a new player, drop the flags clause.
+- The skyline panel is decorative but meaningful. Wrap it in a `role="img"` with an `aria-label` such as: "An engraved map of Saskatoon printed in prairie ochre, with your lab's flags on three rooftops." For a new player, drop the flags clause.
 - The microprint and dots are `aria-hidden`.
 - Every menu button is a real `<button>`, ≥ 44 px tall. Focus order: Continue, New game, Load, Settings, Credits, Check for updates.
 

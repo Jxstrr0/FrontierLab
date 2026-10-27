@@ -155,7 +155,7 @@ Prices in the tier column are the default price × 0.85 / 1 / 1.25 for Low / Med
 | id | Name | Base | Effect |
 |---|---|---|---|
 | student_plus | Student Plus | plus | STU affinity +0.15; default $10 |
-| golden_years | Golden Years Plan | plus | RET affinity +0.15; default $12 |
+| golden_years | Researcher Plan | plus | RET (Researchers) affinity +0.15; default $12 |
 | family_plan | Family Plan | plus | FAM affinity +0.15; 4 seats per sign-up; default $12 per seat |
 | plus_annual | Plus Annual | plus | churn ×0.5; take-up ×0.85 |
 | carbon_neutral | Carbon-Neutral Plan | plus | reputation +0.05; YP +0.05 |
@@ -169,7 +169,17 @@ Prices in the tier column are the default price × 0.85 / 1 / 1.25 for Low / Med
 | voice_companion | Voice Companion | creative_suite | RET/FAM +0.1; take-up ×1.15 |
 | contract_copilot | Contract Copilot | agent_studio | BIZ +0.15; default $149; reputation +0.05 |
 | mobile_app_v2 | Mobile App 2.0 (Digital) | — | app rating +0.3 (one-time); requires the Platform & Security floor |
-| instant_decisions | Instant Decisions (Digital) | — | model Speed +2; requires the Platform & Security floor |
+| instant_decisions | Fast Inference (Digital) | — | model Speed +2; requires the Platform & Security floor |
+| model_playground | Model Playground (Digital) | — | app rating +0.1 (one-time); requires the Platform & Security floor |
+| usage_dashboard | Usage Dashboard (Digital) | — | app rating +0.1 |
+| status_page | Status Page (Digital) | — | app rating +0.05 |
+| prompt_library | Prompt Library (Digital) | — | app rating +0.1 |
+| sso_audit | SSO & Audit Logs (Digital) | — | app rating +0.1 |
+| developer_console | Developer Console (Digital) | — | app rating +0.15 |
+| agent_marketplace | Agent Marketplace (Digital) | — | app rating +0.1 |
+| streaming_runtime | Streaming Runtime (Digital) | — | model Speed +1 |
+
+All ten digital projects together add +1.0 to the app rating target and +3 model Speed. Each runs once; the CTO's digital delegation starts them in table order.
 
 Training runs for new model generations are separate from these templates; their numbers are `TRAINING` in balance.ts (SIMULATION §16.12).
 
@@ -227,7 +237,7 @@ Meeting rooms are `advisorOffices` in code.
 | vlt_timelock | Glazed Machine Room | 4 | 4 | 95,000 |
 | vlt_fortress | Showcase Machine Room | 5 | 5 | 180,000 |
 
-The code still gives each one a `boxes` count (0 / 150 / 300 / 600) from the bank's safe deposit boxes; the build picker shows it as "storage bays" ("No storage bays" at 0), and no product uses it.
+The code still gives each one a `boxes` count (0 / 150 / 300 / 600) from the bank's safe deposit boxes; the build picker shows it as "GPU racks" ("No GPU racks" at 0), and no product uses it.
 
 **Demo kiosks** (`atm_*`):
 
@@ -408,7 +418,7 @@ Provider names (fictional GPU clouds): Northbeam Cloud · Halcyon Compute · Str
 
 ## 13b. Model names
 
-Rival model families (one per lab, numbered by generation, starting at 2): Wren, Lantern, Cobalt, Kestrel, Fathom, Juniper, Halyard, Tessel, Sable, Quarry, Marlin, Ember. Your trained models take the name you give them (the strategies use "Gen N").
+Rival model families (one per lab, numbered by generation, starting at 2; 52 names in `src/data/modelNames.ts`, enough for the 34 rivals plus labs founded later): Wren, Lantern, Cobalt, Kestrel, Fathom, Juniper, Halyard, Tessel, Sable, Quarry, Marlin, Ember, then birds (Osprey, Plover, Siskin, Curlew, Heron, Tern, Linnet, Gannet), winds (Foehn, Gale, Sirocco, Bora, Chinook, Squall, Levant, Harmattan), minerals (Basalt, Garnet, Feldspar, Onyx, Tourmaline, Beryl, Obsidian, Agate), stars (Vega, Altair, Deneb, Rigel, Spica, Mizar, Capella, Procyon) and trees (Rowan, Alder, Larch, Hazel, Tamarack, Hemlock, Birch, Cedar). Your trained models take the name you give them (the strategies use "Gen N").
 
 ## 13c. Researchers and the Chief Scientist
 
@@ -487,7 +497,7 @@ Employers sit on the Businesses layer (layer id `employers`). Each is also an an
 | Community | −20% | 3.6 / 3.0 / 4.0 / 3.0 | 2.8 |
 
 - **Fees** move a rival's plan, API and app prices against the default. (The profile also keeps a `loans` rate offset from the bank era; nothing priced as a rate is left for it to move.)
-- Each rival lab holds one sales office per city it serves, with a size (SIMULATION §18.4). At the start a city's rivals draw S 3–5, M 6–10, L 10–16 or XL 16–24 bank-sized branches in total (`RIVAL_BRANCHES_BY_SIZE`; disruptors 1–2 each), and each lab's draw folds into one office sized to match.
+- Each rival lab holds one sales office per city it serves, with a size (SIMULATION §18.4). At the start a city's rivals draw S 3–5, M 6–10, L 10–16 or XL 16–24 full-size offices in total (`RIVAL_BRANCHES_BY_SIZE`; disruptors 1–2 each), and each lab's draw folds into one office sized to match.
 - Every rival has a named model (§13b) and a bench of a CFO, a COO and a Chief Safety Officer.
 
 ### New labs (2026-10-26)
@@ -508,7 +518,18 @@ New labs founded during a game (SIMULATION §18.7) take an invented name from `s
 
   Cities not listed borrow the nearest house: Saskatoon and Montréal → Ashgrove Capital, Seattle → Whitlock & Rowe, Frankfurt, Amsterdam, Moscow and St Petersburg → Meridian Partners. Implemented in `src/data/investmentBanks.ts`. Each office is also a lender: its Debt tab offers venture debt and a credit line to labs with a sales office in its city (SIMULATION §19.9).
 - **Marketing agencies:** Brightwell Creative, Northwind & Pike, Studio Halcyon. Present in L and XL cities; M cities get one.
-- **Lobbying firms:** Capitol Bridge Advisors (US), Parliament Row Partners (CA, UK), Rue Royale Affairs (EA, and CH by borrowing), Harbourline Policy Group (AU, SG, HK, and JP by borrowing), Granite Quay Advisors (RU). Campaigns are in SIMULATION §21.6.
+- **Lobbying firms:** Capitol Bridge Advisors (US), Parliament Row Partners (CA, UK), Rue Royale Affairs (EA, and CH by borrowing), Harbourline Policy Group (AU, SG, HK, and JP by borrowing), Granite Quay Advisors (RU). Campaigns (`src/data/lobbying.ts`; the first three are in SIMULATION §21.6, the rest pay a one-off grant on a win):
+
+  | id | Campaign | Fee | Success | Exposure | Win |
+  |---|---|---|---|---|---|
+  | easeBuffer | Ease the AI safety rules for 4 quarters | 2.5M | 55% | 12% | safety tier lines −5 points for a year |
+  | fastTrack | Fast-track a merger review | 1.5M | 60% | 10% | next deal may reach 65% of a city |
+  | stallBuffer | Stall the AI safety bill | 1.2M | 50% | 15% | pending safety bill fails its vote |
+  | computeSubsidy | Win a compute subsidy | 2M | 50% | 12% | 6M grant |
+  | dcPermits | Loosen data-centre permits | 1M | 60% | 8% | 2.5M grant |
+  | fairUse | Argue training data is fair use | 3M | 40% | 18% | 9M grant |
+  | rdCredit | Extend the R&D tax credit to training runs | 1.8M | 55% | 10% | 5M grant |
+  | chipRelief | Lift import duties on AI chips | 1.5M | 50% | 10% | 4M grant |
 - **Universities:**
   - Named: Prairie State University (Saskatoon), Kingsley University (Toronto), Bow River University (Calgary), Pacific Crest University (Vancouver), Hudson Polytechnic (New York).
   - Elsewhere, generate as "University of {City}" or "{City} Institute of Technology".
@@ -585,12 +606,12 @@ Pentagon order: Management, Product maturity, Market size, Competitiveness, Fina
 | Clarion Security | Cybersecurity | 2023 | B | 7, 7, 7, 6, 6 | 120M | Identity verification built for banks |
 | Harvest Ledger | Agtech/Fintech | 2025 | A | 6, 5, 6, 6, 5 | 20M | A marketplace that finances farmers against future harvests |
 
-**Sector growth μ** (quarterly mean; mature margin, P/S multiple and listed sector are in `src/data/startups.ts`): Energy storage 0.06, Agtech/Fintech 0.065, Fintech 0.08, Energy 0.06, Space 0.07, Biotech 0.05, Robotics 0.07, Healthtech 0.06, Agtech 0.05, Quantum 0.06, Proptech 0.05, Consumer 0.06, Materials 0.05, Gaming 0.05, Logistics 0.05, Mobility 0.04, Cybersecurity 0.07.
+**Sector growth μ** (quarterly mean; mature margin, P/S multiple and listed sector are in `src/data/startups.ts`): Energy storage 0.06, Agtech/Fintech 0.065, Fintech 0.08, Energy 0.06, Space 0.07, Biotech 0.05, Robotics 0.07, Healthtech 0.06, Agtech 0.05, Quantum 0.06, Proptech 0.05, Consumer 0.06, Materials 0.05, Gaming 0.05, Logistics 0.05, Mobility 0.04, Cybersecurity 0.07, AI & dev tools 0.09 (margin 0.20, P/S 16, lists as technology).
 
 
 ### Generated startups (2026-10-26)
 Startups generated during a game (conventions and the Investment floor pipeline, SIMULATION §20.1) take names and descriptions from templates, so a pipeline keeps showing new companies:
-- **Names** (`src/data/nameParts.ts`, `NAME_GEN.startupPatterns`): half are a word and a suffix that fits the sector (Cobalt Grid, Mosaic Arcade, Echo Volt); a quarter are coined brands (Quindra, Zandwell); a quarter a coined brand with a sector suffix (Tremio Shield). 50 words; 6 suffixes for each of the 17 sectors. A name already used by a startup or listed company is drawn again.
+- **Names** (`src/data/nameParts.ts`, `NAME_GEN.startupPatterns`): half are a word and a suffix that fits the sector (Cobalt Grid, Mosaic Arcade, Echo Volt); a quarter are coined brands (Quindra, Zandwell); a quarter a coined brand with a sector suffix (Tremio Shield). 50 words; 6 suffixes for each of the 18 sectors. A name already used by a startup or listed company is drawn again.
 - **Descriptions** (`src/data/startupBlurbs.ts`): "{offer} for {customer}" from six offers and six customers per sector (36 per sector), e.g. "Cold-chain trucking for pharmacies"; 15% of the time one of the sector's handwritten lines instead. A description already used by a startup still in the pipeline is drawn again.
 ## 19. Conferences (yearly calendar)
 
@@ -627,18 +648,35 @@ Announced in the paper 4 weeks before. Active for 4 weeks (was 2 and 1 until 202
 
 **Homes:**
 
-| Home | Region | Price |
-|---|---|---|
-| Muskoka Lake House | CA | 4.8M |
-| Whistler Ski Chalet | CA | 6.5M |
-| Okanagan Vineyard Estate | CA | 9.2M |
-| Hamptons Beach Estate | US | 28M |
-| Aspen Ridge Retreat | US | 14M |
-| Côte d'Azur Villa | EA | 35M |
-| Lake Como Villa | EA | 22M |
-| Swiss Alpine Chalet | CH | 18M |
-| Kyoto Garden House | JP | 6M |
-| Byron Bay Clifftop | AU | 9M |
+| Home | Region | City map | Price |
+|---|---|---|---|
+| Lake Waskesiu Cabin | CA | Saskatoon | 1.6M |
+| Bow Valley Ranch | CA | Calgary | 3.9M |
+| Muskoka Lake House | CA | Toronto | 4.8M |
+| Whistler Ski Chalet | CA | Vancouver | 6.5M |
+| Okanagan Vineyard Estate | CA | Vancouver | 9.2M |
+| Laurentian Ski Lodge | CA | Montréal | 3.4M |
+| Hamptons Beach Estate | US | New York | 28M |
+| Aspen Ridge Retreat | US | Chicago | 14M |
+| Lake Shore Orchard House | US | Chicago | 5.2M |
+| Big Sur Cliff House | US | San Francisco | 24M |
+| Napa Hillside Winery | US | San Francisco | 31M |
+| San Juan Island Lodge | US | Seattle | 8.5M |
+| Cotswold Manor House | UK | London | 19M |
+| Cornish Harbour Cottage | UK | London | 4.2M |
+| Côte d'Azur Villa | EA | Paris | 35M |
+| Lake Como Villa | EA | Paris | 22M |
+| Frisian Dune House | EA | Amsterdam | 7.8M |
+| Black Forest Hunting Lodge | EA | Frankfurt | 6.9M |
+| Swiss Alpine Chalet | CH | Zürich | 18M |
+| Kyoto Garden House | JP | Tokyo | 6M |
+| Byron Bay Clifftop | AU | Sydney | 9M |
+| Sentosa Cove Bungalow | SG | Singapore | 26M |
+| Peak Road Residence | HK | Hong Kong | 58M |
+| Birch Forest Dacha | RU | Moscow | 12M |
+| Karelian Lake Retreat | RU | St Petersburg | 3.6M |
+
+Every city with a sales-office map has at least one home (25 in all).
 
 **Cars** (fictional marques):
 
@@ -651,9 +689,20 @@ Announced in the paper 4 weeks before. Active for 4 weeks (was 2 and 1 until 202
 | Arcadia Veloce V12 | 420,000 | |
 | Valkyr Hypercar | 3,200,000 | limited |
 | Castellan 1962 Classic | 2,100,000 | classic, appreciates |
+| Tamsin City Hatch | 38,000 | |
+| Halcyon Estate Hybrid | 72,000 | |
+| Osprey Touring Saloon | 130,000 | |
+| Stratus Coupe EV | 215,000 | |
+| Brennock Overland | 275,000 | |
+| Vespera Strada | 560,000 | |
+| Pellegrin 1955 Barchetta | 4,800,000 | classic, limited |
+
+Dealer names (20, one per dealer city): Prestige Motor House, Grand Marque Autos, Silverline Motors, Crown & Chassis, Meridian Motorworks, Ashford Motor Gallery, Harbourfront Motors, Kingsway Prestige Cars, Belvedere Automobiles, Northstar Motor Company, Stonebridge Classics, Lakeside Luxury Motors, The Carriage House, Summit Auto Salon, Regent Street Motors, Pinnacle Performance Cars, Oakwood Motor Exchange, Westgate Marques, Foxhall Motors, Citadel Automotive.
 
 **Jets:**
+- Kite 350: 9.5M, 3,500 km range.
 - Corvid 600: 24M, 6,000 km range.
+- Petrel 7500: 46M, 11,000 km range.
 - Albatross 8000: 68M, global range.
 
 **Collectibles** (estimates):
@@ -669,6 +718,36 @@ Announced in the paper 4 weeks before. Active for 4 weeks (was 2 and 1 until 202
 - Signed First Edition of a classic detective novel — 380k
 - Deco Mantel Clock by "Atelier Vautrin" — 640k
 - Prototype Racing Helmet, 1970s — 520k
+- 1931 Pennant-Winning Bat, cracked — 310k
+- Olympic Gold Skates, 1964 — 420k
+- Game-Worn Jersey of "Lena Forsberg" — 690k
+- "Harbour at Dusk", oil, 1920s — 2.1M
+- Untitled abstract, acrylic, 1961 — 4.4M
+- Portrait of a Girl with a Lantern, 1780s — 2.9M
+- Woodblock Print of a Snowy Bridge, 1830s — 720k
+- Pattern Double Eagle, 1879 — 2.8M
+- Silver Tetradrachm, 4th c. BC — 240k
+- Proof Five-Guinea Piece, 1703 — 1.05M
+- Bronze "Dancer with Veil", 1920s — 1.7M
+- Marble Horse Fragment, Roman — 3.3M
+- Painted Steel Mobile, 1958 — 2.2M
+- Perpetual Calendar Wristwatch, 1941 — 2.4M
+- Minute-Repeating Pocket Watch, 1890s — 880k
+- Military Dive Watch, 1950s — 460k
+- Prototype Keyboard from the First Chatbot Lab, 1966 — 290k
+- Ticket Stub from the First Transatlantic Flight — 350k
+- Telegram Announcing a Famous Armistice — 410k
+- Training Glove from a Lunar Programme — 1.4M
+- Hand-Coloured World Atlas, 1620s — 1.9M
+- Manuscript Notebook of a Romantic Poet — 2.7M
+- Early Printed Folio of Collected Plays — 5.6M
+- First Issue of "Captain Meridian", 1939 — 1.1M
+- Library Globe on a Mahogany Stand, 1790s — 760k
+- Lacquer Cabinet with Gilt Mounts, 1700s — 1.3M
+- Hunting Tapestry, 16th c. — 2.05M
+- Crystal Chandelier from a Grand Hotel — 590k
+
+40 lots across sports, art, coins, sculpture, watches, memorabilia, books and antiques (`src/data/collectibles.ts`).
 
 **Sports franchises:**
 
@@ -759,7 +838,7 @@ Examples:
 | FASTEST_GROWING | The fastest growing labs of {year} | {bank} tops this year's list after growing assets {pct}. |
 | RICH_LIST | {name} enters the rich list at #{rank} | The {bank} founder's fortune is estimated at {worth}. |
 | REG_FINE | Regulator fines {bank} {amount} | The penalty follows {reason}. |
-| BANK_FAILURE | Regulators seize {bank} | {bank}'s {n} sales offices will be offered to buyers. |
+| BANK_FAILURE | {bank} collapses into administration | {bank}'s {n} sales offices will be offered to buyers. |
 | ACQUISITION_CLOSED | {bank} buys {target} for {price} | {target}'s {n} sales offices join {bank}. Signs come down over the next eight weeks. |
 | IPO_LISTED | {bank} opens at {open} on its first day | Shares priced at {price} {pop} as {ticker} began trading on the {exchange}. The listing raised {raised}. |
 | BREACH | {bank} discloses data breach | About {n} customers may be affected. |
@@ -771,7 +850,7 @@ Examples:
 
 ## 24. Review card templates
 
-Pick by category and sentiment. Use campaign-specific lines when the campaign is active. The full lists live in `src/data/reviews.ts` (examples below).
+Pick by category and sentiment. Use campaign-specific lines when the campaign is active. The full lists live in `src/data/reviews.ts`: ten lines per category and sentiment (80 in all) plus one line per sales-office campaign (examples below).
 
 - **Price +**
   - "Pro costs less here than anywhere else I tried. Switched the whole team."
@@ -803,6 +882,11 @@ Pick by category and sentiment. Use campaign-specific lines when the campaign is
   - Weekend Support: "Open Saturday mornings. Thank you!"
   - Sign-Up Credits: "Came for the free credits. Might stay."
   - AI Workshops: "The prompting workshop finally made it click for me."
+  - Green Compute Pledge: "Green compute pledge on the door, solar on the roof. I felt less guilty about the batch job."
+  - Research Newsletter: "Signed up after the research newsletter. The eval results were worth the read."
+  - Community Sponsors: "Saw their name on the school robotics team shirts. Nice to see a lab put money in."
+  - Social Media: "Tried it because of a demo clip online. The agent really does file the expenses."
+  - Local Paid Search: "Searched for a cheaper API and their ad was right. It was cheaper."
 
 ## 25. Advisor lines (contextual)
 
@@ -839,4 +923,4 @@ Fill these per panel and state.
 
 - **First names:** Avery, Malik, Sofia, Kenji, Amara, Liam, Priya, Mateo, Chloé, Tariq, Hannah, Diego, Mei, Oluwaseun, Freya, Arjun, Isabel, Noah, Zainab, Lucas, Yuki, Elena, Kwame, Grace, Rafael, Aisha, Oscar, Leila, Dmitri, Nora, Santiago, Ingrid, Hamza, Camille, Ethan, Sakura, Omar, Bianca, Theo, Imani.
 - **Last names:** Bennett, Okafor, Laurent, Tanaka, Haddad, Novak, Fraser, Mendes, Kowalski, Singh, Achebe, Moreau, Lindqvist, Park, Delgado, Whitfield, Nakamura, Osei, Brennan, Rossi, Chen, Abara, Duval, MacLeod, Petrov, Ahmed, Sorensen, Kaur, Ibarra, Gallagher, Hoffmann, Mensah, Calloway, Ferreira, Varga, Kimura, Nwosu, Ashford, Castillo, Holm.
-- **Investor and fund names:** Hardwick Capital, Wren & Lowe, Saltmarsh Ventures, Northgate Partners, Lindenhall Fund, Bluewater Equity, Corbel Asset Management, Fenwick Family Office.
+- **Investor and fund names** (25): Hardwick Capital, Wren & Lowe, Saltmarsh Ventures, Northgate Partners, Lindenhall Fund, Bluewater Equity, Corbel Asset Management, Fenwick Family Office, Greyfell Growth, Tidewater Ventures, Ironbridge Capital, Marrow & Vale, Quill Street Partners, Halden Pension Trust, Oakmere Endowment, Stirling Ridge Capital, Pelican Point Ventures, Ashcombe Holdings, Lantern Hill Partners, Blackwater Growth Fund, Carrick Sovereign Fund, Foxglove Capital, Winterbourne Family Office, Keel & Compass Ventures, Rookery Asset Management.

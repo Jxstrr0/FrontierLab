@@ -39,7 +39,7 @@ const EXPLAINERS: { title: string; body: string }[] = [
   },
   {
     title: 'Treasury reserves',
-    body: 'Cash the treasury holds apart from the operating account. When enterprise contracts replaced lending, any loans still on the books were repaid into reserves.',
+    body: 'Cash set aside from the operating account.',
   },
   {
     title: 'Cash cover',

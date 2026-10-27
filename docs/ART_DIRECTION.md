@@ -107,16 +107,16 @@ The brand ink is the sixth wash: awning stripes, the tympanum of the Classic Col
 - **Water:** horizontal wavy guilloche lines in the ink at 50%, over a pale tint of the ink.
 - **Parks:** stipple dots plus lollipop trees drawn with spiral strokes.
 - **Streets:** paper-coloured, with dashed centrelines in the ink at 30%.
-- **Your branches** add a small brand-ink flag on the roof.
+- **Your sales offices** add a small brand-ink flag on the roof.
 - **Data centers** (C8c, `src/art/buildingsDataCenter.ts`): a low, wide engraved hall instead of a storefront, about 1.2–1.5 storeys with a long parapet roofline, precast wall panels (ribs), a dense louvre band under the parapet, a loading door on the lit face, and a row of rooftop chillers with fan rings (round vents at close zoom). A small fenced substation yard with two transformers sits in front of it, and your brand flag stands on the roof.
 - **Energy sites** draw a substation yard (fence, three transformers with bushings, a lattice pylon with cross-arms) beside a small control house; once you build a data center there, the hall replaces the control house. Both looks come only from the tile's art seed and stay inside the tile's draw bounds (tested), so chunk pre-rendering is unchanged; a build only repaints the chunks that tile touches.
 - **Pins** (DOM; SCREENS §2). Silhouette first, then colour, then glyph, so a pin reads at a glance and without relying on hue:
-  - **Crest** (shield): banks. Yours filled with your brand ink and monogram; rivals ivory with their ink ring and monogram; head offices add a brass crown.
+  - **Crest** (shield): labs. Yours filled with your brand ink and monogram; rivals ivory with their ink ring and monogram; head offices add a brass crown.
   - **Coin**: open locations to build on. A small ivory "+" coin with a milled edge at close zoom; nearer out, a quiet brass dot on the roof with no stem.
   - **Medallion**: places. A round coin filled with the type's own ink (`--type-*` tokens in tokens.css: oxblood, vermilion, teal, cobalt, plum, magenta, forest …) with an ivory glyph. Every glyph and caption on its ink reaches 4.5:1 (tested).
   - **Price tag**: things you rent or buy. A pointed tag with a punched hole: offices in light brass with dark ink, buildings and vacation homes in their type ink. Compact (just the glyph) until close zoom, where it adds its words ("For lease").
   - **Seal**: landmarks (central bank, airport, stadium). 32 px, scalloped.
-  - **Yours, one colour:** every place you own (branches, HQ, property, vacation homes, clubs) is a crest in your brand ink. Branches carry your monogram; the rest carry their type glyph, so each reads apart. Partners (employers, universities) keep their type medallion with a small brand-ink tick.
+  - **Yours, one colour:** every place you own (sales offices, HQ, property, vacation homes, clubs) is a crest in your brand ink. Sales offices carry your monogram; the rest carry their type glyph, so each reads apart. Partners (employers, universities) keep their type medallion with a small brand-ink tick.
   - **One footprint:** crests (26 × 30), medallions (28), tags (22 high) and seals (32) are all about the same size, so no kind of pin shouts over the others.
   - **Words at close zoom only:** captions, notes ("Sale wk 4", "For sale", "Converting") and tag words appear from close zoom (PIN_CAPTION_FROM_ZOOM); the normal view is symbols only.
   - The same per-type ink marks that type everywhere it appears: map pins, the Layers legend and panel headers.
@@ -162,8 +162,8 @@ The title screen leads with the map, the game's boldest art ("Living skyline", d
   - Deco Tower Front: stepped crown and sunburst over the door
   - Lattice Pavilion: a thin roof slab floating over a box of smoked glass crossed by a diagrid, the seal hanging in the glazing, and a light wall in the brand ink beside the door with a ticker of dashes running down it
   - **Colour** (§1.1 material washes): each front is engraved over pale material colour, with the hatching kept on top: terracotta brick, warm limestone, cool glass, slate roofs and fascias, verdigris on the Deco setbacks, leaf green in the planters, and the brand ink on the awning stripes, pediment, canopy and spandrels. The Deco sunburst is brass.
-  - **Logo shape** (CONTENT §7b), chosen on New Game: the bank's mark is one outline everywhere (`art/logoShapes.ts`), so the medallion in the top bar, the seal on the front, the plaque over the counter and the mark on an owned building all match. Round, shield, lozenge, hexagon, cut-corner plaque, a twelve-scallop rosette, a sharp tile, a rounded pebble or an octagon; rivals stay round.
-  - **House style** (CONTENT §7a), chosen on New Game, dresses whichever option you built: the name sign (with the bank's full name), the door, the lamps, the planters and the roof flag. **Quant Noir** is the modern one: a graphite sign with the name in lower-case, widely spaced sans and a light strip in the brand ink, recessed light bars with a soft cone of light, graphite cube planters with clipped spheres, a frameless glass door with a glowing seam, and a slim light blade on the roof that pulses instead of a cloth flag (`branch/houseStyleQuant.tsx`). Each composition marks where they go (`FacadeAnchors` in `branch/houseStyleArt.tsx`), so a style reads the same on every front and no two banks on a street look alike.
+  - **Logo shape** (CONTENT §7b), chosen on New Game: the lab's mark is one outline everywhere (`art/logoShapes.ts`), so the medallion in the top bar, the seal on the front, the plaque over the counter and the mark on an owned building all match. Round, shield, lozenge, hexagon, cut-corner plaque, a twelve-scallop rosette, a sharp tile, a rounded pebble or an octagon; rivals stay round.
+  - **House style** (CONTENT §7a), chosen on New Game, dresses whichever option you built: the name sign (with the lab's full name), the door, the lamps, the planters and the roof flag. **Quant Noir** is the modern one: a graphite sign with the name in lower-case, widely spaced sans and a light strip in the brand ink, recessed light bars with a soft cone of light, graphite cube planters with clipped spheres, a frameless glass door with a glowing seam, and a slim light blade on the roof that pulses instead of a cloth flag (`branch/houseStyleQuant.tsx`). Each composition marks where they go (`FacadeAnchors` in `branch/houseStyleArt.tsx`), so a style reads the same on every front and no two labs on a street look alike.
   - Street life: two passers-by stroll the pavement, the flag stirs and garden lanterns and plants sway; all of it stops with reduced motion.
 - **HQ floors:** an isometric cut-away office. **Desks and people reflect actual staffing** (filled desks vs empty), so understaffing is visible at a glance.
   - The room: plank floor (carpet for the Executive suite), walls with skirting and cornice, cut tops inked solid like an architect's section, mullioned windows throwing pale daylight across the floor, a clock and a door.
@@ -174,10 +174,10 @@ The title screen leads with the map, the game's boldest art ("Living skyline", d
   - **Exterior** (`dataCenter/DataCenterArt.tsx`): a low precast hall that widens with the hall size (a split line on twin halls, a second hall behind a campus), a louvre band, a glazed entrance with a brand-ink canopy and your seal, roller doors, and rooftop units by cooling (air: fan rings; liquid: dry coolers and a pipe run; immersion: three low units). A fenced transformer yard stands to the left; at an energy site a pylon and faint wind turbines behind it. During fit-out a crane lowers the last chiller.
   - **GPU hall interior** (`dataCenter/GpuHallArt.tsx`): an isometric cut-away on a raised tile floor with no windows. Rows of rack cabinets (2×6, 3×7 or 3×9 by hall) under a ladder cable tray; lit racks show running GPUs with signal-cyan lights, idle racks stay dark and dense, so the share running reads at a glance (the caption says "X of Y GPUs running"). Cooling dresses the room (air grilles and a CRAH unit, liquid hoses and pipes, or immersion tanks instead of racks), and the switchgear on the left wall grows with the power option. A technician walks the front aisle; fit-out shows dashed empty rack outlines and a ladder.
 - **Sales office interior** (the Inside view on a sales office or the build preview; re-skinned from the bank's hall in C8c): an isometric cut-away lab storefront and workspace drawn from the fit-out.
-  - The teller line takes its option's shape: a glazed counter (Two-Window, Standard), an open express counter, separate service pods, or concierge desks with seated staff and clients.
+  - The sales desk line takes its option's shape: a glazed counter (Two-Window, Standard), an open express counter, separate service pods, or concierge desks with seated staff and clients.
   - The lobby sets the floor (tiles, planks, carpet, a marble checker) and the number of glass advisor offices along the left wall.
   - The secure-room option puts a machine room on the back wall (one rack cabinet; a glazed room of two racks with a badge reader; a wider glazed room of three) beside a wall of server units that grows with the box count, or a single floor-standing rack for the back-office option. Demo kiosks with a chat screen stand by the left wall, and the lab's monogram plaque hangs over the counter in the brand ink. The build options keep their ids (`vlt_*`, `atm_*`), so saves are unaffected.
-  - Live figures fill it: tellers first, then advisors, then a greeter, tinted by staff morale, and a queue as long as the wait behind brass posts and a rope, with a sofa of waiting customers when it is busy. A branch in fit-out shows a ladder and boxes and nobody inside.
+  - Live figures fill it: desk staff first, then advisors, then a greeter, tinted by staff morale, and a queue as long as the wait behind brass posts and a rope, with a sofa of waiting customers when it is busy. An office in fit-out shows a ladder and boxes and nobody inside.
 - **Interior motion:** quiet and small. People breathe and type (under a pixel), screens flicker, rack and IT lights blink in `--signal`, plants sway, clock hands turn, and a walker or arriving customer crosses the room. All of it stops with reduced motion (system or in-game setting).
 - **Other buildings:** one composition each — investment bank (trading floor), central bank (dome and steps), credit bureau (storage bays and filing cabinets), airport (terminal and tail fins), auction house (gallery with podium), car dealer (showroom), convention (hall with booths), university (quad), employer (by type), stadium.
 - **Products, campaigns and benefits:** small spot illustrations (80×80) in a single ink.
@@ -212,9 +212,9 @@ The title screen leads with the map, the game's boldest art ("Living skyline", d
 - **Donut:** segments in a palette derived from the city inks, with fine diagonal engraving lines inside each segment.
 - **Line charts:** 1.5 px strokes, no area fills, and a dotted brass marker for "now".
 
-## 6. The Weekly Ledger
+## 6. The Weekly Inference
 
-- **Paper:** ivory with grain. The masthead "The Weekly Ledger" is Bodoni Moda 900, tight tracking, centered, between a double rule with the date at the right.
+- **Paper:** ivory with grain. The masthead "The Weekly Inference" is Bodoni Moda 900, tight tracking, centered, between a double rule with the date at the right.
 - **Tabs:** text links with a brass underline on the active tab.
 - **Articles:**
   - two columns separated by a hairline
@@ -232,7 +232,7 @@ The title screen leads with the map, the game's boldest art ("Living skyline", d
 - coin clink on positive weekly results
 - paper slide for the Ledger
 - soft stamp for approvals and counterfeit reveals
-- vault latch for opening panels
+- server-room latch for opening panels
 
 Keep everything under 30 KB each, off by default on first launch, and toggleable.
 

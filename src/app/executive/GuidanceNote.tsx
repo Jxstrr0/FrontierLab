@@ -1,7 +1,7 @@
 // Branch guidance readout on an executive's profile (SCREENS §10.1): what the
-// executive is currently telling delegated branch managers to do. The CFO and
-// CRO share one note (deposit and loan rates); the COO, CMO and CPO each get
-// their own line.
+// executive is currently telling delegated branch managers to do. The COO, CMO
+// and CPO each get a line; the CFO and CSO guidance (deposit and loan rate
+// offsets) applies to no current product, so their note renders nothing.
 import { GUIDANCE } from '../../config/balance';
 import { guidanceOf } from '../../sim/branchGuidance';
 import type { ExecSeat } from '../../sim/marketsTypes';
@@ -46,6 +46,7 @@ function line(s: GameState, seat: ExecSeat): string {
 }
 
 export function GuidanceNote(p: { s: GameState; seat: ExecSeat }) {
+  if (p.seat === 'cfo' || p.seat === 'cro') return null;
   return (
     <div class="muted small exec-note">
       <p>{line(p.s, p.seat)}</p>

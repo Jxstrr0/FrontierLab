@@ -14,7 +14,7 @@ export const PERSONAL_TEMPLATES = {
       b: 'Built on {bank}, the fortune is put at {worth}.',
     },
     {
-      h: 'Banker {name} joins the rich list',
+      h: 'AI founder {name} joins the rich list',
       b: 'The founder of {bank} debuts at #{rank} with an estimated {worth}.',
     },
   ],

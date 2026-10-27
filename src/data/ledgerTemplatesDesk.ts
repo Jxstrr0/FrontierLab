@@ -72,7 +72,7 @@ export const DESK_TEMPLATES = {
     },
     {
       h: 'Money Column: rising rates, winners and losers',
-      b: 'At {rate}, borrowers pay more and savers earn more. Check what your lab pays before you leave money idle.',
+      b: 'At {rate}, borrowers pay more and savers earn more. Check what your bank pays before you leave money idle.',
     },
   ],
   COLUMN_RATES_DOWN: [

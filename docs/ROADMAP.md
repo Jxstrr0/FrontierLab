@@ -212,8 +212,8 @@ Eleven stages. Each one ends playable and deployed. A stage usually takes severa
 - ~~Share-for-share mergers and share buybacks~~ (built 2026-10-26, SIMULATION §19.6a, §19.8)
 - FX between currencies
 - An investment banking division of your own
-- Branch renovations and relocations
-- A credit rating agency score for your bank
-- Scenario mode (start in a recession, rescue a failing bank)
+- Office renovations and relocations
+- A credit rating agency score for your lab
+- Scenario mode (start in a recession, rescue a failing lab)
 - Seasonal events
 - Leaderboards via export codes

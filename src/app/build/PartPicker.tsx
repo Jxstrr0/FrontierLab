@@ -33,7 +33,7 @@ function facts(e: EquipmentSpec): string[] {
     out.push(`${count(e.perStation ?? 0)} interactions per station each week`);
   }
   if (e.slot === 'vault') {
-    out.push(e.boxes ? `${count(e.boxes)} storage bays` : 'No storage bays');
+    out.push(e.boxes ? `${count(e.boxes)} GPU racks` : 'No GPU racks');
   }
   if (e.slot === 'atm' && e.atmProductivity) {
     out.push(`${count(e.atmProductivity)} interactions per week`);

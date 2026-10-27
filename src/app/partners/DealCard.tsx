@@ -45,8 +45,8 @@ function Deal(p: { site: Site; kind: PartnershipKind; people: number }) {
   const blocker =
     hosts.length === 0
       ? regional
-        ? `You need an open sales office in ${COUNTRIES[regional].name} to host the accounts.`
-        : 'You need an open sales office in this city to host the accounts.'
+        ? `You need an open sales office in ${COUNTRIES[regional].name} to host the plans.`
+        : 'You need an open sales office in this city to host the plans.'
       : cmd.signBlocker(s, site.id, hostId ?? '', pkg ?? '', kind);
   // Hosts in other cities (a regional site's) carry their city's name.
   const hostLabel = (b: Branch) =>

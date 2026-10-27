@@ -52,15 +52,15 @@ const BANK_TEMPLATES = {
   BRANCH_OPENED: [
     {
       h: '{bank} opens {name}',
-      b: '{address} has a new lab on the block. Tellers are at their stations and the savings board is up.',
+      b: '{address} has a new lab on the block. The sales desks are staffed and the demo screens are on.',
     },
     {
       h: 'Doors open at {name}',
-      b: 'The first customers queued at {address} as {bank} opened for business. Deposits are welcome from day one.',
+      b: 'The first customers queued at {address} as {bank} opened for business. Sign-ups are open from day one.',
     },
     {
       h: '{name} welcomes its first customers',
-      b: '{bank} cut the ribbon at {address} this week. The manager promises short queues and long hours.',
+      b: '{bank} cut the ribbon at {address} this week. The manager promises quick demos and long hours.',
     },
   ],
   BRANCH_CLOSED: [
@@ -145,22 +145,22 @@ const BANK_TEMPLATES = {
   ],
   WINDOW_USE: [
     {
-      h: '{bank} taps emergency central bank funding',
-      b: "The lab borrowed {amount} from the {cb}'s standing facility this week.",
+      h: '{bank} draws on its emergency credit line',
+      b: "The lab borrowed {amount} on the {cb}'s emergency credit line this week.",
     },
     {
       h: '{bank} turns to the lender of last resort',
-      b: "Treasury drew {amount} from the {cb}'s window. Use of the window is noticed, and rivals will not forget it soon.",
+      b: "Finance drew {amount} on the {cb}'s emergency credit line. A draw like that is noticed, and rivals will not forget it soon.",
     },
     {
-      h: 'Questions over {bank} liquidity',
-      b: "A {amount} draw on the {cb}'s facility has set tongues wagging in the funding market.",
+      h: 'Questions over {bank} cash',
+      b: "A {amount} draw on the {cb}'s emergency credit line has set tongues wagging among investors.",
     },
   ],
   REGULATOR_AUDIT: [
     {
       h: 'Regulator fines {bank} {fine} after audit',
-      b: 'Examiners found gaps in risk controls during their quarterly review.',
+      b: 'Auditors found gaps in safety controls during their quarterly review.',
     },
     {
       h: '{bank} fails regulator review',
@@ -183,12 +183,12 @@ const BANK_TEMPLATES = {
   ],
   BANK_RUN: [
     {
-      h: 'Queues form outside {bank}',
-      b: 'Depositors are pulling savings after a week of worrying headlines. The lab says it has ample cash.',
+      h: 'Customers cancel amid outage rumours at {bank}',
+      b: 'Subscribers are cancelling after a week of worrying headlines about reliability. The lab says its systems are sound and its cash is ample.',
     },
     {
-      h: 'Run on {bank} as savers take fright',
-      b: 'Withdrawals surged at sales offices across the network. Regulators are watching closely.',
+      h: 'Sign-ups stall at {bank} as users take fright',
+      b: 'Cancellations surged across the network as rumours of an outage spread. Regulators are watching closely.',
     },
   ],
   COMPUTE_BURST: [
@@ -234,11 +234,11 @@ const BANK_TEMPLATES = {
   BANK_RUN_ENDED: [
     {
       h: 'Calm returns at {bank}',
-      b: 'Withdrawals have slowed to normal levels and the queues have gone.',
+      b: 'Cancellations have slowed to normal levels and the rumours have gone quiet.',
     },
     {
       h: '{bank} weathers the storm',
-      b: 'The rush for the exits is over. Deposits are flowing back in.',
+      b: 'The rush for the exits is over. Sign-ups are back.',
     },
   ],
   RECAP: [
@@ -354,7 +354,7 @@ const BANK_TEMPLATES = {
   PRODUCT_DEVELOPED: [
     {
       h: '{bank} launches {name}',
-      b: 'The new product reached the shelves this week. Early testers rate it {stars} stars.',
+      b: 'The new product went live this week. Early testers rate it {stars} stars.',
     },
     {
       h: 'New from {bank}: {name}',
@@ -378,7 +378,7 @@ const BANK_TEMPLATES = {
     },
     {
       h: '{bank} wins {employer} {kind}',
-      b: 'Staff at {employer} will be offered accounts through {branch}. The lab paid {fee} to sign.',
+      b: 'Staff at {employer} will be offered plans through {branch}. The lab paid {fee} to sign.',
     },
   ],
   PARTNERSHIP_RENEWED: [
@@ -391,7 +391,7 @@ const BANK_TEMPLATES = {
   PARTNERSHIP_ENDED: [
     {
       h: '{employer} and {bank} part ways',
-      b: 'The partnership has {reason}. Balances will run off over the coming weeks.',
+      b: 'The partnership has {reason}. Seats will lapse over the coming weeks.',
     },
     { h: '{bank} loses {employer} deal', b: 'The arrangement has {reason}.' },
   ],

@@ -16,7 +16,7 @@ export function PartnershipCards() {
       <Card>
         <p class="muted small hq-note">
           No partnerships yet. Turn on the Employers layer on the map and tap a large employer to
-          offer a payroll deal that brings its staff's salary accounts to your lab.
+          offer a staff plan deal that puts its staff on your plans.
         </p>
       </Card>
     );

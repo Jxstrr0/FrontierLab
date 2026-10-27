@@ -3,13 +3,31 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.29, save schema 20). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
+**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.30, save schema 21). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `0bf7d7abb55509` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `1450001cc8011a` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-27 — Bank-wording sweep and content fills (v0.1.30, schema 21)
+
+An audit of the whole game for three things: bank-era text that still reaches the player, content pools too small for how often they're seen, and places where the AI-lab framing didn't hold together. This release covers the first two. Two further releases follow: AI milestones and AI-native incidents, then the executive floor trimmed to seven seats and the rival labs' accounting rewritten on ARR.
+
+**What changed.**
+- **About 115 bank-era strings replaced** across screens, toasts, news and data. The old bank run is an *outage rumour* ("customers are cancelling"), a failed rival *goes into administration* instead of being seized by regulators, "capital ratio" is the *credit ratio* everywhere, "risk appetite" is *launch posture*, "rates" are *prices*, "deposits/accounts" are *sign-ups/seats*, the Head teller is the *Office lead*, the Deal Desk fallback is the CSO (not CRO), rival strategy labels read Incumbent / Premium / Open-model *lab*, and rival news says "established lab" not "high-street bank". Compute credits for startups are now offered by a *Provider* for an *annual fee* ("Offer credits"), not a lender at a rate. Partnerships are *staff plan deals* with *seats*. Game over reports customers served and ARR, not deposits and loans.
+- **Dead cards removed.** The Safety floor's *Losses* and *Model performance* cards came from the bank's loan book and could never show anything ("No loan history yet."). The CFO's and CSO's *Sales office guidance* notes (deposit and loan rate offsets no product uses) are hidden; their toggles go in the next release.
+- **AI glyphs for product templates.** Every AI template used to fall back to the savings coin stack; each now has its own icon.
+- **Model names bug.** There were 12 model family names for 34+ rival labs, so every lab after the twelfth shipped "Wren N". Now 52 families.
+- **Pools filled (CONTENT updated):** review cards 4 → 10 per bucket, plus review lines for the five campaigns that had none; collectibles 12 → 40; digital projects 2 → 10 ("Instant Decisions" is now *Fast Inference*; the "Golden Years Plan" is the *Researcher Plan*); lobbying campaigns 3 → 8 (the five new ones pay a one-off grant on a win, booked as a refund on the lobbying line); cars 7 → 14, dealer names 6 → 20, jets 2 → 4; investor fund names 8 → 25; an *AI & dev tools* startup sector; vacation homes 12 → 25, now in every storefront city (Lake Como moved from Frankfurt to Paris, Aspen Ridge from Seattle to Chicago); six AI policies in the world news; the stock-market "banking" beats rewritten as AI-lab beats.
+- **Docs:** stale bank wording fixed in ART_DIRECTION, COVER_SCREEN, CONTENT, ROADMAP, SCREENS, DESIGN, DATA_MODEL; SIMULATION §21.6 lists the grant campaigns; the conference tip now says four weeks, matching the balance file.
+- **Save schema 21.** Migration 20 → 21 re-runs the personal-site generator for every generated city so the new homes get map sites. Existing sites keep their tiles (the generator skips ids it already has before drawing). The layout-1 fixture digests were regenerated for the nine cities that gained a home.
+- **Determinism snapshot** `0bf7d7abb55509` → `1450001cc8011a`: bigger name pools and the extra sites change RNG draws; intended.
+
+**Checked.** `npm run lint`, `npx vitest run` (1011 tests) and `npm run build` pass. `npm run balance -- --years 10 --seed 42 --strategy steady`: all checkpoints in range.
+
+**Dependencies:** none added.
 
 ### 2026-10-27 — City text fix, menu scrolling, free top rerolls (v0.1.29)
 

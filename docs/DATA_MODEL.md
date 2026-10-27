@@ -225,7 +225,7 @@ export interface RivalBank {
   cities: Id[]; branches: RivalBranch[]; cash: Money; equity: Money; capitalRatio: number;
   listed: boolean; ticker?: string; shares: number; price: Money; execs: { title: string; name: string }[];
   status: 'active'|'distressed'|'seized'|'acquired'|'merged'; priceLags: Record<string, { target: number; weeksLeft: number }>;
-  home?: CountryId[]; charteredWeek?: Week;      // chartered banks (v37)
+  home?: CountryId[]; charteredWeek?: Week;      // labs founded during play (v37)
   mergedInto?: Id;                               // set with status 'merged' (v37)
   campaigns?: Record<Id /*city*/, { boost: number; weeksLeft: number }>;   // rival ads (v37)
 }
@@ -267,7 +267,7 @@ export interface Governance {
   pendingDividend?: { perShare: Money; total: Money; payWeek: Week };
 }
 export interface Personal {
-  cash: Money; shares: number /* own bank */;
+  cash: Money; shares: number /* own lab */;
   homes: { id: Id; homeId: string; price: Money; value: Money; rebuildDoneWeek?: Week }[];
   cars: { id: Id; carId: string; price: Money; value: Money }[];
   collectibles: { id: Id; itemId: string; price: Money; value: Money; genuine: boolean; appraised: boolean; consigned?: boolean }[];
@@ -370,6 +370,8 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 **Frontier Lab schema 18 (stage C8a, data-centre and power deals):** `GameState.powerDeals: Record<Id, PowerDeal>` (types in `src/sim/competitionTypes.ts`): `siteId`, `startWeek`, `termWeeks`, `fee` (total paid) and `unamortized` (an intangible, as for partnerships), `gpus` (contracted this week), `price` (per GPU-week, fixed at signing), `health`, `lowHealthWeeks`, `status` active/runoff, `runoffWeeksLeft?`. Migration 17 → 18 adds an empty book. New events: `POWER_DEAL_SIGNED`, `POWER_DEAL_RENEWED`, `POWER_DEAL_ENDED`.
 
 **Frontier Lab schema 19 (stage C8f, seed money):** no shape change. The bank's locked charter capital is gone: a new game starts with `treasury.reserves = 0` and `company.paidInCapital = startCash` (`meta.startCash` is one of 1M / 1.5M / 2M / 2.5M). Migration 18 → 19 (`src/sim/save/migrateSeedMoney.ts`) moves treasury reserves into `company.cash` when the save has no deposits, wholesale lots, overnight or central bank window borrowing; both are assets, so equity is unchanged. A save that still carries bank-era funding keeps its reserves. `CorporateDebt` lender ids (`CorporateLoan.lenderId`, `CorporateLoanOffer.lenderId`, the keys of `lines`) are now investment bank site ids; saves from before may still hold rival lab ids, which keep accruing and can be repaid but not drawn, and offers from them are replaced on the next tick. `company.riskAppetite` is unchanged in shape and now holds the launch posture. The `deposits_1b` milestone id stays and now means a billion in ARR.
+
+**Frontier Lab schema 21 (content fills):** no new fields. Migration 20 → 21 re-runs `generatePersonalSites` for every generated city so the new vacation homes (CONTENT §20) get map sites; existing sites keep their tiles because the generator skips ids it already has before drawing.
 
 **Frontier Lab schema 20 (post-C8, the CTO's Compute delegation):** `ExecutivesState.computeCover` (one of `CTO_COMPUTE.coverTargets` 0.6 / 0.75 / 0.9, default 0.75), the share of GPU demand the CTO's **Compute** delegation (`cto` seat, id `compute`) covers outside spot. Migration 19 → 20 sets 0.75. The switch is stored like every delegation toggle, so a CTO already seated in an older save has it off (missing = off) until you switch it on; new candidates come with it on.
 

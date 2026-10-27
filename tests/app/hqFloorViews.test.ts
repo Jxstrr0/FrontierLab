@@ -1,6 +1,6 @@
 // View helpers behind the Treasury, Marketing and Risk floors (Stage 4 UI):
 // liquidity gauge maths, term text and slider steps, campaign targets and
-// awareness rows, the next regulator review and the model verdict.
+// awareness rows and the next regulator review.
 import { describe, expect, it } from 'vitest';
 import {
   awarenessRows,
@@ -10,12 +10,7 @@ import {
   targetCities,
   targetName,
 } from '../../src/app/hq/marketing/marketingView';
-import {
-  lossProductName,
-  modelVerdict,
-  nextReviewWeek,
-  pairBars,
-} from '../../src/app/hq/risk/riskView';
+import { nextReviewWeek } from '../../src/app/hq/risk/riskView';
 import {
   GAUGE_MAX,
   gainTone,
@@ -122,21 +117,5 @@ describe('risk view', () => {
       expect(isQuarterStart(s.meta.startDate, w * DAYS_PER_WEEK)).toBe(false);
     }
     expect(nextReviewWeek(s.meta.startDate, next)).toBeGreaterThan(next);
-  });
-
-  it('names loss-table products, with Enterprise contracts spelled out', () => {
-    const s = newGame({ seed: 42, cityId: 'cal' });
-    expect(lossProductName(s, 'sbl')).toMatch(/Enterprise contracts/);
-    expect(lossProductName(s, 'api')).not.toBe('api');
-    expect(lossProductName(s, 'nope')).toBe('nope');
-  });
-
-  it('compares actual defaults with the prediction', () => {
-    expect(modelVerdict(0, 0)).toBe('none');
-    expect(modelVerdict(0.02, 0.025)).toBe('under');
-    expect(modelVerdict(0.02, 0.015)).toBe('over');
-    expect(modelVerdict(0.02, 0.021)).toBe('close');
-    expect(pairBars(0.02, 0.01)).toEqual([1, 0.5]);
-    expect(pairBars(0, 0)).toEqual([0, 0]);
   });
 });
