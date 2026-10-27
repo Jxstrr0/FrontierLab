@@ -7,7 +7,7 @@ export function RerollButton(p: { fee: number; sym: string; weeks: number; onCli
   return (
     <div class="stack">
       <button type="button" class="btn btn-secondary btn-block" onClick={p.onClick}>
-        New candidates · {moneyFull(p.fee, p.sym)}
+        New candidates · {p.fee === 0 ? 'Free' : moneyFull(p.fee, p.sym)}
       </button>
       <p class="muted small">
         A recruiter finds a fresh list. The fee doubles each time until a free new list in {p.weeks}{' '}

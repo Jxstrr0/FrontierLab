@@ -84,18 +84,27 @@ export function generateManager(
     marketing: skill(rng, bonus),
     ethics: skill(rng, bonus),
   };
-  const avg = (skills.people + skills.product + skills.marketing + skills.ethics) / 4;
-  const salary =
-    managerBaseSalary(state, cityId) *
-    (MANAGER_SALARY_SPREAD.base + (MANAGER_SALARY_SPREAD.slope * avg) / 100);
   return {
     id: newId(state, 'mgr'),
     name: personName(rng),
     portrait: randomAvatar(rng),
     skills,
-    salary: Math.round(salary / 100) * 100,
+    salary: managerAskingSalary(state, cityId, skills),
     sinceWeek: state.clock.week,
   };
+}
+
+/** A manager's asking salary in a city: the market rate, scaled by average skill. */
+export function managerAskingSalary(
+  state: GameState,
+  cityId: string,
+  skills: Manager['skills'],
+): number {
+  const avg = (skills.people + skills.product + skills.marketing + skills.ethics) / 4;
+  const salary =
+    managerBaseSalary(state, cityId) *
+    (MANAGER_SALARY_SPREAD.base + (MANAGER_SALARY_SPREAD.slope * avg) / 100);
+  return Math.round(salary / 100) * 100;
 }
 
 /** Refreshes a city's candidate pool when it's empty or 4 weeks old. */

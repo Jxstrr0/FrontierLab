@@ -10,6 +10,7 @@ import { CAMPAIGNS } from '../../data/campaigns';
 import { CITIES } from '../../data/cities';
 import { marketWage, staffNeeded } from '../branch/staff';
 import { managerRerollFee } from '../candidateRerolls';
+import { topManager } from '../devStaff';
 import { spend } from '../ledger';
 import { roundToStep } from '../math';
 import { generateManager } from '../people';
@@ -99,7 +100,11 @@ export function rerollManagerCandidates(
     Object.keys(state.people.managers).length === 0 &&
     old.length > 0;
   const pool = keepGuide ? [old[0]!] : [];
-  while (pool.length < MANAGER_POOL_SIZE) pool.push(generateManager(state, cityId));
+  while (pool.length < MANAGER_POOL_SIZE) {
+    const mgr = generateManager(state, cityId);
+    topManager(state, mgr, cityId);
+    pool.push(mgr);
+  }
   state.people.managerCandidates[cityId] = pool;
   state.people.rerolls[cityId] = (state.people.rerolls[cityId] ?? 0) + 1;
   return ok({ fee });

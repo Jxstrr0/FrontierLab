@@ -10,10 +10,11 @@ import {
   TEXT_SCALES,
   WEEKLY_RESULTS_MODES,
 } from '../../data/settingsOptions';
-import { DEV_PAYMENT, DEV_STAFF } from '../../config/balance';
+import { DEV_PAYMENT, DEV_REROLL, DEV_STAFF } from '../../config/balance';
 import {
   devPayment,
   setDevNoBankruptcy,
+  setDevRerolls,
   setDevStaff,
   setFounderAvatar,
   setSettings,
@@ -190,6 +191,12 @@ export function SettingsScreen(p: { inGame?: boolean }) {
                   hint={`Holds every team's skill and morale at ${DEV_STAFF.skill} or better, so you can test a high-staff game. Saved with this game.`}
                   checked={!!game.flags.devStaff}
                   onChange={(on) => act(setDevStaff, on)}
+                />
+                <Toggle
+                  label="Free top rerolls"
+                  hint={`New candidates for managers and executives cost nothing, and every one rolls ${DEV_REROLL.minSkill}–${DEV_REROLL.maxSkill} in each skill. Saved with this game.`}
+                  checked={!!game.flags.devRerolls}
+                  onChange={(on) => act(setDevRerolls, on)}
                 />
                 <Toggle
                   label="No bankruptcy"

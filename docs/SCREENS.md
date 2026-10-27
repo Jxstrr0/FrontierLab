@@ -590,6 +590,7 @@ Opened by tapping a business pin on the map (the **Businesses** layer, which als
   - **Tutorial:** Replay tutorial, the Guides switch and "Show the guides again" (§27)
   - **Developer:** a "Developer tools" switch, saved on this device only (not in the game save). When on, in a game, a button adds `DEV_PAYMENT` ($10,000,000) to corporate cash as paid-in capital (`devPayment` command; no shares issued, the books still balance). Two more switches sit under it, in a game only, and are stored in the game save (`flags.devStaff`, `flags.devNoBankruptcy`, optional, no schema change):
     - **Top staff** (`setDevStaff`): holds every sales office's staff and every HQ team's skill and morale at `DEV_STAFF` (95) or better, now and after every weekly update, so a high-staff game can be tested. Off, they drift back to where pay and management put them.
+    - **Free top rerolls** (`setDevRerolls`): manager and executive "New candidates" cost nothing (the button reads "Free"), and every rerolled candidate's skills land in `DEV_REROLL` (95–99, the normal roll squeezed into that range so candidates still differ), with the asking salary to match. Lists already on offer and the free monthly refresh are unchanged. Before your first manager hire the guide keeps the first place on the list.
     - **No bankruptcy** (`setDevNoBankruptcy`): weeks in the red never end the game. Cash still goes negative and the warnings still show.
     From the title screen the section only notes that the tools work inside a game.
 - **Saves:**
