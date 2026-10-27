@@ -254,7 +254,7 @@ const BANK_TEMPLATES = {
   MODEL_TRAINED: [
     {
       h: '{bank} finishes training {name}',
-      b: 'The new model scores {score} on the benchmark board. Customers move over in the next two weeks.',
+      b: 'The new model scores {score} on the benchmark board and is ready to switch on in Manage Models.',
     },
     {
       h: 'Meet {name}, from {bank}',

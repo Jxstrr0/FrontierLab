@@ -36,7 +36,7 @@ How the economy works, step by step. Every CAPS name is a key in `src/config/bal
    8. branch P&L (§12)
 5. `partnerships.weekly` (§13.7)
 6. `treasury.weekly` (§13)
-7. `hq.weekly`: floors, coverage, benefits, then developments (§16.6) and the AI model (custom model refresh, switch countdown, §16.7)
+7. `hq.weekly`: floors, coverage, benefits, then developments (§16.6), the training run (§16.12) and the AI model (custom model refresh, switch countdown, §16.7)
 8. Corporate items: offices, executives, brand marketing, corporate debt, M&A, real estate, ventures (venture debt payments, rounds closing, the pipeline), conventions, lobbying outcomes, depreciation (§14, §20, §21)
 9. `statements.close`: P&L, cash flow, balance sheet, tax (§14)
 10. `capital.evaluate` and regulator tier (§15)
@@ -50,6 +50,7 @@ How the economy works, step by step. Every CAPS name is a key in `src/config/bal
     - regulator review (§15)
     - partnership reviews
     - the renewal season for business contracts (§11.3, stage C5b; rival signings follow)
+    - rival model releases (§16.12, stage C6b)
     - the quarter's report sums the weeks whose last day falls in it, so when this tick lands on the quarter's first day the week just closed still counts for the old quarter
 14. **Year-end** (first tick of a new year):
     - rankings: Fastest Growing Banks, Rich List
@@ -736,7 +737,8 @@ If Finance coverage' < 0.9, the newest `ceil((0.9 − k') × 10)` weeks show as 
   - **Data licences:** each office pays `customers × costPerCustomer × (1 + 0.3 × Products shortfall) / 52` a week (P&L line `underwriting`).
   - **Inference cost:** every compute cost behind plans, usage and contracts × `1 − 0.05 × (Efficiency − 7)` (0.85–1.35 over the radar).
   - **Price headroom:** plan and usage demand and churn compare your price with `market × (1 + 0.04 × (quality − 5.8))`.
-  - **Model rating:** `+ 0.1 × (quality − 5)` on the Model (Products) rating (§8).
+  - **Model rating:** `+ 0.1 × (quality − 5 − bar rise)` on the Model (Products) rating (§8), where bar rise = `qualityBar − 5.8` (§16.12).
+  - From C6b, 5.8 in the headroom and contract formulas is `qualityBar` (§16.12).
   - **Contracts:** win and keep chances (§11.3) `+ 0.05 × (quality − 5.8) + 0.03 × (Safety − 5) × (Data sensitivity − 5) / 5`.
   - **Speed** lifts the Service rating and **Safety** the fraud shield, as Speed and FraudShield did.
   - The starting package (Clearline Web Base, radar 6, 8, 4, 4, 7) sits exactly at the reference points, so a new game is unchanged.
@@ -765,6 +767,17 @@ Levels 1–5 (Very conservative to Very aggressive):
 - With an HR floor and `people.hrHiring` on (the default; switch on the HR floor, `setHrHiring`), each week (tick step 8, right after the executives) every **open** branch with no manager gets the candidate in its city with the highest total of the four skills (people + product + marketing + ethics; ties go to the first listed), hired with the player's own `hireManager`, so at the candidate's asking salary. A branch still being built waits until it opens; a city with no candidates waits for its next pool.
 - HR only fills the seat: the branch's delegations stay as they were. The COO's **Branch operations** (§17.2) runs first in the same week and does the same hire plus default delegation, so with both on the COO's version wins.
 - This also refills a branch whose manager was poached (§6.5) the following week.
+
+### 16.12 Training runs and the frontier (stage C6b)
+- **Training runs** (Products floor required; one at a time; `startTrainingRun`, `cancelTrainingRun`). The player names the model, picks a focus axis, a term from `DEV_TERMS` and a weekly budget (≥ `TRAINING.minWeekly` $20k, step $5k).
+  - Odds use §16.6's `devScore`/`starOdds` with the budget scored from $20k (B 0) to $2M (B 1).
+  - The run pays `weeklyBudget × devSpeed` a week (P&L line `development`) and progresses at `devSpeed`; it pauses without a Products floor. Cancelling loses what was spent.
+  - On finishing, stars are drawn from the odds (`training` stream). The new **trained model** copies the active model's mix and adds a lift: `TRAINING.starLift[stars−1]` on every axis plus `focusLift[stars−1]` on the focus axis, on top of the active model's own lift (so generations stack when you train from a trained model). Its radar = mix radar + lift, capped at 10; cost = the custom mix's cost. It is not switched on: use it in Manage Models (the usual 2-week switch).
+- **Rival models.** Every rival lab has a model (`RivalBank.model`) starting at `5.8 + U(−0.5, 0.1)`, generation 2. A lab that appears later starts `lateGap` (0.3) under the best rival model.
+  - Each quarter start, every active rival releases a new generation with chance 0.2, gaining `max(0.05, normal(0.22, 0.12))` quality (cap 10). A release that takes the lead is a bigger Ledger story.
+- **The frontier.** `frontierRise = max(0, best rival model − frontierBase)`, where `frontierBase` is the best rival model at the start (or at migration). `qualityBar = 5.8 + 0.6 × frontierRise` (`MODEL_EFFECTS.frontierWeight`) replaces 5.8 in price headroom, contract chances and the Model rating, so a model that stands still slowly loses pricing power and deals.
+- **Leaderboard:** every active lab's model by quality (your active model included).
+- **Balance check (seed 42, steady):** the strategy trains from its Products floor (~week 130) at 1% of cash a week (capped at $150k); by week 260 it is on generation 5 at quality 8.0 against the best rival's 8.3.
 
 ## 17. People AI
 
