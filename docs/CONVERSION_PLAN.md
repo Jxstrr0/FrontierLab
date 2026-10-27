@@ -284,8 +284,8 @@ Follows the brief's map structure (1–2 main offices worldwide, one sales offic
 
 ### C4 — Compute (split into C4a–C4c)
 - **C4a — Compute price index and pool: done (v0.1.13, schema 9).** A global chip cycle (glut, normal, shortage) moves a compute price index. Office compute is counted in GPU-weeks; data-center GPUs serve it first and the rest is bought at spot × index. A Compute card on the Company screen and each data center's panel shows the price, the chart, GPUs used and owned, and the spot bill. **Next: C4b.**
-- **C4b:** the Treasury floor becomes the Compute floor; the funding market sells GPU lots; headroom gauge, auto spot-buy and emergency burst.
-- **C4c:** capacity crunch (waitlist) and outages.
+- **C4b — Compute floor and GPU lots: done (v0.1.14, schema 10).** The HQ Treasury floor is now the Compute floor (same id). A GPU market offers 6-month, 1-year and 3-year reservations from fictional GPU clouds at a discount on spot; rented GPUs cover demand alongside data centers and are billed weekly for their whole term. The bank-era liquidity, funding and central bank cards show only for saves that still carry deposits or wholesale funding. **Next: C4c.**
+- **C4c:** spot limit and auto spot-buy, emergency burst with a price premium, capacity crunch (waitlist) and outages, and retiring the bank-era liquidity cards.
 - **Build:**
   - Compute floor (Treasury relabelled and re-pointed)
   - Compute price index (§3.6)

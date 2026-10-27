@@ -358,6 +358,20 @@ export const COMPUTE = {
   /** Weeks of index history kept for the chart. */
   historyWeeks: 104,
 } as const;
+/**
+ * The GPU market on the Compute floor (stage C4b, SIMULATION §13.0): offers
+ * refresh every refreshWeeks while you have the floor, counted like funding
+ * offers (FUNDING_OFFERS). Price = spot × index × (1 − type discount) ×
+ * (1 + understaffedMarkup × (1 − coverage′)) × noise(±priceNoise). Size =
+ * the type's GPU range × max(1, demand / sizeScale), rounded to sizeStep.
+ */
+export const GPU_MARKET = {
+  refreshWeeks: 2,
+  sizeScale: 2_000,
+  sizeStep: 50,
+  priceNoise: 0.04,
+  understaffedMarkup: 0.1,
+} as const;
 export const TAKEUP_CAP = 0.95;
 export const STARS_TAKEUP = { base: 0.6, slope: 0.2 } as const;
 export const MORTGAGE_SPECIAL = {

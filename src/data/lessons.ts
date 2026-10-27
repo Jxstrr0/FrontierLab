@@ -217,8 +217,8 @@ export const FLOOR_TIPS: Record<DeptId, TipText> = {
     line: 'Set rates for every sales office at once, tune the house underwriting model, and develop new products. A better model lifts every sales office’s Products rating.',
   },
   treasury: {
-    title: 'Treasury floor',
-    line: 'Treasury keeps enough cash on hand for withdrawals. Watch the liquidity gauge, keep auto-funding on, and look at the funding market and payroll partnerships for cheaper money.',
+    title: 'Compute floor',
+    line: 'Every customer runs on GPUs. Watch the chip market, reserve GPUs below spot before a shortage hits, and remember reserved GPUs are billed whether you use them or not.',
   },
   marketing: {
     title: 'Marketing floor',

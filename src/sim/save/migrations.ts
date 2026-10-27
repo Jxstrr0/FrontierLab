@@ -8,6 +8,7 @@ import { foldRivalCity } from '../rivalOffices';
 import { migrateCatalog } from './migrateCatalog';
 import { migrateBankCleanup } from './migrateBankCleanup';
 import { migrateCompute } from './migrateCompute';
+import { migrateGpuLots } from './migrateGpuLots';
 import { migrateMoney } from './migrateMoney';
 import { SCHEMA_VERSION, type GameState } from '../state';
 
@@ -65,6 +66,11 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
   // 8 → 9 (stage C4a): the compute pool and the chip cycle.
   8: (s) => {
     migrateCompute(s as unknown as GameState);
+    return s;
+  },
+  // 9 → 10 (stage C4b): GPU lots and the GPU market on the Compute floor.
+  9: (s) => {
+    migrateGpuLots(s as unknown as GameState);
     return s;
   },
 };

@@ -249,7 +249,7 @@ Tabs: Overview · Loans · Credit.
 
 - **Header:** "{Bank} HQ" with the address, and an **Office** button. Shows an office switcher if you have more than one.
 - **Office sheet** (from the header button): address, floors in use, weekly rent, which department sits on each floor; a **Tab order** card listing the floors you have in the order their tabs run along the bottom bar, each with ▲ ▼ arrows (44 px) to move it past its neighbour, and **Reset order** once any has moved (the order is saved with the game; departments you add later slot in where the usual order puts them); then **Release floor · {department}** (the floor you're on; "Close HR floor" on HR) and **Release office**, each with its confirm.
-- **Bottom icon bar** (only departments you have): an icon over a short label for each floor, scrolling sideways when they don't fit. Finance (ledger) · HR (people) · Products (card) · Treasury (vault) · Marketing (megaphone) · IT (screen) · Risk (shield) · Executive (briefcase) · Investment (rising chart) · Add floor (plus).
+- **Bottom icon bar** (only departments you have): an icon over a short label for each floor, scrolling sideways when they don't fit. Finance (ledger) · HR (people) · Products (card) · Compute (server; the Treasury floor before C4b) · Marketing (megaphone) · IT (screen) · Risk (shield) · Executive (briefcase) · Investment (rising chart) · Add floor (plus).
 
 **Every department floor shows:**
 - **hero:** engraved isometric office interior whose desk count reflects staffing, furnished per department (ART_DIRECTION §3)
@@ -285,7 +285,13 @@ Tabs: Overview · Loans · Credit.
     - open-positions chip for the Products team
     - probability table (5★ … 1★ with %)
     - Start development
-- **Treasury:**
+- **Compute** (C4b; was Treasury):
+  - **Compute pool:** the Compute card (§24), with a "GPUs rented in lots" row when you have any
+  - **Rented GPUs:** totals card (GPUs rented, weekly bill), then lot cards with provider, reservation type, price per GPU-week, GPUs, end date, weeks left and a rosette (Cost, Term, Reliability, Flexibility, Latency). No early cancel.
+  - **GPU market:** offer cards with provider, type, price per GPU-week, "Up to" GPUs, term, price vs spot and rosette, a GPU slider (step 50+) with Max, **Rent N GPUs**, the weekly bill under it, and when the next offers arrive
+  - **Partnerships** (below)
+  - The bank-era cards below (liquidity, policy, funding inventory and market, central bank) show only while a save still carries deposits, wholesale lots, overnight or window borrowing.
+- **Treasury (legacy, see above):**
   - liquidity gauge (LR vs minimum and target), with a funding freeze banner when active. (C3c: the one-way cash transfer moved to the Loan Desk tab's lending fund card as "Top up"; the bonds card and bond share slider are gone.)
   - Treasury policy: target LR slider, auto-funding toggle
   - **Funding inventory:** lot cards with counterparty, type, rate, amount, maturity date and rosette, plus Details and "Repay early" where flexibility allows

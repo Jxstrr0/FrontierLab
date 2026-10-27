@@ -77,7 +77,7 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
     delegations: [
       {
         id: 'treasury',
-        label: 'Treasury',
+        label: 'Funding',
         description: 'Runs auto-funding and funding offers to hold liquidity near target.',
       },
       {
