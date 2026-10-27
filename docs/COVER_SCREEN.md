@@ -67,7 +67,8 @@ cover?: {
   cityId: string;      // current city at save time
   seed: number;        // state.meta.seed
   layout: number;      // CityState.layout for that city (1 = old saves, 2 = city looks)
-  flags: string[];     // ids of the player's lots/offices in that city (cap at ~12)
+  flags: string[];     // ids of the player's lots/offices (and data-center energy sites) in that city (cap at ~12)
+  dataCenters?: string[]; // which of those flags are data centers: printed as low halls, not storefronts
 };
 ```
 
@@ -173,3 +174,5 @@ Don't run a live pannable map on the title screen. Instead:
 - Don't add dependencies.
 - Don't use real city landmarks' names anywhere in labels. The renderer's signatures are already generic.
 - Don't commit straight to `main`.
+
+**Data centers and energy sites (2026-10-27).** The cover draws what the live map draws: your data centers as low halls (from `cover.dataCenters`; older cards without it fall back to storefronts) and every energy site in a regional city as a substation yard.

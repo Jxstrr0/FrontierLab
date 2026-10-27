@@ -5,7 +5,7 @@
 import { DISTRICT_SPECS } from '../../data/districts';
 import { Panel } from '../components';
 import { LayerMedallion } from '../map/LayerIcon';
-import { siteName } from '../map/pins';
+import { siteName } from '../map/sitePins';
 import { closePanel, useGame } from '../store';
 import { BureauBody } from './BureauBody';
 import { AgencyBody } from './AgencyBody';

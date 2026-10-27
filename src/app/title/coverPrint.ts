@@ -16,7 +16,7 @@ import {
   COVER_ZOOM,
 } from '../../config/cover';
 import { SIGNATURE_HEIGHT_PX } from '../../config/map';
-import { CITIES } from '../../data/cities';
+import { CITIES, isRegional } from '../../data/cities';
 import { coverWorld } from '../../sim/coverWorld';
 import { newGame } from '../../sim/newGame';
 import type { GameState, Lot } from '../../sim/state';
@@ -43,18 +43,34 @@ export interface PrintedCover {
 
 const nextFrame = () => new Promise<void>((done) => requestAnimationFrame(() => done()));
 
+/** Every energy site on the map draws its substation yard, as on the live map (C8c). */
+function energyYards(map: CityMap): Record<string, LotOccupant> {
+  const yards: Record<string, LotOccupant> = {};
+  for (const site of map.siteAt.values()) {
+    if (site.kind === 'employer' && isRegional(map.cityId))
+      yards[site.id] = { type: 'site', ink: '', building: 'energySite' };
+  }
+  return yards;
+}
+
 /** The saved game's flags and rival flags, for ids the rebuilt map has. */
 function savedOccupants(choice: CoverChoice, map: CityMap) {
   const cover = choice.cover!;
-  const known = new Set([...map.lotAt.values(), ...map.officeAt.values()]);
-  const occupants: Record<string, LotOccupant> = {};
+  const sites = [...map.siteAt.values()].map((x) => x.id);
+  const known = new Set([...map.lotAt.values(), ...map.officeAt.values(), ...sites]);
+  const halls = new Set(cover.dataCenters ?? []);
+  const occupants = energyYards(map);
   for (const [lotId, ink] of Object.entries(cover.rivals)) {
     if (known.has(lotId)) occupants[lotId] = { type: 'rival', ink };
   }
   let flags = 0;
   for (const id of cover.flags) {
     if (!known.has(id)) continue;
-    occupants[id] = { type: 'player', ink: choice.brandInk ?? COVER_SHOWCASE_INK };
+    const ink = choice.brandInk ?? COVER_SHOWCASE_INK;
+    // Your data centers stand as low halls, not storefronts.
+    occupants[id] = halls.has(id)
+      ? { type: 'player', ink, building: 'dataCenter' }
+      : { type: 'player', ink };
     flags += 1;
   }
   return { occupants, flags };
@@ -63,7 +79,8 @@ function savedOccupants(choice: CoverChoice, map: CityMap) {
 /** Where each of your flags stands on the map (world px). */
 function flagPoints(map: CityMap, occupants: Record<string, LotOccupant>) {
   const points = [];
-  for (const at of [map.lotAt, map.officeAt]) {
+  const siteIds = new Map([...map.siteAt].map(([i, x]) => [i, x.id]));
+  for (const at of [map.lotAt, map.officeAt, siteIds]) {
     for (const [index, id] of at) {
       if (occupants[id]?.type !== 'player') continue;
       points.push(tileCenter(map.tiles, index % map.tiles, Math.floor(index / map.tiles)));
@@ -74,7 +91,7 @@ function flagPoints(map: CityMap, occupants: Record<string, LotOccupant>) {
 
 /** A new player's cover: the city's rivals plus a few showcase flags near the financial district. */
 function showcaseOccupants(state: GameState, lots: Lot[], map: CityMap) {
-  const occupants: Record<string, LotOccupant> = {};
+  const occupants = energyYards(map);
   for (const lot of lots) {
     if (lot.occupant?.type === 'rival') {
       const ink = state.rivals[lot.occupant.id]?.ink;

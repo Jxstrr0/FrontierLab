@@ -140,7 +140,7 @@ After the wizard, the map opens with the tutorial (§27).
 
 ## 5. Sales office panel
 
-- **Header:** "{Lab} — {District}" with the address.
+- **Header:** the office name (usually its district), with "{Lab} · address" under it, so a long lab name never pushes the district off the line.
 - **Advisor:** the office manager's portrait with a contextual line (CONTENT Advisor lines).
 - **Hero:** the exterior, with an **Inside / Outside** pill (44 px tall) in the corner that switches to the inside (ART_DIRECTION §3) and back; the choice holds for the session. The inside view shows the real staff, morale tint and a queue as long as the wait, with a caption such as "3 of 3 windows open · busy".
 - **Tabs:** Service · Products · Deal Desk · Marketing · Finance.
@@ -253,7 +253,7 @@ No tabs: one overview page.
 
 ## 10. HQ
 
-- **Header:** "{Lab} HQ" with the address, and an **Office** button. Shows an office switcher if you have more than one.
+- **Header:** "HQ" with "{Lab} · address · city" under it (the Office button leaves little room for a long title), and an **Office** button. Shows an office switcher if you have more than one.
 - **Office sheet** (from the header button): address, floors in use, weekly rent, which department sits on each floor; a **Tab order** card listing the floors you have in the order their tabs run along the bottom bar, each with ▲ ▼ arrows (44 px) to move it past its neighbour, and **Reset order** once any has moved (the order is saved with the game; departments you add later slot in where the usual order puts them); then **Release floor · {department}** (the floor you're on; "Close HR floor" on HR) and **Release office**, each with its confirm.
 - **Bottom icon bar** (only departments you have): an icon over a short label for each floor, scrolling sideways when they don't fit. Finance (ledger) · HR (people) · Products (card) · Compute (server) · Marketing (megaphone) · Platform (screen; dept `it`) · Safety (shield; dept `risk`) · Executive (briefcase) · Investment (rising chart) · Add floor (plus). The Platform & Security floor's tab reads Platform and the Safety & Alignment floor's reads Safety, to fit the bar.
 

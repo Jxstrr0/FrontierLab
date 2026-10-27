@@ -141,14 +141,14 @@
   display: block;
 }
 
-/* ─── Coin ("$", open branch location) ───────────────────────────────── */
+/* ─── Coin ("+", open location to build on) ───────────────────────────────── */
 .coin-text {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 12px;
 }
 /* Short of close zoom the coin is a quiet brass dot sitting on the roof, no
-   stem and no "$" (it keeps its 44 px tap target). */
+   stem and no "+" (it keeps its 44 px tap target). */
 .pin-layer:not(.is-close) .map-pin.shape-coin {
   --s: var(--dot-coin);
   margin-top: calc(var(--pin-hit) / -2 - var(--half) * var(--s) - 1px);
