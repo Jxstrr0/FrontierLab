@@ -1,7 +1,7 @@
 // Read-only wording for the Finance floor's launch posture card (SCREENS §10,
 // SIMULATION §16.8, §17.2): level names, what a level does to deals, safety
 // and over-claims, and who else is steering the dial. Nothing here mutates GameState.
-import { EXEC_DELEGATION, LAUNCH_POSTURE, TIER_THRESHOLDS } from '../../../config/balance';
+import { EXEC_DELEGATION, LAUNCH_POSTURE } from '../../../config/balance';
 import { INCIDENT_PARAMS } from '../../../data/incidents';
 import type { GameState } from '../../../sim/state';
 
@@ -25,18 +25,10 @@ export function riskHint(level: number): string {
 }
 
 /**
- * Who else moves the dial (SIMULATION §17.2): the CRO tunes it both ways, the
- * CFO's Capital switch steps it down while capital is weak. Undefined when
- * neither is seated with the switch on, so the card says nothing.
+ * Who else moves the dial (SIMULATION §17.2): the CSO tunes it to the safety
+ * tier. Undefined when no CSO is seated with the switch on, so the card says nothing.
  */
 export function riskSteering(s: GameState): string | undefined {
-  const cro = !!s.executives.seats.cro?.delegations.appetite;
-  const cfo = !!s.executives.seats.cfo?.delegations.capital;
-  const adequate = TIER_THRESHOLDS.find((t) => t.tier === 'adequate')!.minCr;
-  const croLine = `your CSO tunes this to the safety tier every ${EXEC_DELEGATION.croEveryWeeks} weeks`;
-  const cfoLine = `your CFO steps it down while the credit ratio is under ${+(adequate * 100).toFixed(1)}%`;
-  const parts = [cro && croLine, cfo && cfoLine].filter(Boolean) as string[];
-  if (parts.length === 0) return undefined;
-  const text = parts.join(', and ');
-  return `${text[0]!.toUpperCase()}${text.slice(1)}. You can still set it yourself.`;
+  if (!s.executives.seats.cro?.delegations.appetite) return undefined;
+  return `Your CSO tunes this to the safety tier every ${EXEC_DELEGATION.croEveryWeeks} weeks. You can still set it yourself.`;
 }

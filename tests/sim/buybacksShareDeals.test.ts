@@ -71,12 +71,13 @@ describe('share buybacks (§19.6a)', () => {
     expect(buybackQuote(s, BUYBACK.maxPct).shares).toBe(max);
   });
 
-  it('refuses a buyback that would drop capital below Adequate', () => {
+  it('refuses a buyback that would leave under a year of runway', () => {
     const s = publicBank();
     s.company.cash += 500_000_000;
     const q = buybackQuote(s, 0.05);
     expect(buybackBlocker(s, q)).toBeUndefined();
-    expect(buybackBlocker(s, { ...q, crAfter: 0.1 })).toMatch(/Adequate/);
+    const tight = { ...q.runwayAfter, months: 8, tier: 'tight' as const };
+    expect(buybackBlocker(s, { ...q, runwayAfter: tight })).toMatch(/Runway/);
   });
 });
 
@@ -109,9 +110,9 @@ describe('share-for-share deals (§19.8)', () => {
     expect(half.plan.cash).toBeCloseTo(cashOnly.plan.cash / 2, 3);
     expect(half.plan.split.stockValue).toBeCloseTo(cashOnly.plan.cash / 2, 3);
     expect(half.plan.split.newShares).toBe(Math.round(half.plan.split.stockValue / 20));
-    // Same goodwill; more capital, since the new shares add equity.
+    // Same goodwill; more cash left, since half the price is paid in shares.
     expect(half.plan.goodwill).toBeCloseTo(cashOnly.plan.goodwill, 3);
-    expect(half.plan.proFormaCr).toBeGreaterThan(cashOnly.plan.proFormaCr);
+    expect(half.plan.proFormaRunway.cash).toBeGreaterThan(cashOnly.plan.proFormaRunway.cash);
     // The board sees a lower premium.
     expect(half.premium).toBeLessThan(cashOnly.premium);
     expect(boardPrice(price, 0.5)).toBeCloseTo(price * (1 - 0.5 * SHARE_DEALS.boardDiscount), 9);

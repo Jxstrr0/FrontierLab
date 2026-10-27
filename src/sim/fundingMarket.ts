@@ -44,7 +44,7 @@ export function offerCount(state: GameState): number {
 export function fundingRate(state: GameState, spec: FundingTypeSpec): number {
   const c = homeCountry(state);
   const basis = spec.basis === 'policy' ? c.policyRate : ftpLong(c);
-  return basis + spec.spread + ratingSpread(state.company.capitalRatio) + treasuryPenalty(state);
+  return basis + spec.spread + ratingSpread(state) + treasuryPenalty(state);
 }
 
 /** The most you can borrow from an offer now: all of it until it expires. */

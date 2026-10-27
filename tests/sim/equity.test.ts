@@ -104,9 +104,10 @@ describe('IPO eligibility (§19.4)', () => {
     expect(failing(v)).toEqual(['tier']);
     const w = eligibleBank();
     for (const c of Object.values(w.world.countries)) if (c) c.phase = 'recession';
-    w.company.capitalRatio = 0.12;
+    const cash = w.company.cash;
+    w.company.cash = -1; // overdrawn: Critical runway
     expect(failing(w)).toEqual(['recession']);
-    w.company.capitalRatio = 0.15;
+    w.company.cash = cash; // not burning cash: Strong runway
     expect(failing(w)).toEqual([]);
   });
 

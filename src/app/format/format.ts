@@ -121,12 +121,12 @@ export function percentText(v: number): string {
   return String(Number((v * 100).toFixed(3)));
 }
 
-/**
- * A capital ratio for display. Before much lending, risk-weighted assets are tiny
- * and the true ratio runs to hundreds of percent, so anything above 100% reads "100%+".
- */
-export function capitalRatioText(ratio: number): string {
-  return ratio > 1 ? '100%+' : pct(ratio, 1);
+/** Runway for display (SIMULATION §15): "Not burning cash" with no burn, else months. */
+export function runwayText(months: number | null): string {
+  if (months === null) return 'Not burning cash';
+  if (months >= 120) return '10 years+';
+  const m = months < 10 ? Math.floor(months * 10) / 10 : Math.floor(months);
+  return `${m} month${m === 1 ? '' : 's'}`;
 }
 
 /** A safety ratio as a whole percent: 0.963 → "96%". */

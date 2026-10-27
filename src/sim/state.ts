@@ -58,7 +58,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState } from './personalTypes';
 
-export const SCHEMA_VERSION = 23;
+export const SCHEMA_VERSION = 24;
 
 export interface GameState {
   schemaVersion: number;
@@ -399,8 +399,6 @@ export interface Company {
   negativeCashWeeks: number;
   /** Consecutive weeks with the safety ratio below MANDATED_PAUSE.revokeLine (C7a). */
   lowCapitalWeeks: number;
-  /** Credit ratio: CET1 ÷ risk-weighted assets, what lenders price on (§15). */
-  capitalRatio: number;
   /** Safety ratio (C7a, §15): it sets `tier`, the AI regulator's tier. */
   safetyRatio: number;
   /** A mandated pause: no new customers, deals or training until untilWeek (C7a). */
@@ -1117,12 +1115,10 @@ export interface WeeklySnapshot {
     deposits: Money;
     loans: Money;
     equity: Money;
-    rwa: Money;
     liquid: Money;
     taxPayable: Money;
   };
   pnl: Record<PnlLine, Money>;
-  capitalRatio: number;
   /** Safety ratio at the close (C7a); absent in weeks closed before schema 17. */
   safetyRatio?: number;
   tier: Tier;

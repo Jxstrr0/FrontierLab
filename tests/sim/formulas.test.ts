@@ -4,7 +4,7 @@ import { shareFormula } from '../../src/sim/branch/demand';
 import { competitiveness, priceFactor } from '../../src/sim/branch/pricing';
 import { PRODUCTS } from '../../src/data/products';
 import { isQuarterStart, isYearStart, weekOfYear } from '../../src/sim/calendar';
-import { tierFor } from '../../src/sim/capital';
+import { runwayTierFor } from '../../src/sim/runway';
 
 describe('share of prospects (§9.3)', () => {
   it('matches the calibration example', () => {
@@ -55,11 +55,12 @@ describe('calendar and tiers', () => {
     expect(weekOfYear(new Date(Date.UTC(2027, 0, 4)))).toBe(1);
   });
 
-  it('maps capital ratios to tiers (§15)', () => {
-    expect(tierFor(0.15)).toBe('strong');
-    expect(tierFor(0.12)).toBe('adequate');
-    expect(tierFor(0.09)).toBe('watch');
-    expect(tierFor(0.07)).toBe('restricted');
-    expect(tierFor(0.05)).toBe('critical');
+  it('maps runway months to tiers (§15)', () => {
+    expect(runwayTierFor(null)).toBe('strong');
+    expect(runwayTierFor(30)).toBe('strong');
+    expect(runwayTierFor(24)).toBe('strong');
+    expect(runwayTierFor(18)).toBe('comfortable');
+    expect(runwayTierFor(8)).toBe('tight');
+    expect(runwayTierFor(3)).toBe('critical');
   });
 });

@@ -2,13 +2,10 @@
 // Calgary, buy a listed building as the company and another privately, then
 // run 30 weeks with cre moving, a rent change, a sale and foreclosed homes in
 // Hold, Rent and Sell all. Every week the balance sheet's real estate equals the
-// company's buildings, RWA carries them at PROPERTY_RISK_WEIGHT, the balance
-// identity holds, the private building never touches the bank's books, and
+// company's buildings, the balance identity holds, the private building never touches the bank's books, and
 // portfolioBreakdown sums.
 import { describe, expect, it } from 'vitest';
-import { PROPERTY_RISK_WEIGHT } from '../../src/config/balance';
 import { balanceSheet } from '../../src/sim/balanceSheet';
-import { capitalSnapshot } from '../../src/sim/capital';
 import * as cmd from '../../src/sim/commands';
 import { advanceWeeks } from '../../src/sim/engine';
 import { postCash } from '../../src/sim/ledger';
@@ -29,17 +26,8 @@ function checkIdentity(s: GameState) {
   return bs;
 }
 
-/** RWA with and without the company's buildings differ by their value × the property weight. */
-function propertyRwa(s: GameState): number {
-  const without = structuredClone(s);
-  for (const [id, p] of Object.entries(without.realEstate.properties)) {
-    if (p.owner === 'company') delete without.realEstate.properties[id];
-  }
-  return capitalSnapshot(s).rwa - capitalSnapshot(without).rwa;
-}
-
 describe('real estate ties out', () => {
-  it('keeps the books, RWA and portfolio consistent through a full cycle', () => {
+  it('keeps the books and portfolio consistent through a full cycle', () => {
     const s = newGame({ seed: 42, cityId: 'cal', bankName: 'Ledger Test Bank' });
     openScriptedBranch(s, 'midtown');
     advanceWeeks(s, 2);
@@ -83,7 +71,6 @@ describe('real estate ties out', () => {
 
       const bs = checkIdentity(s);
       expect(bs.realEstate).toBeCloseTo(realEstateValue(s, 'company'), 6);
-      expect(propertyRwa(s)).toBeCloseTo(realEstateValue(s, 'company') * PROPERTY_RISK_WEIGHT, 3);
       for (const account of ['company', 'personal'] as const) {
         const pb = portfolioBreakdown(s, account);
         expect(pb.total).toBeCloseTo(pb.stocks + pb.ventures + pb.realEstate + pb.ventureDebt, 6);

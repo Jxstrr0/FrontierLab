@@ -3,13 +3,13 @@
 // (Income / Balance sheet / Cash flow × Week / Quarter / Year), the credit
 // ratio meter, the liquidity ratio and the risk appetite dial. Weeks a short-staffed team hasn't
 // closed (statementDelayWeeks) show as "Delayed" instead of numbers.
-import { capitalSnapshot } from '../../sim/capital';
+import { runwaySnapshot } from '../../sim/runway';
 import { statementDelayWeeks } from '../../sim/hq';
 import { Badge, BarChart, Card, Row, SectionTitle } from '../components';
 import { dayOfWeek } from '../branch/selectors';
-import { CapitalMeter, TIER_LABEL, TIER_TONE } from '../company/CapitalMeter';
+import { RUNWAY_LABEL, RUNWAY_TONE, RunwayMeter } from '../company/RunwayMeter';
 import { Statements } from '../company/Statements';
-import { capitalRatioText, delta, money, pct, shortDate } from '../format/format';
+import { delta, money, pct, runwayText, shortDate } from '../format/format';
 import { useGame } from '../store';
 import { RiskAppetite } from './finance/RiskAppetite';
 
@@ -28,7 +28,7 @@ export function FinanceFloor() {
     revenue: w.revenue,
     income: w.netIncome,
   }));
-  const cap = capitalSnapshot(s);
+  const runway = runwaySnapshot(s);
   const liq = s.company.liquidityRatio;
 
   return (
@@ -61,19 +61,24 @@ export function FinanceFloor() {
         </Card>
       )}
 
-      <SectionTitle>Credit</SectionTitle>
+      <SectionTitle>Runway</SectionTitle>
       <Card>
         <div class="cap-head">
           <div>
-            <div class="muted small">Credit ratio (what lenders price on)</div>
-            <div class="hero-number">{capitalRatioText(cap.capitalRatio)}</div>
+            <div class="muted small">Runway (what lenders price on)</div>
+            <div class="hero-number">{runwayText(runway.months)}</div>
           </div>
-          <Badge tone={TIER_TONE[cap.tier]}>{TIER_LABEL[cap.tier]} credit</Badge>
+          <Badge tone={RUNWAY_TONE[runway.tier]}>{RUNWAY_LABEL[runway.tier]}</Badge>
         </div>
-        <CapitalMeter ratio={cap.capitalRatio} tier={cap.tier} kind="credit" />
+        <RunwayMeter months={runway.months} tier={runway.tier} />
+        <Row
+          label="Net burn"
+          value={runway.burn > 0 ? `${money(runway.burn, sym)} / week` : 'None'}
+          tone="dim"
+        />
         <p class="muted small">
-          Lenders and bond buyers price your debt on this. The regulator looks at the safety ratio
-          on the Safety floor instead.
+          Months of cash at the last few weeks' net loss. Lenders price your debt on it with your
+          ARR; the regulator looks at the safety ratio on the Safety floor instead.
         </p>
       </Card>
       {liq !== null && (

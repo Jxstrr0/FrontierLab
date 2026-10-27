@@ -39,6 +39,8 @@ export type Difficulty = 'easy' | 'normal' | 'hard' | 'expert';
 
 export type Phase = 'expansion' | 'slowdown' | 'recession' | 'recovery';
 export type Tier = 'strong' | 'adequate' | 'watch' | 'restricted' | 'critical';
+/** Runway tier (SIMULATION §15): months of cash at the current net burn. */
+export type RunwayTier = 'strong' | 'comfortable' | 'tight' | 'critical';
 export type RatingCategory = 'rates' | 'products' | 'service' | 'branch';
 /** Five scores, 1–10. Axis order is documented where each is used. */
 export type Pentagon = [number, number, number, number, number];

@@ -14,7 +14,6 @@ import { addReviews, updateRatings } from './branch/ratings';
 import { updateStaff } from './branch/staff';
 import { emptyWeek } from './branch/week';
 import { isQuarterStart, isYearStart } from './calendar';
-import { evaluateCapital } from './capital';
 import { evaluateSafety } from './safety';
 import { settleCompute, tallyCompute, updateComputeIndex } from './compute';
 import { refreshGpuOffers, retireGpuLots } from './gpuMarket';
@@ -134,7 +133,6 @@ export function weeklyTick(state: GameState): void {
   runLobbying(state); // 8 (campaign outcomes, DESIGN §5.8.10)
   depreciate(state); // 8
   closeWeek(state); // 9
-  evaluateCapital(state); // 10 (credit ratio)
   evaluateSafety(state); // 10 (safety ratio and regulator tier, C7a)
   checkFailure(state);
   runPersonal(state); // 11

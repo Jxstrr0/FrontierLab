@@ -6,7 +6,6 @@
 import { describe, expect, it } from 'vitest';
 import { MERGERS } from '../../src/config/balance';
 import { balanceSheet } from '../../src/sim/balanceSheet';
-import { capitalSnapshot } from '../../src/sim/capital';
 import { advanceWeeks } from '../../src/sim/engine';
 import { referencePrice } from '../../src/sim/mergerPricing';
 import type { GameEvent } from '../../src/sim/state';
@@ -30,10 +29,8 @@ describe('acquiring a rival bank', () => {
       expect(identityGap(s)).toBeLessThan(1);
       if (closedWeek < 0 && seen.some((e) => e.type === 'ACQUISITION_CLOSED')) {
         closedWeek = s.clock.week;
-        // Goodwill sits on the balance sheet and comes off CET1 (§15).
-        const bs = balanceSheet(s);
-        expect(bs.goodwill).toBeGreaterThan(0);
-        expect(capitalSnapshot(s).cet1).toBeCloseTo(bs.equity - bs.intangibles - bs.goodwill, 0);
+        // Goodwill sits on the balance sheet (§19.8).
+        expect(balanceSheet(s).goodwill).toBeGreaterThan(0);
         for (const r of rbs) {
           const occ = s.world.lots[r.lotId]!.occupant;
           // Folded into an office (lot freed), or kept as the office in its city.

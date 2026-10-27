@@ -16,7 +16,6 @@ import { DEFAULT_MODEL_ID } from '../data/bureaus';
 import { CITIES } from '../data/cities';
 import { PRODUCTS } from '../data/products';
 import { newComputeState } from './compute';
-import { capitalSnapshot } from './capital';
 import { safetySnapshot } from './safety';
 import { fullCoverage } from './hq';
 import { emptyLedger } from './ledger';
@@ -164,7 +163,6 @@ export function newGame(opts: NewGameOptions): GameState {
       tierWeeks: 0,
       negativeCashWeeks: 0,
       lowCapitalWeeks: 0,
-      capitalRatio: 0,
       safetyRatio: 1,
       liquidityRatio: null,
       appRating: START_APP_RATING,
@@ -252,8 +250,6 @@ export function newGame(opts: NewGameOptions): GameState {
   seedRivalModels(state);
   seedResearchers(state);
 
-  const cap = capitalSnapshot(state);
-  state.company.capitalRatio = cap.capitalRatio;
   const safety = safetySnapshot(state);
   state.company.safetyRatio = safety.ratio;
   state.company.tier = safety.tier;
