@@ -11,6 +11,7 @@ import { generateLots, lotCount } from './citygen';
 import { generateCompetitionSites } from './competitionSites';
 import { generateSites } from './hqSites';
 import { generateInvestmentSites } from './investmentSites';
+import { generateLandmarkTower } from './landmarkTowers';
 import { generatePersonalSites } from './personalSites';
 import { refreshManagerPool } from './people';
 import { refreshListings } from './propertyListings';
@@ -58,6 +59,7 @@ export function generateCity(
   generateCapitalMarketSites(state, cityId);
   generateInvestmentSites(state, cityId);
   generatePersonalSites(state, cityId);
+  generateLandmarkTower(state, cityId);
   // C5a: spare storefronts become businesses and employers anchor accounts.
   seedBusinesses(state, cityId);
   updateMarketRefs(state);

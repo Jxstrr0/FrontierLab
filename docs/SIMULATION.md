@@ -600,6 +600,7 @@ The AI regulator watches a **safety ratio**. Lenders, the CFO and the deal limit
 
 ### 16.1 Offices
 - **Listings:** OFFICE_LISTINGS.countBySize per city (S 2, M 2, L 3, XL 4), split across the financial, downtown and midtown districts by largest remainder; floors 3–10, desks per floor 24 or 32 (set per building).
+- **Landmark towers:** London and Moscow each also list one landmark tower in the Financial District (`LANDMARK_TOWERS` in `src/data/landmarkTowers.ts`): London's Kestrel Tower has 20 floors and Moscow's Polaris Tower 18, all with 32 desks. It rents like any listing (per floor, the whole building), so one tower holds every department with room for second floors, with no need for a second main office. It is placed after every other site from its own `tower:{cityId}` stream, so no other lot or site moves.
 - **Rent:** weekly rent = `floors × OFFICE_RENT_PER_FLOOR ($1,100) × city.rentIndex`. Deposit = 8 × weekly rent.
 - **Floors:** each floor slot holds one department. Fit-out = FLOOR_FITOUT ($120,000) × city.costIndex, a fixed asset.
 - **Desks per floor:** set by the building, 24 or 32. Investment floors always have 32. The Executive suite always has 7 desks (`fixedDesks` in `src/data/departments.ts`): you and your six executives, not hired staff.
