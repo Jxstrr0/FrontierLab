@@ -310,3 +310,71 @@
   margin: var(--space-3, 12px) 0 0;
   font-weight: 600;
 }
+
+/* ─── Training and leaderboard (C6b) ─────────────────────────────────── */
+.pf-focus {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.pf-focus-opt {
+  flex: 1 1 28%;
+  min-height: 44px;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-card);
+  background: transparent;
+  color: var(--ivory);
+  font: inherit;
+}
+.pf-focus-opt.is-active {
+  border-color: var(--brass);
+  background: var(--vault-deep);
+  font-weight: 700;
+}
+.pf-train-odds .pf-odds-row {
+  grid-template-columns: auto 3em 1fr;
+}
+.pf-board {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.pf-board-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.pf-board-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 44px;
+  padding: var(--space-1) var(--space-2);
+  border-bottom: 1px solid var(--hairline);
+}
+.pf-board-row.is-you {
+  background: var(--vault-deep);
+  border-left: 3px solid var(--brass);
+}
+.pf-board-rank {
+  width: 1.5em;
+  font-weight: 700;
+  text-align: center;
+  color: var(--ivory-dim);
+}
+.pf-board-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.pf-board-lab {
+  font-weight: 600;
+}
+.pf-board-q {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}

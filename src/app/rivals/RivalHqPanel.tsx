@@ -83,6 +83,12 @@ function quarterLabels(s: GameState, n: number): string[] {
   return out;
 }
 
+/** "this week" / "N weeks ago" for a model's release. */
+function releasedText(weeks: number): string {
+  if (weeks <= 0) return 'This week';
+  return `${weeks} ${weeks === 1 ? 'week' : 'weeks'} ago`;
+}
+
 function Overview(p: { s: GameState; bank: RivalBank }) {
   const { s, bank } = p;
   const sym = s.settings.currency;
@@ -120,6 +126,15 @@ function Overview(p: { s: GameState; bank: RivalBank }) {
             )
           }
         />
+        {bank.model && (
+          <Row label="AI model" value={`${bank.model.name} · ${bank.model.quality.toFixed(1)}`} />
+        )}
+        {bank.model && (
+          <Row
+            label="Model released"
+            value={releasedText(s.clock.week - bank.model.releasedWeek)}
+          />
+        )}
         <Row label="Chief executive" value={bank.ceo || '—'} />
         {bank.execs.map((e) => (
           <Row key={e.title} label={RIVAL_BENCH_LABEL[e.title] ?? e.title} value={e.name || '—'} />

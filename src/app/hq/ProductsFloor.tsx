@@ -6,7 +6,9 @@ import { useGame } from '../store';
 import { CompanyTrend } from './products/CompanyTrend';
 import { Developments } from './products/Developments';
 import { HouseModelCard } from './products/HouseModelCard';
+import { LeaderboardCard } from './products/LeaderboardCard';
 import { ProductLineup } from './products/ProductLineup';
+import { TrainingCard } from './products/TrainingCard';
 import './products/products.css';
 
 export function ProductsFloor() {
@@ -22,6 +24,12 @@ export function ProductsFloor() {
     <div class="stack">
       <SectionTitle>AI model</SectionTitle>
       <HouseModelCard />
+
+      <SectionTitle>Training run</SectionTitle>
+      <TrainingCard />
+
+      <SectionTitle>Leaderboard</SectionTitle>
+      <LeaderboardCard />
 
       <SectionTitle>Deposits and loans</SectionTitle>
       <CompanyTrend />
