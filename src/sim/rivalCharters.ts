@@ -22,7 +22,8 @@ import { initRivalShares } from './marketInit';
 import { nominalIndex } from './nominal';
 import { countryOfCity } from './rates';
 import { stream, type Rng } from './rng';
-import { rivalCapitalRatio } from './rivalBooks';
+import { refreshRivalFinances } from './rivalBooks';
+import { syncRivalEquity } from './rivalFinance';
 import { bestExpansionLot, openRivalBranch } from './rivalExpansion';
 import { nearestSize } from './rivalOffices';
 import { competitorsFor, initRivalBench, newRivalBank } from './rivals';
@@ -91,7 +92,9 @@ export function charterRival(state: GameState, cityId: string, rng: Rng): RivalB
   bank.home = [c.id];
   bank.charteredWeek = state.clock.week;
   bank.cities = [cityId];
-  bank.equity = RIVAL_CHARTER.capital * nominalIndex(state, cityId);
+  // Seed money (§18.7): cash, so the share count is set on it before the first office is paid for.
+  bank.cash = RIVAL_CHARTER.capital * nominalIndex(state, cityId);
+  syncRivalEquity(state, bank);
   bank.ceo = `${rng.pick(FIRST_NAMES)} ${rng.pick(LAST_NAMES)}`;
   initRivalShares(bank);
   initRivalBench(state, bank);
@@ -104,7 +107,7 @@ export function charterRival(state: GameState, cityId: string, rng: Rng): RivalB
     delete state.rivals[bank.id];
     return undefined;
   }
-  bank.capitalRatio = rivalCapitalRatio(bank);
+  refreshRivalFinances(state, bank);
   pushEvent(
     state,
     'RIVAL_CHARTERED',

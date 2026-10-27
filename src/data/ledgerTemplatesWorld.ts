@@ -140,11 +140,11 @@ export const WORLD_TEMPLATES = {
   FASTEST_GROWING: [
     {
       h: 'The fastest growing labs of {year}',
-      b: "{bank} tops this year's list after growing assets {pct}. {second} and {third} follow.",
+      b: "{bank} tops this year's list after growing ARR {pct}. {second} and {third} follow.",
     },
     {
       h: '{bank} named fastest growing lab of {year}',
-      b: 'Assets rose {pct} over the year, ahead of {second} and {third}.',
+      b: 'ARR rose {pct} over the year, ahead of {second} and {third}.',
     },
   ],
   // ─── Sports ─────────────────────────────────────────────────────────────────

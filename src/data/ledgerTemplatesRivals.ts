@@ -190,6 +190,16 @@ export const RIVAL_TEMPLATES = {
       b: 'Administrators stepped in over the weekend. Its {n} sales offices are up for sale.',
     },
   ],
+  RIVAL_RAISE: [
+    {
+      h: '{bank} raises {amount} to keep the lights on',
+      b: 'Short of runway, the lab sold new shares at {price} apiece. Existing holders are diluted.',
+    },
+    {
+      h: 'Rescue round at {bank}',
+      b: 'Investors put in {amount} at {price} a share after months of losses.',
+    },
+  ],
   RIVAL_NETWORK_SPLIT: [
     { h: "{bank}'s sales offices find new owners", b: 'The {n} sales offices go to {takers}.' },
     {

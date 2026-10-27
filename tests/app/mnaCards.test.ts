@@ -45,7 +45,7 @@ describe('M&A card market facts', () => {
     expect(facts.market).toBeUndefined();
     expect(facts.listing).toBe('Private');
     expect(facts.reference).toEqual({
-      label: 'Book value / share',
+      label: 'Fair value / share',
       price: referencePrice(bank),
     });
   });

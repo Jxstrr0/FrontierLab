@@ -211,6 +211,19 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
         priority: P.rivalLocal + 10,
         tokens: { bank: str(p.bank), n: String(num(p.n)) },
       };
+    case 'RIVAL_RAISE':
+      return {
+        key: 'RIVAL_RAISE',
+        subject: rivalId,
+        tab: 'markets',
+        icon: 'coin',
+        priority: isLocal(ctx, rivalId) ? P.rivalLocal + 2 : P.rivalAbroad,
+        tokens: {
+          bank: str(p.bank),
+          amount: newsMoney(num(p.amount), ctx.sym),
+          price: `${ctx.sym}${num(p.price).toFixed(2)}`,
+        },
+      };
     case 'RIVAL_NETWORK_SPLIT': {
       const takers = Array.isArray(p.takers) ? p.takers.map((t) => str(t)).filter(Boolean) : [];
       return {

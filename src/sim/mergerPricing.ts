@@ -1,8 +1,11 @@
 // Rival M&A prices (SIMULATION §19.8, §18.5): the reference price an offer's
-// premium is measured against, a distressed network's asking price, the shares
-// an offer has to buy, and the target's acceptance curve.
+// premium is measured against (a listed lab's market price, a private lab's
+// fair value of ARR × the §19.2 multiple, a distressed network's asking
+// price), a distressed network's ask, the shares an offer has to buy, and the
+// target's acceptance curve.
 import { MERGERS, SHARE_DEALS } from '../config/balance';
 import { dexp } from './detmath';
+import { rivalArr, rivalFairPerShare, rivalTier } from './rivalFinance';
 import type { Rng } from './rng';
 import type { GameState, RivalBank } from './state';
 
@@ -12,34 +15,34 @@ export function rivalBvps(bank: RivalBank): number {
 }
 
 /**
- * A distressed network's asking price per share: BVPS × P/B, floored at
- * MERGERS.distressedMinAsk because a failed bank's equity can be thin or
- * negative (SIMULATION §18.5).
+ * A distressed network's asking price per share: ARR × a distressed multiple ÷
+ * shares, floored at MERGERS.distressedMinAsk because a failed lab's ARR can be
+ * all but gone (SIMULATION §18.5).
  */
-export function askFromPb(bank: RivalBank, pb: number): number {
-  return Math.max(MERGERS.distressedMinAsk, rivalBvps(bank) * pb);
+export function askFromMultiple(bank: RivalBank, multiple: number): number {
+  return Math.max(MERGERS.distressedMinAsk, (rivalArr(bank) * multiple) / Math.max(1, bank.shares));
 }
 
-/** Rolls the P/B for a distressed sale (§18.5: 0.4–0.7). */
+/** Rolls the ARR multiple for a distressed sale (§18.5: MERGERS.distressedMultiple). */
 export function rollDistressedAsk(bank: RivalBank, rng: Rng): number {
-  return askFromPb(bank, rng.range(...MERGERS.distressedPb));
+  return askFromMultiple(bank, rng.range(...MERGERS.distressedMultiple));
 }
 
-/** The asking price per share while distressed (mid P/B for saves made before asks existed). */
+/** The asking price per share while distressed (mid multiple for saves made before asks existed). */
 export function distressedAsk(bank: RivalBank): number {
-  const [lo, hi] = MERGERS.distressedPb;
-  return bank.distressedAsk ?? askFromPb(bank, (lo + hi) / 2);
+  const [lo, hi] = MERGERS.distressedMultiple;
+  return bank.distressedAsk ?? askFromMultiple(bank, (lo + hi) / 2);
 }
 
 /**
  * The price an offer's premium is measured against (§19.8): a listed active
- * rival's market price, a private one's book value per share, a distressed
- * network's asking price.
+ * rival's market price, a private one's fair value per share (ARR × the §19.2
+ * multiple, at least book), a distressed network's asking price.
  */
 export function referencePrice(bank: RivalBank): number {
   if (bank.status === 'distressed') return distressedAsk(bank);
   if (bank.listed) return bank.price;
-  return rivalBvps(bank);
+  return rivalFairPerShare(bank);
 }
 
 /** premium = offer / reference − 1 (§19.8). */
@@ -70,10 +73,11 @@ export function sharesToBuy(state: GameState, rivalId: string): number {
   return Math.max(0, bank.shares - companySharesOf(state, rivalId));
 }
 
-/** The premium a target needs: healthy, Watch tier (CR < MERGERS.watchCr) or distressed (§19.8). */
+/** The premium a target needs: healthy, short of runway (Watch tier or worse, §18.5) or distressed (§19.8). */
 export function requiredPremium(bank: RivalBank): number {
   if (bank.status === 'distressed') return MERGERS.reqDistressed;
-  if (bank.capitalRatio < MERGERS.watchCr) return MERGERS.reqWatch;
+  const tier = rivalTier(bank);
+  if (tier !== 'strong' && tier !== 'adequate') return MERGERS.reqWatch;
   return MERGERS.reqHealthy;
 }
 

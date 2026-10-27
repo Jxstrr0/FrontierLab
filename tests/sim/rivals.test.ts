@@ -1,11 +1,13 @@
 // Rival AI (SIMULATION §18): books, expansion within the city's room, closures
-// that free lots, recession failures with the 8-week distressed window and the
+// that free lots, insolvencies with the 8-week distressed window and the
 // network split, and quarterly earnings reports.
 import { describe, expect, it } from 'vitest';
 import { RIVAL_EXPANSION, RIVAL_FAILURE } from '../../src/config/balance';
 import { advanceWeeks } from '../../src/sim/engine';
 import { newGame } from '../../src/sim/newGame';
-import { rampShare } from '../../src/sim/rivalBooks';
+import { countryOfCity } from '../../src/sim/rates';
+import { downturnFactor, rampShare } from '../../src/sim/rivalBooks';
+import { arrPerCustomer, rivalBookAssets } from '../../src/sim/rivalFinance';
 import { runClosures } from '../../src/sim/rivalExpansion';
 import { rivalReviewCards } from '../../src/sim/rivalReviews';
 import type { GameEvent, GameState } from '../../src/sim/state';
@@ -48,16 +50,18 @@ describe('rival books', () => {
     expect(rampShare(400)).toBe(1);
   });
 
-  it('keeps seeded books near mature size and tracks equity and capital', () => {
+  it('keeps seeded books near mature size and tracks cash, costs and equity', () => {
     const s = game();
     run(s, 26);
     for (const bank of Object.values(s.rivals)) {
       expect(bank.equity).toBeGreaterThan(0);
-      expect(bank.capitalRatio).toBeGreaterThan(0.04);
+      expect(bank.cash).toBeGreaterThan(0);
+      expect(bank.costs).toBeGreaterThan(0);
+      expect(bank.equity).toBeCloseTo(bank.cash + rivalBookAssets(s, bank), 0);
       for (const b of bank.branches) {
-        expect(b.deposits).toBeGreaterThan(0);
-        expect(b.loans / b.deposits).toBeGreaterThan(0.6);
-        expect(b.loans / b.deposits).toBeLessThan(1);
+        expect(b.customers).toBeGreaterThan(0);
+        const factor = downturnFactor(countryOfCity(s, b.cityId), bank.strategy);
+        expect(b.arr).toBeCloseTo(b.customers * arrPerCustomer(s, bank, b.cityId) * factor, 0);
       }
     }
   });
@@ -105,14 +109,14 @@ describe('rival expansion and closures', () => {
     const bank = Object.values(s.rivals)[0]!;
     const office = bank.branches[0]!;
     office.size = 2;
-    const deposits = office.deposits;
+    const customers = office.customers;
     s.clock.week = 60;
     office.contribution = -1;
     office.negativeWeeks = 25;
     runClosures(s);
     expect(bank.branches).toContain(office);
     expect(office.size).toBe(1);
-    expect(office.deposits).toBeCloseTo((deposits * sizeMultOf(1)) / sizeMultOf(2), 0);
+    expect(office.customers).toBeCloseTo((customers * sizeMultOf(1)) / sizeMultOf(2), 6);
     expect(s.events.log.some((e) => e.type === 'RIVAL_OFFICE_SHRUNK')).toBe(true);
   });
 
@@ -129,22 +133,18 @@ describe('rival expansion and closures', () => {
 });
 
 describe('rival failures', () => {
-  it('a thin-capital rival fails in a recession, is distressed for 8 weeks, then split', () => {
+  it('a rival out of cash goes into administration, is distressed for 8 weeks, then split', () => {
     const s = game();
     const nimbus = s.rivals.nimbus!;
     expect(nimbus.strategy).toBe('disruptor');
     const lotIds = nimbus.branches.map((b) => b.lotId);
     const ca = s.world.countries.CA!;
-    // Hold Canada in recession and the disruptor at a 4% capital ratio.
+    // Hold Canada in recession and the disruptor's cash in a deep hole (a round may delay the end).
     const events = run(s, 520, (st) => {
       ca.phase = 'recession';
       ca.weeksInPhase = 0;
       const n = st.rivals.nimbus!;
-      if (n.status === 'active') {
-        const rwa = n.branches.reduce((x, b) => x + b.loans, 0) * 0.75;
-        n.equity = rwa * 0.04;
-        n.capitalRatio = 0.04;
-      }
+      if (n.status === 'active') n.cash = -(RIVAL_FAILURE.maxDebtWeeks + 1) * n.costs;
     });
     // Ten years of recession can topple another rival too; this test follows Nimbus.
     const failure = events.find((e) => e.type === 'BANK_FAILURE' && e.payload.rivalId === 'nimbus');
@@ -170,7 +170,7 @@ describe('rival failures', () => {
     run(s, 260, (st) => {
       ca.phase = 'recession';
       const n = st.rivals.nimbus!;
-      if (n.status === 'active') n.equity = 0;
+      if (n.status === 'active') n.cash = -(RIVAL_FAILURE.maxDebtWeeks + 1) * n.costs;
       if (n.status === 'distressed' && !seen)
         seen = { week: st.clock.week, until: n.distressedUntil };
     });

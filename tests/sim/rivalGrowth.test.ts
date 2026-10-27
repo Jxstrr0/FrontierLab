@@ -14,10 +14,10 @@ import { rivalUnits } from '../../src/sim/rivalOffices';
 import type { GameState, RivalBank } from '../../src/sim/state';
 import { openScriptedBranch } from '../helpers/scenario';
 
-/** A rival that passes every expansion test: a year of profit, strong capital, a network. */
+/** A rival that passes every expansion test: a year of profit, a deep cash pile, a network. */
 function primed(s: GameState, bank: RivalBank): void {
   bank.quarters = [1, 2, 3, 4].map(() => ({ revenue: 1e6, netIncome: 5e5 }));
-  bank.capitalRatio = 0.2;
+  bank.cash = 1e9;
   bank.equity = 1e9;
   // A Flagship office stands for more than entryMinUnits branches (C2b).
   bank.branches[0]!.size = MAX_OFFICE_SIZE;

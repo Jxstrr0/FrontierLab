@@ -1,16 +1,13 @@
-// Rival banks (SIMULATION §5, §18.1): who operates in a city, where their
-// branches stand, their quality profiles and starting books. Rate sheets live in
-// rivalPrices.ts; expansion, closures and failures in rivalAi.ts.
+// Rival labs (SIMULATION §5, §18.1): who operates in a city, where their
+// offices stand, their quality profiles and starting books (customers, ARR and
+// cash). Price sheets live in rivalPrices.ts; expansion, closures and failures
+// in rivalAi.ts.
 import {
   COMPETITORS,
   OVERALL_WEIGHTS,
-  RIVAL_LDR,
-  RIVAL_LOAN_RISK_WEIGHT,
-  RIVAL_MATURE_DEPOSITS,
+  RIVAL_BOOKS,
   RIVAL_PLACEMENT,
-  RIVAL_QUALITY_REF,
   RIVAL_QUALITY_SIGMA,
-  RIVAL_START_CR,
 } from '../config/balance';
 import { FIRST_NAMES, LAST_NAMES } from '../data/names';
 import { CITIES } from '../data/cities';
@@ -29,11 +26,11 @@ import { clamp } from './math';
 import { countryOfCity } from './rates';
 import { rivalTargetPrice } from './rivalPrices';
 import { initRivalShares } from './marketInit';
-import { nominalIndex } from './nominal';
+import { arrPerCustomer, matureCustomers, rivalWeeklyCosts, syncRivalEquity } from './rivalFinance';
 import { stream, type Rng } from './rng';
 import type { CountryState, GameState, Lot, RivalBank, RivalBranch } from './state';
 import { dpow } from './detmath';
-import { foldRivalCity, rivalMult } from './rivalOffices';
+import { foldRivalCity } from './rivalOffices';
 
 const STRATEGY_ORDER: Strategy[] = ['incumbent', 'community', 'disruptor', 'premium'];
 
@@ -121,8 +118,8 @@ export function seedRivals(state: GameState, cityId: string, lots: Lot[]): void 
         quality,
         overall: overallOf(quality),
         reviewCount: rng.int(RIVAL_PLACEMENT.reviewsMin, RIVAL_PLACEMENT.reviewsMax),
-        deposits: 0,
-        loans: 0,
+        customers: 0,
+        arr: 0,
         contribution: 0,
         negativeWeeks: 0,
       };
@@ -130,11 +127,17 @@ export function seedRivals(state: GameState, cityId: string, lots: Lot[]): void 
     }
     // One office per city (C2b): the branches drawn fold into one sized for them.
     const office = foldRivalCity(state, bank, cityId);
-    if (office) seedMatureBooks(state, office);
+    if (office) seedMatureBooks(state, bank, office);
   });
   for (const spec of chosen) {
     const bank = state.rivals[spec.id];
-    if (bank && bank.equity === 0) initRivalFinancials(state, bank);
+    if (!bank) continue;
+    if (bank.ceo === '') initRivalFinancials(state, bank);
+    // A lab seeded into another city later keeps its cash; its costs and equity follow the new office.
+    else {
+      bank.costs = rivalWeeklyCosts(state, bank);
+      syncRivalEquity(state, bank);
+    }
   }
 }
 
@@ -149,40 +152,22 @@ function seedBranchId(bank: RivalBank): string {
   return `rb_${bank.id}_${n}`;
 }
 
-/**
- * A rival office's mature deposit size (§18.1): city size × quality × the
- * nominal index (§4.6) × its size multiplier (C2b).
- */
-export function matureDeposits(
-  state: GameState,
-  branch: Pick<RivalBranch, 'cityId' | 'overall' | 'size'>,
-): number {
-  const income = CITIES[branch.cityId]?.incomeIndex ?? 1;
-  return (
-    RIVAL_MATURE_DEPOSITS *
-    rivalMult(branch) *
-    income *
-    (branch.overall / RIVAL_QUALITY_REF) *
-    nominalIndex(state, branch.cityId)
-  );
-}
-
-/** Branches present at the start are already mature. */
-export function seedMatureBooks(state: GameState, branch: RivalBranch): void {
-  branch.deposits = matureDeposits(state, branch);
-  branch.loans = branch.deposits * RIVAL_LDR;
+/** Offices present at the start are already mature: customers and the ARR they pay (§18.1). */
+export function seedMatureBooks(state: GameState, bank: RivalBank, office: RivalBranch): void {
+  office.customers = matureCustomers(office);
+  office.arr = office.customers * arrPerCustomer(state, bank, office.cityId);
 }
 
 /**
- * Starting equity (from a strategy capital ratio over its loans), CEO and
- * listing. Uses its own stream so seeding draws never shift branch placement.
+ * Starting cash (RIVAL_BOOKS.startRunwayWeeks of running costs by strategy),
+ * equity, CEO and listing. Uses its own stream so seeding draws never shift
+ * office placement.
  */
 export function initRivalFinancials(state: GameState, bank: RivalBank): void {
   const rng = stream(state, 'rivalInit');
-  const loans = bank.branches.reduce((sum, b) => sum + b.loans, 0);
-  const cr = rng.range(...RIVAL_START_CR[bank.strategy]);
-  bank.capitalRatio = cr;
-  bank.equity = loans * RIVAL_LOAN_RISK_WEIGHT * cr;
+  bank.costs = rivalWeeklyCosts(state, bank);
+  bank.cash = rng.range(...RIVAL_BOOKS.startRunwayWeeks[bank.strategy]) * bank.costs;
+  syncRivalEquity(state, bank);
   bank.ceo = `${rng.pick(FIRST_NAMES)} ${rng.pick(LAST_NAMES)}`;
   initRivalShares(bank);
   initRivalBench(state, bank);
@@ -228,8 +213,10 @@ export function newRivalBank(
     priceLags: {},
     appRating: STRATEGY_PROFILES[spec.strategy].app,
     status: 'active',
+    cash: 0,
+    costs: 0,
+    negativeQuarters: 0,
     equity: 0,
-    capitalRatio: 0,
     listed: spec.ticker !== undefined,
     ceo: '',
     execs: [],

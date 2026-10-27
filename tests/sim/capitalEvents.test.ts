@@ -1,11 +1,14 @@
-// Bank runs (SIMULATION §13.8) and the regulator's letter (§15): triggers,
-// deposit churn during a run and its end. The mandated pause that replaced the
-// emergency recapitalisation is tested in safety.test.ts.
+// Outage rumours (SIMULATION §13.8, the BANK_RUN case) and the regulator's
+// letter (§15): triggers (weak ratings plus an outage, a weak or falling safety
+// tier, or a ratings slide), plan churn during a rumour and its end. The
+// mandated pause that replaced the emergency recapitalisation is tested in
+// safety.test.ts.
 import { describe, expect, it } from 'vitest';
 import { BANK_RUN } from '../../src/config/balance';
 import { companyArr } from '../../src/sim/arr';
 import * as cmd from '../../src/sim/commands';
 import { advanceWeeks } from '../../src/sim/engine';
+import { bankRunCondition, statementOdds, tierDropped } from '../../src/sim/incident/capitalEvents';
 import { bankRunMult } from '../../src/sim/incident/effects';
 import { runIncidents } from '../../src/sim/incidents';
 import type { GameState } from '../../src/sim/state';
@@ -21,16 +24,31 @@ describe('bank runs', () => {
     }
   }
 
-  it('need weak ratings and weak capital or liquidity', () => {
+  it('need weak ratings and an outage, a weak or falling tier, or a ratings slide', () => {
     const { s, b } = openBank();
-    b.ratings.overall = 2.2;
+    b.ratings.overall = 2.4;
     s.company.tier = 'adequate';
-    s.company.liquidityRatio = 0.3;
+    s.company.tierWeeks = 50;
+    expect(bankRunCondition(s)).toBe(false);
     for (let i = 0; i < 200; i++) {
       s.clock.week += 1;
       runIncidents(s);
     }
     expect(s.incidents.bankRunWeeksLeft).toBeUndefined();
+    // An outage, a slide under slideOverall, or a recent tier drop each qualify.
+    s.compute.outageWeeksLeft = 2;
+    expect(bankRunCondition(s)).toBe(true);
+    s.compute.outageWeeksLeft = 0;
+    b.ratings.overall = BANK_RUN.slideOverall - 0.1;
+    expect(bankRunCondition(s)).toBe(true);
+    b.ratings.overall = 2.4;
+    s.history.weekly.push({ tier: 'strong' } as GameState['history']['weekly'][number]);
+    s.history.weekly.push({ tier: 'adequate' } as GameState['history']['weekly'][number]);
+    s.company.tierWeeks = 0;
+    expect(tierDropped(s)).toBe(true);
+    expect(bankRunCondition(s)).toBe(true);
+    s.company.tierWeeks = BANK_RUN.tierDropWeeks;
+    expect(bankRunCondition(s)).toBe(false);
     s.company.tier = 'critical';
     s.company.tierWeeks = 5;
     startRun(s);
@@ -61,6 +79,19 @@ describe('bank runs', () => {
     const panic = run.branches[id]!.books.plus!.last.churned;
     expect(calm).toBeGreaterThan(0);
     expect(panic / calm).toBeCloseTo(BANK_RUN.runMult, 1);
+  });
+
+  it('prices the public statement on the safety ratio', () => {
+    const { s } = openBank();
+    s.company.safetyRatio = BANK_RUN.statementFromSr;
+    expect(statementOdds(s)).toBeCloseTo(BANK_RUN.statementBase, 9);
+    s.company.safetyRatio = BANK_RUN.statementFromSr + 0.1;
+    expect(statementOdds(s)).toBeCloseTo(
+      BANK_RUN.statementBase + 10 * BANK_RUN.statementPerPoint,
+      9,
+    );
+    s.company.safetyRatio = 5;
+    expect(statementOdds(s)).toBe(BANK_RUN.statementMax);
   });
 
   it('ends when a public statement works', () => {

@@ -58,7 +58,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState } from './personalTypes';
 
-export const SCHEMA_VERSION = 21;
+export const SCHEMA_VERSION = 22;
 
 export interface GameState {
   schemaVersion: number;
@@ -977,9 +977,16 @@ export interface RivalBank {
   mergedInto?: Id;
   /** Running ad campaigns by city (§18.9): overall-rating boost and weeks left. */
   campaigns?: Record<Id, { boost: number; weeksLeft: number }>;
-  /** Stage 5 (§18.5): simplified financials. */
+  /**
+   * Books on ARR and runway (schema 22, §18.1, §18.5): corporate cash, last
+   * week's running costs (compute, offices, training; runway = cash ÷ costs),
+   * quarter-ends in a row with negative cash, and equity = cash + the offices'
+   * replacement value (synced every week, so panels and prices can read it).
+   */
+  cash: Money;
+  costs: Money;
+  negativeQuarters: number;
   equity: Money;
-  capitalRatio: number;
   listed: boolean;
   ticker?: string;
   ceo: string;
@@ -1022,9 +1029,9 @@ export interface RivalBranch {
   quality: [Stars, Stars, Stars, Stars];
   overall: Stars;
   reviewCount: number;
-  /** Stage 5 aggregate books (§18.1). */
-  deposits: Money;
-  loans: Money;
+  /** Customers served from this office and the ARR they pay (§18.1, schema 22). */
+  customers: number;
+  arr: Money;
   /** Last week's contribution (earnings minus costs). */
   contribution: Money;
   /** Consecutive weeks of negative contribution (closes at 26, §18.4). */

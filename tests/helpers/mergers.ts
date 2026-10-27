@@ -1,5 +1,5 @@
 // M&A test helpers: a capitalised scripted bank in Calgary and its smallest
-// rival there (the one whose deposits keep your city share under the cap).
+// rival there (the one whose customers keep your city share under the cap).
 import * as cmd from '../../src/sim/commands';
 import { advanceWeeks } from '../../src/sim/engine';
 import { newGame } from '../../src/sim/newGame';
@@ -22,10 +22,10 @@ export function capitalisedBank(weeks = 26, capital = 120_000_000): GameState {
   return s;
 }
 
-/** The active rival in a city with the smallest deposits there. */
+/** The active rival in a city with the fewest customers there. */
 export function smallestRival(s: GameState, cityId = 'cal'): RivalBank {
   const deps = (r: RivalBank) =>
-    r.branches.filter((b) => b.cityId === cityId).reduce((x, b) => x + b.deposits, 0);
+    r.branches.filter((b) => b.cityId === cityId).reduce((x, b) => x + b.customers, 0);
   return Object.values(s.rivals)
     .filter((r) => r.status === 'active' && deps(r) > 0)
     .sort((a, b) => deps(a) - deps(b) || a.id.localeCompare(b.id))[0]!;
