@@ -1,11 +1,9 @@
-// Treasury (SIMULATION §13.1–13.6): liquid assets (reserves plus government
-// bonds), bond mark-to-market, funding lot interest and maturities, automatic
-// overnight and central bank window funding, funding freezes, and interest on
-// all of it. Market offers are generated in fundingMarket.ts.
+// Treasury (SIMULATION §13.1–13.6): liquid assets (reserves, the Loan Desk's
+// lending fund), funding lot interest and maturities, automatic overnight and
+// central bank window funding, funding freezes, and interest on all of it.
+// Government bonds were removed in stage C3c. Market offers are generated in
+// fundingMarket.ts.
 import {
-  BOND_DURATION,
-  BOND_PULL_TO_PAR_WEEKS,
-  BOND_YIELD_SPREAD,
   FREEZE_RELEASE,
   LIQ_MIN,
   LIQ_REPAY_BUFFER,
@@ -23,8 +21,7 @@ import { totalDeposits } from './balanceSheet';
 import { pushEvent } from './events';
 import { matureLots, payLotInterest } from './fundingLots';
 import { treasuryPenalty } from './hq';
-import { earn, postPnl, spend } from './ledger';
-import { ftpLong } from './rates';
+import { earn, spend } from './ledger';
 import { stream } from './rng';
 import type { CountryState, GameState } from './state';
 
@@ -54,18 +51,13 @@ export function windowRate(state: GameState): number {
 }
 
 export function liquidAssets(state: GameState): number {
-  return state.treasury.reserves + state.treasury.bondsMarket;
+  return state.treasury.reserves;
 }
 
 /** Tick step 6. */
 export function runTreasury(state: GameState): void {
   const t = state.treasury;
   const c = homeCountry(state);
-
-  // §13.4 mark-to-market on FTP_long moves, then pull to par.
-  const dLong = ftpLong(c) - c.prevFtpLong;
-  t.bondsMarket *= 1 - BOND_DURATION * dLong;
-  t.bondsMarket += (t.bondsBook - t.bondsMarket) / BOND_PULL_TO_PAR_WEEKS;
 
   // §13.6 lots: interest from corporate cash, then maturities drain L before §13.5 runs.
   payLotInterest(state);
@@ -74,12 +66,10 @@ export function runTreasury(state: GameState): void {
   const deposits = totalDeposits(state);
   handleShortfall(state, deposits);
   repayWholesale(state, deposits);
-  rebalanceBonds(state, deposits, c);
 
-  // Interest: reserves earn the deposit-facility rate, bonds pay their book coupon, wholesale costs.
+  // Interest: reserves earn the deposit-facility rate; wholesale funding costs.
   const reserveRate = Math.max(0, c.policyRate - RESERVE_RATE_SPREAD);
   earn(state, 'reserveInterest', (Math.max(0, t.reserves) * reserveRate) / WEEKS_PER_YEAR);
-  earn(state, 'bondCoupon', (t.bondsBook * t.bondBookYield) / WEEKS_PER_YEAR);
   spend(
     state,
     'wholesaleInterest',
@@ -142,31 +132,7 @@ function repayWholesale(state: GameState, deposits: number): void {
   }
 }
 
-/** Bonds target bondShare of liquid assets above LIQ_MIN × deposits (§13.4). */
-function rebalanceBonds(state: GameState, deposits: number, c: CountryState): void {
-  const t = state.treasury;
-  const target = t.bondShare * Math.max(0, liquidAssets(state) - LIQ_MIN * deposits);
-  const diff = target - t.bondsMarket;
-  if (diff > 0) {
-    const yieldNew = ftpLong(c) + BOND_YIELD_SPREAD;
-    t.bondBookYield =
-      t.bondsBook + diff > 0
-        ? (t.bondsBook * t.bondBookYield + diff * yieldNew) / (t.bondsBook + diff)
-        : yieldNew;
-    t.bondsBook += diff;
-    t.bondsMarket += diff;
-    t.reserves -= diff;
-  } else if (diff < 0 && t.bondsMarket > 0) {
-    const sell = Math.min(-diff, t.bondsMarket);
-    const bookPart = (sell * t.bondsBook) / t.bondsMarket;
-    postPnl(state, 'realizedGains', sell - bookPart);
-    t.bondsBook -= bookPart;
-    t.bondsMarket -= sell;
-    t.reserves += sell;
-  }
-}
-
-/** Corporate cash → liquid assets. There is no reverse transfer (§13.2). */
-export function transferIn(state: GameState, amount: number): void {
+/** Company cash → the lending fund (reserves). There is no reverse transfer (§13.2). */
+export function addToLendingFund(state: GameState, amount: number): void {
   state.treasury.reserves += amount;
 }

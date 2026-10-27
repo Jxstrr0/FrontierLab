@@ -33,8 +33,6 @@ You found a bank with a fresh charter: $2,000,000 of charter capital locked in t
   - **Deposit beta:** rivals pass on only part of a rate hike to savers (§5.9)
   - **Loan Desk:** individual business loan applications using the startup pentagon (§5.4.3)
   - **Adverse selection:** charging far above market attracts riskier borrowers (§5.4.2)
-  - **Government bonds** that lose market value when rates rise (§5.8.4)
-  - **Foreclosed homes (REO)** from defaulted mortgages (§5.11)
   - **Payroll partnerships** in place of plantations (§5.8.4)
   - **Venture debt** alongside equity investing (§5.12)
   - **Insider-trading** risk on your personal trades (§5.16)
@@ -258,8 +256,7 @@ Shown to the player in one place, the Company summary:
 - A company-wide deposits and loans trend chart.
 
 #### 5.8.4 Treasury
-- **Liquidity:** a gauge and the policy settings (target liquidity, bond share, auto-funding).
-- **Government bonds:** market value, yield and unrealised gain or loss.
+- **Liquidity:** a gauge and the policy settings (target liquidity, auto-funding). Government bonds were removed in C3c.
 - **Funding inventory:** one card per lot with counterparty, type, rate, amount, maturity, and a radar (Cost, Term, Stability, Flexibility, Discretion).
 - **Funding market:** offers refresh every two weeks. A strong treasury team and capital ratio bring more and better offers.
 - **Payroll partnerships:** employer, employees, "Year 3 of 7", deposit curve and relationship health. Renew or let lapse.
@@ -324,7 +321,6 @@ Investment banks on the map, with tabs Market / Equity / M&A:
 ### 5.11 Real estate
 - **Buy buildings** as the company or personally. Listings show size, estimated value, market rent, occupancy and asking price.
 - **Run them.** Set rent per m² and occupancy responds. Weekly rent, maintenance and vacancy costs give ROI. List any building for sale.
-- **Foreclosures.** Defaulted mortgages leave foreclosed homes (REO) in each city. Rent them out, or sell them all (fast, at a discount).
 
 ### 5.12 Ventures and conventions
 - **Where startups come from.** The Investment floor surfaces startups that are raising money. Conventions show exclusive ones; they're announced in the Ledger a month ahead, sit on the map for a month, and must be attended in person.
@@ -642,3 +638,6 @@ Add one dated line per decision. Never delete entries; supersede them.
 - 2026-10-27 (stage C3b): **Compute replaces funds transfer pricing.** Each plan seat's running cost and each API unit's cost now post to a `compute` line, and the office P&L drops the bank's internal funding credit and charge. The company income statement reads Revenue → Compute → Gross profit, the way a software company reports.
 - 2026-10-27 (stage C3b): **The Loan Desk lends from a lending fund.** Loans come out of treasury reserves and repayments flow back in. The desk no longer borrows overnight or at the central bank window, so lending stops when the fund is empty, and the Loan Desk tab gets a button that moves $250k of company cash into it. Lending straight from company cash was tried first, but a young lab's delegated desk lent its cash down to zero within half a year; a separate fund keeps the running money safe. C3c folds the treasury into cash and revisits this.
 - 2026-10-27 (stage C3b): **Bank lines hide when empty.** Reserves stay (they are the lending fund), but bonds, foreclosed property, deposits, wholesale funding and unrealised bond gains show on the balance sheet only while an older save still holds them. The liquidity card shows only while there are deposits or overnight borrowing. C3c removes the machinery.
+- 2026-10-27 (stage C3c): **The last bank-only machinery goes.** Foreclosed homes (REO), government bonds (with the bond share, mark-to-market and unrealised gains), covered bonds (which needed mortgage cover), the rivals' savings, term-deposit, mortgage and card price offsets, and the $2M charter floor that forced a Critical tier are all removed. The tier now follows the capital ratio alone. Migration 7 → 8 sells REO into cash and bonds into reserves at market, moving any unrealised bond gain into retained earnings so equity holds. There is no news note: in Frontier Lab saves both sums are tiny or zero, because mortgages went in C3a.
+- 2026-10-27 (stage C3c): **The cash transfer lives on the Loan Desk.** The HQ Treasury "Transfer cash to Treasury" card is gone. The only way to move cash into reserves is the lending fund's Top up button on the Loan Desk tab (`topUpLendingFund`, still one way). The benefit id `mortgage_disc` stays, because saves key benefits by id; it already shows as Compute Allowance.
+- 2026-10-27 (stage C3c): **Unused P&L lines stay for now.** `bondCoupon`, `realizedGains`, `depositInterest`, `wealthFees` and `originationFees` no longer receive postings, but they stay in the ledger at zero so years of weekly records keep their shape. They can go with the statement rework in C7.

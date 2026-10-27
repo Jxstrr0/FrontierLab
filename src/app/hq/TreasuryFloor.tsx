@@ -1,6 +1,6 @@
 // Treasury floor content (SCREENS §10, DESIGN §5.8.4, SIMULATION §13): the
-// liquidity gauge with the funding-freeze banner and cash transfers, the
-// treasury policy, government bonds, the funding inventory, the funding
+// liquidity gauge with the funding-freeze banner, the treasury policy, the
+// funding inventory, the funding
 // market and the central bank's standing facility (SCREENS §8 puts its
 // Borrow / Repay here) and a card per payroll or student partnership.
 import { SectionTitle } from '../components';
@@ -9,7 +9,7 @@ import { FundingInventory } from './treasury/FundingInventory';
 import { FundingMarket } from './treasury/FundingMarket';
 import { LiquidityCard } from './treasury/LiquidityCard';
 import { PartnershipCards } from './treasury/PartnershipCards';
-import { BondsCard, TreasuryPolicyCard } from './treasury/PolicyAndBonds';
+import { TreasuryPolicyCard } from './treasury/TreasuryPolicyCard';
 import './treasury/treasury.css';
 
 export function TreasuryFloor() {
@@ -18,7 +18,6 @@ export function TreasuryFloor() {
       <SectionTitle>Liquidity</SectionTitle>
       <LiquidityCard />
       <TreasuryPolicyCard />
-      <BondsCard />
 
       <SectionTitle>Funding inventory</SectionTitle>
       <FundingInventory />

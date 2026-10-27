@@ -1,8 +1,7 @@
 // Executive delegations for money and products (SIMULATION §17.2 table), each a
 // small weekly routine that only uses the player's own commands:
 //   CFO  treasury      auto-funding on; borrows the cheapest funding offer when LR is
-//                      more than 2pp under target; moves the bond share a step out of
-//                      the band (down when short, up when flush)
+//                      more than 2pp under target
 //   CPO  pricing       prices the company lineup like a delegated manager (§17.1)
 //                      while Apply-to-all is on
 //   CPO  developments  starts the next undeveloped template when none is running, on a
@@ -13,7 +12,6 @@
 // The CFO's halved statement delay is passive (hq.ts); the dividend proposal is a
 // selector the board meeting reads (governance.ts).
 import {
-  BOND_SHARE_MAX,
   DEV_BUDGET_STEP,
   DEV_MIN_WEEKLY,
   EXEC_DELEGATION as X,
@@ -31,7 +29,6 @@ import { borrowOffer, setTreasuryPolicy } from './commands/treasury';
 import { buyBureauModel } from './commands/underwriting';
 import { totalDeposits } from './balanceSheet';
 import { hasTreasuryFloor, maxBorrow } from './fundingMarket';
-import { roundToStep } from './math';
 import { allProducts } from './products';
 import { stream } from './rng';
 import type { Branch, GameState } from './state';
@@ -46,27 +43,17 @@ export function weeklyRevenue(state: GameState): number {
 
 // ─── CFO ──────────────────────────────────────────────────────────────────────
 
-/** Treasury: auto-funding on, funding offers and the bond share keep LR within ±2pp of target. */
+/** Treasury: auto-funding on, funding offers keep LR within ±2pp of target. */
 export function cfoTreasury(state: GameState): void {
   const t = state.treasury;
   if (!t.autoFunding) setTreasuryPolicy(state, { autoFunding: true });
   const lr = state.company.liquidityRatio;
   if (lr === null) return;
-  if (lr < t.liqTarget - X.lrBand) {
-    if (hasTreasuryFloor(state)) {
-      const offer = [...t.offers].sort((a, b) => a.rate - b.rate)[0];
-      const need = (t.liqTarget - lr) * totalDeposits(state);
-      const amount = offer ? Math.min(maxBorrow(state, offer), need) : 0;
-      if (offer && amount >= 1) borrowOffer(state, offer.id, amount);
-    }
-    if (t.bondShare > 0)
-      setTreasuryPolicy(state, {
-        bondShare: Math.max(0, roundToStep(t.bondShare - X.bondStep, X.bondStep)),
-      });
-  } else if (lr > t.liqTarget + X.lrBand && t.bondShare < BOND_SHARE_MAX) {
-    setTreasuryPolicy(state, {
-      bondShare: Math.min(BOND_SHARE_MAX, roundToStep(t.bondShare + X.bondStep, X.bondStep)),
-    });
+  if (lr < t.liqTarget - X.lrBand && hasTreasuryFloor(state)) {
+    const offer = [...t.offers].sort((a, b) => a.rate - b.rate)[0];
+    const need = (t.liqTarget - lr) * totalDeposits(state);
+    const amount = offer ? Math.min(maxBorrow(state, offer), need) : 0;
+    if (offer && amount >= 1) borrowOffer(state, offer.id, amount);
   }
 }
 

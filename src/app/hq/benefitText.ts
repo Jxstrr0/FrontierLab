@@ -33,7 +33,7 @@ export function benefitUnit(spec: BenefitSpec): string {
     case 'pctSalary':
       return 'matched share of salary';
     case 'discount':
-      return spec.id === 'mortgage_disc' ? 'discount on the mortgage rate' : 'discount on shares';
+      return spec.id === 'mortgage_disc' ? 'discount on compute' : 'discount on shares';
     case 'toggle':
       return spec.hqOnly ? 'HQ staff only' : 'for everyone';
   }

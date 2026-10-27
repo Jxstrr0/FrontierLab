@@ -1,45 +1,43 @@
-// Treasury commands (SIMULATION §13): transfers of corporate cash into liquid
-// assets, the treasury policy, borrowing from and repaying the funding market
+// Treasury commands (SIMULATION §13): top-ups of the lending fund from company
+// cash, the treasury policy, borrowing from and repaying the funding market
 // (§13.6), and the central bank's standing lending facility (§13.5, SCREENS §8).
-import { BOND_SHARE_MAX, LIQ_MIN, LIQ_TARGET_RANGE } from '../../config/balance';
+import { LIQ_MIN, LIQ_TARGET_RANGE } from '../../config/balance';
 import { FUNDING_TYPES } from '../../data/fundingTypes';
 import { totalDeposits } from '../balanceSheet';
 import { hasTreasuryFloor, maxBorrow } from '../fundingMarket';
 import { newId } from '../ids';
 import { postCash } from '../ledger';
 import type { GameState } from '../state';
-import { applyWindowStigma, liquidAssets, transferIn } from '../treasury';
+import { applyWindowStigma, liquidAssets, addToLendingFund } from '../treasury';
 import { fail, money, ok, type CommandResult } from './result';
 
-/** Moves corporate cash into treasury reserves. There is no way back (SIMULATION §13.2). */
-export function transferToTreasury(state: GameState, amount: number): CommandResult {
+/**
+ * Tops up the Loan Desk's lending fund (treasury reserves) from company cash.
+ * There is no way back (SIMULATION §13.2). C3c: this replaced the HQ treasury transfer.
+ */
+export function topUpLendingFund(state: GameState, amount: number): CommandResult {
   if (!Number.isFinite(amount) || amount <= 0) return fail('Enter an amount above zero.');
   if (amount > state.company.cash)
     return fail(`You only have ${money(state.company.cash)} in corporate cash.`);
   postCash(state, -amount, 'investing');
-  transferIn(state, amount);
+  addToLendingFund(state, amount);
   return ok();
 }
 
 export interface TreasuryPolicy {
   /** Target liquidity ratio, LIQ_TARGET_RANGE (0.10–0.40). */
   liqTarget?: number;
-  /** Share of liquid assets above the minimum held in bonds, 0–BOND_SHARE_MAX (0.8). */
-  bondShare?: number;
   autoFunding?: boolean;
 }
 
-/** Sets any of the target liquidity ratio, bond share and auto-funding (§13.3–13.5). */
+/** Sets any of the target liquidity ratio and auto-funding (§13.3–13.5). */
 export function setTreasuryPolicy(state: GameState, policy: TreasuryPolicy): CommandResult {
-  const { liqTarget, bondShare, autoFunding } = policy;
+  const { liqTarget, autoFunding } = policy;
   const [lo, hi] = LIQ_TARGET_RANGE;
   if (liqTarget !== undefined && !(liqTarget >= lo && liqTarget <= hi))
     return fail(`The liquidity target must be between ${lo * 100}% and ${hi * 100}%.`);
-  if (bondShare !== undefined && !(bondShare >= 0 && bondShare <= BOND_SHARE_MAX))
-    return fail(`The bond share must be between 0% and ${BOND_SHARE_MAX * 100}%.`);
   const t = state.treasury;
   if (liqTarget !== undefined) t.liqTarget = liqTarget;
-  if (bondShare !== undefined) t.bondShare = bondShare;
   if (autoFunding !== undefined) t.autoFunding = autoFunding;
   return ok();
 }
@@ -61,11 +59,6 @@ export function borrowOffer(
   if (!offer) return fail('That offer is no longer available.');
   if (!Number.isFinite(amount) || amount <= 0) return fail('Enter an amount above zero.');
   const max = maxBorrow(state, offer);
-  const cover = FUNDING_TYPES[offer.type]?.mortgageCover;
-  if (cover && amount > max)
-    return fail(
-      `Covered bonds need mortgages worth ${cover}× the bonds. You can borrow up to ${money(max)}.`,
-    );
   if (amount > max) return fail(`This offer is for at most ${money(max)}.`);
   const lotId = newId(state, 'fl');
   t.lots.push({

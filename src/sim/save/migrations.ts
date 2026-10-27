@@ -6,6 +6,7 @@
 // and its export codes are turned away, so none can reach this chain.
 import { foldRivalCity } from '../rivalOffices';
 import { migrateCatalog } from './migrateCatalog';
+import { migrateBankCleanup } from './migrateBankCleanup';
 import { migrateMoney } from './migrateMoney';
 import { SCHEMA_VERSION, type GameState } from '../state';
 
@@ -53,6 +54,11 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
   // 6 → 7 (stage C3b): compute and AI P&L lines; the Loan Desk lends company cash.
   6: (s) => {
     migrateMoney(s as unknown as GameState);
+    return s;
+  },
+  // 7 → 8 (stage C3c): REO sold into cash, bonds into reserves, covered bonds gone.
+  7: (s) => {
+    migrateBankCleanup(s as unknown as GameState);
     return s;
   },
 };

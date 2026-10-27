@@ -25,7 +25,6 @@ import { runMergers } from './mergers';
 import { conventionsYear, runConventions } from './conventions';
 import { runLobbying } from './lobbying';
 import { runRealEstate } from './realEstate';
-import { runReo } from './reo';
 import { runVentures, venturesQuarter } from './ventures';
 import { runPersonal } from './personal';
 import { runTravel } from './travel';
@@ -115,7 +114,6 @@ export function weeklyTick(state: GameState): void {
   runGovernance(state); // 8 (dividends due)
   runMergers(state); // 8 (M&A responses and integrations, §19.8)
   runRealEstate(state); // 8 (owned buildings, listings, sales, §21.1–21.2)
-  runReo(state); // 8 (foreclosed homes, §21.3)
   runVentures(state); // 8 (venture debt, open rounds, pipeline, §20.3–20.5)
   runConventions(state); // 8 (announce, open and close conventions, CONTENT §19)
   runLobbying(state); // 8 (campaign outcomes, DESIGN §5.8.10)

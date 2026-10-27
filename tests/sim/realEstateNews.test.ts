@@ -34,7 +34,6 @@ describe('real estate and lobbying stories', () => {
     ev('PROPERTY_BOUGHT', { ...deal, price: REAL_ESTATE.newsMin / 2, account: 'company' }),
     ev('PROPERTY_SOLD', { ...deal, price: big, account: 'company' }),
     ev('PROPERTY_SOLD', { ...deal, price: big, account: 'personal' }),
-    ev('REO_SOLD', { cityId: 'cal', city: 'Calgary', units: 14, price: 4.2e6 }),
     ev('LOBBY_WON', lobby),
     ev('LOBBY_LOST', lobby),
     ev('LOBBY_EXPOSED', { ...lobby, bank: 'Test Bank', fine: 1.25e6 }),
@@ -59,6 +58,5 @@ describe('real estate and lobbying stories', () => {
     expect(exposed.tokens.campaign).toMatch(/^ease the capital buffer/);
     const personal = stories.find((x) => x.key === 'PROPERTY_BOUGHT_PERSONAL')!;
     expect(personal.tokens.founder).toBe(s.meta.founderName);
-    expect(stories.find((x) => x.key === 'REO_SOLD')!.tokens.units).toBe('14');
   });
 });

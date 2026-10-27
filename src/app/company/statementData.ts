@@ -75,18 +75,16 @@ export function cashFlowStatement(snaps: WeeklySnapshot[]): StatementLine[] {
 export function balanceSheetLines(s: GameState): StatementLine[] {
   const b = balanceSheet(s);
   // Retained earnings = equity − paid-in capital − AOCI (§14.4).
-  const retained = b.equity - s.company.paidInCapital - b.aoci;
+  const retained = b.equity - s.company.paidInCapital;
   // Lines that only appear once something is in them (later-stage assets and liabilities).
   const optional = (label: string, value: number): StatementLine[] =>
     Math.abs(value) >= 0.5 ? [{ label, value, kind: 'sub' }] : [];
-  // C3b: bank-only lines (reserves, bonds, foreclosed property, deposits,
-  // wholesale funding) show only while an older save still holds them.
+  // C3b: bank-only lines (reserves, deposits, wholesale funding) show only
+  // while they hold money. Bonds and foreclosed property went in C3c.
   return [
     { label: 'Cash', value: b.cash, kind: 'sub' },
     ...optional('Treasury reserves', b.reserves),
-    ...optional('Government bonds', b.bonds),
     ...optional('Loan Desk loans', b.loans),
-    ...optional('Foreclosed property', b.reo),
     ...optional('Stocks', b.investments),
     ...optional('Ventures', b.ventures),
     ...optional('Compute credits', b.ventureDebt),
@@ -105,7 +103,6 @@ export function balanceSheetLines(s: GameState): StatementLine[] {
     { label: 'Total liabilities', value: b.liabilities, kind: 'total' },
     { label: 'Paid-in capital', value: s.company.paidInCapital, kind: 'sub' },
     { label: 'Retained earnings', value: retained, kind: 'sub' },
-    ...optional('Unrealised bond gains', b.aoci),
     { label: 'Total equity', value: b.equity, kind: 'total' },
   ];
 }

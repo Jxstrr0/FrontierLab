@@ -1,5 +1,4 @@
-// Percent slider for the treasury policy (SCREENS §10: target LR slider, bonds
-// share slider). A native range input styled like the funding market's amount
+// Percent slider for the treasury policy (SCREENS §10: target LR slider). A native range input styled like the funding market's amount
 // slider (brass track, 44 px touch height), with the current value beside the
 // label and the bounds under the track. The input works in whole hundredths so
 // steps stay exact (0.07, never 0.07000000000000001).

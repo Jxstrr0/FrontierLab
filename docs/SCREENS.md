@@ -286,9 +286,8 @@ Tabs: Overview · Loans · Credit.
     - probability table (5★ … 1★ with %)
     - Start development
 - **Treasury:**
-  - liquidity gauge (LR vs minimum and target), with a funding freeze banner when active, and a one-way "Transfer cash to Treasury"
-  - Treasury policy: target LR slider, bonds share slider, auto-funding toggle
-  - Bonds: market value, book, unrealized gain/loss, yield, duration
+  - liquidity gauge (LR vs minimum and target), with a funding freeze banner when active. (C3c: the one-way cash transfer moved to the Loan Desk tab's lending fund card as "Top up"; the bonds card and bond share slider are gone.)
+  - Treasury policy: target LR slider, auto-funding toggle
   - **Funding inventory:** lot cards with counterparty, type, rate, amount, maturity date and rosette, plus Details and "Repay early" where flexibility allows
   - **Funding market:** offer cards with an amount slider and Borrow
   - **Central bank:** the standing facility from §8 (window rate, window and overnight usage, Borrow / Repay with the stigma warning)
@@ -453,7 +452,7 @@ Tabs: Overview · Loans · Credit.
     - weekly net rent income
     - ROI %
   - **Real estate sale:** For Sale toggle
-- **Foreclosed homes** (Company → Real estate): units, value, carrying cost, rent income, and Rent / Sell all.
+- (C3c: the Foreclosed homes card under Company → Real estate is gone; the card lists owned buildings only.)
 - **Map pins:** a building's pin shows only while it's for sale ("For sale" tag, never "For lease") or once you own it (your seal; "Selling" while For Sale is on). Unlisted buildings say "Not for sale right now; listings refresh every 4 weeks".
 
 ## 17. Convention

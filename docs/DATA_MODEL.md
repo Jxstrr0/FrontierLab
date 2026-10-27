@@ -50,7 +50,6 @@ export interface GameState {
   market: MarketState;
   ventures: Record<Id, Startup>;
   realEstate: Record<Id, Property>;
-  reo: Record<Id /*cityId*/, ReoPool>;
   governance: Governance;
   personal: Personal;
   events: { log: GameEvent[]; scheduled: ScheduledEvent[]; incidents: Incident[]; cooldowns: Record<string, Week> };
@@ -186,8 +185,8 @@ export interface UnderwritingState {
 
 ```ts
 export interface Treasury {
-  reserves: Money; bondsMarket: Money; bondsBook: Money; bondBookYield: Rate;
-  liqTarget: Pct; bondShare: Pct; autoFunding: boolean; freeze: boolean;
+  reserves: Money; // the Loan Desk's lending fund (C3b); bonds removed in C3c
+  liqTarget: Pct; autoFunding: boolean; freeze: boolean;
   lots: FundingLot[]; offers: FundingOffer[]; offersRefreshWeek: Week;
   overnight: Money; window: Money; windowStigmaWeeks: number;
 }
@@ -250,7 +249,6 @@ export interface Property {
   id: Id; cityId: Id; lotId: Id; owner: 'company'|'personal'; sqm: number; purchasePrice: Money;
   value: Money; rent: number; marketRent: number; occupancy: Pct; forSale: boolean; saleWeek?: Week;
 }
-export interface ReoPool { units: number; value: Money; mode: 'hold'|'rent'|'selling'; sellWeek?: Week }
 ```
 
 ## 8. Governance, personal, events, news
@@ -328,7 +326,7 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 | Offices and departments | `leaseOffice`, `addFloor`, `releaseFloor`, `setDeptTarget`, `setDeptSalary`, `setBenefit` |
 | Finance floor | `setRiskAppetite` |
 | Products floor | `startDevelopment`, `cancelDevelopment`, `deleteProduct`, `buyBureauModel`, `commissionBureauModel`, `saveCustomModel`, `activateModel` |
-| Treasury | `setTreasuryPolicy`, `borrowOffer`, `repayLot`, `transferToTreasury`, `borrowWindow`, `repayWindow` |
+| Treasury | `setTreasuryPolicy`, `borrowOffer`, `repayLot`, `topUpLendingFund`, `borrowWindow`, `repayWindow` |
 | Partnerships and partners | `signPartnership` (payroll or student), `renewPartnership`, `releasePartnership`, `startGradProgram`, `endGradProgram` |
 | Marketing and lobbying | `startBrandCampaign`, `buyAgencyPackage`, `startLobbying` (was `lobby`) |
 | Corporate borrowing | `acceptCorporateLoan`, `repayCorporateLoan`, `drawCredit`, `repayCredit` |
@@ -348,6 +346,12 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 **Frontier Lab schema 4 (stage C2c, data centers):** `dataCenters: Record<Id, DataCenter>` (`id`, `cityId`, `lotId?` or `siteId?`, `name`, `status` fitout/open, `weeksLeft`, `builtWeek`, `openedWeek?`, `build { hall, power, cooling }` part ids, `lease { weeklyRent, deposit }`). A data center on a storefront sets that lot's occupant to `{ type: 'player', id: <data center id> }`, so code that reads a player occupant checks `dataCenters` before `branches`. Its parts are fixed assets owned by its id. Migration 3 → 4 adds an empty table. Events `DATA_CENTER_STARTED { dataCenterId, name, city, site, weeks }`, `DATA_CENTER_OPENED { …, gpus, refit }`, `DATA_CENTER_UPGRADED { …, slot, part }`, `DATA_CENTER_CLOSED`. Commands `buildDataCenter`, `upgradeDataCenter`, `renameDataCenter`, `closeDataCenter`.
 
 **Frontier Lab schema 5 (stage C2d2, main offices and company-wide prices):** `Branch.ownPrices: boolean`, true when a sales office sets its own prices and lineup while Apply-to-all is on. Migration 4 → 5 sets it false everywhere. Commands `setOwnPrices(branchId, on)` and `mainOfficeBlocker(cityId)` (the two-office cap, MAIN_OFFICES_MAX).
+
+**Frontier Lab schema 8 (stage C3c, bank leftovers removed):** `GameState.reo` and the `ReoPool` type are gone, and `Treasury` loses `bondsMarket`, `bondsBook`, `bondBookYield` and `bondShare`. The `covered_bond` funding type is gone. The command `transferToTreasury` is renamed `topUpLendingFund`. Migration 7 → 8 (`src/sim/save/migrateBankCleanup.ts`) keeps equity unchanged:
+- Each REO pool's value is added to company cash, and `reo` is deleted.
+- Bonds are sold into reserves at market value. The unrealised gain or loss (market − book) moves into `company.retainedEarnings`, since the balance sheet no longer carries AOCI.
+- Covered bond lots become `term_interbank` lots, and covered bond offers are dropped.
+- The `bondCoupon`, `realizedGains`, `depositInterest`, `wealthFees` and `originationFees` P&L lines stay in the ledger at zero for now, so old weekly records keep their shape.
 
 **Frontier Lab schema 7 (stage C3b, the money model):** new company P&L line `compute` (an operating expense; plan seats and API usage). `BranchPnl.lines` move to `plans`, `api`, `apps`, `loanDesk`, `otherIncome`, `compute`, `losses`, `staff`, `manager`, `rent`, `marketing`, `equipment`, `servicing`, `overhead` (the funding credit and charge, deposit interest and wealth lines are gone). Migration 6 → 7 (`src/sim/save/migrateMoney.ts`) keeps equity unchanged:
 - `compute: 0` is added to the running ledger and every weekly snapshot's P&L.

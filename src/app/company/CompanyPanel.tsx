@@ -141,7 +141,7 @@ export function CompanyPanel() {
               />
             )}
             <p class="muted small cap-note">
-              Reserves and bonds as a share of deposits: the cash you can reach in a hurry.{' '}
+              Reserves as a share of deposits: the cash you can reach in a hurry.{' '}
               {s.treasury.autoFunding
                 ? 'Auto-funding holds the target by borrowing overnight, so it looks after itself.'
                 : 'Auto-funding is off, so nothing tops it up when it slips.'}

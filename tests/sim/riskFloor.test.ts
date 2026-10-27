@@ -60,7 +60,7 @@ describe('loss records', () => {
     const s = runScript(40, (st, week) => {
       if (week !== 1) return;
       addCapital(st, 5_000_000);
-      cmd.transferToTreasury(st, 5_000_000);
+      cmd.topUpLendingFund(st, 5_000_000);
     });
     const ids = lossTable(s).map((r) => r.productId);
     expect(ids).toEqual(['sbl']);

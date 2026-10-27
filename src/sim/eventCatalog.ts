@@ -376,8 +376,6 @@ export interface EventPayloads {
   PROPERTY_OFFER_REJECTED: { siteId: Id; address: string; offer: Money };
   /** A For Sale building of yours sold (realEstate.ts). */
   PROPERTY_SOLD: { siteId: Id; address: string; price: Money; account: string; cityId: Id };
-  /** A city's foreclosed homes were sold in one lot at 90% of value (reo.ts). */
-  REO_SOLD: { cityId: Id; city: string; units: number; price: Money };
 
   // ─── Lobbying (lobbying.ts) ───────────────────────────────────────────────
   /** You hired a firm for a campaign (commands/lobbying.ts); scope is the campaign record id. */

@@ -25,8 +25,8 @@ const identityGap = (s: GameState) => {
   return Math.abs(bs.equity - bs.expectedEquity);
 };
 
-/** The first offer that isn't a covered bond (those need mortgage cover). */
-const plainOffer = (s: GameState) => s.treasury.offers.find((o) => o.type !== 'covered_bond')!;
+/** The first market offer (C3c: covered bonds are gone, so any offer will do). */
+const plainOffer = (s: GameState) => s.treasury.offers[0]!;
 
 describe('funding market offers', () => {
   it('needs a Treasury floor', () => {
@@ -110,30 +110,6 @@ describe('funding lots', () => {
     expect(cmd.borrowOffer(s, offer.id, offer.amount + 1)).toMatchObject({ ok: false });
   });
 
-  it('refuses covered bonds without mortgage cover', () => {
-    const s = bankWithFloors(['treasury']);
-    s.treasury.offers = [
-      {
-        id: 'fo_cb',
-        type: 'covered_bond',
-        counterparty: 'Meridian Treasury',
-        amount: 100_000_000,
-        rate: 0.05,
-        termWeeks: 260,
-        radar: [6, 9, 9, 2, 9],
-        expiresWeek: s.clock.week + 2,
-      },
-    ];
-    // C3a: an AI lab holds no mortgages, so there is no cover and any covered bond is
-    // refused (covered bonds go in C3c).
-    let mortgages = 0;
-    for (const b of Object.values(s.branches)) mortgages += b.books.mortgage?.balance ?? 0;
-    expect(mortgages).toBe(0);
-    const r = cmd.borrowOffer(s, 'fo_cb', 1_000_000);
-    expect(r.ok).toBe(false);
-    expect(!r.ok && r.reason).toMatch(/^Covered bonds need mortgages worth 1.25×/);
-  });
-
   it('pays weekly interest from corporate cash and matures on time', () => {
     const s = bankWithFloors(['treasury']);
     advanceWeeks(s, 1);
@@ -158,7 +134,7 @@ describe('funding lots', () => {
     const t = s.treasury;
     const deposits = totalDeposits(s);
     // Target at the minimum, so only the §13.5 shortfall itself is borrowed.
-    Object.assign(t, { bondsMarket: 0, bondsBook: 0, overnight: 0, window: 0, liqTarget: LIQ_MIN });
+    Object.assign(t, { overnight: 0, window: 0, liqTarget: LIQ_MIN });
     t.reserves = LIQ_MIN * deposits + 1_000_000;
     t.lots.push({
       id: 'fl_x',
@@ -199,26 +175,27 @@ describe('funding lots', () => {
   it('repays early only where the type allows it', () => {
     const s = bankWithFloors(['treasury']);
     const base = { counterparty: 'X', rate: 0.05, startWeek: 0, maturityWeek: 999, amount: 1e6 };
+    // C3c: every market type allows early repayment; an unknown type does not.
     s.treasury.lots.push(
       { ...base, id: 'ti', type: 'term_interbank', radar: [7, 5, 5, 5, 7] },
-      { ...base, id: 'cb', type: 'covered_bond', radar: [5, 9, 9, 2, 9] },
+      { ...base, id: 'xx', type: 'retired_type', radar: [5, 9, 9, 2, 9] },
     );
     s.treasury.reserves += 2e6;
-    expect(cmd.repayLot(s, 'cb')).toEqual({
+    expect(cmd.repayLot(s, 'xx')).toEqual({
       ok: false,
-      reason: "Covered Bond can't be repaid early; it runs to maturity.",
+      reason: "This funding can't be repaid early; it runs to maturity.",
     });
     const reserves = s.treasury.reserves;
     expect(cmd.repayLot(s, 'ti')).toEqual({ ok: true });
     expect(s.treasury.reserves).toBeCloseTo(reserves - 1e6);
-    expect(s.treasury.lots.map((l) => l.id)).toEqual(['cb']);
+    expect(s.treasury.lots.map((l) => l.id)).toEqual(['xx']);
   });
 
   it('keeps the balance identity through borrowing and maturities', () => {
     const s = bankWithFloors(['treasury', 'finance']);
     advanceWeeks(s, 1);
     for (const o of [...s.treasury.offers]) {
-      if (o.type !== 'covered_bond') cmd.borrowOffer(s, o.id, Math.min(o.amount, 1_500_000));
+      cmd.borrowOffer(s, o.id, Math.min(o.amount, 1_500_000));
     }
     expect(s.treasury.lots.length).toBeGreaterThan(0);
     for (let w = 0; w < 110; w++) {
@@ -234,7 +211,7 @@ describe('auto-funding holds the target (§13.5)', () => {
     const s = bankWithFloors(['treasury']);
     const t = s.treasury;
     const deposits = totalDeposits(s);
-    Object.assign(t, { bondsMarket: 0, bondsBook: 0, overnight: 0, window: 0, autoFunding });
+    Object.assign(t, { overnight: 0, window: 0, autoFunding });
     t.reserves = lr * deposits;
     homeCountry(s).prevFtpLong = ftpLong(homeCountry(s));
     return { s, t, deposits };
@@ -284,11 +261,8 @@ describe('treasury policy and the central bank window', () => {
   it('validates policy ranges', () => {
     const s = bankWithFloors(['treasury']);
     expect(cmd.setTreasuryPolicy(s, { liqTarget: 0.05 })).toMatchObject({ ok: false });
-    expect(cmd.setTreasuryPolicy(s, { bondShare: 0.9 })).toMatchObject({ ok: false });
-    expect(
-      cmd.setTreasuryPolicy(s, { liqTarget: 0.2, bondShare: 0.5, autoFunding: false }),
-    ).toEqual({ ok: true });
-    expect(s.treasury).toMatchObject({ liqTarget: 0.2, bondShare: 0.5, autoFunding: false });
+    expect(cmd.setTreasuryPolicy(s, { liqTarget: 0.2, autoFunding: false })).toEqual({ ok: true });
+    expect(s.treasury).toMatchObject({ liqTarget: 0.2, autoFunding: false });
   });
 
   it('borrows and repays at the window with stigma', () => {
@@ -310,26 +284,5 @@ describe('treasury policy and the central bank window', () => {
       ok: false,
       reason: 'You have no central bank borrowing to repay.',
     });
-  });
-});
-
-describe('bond mark-to-market', () => {
-  const withBonds = (dLong: number) => {
-    const s = bankWithFloors([]);
-    const t = s.treasury;
-    // A high bond share means the weekly rebalance only buys (at market), leaving
-    // the unrealized gain or loss from the move intact.
-    Object.assign(t, { bondsMarket: 10_000_000, bondsBook: 10_000_000, bondShare: 0.8 });
-    t.reserves += 50_000_000;
-    const c = homeCountry(s);
-    c.prevFtpLong = ftpLong(c) - dLong;
-    runTreasury(s);
-    return balanceSheet(s);
-  };
-
-  it('loses value when long rates rise and gains when they fall', () => {
-    // §13.4: Bd_market ×= 1 − 4.0 × Δ; Δ = +1pp → about −4% before pull to par.
-    expect(withBonds(0.01).aoci).toBeLessThan(-300_000);
-    expect(withBonds(-0.01).aoci).toBeGreaterThan(300_000);
   });
 });
