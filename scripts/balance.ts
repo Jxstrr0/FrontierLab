@@ -100,7 +100,7 @@ function simulate(args: Args) {
   const weeks = args.years * 52;
   let minCash = Infinity;
   let maxIdentityGap = 0;
-  const yearly = { ni: 0, rev: 0, gross: 0, losses: 0, loans: 0, equity: 0, n: 0 };
+  const yearly = { ni: 0, rev: 0, gross: 0, equity: 0, n: 0 };
   const log = emptyLog();
 
   for (let w = 1; w <= weeks; w++) {
@@ -115,8 +115,6 @@ function simulate(args: Args) {
     yearly.ni += sum.netIncome;
     yearly.rev += sum.revenue;
     yearly.gross += sum.grossProfit;
-    yearly.losses += sum.loanLosses;
-    yearly.loans += bs.loans;
     yearly.equity += bs.equity;
     yearly.n += 1;
 
@@ -150,11 +148,9 @@ function simulate(args: Args) {
           String(w / 52).padStart(4),
           String(Object.keys(state.branches).length).padStart(8),
           M(companyArr(state)).padStart(9),
-          M(bs.loans).padStart(9),
           M(bs.equity).padStart(8),
           P(state.company.safetyRatio).padStart(7),
           P(yearly.gross / Math.max(1, yearly.rev)).padStart(6),
-          P(yearly.losses / Math.max(1, yearly.loans / n)).padStart(6),
           P(yearly.ni / Math.max(1, yearly.equity / n)).padStart(7),
           M(state.company.cash).padStart(8),
           state.company.tier.padStart(10),
@@ -164,7 +160,7 @@ function simulate(args: Args) {
           country.nominal.toFixed(2).padStart(6),
         ].join(' '),
       );
-      Object.assign(yearly, { ni: 0, rev: 0, gross: 0, losses: 0, loans: 0, equity: 0, n: 0 });
+      Object.assign(yearly, { ni: 0, rev: 0, gross: 0, equity: 0, n: 0 });
     }
   }
 
@@ -195,7 +191,7 @@ function run(): void {
       `${args.difficulty}, ${state.meta.competitors} competitors, ${args.years} years\n`,
   );
   console.log(
-    'Year Branches       ARR     Loans   Equity  Safety     GM   Loss     ROE     Cash       Tier       Policy HQ ppl  Min k′  Index',
+    'Year Branches       ARR   Equity  Safety     GM     ROE     Cash       Tier       Policy HQ ppl  Min k′  Index',
   );
   for (const r of rows) console.log(r);
 
