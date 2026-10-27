@@ -75,6 +75,8 @@ export interface ExecutivesState {
   moraleTarget: number;
   /** City brand awareness the CMO's Brand campaigns hold (schema v21), one of EXEC_DELEGATION.brandTargets. */
   brandTarget: number;
+  /** Share of GPU demand the CTO's Compute delegation covers outside spot (schema v20), one of CTO_COMPUTE.coverTargets. */
+  computeCover: number;
   /** Occupancy the CREO's Rents price for, per owner (schema v30), each one of EXEC_DELEGATION.occTargets. */
   occTargets: { company: number; personal: number };
   /** Stocks the CFO's Investing sold at a loss, per account: id → week sold (schema v31). */
