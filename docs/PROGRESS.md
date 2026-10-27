@@ -3,13 +3,27 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.28, save schema 20). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
+**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.29, save schema 20). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
 **Determinism snapshot:** `0bf7d7abb55509` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-27 — City text fix, menu scrolling, free top rerolls (v0.1.29)
+
+**What changed.**
+- **City picker text fixed.** My last change put the new Paris, Frankfurt and Amsterdam blurbs in the wrong place: their country line ("France", "Germany", "Netherlands") was overwritten with the blurb, and the blurb itself was still the old one. Both are right now, and a test checks the country lines.
+- **Menu scrolling.** Three fixes, found by driving the game on a simulated iPhone screen with touch swipes:
+  - Switching tabs in a panel (a sales office's Service / Products / Deal Desk…, or HQ's floors) used to keep the old scroll position, so you landed halfway down the new tab. A new tab now starts at its top.
+  - While the tutorial guide is showing, its bar sat over the bottom ~240 px of every panel. The last cards could never scroll out from under it, and it covered the panel's tab bar. Now the bar sits just above the tab bar, and the panel (or sheet) gets extra room at the bottom so everything can scroll into view.
+  - Bottom sheets (Menu, Layers…) were sized to 88% of Safari's full-screen height, which is taller than what you see while Safari's toolbars show. They now use the visible height.
+- **Settings → Developer → Free top rerolls.** With developer tools on, inside a game: "New candidates" for managers and executives costs nothing (the button says "Free"), and every rerolled candidate rolls 95–99 in every skill, with an asking salary to match. "Top staff" (the earlier switch) only lifts the *teams* (office staff and HQ floors), not the candidates you hire, which is why it didn't do what you wanted. This one does. Saved with the game; no save change, determinism snapshot unchanged.
+
+**Checked.** `npm run lint`, `npx vitest run` (1013 tests, 4 new) and `npm run build` pass. Swipe tests at 390×844 in Chromium's iPhone emulation, with the clock running.
+
+**Dependencies:** none added.
 
 ### 2026-10-27 — Dev tools for staff and bankruptcy, AI-lab city blurbs (v0.1.28)
 

@@ -20,6 +20,12 @@ const SCROLLERS = '.panel-content, .sheet-content, .modal-content, .standalone';
 /** A panel, sheet or modal: its own chrome (tab bar, footer) may be scrolled past. */
 const SHELLS = '.panel, .sheet, .modal';
 
+/** Scroll areas the bottom bar can cover, and the CSS variable holding the room they need. */
+const BOTTOM_PADS: Record<string, string> = {
+  '.panel .panel-content': '--tut-panel-pad',
+  '.sheet .sheet-content': '--tut-sheet-pad',
+};
+
 export type Dock = 'top' | 'bottom';
 
 /** A data-tutorial target and the guide's line for it (Part 1 and Part 2 alike). */
@@ -44,7 +50,9 @@ export class RingTracker {
   private lastResolve = 0;
   private scrolled: Element | null = null;
   private pad = 0;
+  private bottomPads: Record<string, number> = {};
   private headerBottom = 0;
+  private chromeTop = 0;
 
   constructor(
     private ring: HTMLElement,
@@ -71,6 +79,10 @@ export class RingTracker {
     this.ring.style.display = 'none';
     document.documentElement.style.removeProperty('--tut-modal-pad');
     document.documentElement.style.removeProperty('--tut-top');
+    document.documentElement.style.removeProperty('--tut-bottom');
+    this.chromeTop = 0;
+    for (const v of Object.values(BOTTOM_PADS)) document.documentElement.style.removeProperty(v);
+    this.bottomPads = {};
   }
 
   private frame = (now: number) => {
@@ -160,8 +172,12 @@ export class RingTracker {
    * With the bar on top of an open modal (the weekly results), pads the modal's
    * content so its first lines can scroll out from under the bar. Over a panel,
    * the bar sits under the panel's header so its Close button stays reachable.
+   * With the bar at the bottom, it sits above an open panel's tab bar or
+   * footer, and an open panel's and sheet's content is padded so their last
+   * cards can scroll up out from under it.
    */
   private makeRoom(): void {
+    this.makeRoomBelow();
     const header = this.dock === 'top' ? document.querySelector('.panel .panel-header') : null;
     const headerBottom = header ? Math.round(header.getBoundingClientRect().bottom) : 0;
     if (headerBottom !== this.headerBottom) {
@@ -182,6 +198,32 @@ export class RingTracker {
     if (want === this.pad) return;
     this.pad = want;
     document.documentElement.style.setProperty('--tut-modal-pad', `${want}px`);
+  }
+
+  private makeRoomBelow(): void {
+    // Docked at the bottom over a panel, the bar sits on its tab bar or footer so they stay tappable.
+    const chrome =
+      this.dock === 'bottom'
+        ? document.querySelector('.panel .panel-tabs, .panel .panel-footer')
+        : null;
+    const lift = chrome
+      ? Math.max(0, Math.round(innerHeight - chrome.getBoundingClientRect().top))
+      : 0;
+    if (lift !== this.chromeTop) {
+      this.chromeTop = lift;
+      document.documentElement.style.setProperty('--tut-bottom', `${lift}px`);
+    }
+    const bar = this.dock === 'bottom' ? this.bar() : null;
+    const barTop = bar ? bar.getBoundingClientRect().top : 0;
+    for (const [sel, prop] of Object.entries(BOTTOM_PADS)) {
+      const content = bar ? document.querySelector(sel) : null;
+      // Padding sits inside the content box, so its bottom (and this measure) stays put.
+      const overlap = content ? Math.round(content.getBoundingClientRect().bottom - barTop) : 0;
+      const want = overlap > 0 ? overlap + MODAL_GAP : 0;
+      if (want === (this.bottomPads[sel] ?? 0)) continue;
+      this.bottomPads[sel] = want;
+      document.documentElement.style.setProperty(prop, `${want}px`);
+    }
   }
 
   private update(index: number): void {

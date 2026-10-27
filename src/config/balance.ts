@@ -49,6 +49,8 @@ export const START_CASH_OPTIONS = [1_000_000, 1_500_000, 2_000_000, 2_500_000] a
 export const DEV_PAYMENT = 10_000_000;
 /** The Settings developer tools' "Top staff" switch: the floor it holds every team's skill and morale at (SCREENS §26). */
 export const DEV_STAFF = { skill: 95, morale: 95 } as const;
+/** The developer tools' "Free top rerolls" switch: rerolled candidates' skills land in this range (SCREENS §26). */
+export const DEV_REROLL = { minSkill: 95, maxSkill: 99 } as const;
 /** Rival banks in each city (the wizard's competitor count); clamped to the rivals available. */
 export const COMPETITORS = { min: 1, max: 5 } as const;
 

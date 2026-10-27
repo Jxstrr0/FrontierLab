@@ -14,6 +14,7 @@ import {
 import { CITIES } from '../../data/cities';
 import { EXEC_SEATS } from '../../data/executives';
 import { execRerollFee } from '../candidateRerolls';
+import { topExecutive } from '../devStaff';
 import { generateExecutive } from '../execCandidates';
 import { canGrowIn, carryOutPlan, expansionPlan, seedGrowthCities } from '../execDelegationsGrowth';
 import { grantFairValue } from '../execGrants';
@@ -74,7 +75,11 @@ export function rerollExecCandidates(
   if (state.company.cash < fee) return fail(`Not enough cash: new candidates cost ${money(fee)}.`);
   spend(state, 'execPay', fee);
   const pool: Executive[] = [];
-  for (let i = 0; i < EXECUTIVES.candidatesPerSeat; i++) pool.push(generateExecutive(state, seat));
+  for (let i = 0; i < EXECUTIVES.candidatesPerSeat; i++) {
+    const exec = generateExecutive(state, seat);
+    topExecutive(state, exec);
+    pool.push(exec);
+  }
   state.executives.candidates[seat] = pool;
   state.executives.rerolls[seat] = (state.executives.rerolls[seat] ?? 0) + 1;
   return ok({ fee });

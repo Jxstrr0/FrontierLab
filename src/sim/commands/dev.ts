@@ -29,6 +29,17 @@ export function setDevStaff(state: GameState, on: boolean) {
 }
 
 /**
+ * Switches the "Free top rerolls" tool on or off. On, manager and executive
+ * rerolls cost nothing and deal candidates with DEV_REROLL skills; the lists
+ * already on offer are left as they are.
+ */
+export function setDevRerolls(state: GameState, on: boolean) {
+  if (on) state.flags.devRerolls = true;
+  else delete state.flags.devRerolls;
+  return ok();
+}
+
+/**
  * Switches the "No bankruptcy" tool on or off. On, weeks in the red never end
  * the game (cash still goes negative and the warnings still show); a game
  * already over for insolvency is not revived.

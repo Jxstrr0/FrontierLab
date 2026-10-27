@@ -28,6 +28,10 @@ describe('start cities', () => {
       expect(CITY_FLAVOUR[id]).toBeTruthy();
       expect(nationOf(id)).not.toBe('Eurozone');
     }
+    expect(nationOf('par')).toBe('France');
+    expect(nationOf('fra')).toBe('Germany');
+    expect(nationOf('ams')).toBe('Netherlands');
+    for (const id of START_CITIES) expect(CITY_FLAVOUR[id]).not.toBe(nationOf(id));
   });
 
   it('starts a game at home in each city', () => {
