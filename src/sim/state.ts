@@ -25,6 +25,7 @@ import type {
   Week,
 } from '../data/types';
 import type {
+  Business,
   CompetitionState,
   CorporateDebt,
   EmployerInfo,
@@ -55,7 +56,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState } from './personalTypes';
 
-export const SCHEMA_VERSION = 11;
+export const SCHEMA_VERSION = 12;
 
 export interface GameState {
   schemaVersion: number;
@@ -83,6 +84,8 @@ export interface GameState {
   treasury: Treasury;
   loanDesk: { applications: Record<Id, LoanApplication>; loans: Record<Id, BusinessLoan> };
   rivals: Record<Id, RivalBank>;
+  /** Customer businesses and anchor accounts in generated cities (stage C5a; schema 12). */
+  businesses: Record<Id, Business>;
   /** HQ brand campaigns and agency packages (§16.10). */
   marketing: MarketingState;
   /** Risk floor records: weekly losses by product and regulator reviews (§15, §16). */
@@ -355,7 +358,8 @@ export interface Lot {
   homeownerShare: Pct;
   weeklyRent: Money;
   deposit: Money;
-  occupant?: { type: 'player' | 'rival'; id: Id };
+  /** A business (stage C5a) holds its lot for good: it is not for lease. */
+  occupant?: { type: 'player' | 'rival' | 'business'; id: Id };
   buildingSeed: number;
 }
 

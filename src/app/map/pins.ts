@@ -26,7 +26,8 @@ import type { SitePinInfo } from './sitePinInfo';
 import type { CountryId } from '../../data/types';
 import { LEASE_ONLY_KEY, layerOn, type MapLayerId } from '../../data/mapLayers';
 import { rivalShortName } from './markers';
-import type { GameState, Lot, OfficeListing, Site } from '../../sim/state';
+import type { Business, GameState, Lot, OfficeListing, Site } from '../../sim/state';
+import { vendorCaption, vendorInk, vendorName } from '../business/businessView';
 
 export type PinKind =
   | 'mine'
@@ -49,6 +50,7 @@ export type PinKind =
   | 'auctionHouse'
   | 'vacationHome'
   | 'stadium'
+  | 'business'
   | 'lot';
 
 export interface PinSpec {
@@ -82,6 +84,8 @@ export interface PinSpec {
   muted?: boolean;
   /** Your acquired branch still converting (§19.8): old ink and monogram, with a progress ring. */
   converting?: { from: string; weeksLeft: number; progress: number };
+  /** The business a business pin opens (stage C5a). */
+  businessId?: string;
   /** The club a stadium pin opens (Stage 9). */
   clubId?: string;
   /** A short note under the medallion on Stage 7 sites ("For sale", "Open now"). */
@@ -112,7 +116,8 @@ const KIND_ORDER: Record<PinKind, number> = {
   auctionHouse: 16,
   vacationHome: 17,
   stadium: 18,
-  lot: 19,
+  business: 19,
+  lot: 20,
 };
 
 export function pendingByBranch(s: GameState): Record<string, number> {
@@ -193,6 +198,28 @@ function lotPin(s: GameState, map: CityMap, lot: Lot, pending: Record<string, nu
     monogram: '',
     badge: false,
   };
+}
+
+/** A business on its storefront (C5a): the Businesses medallion, your seal once it is yours. */
+function businessPin(s: GameState, map: CityMap, lot: Lot, b: Business): PinSpec {
+  const at = anchor(map, lot.tile);
+  const mine = b.vendor?.type === 'player';
+  const pin: PinSpec = {
+    id: lot.id,
+    kind: 'business',
+    x: at.x,
+    y: at.y,
+    label: `${b.name}, ${b.vendor ? `served by ${vendorName(s, b)}` : 'no AI vendor yet'}, ${lot.address}`,
+    ink: mine ? s.meta.brandInk : '',
+    monogram: '',
+    badge: false,
+    icon: 'employers',
+    businessId: b.id,
+  };
+  const caption = vendorCaption(s, b);
+  if (caption) pin.caption = caption;
+  if (mine) pin.partner = true;
+  return pin;
 }
 
 function officePin(s: GameState, map: CityMap, o: OfficeListing): PinSpec {
@@ -355,11 +382,19 @@ export function buildPins(
     const pending = pendingByBranch(s);
     for (const lot of lots) {
       if (lot.cityId !== map.cityId) continue;
+      // Businesses (C5a) sit on the Businesses layer, below.
+      if (lot.occupant?.type === 'business') continue;
       // Your data centers have their own layer (C2d); every other lot is a sales office or storefront.
       const dc = lot.occupant?.type === 'player' && !!s.dataCenters[lot.occupant.id];
       if (!(dc ? dataCenters : offices)) continue;
       if (leaseOnly && lot.occupant && !dc) continue;
       pins.push(lotPin(s, map, lot, pending));
+    }
+  }
+  if (features.competition && layerOn(layers, 'employers')) {
+    for (const lot of lots) {
+      const b = lot.occupant?.type === 'business' ? s.businesses[lot.occupant.id] : undefined;
+      if (b && lot.cityId === map.cityId) pins.push(businessPin(s, map, lot, b));
     }
   }
   if (features.hq) {
@@ -418,6 +453,12 @@ export function occupantsOf(
   for (const lot of lots) {
     const occ = lot.occupant;
     if (!occ) continue;
+    if (occ.type === 'business') {
+      // C5a: a business wears its AI vendor's awning; one with no vendor stays plain.
+      const ink = vendorInk(s, s.businesses[occ.id]);
+      if (ink) out[lot.id] = { type: 'business', ink };
+      continue;
+    }
     // A converting branch still flies the old bank's colours (§19.8).
     out[lot.id] =
       occ.type === 'player'

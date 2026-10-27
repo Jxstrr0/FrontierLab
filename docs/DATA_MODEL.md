@@ -353,6 +353,8 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 
 **Frontier Lab schema 11 (stage C4c, spot limits):** `ComputeState` gains `autoSpotBuy` (default true), `spotTrail`, `crunchWeeks`, `outageWeeksLeft`, `burstStigmaWeeks`, `weekCharge` and `weekCost` (SIMULATION §13.0). Office P&L `compute` is now the internal charge at spot. Migration 10 → 11 (`src/sim/save/migrateSpotLimits.ts`) turns auto spot-buy on and seeds the trail with today's gap, so an old save isn't squeezed by a limit it never built up.
 
+**Frontier Lab schema 12 (stage C5a, customer businesses):** new `GameState.businesses: Record<Id, Business>`, where `Business` = `{ id, cityId, name, sector, size: 'small'|'mid'|'large'|'anchor', lotId? or siteId?, pentagon, budget, vendor?: { type: 'player'|'rival', id }, contractValue?, renewalWeek? }` (SIMULATION §11.0). A business on a storefront sets that lot's occupant to `{ type: 'business', id }`; anchors sit on employer sites. Each city draws from its own `businesses:{cityId}` stream. Migration 11 → 12 (`src/sim/save/migrateBusinesses.ts`) seeds businesses in every generated city.
+
 **Frontier Lab schema 8 (stage C3c, bank leftovers removed):** `GameState.reo` and the `ReoPool` type are gone, and `Treasury` loses `bondsMarket`, `bondsBook`, `bondBookYield` and `bondShare`. The `covered_bond` funding type is gone. The command `transferToTreasury` is renamed `topUpLendingFund`. Migration 7 → 8 (`src/sim/save/migrateBankCleanup.ts`) keeps equity unchanged:
 - Each REO pool's value is added to company cash, and `reo` is deleted.
 - Bonds are sold into reserves at market value. The unrealised gain or loss (market − book) moves into `company.retainedEarnings`, since the balance sheet no longer carries AOCI.

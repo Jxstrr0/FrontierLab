@@ -15,6 +15,7 @@ import {
 } from '../data/rivalCharters';
 import type { Strategy } from '../data/rivals';
 import { FIRST_NAMES, LAST_NAMES } from '../data/names';
+import { roomLot } from './citygen';
 import { pushEvent } from './events';
 import { coinedBrand, placeStem } from './nameGen';
 import { initRivalShares } from './marketInit';
@@ -38,7 +39,8 @@ export function activeRivalsIn(state: GameState, cityId: string): RivalBank[] {
 export function charterChance(state: GameState, cityId: string, lots: Lot[]): number {
   const city = CITIES[cityId];
   if (!city || city.regional || lots.length === 0) return 0;
-  const free = lots.filter((l) => !l.occupant).length;
+  // Storefronts held by businesses (C5a) still count as the city's room.
+  const free = lots.filter(roomLot).length;
   if (free < RIVAL_CHARTER.branches[1] || free / lots.length < RIVAL_EXPANSION.minFreeLotShare)
     return 0;
   if (activeRivalsIn(state, cityId).length < competitorsFor(state, cityId))

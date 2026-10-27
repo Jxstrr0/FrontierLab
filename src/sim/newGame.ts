@@ -200,6 +200,7 @@ export function newGame(opts: NewGameOptions): GameState {
     },
     loanDesk: { applications: {}, loans: {} },
     rivals: {},
+    businesses: {},
     marketing: { campaigns: [], packages: [], cityBonus: {} },
     risk: { losses: [], reviews: [] },
     partnerships: {},

@@ -76,6 +76,8 @@ export function MapView() {
           openPanel({ type: 'centralBank', countryId: pin.countryId });
         else if (pin.kind === 'employer' || pin.kind === 'energySite')
           openPanel({ type: 'employer', siteId: pin.id });
+        else if (pin.kind === 'business' && pin.businessId)
+          openPanel({ type: 'business', businessId: pin.businessId });
         else if (pin.kind === 'university') openPanel({ type: 'university', siteId: pin.id });
         else if (pin.kind === 'hq') openPanel({ type: 'hq', officeId: pin.officeId });
         else if (pin.kind === 'office') openPanel({ type: 'office', listingId: pin.id });

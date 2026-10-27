@@ -3,10 +3,14 @@
 // renderer draws the engraved city for a camera. Plain data in, pixels out.
 import type { CityMap } from './citygen';
 
-/** Who occupies a storefront lot (or leases an office building), for roof flags and awnings. */
+/**
+ * Who occupies a storefront lot (or leases an office building), for roof flags
+ * and awnings. A 'business' (stage C5a) wears its AI vendor's awning: a rival
+ * lab's ink or your brand ink once you win the contract.
+ */
 export interface LotOccupant {
-  type: 'player' | 'rival';
-  /** Brand ink of the occupying bank. */
+  type: 'player' | 'rival' | 'business';
+  /** Brand ink of the occupying lab, or of the business's vendor. */
   ink: string;
 }
 

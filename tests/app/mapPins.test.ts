@@ -95,7 +95,10 @@ describe('map pins', () => {
   it('has one pin per storefront, yours first, anchored on the roof', () => {
     const { s, branchId, lots, map } = setup();
     const pins = buildPins(s, map, lots, NO_HQ);
-    expect(pins).toHaveLength(lots.length);
+    // Storefronts held by businesses (C5a) pin on the Businesses layer instead.
+    const offices = lots.filter((l) => l.occupant?.type !== 'business');
+    expect(offices.length).toBeLessThan(lots.length);
+    expect(pins).toHaveLength(offices.length);
     const mine = pins[0]!;
     expect(mine.kind).toBe('mine');
     expect(mine.branchId).toBe(branchId);
@@ -106,6 +109,25 @@ describe('map pins', () => {
     expect(pins.some((p) => p.kind === 'rival')).toBe(true);
     const open = pins.find((p) => p.kind === 'lot')!;
     expect(open.label).toBe(`Available sales office location, ${s.world.lots[open.id]!.address}`);
+  });
+
+  it("pins businesses on the Businesses layer in their vendor's colours (C5a)", () => {
+    const { s, lots, map } = setup();
+    const held = lots.filter((l) => l.occupant?.type === 'business');
+    const pins = buildPins(s, map, lots, STAGE5).filter((p) => p.kind === 'business');
+    expect(pins).toHaveLength(held.length);
+    const rivalHeld = pins.find((p) => s.businesses[p.businessId!]!.vendor?.type === 'rival')!;
+    expect(rivalHeld.caption).toBeTruthy();
+    const occ = occupantsOf(s, lots, STAGE5);
+    const biz = s.businesses[rivalHeld.businessId!]!;
+    expect(occ[rivalHeld.id]).toEqual({ type: 'business', ink: s.rivals[biz.vendor!.id]!.ink });
+    // Won: your brand ink on the awning and your seal on the pin.
+    biz.vendor = { type: 'player', id: 'player' };
+    expect(occupantsOf(s, lots, STAGE5)[rivalHeld.id]!.ink).toBe(s.meta.brandInk);
+    const mine = buildPins(s, map, lots, STAGE5).find((p) => p.id === rivalHeld.id)!;
+    expect(mine.partner).toBe(true);
+    cmd.setSettings(s, { layers: { employers: false } });
+    expect(buildPins(s, map, lots, STAGE5).some((p) => p.kind === 'business')).toBe(false);
   });
 
   it('follows the layer settings', () => {

@@ -33,7 +33,11 @@ export function CityList(p: { hideTitle?: boolean } = {}) {
   const city = CITIES[s.world.currentCityId];
 
   // Lot objects live for the whole game (only their occupant changes), so group once per city.
-  const lots = useMemo(() => cityLots(s), [s.world.lots, s.world.currentCityId]);
+  // Storefronts held by businesses (C5a) aren't for lease; they show on the Businesses layer.
+  const lots = useMemo(
+    () => cityLots(s).filter((l) => l.occupant?.type !== 'business'),
+    [s.world.lots, s.world.currentCityId],
+  );
   const groups = useMemo(() => groupByDistrict(lots), [lots]);
 
   const free = lots.filter((l) => !l.occupant).length;
