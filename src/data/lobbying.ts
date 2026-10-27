@@ -41,8 +41,9 @@ export interface LobbyCampaignSpec {
 export const LOBBY_CAMPAIGNS: LobbyCampaignSpec[] = [
   {
     id: 'easeBuffer',
-    title: 'Ease the capital buffer by 1pp for 4 quarters',
-    description: 'Every capital tier threshold drops by one point for a year in this country.',
+    title: 'Ease the AI safety rules for 4 quarters',
+    description:
+      'Every safety tier line drops by five points (one notch of buffer) for a year in this country.',
     cost: 2_500_000,
     success: 0.55,
     exposure: 0.12,
@@ -50,16 +51,16 @@ export const LOBBY_CAMPAIGNS: LobbyCampaignSpec[] = [
   {
     id: 'fastTrack',
     title: 'Fast-track a merger review',
-    description: 'Your next acquisition may take you to 45% of a city’s deposits instead of 35%.',
+    description: 'Your next acquisition may take you to 65% of a city’s market instead of 50%.',
     cost: 1_500_000,
     success: 0.6,
     exposure: 0.1,
   },
   {
     id: 'stallBuffer',
-    title: 'Stall the capital buffer bill',
+    title: 'Stall the AI safety bill',
     description:
-      'A capital buffer bill before lawmakers here fails its vote. Only while one is pending.',
+      'An AI safety bill before lawmakers here fails its vote. Only while one is pending.',
     cost: 1_200_000,
     success: 0.5,
     exposure: 0.15,

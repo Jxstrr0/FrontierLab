@@ -1,10 +1,16 @@
-// Your bank's valuation (SIMULATION §19.2, §19.5): trailing ROE and the
-// private valuation per share. The public price model lives in market code.
-import { COE, PRIVATE_VALUATION, QUARTERS_PER_YEAR } from '../config/balance';
+// Your lab's valuation (SIMULATION §19.2, §19.5; stage C7b): trailing ROE,
+// revenue growth, and the revenue multiple that values the company at ARR ×
+// a multiple set by growth and model quality, with book value as the floor.
+// The private valuation per share is that value with a private discount; the
+// public price model lives in equityPrice.ts.
+import { PRIVATE_VALUATION, QUARTERS_PER_YEAR, VALUATION } from '../config/balance';
+import { companyArr } from './arr';
 import { balanceSheet } from './balanceSheet';
+import { dpow } from './detmath';
 import { clamp } from './math';
 import { bookValuePerShare } from './shares';
 import type { GameState } from './state';
+import { activeModel, modelQuality, qualityBar } from './underwriting';
 
 /** Trailing net income over the last four reported quarters (annualised if fewer). */
 export function netIncomeTtm(state: GameState): number {
@@ -19,10 +25,43 @@ export function roeTtm(state: GameState, equity = balanceSheet(state).equity): n
   return equity > 0 ? netIncomeTtm(state) / equity : 0;
 }
 
-/** §19.2: valuation/share = BVPS × clamp(ROE_ttm / COE, 0.5, 2.5) × 0.8. */
+/**
+ * §19.2: the latest quarter's revenue against the same quarter a year earlier.
+ * With under five quarters reported, the growth since the first one, scaled to
+ * a year; 0 before two quarters or while the base is zero.
+ */
+export function revenueGrowth(state: GameState): number {
+  const q = state.history.quarterly;
+  if (q.length < 2) return 0;
+  const last = q[q.length - 1]!.revenue;
+  const back = Math.min(QUARTERS_PER_YEAR, q.length - 1);
+  const base = q[q.length - 1 - back]!.revenue;
+  if (base <= 0 || last <= 0) return 0;
+  return dpow(last / base, QUARTERS_PER_YEAR / back) - 1;
+}
+
+/** §19.2: base + growthSlope × growth + qualitySlope × the model's lead over the bar, clamped. */
+export function revenueMultiple(state: GameState): number {
+  const growth = clamp(revenueGrowth(state), 0, VALUATION.growthCap);
+  const lead = modelQuality(activeModel(state)) - qualityBar(state);
+  return clamp(
+    VALUATION.base + VALUATION.growthSlope * growth + VALUATION.qualitySlope * lead,
+    ...VALUATION.range,
+  );
+}
+
+/** §19.2: what the business is worth per share: ARR × multiple, never below book value. */
+export function fundamentalPerShare(
+  state: GameState,
+  equity = balanceSheet(state).equity,
+  discount = 1,
+): number {
+  const shares = Math.max(1, state.company.sharesOutstanding);
+  const byRevenue = (companyArr(state) * revenueMultiple(state) * discount) / shares;
+  return Math.max(0, bookValuePerShare(state, equity), byRevenue);
+}
+
+/** §19.2: valuation/share = max(BVPS, ARR × multiple × 0.8 ÷ shares). */
 export function privateValuation(state: GameState): number {
-  const equity = balanceSheet(state).equity;
-  const pb =
-    clamp(roeTtm(state, equity) / COE, ...PRIVATE_VALUATION.pb) * PRIVATE_VALUATION.discount;
-  return Math.max(0, bookValuePerShare(state, equity) * pb);
+  return fundamentalPerShare(state, undefined, PRIVATE_VALUATION.discount);
 }

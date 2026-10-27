@@ -16,7 +16,6 @@ import {
 } from '../../src/sim/insider';
 import type { GameState } from '../../src/sim/state';
 import { publicBank } from '../helpers/markets';
-import { openScriptedBranch } from '../helpers/scenario';
 
 const setWeek = (s: GameState, week: number) => {
   s.clock.week = week;
@@ -78,7 +77,7 @@ describe('insider fine', () => {
 
   it('raises the probe at quarter-end; settling pays from personal cash with a rating hit', () => {
     const s = listed(1);
-    const branch = openScriptedBranch(s, 'midtown');
+    const branch = Object.keys(s.branches)[0]!; // the office holding its ARR
     s.branches[branch]!.status = 'open';
     expect(tradeUntilCase(s)).toBeGreaterThan(0);
     const c = s.personal.empire.insider.pending[0]!;
