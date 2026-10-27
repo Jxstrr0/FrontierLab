@@ -13,9 +13,7 @@ import type { GameState } from './state';
 export interface BalanceSheet {
   cash: number;
   reserves: number;
-  bonds: number;
   loans: number;
-  reo: number;
   fixedAssets: number;
   leaseDeposits: number;
   /** Unamortized partnership signing fees (deducted from CET1, §15). */
@@ -44,7 +42,6 @@ export interface BalanceSheet {
   taxPayable: number;
   liabilities: number;
   equity: number;
-  aoci: number;
   expectedEquity: number;
 }
 
@@ -107,7 +104,6 @@ export function balanceSheet(state: GameState): BalanceSheet {
   const c = state.company;
   const t = state.treasury;
   const loans = loanTotals(state).total;
-  const reo = Object.values(state.reo).reduce((sum, p) => sum + p.value, 0);
   const fixedAssets = c.fixedAssets.reduce((sum, a) => sum + assetBookValue(a), 0);
   const intangibles = intangibleAssets(state);
   const investments = holdingsValue(state, 'company');
@@ -119,9 +115,7 @@ export function balanceSheet(state: GameState): BalanceSheet {
   const assets =
     c.cash +
     t.reserves +
-    t.bondsMarket +
     loans +
-    reo +
     fixedAssets +
     c.leaseDeposits +
     intangibles +
@@ -137,13 +131,10 @@ export function balanceSheet(state: GameState): BalanceSheet {
   const corporateDebt = corporateDebtTotal(state);
   const dividendsPayable = state.governance.pendingDividend?.total ?? 0;
   const liabilities = deposits + wholesale + corporateDebt + dividendsPayable + c.taxPayable;
-  const aoci = t.bondsMarket - t.bondsBook;
   return {
     cash: c.cash,
     reserves: t.reserves,
-    bonds: t.bondsMarket,
     loans,
-    reo,
     fixedAssets,
     leaseDeposits: c.leaseDeposits,
     intangibles,
@@ -162,9 +153,7 @@ export function balanceSheet(state: GameState): BalanceSheet {
     taxPayable: c.taxPayable,
     liabilities,
     equity: assets - liabilities,
-    aoci,
     // Net income posted since the last weekly close hasn't reached retained earnings yet.
-    expectedEquity:
-      c.paidInCapital + c.retainedEarnings + aoci + summarize(state.ledger.pnl).netIncome,
+    expectedEquity: c.paidInCapital + c.retainedEarnings + summarize(state.ledger.pnl).netIncome,
   };
 }

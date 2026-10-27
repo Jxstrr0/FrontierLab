@@ -255,12 +255,9 @@ export const RIVALS: Record<string, RivalSpec> = {
 };
 
 export interface StrategyProfile {
-  /** Price offsets from the default rule, as decimals (pp). Fees are a % multiplier. */
-  savings: number;
-  gic: number;
+  /** Loan Desk rate offset from the default rule, as a decimal (pp). */
   loans: number;
-  mortgage: number;
-  cardApr: number;
+  /** Fee multiplier on fee-priced products (plans, API, apps). */
   fees: number;
   /** Quality profile: Rates, Products, Service, Branch. */
   quality: [number, number, number, number];
@@ -269,41 +266,25 @@ export interface StrategyProfile {
 
 export const STRATEGY_PROFILES: Record<Strategy, StrategyProfile> = {
   incumbent: {
-    savings: -0.002,
-    gic: -0.001,
     loans: 0.002,
-    mortgage: 0.001,
-    cardApr: 0.01,
     fees: 0.1,
     quality: [2.8, 3.6, 3.2, 3.6],
     app: 3.6,
   },
   disruptor: {
-    savings: 0.006,
-    gic: 0.0025,
     loans: -0.003,
-    mortgage: -0.001,
-    cardApr: -0.02,
     fees: -0.6,
     quality: [4.3, 3.4, 3.0, 2.5],
     app: 4.6,
   },
   premium: {
-    savings: -0.004,
-    gic: -0.0015,
     loans: 0.005,
-    mortgage: 0.002,
-    cardApr: 0.02,
     fees: 0.4,
     quality: [2.4, 4.0, 4.4, 4.6],
     app: 4.0,
   },
   community: {
-    savings: 0.0015,
-    gic: 0.001,
     loans: -0.0025,
-    mortgage: -0.0015,
-    cardApr: -0.015,
     fees: -0.2,
     quality: [3.6, 3.0, 4.0, 3.0],
     app: 2.8,

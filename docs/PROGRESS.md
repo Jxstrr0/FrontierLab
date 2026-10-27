@@ -3,13 +3,35 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C3b done (v0.1.11, save schema 7): compute costs, AI-style statements and the Loan Desk's lending fund. C3a (v0.1.10, schema 6) brought the AI product catalog. Next is C3c (removing the leftover bank machinery). C2 (v0.1.5–v0.1.9) and C1 (v0.1.4) are done. The owner's decisions are in the design brief and CONVERSION_PLAN §5.
+**Current stage:** C3 done. C3c (v0.1.12, save schema 8) removed the leftover bank machinery; C3b (v0.1.11) brought compute costs, AI statements and the lending fund; C3a (v0.1.10) the AI product catalog. Next is C4 (compute). C2 (v0.1.5–v0.1.9) and C1 (v0.1.4) are done. The owner's decisions are in the design brief and CONVERSION_PLAN §5.
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `12083e8011b7b4` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `0b4f2c7e9da8e8` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-27 — Stage C3c: the last bank machinery goes (v0.1.12)
+
+**What you asked for:** "Finish C3c, roll on with it." This is the last part of C3: clearing out bank features an AI lab has no use for.
+
+**What's gone.**
+- **Foreclosed homes.** They came from unpaid mortgages, and the lab has none. The Company → Real estate card now lists only the buildings you own.
+- **Government bonds.** The treasury no longer buys bonds with part of its reserves. The HQ Treasury floor loses the Bonds card and the "Bond share" slider, and the balance sheet loses the "Unrealised bond gains" line.
+- **Covered bonds.** This funding-market offer needed mortgages as security, so it could never appear any more. Term Interbank is the one market offer now.
+- **The HQ "Transfer cash to Treasury" card.** The Loan Desk tab's lending fund button does the same job, so there's now one place to do it. Behind the scenes the command is renamed `topUpLendingFund`.
+- **Old bank code.** The savings, term-deposit, mortgage, credit card, wealth, safe-box and FX paths in the office books, the rivals' savings and mortgage price offsets, and about 15 bank-only tuning numbers.
+- **The $2M charter floor.** Before, if the company's equity dipped under $2M, the regulator badge jumped to Critical whatever the capital ratio said. Now the badge follows the ratio alone. The capital rules get a full rework in C7.
+
+**Kept on purpose.** The "Compute Allowance" staff benefit still has the internal id `mortgage_disc`, because saves remember benefits by id. Its stepper now says "discount on compute". A few income-statement lines that nothing posts to any more (bond coupons and similar) stay at zero so old weekly records keep their shape.
+
+**Old saves.** Schema 7 → 8. Any foreclosed homes are sold into company cash at their value. Any bonds are sold into treasury reserves at market, and their gain or loss moves into retained earnings so equity doesn't change. Any covered bond loans become Term Interbank loans. A new test builds an old save holding all three, loads it, checks equity is unchanged and plays on 4 weeks.
+
+**Balance.** Basically unchanged, as expected, since a new lab never bought bonds or foreclosed homes. Across 20 cities (median city), every office checkpoint passes. ARR at weeks 26 / 52 / 104 / 156 / 208 / 260 reads $1.5M / $3.4M / $9.8M / $17.0M / $20.5M / $22.9M, payback is 42.5 weeks, and cash stays above zero in every city. Seed 42 steady gives the same six single-city warnings as main, and $1.0B ARR in year 10. Aggressive still dips under zero cash on seed 42 (−$71k at its lowest, a little better than before).
+
+**Checks.** `npm run lint`, all 879 tests and `npm run build` pass. The **determinism snapshot** moved from `12083e8011b7b4` to `0b4f2c7e9da8e8` (intended: without bonds, all reserves earn the reserve rate).
+
+**Next:** C4, compute. Treasury becomes the Compute floor, with GPU lots, a compute price index, a headroom gauge and outages when you outgrow your capacity.
 
 ### 2026-10-27 — Stage C3b: compute, AI statements and the lending fund (v0.1.11)
 

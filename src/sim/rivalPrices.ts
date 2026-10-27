@@ -39,10 +39,7 @@ export function rivalTargetPrice(
   // Price wars (§18.6) cut plan prices.
   const cut = spec.kind === 'plan' && spec.category === 'deposits' ? depositBump : 0;
   if (spec.priceType !== 'rate') price = base * (1 + p.fees - cut);
-  else if (spec.id === 'savings') price = base + p.savings;
-  else if (spec.id === 'gic1y') price = base + p.gic;
-  else if (spec.id === 'mortgage') price = base + p.mortgage;
-  else if (spec.id === 'credit_card') price = base + p.cardApr;
+  // C3c: the bank-only savings, term-deposit, mortgage and card offsets are gone.
   else price = base + p.loans;
   // Difficulty edge: better deposit rates, cheaper loans (in pp).
   if (spec.priceType === 'rate') price += isDeposit(spec) ? edge / 100 : -edge / 100;

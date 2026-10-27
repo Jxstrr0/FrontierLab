@@ -110,7 +110,7 @@ function LendingFund(p: { reserves: number; cash: number; sym: string }) {
         type="button"
         class="btn btn-secondary btn-block"
         disabled={step <= 0}
-        onClick={() => act(cmd.transferToTreasury, step)}
+        onClick={() => act(cmd.topUpLendingFund, step)}
       >
         Add {money(step, p.sym)} from company cash
       </button>

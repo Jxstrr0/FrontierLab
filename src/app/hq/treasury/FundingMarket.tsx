@@ -1,6 +1,6 @@
 // Funding market (SCREENS §10 Treasury, SIMULATION §13.6): offer cards with
 // counterparty, type, fixed rate, term and rosette, an amount slider up to
-// what you can borrow (covered bonds are capped by mortgage cover), Borrow,
+// the offer size, Borrow,
 // and when the next set of offers arrives.
 import { useState } from 'preact/hooks';
 import { WEEKS_PER_YEAR } from '../../../config/balance';
@@ -53,7 +53,6 @@ function OfferCard({ offer }: { offer: FundingOffer }) {
   const max = maxBorrow(s, offer);
   const [amount, setAmount] = useState(max);
   const value = Math.min(amount, max);
-  const capped = max < offer.amount;
   const borrow = () => {
     const r = act(cmd.borrowOffer, offer.id, value);
     if (r.ok) toast(`Borrowed ${money(value, sym)} from ${offer.counterparty}.`, 'good');
@@ -77,13 +76,6 @@ function OfferCard({ offer }: { offer: FundingOffer }) {
         />
         <FundingRosette radar={offer.radar} />
       </div>
-      {capped && (
-        <p class="muted small tr-under">
-          {max > 0
-            ? `Mortgage cover limits this to ${money(max, sym)}.`
-            : 'Covered bonds need more mortgages on the books first.'}
-        </p>
-      )}
       <AmountSlider label="Borrow" value={value} max={max} onChange={setAmount} sym={sym} />
       <button
         type="button"

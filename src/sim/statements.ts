@@ -58,7 +58,7 @@ export function closeWeek(state: GameState): WeeklySnapshot {
       loans: loanTotals(state).total,
       equity: bs.equity,
       rwa: cap.rwa,
-      liquid: bs.reserves + bs.bonds,
+      liquid: bs.reserves,
       taxPayable: bs.taxPayable,
     },
     pnl: { ...state.ledger.pnl },

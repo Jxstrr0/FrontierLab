@@ -1,11 +1,10 @@
 // Read-only views of GameState for the real estate screens (SCREENS §16, §24):
 // what a building's panel shows (for sale, owned or neither), the Company
-// panel's list of company buildings and each city's foreclosed homes.
+// panel's list of company buildings.
 import { REAL_ESTATE } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { marketRentNow, propertyWeek } from '../../sim/propertyMath';
-import { reoWeek } from '../../sim/reo';
-import type { GameState, Property, PropertyListing, ReoPool, Site } from '../../sim/state';
+import type { GameState, Property, PropertyListing, Site } from '../../sim/state';
 
 export type PropertyView =
   | { kind: 'listed'; site: Site; listing: PropertyListing; marketRent: number; refreshIn: number }
@@ -58,36 +57,4 @@ export function ownedBuildings(s: GameState, owner: Property['owner']): OwnedRow
       net: propertyWeek(p).net,
       forSale: p.forSale,
     }));
-}
-
-export interface ReoRow {
-  cityId: string;
-  city: string;
-  pool: ReoPool;
-  units: number;
-  carrying: number;
-  rent: number;
-  /** Weeks until a Sell all settles (selling only). */
-  sellsIn?: number;
-}
-
-/** Foreclosed homes per city, largest first. */
-export function reoRows(s: GameState): ReoRow[] {
-  return Object.entries(s.reo)
-    .filter(([, pool]) => pool.value > 0)
-    .sort(([a, pa], [b, pb]) => pb.value - pa.value || a.localeCompare(b))
-    .map(([cityId, pool]) => {
-      const wk = reoWeek(pool);
-      const row: ReoRow = {
-        cityId,
-        city: CITIES[cityId]?.name ?? cityId,
-        pool,
-        units: Math.max(1, Math.round(pool.units)),
-        carrying: wk.carrying,
-        rent: wk.rent,
-      };
-      if (pool.mode === 'selling' && pool.sellWeek !== undefined)
-        row.sellsIn = Math.max(1, pool.sellWeek - s.clock.week);
-      return row;
-    });
 }

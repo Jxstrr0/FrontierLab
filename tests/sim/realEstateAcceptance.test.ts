@@ -67,18 +67,8 @@ describe('real estate ties out', () => {
     expect(afterPersonal.equity).toBeCloseTo(afterCompany.equity, 6);
     expect(personalBefore.realEstate).toBe(0);
 
-    // Foreclosed homes funded by shareholders, so the identity holds from the start.
-    const reoValue = 3_000_000;
-    const pool = (s.reo.cal ??= { units: 0, value: 0, mode: 'rent', hpiRef: 100 });
-    pool.value += reoValue;
-    pool.units += 10;
-    s.company.paidInCapital += reoValue;
-    checkIdentity(s);
-
     const companyId = cheap!.siteId;
     let sold = false;
-    let reoSold = false;
-    let cashBeforeReoSale = 0;
     for (let week = 1; week <= 30; week++) {
       if (week % 5 === 0) s.world.countries.CA!.cre *= week % 10 === 0 ? 0.96 : 1.05;
       if (week === 3) {
@@ -87,11 +77,6 @@ describe('real estate ties out', () => {
       }
       if (week === 12) {
         expect(cmd.setPropertyForSale(s, companyId, true).ok).toBe(true);
-      }
-      if (week === 18 && s.reo.cal) {
-        cashBeforeReoSale = s.company.cash;
-        expect(cmd.setReoMode(s, 'cal', 'selling').ok).toBe(true);
-        expect(cmd.setReoMode(s, 'cal', 'rent').ok).toBe(false);
       }
       checkIdentity(s);
       advanceWeeks(s, 1);
@@ -105,13 +90,8 @@ describe('real estate ties out', () => {
         expect(pb.realEstate).toBeCloseTo(realEstateValue(s, account), 6);
       }
       if (!s.realEstate.properties[companyId]) sold = true;
-      if (week > 18 && !s.reo.cal && !reoSold) {
-        reoSold = true;
-        expect(s.company.cash).toBeGreaterThan(cashBeforeReoSale);
-      }
     }
     expect(sold).toBe(true);
-    expect(reoSold).toBe(true);
     // The private building is still held and never entered the bank's books.
     expect(s.realEstate.properties[next!.siteId]!.owner).toBe('personal');
     expect(balanceSheet(s).realEstate).toBe(0);
