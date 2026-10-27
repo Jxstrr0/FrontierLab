@@ -1,8 +1,8 @@
-// Property readout on the CREO's profile (SCREENS §10.1): how many buildings
-// the chief manages for the bank and for you, the premium over market their
+// Property readout on the CFO's profile (SCREENS §10.1): how many buildings
+// the CFO manages for the lab and for you, the premium over market their
 // tenants accept (SIMULATION §21.2 pricing power) and when the next rent
 // review falls; then, for each Buying switch that is on, the building the
-// chief would buy next and when, or what is holding them back (§21.1).
+// CFO would buy next and when, or what is holding them back (§21.1).
 import { EXEC_DELEGATION } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { buyingOn, nextPurchase } from '../../sim/execBuying';

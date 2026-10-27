@@ -20,7 +20,6 @@ import { settleCompute, tallyCompute, updateComputeIndex } from './compute';
 import { refreshGpuOffers, retireGpuLots } from './gpuMarket';
 import { runDataCenters } from './dataCenters';
 import { runExecutives } from './executives';
-import { hrFillVacancies } from './hrHiring';
 import { governanceQuarter, runGovernance } from './governance';
 import { marketsQuarter, runMarkets } from './market';
 import { runFx } from './fx';
@@ -126,7 +125,6 @@ export function weeklyTick(state: GameState): void {
   runCorporateDebt(state); // 8 (corporate debt)
   runExecutives(state); // 8 (executives, §17.2)
   runTalent(state); // 8 (researcher pay, C6c)
-  hrFillVacancies(state); // 8 (HR fills manager vacancies, §16.11)
   runManagerPoaching(state); // 8 (branch managers poached, §17.1)
   runGovernance(state); // 8 (dividends due)
   runMergers(state); // 8 (M&A responses and integrations, §19.8)

@@ -4,8 +4,9 @@
 // releases bigger. Each quarter rivals bid for your researchers (the
 // RESEARCHER_POACHED case decides), free researchers sign with rivals, and
 // new graduates join the market. Hiring and releasing are commands in
-// commands/talent.ts. Also the Chief Scientist's lift on training odds.
-import { CHIEF_SCIENTIST, RESEARCHERS, WEEKS_PER_YEAR } from '../config/balance';
+// commands/talent.ts. Also the CPO's lift on training odds (the Chief
+// Scientist's until schema 22).
+import { CPO_TRAINING, RESEARCHERS, WEEKS_PER_YEAR } from '../config/balance';
 import { CITIES } from '../data/cities';
 import { raiseIncident } from './incidents';
 import { newId } from './ids';
@@ -60,10 +61,10 @@ export function hireTerms(state: GameState, r: Researcher): { salary: number; si
   return { salary, signing };
 }
 
-/** §16.13: the Chief Scientist's addition to a training run's score. */
-export function chiefScientistBonus(state: GameState): number {
-  const csci = state.executives.seats.csci;
-  return csci ? (CHIEF_SCIENTIST.scoreMax * csci.expertise) / 100 : 0;
+/** §16.13: the seated CPO's addition to a training run's score, by their expertise. */
+export function cpoTrainingBonus(state: GameState): number {
+  const cpo = state.executives.seats.cpo;
+  return cpo ? (CPO_TRAINING.scoreMax * cpo.expertise) / 100 : 0;
 }
 
 /** §16.13: your researchers' addition to a training run's score with this focus. */

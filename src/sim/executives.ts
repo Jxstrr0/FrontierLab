@@ -1,10 +1,10 @@
 // Executives (SIMULATION §17.2), tick step 8: candidate pools, weekly payroll
 // (P&L execPay, cash), equity grants (execGrants.ts), the delegations each
-// executive has switched on (execDelegations*.ts, payReviews.ts; the CREO's
-// rents in execDelegationsProperty.ts, the CFO's investing in execInvesting.ts, the Chief
-// Scientist's training runs in execDelegationsResearch.ts), the CFO and
-// CRO's branch guidance (branchGuidance.ts) and resignations, which raise the
-// EXEC_POACHED incident. Hiring, firing and grants are player commands in
+// executive has switched on (execDelegations*.ts, payReviews.ts; the CFO's
+// rents in execDelegationsProperty.ts, its buying in execBuying.ts and its
+// investing in execInvesting.ts; the CPO's training runs in
+// execDelegationsResearch.ts), the COO, CMO and CPO's sales office guidance
+// (branchGuidance.ts) and resignations, which raise the EXEC_POACHED incident. Hiring, firing and grants are player commands in
 // commands/executives.ts; seat lookups other systems read are in execSeats.ts.
 import { WEEKS_PER_YEAR } from '../config/balance';
 import { EXEC_SEATS } from '../data/executives';
@@ -12,16 +12,10 @@ import { BENEFIT_RULES } from '../data/benefits';
 import { refreshExecCandidates } from './execCandidates';
 import { cfoCapital, cfoShares } from './execDelegationsCapital';
 import { cooExpansion } from './execDelegationsGrowth';
-import { creoBankRents, creoPrivateRents } from './execDelegationsProperty';
-import { creoBankBuys, creoPrivateBuys } from './execBuying';
+import { cfoBankRents, cfoPrivateRents } from './execDelegationsProperty';
+import { cfoBankBuys, cfoPrivateBuys } from './execBuying';
 import { cfoBankInvests, cfoPrivateInvests } from './execInvesting';
-import {
-  cfoTreasury,
-  cpoDevelopments,
-  cpoModels,
-  cpoPricing,
-  ctoDigital,
-} from './execDelegationsFinance';
+import { cpoDevelopments, cpoModels, cpoPricing, ctoDigital } from './execDelegationsFinance';
 import {
   cmoBrand,
   cooBenefits,
@@ -30,7 +24,7 @@ import {
   croAppetite,
 } from './execDelegationsPeople';
 import { runBranchGuidance } from './branchGuidance';
-import { csciTraining } from './execDelegationsResearch';
+import { cpoTraining } from './execDelegationsResearch';
 import { runGrants } from './execGrants';
 import { cooPayReviews } from './payReviews';
 import { ctoCompute } from './execDelegationsCompute';
@@ -47,23 +41,22 @@ const DELEGATIONS: [ExecSeat, string, (s: GameState) => void][] = [
   ['coo', 'hrDivision', cooDivision],
   ['coo', 'hrBenefits', cooBenefits],
   ['coo', 'payReviews', cooPayReviews],
-  ['cfo', 'treasury', cfoTreasury],
   ['cfo', 'capital', cfoCapital],
   ['cfo', 'shares', cfoShares],
   ['cfo', 'bankInvests', cfoBankInvests],
   ['cfo', 'privateInvests', cfoPrivateInvests],
+  ['cfo', 'bankRents', cfoBankRents],
+  ['cfo', 'privateRents', cfoPrivateRents],
+  ['cfo', 'bankBuys', cfoBankBuys],
+  ['cfo', 'privateBuys', cfoPrivateBuys],
   ['cto', 'digital', ctoDigital],
   ['cto', 'compute', ctoCompute],
   ['cpo', 'developments', cpoDevelopments],
   ['cpo', 'models', cpoModels],
+  ['cpo', 'training', cpoTraining],
   ['cpo', 'pricing', cpoPricing],
   ['cmo', 'brand', cmoBrand],
   ['cro', 'appetite', croAppetite],
-  ['creo', 'bankRents', creoBankRents],
-  ['creo', 'privateRents', creoPrivateRents],
-  ['creo', 'bankBuys', creoBankBuys],
-  ['creo', 'privateBuys', creoPrivateBuys],
-  ['csci', 'training', csciTraining],
 ];
 
 /** Weekly cost of every seated executive's salary. */

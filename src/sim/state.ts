@@ -58,7 +58,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState } from './personalTypes';
 
-export const SCHEMA_VERSION = 21;
+export const SCHEMA_VERSION = 22;
 
 export interface GameState {
   schemaVersion: number;
@@ -424,21 +424,18 @@ export interface Company {
   /** The fit-out you last built with (schema v14): the build sheet and the COO start from it. */
   lastBuild?: BuildSpec;
   /**
-   * Branch guidance from the C-suite (schema v15, §17.2): whole steps that move
-   * delegated managers' pricing, Loan Desk approvals, wages, marketing and
-   * lineup. Staffing, marketing and products joined in schema v18.
+   * Sales office guidance from the C-suite (§17.2): whole steps that move
+   * delegated managers' wages, marketing and lineup (schema v18). The CFO and
+   * CSO's deposit and loan steps of schema v15 were removed in schema 22.
    */
   guidance: BranchGuidance;
 }
 
 /**
- * Positive deposits pays savers more; positive loans charges borrowers more and
- * approves less; positive staffing pays and staffs more; positive marketing
- * spends more on campaigns; positive products offers more and charges less.
+ * Positive staffing pays and staffs more; positive marketing spends more on
+ * campaigns; positive products offers more and charges less.
  */
 export interface BranchGuidance {
-  deposits: number;
-  loans: number;
   staffing: number;
   marketing: number;
   products: number;
@@ -781,8 +778,6 @@ export interface People {
   rerolls: Record<Id, number>;
   /** HR benefit control values by benefit id (§16.5). */
   benefits: Record<string, number>;
-  /** With an HR floor, HR hires a manager for every open branch without one (§16.11, schema v25). */
-  hrHiring: boolean;
 }
 
 export interface Manager {
