@@ -167,6 +167,9 @@ describe('equity grants', () => {
     const paidIn = s.company.paidInCapital;
     for (let w = 0; w < VEST_WEEKS; w++) {
       tick(s);
+      // Loyalty caps at 100, so a rival can still bid now and then: keep them.
+      for (const inc of s.incidents.active.filter((i) => i.type === 'EXEC_POACHED'))
+        cmd.resolveIncident(s, inc.id, 'counter');
       expect(identityGap(s)).toBeLessThan(1);
       expect(holderTotal(s)).toBe(s.company.sharesOutstanding);
       if (w + 1 === WEEKS_PER_YEAR) {

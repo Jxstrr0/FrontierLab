@@ -211,6 +211,23 @@ export const INCIDENT_SPECS: Record<string, IncidentSpec> = {
     ],
     worst: 'release',
   },
+  RESEARCHER_POACHED: {
+    id: 'RESEARCHER_POACHED',
+    title: 'Researcher poached',
+    scope: 'company',
+    trigger: 'triggered',
+    yours: true,
+    text: '{rival} is trying to hire away our researcher {name}.',
+    options: [
+      { id: 'counter', label: 'Counter-offer', effect: 'Their salary +25%.' },
+      {
+        id: 'release',
+        label: 'Let them go',
+        effect: 'They join the rival lab, and its next models get better.',
+      },
+    ],
+    worst: 'release',
+  },
   BRANCH_FLOOD: {
     id: 'BRANCH_FLOOD',
     title: 'Heatwave',

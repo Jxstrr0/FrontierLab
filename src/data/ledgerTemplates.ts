@@ -271,6 +271,36 @@ const BANK_TEMPLATES = {
       b: 'A {score} benchmark score puts the new model first on the board. Rival labs are expected to answer.',
     },
   ],
+  RESEARCHER_HIRED: [
+    {
+      h: '{bank} hires researcher {name}',
+      b: '{name} joins the lab’s training team.',
+    },
+    {
+      h: '{name} signs with {bank}',
+      b: 'The researcher starts work on the lab’s next model.',
+    },
+  ],
+  RESEARCHER_POACHED_FROM: [
+    {
+      h: '{bank} lures {name} from {rival}',
+      b: 'A signing bonus and a bigger salary win the talent war this time. {rival} loses a key researcher.',
+    },
+    {
+      h: '{name} leaves {rival} for {bank}',
+      b: 'One of {rival}’s researchers changes sides, and {bank}’s next model should show it.',
+    },
+  ],
+  RESEARCHER_LEFT: [
+    {
+      h: '{rival} hires {name} away from {bank}',
+      b: 'The researcher takes their know-how to a rival lab.',
+    },
+    {
+      h: '{bank} loses {name} to {rival}',
+      b: '{bank} chose not to match the offer. {rival}’s next model should be the better for it.',
+    },
+  ],
   RIVAL_MODEL_RELEASED: [
     {
       h: '{bank} ships {model}',

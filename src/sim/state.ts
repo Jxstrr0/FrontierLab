@@ -57,7 +57,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState } from './personalTypes';
 
-export const SCHEMA_VERSION = 15;
+export const SCHEMA_VERSION = 16;
 
 export interface GameState {
   schemaVersion: number;
@@ -84,6 +84,8 @@ export interface GameState {
   underwriting: UnderwritingState;
   /** Training runs and the frontier (stage C6b). */
   training: TrainingState;
+  /** Named researchers and who employs them: the talent war (stage C6c, schema 16). */
+  talent: TalentState;
   treasury: Treasury;
   /** Open RFPs on the Deal Desk (stage C5b; schema 13). Contracts live on the businesses. */
   dealDesk: { rfps: Record<Id, Rfp> };
@@ -844,6 +846,27 @@ export interface TrainingRun {
   /** Star odds [1★..5★] fixed at the start. */
   odds: number[];
   startWeek: Week;
+}
+
+/** A named AI researcher (stage C6c, §16.13). */
+export interface Researcher {
+  id: Id;
+  name: string;
+  portrait: AvatarSpec;
+  /** Radar axis they are best at (0 Reasoning … 4 Efficiency). */
+  specialty: number;
+  /** 1–5. */
+  stars: number;
+  /** Yearly salary. */
+  salary: Money;
+  /** Who employs them; absent while on the market. */
+  employer?: { type: 'player' } | { type: 'rival'; id: Id };
+  /** Week they joined their current lab. */
+  joinedWeek?: Week;
+}
+
+export interface TalentState {
+  researchers: Record<Id, Researcher>;
 }
 
 export interface TrainingState {

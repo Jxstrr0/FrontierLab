@@ -12,13 +12,24 @@ import { newId } from './ids';
 import { spend } from './ledger';
 import { bestRivalModel } from './rivalModels';
 import { stream } from './rng';
+import { chiefScientistBonus, researchBonus } from './talent';
 import type { GameState, TrainingRun, UnderwritingModel } from './state';
 import { activeModel, customFigures, modelQuality, trainedRadar } from './underwriting';
 
-/** Star odds [1★..5★] for a run of `weeks` at `weeklyBudget` with today's team. */
-export function trainingOdds(state: GameState, weeks: number, weeklyBudget: number): number[] {
+/**
+ * Star odds [1★..5★] for a run of `weeks` at `weeklyBudget` with today's team,
+ * plus the Chief Scientist's and your researchers' lift (§16.13, C6c).
+ */
+export function trainingOdds(
+  state: GameState,
+  weeks: number,
+  weeklyBudget: number,
+  focus?: number,
+): number[] {
   return starOdds(
-    devScore(state, weeks, weeklyBudget, TRAINING.minWeekly, TRAINING.maxBudgetScoreAt),
+    devScore(state, weeks, weeklyBudget, TRAINING.minWeekly, TRAINING.maxBudgetScoreAt) +
+      chiefScientistBonus(state) +
+      researchBonus(state, focus),
   );
 }
 

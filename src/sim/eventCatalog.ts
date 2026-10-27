@@ -48,6 +48,10 @@ export interface EventPayloads {
   PRODUCT_DEVELOPED: { productId: string; name: string; stars: number };
   /** A training run finished: a new model generation (training.ts, C6b). */
   MODEL_TRAINED: { modelId: Id; name: string; stars: number; quality: number; leads: boolean };
+  /** You hired a researcher; `from` names the rival lab they left (commands/talent.ts, C6c). */
+  RESEARCHER_HIRED: { researcherId: Id; name: string; stars: number; from?: string };
+  /** One of your researchers left for a rival (RESEARCHER_POACHED, C6c). */
+  RESEARCHER_LEFT: { researcherId: Id; name: string; stars: number; rival: string };
   /** A rival lab shipped a new model; `leads` when it tops every rival model (rivalModels.ts, C6b). */
   RIVAL_MODEL_RELEASED: {
     rivalId: Id;

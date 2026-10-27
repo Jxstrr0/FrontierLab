@@ -208,6 +208,22 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
         priority: p.leads ? P.company : P.companyRoutine,
         tokens: { bank, name: str(p.name), score: num(p.quality).toFixed(1) },
       });
+    case 'RESEARCHER_HIRED':
+      return business({
+        key: p.from ? 'RESEARCHER_POACHED_FROM' : 'RESEARCHER_HIRED',
+        subject: str(p.researcherId),
+        icon: 'spark',
+        priority: num(p.stars) >= 4 ? P.company : P.companyRoutine,
+        tokens: { bank, name: str(p.name), rival: str(p.from, 'a rival lab') },
+      });
+    case 'RESEARCHER_LEFT':
+      return business({
+        key: 'RESEARCHER_LEFT',
+        subject: str(p.researcherId),
+        icon: 'spark',
+        priority: num(p.stars) >= 4 ? P.company : P.companyRoutine,
+        tokens: { bank, name: str(p.name), rival: str(p.rival, 'a rival lab') },
+      });
     case 'DIGITAL_PROJECT_DONE':
       return business({
         key: 'DIGITAL_PROJECT_DONE',

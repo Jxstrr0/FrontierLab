@@ -392,6 +392,10 @@ Provider names (fictional GPU clouds): Northbeam Cloud · Halcyon Compute · Str
 
 Rival model families (one per lab, numbered by generation, starting at 2): Wren, Lantern, Cobalt, Kestrel, Fathom, Juniper, Halyard, Tessel, Sable, Quarry, Marlin, Ember. Your trained models take the name you give them (the strategies use "Gen N").
 
+## 13c. Researchers and the Chief Scientist (C6c)
+
+Researchers take names and portraits from the shared person generator (the same lists as managers and executives), so every one is fictional. The Chief Scientist (short CSci) is the ninth executive seat, with one delegation, **Routine training runs**. A rival bidding for one of yours raises **Researcher poached**: "{rival} is trying to hire away our researcher {name}." It offers *Counter-offer* (their salary +25%) or *Let them go* (they join the rival lab, and its next models get better).
+
 ## 14. Employers (payroll partnerships)
 
 | Type | Employees | Income mult | Notes |

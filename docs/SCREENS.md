@@ -289,6 +289,7 @@ Tabs: Overview · Loans · Credit.
     - Start development
   - **Training run** (C6b): with no run, the model name (default "Gen N"), a focus picker over the five axes, training time (the development terms), weekly budget stepper ($20k up, step $5k) with total cost, an odds table (each star result with its % and lift, e.g. "+0.4 on all, +0.4 more Reasoning") and Start. While a run is under way: name, focus, progress bar, weeks left, budget and spent so far, and Cancel (with a confirm). "Paused: no Products floor" if the floor goes.
   - **Leaderboard** (C6b): a line on today's quality bar and your price headroom, then every lab ranked by model quality (rank, lab, model, quality to one decimal), your row highlighted. A rival HQ panel's Overview shows that lab's AI model (name · quality) and when it shipped.
+  - **Research team** (C6c): "Your team: N of 8", the training boost, and your researchers (portrait, name, stars, specialty, salary a year, **Let go** with a confirm) with the team's weekly pay. Then the **Talent market**: everyone else, best first (top 8, Show all), with where they work ("At <rival>" or "Available"), salary a year, the signing bonus when poaching, and **Hire** / **Poach**. The Training run card adds a line under its odds: "Your research team adds +N, the Chief Scientist +M." The Chief Scientist's profile shows their training-odds boost, and a rival HQ panel's Overview lists its researchers (count and stars).
   - Manage models lists trained models as "Trained · Gen N" with **Use as AI model**.
 - **Compute** (C4b; was Treasury):
   - An **Outage** or **Capacity crunch** banner at the top while either runs (C4c)
@@ -313,7 +314,7 @@ Tabs: Overview · Loans · Credit.
   - regulator status and last review result
 - **Executive:**
   - Board meeting card: explanation, last meeting date, Hold meeting (enabled once per quarter)
-  - Senior executives grid: eight seats (CEO, COO, CFO, CPO, CMO, CTO, CSO, CIO) with portrait, name and title; empty seats show Hire, which opens a sheet of the seat's candidates with a paid "New candidates · $fee" button at the bottom (as for branch managers)
+  - Senior executives grid: nine seats (CEO, COO, CFO, CPO, CMO, CTO, CSO, CIO, CSci; the Chief Scientist joined in C6c, and on a phone the last cell spans both columns) with portrait, name and title; empty seats show Hire, which opens a sheet of the seat's candidates with a paid "New candidates · $fee" button at the bottom (as for branch managers)
 - **Investment:**
   - portfolio value with weekly change, a donut (Stocks, Ventures, Real estate, Venture debt, Currencies) and List portfolio
   - Ventures carousel (vignette, name, sector, short description, founded, Details)

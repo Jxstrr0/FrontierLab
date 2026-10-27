@@ -29,6 +29,7 @@ import { ExecGrantForm } from './ExecGrantForm';
 import { GrowthCities } from './GrowthCities';
 import { GUIDANCE_SEATS, GuidanceNote } from './GuidanceNote';
 import { InvestNote } from './InvestNote';
+import { chiefScientistBonus } from '../../sim/talent';
 import { PropertyNote } from './PropertyNote';
 import { dayOf, execSalaryStepper, seatSpec, vestProgress } from './execSelectors';
 
@@ -82,6 +83,11 @@ export function ExecProfileSheet(p: { seat: ExecSeat; onClose: () => void }) {
               {p.seat === 'cfo' && (
                 <p class="muted small exec-note">
                   Statement delays are halved while a CFO is seated.
+                </p>
+              )}
+              {p.seat === 'csci' && (
+                <p class="muted small exec-note">
+                  Training odds boost: +{Math.round(chiefScientistBonus(s) * 100)} points.
                 </p>
               )}
               {p.seat === 'cto' && (
