@@ -56,6 +56,7 @@ import { regulatorReview } from './riskFloor';
 import { repriceRivalFees, updateRivalPrices } from './rivalPrices';
 import type { Branch, BusinessLoan, GameState } from './state';
 import { closeWeek, depreciate, quarterEnd } from './statements';
+import { renewContracts } from './businesses';
 import { runTreasury } from './treasury';
 import { updateModels } from './underwriting';
 import { productSpec } from './products';
@@ -140,6 +141,7 @@ export function weeklyTick(state: GameState): void {
     quarterEnd(state); // 13
     regulatorReview(state); // 13 (§15)
     rivalsQuarter(state); // 13 (rival earnings and failures)
+    renewContracts(state); // 13 (the renewal season for business contracts, C5a)
     marketsQuarter(state); // 13 (listed earnings, IPO listing)
     governanceQuarter(state); // 13 (board meeting unlocks)
     venturesQuarter(state); // 13 (ventures report and raise, §20.2)

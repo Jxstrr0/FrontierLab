@@ -26,6 +26,8 @@ export type PanelRoute =
   | { type: 'rivalHq'; siteId: string; tab?: 'overview' | 'loans' | 'credit' }
   | { type: 'centralBank'; countryId: CountryId }
   | { type: 'employer'; siteId: string }
+  // Stage C5a: a customer business on a storefront.
+  | { type: 'business'; businessId: string }
   | { type: 'university'; siteId: string }
   | { type: 'ledger'; week?: number }
   // Stage 6 (FEATURES.capitalMarkets)

@@ -44,6 +44,7 @@ import { CentralBankPanel } from '../centralbank/CentralBankPanel';
 import { IncidentModal } from '../incidents/IncidentModal';
 import { LedgerArchivePanel } from '../ledger/LedgerArchivePanel';
 import { EmployerPanel } from '../partners/EmployerPanel';
+import { BusinessPanel } from '../business/BusinessPanel';
 import { UniversityPanel } from '../partners/UniversityPanel';
 import { RivalBranchPanel } from '../rivals/RivalBranchPanel';
 import { RivalHqPanel } from '../rivals/RivalHqPanel';
@@ -123,6 +124,10 @@ function PanelHost() {
       return FEATURES.competition ? <CentralBankPanel countryId={p.countryId} /> : null;
     case 'employer':
       return FEATURES.competition ? <EmployerPanel key={p.siteId} siteId={p.siteId} /> : null;
+    case 'business':
+      return FEATURES.competition ? (
+        <BusinessPanel key={p.businessId} businessId={p.businessId} />
+      ) : null;
     case 'university':
       return FEATURES.competition ? <UniversityPanel key={p.siteId} siteId={p.siteId} /> : null;
     case 'ledger':

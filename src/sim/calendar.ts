@@ -63,3 +63,16 @@ export function previousQuarter(
   const prev = dateOf(startDate, day - DAYS_PER_WEEK);
   return { year: prev.getUTCFullYear(), q: quarterOf(prev) };
 }
+
+/**
+ * The week of the `n`-th quarter-start tick after `afterWeek` (n ≥ 1): the
+ * renewal season for business contracts (stage C5a).
+ */
+export function quarterStartWeek(startDate: string, afterWeek: number, n: number): number {
+  let week = afterWeek;
+  for (let found = 0; found < n;) {
+    week += 1;
+    if (isQuarterStart(startDate, week * DAYS_PER_WEEK)) found += 1;
+  }
+  return week;
+}

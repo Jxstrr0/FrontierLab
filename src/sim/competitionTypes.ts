@@ -2,7 +2,7 @@
 // debt from rival banks, incidents with their timed effects, The Weekly Ledger's
 // issues and the price-war tracker. Re-exported from state.ts; kept here so
 // state.ts stays readable. See docs/DATA_MODEL.md §6 and §8.
-import type { CountryId, Id, Money, Rate, Week } from '../data/types';
+import type { CountryId, Id, Money, Pentagon, Rate, Week } from '../data/types';
 
 // ─── Partnerships (SIMULATION §13.7) ──────────────────────────────────────────
 
@@ -236,4 +236,32 @@ export interface EmployerInfo {
   incomeMult: number;
   /** Rival bank holding the payroll today, if any. */
   partnerRivalId?: Id;
+}
+
+/** Business size (stage C5a): anchors are the city's major employers. */
+export type BusinessSize = 'small' | 'mid' | 'large' | 'anchor';
+
+/**
+ * A customer business (stage C5a, SIMULATION §11.0): on a spare storefront
+ * (`lotId`) or, for anchors, an employer site (`siteId`). Pentagon order:
+ * AI readiness, Budget, Data sensitivity, Switching cost, Financial health.
+ */
+export interface Business {
+  id: Id;
+  cityId: Id;
+  name: string;
+  /** Sector id in src/data/dealSectors.ts ('anchor' for employers). */
+  sector: string;
+  size: BusinessSize;
+  lotId?: Id;
+  siteId?: Id;
+  pentagon: Pentagon;
+  /** Yearly AI budget in money of the week it was set. */
+  budget: Money;
+  /** Who serves it today: you or a rival lab. None while it has no AI vendor. */
+  vendor?: { type: 'player' | 'rival'; id: Id };
+  /** Yearly value of its current contract. */
+  contractValue?: Money;
+  /** The quarter-start week its contract comes up for renewal. */
+  renewalWeek?: Week;
 }

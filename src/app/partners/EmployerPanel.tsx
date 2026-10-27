@@ -9,6 +9,8 @@ import { Card, Panel, Row, SectionTitle } from '../components';
 import { count, money } from '../format/format';
 import { LayerMedallion } from '../map/LayerIcon';
 import { closePanel, useGame } from '../store';
+import { businessAtSite } from '../../sim/businesses';
+import { BusinessCard } from '../business/BusinessCard';
 import { DealCard } from './DealCard';
 import { PartnerArt } from './PartnerArt';
 import { averageIncome, currentPartner, typeLabel } from './partnerView';
@@ -28,6 +30,7 @@ export function EmployerPanel(p: { siteId: string }) {
   const sym = s.settings.currency;
   const mine = !!cmd.activePartnership(s, site.id, 'payroll');
   const district = DISTRICT_SPECS[site.district]?.name;
+  const anchor = businessAtSite(s, site.id);
   return (
     <Panel
       title={e.name}
@@ -47,6 +50,12 @@ export function EmployerPanel(p: { siteId: string }) {
             tone={mine ? 'good' : undefined}
           />
         </Card>
+        {anchor && (
+          <>
+            <SectionTitle>Anchor account</SectionTitle>
+            <BusinessCard s={s} b={anchor} />
+          </>
+        )}
         <SectionTitle>{mine ? 'Yours' : 'Payroll deal'}</SectionTitle>
         <DealCard site={site} kind="payroll" people={e.employees} />
         {isRegional(site.cityId) && <EnergySiteCard siteId={site.id} />}

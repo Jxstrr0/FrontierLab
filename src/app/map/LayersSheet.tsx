@@ -138,6 +138,14 @@ function LayerPins(p: { id: MapLayerId; brand: Brand }) {
           <LayerMedallion id="vacationHomes" size={KEY_PX.medallion} />
         </>
       );
+    case 'employers':
+      // C5a: customer businesses and the anchor employers.
+      return (
+        <>
+          <LayerMedallion id="businesses" size={KEY_PX.medallion} />
+          <LayerMedallion id="employers" size={KEY_PX.medallion} />
+        </>
+      );
     default:
       return <LayerMedallion id={p.id} size={KEY_PX.medallion} />;
   }
