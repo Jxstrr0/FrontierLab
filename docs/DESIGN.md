@@ -233,7 +233,7 @@ Shown to the player in one place, the Company summary:
   | Restricted | ≥ 55% | No dividends, no new sales offices or acquisitions, new sign-ups halved |
   | Critical | < 55% | No new sign-ups, a fine each quarter |
 - **Mandated pause.** After eight weeks below 40%, the regulator offers an eight-week pause (no new customers, deals or training, for a fee) while its monitors work with your Safety team. Declining, or failing to recover, revokes the licence for 26 weeks, then a year of strict watch. It is never game over (`RECAP_OFFER` is the pause offer).
-- **Credit ratio.** The bank's old capital ratio (`capitalRatio`) lives on as the credit ratio lenders look at. It sets loan spreads and limits buybacks and acquisitions.
+- **Credit ratio.** The ratio of the lab's own capital to what it has at risk (`capitalRatio` in code). Lenders and the board watch it: it sets the price of corporate debt and limits buybacks and acquisitions.
 - **Outage rumour.** Very poor ratings while the safety tier is Restricted or Critical can start a rumour that the lab is about to go dark: customers cancel their plans fast for a few weeks until you respond with service credits, a price cut or a public statement (code `BANK_RUN`).
 
 ### 5.7 Macro and central banks
