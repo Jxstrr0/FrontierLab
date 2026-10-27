@@ -18,6 +18,7 @@ import { CITIES } from '../data/cities';
 import { PRODUCTS } from '../data/products';
 import { newComputeState } from './compute';
 import { capitalSnapshot } from './capital';
+import { safetySnapshot } from './safety';
 import { fullCoverage } from './hq';
 import { emptyLedger } from './ledger';
 import { initCountries } from './macro';
@@ -165,6 +166,7 @@ export function newGame(opts: NewGameOptions): GameState {
       negativeCashWeeks: 0,
       lowCapitalWeeks: 0,
       capitalRatio: 0,
+      safetyRatio: 1,
       liquidityRatio: null,
       appRating: START_APP_RATING,
       riskAppetite: DEFAULT_RISK_APPETITE,
@@ -253,7 +255,9 @@ export function newGame(opts: NewGameOptions): GameState {
 
   const cap = capitalSnapshot(state);
   state.company.capitalRatio = cap.capitalRatio;
-  state.company.tier = cap.tier;
+  const safety = safetySnapshot(state);
+  state.company.safetyRatio = safety.ratio;
+  state.company.tier = safety.tier;
   initCapitalMarkets(state);
   initInvestments(state);
   initPersonalEmpire(state);

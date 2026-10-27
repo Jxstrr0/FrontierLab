@@ -1,13 +1,12 @@
 // Finance floor content (SCREENS §10, DESIGN §5.8.1): total revenue and net
 // income with the weekly change, a 5-week bar chart, the company statements
-// (Income / Balance sheet / Cash flow × Week / Quarter / Year), the capital
+// (Income / Balance sheet / Cash flow × Week / Quarter / Year), the credit
 // ratio meter, the liquidity ratio and the risk appetite dial. Weeks a short-staffed team hasn't
 // closed (statementDelayWeeks) show as "Delayed" instead of numbers.
 import { capitalSnapshot } from '../../sim/capital';
 import { statementDelayWeeks } from '../../sim/hq';
 import { Badge, BarChart, Card, Row, SectionTitle } from '../components';
 import { dayOfWeek } from '../branch/selectors';
-import { CapitalFixes } from '../company/CapitalFixes';
 import { CapitalMeter, TIER_LABEL, TIER_TONE } from '../company/CapitalMeter';
 import { Statements } from '../company/Statements';
 import { capitalRatioText, delta, money, pct, shortDate } from '../format/format';
@@ -62,17 +61,20 @@ export function FinanceFloor() {
         </Card>
       )}
 
-      <SectionTitle>Capital and liquidity</SectionTitle>
+      <SectionTitle>Credit and liquidity</SectionTitle>
       <Card>
         <div class="cap-head">
           <div>
-            <div class="muted small">Capital ratio</div>
+            <div class="muted small">Credit ratio (what lenders price on)</div>
             <div class="hero-number">{capitalRatioText(cap.capitalRatio)}</div>
           </div>
-          <Badge tone={TIER_TONE[cap.tier]}>{TIER_LABEL[cap.tier]}</Badge>
+          <Badge tone={TIER_TONE[cap.tier]}>{TIER_LABEL[cap.tier]} credit</Badge>
         </div>
-        <CapitalMeter ratio={cap.capitalRatio} tier={cap.tier} />
-        <CapitalFixes tier={cap.tier} listing={s.stock.status} />
+        <CapitalMeter ratio={cap.capitalRatio} tier={cap.tier} kind="credit" />
+        <p class="muted small">
+          Lenders and bond buyers price your debt on this. The regulator looks at the safety ratio
+          on the Safety floor instead.
+        </p>
       </Card>
       <Card>
         <Row

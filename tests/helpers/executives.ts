@@ -23,6 +23,20 @@ export function execGame(extra: DeptId[] = []): GameState {
   return s;
 }
 
+/**
+ * Adds a well-staffed Safety & Alignment floor, so a lab funded past founder
+ * mode keeps a good safety tier and the regulator doesn't block it (C7a).
+ */
+export function staffSafety(s: GameState): void {
+  const office = Object.values(s.offices).find((o) => o.floors.includes(null))!;
+  const r = cmd.addFloor(s, office.id, 'risk');
+  if (!r.ok) throw new Error(r.reason);
+  const d = s.departments.risk!;
+  d.staff = 10;
+  d.skill = 80;
+  cmd.setDeptTarget(s, 'risk', 10);
+}
+
 /** Hires the first candidate for a seat and returns them. */
 export function hire(s: GameState, seat: ExecSeat): Executive {
   const c = s.executives.candidates[seat]![0]!;

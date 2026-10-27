@@ -162,6 +162,10 @@ export interface EventPayloads {
   COMPUTE_CRUNCH_ENDED: { bank: string };
   COMPUTE_OUTAGE: { bank: string };
   RECAP: { bank: string; amount: Money; shares: number };
+  // ─── The AI regulator (mandatedPause.ts, C7a) ───
+  SAFETY_PAUSE: { bank: string; weeks: number; fee: Money };
+  LICENCE_REVOKED: { bank: string; weeks: number };
+  LICENCE_RESTORED: { bank: string };
 
   // ─── Partnerships (partnerships.ts) ───────────────────────────────────────
   PARTNERSHIP_SIGNED: {
@@ -262,7 +266,7 @@ export interface EventPayloads {
     stockPct?: number;
   };
   CONVERSION_DONE: { rivalId: Id; bank: string; buyer: string; branches: number };
-  /** An accepted offer that could not close (cash or capital tier), or a target gone from the market. */
+  /** An accepted offer that could not close (cash or safety tier), or a target gone from the market. */
   MERGER_LAPSED: { rivalId: Id; bank: string; reason: string };
   /** A failed rival's network goes on sale in M&A (rivalQuarter.ts failureCheck, §18.5). */
   DISTRESSED_SALE: { rivalId: Id; bank: string; ask: Money; pb: number; weeks: number; n: number };

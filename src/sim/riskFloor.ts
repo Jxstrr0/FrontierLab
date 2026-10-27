@@ -1,9 +1,10 @@
-// Risk & Compliance (SIMULATION §15, §16; SCREENS §10): weekly loss records by
-// product, the selectors behind the Risk floor (loss table, delinquency, model
-// performance, regulator status) and the quarterly regulator review.
+// Safety & Alignment (SIMULATION §15, §16; SCREENS §10): weekly loss records by
+// product, the selectors behind the floor (loss table, delinquency, model
+// performance, regulator status) and the quarterly safety audit.
 import {
   DELINQUENCY,
   HQ_EFFECTS,
+  LICENCE,
   REGULATOR_REVIEW,
   RISK_LOSS_WEEKS,
   WEEKS_PER_YEAR,
@@ -13,6 +14,7 @@ import { pushEvent } from './events';
 import { raiseIncident } from './incidents';
 import { spend } from './ledger';
 import { stream } from './rng';
+import { safetyExposure, underStrictWatch } from './safety';
 import type { GameState, LossLine, LossWeek, RegulatorReview } from './state';
 
 // ─── Recording (called from the books and the Loan Desk) ──────────────────────
@@ -160,19 +162,27 @@ export function avgManagerEthics(state: GameState): number {
   return ethics.reduce((a, b) => a + b, 0) / ethics.length;
 }
 
-/** §15: 0.02 × (1 + 3 × (1 − riskCoverage′)) × (1.6 − avgManagerEthics/100). */
+/**
+ * §15: the quarterly safety audit's fail chance,
+ * 0.02 × (1 + 3 × (1 − safetyCoverage′)) × (1.6 − avgManagerEthics/100) × exposure,
+ * doubled under strict watch (C7a).
+ */
 export function reviewFailChance(state: GameState): number {
   const kPrime = Math.min(1, state.hq.coverage.risk?.kPrime ?? 1);
   return (
     REGULATOR_REVIEW.failBase *
     (1 + HQ_EFFECTS.riskFine * (1 - kPrime)) *
-    (REGULATOR_REVIEW.ethicsBase - avgManagerEthics(state) / 100)
+    (REGULATOR_REVIEW.ethicsBase - avgManagerEthics(state) / 100) *
+    safetyExposure(state) *
+    (underStrictWatch(state) ? LICENCE.watchAuditMult : 1)
   );
 }
 
 export interface RegulatorStatus {
   tier: Tier;
+  /** The credit ratio (lenders' view). */
   capitalRatio: number;
+  safetyRatio: number;
   /** Chance the next quarterly review fails. */
   failChance: number;
   lastReview?: RegulatorReview;
@@ -183,6 +193,7 @@ export function regulatorStatus(state: GameState): RegulatorStatus {
   const status: RegulatorStatus = {
     tier: state.company.tier,
     capitalRatio: state.company.capitalRatio,
+    safetyRatio: state.company.safetyRatio,
     failChance: reviewFailChance(state),
     failedReviews: state.risk.reviews.filter((r) => !r.passed).length,
   };

@@ -58,7 +58,7 @@ export function winsInForce(s: GameState): string[] {
   if (lob.bufferRelief && lob.bufferRelief.untilWeek > week) {
     const weeks = lob.bufferRelief.untilWeek - week;
     out.push(
-      `Capital tier thresholds ${lob.bufferRelief.pp}pp lower for ${weeks} more week${weeks === 1 ? '' : 's'}.`,
+      `Safety tier lines ${lob.bufferRelief.pp}pp lower for ${weeks} more week${weeks === 1 ? '' : 's'}.`,
     );
   }
   if (lob.fastTrack) out.push('Your next merger review is fast-tracked.');

@@ -1,14 +1,17 @@
 // Risk & Compliance floor content (SCREENS §10, DESIGN §5.8.7, SIMULATION
 // §15): the loss-rate table by product (annualized over the last 13 weeks,
 // stacked so it reads on a phone), company delinquency, model performance
-// (predicted vs actual default rate as a bar pair) and regulator status (tier
-// badge and capital meter, next review's fail chance, last review, failures).
+// (predicted vs actual default rate as a bar pair) and regulator status (safety
+// ratio, tier badge and meter, strength vs exposure, pause or strict watch, the
+// next safety audit's fail chance, last audit, failures).
 import { REGULATOR_REVIEW, RISK_LOSS_WEEKS } from '../../config/balance';
+import { safetySnapshot, tierLift } from '../../sim/safety';
+import { SafetyNotice } from '../company/SafetyNotice';
 import { delinquency, lossTable, modelPerformance, regulatorStatus } from '../../sim/riskFloor';
 import { Badge, Card, Row, SectionTitle } from '../components';
 import { dayOfWeek } from '../branch/selectors';
 import { CapitalMeter, TIER_LABEL, TIER_TONE } from '../company/CapitalMeter';
-import { capitalRatioText, gameDate, money, pct } from '../format/format';
+import { gameDate, money, pct, safetyRatioText } from '../format/format';
 import { useGame } from '../store';
 import {
   lossProductName,
@@ -29,7 +32,7 @@ export function RiskFloor() {
       <LossCard />
       <SectionTitle>Model performance</SectionTitle>
       <ModelCard />
-      <SectionTitle>Regulator</SectionTitle>
+      <SectionTitle>Regulator and safety</SectionTitle>
       <RegulatorCard />
     </div>
   );
@@ -143,18 +146,22 @@ function RegulatorCard() {
   const r = regulatorStatus(s);
   const next = nextReviewWeek(s.meta.startDate, s.clock.week);
   const last = r.lastReview;
+  const snap = safetySnapshot(s);
   return (
     <Card>
       <div class="rk-reg-head">
         <div>
-          <div class="muted small">Capital ratio</div>
-          <div class="hero-number">{capitalRatioText(r.capitalRatio)}</div>
+          <div class="muted small">Safety ratio</div>
+          <div class="hero-number">{safetyRatioText(r.safetyRatio)}</div>
         </div>
         <Badge tone={TIER_TONE[r.tier]}>{TIER_LABEL[r.tier]}</Badge>
       </div>
-      <CapitalMeter ratio={r.capitalRatio} tier={r.tier} />
+      <SafetyNotice s={s} />
+      <CapitalMeter ratio={r.safetyRatio} tier={r.tier} kind="safety" lift={tierLift(s)} />
       <div class="rk-reg-rows">
-        <Row label="Next review" value={gameDate(s.meta.startDate, dayOfWeek(next))} />
+        <Row label="Safety cover" value={safetyRatioText(snap.strength)} />
+        <Row label="Model exposure" value={`×${snap.exposure.toFixed(2)}`} />
+        <Row label="Next safety audit" value={gameDate(s.meta.startDate, dayOfWeek(next))} />
         <Row
           label="Chance it fails"
           value={pct(r.failChance, 1)}
@@ -162,7 +169,7 @@ function RegulatorCard() {
           strong
         />
         <Row
-          label="Last review"
+          label="Last safety audit"
           value={
             last
               ? `${last.passed ? 'Passed' : `Failed · fined ${money(last.fine, sym)}`}, ${gameDate(s.meta.startDate, dayOfWeek(last.week))}`
@@ -171,14 +178,14 @@ function RegulatorCard() {
           tone={last && !last.passed ? 'bad' : undefined}
         />
         <Row
-          label="Failed reviews"
+          label="Failed audits"
           value={String(r.failedReviews)}
           tone={r.failedReviews > 0 ? 'bad' : 'dim'}
         />
       </div>
       <p class="muted small hq-note">
-        A fully staffed Risk team and ethical office managers keep reviews clean. Failures bring a
-        fine of up to {pct(REGULATOR_REVIEW.fineRange[1], 1)} of a year's revenue.
+        A fully staffed Safety team, a safer model and ethical office managers keep audits clean.
+        Failures bring a fine of up to {pct(REGULATOR_REVIEW.fineRange[1], 1)} of a year's revenue.
       </p>
     </Card>
   );

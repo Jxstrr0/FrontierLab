@@ -573,7 +573,58 @@ export const CAPITAL_GATE: Record<Tier, number> = {
   restricted: 0.5,
   critical: 0,
 };
-export const CRITICAL_FINE_RWA = 0.001;
+/**
+ * The safety ratio and the AI regulator (stage C7a, SIMULATION §15):
+ * ratio = strength ÷ exposure, where strength is the Safety & Alignment floor's
+ * coverage′ plus any staffing above the requirement (up to HQ_COVERAGE.kMax),
+ * and exposure = 1 + frontierWeight × how far your model sits above the
+ * quality bar − modelSafetyWeight × (its Safety axis − 5), never under
+ * minExposure. A policy buffer raises every tier line by bufferPerPp per point.
+ * criticalFine: share of trailing annual revenue fined each quarter at Critical.
+ * dealEdge: win-chance points by tier, scaled by a business's data sensitivity.
+ */
+export const SAFETY = {
+  frontierWeight: 0.15,
+  modelSafetyWeight: 0.05,
+  minExposure: 0.8,
+  bufferPerPp: 0.05,
+  criticalFine: 0.005,
+  dealEdge: { strong: 0.04, adequate: 0, watch: -0.02, restricted: -0.05, critical: -0.08 },
+} as const;
+export const SAFETY_TIER_THRESHOLDS: { tier: Tier; minSr: number }[] = [
+  { tier: 'strong', minSr: 1.05 },
+  { tier: 'adequate', minSr: 0.85 },
+  { tier: 'watch', minSr: 0.7 },
+  { tier: 'restricted', minSr: 0.55 },
+  { tier: 'critical', minSr: -Infinity },
+];
+/**
+ * The mandated pause (C7a, §15): after offerWeeks below revokeLine the
+ * regulator offers a voluntary pause of `weeks` (no new customers or deals, no
+ * training), with its monitors lifting Safety coverage′ by monitorLift for a fee
+ * of feeShare × trailing revenue (at least minFee). Declining, or still sitting
+ * below the line when the pause ends, revokes the licence.
+ */
+export const MANDATED_PAUSE = {
+  revokeLine: 0.4,
+  offerWeeks: 8,
+  weeks: 8,
+  monitorLift: 0.5,
+  feeShare: 0.02,
+  minFee: 250_000,
+  feeStep: 10_000,
+} as const;
+/**
+ * Licence revoked (C7a, owner decision A11): not game over. A long pause of
+ * pauseWeeks, then a restart under strict watch for watchWeeks: every tier line
+ * sits watchBuffer higher and the quarterly audit fails watchAuditMult× as often.
+ */
+export const LICENCE = {
+  pauseWeeks: 26,
+  watchWeeks: 52,
+  watchBuffer: 0.1,
+  watchAuditMult: 2,
+} as const;
 /**
  * Quarterly regulator review (§15): fail chance
  * failBase × (1 + HQ_EFFECTS.riskFine × (1 − riskCoverage′)) × (ethicsBase − avgManagerEthics/100).
@@ -594,13 +645,12 @@ export const RISK_LOSS_WEEKS = 13;
  * default, as a share of the current balance.
  */
 export const DELINQUENCY = { recentWeeks: 4, pipelineWeeks: 13 } as const;
-export const RECAP_DISCOUNT = 0.5;
 /**
- * Game over (DESIGN §5.18). Insolvency: corporate cash below zero for 4 weeks.
- * Takeover: the capital ratio stays below takeoverCr until the emergency
- * recapitalisation (RECAP, §15) is declined or fails to lift it in time.
+ * Game over (DESIGN §5.18): corporate cash below zero for 4 weeks with no
+ * credit left to cover it. (The regulator's takeover went in stage C7a: a
+ * revoked licence is a long pause instead, LICENCE.)
  */
-export const FAILURE = { insolvencyWeeks: 4, takeoverCr: 0.045 } as const;
+export const FAILURE = { insolvencyWeeks: 4 } as const;
 
 // ─── RISK APPETITE (§16.8) ────────────────────────────────────────────────────
 export const RISK_APPETITE = {
@@ -654,7 +704,7 @@ export const DEPT_REQUIREMENTS = {
   treasury: { base: 1, perFunding: 1 / 1e9 },
   marketing: { base: 1, perBranch: 0.15, perCampaign: 2 },
   it: { base: 2, perBranch: 0.25, perAssets: 1 / 5e9 },
-  risk: { base: 2, perBranch: 0.15, perLoans: 1 / 750e6 },
+  risk: { base: 2, perBranch: 0.15, perArr: 1 / 50e6 },
 } as const;
 /** Coverage (§16.4): staffEff, k, k′ and the shortfall curve. */
 export const HQ_COVERAGE = {
@@ -1332,20 +1382,6 @@ export const BANK_RUN = {
   statementPerPoint: 0.05,
   statementFromCr: 0.08,
   statementMax: 0.95,
-} as const;
-/**
- * Emergency recapitalisation (§15): after offerWeeks in a row below
- * FAILURE.takeoverCr, the regulator offers forced new shares at RECAP_DISCOUNT of
- * book value per share, enough to reach targetCr (rounded up to roundTo). Still
- * below FAILURE.takeoverCr graceWeeks after accepting means a takeover.
- * minPrice floors the share price when book value is at or below zero.
- */
-export const RECAP = {
-  offerWeeks: 8,
-  graceWeeks: 5,
-  targetCr: 0.105,
-  roundTo: 1_000,
-  minPrice: 0.01,
 } as const;
 
 // ─── NEWS: THE WEEKLY LEDGER (§24) ─────────────────────────────────────────────

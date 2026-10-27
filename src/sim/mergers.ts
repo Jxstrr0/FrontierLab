@@ -2,7 +2,7 @@
 // (rebranding costs spread over the conversion), then pending offers get their
 // answer — the regulator first (pro-forma capital and city deposit share), then
 // the target's board on the acceptance curve, rolled on the `mergers` stream.
-// An accepted offer closes at once if your cash and capital tier still allow it.
+// An accepted offer closes at once if your cash and safety tier still allow it.
 import { MERGERS, REBRAND_COST } from '../config/balance';
 import { closeAcquisition } from './acquisition';
 import { planDeal, regulatorBlock } from './acquisitionPlan';
@@ -81,11 +81,11 @@ function answer(state: GameState, offer: MergerOffer): void {
     pushEvent(state, 'MERGER_REJECTED', { rivalId: bank.id, bank: bank.name, reason }, 5);
     return;
   }
-  // Closing re-checks what the offer needed: cash, an allowed capital tier and the share cap.
+  // Closing re-checks what the offer needed: cash, an allowed safety tier and the share cap.
   const tier = state.company.tier;
   const lapse =
     tier === 'restricted' || tier === 'critical'
-      ? `The regulator stopped the closing at the ${tier} capital tier.`
+      ? `The regulator stopped the closing at the ${tier} safety tier.`
       : state.company.cash < plan.cash
         ? 'You no longer had the cash to close.'
         : shareDealBlocker(state, plan.split, offer.stockPct ?? 0);

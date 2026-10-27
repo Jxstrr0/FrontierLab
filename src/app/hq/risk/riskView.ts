@@ -1,5 +1,5 @@
-// View helpers for the Risk & Compliance floor (SCREENS §10, SIMULATION §15):
-// the week of the next quarterly regulator review, product names for the
+// View helpers for the Safety & Alignment floor (SCREENS §10, SIMULATION §15):
+// the week of the next quarterly safety audit, product names for the
 // loss table, and the model performance comparison. Pure apart from reads.
 import { DAYS_PER_WEEK } from '../../../config/balance';
 import { isQuarterStart } from '../../../sim/calendar';

@@ -300,9 +300,9 @@ export const HOUSING_REASONS: Record<'up' | 'down', Record<Phase, string[]>> = {
 
 /** Your bank's capital tier as the paper describes it. */
 export const TIER_COPY: Record<string, string> = {
-  watch: 'a thin cushion that the regulator is watching',
-  restricted: 'a cushion so thin that growth is restricted',
-  critical: 'a critical shortfall that stops all new lending',
+  watch: 'thin safety cover that the regulator is watching',
+  restricted: 'safety cover so thin that growth is restricted',
+  critical: 'a critical shortfall that stops all new customers',
 };
 
 /** Why a partnership ended, completing "The partnership has …". */
