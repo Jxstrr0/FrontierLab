@@ -49,6 +49,7 @@ import { runCorporateDebt } from './corporateDebt';
 import { runIncidents } from './incidents';
 import { composeNews } from './news';
 import { runPartnerships } from './partnerships';
+import { runPowerDeals } from './powerDeals';
 import { rivalsQuarter, rivalsYear, runRivals } from './rivalAi';
 import { refreshManagerPool } from './people';
 import { runManagerPoaching } from './payReviews';
@@ -107,6 +108,7 @@ export function weeklyTick(state: GameState): void {
     if (branch.status === 'open') runBranch(state, branch, deals); // 4
   }
   runContracts(state); // 4 (business failures and outage losses, C5b)
+  runPowerDeals(state); // 4 (power deals, C8a: their GPUs join this week's pool)
   tallyCompute(state); // 4 (the compute pool, C4a)
   settleCompute(state); // 4 (pay the pool; spot trail, crunch and outages, C4c)
   retireGpuLots(state); // 4 (rented GPU lots, C4b)

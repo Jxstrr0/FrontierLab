@@ -184,6 +184,11 @@ export interface EventPayloads {
   };
   GRAD_PROGRAM: { siteId: Id; university: string; cost: Money; started: boolean };
 
+  // ─── Power deals at energy sites (powerDeals.ts, C8a) ──────────────────────
+  POWER_DEAL_SIGNED: { dealId: Id; siteId: Id; site: string; fee: Money };
+  POWER_DEAL_RENEWED: { dealId: Id; site: string; fee: Money };
+  POWER_DEAL_ENDED: { dealId: Id; site: string; reason: 'terminated' | 'lapsed' | 'released' };
+
   // ─── Governance and executives (governance.ts, executives.ts) ──────────────
   BOARD_MEETING: {
     bank: string;

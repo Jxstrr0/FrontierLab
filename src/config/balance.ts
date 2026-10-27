@@ -1649,6 +1649,28 @@ export const PARTNER_HEALTH = {
 } as const;
 /** perksBonus = perMoralePoint × the benefits' morale bonus (HR, §16.5), capped at max. */
 export const PARTNER_PERKS = { perMoralePoint: 1, max: 10 } as const;
+/**
+ * Data-centre and power deals at regional energy sites (stage C8a, SIMULATION
+ * §13.7a): the payroll partnership reworked. Signing fee = employees ×
+ * feePerEmployee at the site's price list. Contracted GPUs = employees ×
+ * gpusPerEmployee × participation × (balanceBase + balanceSlope × health/100)
+ * (PARTNER_HEALTH), moving PARTNER_BALANCE_STEP of the way each week. They join
+ * the compute pool and cost pricePerGpuWeek each (fixed at signing, take or
+ * pay). Your data centers in the site's country pay powerDiscount × their power
+ * bill. Health target = healthBase + dataCenterBonus with a data center of
+ * yours in the country − tierPenalty[safety tier], eased by PARTNER_HEALTH.ema.
+ */
+export const POWER_DEAL = {
+  termWeeks: 364,
+  feePerEmployee: 500,
+  gpusPerEmployee: 1.5,
+  pricePerGpuWeek: 20,
+  powerDiscount: 0.75,
+  healthBase: 50,
+  dataCenterBonus: 20,
+  /** The utility cools on a lab the regulator is cracking down on (safety tier). */
+  tierPenalty: { strong: 0, adequate: 0, watch: 10, restricted: 25, critical: 40 },
+} as const;
 /** A terminated, lapsed or released partnership's balance leaves over this many weeks. */
 export const PARTNER_RUNOFF_WEEKS = 12;
 /** Renewal fee = current signing fee × (base − health/100), in the last `windowWeeks` of the term. */

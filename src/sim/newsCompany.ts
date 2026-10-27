@@ -266,6 +266,21 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
           reason: PARTNERSHIP_END_COPY[str(p.reason)] ?? 'come to an end',
         },
       });
+    case 'POWER_DEAL_SIGNED':
+    case 'POWER_DEAL_RENEWED':
+    case 'POWER_DEAL_ENDED':
+      return business({
+        key: e.type,
+        subject: str(p.dealId),
+        icon: 'handshake',
+        priority: e.type === 'POWER_DEAL_RENEWED' ? P.companyRoutine : P.company,
+        tokens: {
+          bank,
+          site: str(p.site),
+          fee: m(p.fee),
+          reason: PARTNERSHIP_END_COPY[str(p.reason)] ?? 'come to an end',
+        },
+      });
     case 'GRAD_PROGRAM':
       if (p.started !== true) return undefined;
       return business({

@@ -374,11 +374,11 @@ const BANK_TEMPLATES = {
   PARTNERSHIP_SIGNED: [
     {
       h: '{employer} picks {bank} for {kind}',
-      b: 'The deal, worth a {fee} signing fee, is run from {sales office}.',
+      b: 'The deal, worth a {fee} signing fee, is run from {branch}.',
     },
     {
       h: '{bank} wins {employer} {kind}',
-      b: 'Staff at {employer} will be offered accounts through {sales office}. The lab paid {fee} to sign.',
+      b: 'Staff at {employer} will be offered accounts through {branch}. The lab paid {fee} to sign.',
     },
   ],
   PARTNERSHIP_RENEWED: [
@@ -394,6 +394,27 @@ const BANK_TEMPLATES = {
       b: 'The partnership has {reason}. Balances will run off over the coming weeks.',
     },
     { h: '{bank} loses {employer} deal', b: 'The arrangement has {reason}.' },
+  ],
+  POWER_DEAL_SIGNED: [
+    {
+      h: '{bank} signs a power deal at {site}',
+      b: 'The {fee} contract brings cheap power and contracted GPUs to the lab over seven years.',
+    },
+    {
+      h: '{site} plugs in {bank}',
+      b: 'A long data-centre and power deal, signed for {fee}, will feed the lab’s compute.',
+    },
+  ],
+  POWER_DEAL_RENEWED: [
+    { h: '{bank} renews its power deal at {site}', b: 'Another term, for a {fee} fee.' },
+    { h: '{site} keeps the lights on for {bank}', b: 'Both sides signed a {fee} renewal.' },
+  ],
+  POWER_DEAL_ENDED: [
+    {
+      h: '{bank} and {site} part ways',
+      b: 'The power deal has {reason}. Its GPUs leave the pool over the coming weeks.',
+    },
+    { h: '{bank} loses its power at {site}', b: 'The deal has {reason}.' },
   ],
   GRAD_PROGRAM: [
     {
