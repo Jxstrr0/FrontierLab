@@ -1,9 +1,15 @@
-// Treasury floor content (SCREENS §10, DESIGN §5.8.4, SIMULATION §13): the
-// liquidity gauge with the funding-freeze banner, the treasury policy, the
-// funding inventory, the funding
-// market and the central bank's standing facility (SCREENS §8 puts its
-// Borrow / Repay here) and a card per payroll or student partnership.
+// Compute floor content (stage C4b, SCREENS §10, SIMULATION §13.0; the old
+// Treasury floor keeps its `treasury` id): the compute pool, rented GPU lots,
+// the GPU market and a card per partnership. The bank-era liquidity, funding
+// market and central bank cards show only for saves that still carry
+// deposits, wholesale lots or central bank borrowing.
+import { totalDeposits } from '../../sim/balanceSheet';
+import type { GameState } from '../../sim/state';
+import { ComputeCard } from '../company/ComputeCard';
 import { SectionTitle } from '../components';
+import { useGame } from '../store';
+import { GpuInventory } from './compute/GpuInventory';
+import { GpuMarket } from './compute/GpuMarket';
 import { CentralBankFacility } from './treasury/CentralBankFacility';
 import { FundingInventory } from './treasury/FundingInventory';
 import { FundingMarket } from './treasury/FundingMarket';
@@ -12,21 +18,41 @@ import { PartnershipCards } from './treasury/PartnershipCards';
 import { TreasuryPolicyCard } from './treasury/TreasuryPolicyCard';
 import './treasury/treasury.css';
 
+/** A save from the bank era that still has deposits or wholesale funding to manage. */
+function hasLegacyFunding(s: GameState): boolean {
+  const t = s.treasury;
+  return totalDeposits(s) > 0 || t.lots.length > 0 || t.overnight > 0 || t.window > 0;
+}
+
 export function TreasuryFloor() {
+  const s = useGame();
   return (
     <div class="stack tr-floor">
-      <SectionTitle>Liquidity</SectionTitle>
-      <LiquidityCard />
-      <TreasuryPolicyCard />
+      <SectionTitle>Compute pool</SectionTitle>
+      <ComputeCard />
 
-      <SectionTitle>Funding inventory</SectionTitle>
-      <FundingInventory />
+      <SectionTitle>Rented GPUs</SectionTitle>
+      <GpuInventory />
 
-      <SectionTitle>Funding market</SectionTitle>
-      <FundingMarket />
+      <SectionTitle>GPU market</SectionTitle>
+      <GpuMarket />
 
-      <SectionTitle>Central bank</SectionTitle>
-      <CentralBankFacility />
+      {hasLegacyFunding(s) && (
+        <>
+          <SectionTitle>Liquidity</SectionTitle>
+          <LiquidityCard />
+          <TreasuryPolicyCard />
+
+          <SectionTitle>Funding inventory</SectionTitle>
+          <FundingInventory />
+
+          <SectionTitle>Funding market</SectionTitle>
+          <FundingMarket />
+
+          <SectionTitle>Central bank</SectionTitle>
+          <CentralBankFacility />
+        </>
+      )}
 
       <SectionTitle>Partnerships</SectionTitle>
       <PartnershipCards />

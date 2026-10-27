@@ -349,6 +349,8 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 
 **Frontier Lab schema 9 (stage C4a, the compute pool):** new `GameState.compute: ComputeState` = `{ index, phase: 'glut' | 'normal' | 'shortage', weeksInPhase, demandGpus, ownedGpus, history: number[] }` (SIMULATION §13.0), and an optional `BranchPnl.gpus` (GPU-weeks the office used that week). The `compute` RNG stream is created on first use. Migration 8 → 9 (`src/sim/save/migrateCompute.ts`) starts the pool at a normal index of 1 with an empty history and counts the GPUs already running.
 
+**Frontier Lab schema 10 (stage C4b, GPU lots):** `ComputeState` gains `rentedGpus`, `lots: GpuLot[]` (`{ id, type, provider, gpus, price, startWeek, endWeek, radar }`), `offers: GpuOffer[]` (`{ id, type, provider, gpus, price, termWeeks, radar, expiresWeek }`) and `offersRefreshWeek` (−1 without a Compute floor). The `gpuMarket` RNG stream is created on first use. Migration 9 → 10 (`src/sim/save/migrateGpuLots.ts`) adds them empty.
+
 **Frontier Lab schema 8 (stage C3c, bank leftovers removed):** `GameState.reo` and the `ReoPool` type are gone, and `Treasury` loses `bondsMarket`, `bondsBook`, `bondBookYield` and `bondShare`. The `covered_bond` funding type is gone. The command `transferToTreasury` is renamed `topUpLendingFund`. Migration 7 → 8 (`src/sim/save/migrateBankCleanup.ts`) keeps equity unchanged:
 - Each REO pool's value is added to company cash, and `reo` is deleted.
 - Bonds are sold into reserves at market value. The unrealised gain or loss (market − book) moves into `company.retainedEarnings`, since the balance sheet no longer carries AOCI.

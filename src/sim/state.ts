@@ -55,7 +55,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState } from './personalTypes';
 
-export const SCHEMA_VERSION = 9;
+export const SCHEMA_VERSION = 10;
 
 export interface GameState {
   schemaVersion: number;
@@ -579,6 +579,38 @@ export interface ComputeState {
   ownedGpus: number;
   /** Weekly index history, oldest first. */
   history: number[];
+  /** GPUs rented in active lots at the last tally (C4b). */
+  rentedGpus: number;
+  /** Rented GPU reservations and the GPU market's offers (C4b). */
+  lots: GpuLot[];
+  offers: GpuOffer[];
+  /** Week the next set of offers arrives; −1 without a Compute floor. */
+  offersRefreshWeek: Week;
+}
+
+/** A GPU reservation rented from the market: fixed GPUs at a fixed weekly price until endWeek. */
+export interface GpuLot {
+  id: Id;
+  type: string;
+  provider: string;
+  gpus: number;
+  /** Price per GPU-week, fixed for the term. */
+  price: Money;
+  startWeek: Week;
+  endWeek: Week;
+  radar: Pentagon;
+}
+
+export interface GpuOffer {
+  id: Id;
+  type: string;
+  provider: string;
+  /** Most GPUs you can rent from this offer. */
+  gpus: number;
+  price: Money;
+  termWeeks: number;
+  radar: Pentagon;
+  expiresWeek: Week;
 }
 
 export interface ReviewCard {
