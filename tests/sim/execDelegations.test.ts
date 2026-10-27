@@ -120,14 +120,14 @@ describe('CMO brand', () => {
 });
 
 describe('CRO appetite', () => {
-  it('steps appetite down when capital is short and up when it is ample', () => {
+  it('steps the launch posture down on a weak safety tier and up on a strong one', () => {
     const s = execGame();
     s.clock.week = EXEC_DELEGATION.croEveryWeeks * 3;
     s.company.riskAppetite = 3;
-    s.company.capitalRatio = 0.08;
+    s.company.tier = 'watch';
     croAppetite(s);
     expect(s.company.riskAppetite).toBe(2);
-    s.company.capitalRatio = 0.3;
+    s.company.tier = 'strong';
     croAppetite(s);
     expect(s.company.riskAppetite).toBe(3);
   });

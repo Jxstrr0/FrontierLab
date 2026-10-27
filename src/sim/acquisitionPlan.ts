@@ -199,17 +199,17 @@ export function regulatorChecks(
   ];
   if (plan.distressed && MERGERS.distressedShareExempt) {
     checks.push({
-      label: 'Deposit share',
+      label: 'Customer share',
       ok: true,
-      detail: 'Not tested for a distressed sale: the regulator wants the network rescued',
+      detail: 'Not tested for a distressed sale: the regulator wants the lab rescued',
     });
     return checks;
   }
   for (const c of plan.cityShares) {
     checks.push({
-      label: `Deposit share in ${cityName(c.cityId)}`,
+      label: `Customer share in ${cityName(c.cityId)}`,
       ok: c.share <= plan.shareLimit,
-      detail: `${pct(c.share)} of the city's deposits (limit ${pct(plan.shareLimit)}${plan.fastTrack ? ', fast-tracked' : ''})`,
+      detail: `${pct(c.share)} of the city's AI customers (limit ${pct(plan.shareLimit)}${plan.fastTrack ? ', fast-tracked' : ''})`,
     });
   }
   return checks;

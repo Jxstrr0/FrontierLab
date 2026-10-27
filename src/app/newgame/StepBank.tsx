@@ -42,7 +42,7 @@ export function StepBank(p: { draft: Draft; patch: (d: Partial<Draft>) => void }
       </div>
 
       <label class="field">
-        <span class="field-label">Bank name</span>
+        <span class="field-label">Lab name</span>
         <input
           class="field-input"
           type="text"

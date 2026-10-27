@@ -102,7 +102,7 @@ export function advisorLines(state: GameState, branch: Branch, openingDate: stri
     );
   }
   if (branch.waitIndex < ADVISOR.quietWait) lines.push('Quiet week. Want to sharpen our rates?');
-  if (lines.length === 0) lines.push("Morning, boss. Drawers are balanced and the coffee's on.");
+  if (lines.length === 0) lines.push("Morning, boss. The pipeline's warm and the coffee's on.");
   return lines;
 }
 
@@ -335,7 +335,7 @@ export const REVENUE_LINES: [BranchPnlLine, string][] = [
 ];
 export const EXPENSE_LINES: [BranchPnlLine, string][] = [
   ['compute', 'Compute'],
-  ['losses', 'Loan losses'],
+  ['losses', 'Bad debts'],
   ['staff', 'Staff'],
   ['manager', 'Manager'],
   ['rent', 'Rent'],

@@ -32,7 +32,7 @@ export function setOffered(
   if (!spec) return fail('Unknown product.');
   if (followsHq(state, branch)) return fail('Set at HQ.');
   if (branch.delegation.products)
-    return fail('Your manager sets products here. Turn off Products & rates delegation first.');
+    return fail('Your manager sets products here. Turn off Products & prices delegation first.');
   slotOf(state, branch, spec).on = on;
   return ok();
 }
@@ -49,7 +49,7 @@ export function setPrice(
   if (!spec) return fail('Unknown product.');
   if (followsHq(state, branch)) return fail('Set at HQ.');
   if (branch.delegation.products)
-    return fail('Your manager sets prices here. Turn off Products & rates delegation first.');
+    return fail('Your manager sets prices here. Turn off Products & prices delegation first.');
   if (!Number.isFinite(price)) return fail('Enter a number.');
   const p = clamp(roundToStep(price, spec.step), spec.min, spec.max);
   slotOf(state, branch, spec).price = p;
@@ -134,7 +134,7 @@ export function setCompanyPrice(
 /**
  * Offers or withdraws a product company-wide, and new branches follow this
  * lineup. With Apply-to-all on it reaches every branch; otherwise branches
- * whose manager runs Products & rates keep choosing for themselves.
+ * whose manager runs Products & prices keep choosing for themselves.
  */
 export function setCompanyOffered(state: GameState, productId: string, on: boolean): CommandResult {
   const spec = productSpec(state, productId);
@@ -169,8 +169,9 @@ export function setOwnPrices(state: GameState, branchId: string, on: boolean): C
   return ok();
 }
 
+/** Sets the launch posture, 1 very cautious to 5 very bold (code id riskAppetite, §16.8). */
 export function setRiskAppetite(state: GameState, level: number): CommandResult {
-  if (![1, 2, 3, 4, 5].includes(level)) return fail('Risk appetite runs from 1 to 5.');
+  if (![1, 2, 3, 4, 5].includes(level)) return fail('Launch posture runs from 1 to 5.');
   state.company.riskAppetite = level as 1 | 2 | 3 | 4 | 5;
   return ok();
 }

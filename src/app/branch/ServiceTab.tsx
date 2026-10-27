@@ -10,7 +10,7 @@ import { ManagerCard } from './ManagerCard';
 import { dayOfWeek, moodTone, staffBounds, wageBounds, waitLabel } from './selectors';
 
 const CATEGORY_LABELS = {
-  rates: 'Rates',
+  rates: 'Price',
   products: 'Products',
   service: 'Service',
   branch: 'Sales office',

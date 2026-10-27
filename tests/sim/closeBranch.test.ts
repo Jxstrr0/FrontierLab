@@ -12,7 +12,7 @@ import { openScriptedBranch } from '../helpers/scenario';
 import { fly } from '../helpers/world';
 
 function twoBranches() {
-  const s = newGame({ seed: 11, cityId: 'cal', startCash: 1_500_000 });
+  const s = newGame({ seed: 11, cityId: 'cal', startCash: 3_500_000 });
   const a = openScriptedBranch(s, 'midtown');
   fly(s, 'sas');
   const b = openScriptedBranch(s);

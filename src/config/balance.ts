@@ -39,9 +39,12 @@ export const WEEKS_PER_YEAR = 52;
 export const START_DATE = '2027-01-04';
 
 // ─── START ────────────────────────────────────────────────────────────────────
-/** Default spendable cash; the New Game wizard offers START_CASH_OPTIONS. */
-export const START_CASH = 900_000;
-export const START_CASH_OPTIONS = [600_000, 900_000, 1_200_000, 1_500_000] as const;
+/**
+ * Default seed money, all spendable; the New Game wizard offers START_CASH_OPTIONS.
+ * Stage C8f folded the bank's locked $2M charter capital into it (DESIGN log).
+ */
+export const START_CASH = 2_900_000;
+export const START_CASH_OPTIONS = [2_600_000, 2_900_000, 3_200_000, 3_500_000] as const;
 /** The Settings developer tools' one-tap payment into corporate cash (SCREENS §26). */
 export const DEV_PAYMENT = 10_000_000;
 /** Rival banks in each city (the wizard's competitor count); clamped to the rivals available. */
@@ -63,7 +66,6 @@ export const DIFFICULTY: Record<
   hard: { demandMult: 0.92, rivalQuality: 0.2, rivalRateEdge: 0.1, lossMult: 1.1 },
   expert: { demandMult: 0.85, rivalQuality: 0.4, rivalRateEdge: 0.2, lossMult: 1.25 },
 };
-export const CHARTER_CAPITAL = 2_000_000;
 export const START_SHARES = 10_000_000;
 export const START_PERSONAL_CASH = 150_000;
 export const START_CEO_SALARY = 120_000;
@@ -652,12 +654,19 @@ export const DELINQUENCY = { recentWeeks: 4, pipelineWeeks: 13 } as const;
  */
 export const FAILURE = { insolvencyWeeks: 4 } as const;
 
-// ─── RISK APPETITE (§16.8) ────────────────────────────────────────────────────
-export const RISK_APPETITE = {
-  volumeMult: [0.7, 0.85, 1.0, 1.15, 1.3],
-  pdMult: [0.7, 0.85, 1.0, 1.2, 1.45],
+// ─── LAUNCH POSTURE (§16.8) ───────────────────────────────────────────────────
+/**
+ * The Finance floor's 1–5 dial (code id `riskAppetite`; C8f, was the bank's
+ * risk appetite). Bolder launches win more deals and carry more safety risk:
+ * dealEdge is added to every Deal Desk win and keep chance, exposure to the
+ * safety exposure (§15). Levels from MIS_SELLING.appetiteFrom also raise the
+ * capability over-claim odds (CONTENT §22).
+ */
+export const LAUNCH_POSTURE = {
+  dealEdge: [-0.04, -0.02, 0, 0.03, 0.06],
+  exposure: [-0.1, -0.05, 0, 0.08, 0.16],
 } as const;
-export const DEFAULT_RISK_APPETITE = 3;
+export const DEFAULT_LAUNCH_POSTURE = 3;
 
 // ─── HQ (§16) ─────────────────────────────────────────────────────────────────
 /**
@@ -682,7 +691,6 @@ export const FLOOR_FITOUT = 120_000;
 export const MAIN_OFFICES_MAX = 2;
 export const FLOOR_FITOUT_LIFE_WEEKS = 520;
 export const DESKS_PER_FLOOR_OPTIONS = [24, 32] as const;
-export const EXEC_SUITE_DESKS = 7;
 export const INVESTMENT_FLOOR_DESKS = 32;
 /** Releasing a floor or office lets staff above the remaining desks go with this severance. */
 export const SEVERANCE_WEEKS = 4;
@@ -1375,7 +1383,8 @@ export const BANK_RUN = {
   weeklyChance: 0.04,
   weeks: [3, 6] as [number, number],
   runMult: 6,
-  windowShare: 0.1,
+  /** Service credits that end the rumour: this share of company ARR (C8f; was the central bank window). */
+  creditShare: 0.02,
   planCut: 0.1,
   boostWeeks: 8,
   statementBase: 0.3,
@@ -1951,9 +1960,9 @@ export const EXEC_PAY = {
  * CTO: developments of devWeeks at devTier with a weekly budget of at most
  * devBudgetShare of weekly revenue (trailing revenueWeeks average). CMO: holds
  * brand awareness near brandTarget (± brandSlack) within brandBudgetShare of
- * revenue. CRO: every croEveryWeeks weeks, lowers appetite when CR < croMinCr or
- * the loss rate > croMaxLoss, raises it when CR ≥ croRaiseCr and the loss rate ≤
- * croRaiseLoss, up to croMaxAppetite. CREO (Chief Real Estate Officer):
+ * revenue. CRO (Chief Safety Officer): every croEveryWeeks weeks, steps the
+ * launch posture down while the safety tier is Watch or worse and up while it
+ * is Strong, up to croMaxAppetite. CREO (Chief Real Estate Officer):
  * every rentEveryWeeks weeks, Rents sets each managed building's rent to the
  * level that holds its occupancy dial (propertyMath.rentForOccupancy; 100%
  * is the highest that still fills it); tenants of a managed building accept
@@ -2597,7 +2606,8 @@ export const MILESTONE_GOALS = {
   /** Data centers open for 'Three data centers' (C2c). */
   dataCenters: 3,
   cities: 10,
-  deposits: 1_000_000_000,
+  /** ARR for 'A billion in ARR' (C8f; id deposits_1b). */
+  arr: 1_000_000_000,
   countries: 5,
   assets: 10_000_000_000,
   acquisitions: 5,
