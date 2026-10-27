@@ -11,7 +11,7 @@ import * as cmd from '../../../sim/commands';
 import { starsOf } from '../../../sim/products';
 import { marketRef } from '../../../sim/rates';
 import { Card, CoinRating, Confirm, Row, Stepper, Toggle } from '../../components';
-import { editPrice, parsePrice, priceText, rangeText } from '../../branch/selectors';
+import { editPrice, parsePrice, priceText, productWords, rangeText } from '../../branch/selectors';
 import { count, money } from '../../format/format';
 import { act, useGame } from '../../store';
 import '../../branch/branch.css';
@@ -57,25 +57,22 @@ export function CompanyProductCard(p: { spec: ProductSpec; country: CountryId })
         {n.total > 0 && <Row label="Sales offices offering" value={`${n.on} of ${n.total}`} />}
         {spec.kind !== 'fx' && (
           <>
-            <Row label="New accounts last week" value={count(totals.newAccounts)} />
+            <Row label={productWords(spec).newAccounts} value={count(totals.newAccounts)} />
             {spec.kind === 'safebox' ? (
               <Row label="Boxes rented" value={count(totals.accounts)} />
             ) : (
-              <Row
-                label={spec.kind === 'wealth' ? 'Assets under management' : 'Balance'}
-                value={money(totals.balance, sym)}
-              />
+              <Row label={productWords(spec).balance} value={money(totals.balance, sym)} />
             )}
           </>
         )}
       </div>
       <Stepper
-        label={spec.priceType === 'rate' ? 'HQ rate' : 'HQ fee'}
+        label={`HQ ${productWords(spec).price.toLowerCase()}`}
         value={companyPrice(s, spec, p.country)}
         min={spec.min}
         max={spec.max}
         step={spec.step}
-        format={fmt}
+        format={(v) => priceText(spec, v, sym, true)}
         parse={(t) => parsePrice(spec, t, sym)}
         editText={(v) => editPrice(spec, v, sym)}
         onChange={(v) => act(cmd.setCompanyPrice, spec.id, v, p.country)}

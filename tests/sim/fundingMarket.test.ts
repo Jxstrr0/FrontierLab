@@ -110,7 +110,7 @@ describe('funding lots', () => {
     expect(cmd.borrowOffer(s, offer.id, offer.amount + 1)).toMatchObject({ ok: false });
   });
 
-  it('caps covered bonds by mortgage cover', () => {
+  it('refuses covered bonds without mortgage cover', () => {
     const s = bankWithFloors(['treasury']);
     s.treasury.offers = [
       {
@@ -124,13 +124,14 @@ describe('funding lots', () => {
         expiresWeek: s.clock.week + 2,
       },
     ];
+    // C3a: an AI lab holds no mortgages, so there is no cover and any covered bond is
+    // refused (covered bonds go in C3c).
     let mortgages = 0;
     for (const b of Object.values(s.branches)) mortgages += b.books.mortgage?.balance ?? 0;
-    const cap = mortgages / 1.25;
-    const r = cmd.borrowOffer(s, 'fo_cb', cap + 1_000);
+    expect(mortgages).toBe(0);
+    const r = cmd.borrowOffer(s, 'fo_cb', 1_000_000);
     expect(r.ok).toBe(false);
     expect(!r.ok && r.reason).toMatch(/^Covered bonds need mortgages worth 1.25×/);
-    expect(cmd.borrowOffer(s, 'fo_cb', Math.floor(cap * 0.5)).ok).toBe(true);
   });
 
   it('pays weekly interest from corporate cash and matures on time', () => {
@@ -269,7 +270,10 @@ describe('auto-funding holds the target (§13.5)', () => {
     runTreasury(a.s);
     expect(a.t.overnight).toBe(0);
     expect(a.t.freeze).toBe(false);
-    const b = bare(false, 0.08);
+    // C3a: with no deposit book the minimum is zero, so "under the minimum" means
+    // reserves overdrawn (by Loan Desk lending, say).
+    const b = bare(false, 0);
+    b.t.reserves = -1_000_000;
     runTreasury(b.s);
     expect(b.t.overnight).toBe(0);
     expect(b.t.freeze).toBe(true);

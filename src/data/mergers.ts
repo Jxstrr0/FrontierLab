@@ -13,22 +13,12 @@ export const ACQUIRED_BUILDS: Record<Strategy, BuildSpec> = {
 };
 
 /**
- * Share of a rival branch's deposits by product, as in a mature branch:
- * mostly savings, chequing and GICs, some business accounts. Sums to 1.
+ * Plans an acquired office's customers move onto (C3a), by share of customers.
+ * Sums to 1.
  */
-export const ACQUIRED_DEPOSIT_MIX: Record<string, number> = {
-  chequing: 0.28,
-  savings: 0.34,
-  gic1y: 0.26,
-  business_acct: 0.1,
-  student: 0.02,
-};
-
-/** Share of a rival branch's loans by product: mortgage-heavy like a mature branch. Sums to 1. */
-export const ACQUIRED_LOAN_MIX: Record<string, number> = {
-  mortgage: 0.62,
-  personal_loan: 0.08,
-  auto_loan: 0.12,
-  loc: 0.08,
-  credit_card: 0.1,
+export const ACQUIRED_PLAN_MIX: Record<string, number> = {
+  plus: 0.6,
+  pro: 0.15,
+  team: 0.2,
+  campus_plan: 0.05,
 };

@@ -1,6 +1,6 @@
 // Partnership cards on the Treasury floor (SCREENS §10 Treasury): one card per
 // payroll or student partnership with the employer or university, the people
-// it covers, "Year X of Y", deposits, accounts and a health bar. Tapping a
+// it covers, "Year X of Y", ARR, seats and a health bar. Tapping a
 // card opens that employer's or university's panel (SCREENS §14–15). With no
 // partnerships it points the player to the Employers layer on the map.
 import { Badge, Card, Row, StatBar } from '../../components';
@@ -46,8 +46,8 @@ function PartnershipCard({ card: c, sym }: { card: PartnershipCardView; sym: str
         )}
       </div>
       <Row label={c.peopleLabel} value={count(c.people)} />
-      <Row label="Deposits" value={money(c.balance, sym)} strong />
-      <Row label="Accounts" value={count(c.accounts)} />
+      <Row label="ARR" value={money(c.balance, sym)} strong />
+      <Row label="Seats" value={count(c.accounts)} />
       <StatBar label="Health" value={c.health} />
       {route && <span class="small tr-partner-link">Open partnership →</span>}
     </Card>

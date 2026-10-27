@@ -1,6 +1,6 @@
 // The nominal index (SIMULATION §4.6): each country's price-and-wealth level
-// compounds with growth, inflation and the trend, and balances per account,
-// market wages and rival books are all quoted at that level.
+// compounds with growth, inflation and the trend; market wages and rival books
+// are quoted at that level, while plan ARR follows the price charged (C3a).
 import { describe, expect, it } from 'vitest';
 import { MACRO_TARGETS, NOMINAL_INDEX } from '../../src/config/balance';
 import { marketWage } from '../../src/sim/branch/staff';
@@ -46,16 +46,16 @@ describe('nominal index (§4.6)', () => {
     expect(nominalIndex(s, 'nowhere')).toBe(1);
   });
 
-  it('quotes new-account balances at the index, so a doubled level doubles new volume', () => {
-    const run = (level: number) => {
-      const s = newGame({ seed: 3, cityId: 'cal' });
-      s.world.countries.CA!.nominal = level;
-      const id = openScriptedBranch(s, 'midtown');
-      advanceWeeks(s, 2);
-      return s.branches[id]!.books.chequing!.last.newVolume;
-    };
-    const base = run(1);
-    expect(base).toBeGreaterThan(0);
-    expect(run(2) / base).toBeCloseTo(2, 1);
+  it('books plan ARR at the price charged: seats × monthly fee × 12 (C3a)', () => {
+    // Plan balances are ARR at the player's own price, so the index moves them
+    // only through prices (§10.7), not through the size of a new account.
+    const s = newGame({ seed: 3, cityId: 'cal' });
+    const id = openScriptedBranch(s, 'midtown');
+    advanceWeeks(s, 2);
+    const b = s.branches[id]!;
+    const book = b.books.plus!;
+    expect(book.last.newAccounts).toBeGreaterThan(0);
+    // Free-tier upgrades land after billing, so they join the ARR next week.
+    expect(book.balance / (book.accounts * b.offered.plus!.price * 12)).toBeCloseTo(1, 1);
   });
 });

@@ -1,18 +1,18 @@
 import { describe, expect, it } from 'vitest';
 import { CHARTER_CAPITAL } from '../../src/config/balance';
 import { advanceWeeks } from '../../src/sim/engine';
-import { totalDeposits } from '../../src/sim/balanceSheet';
+import { companyArr } from '../../src/sim/arr';
 import { creditAvailable, lendersNearYou } from '../../src/sim/corporateDebt';
 import { newGame, type NewGameOptions } from '../../src/sim/newGame';
 import { openScriptedBranch } from '../helpers/scenario';
 
 const base: NewGameOptions = { seed: 7, cityId: 'cal' };
 
-function depositsAfter(opts: Partial<NewGameOptions>, weeks: number): number {
+function arrAfter(opts: Partial<NewGameOptions>, weeks: number): number {
   const s = newGame({ ...base, ...opts });
   openScriptedBranch(s, 'midtown');
   advanceWeeks(s, weeks);
-  return totalDeposits(s);
+  return companyArr(s);
 }
 
 describe('new game options', () => {
@@ -37,9 +37,9 @@ describe('new game options', () => {
   });
 
   it('makes Easy friendlier than Expert', () => {
-    const easy = depositsAfter({ difficulty: 'easy' }, 40);
-    const normal = depositsAfter({ difficulty: 'normal' }, 40);
-    const expert = depositsAfter({ difficulty: 'expert' }, 40);
+    const easy = arrAfter({ difficulty: 'easy' }, 40);
+    const normal = arrAfter({ difficulty: 'normal' }, 40);
+    const expert = arrAfter({ difficulty: 'expert' }, 40);
     expect(easy).toBeGreaterThan(normal);
     expect(normal).toBeGreaterThan(expert);
   }, 30_000);

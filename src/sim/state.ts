@@ -55,7 +55,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState } from './personalTypes';
 
-export const SCHEMA_VERSION = 5;
+export const SCHEMA_VERSION = 6;
 
 export interface GameState {
   schemaVersion: number;
@@ -1000,6 +1000,8 @@ export interface WeeklySnapshot {
   cashFlow: { ops: Money; investing: Money; financing: Money; net: Money };
   totals: {
     assets: Money;
+    /** Annual recurring revenue at the close (C3a); absent in weeks closed before schema 6. */
+    arr?: Money;
     deposits: Money;
     loans: Money;
     equity: Money;

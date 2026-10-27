@@ -12,7 +12,14 @@ import { hire, holderTotal, identityGap } from '../helpers/executives';
 
 describe('governance over three years', () => {
   it('keeps the books whole with every executive delegating', () => {
-    const s = bankWithFloors(['executive', 'finance', 'hr', 'products', 'marketing', 'it', 'risk']);
+    // A full executive suite costs far more than one young sales office earns, so
+    // the run starts well funded (as a lab that had raised a big round would).
+    const s = bankWithFloors(
+      ['executive', 'finance', 'hr', 'products', 'marketing', 'it', 'risk'],
+      {
+        capital: 30_000_000,
+      },
+    );
     for (const seat of EXEC_SEAT_ORDER) {
       hire(s, seat);
       for (const d of EXEC_SEATS[seat].delegations) cmd.setExecDelegation(s, seat, d.id, true);

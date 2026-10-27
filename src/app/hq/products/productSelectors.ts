@@ -1,6 +1,6 @@
 // Read-only views for the Products floor, the credit bureau and the IT floor's
 // digital projects (SCREENS §10, §13): the company lineup's price and Offered
-// state, company totals per product, the deposits and loans trend, development
+// state, company totals per product, the ARR and lending trend, development
 // status and model labels. Nothing here mutates GameState.
 import { DEV_TIER, DEV_TERMS } from '../../../config/balance';
 import { DATA_INPUTS } from '../../../data/bureaus';
@@ -43,8 +43,8 @@ export function tierHint(template: DevTemplate | undefined, tier: DevTier): stri
   const fee = base.defaultRule.base === 'fixed';
   const price = fee
     ? DEV_TIER.feeMult[tier] === 1
-      ? 'Standard fee'
-      : `Fee ×${DEV_TIER.feeMult[tier]}`
+      ? 'Standard price'
+      : `Price ×${DEV_TIER.feeMult[tier]}`
     : DEV_TIER.rateAdd[tier] === 0
       ? 'Standard rate'
       : `Default rate ${pp(DEV_TIER.rateAdd[tier])}`;
@@ -161,14 +161,14 @@ export function companyTotals(s: GameState, productId: string) {
 
 // ─── Company trend ────────────────────────────────────────────────────────────
 
-/** Deposits and loans over the last `weeks` closed weeks, with the latest two values. */
+/** ARR and Loan Desk lending over the last `weeks` closed weeks, with the latest two values. */
 export function trendSeries(history: WeeklySnapshot[], weeks: number) {
   const recent = history.slice(-weeks);
-  const deposits = recent.map((w) => w.totals.deposits);
+  const arr = recent.map((w) => w.totals.arr ?? 0);
   const loans = recent.map((w) => w.totals.loans);
   return {
     weeks: recent.map((w) => w.week),
-    deposits,
+    arr,
     loans,
     last: recent[recent.length - 1],
     prev: recent[recent.length - 2],

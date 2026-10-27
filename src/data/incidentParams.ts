@@ -74,8 +74,10 @@ export const INCIDENT_PARAMS = {
     slowWeeks: 4,
   },
   CARD_FRAUD: {
+    /** The base product whose ARR the ring abuses (C3a: the API). */
+    product: 'api',
     shieldBase: 1.3,
-    lossShare: 0.005,
+    lossShare: 0.02,
     takeupMult: 0.5,
     takeupWeeks: 4,
   },
@@ -89,5 +91,5 @@ export const INCIDENT_PARAMS = {
     waitWeeks: 1,
     waitMorale: 10,
   },
-  PRICE_WAR: { matchBoost: 0.0015, matchWeeks: 26 },
+  PRICE_WAR: { matchCut: 0.1, matchWeeks: 26 },
 } as const;

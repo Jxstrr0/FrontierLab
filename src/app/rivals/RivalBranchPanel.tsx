@@ -10,7 +10,7 @@ import type { GameState, RivalBank, RivalBranch } from '../../sim/state';
 import { ReviewCardView } from '../branch/ServiceTab';
 import { priceText } from '../branch/selectors';
 import { Badge, Card, CoinRating, Medallion, Panel, SectionTitle } from '../components';
-import { count, pct } from '../format/format';
+import { count } from '../format/format';
 import { closePanel, openPanel, useGame } from '../store';
 import { RivalBranchArt } from './RivalArt';
 import {
@@ -48,13 +48,15 @@ export function RivalBranchPanel(p: { lotId: string }) {
   const { bank, branch } = found;
   const district = DISTRICT_SPECS[lot.district]?.name;
   const mine = nearestOwnBranch(s, branch);
-  const theirs = rivalPriceInCity(s, bank, 'savings', branch.cityId);
-  const ours = ourPrice(s, mine, 'savings');
+  const sym = s.settings.currency;
+  const plus = productOf('plus')!;
+  const theirs = rivalPriceInCity(s, bank, 'plus', branch.cityId);
+  const ours = ourPrice(s, mine, 'plus');
   const advice =
     theirs !== undefined && ours !== undefined
-      ? `This is ${bank.name}'s sales office. Their savings rate is ${pct(theirs)}; ours is ${pct(ours)}.`
+      ? `This is ${bank.name}'s sales office. Their Plus plan is ${priceText(plus, theirs, sym)}; ours is ${priceText(plus, ours, sym)}.`
       : theirs !== undefined
-        ? `This is ${bank.name}'s sales office. Their savings rate is ${pct(theirs)}.`
+        ? `This is ${bank.name}'s sales office. Their Plus plan is ${priceText(plus, theirs, sym)}.`
         : `This is ${bank.name}'s sales office.`;
   const hqSite = rivalHqSite(s, bank.id, branch.cityId);
   const failed = failedText(s, bank);
@@ -131,7 +133,7 @@ function RateSheet(p: { s: GameState; bank: RivalBank; branch: RivalBranch }) {
   const sym = p.s.settings.currency;
   return (
     <section>
-      <SectionTitle>Rate sheet</SectionTitle>
+      <SectionTitle>Price sheet</SectionTitle>
       {mine && <p class="muted small">Compared with our {mine.name} sales office.</p>}
       <Card>
         {RATE_SHEET.map((group) => (

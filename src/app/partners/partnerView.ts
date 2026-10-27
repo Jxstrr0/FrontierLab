@@ -1,5 +1,5 @@
 // Read-only views for the employer and university panels (SCREENS §14–15):
-// the expected-deposits curve, the type label, average income, who holds the
+// the expected-ARR curve, the type label, average income, who holds the
 // payroll today and the default host/package picks. Formulas come from
 // src/sim/partnerships.ts so the panel and the simulation always agree.
 import { PARTNER_CONTRACT_WEEKS, PARTNER_HEALTH } from '../../config/balance';
@@ -18,7 +18,7 @@ import type { GameState, Partnership, Site } from '../../sim/state';
 /** Weeks between points on the curve chart. */
 export const CURVE_STEP_WEEKS = 4;
 
-/** Expected deposits every 4 weeks of the contract at a given health. */
+/** Expected ARR every 4 weeks of the contract at a given health. */
 export function expectedCurve(
   site: Site,
   kind: PartnershipKind,
@@ -59,7 +59,7 @@ export function currentPartner(state: GameState, site: Site, mine: boolean): str
   return rival ? (state.rivals[rival]?.name ?? 'Another bank') : 'None';
 }
 
-/** Default package: a student account for students, chequing for payroll, else the first offered. */
+/** Default package: the Campus Plan for students, Team for payroll, else the first offered. */
 export function defaultPackage(
   state: GameState,
   hostId: string | undefined,
@@ -68,7 +68,7 @@ export function defaultPackage(
   const host = hostId ? state.branches[hostId] : undefined;
   if (!host) return undefined;
   const options = packageOptions(state, host);
-  const want = kind === 'student' ? 'student' : 'chequing';
+  const want = kind === 'student' ? 'campus_plan' : 'team';
   return (
     options.find((pid) => {
       const spec = productSpec(state, pid);

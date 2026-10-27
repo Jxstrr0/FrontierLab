@@ -52,11 +52,11 @@ describe('loss records', () => {
     expect(perf.expectedLoss).toBeCloseTo((500 + (4e6 * 0.01 * 0.2) / 52) * 13);
   });
 
-  it('fills from the books and the Loan Desk during play', () => {
+  it('fills from the Loan Desk during play', () => {
+    // C3a: the Loan Desk holds the only loans left, so it is the only source in play.
     const s = runScript(40);
     const ids = lossTable(s).map((r) => r.productId);
-    expect(ids).toContain('mortgage');
-    expect(ids).toContain('sbl');
+    expect(ids).toEqual(['sbl']);
     expect(s.risk.losses.at(-1)!.week).toBe(s.clock.week);
     const perf = modelPerformance(s);
     expect(perf.predicted).toBeGreaterThan(0);

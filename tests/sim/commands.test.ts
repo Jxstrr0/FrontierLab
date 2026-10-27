@@ -55,8 +55,8 @@ describe('commands', () => {
     const s = newGame({ seed: 42, cityId: 'cal' });
     const r = cmd.buildBranch(s, { lotId: freeLot(s).id, build: REFERENCE_BUILDS.basic });
     if (!r.ok) throw new Error(r.reason);
-    expect(cmd.setPrice(s, r.branchId, 'savings', 0.03123)).toEqual({ ok: true, price: 0.031 });
-    expect(cmd.setPrice(s, r.branchId, 'savings', 0.5)).toEqual({ ok: true, price: 0.08 });
+    expect(cmd.setPrice(s, r.branchId, 'plus', 21.4)).toEqual({ ok: true, price: 21 });
+    expect(cmd.setPrice(s, r.branchId, 'plus', 500)).toEqual({ ok: true, price: 60 });
   });
 
   it('moves corporate cash into treasury reserves one way only', () => {

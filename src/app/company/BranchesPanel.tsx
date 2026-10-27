@@ -1,4 +1,4 @@
-// Branches list (SCREENS §25): every branch with its rating, deposits, loans,
+// Branches list (SCREENS §25): every office with its rating, ARR, customers,
 // weekly income and issues, sortable and filterable by city (chips that scroll
 // sideways). Across countries, rows are grouped under each country and every
 // city carries its country code. Tap a row to open it, from any city.
@@ -25,8 +25,8 @@ import './company.css';
 const SORTS: { value: SortKey; label: string }[] = [
   { value: 'name', label: 'Name' },
   { value: 'rating', label: 'Rating' },
-  { value: 'deposits', label: 'Deposits' },
-  { value: 'loans', label: 'Loans' },
+  { value: 'arr', label: 'ARR' },
+  { value: 'customers', label: 'Customers' },
   { value: 'income', label: 'Income' },
 ];
 
@@ -131,8 +131,8 @@ function BranchCard(p: { r: BranchRow; city: string; sym: string }) {
       </div>
       <div class="branch-row-city muted small">{p.city}</div>
       <div class="branch-row-stats">
-        <Stat label="Deposits" value={money(r.deposits, sym)} />
-        <Stat label="Loans" value={money(r.loans, sym)} />
+        <Stat label="ARR" value={money(r.arr, sym)} />
+        <Stat label="Customers" value={count(r.customers)} />
         <Stat
           label="Income a week"
           value={`${r.income < 0 ? '−' : ''}${money(Math.abs(r.income), sym)}`}

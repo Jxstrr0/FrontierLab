@@ -1,14 +1,13 @@
-// Read-only view of each branch for the Branches list (SCREENS §25): the figures
+// Read-only view of each office for the Branches list (SCREENS §25): the figures
 // to show and sort by, the issues worth a badge, and the cities and countries to
 // filter and group by once the bank spans several of them.
 import { CITIES } from '../../data/cities';
 import type { CountryId } from '../../data/types';
-import { isDeposit, isLoan } from '../../data/products';
-import { productSpec } from '../../sim/products';
+import { branchArr } from '../../sim/arr';
 import { staffNeeded } from '../../sim/branch/staff';
 import type { Branch, GameState } from '../../sim/state';
 
-export type SortKey = 'name' | 'rating' | 'deposits' | 'loans' | 'income';
+export type SortKey = 'name' | 'rating' | 'arr' | 'customers' | 'income';
 
 export interface Issue {
   text: string;
@@ -20,23 +19,12 @@ export interface BranchRow {
   name: string;
   cityId: string;
   rating: number;
-  deposits: number;
-  loans: number;
+  /** Annual recurring revenue of the office's plan and usage books. */
+  arr: number;
+  customers: number;
   /** Net income of the latest weekly close; 0 for a branch with no history. */
   income: number;
   issues: Issue[];
-}
-
-function bookTotals(s: GameState, branch: Branch): { deposits: number; loans: number } {
-  let deposits = 0;
-  let loans = 0;
-  for (const [pid, book] of Object.entries(branch.books)) {
-    const spec = productSpec(s, pid);
-    if (!spec) continue;
-    if (isDeposit(spec)) deposits += book.balance;
-    else if (isLoan(spec)) loans += book.balance;
-  }
-  return { deposits, loans };
 }
 
 function issuesOf(s: GameState, branch: Branch): Issue[] {
@@ -61,7 +49,8 @@ export function branchRows(s: GameState): BranchRow[] {
     name: b.name,
     cityId: b.cityId,
     rating: b.ratings.overall,
-    ...bookTotals(s, b),
+    arr: branchArr(s, b),
+    customers: b.customers,
     income: b.pnl.at(-1)?.income ?? 0,
     issues: issuesOf(s, b),
   }));

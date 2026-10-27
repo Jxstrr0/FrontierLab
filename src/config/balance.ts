@@ -269,7 +269,8 @@ export const REVIEW_RATE = 0.12;
 export const REVIEW_CARDS_KEPT = 8;
 export const REVIEW_CARD_SIGMA = 0.7;
 /** Fee competitiveness denominator floor: $1 for $ fees, 0.25pp for % fees (§8, §9.7). */
-export const FEE_COMP_MIN = { dollars: 1, pct: 0.0025 } as const;
+/** Fee competitiveness floor: $ fees, % fees and per-unit (API) prices (C3a). */
+export const FEE_COMP_MIN = { dollars: 1, pct: 0.0025, unit: 0.1 } as const;
 export const FEE_COMP_SCALE = 0.25;
 
 // ─── DEMAND (§9) ──────────────────────────────────────────────────────────────
@@ -351,7 +352,7 @@ export const PRICE_FACTOR_CLAMP = {
   loan: [0.2, 1.8],
   fee: [0.2, 1.8],
 } as const satisfies Record<string, readonly [number, number]>;
-export const FEE_STEP_MIN = { dollars: 2, pct: 0.0025 } as const;
+export const FEE_STEP_MIN = { dollars: 2, pct: 0.0025, unit: 0.2 } as const;
 export const FEE_PF_SCALE = 0.5;
 export const PRODUCTS_PER_CUSTOMER = 1.6;
 
@@ -459,7 +460,8 @@ export const OVERNIGHT_LIMIT_MULT: Record<Tier, number> = {
   restricted: 0.5,
   critical: 0.25,
 };
-export const DEPOSIT_PER_EMPLOYEE = 4_500;
+/** ARR per participating employee in a company partnership (§13.7, C3a): about a Team seat. */
+export const ARR_PER_EMPLOYEE = 300;
 /** Funding market (§13.6): offers regenerate every 2 weeks while you have a Treasury floor. */
 export const FUNDING_REFRESH_WEEKS = 2;
 /** Offer count = base + floor(perCoverage × treasuryCoverage′) + (CFO expertise ≥ cfoExpertise ? cfoBonus : 0). */
@@ -632,7 +634,7 @@ export const DEV_SIGMA = 0.9;
 export const DEV_MAX_STARS = 5;
 /**
  * Target tier (decision log, DESIGN §7): the default price number moves with the
- * tier — rates −0.10pp / 0 / +0.15pp (CONTENT §6 senior_saver), fees ×0.85 / 1 /
+ * tier — rates −0.10pp / 0 / +0.15pp (Loan Desk-style rate products), prices ×0.85 / 1 /
  * ×1.25 — and Premium adds a small Products rating bump where it's offered.
  */
 export const DEV_TIER = {
@@ -1052,15 +1054,15 @@ export const RIVAL_FAILURE = {
   insolventCr: 0.02,
   distressWeeks: 8,
 } as const;
-/** Price wars (§18.6). Bumps in rate units; decay per week once your streak ends. */
+/** Price wars (§18.6). Bumps are shares cut off rival plan prices; decay per week once your streak ends. */
 export const PRICE_WAR = {
   minRating: 4.0,
   streakWeeks: 8,
   everyWeeks: 4,
   chance: 0.3,
-  bump: 0.0015,
-  cap: 0.006,
-  decay: 0.0001,
+  bump: 0.05,
+  cap: 0.2,
+  decay: 0.005,
 } as const;
 
 // ─── RIVAL CORPORATE LENDING (§19.9) ──────────────────────────────────────────
@@ -1132,7 +1134,7 @@ export const FRAUD_SHIELD = {
  * tier is Restricted/Critical or the liquidity ratio is under maxLiquidity, a run
  * starts with weeklyChance and lasts `weeks`; deposit churn × runMult meanwhile.
  * BANK_RUN options: the central bank window borrows windowShare × deposits;
- * the rate raise adds savingsBoost to savings rates everywhere for boostWeeks;
+ * the price cut takes planCut off every plan price for boostWeeks;
  * a public statement succeeds with statementBase + statementPerPoint per CR point
  * above statementFromCr (capped at statementMax) and ends the run.
  */
@@ -1143,7 +1145,7 @@ export const BANK_RUN = {
   weeks: [3, 6] as [number, number],
   runMult: 6,
   windowShare: 0.1,
-  savingsBoost: 0.01,
+  planCut: 0.1,
   boostWeeks: 8,
   statementBase: 0.3,
   statementPerPoint: 0.05,
@@ -1392,7 +1394,7 @@ export const YIELD_CURVE: { label: string; premiumShare: number }[] = [
 export const PARTNER_CONTRACT_WEEKS = 364;
 /** Signing fee = employees × PARTNER_FEE_PER_EMPLOYEE × income mult × city incomeIndex (CONTENT §14). */
 export const PARTNER_FEE_PER_EMPLOYEE = 160;
-// DEPOSIT_PER_EMPLOYEE ($4,500 per participating employee) sits with the treasury constants above.
+// ARR_PER_EMPLOYEE ($300 per participating employee) sits with the treasury constants above.
 /**
  * Participation curve over a contract of L weeks (§13.7): an S-curve from 0 to
  * `rampTo` by `rampWeeks` (logistic with this `steepness`, rescaled to hit both
@@ -1441,7 +1443,7 @@ export const PARTNER_RENEWAL = { base: 1.5, windowWeeks: 52 } as const;
 export const STUDENT_PARTNERSHIP = {
   students: { S: 6000, M: 10000, L: 16000, XL: 24000 },
   feePerStudent: 30,
-  depositPerStudent: 600,
+  arrPerStudent: 80,
 } as const;
 /**
  * University graduate program (DESIGN §5.8.10): yearly cost × the city's
@@ -2097,6 +2099,12 @@ export const MERGERS = {
   offerStep: 0.1,
   /** An acquired branch's awareness = perStar × the rival branch's overall stars, clamped. */
   acquiredAwareness: { perStar: 0.12, min: 0.2, max: 0.6 },
+  /**
+   * C3a: a rival's book "deposits" stand for its customers until C5, one per
+   * depositPerCustomer. They size the city share test and the plan seats an
+   * acquired office starts with (split by ACQUIRED_PLAN_MIX).
+   */
+  depositPerCustomer: 10_000,
 } as const;
 /**
  * Share-for-share deals (§19.8): a listed bank may pay part of a takeover in

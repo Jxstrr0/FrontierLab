@@ -1,9 +1,9 @@
 // Closing an acquisition (SIMULATION §19.8): the entries that merge a rival's
 // books into yours, keeping the balance identity. With the plan from
 // acquisitionPlan.ts:
-//   assets      −C (cash) −V (holding given up) +G (goodwill) +L′ (loans)
-//               +R (reserves) +LD (lease deposits)
-//   liabilities +D (deposits) −X (corporate debt you owed the target)
+//   assets      −C (cash) −V (holding given up) +G (goodwill) +R (reserves)
+//               +LD (lease deposits)
+//   liabilities −X (corporate debt you owed the target)
 //   equity      +S (new shares in a share-for-share deal) +gain (bargain purchase,
 //               non-cash P&L), since G − gain = C + S + V − net assets.
 // Then the target's branches become yours (acquisitionBranch.ts), converting
@@ -55,9 +55,7 @@ export function closeAcquisition(
   state.treasury.reserves += plan.reserves;
   state.company.leaseDeposits += plan.leaseDeposits;
 
-  const converted = bank.branches.map((rb) =>
-    convertRivalBranch(state, bank, rb, plan.loanFactor, rng),
-  );
+  const converted = bank.branches.map((rb) => convertRivalBranch(state, bank, rb, rng));
   // One office per city (C2a): in each city the acquired branches join your
   // office there, or the biggest of them becomes your office.
   const byCity = new Map<string, string[]>();

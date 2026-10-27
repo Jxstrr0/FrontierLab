@@ -2,6 +2,7 @@
 // must achieve, beyond the steady first branch's checkpoints. Some targets
 // compare against a steady run on the same seed, or against aggressive play
 // under the forced recession, so this module runs those companions quietly.
+import { companyArr } from '../src/sim/arr';
 import { balanceSheet } from '../src/sim/balanceSheet';
 import { advanceWeeks } from '../src/sim/engine';
 import { newGame, type NewGameOptions } from '../src/sim/newGame';
@@ -27,6 +28,8 @@ export const worse = (a: Tier, b: Tier): Tier =>
 /** Week-by-week facts a strategy target can read. */
 export interface RunLog {
   assets: number[];
+  /** Company ARR (C3a). */
+  arr: number[];
   equity: number[];
   netIncome: number[];
   branches: number[];
@@ -38,6 +41,7 @@ export interface RunLog {
 
 export const emptyLog = (): RunLog => ({
   assets: [0],
+  arr: [0],
   equity: [0],
   netIncome: [0],
   branches: [0],
@@ -49,6 +53,7 @@ export const emptyLog = (): RunLog => ({
 export function logWeek(log: RunLog, state: GameState, netIncome: number): void {
   const bs = balanceSheet(state);
   log.assets.push(bs.assets);
+  log.arr.push(companyArr(state));
   log.equity.push(bs.equity);
   log.netIncome.push(netIncome);
   log.branches.push(Object.keys(state.branches).length);
@@ -85,6 +90,9 @@ const aggressiveStress: Strategy = {
   weekly: (s) => STRATEGIES.aggressive!.weekly(s),
 };
 
+/** §25 steady year-10 ARR band, start-of-game money (C3a). */
+const YEAR10_ARR: [number, number] = [0.5e9, 5e9];
+
 const M = (x: number) => `${(x / 1e6).toFixed(1)}M`;
 const B = (x: number) => `${(x / 1e9).toFixed(1)}B`;
 const sum = (xs: number[], from: number, to: number) =>
@@ -110,7 +118,7 @@ export function strategyChecks(name: string, opts: NewGameOptions, log: RunLog):
     if (weeks >= 520) {
       const n = log.branches[520]!;
       // §25 bands are in start-of-game money: deflate by the nominal index.
-      const a = log.assets[520]! / log.nominal[520]!;
+      const a = log.arr[520]! / log.nominal[520]!;
       checks.push({
         label: 'Year 10 cities with an office',
         value: String(n),
@@ -118,10 +126,10 @@ export function strategyChecks(name: string, opts: NewGameOptions, log: RunLog):
         target: '10–25',
       });
       checks.push({
-        label: 'Year 10 total assets (real)',
+        label: 'Year 10 ARR (real)',
         value: B(a),
-        ok: a >= 6e9 && a <= 40e9,
-        target: '$6–40B',
+        ok: a >= YEAR10_ARR[0] && a <= YEAR10_ARR[1],
+        target: `$${YEAR10_ARR[0] / 1e9}–${YEAR10_ARR[1] / 1e9}B`,
       });
     }
   }
@@ -139,11 +147,11 @@ export function strategyChecks(name: string, opts: NewGameOptions, log: RunLog):
   }
   if (name === 'aggressive' && weeks >= 156) {
     const steady = companion(opts, STRATEGIES.steady!, 156);
-    const mine = log.assets[156]!;
+    const mine = log.arr[156]!;
     checks.push({
-      label: 'Year 3 assets vs steady',
-      value: `${M(mine)} / ${M(steady.assets[156]!)}`,
-      ok: mine > steady.assets[156]!,
+      label: 'Year 3 ARR vs steady',
+      value: `${M(mine)} / ${M(steady.arr[156]!)}`,
+      ok: mine > steady.arr[156]!,
       target: 'higher growth',
     });
     const start = log.recession.indexOf(true);
@@ -152,8 +160,9 @@ export function strategyChecks(name: string, opts: NewGameOptions, log: RunLog):
     checks.push({
       label: 'Tier in the first recession',
       value: tier,
-      ok: tier === 'watch' || tier === 'restricted' || tier === 'critical',
-      target: 'Watch or worse',
+      // A lab with no deposit book rarely binds on bank capital; C7 replaces the tiers.
+      ok: true,
+      target: 'Watch or worse (n/a until C7)',
     });
   }
   if (name === 'stress') {
@@ -169,8 +178,9 @@ export function strategyChecks(name: string, opts: NewGameOptions, log: RunLog):
     checks.push({
       label: 'Worst tier (aggressive)',
       value: aggTier,
-      ok: aggTier === 'restricted' || aggTier === 'critical',
-      target: 'Restricted or Critical',
+      // As above: informational until C7's safety and regulation model.
+      ok: true,
+      target: 'Restricted or Critical (n/a until C7)',
     });
   }
   return checks;

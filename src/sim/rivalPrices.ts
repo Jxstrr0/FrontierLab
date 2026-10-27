@@ -36,7 +36,9 @@ export function rivalTargetPrice(
   const p = STRATEGY_PROFILES[strategy];
   const base = defaultPrice(spec, c);
   let price: number;
-  if (spec.priceType !== 'rate') price = base * (1 + p.fees);
+  // Price wars (§18.6) cut plan prices.
+  const cut = spec.kind === 'plan' && spec.category === 'deposits' ? depositBump : 0;
+  if (spec.priceType !== 'rate') price = base * (1 + p.fees - cut);
   else if (spec.id === 'savings') price = base + p.savings;
   else if (spec.id === 'gic1y') price = base + p.gic;
   else if (spec.id === 'mortgage') price = base + p.mortgage;
@@ -44,8 +46,6 @@ export function rivalTargetPrice(
   else price = base + p.loans;
   // Difficulty edge: better deposit rates, cheaper loans (in pp).
   if (spec.priceType === 'rate') price += isDeposit(spec) ? edge / 100 : -edge / 100;
-  // Price wars (§18.6) lift deposit rates.
-  if (spec.priceType === 'rate' && isDeposit(spec)) price += depositBump;
   return clamp(price, spec.min, spec.max);
 }
 

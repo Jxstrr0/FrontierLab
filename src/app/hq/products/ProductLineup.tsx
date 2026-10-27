@@ -5,6 +5,7 @@
 // products included after the base catalog.
 import { useState } from 'preact/hooks';
 import { COUNTRIES } from '../../../data/countries';
+import { CATEGORY_NAMES } from '../../../data/products';
 import type { CategoryId, CountryId } from '../../../data/types';
 import * as cmd from '../../../sim/commands';
 import { theCountryName } from '../../../sim/newsStory';
@@ -14,11 +15,7 @@ import { act, useGame } from '../../store';
 import { CompanyProductCard } from './CompanyProductCard';
 import { lineupSpecs, priceCountries } from './productSelectors';
 
-const CATEGORIES: { value: CategoryId; label: string }[] = [
-  { value: 'deposits', label: 'Deposits' },
-  { value: 'lending', label: 'Lending' },
-  { value: 'cards', label: 'Cards' },
-];
+const CATEGORIES = CATEGORY_NAMES;
 
 export function ProductLineup() {
   const s = useGame();

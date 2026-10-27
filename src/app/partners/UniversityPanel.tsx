@@ -46,7 +46,7 @@ export function UniversityPanel(p: { siteId: string }) {
             tone={mine ? 'good' : undefined}
           />
         </Card>
-        <SectionTitle>Staff payroll</SectionTitle>
+        <SectionTitle>Staff plans</SectionTitle>
         <DealCard site={site} kind="payroll" people={site.employer.employees} />
         <SectionTitle>Student partnership</SectionTitle>
         <DealCard site={site} kind="student" people={students} />

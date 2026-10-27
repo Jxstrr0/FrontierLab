@@ -2,20 +2,18 @@
 // One plan feeds the offer sheet's regulator pre-check, the regulator's answer
 // and the closing entries, so all three always agree.
 //
-// The target's branches bring deposits D and loans L; with its equity E, the
-// cash it holds is R = D + E − L − X − LD, where X is corporate debt you owe it
-// (settled on closing) and LD the lease deposits on its storefronts. If R would
-// be negative the loans are marked down to fair value until it is zero, so the
-// net assets you take on equal its book equity. You pay C in cash and S in new
+// C3a: the target's customers move onto your plans, and its book deposits D
+// and loans L settle inside it before closing (deposits paid out, loans sold),
+// so it brings cash R = E − X − LD, where E is its equity, X corporate debt you
+// owe it (settled on closing) and LD the lease deposits on its storefronts
+// (floored at zero). The net assets you take on are R + LD + X: its book equity
+// whenever R is positive. You pay C in cash and S in new
 // shares (a listed bank's share-for-share part, shareDeals.ts) and give up any
 // of its shares your company holds (V at market); goodwill = C + S + V − net
 // assets, or a bargain gain when that is negative.
 import { MERGERS, STOCK_RISK_WEIGHT } from '../config/balance';
-import { ACQUIRED_LOAN_MIX } from '../data/mergers';
-import { isDeposit, PRODUCTS } from '../data/products';
 import { capitalSnapshot } from './capital';
 import { companySharesOf, sharesToBuy } from './mergerPricing';
-import { productSpec } from './products';
 import { securityPrice } from './securities';
 import { stockSplit, type StockSplit } from './shareDeals';
 import type { GameState, RivalBank } from './state';
@@ -44,12 +42,8 @@ export interface DealPlan {
   personalCash: number;
   /** Market value of the company's holding given up, V. */
   holdingValue: number;
+  /** The target's book deposits D: its customers in the share test (C3a). */
   deposits: number;
-  /** Loans taken on after any fair-value markdown, L′. */
-  loans: number;
-  loanMarkdown: number;
-  /** Fraction of each branch's loans kept (L′ / L). */
-  loanFactor: number;
   reserves: number;
   leaseDeposits: number;
   /** Corporate debt you owe the target, settled on closing. */
@@ -57,8 +51,6 @@ export interface DealPlan {
   netAssets: number;
   goodwill: number;
   gain: number;
-  /** Acquired loans by product (ACQUIRED_LOAN_MIX), for risk weights. */
-  loansByProduct: Record<string, number>;
   proFormaCr: number;
   cityShares: CityShare[];
   /** City deposit share limit: MERGERS.maxCityShare, or fastTrackShare after a won Lobbying fast-track. */
@@ -81,17 +73,13 @@ export function splitByMix(amount: number, mix: Record<string, number>): Record<
   return out;
 }
 
-/** Your branch deposit books in a city. */
+/** Your customers in a city, in rival-deposit terms (MERGERS.depositPerCustomer, C3a). */
 export function yourDepositsIn(state: GameState, cityId: string): number {
   let total = 0;
   for (const b of Object.values(state.branches)) {
-    if (b.cityId !== cityId) continue;
-    for (const [pid, book] of Object.entries(b.books)) {
-      const spec = productSpec(state, pid);
-      if (spec && isDeposit(spec)) total += book.balance;
-    }
+    if (b.cityId === cityId && b.status !== 'closed') total += b.customers;
   }
-  return total;
+  return total * MERGERS.depositPerCustomer;
 }
 
 /** Deposits of rivals still holding branches (not seized, acquired or merged) in a city. */
@@ -137,28 +125,21 @@ export function planDeal(
   const holdingValue = companyShares * securityPrice(state, bank.id);
 
   const deposits = bank.branches.reduce((s, b) => s + b.deposits, 0);
-  const bookLoans = bank.branches.reduce((s, b) => s + b.loans, 0);
   const leaseDeposits = bank.branches.reduce(
     (s, b) => s + (state.world.lots[b.lotId]?.deposit ?? 0) * rivalMult(b),
     0,
   );
   const debtSettled = debtOwedTo(state, bank.id);
-  // Cash-like assets the target holds once its loans, our debt and lease deposits are counted.
-  const available = deposits + bank.equity - debtSettled - leaseDeposits;
-  const loans = Math.min(bookLoans, Math.max(0, available));
-  const reserves = Math.max(0, available - loans);
-  const netAssets = loans + reserves + leaseDeposits - deposits + debtSettled;
+  // The cash the target holds once its books are settled, our debt and lease deposits counted.
+  const reserves = Math.max(0, bank.equity - debtSettled - leaseDeposits);
+  const netAssets = reserves + leaseDeposits + debtSettled;
   const paid = cash + split.stockValue + holdingValue;
   const goodwill = Math.max(0, paid - netAssets);
   const gain = Math.max(0, netAssets - paid);
 
   // Pro-forma capital (§15): CET1 = equity − goodwill − intangibles; cash and reserves carry
   // no risk weight. New deal shares add their value to equity.
-  const loansByProduct = splitByMix(loans, ACQUIRED_LOAN_MIX);
-  let rwaAdded = -holdingValue * STOCK_RISK_WEIGHT;
-  for (const [pid, amount] of Object.entries(loansByProduct)) {
-    rwaAdded += amount * (PRODUCTS[pid]?.riskWeight ?? 1);
-  }
+  const rwaAdded = -holdingValue * STOCK_RISK_WEIGHT;
   const snap = capitalSnapshot(state);
   const cet1 = snap.cet1 + split.stockValue + gain - goodwill;
   const proFormaCr = cet1 / Math.max(1, snap.rwa + rwaAdded);
@@ -175,16 +156,12 @@ export function planDeal(
     personalCash,
     holdingValue,
     deposits,
-    loans,
-    loanMarkdown: bookLoans - loans,
-    loanFactor: bookLoans > 0 ? loans / bookLoans : 1,
     reserves,
     leaseDeposits,
     debtSettled,
     netAssets,
     goodwill,
     gain,
-    loansByProduct,
     proFormaCr,
     cityShares: cityShares(state, bank),
     ...shareLimitFor(state),

@@ -4,16 +4,16 @@
 //   npm run balance -- --years 5 --seeds 1-20   (steady first branch, median city)
 // Prints a yearly company table, the steady first branch's checkpoints, the
 // strategy's own targets (strategyTargets.ts), and a warning for every target
-// out of range. Branch revenue, income and loan-ratio checkpoints that land in
+// out of range. Branch revenue and income checkpoints that land in
 // a recession or the 26 weeks after it read "n/a" (§25: they assume Expansion).
 // With --seeds, it runs steady once per seed and checks the first-branch bands
 // against the median city (branchCheckpoints.ts).
-import { isDeposit, PRODUCTS } from '../src/data/products';
+import { branchArr, companyArr } from '../src/sim/arr';
 import { balanceSheet } from '../src/sim/balanceSheet';
 import { advanceWeeks } from '../src/sim/engine';
 import { newGame } from '../src/sim/newGame';
 import type { Difficulty } from '../src/data/types';
-import type { Branch, GameState } from '../src/sim/state';
+import type { GameState } from '../src/sim/state';
 import { hqStaff } from '../src/sim/hq';
 import { summarize } from '../src/sim/ledger';
 import { founderStake } from '../src/sim/shares';
@@ -64,22 +64,6 @@ function parseArgs(argv: string[]): Args {
 const M = (x: number) => `${(x / 1e6).toFixed(1)}M`;
 const K = (x: number) => `${(x / 1e3).toFixed(1)}k`;
 const P = (x: number) => `${(x * 100).toFixed(1)}%`;
-
-function branchDeposits(b: Branch): number {
-  return Object.entries(b.books).reduce(
-    (s, [p, bk]) => s + (PRODUCTS[p] && isDeposit(PRODUCTS[p]) ? bk.balance : 0),
-    0,
-  );
-}
-
-function branchLoans(state: GameState, b: Branch): number {
-  let total = 0;
-  for (const [p, bk] of Object.entries(b.books)) {
-    const kind = PRODUCTS[p]?.kind;
-    if (kind === 'amortizing' || kind === 'revolving' || kind === 'sbl') total += bk.balance;
-  }
-  return total;
-}
 
 /** Lowest HQ coverage k′ across departments (1 in founder mode). */
 function minCoverage(state: GameState): number {
@@ -150,8 +134,7 @@ function simulate(args: Args) {
         // §25: checkpoints are in start-of-game money, so deflate by the nominal index (§4.6).
         const level = nominalIndex(state, first.cityId);
         at[w] = {
-          dep: branchDeposits(first) / level,
-          loans: branchLoans(state, first) / level,
+          arr: branchArr(state, first) / level,
           cust: first.customers,
           rev: avg((r) => r.revenue) / level,
           inc: avg((r) => r.income) / level,
@@ -166,7 +149,7 @@ function simulate(args: Args) {
         [
           String(w / 52).padStart(4),
           String(Object.keys(state.branches).length).padStart(8),
-          M(bs.deposits).padStart(9),
+          M(companyArr(state)).padStart(9),
           M(bs.loans).padStart(9),
           M(bs.equity).padStart(8),
           P(state.company.capitalRatio).padStart(7),
@@ -208,11 +191,11 @@ function run(): void {
   if (args.seeds) return runPanel(args, args.seeds);
   const { state, strategy, rows, metrics, minCash, maxIdentityGap, log } = simulate(args);
   console.log(
-    `Vault Street balance — strategy ${strategy.name}, seed ${args.seed}, city ${args.city}, ` +
+    `Frontier Lab balance — strategy ${strategy.name}, seed ${args.seed}, city ${args.city}, ` +
       `${args.difficulty}, ${state.meta.competitors} competitors, ${args.years} years\n`,
   );
   console.log(
-    'Year Branches  Deposits     Loans   Equity      CR    NIM   Loss     ROE     Cash       Tier       Policy HQ ppl  Min k′  Index',
+    'Year Branches       ARR     Loans   Equity      CR    NIM   Loss     ROE     Cash       Tier       Policy HQ ppl  Min k′  Index',
   );
   for (const r of rows) console.log(r);
 
@@ -290,10 +273,10 @@ function runPanel(args: Args, [from, to]: [number, number]): void {
   let worstGap = 0;
   let worstCash = Infinity;
   console.log(
-    `Vault Street balance — steady first branch, seeds ${from}–${to}, city ${args.city}, ` +
+    `Frontier Lab balance — steady first branch, seeds ${from}–${to}, city ${args.city}, ` +
       `${args.difficulty}, ${args.years} years\n`,
   );
-  console.log('Seed   Wk52 dep  Wk104 dep  Wk208 dep  Wk156 inc  Payback  Misses');
+  console.log('Seed   Wk52 ARR  Wk104 ARR  Wk208 ARR  Wk156 inc  Payback  Misses');
   for (let seed = from; seed <= to; seed++) {
     const r = simulate({ ...args, seed, strategy: 'steady' });
     runs.push(r.metrics);
@@ -306,9 +289,9 @@ function runPanel(args: Args, [from, to]: [number, number]): void {
     console.log(
       [
         String(seed).padStart(4),
-        cell(a[52]?.dep, M),
-        cell(a[104]?.dep, M),
-        cell(a[208]?.dep, M),
+        cell(a[52]?.arr, M),
+        cell(a[104]?.arr, M),
+        cell(a[208]?.arr, M),
         cell(a[156]?.inc, K),
         String(r.metrics.paybackWeek ?? '—').padStart(8),
         String(misses).padStart(7),
