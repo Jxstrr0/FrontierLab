@@ -855,12 +855,13 @@ export const RIVAL_MODEL = {
   lateGap: 0.3,
 } as const;
 /**
- * The Chief Scientist (§16.13, stage C6c): adds scoreMax × expertise/100 to a
- * training run's score. Its Routine training runs delegation starts a runWeeks
- * run on the weakest axis at cashShare of cash a week (minWeekly to maxWeekly)
- * while cashFloorRuns weeks of that budget stay in cash.
+ * The CPO and training (§16.13; the Chief Scientist's until schema 22): a
+ * seated CPO adds scoreMax × expertise/100 to a training run's score. Their
+ * Routine training runs delegation starts a runWeeks run on the weakest axis at
+ * cashShare of cash a week (minWeekly to maxWeekly) while cashFloorRuns weeks
+ * of that budget stay in cash.
  */
-export const CHIEF_SCIENTIST = {
+export const CPO_TRAINING = {
   scoreMax: 0.15,
   runWeeks: 12,
   cashShare: 0.01,
@@ -1973,19 +1974,21 @@ export const EXEC_PAY = {
  * COO: branch operations turns on `cooDelegation` for the manager it hires;
  * HR benefits, every benefitsEveryWeeks weeks, holds average morale at
  * moraleTarget (cuts back above moraleTarget + moraleSlack), spending at most
- * benefitsBudgetShare of the weekly payroll on benefits. CFO: statement delays × cfoDelayFactor (rounded
- * up); Treasury borrows when LR is more than lrBand under target; Dividends proposes dividendPayout of trailing net income. CPO and
- * CTO: developments of devWeeks at devTier with a weekly budget of at most
- * devBudgetShare of weekly revenue (trailing revenueWeeks average). CMO: holds
- * brand awareness near brandTarget (± brandSlack) within brandBudgetShare of
- * revenue. CRO (Chief Safety Officer): every croEveryWeeks weeks, steps the
- * launch posture down while the safety tier is Watch or worse and up while it
- * is Strong, up to croMaxAppetite. CREO (Chief Real Estate Officer):
- * every rentEveryWeeks weeks, Rents sets each managed building's rent to the
- * level that holds its occupancy dial (propertyMath.rentForOccupancy; 100%
- * is the highest that still fills it); tenants of a managed building accept
- * rent up to × (1 + rentPricingPower × expertise/100) over market with no loss
- * of occupancy (§21.2); Buying buys listed buildings for the bank or for you.
+ * benefitsBudgetShare of the weekly payroll on benefits. CFO: statement delays
+ * × cfoDelayFactor (rounded up); Dividends proposes dividendPayout of trailing
+ * net income; every rentEveryWeeks weeks, Rents sets each managed building's
+ * rent to the level that holds its occupancy dial
+ * (propertyMath.rentForOccupancy; 100% is the highest that still fills it);
+ * tenants of a managed building accept rent up to × (1 + rentPricingPower ×
+ * expertise/100) over market with no loss of occupancy (§21.2); Buying buys
+ * listed buildings for the lab or for you (both the Chief Infrastructure
+ * Officer's until schema 22). CPO and CTO: developments of devWeeks at devTier
+ * with a weekly budget of at most devBudgetShare of weekly revenue (trailing
+ * revenueWeeks average). CMO: holds brand awareness near brandTarget (±
+ * brandSlack) within brandBudgetShare of revenue. CRO (Chief Safety Officer):
+ * every croEveryWeeks weeks, steps the launch posture down while the safety
+ * tier is Watch or worse and up while it is Strong, up to croMaxAppetite;
+ * croMaxLoss is the loss ceiling the attention list warns at.
  */
 export const EXEC_DELEGATION = {
   cooDelegation: { staffing: true, products: true, marketing: true, troubles: true, loans: true },
@@ -1996,7 +1999,6 @@ export const EXEC_DELEGATION = {
   benefitsEveryWeeks: 4,
   benefitsBudgetShare: 0.08,
   cfoDelayFactor: 0.5,
-  lrBand: 0.02,
   dividendPayout: 0.4,
   devWeeks: 12,
   devTier: 'medium',
@@ -2008,10 +2010,7 @@ export const EXEC_DELEGATION = {
   brandSlack: 0.05,
   brandBudgetShare: 0.03,
   croEveryWeeks: 4,
-  croMinCr: 0.12,
   croMaxLoss: 0.012,
-  croRaiseCr: 0.14,
-  croRaiseLoss: 0.009,
   croMaxAppetite: 4,
   /**
    * CFO Capital (§17.2): acts at Watch or worse, raises equity at Restricted or
@@ -2035,11 +2034,11 @@ export const EXEC_DELEGATION = {
   expansionSpacing: 12,
   /** COO Company troubles: option error shrinks with the COO's expertise like a manager's skills. */
   troublesError: 0.5,
-  /** CREO Rents (§21.2): review cadence and the pricing power a 100-expertise chief brings. */
+  /** CFO Rents (§21.2): review cadence and the pricing power a 100-expertise CFO brings. */
   rentEveryWeeks: 4,
   rentPricingPower: 0.1,
   /**
-   * CREO occupancy dials (§21.2), one under each Rents switch: the occupancy
+   * CFO occupancy dials (§21.2), one under each Rents switch: the occupancy
    * each review prices for, default and stops. 1 means as full as tenants allow
    * (REAL_ESTATE.occMax, the bestRent level); lower stops charge more per m²
    * but earn less in total.
@@ -2047,7 +2046,7 @@ export const EXEC_DELEGATION = {
   occTarget: 1,
   occTargets: [0.8, 0.85, 0.9, 0.95, 1] as readonly number[],
   /**
-   * CREO Buying (§21.1): every buyEveryWeeks weeks each Buying switch buys at
+   * CFO Buying (§21.1): every buyEveryWeeks weeks each Buying switch buys at
    * most one listed building, the best net yield at asking in any city. For the
    * bank: its buildings stay under buyAssetCap of total assets, the capital ratio
    * stays at or above buyMinCr after the purchase, expansionReserveWeeks of costs
@@ -2086,14 +2085,9 @@ export const EXEC_DELEGATION = {
 } as const;
 
 /**
- * Branch guidance (§17.2), the CFO and CRO steering delegated managers together.
- * Each half is a whole step in [min, max], moved one step every everyWeeks:
- * the CFO's deposit step up while liquidity is below liqTarget − liqLow and down
- * above liqTarget + liqHigh; the CRO's loan step up (tighter) when capital or
- * losses miss the croMinCr / croMaxLoss marks and down at croRaiseCr /
- * croRaiseLoss. A step moves delegated rate prices by rateStep and the
- * delegated Loan Desk PD threshold by × (1 − thresholdStep × loan step).
- * The COO, CMO and CPO steer the rest the same way (schema v18):
+ * Sales office guidance (§17.2): the COO, CMO and CPO steer delegated managers.
+ * Each part is a whole step in [min, max], moved one step every everyWeeks
+ * (schema v18; the CFO and CSO's deposit and loan steps went in schema 22):
  * - COO staffing: up while delegated-staffing branches average morale below
  *   moraleLow, down above moraleHigh; a step adds wageStep to their wages and
  *   staffStep to their staff target.
@@ -2109,10 +2103,6 @@ export const GUIDANCE = {
   everyWeeks: 4,
   min: -1,
   max: 3,
-  rateStep: 0.001,
-  thresholdStep: 0.12,
-  liqLow: 0.01,
-  liqHigh: 0.05,
   moraleLow: 65,
   moraleHigh: 82,
   wageStep: 0.02,

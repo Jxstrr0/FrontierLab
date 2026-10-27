@@ -1,6 +1,6 @@
 // Executive floor (SCREENS §10): the board meeting card (what the board does,
 // the last meeting, the current dividend and CEO pay, a pending dividend, and
-// Hold meeting once per quarter) and the eight-seat grid. The CEO seat is you;
+// Hold meeting once per quarter) and the seven-seat grid. The CEO seat is you;
 // empty seats open the hire sheet, filled ones the executive's profile.
 import { useState } from 'preact/hooks';
 import type { ExecSeat } from '../../sim/state';

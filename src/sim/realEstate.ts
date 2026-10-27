@@ -2,7 +2,7 @@
 // Each week: values follow the country's cre (company revaluations post to
 // propertyGains through withAssetMarks), each building's market rent eases
 // toward today's (base × cre/100), occupancy eases toward the level the rent
-// supports (a managing CREO's pricing power counted), rent revenue, maintenance
+// supports (a managing CFO's pricing power counted), rent revenue, maintenance
 // and vacancy cost are booked (company buildings in the P&L, private ones in
 // personal cash), For Sale buildings that reach their sale week are sold, and
 // due cities refresh their listings.

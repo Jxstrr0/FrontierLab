@@ -1,8 +1,9 @@
-// The CREO's delegations (SIMULATION §17.2, §21.2): Rents on the bank's
-// buildings and on the ones you own privately. Every EXEC_DELEGATION.rentEveryWeeks
+// The CFO's Rents delegations (SIMULATION §17.2, §21.2; the Chief
+// Infrastructure Officer's until schema 22): Rents on the lab's buildings and
+// on the ones you own privately. Every EXEC_DELEGATION.rentEveryWeeks
 // weeks each managed building's rent moves to the level that holds the owner's
 // occupancy dial (propertyMath.rentForOccupancy; at 100% the highest that still
-// fills it), counting the chief's pricing power, through
+// fills it), counting the CFO's pricing power, through
 // the ordinary setPropertyRent command. Switching a Rents switch on reviews at
 // once (commands/executives.ts). occupancyEstimate feeds the occupancy dials.
 import { EXEC_DELEGATION, REAL_ESTATE, WEEKS_PER_YEAR } from '../config/balance';
@@ -27,13 +28,13 @@ export function reviewRents(state: GameState, owner: Property['owner']): void {
 
 const due = (state: GameState): boolean => state.clock.week % EXEC_DELEGATION.rentEveryWeeks === 0;
 
-/** Rents: the bank's buildings. */
-export function creoBankRents(state: GameState): void {
+/** Rents: the lab's buildings. */
+export function cfoBankRents(state: GameState): void {
   if (due(state)) reviewRents(state, 'company');
 }
 
 /** Rents: your own buildings. */
-export function creoPrivateRents(state: GameState): void {
+export function cfoPrivateRents(state: GameState): void {
   if (due(state)) reviewRents(state, 'personal');
 }
 

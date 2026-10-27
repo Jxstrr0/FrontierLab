@@ -1,9 +1,10 @@
-// Market rents that follow the property cycle and the Chief Real Estate
-// Officer (SIMULATION §21.2, §17.2; DESIGN decision log 2026-10-26): an owned
-// building's market rent eases toward base × cre/100 while its value tracks
-// cre at once; a managing CREO's expertise is pricing power; the Rents
-// switches set the best rent for the bank's and your own buildings, at once
-// when switched on and every 4 weeks after.
+// Market rents that follow the property cycle and the CFO's Rents switches
+// (SIMULATION §21.2, §17.2; DESIGN decision log 2026-10-26 and 2026-10-27, when
+// the Chief Infrastructure Officer folded into the CFO): an owned building's
+// market rent eases toward base × cre/100 while its value tracks cre at once; a
+// managing CFO's expertise is pricing power; the Rents switches set the best
+// rent for the lab's and your own buildings, at once when switched on and every
+// 4 weeks after.
 import { describe, expect, it } from 'vitest';
 import { EXEC_DELEGATION, REAL_ESTATE } from '../../src/config/balance';
 import { CITIES } from '../../src/data/cities';
@@ -88,14 +89,14 @@ describe('pricing power and the best rent', () => {
   });
 });
 
-describe('the Chief Real Estate Officer', () => {
+describe('the CFO’s Rents switches', () => {
   it('reviews managed rents when switched on and every 4 weeks, by owner', () => {
     const s = execGame();
     const { bank, mine } = buyTwo(s);
     refreshExecCandidates(s, true);
-    const c = s.executives.candidates.creo![0]!;
-    expect(cmd.hireExec(s, 'creo', c.id).ok).toBe(true);
-    const chief = s.executives.seats.creo!;
+    const c = s.executives.candidates.cfo![0]!;
+    expect(cmd.hireExec(s, 'cfo', c.id).ok).toBe(true);
+    const chief = s.executives.seats.cfo!;
     expect(chief.delegations.bankRents).toBe(true);
     expect(chief.delegations.privateRents).toBe(true);
     const power = (EXEC_DELEGATION.rentPricingPower * chief.expertise) / 100;
@@ -103,20 +104,20 @@ describe('the Chief Real Estate Officer', () => {
     expect(rentPricingPower(s, 'personal')).toBeCloseTo(power, 12);
 
     // Off and on again: the switch-on reviews at once.
-    cmd.setExecDelegation(s, 'creo', 'bankRents', false);
-    cmd.setExecDelegation(s, 'creo', 'privateRents', false);
+    cmd.setExecDelegation(s, 'cfo', 'bankRents', false);
+    cmd.setExecDelegation(s, 'cfo', 'privateRents', false);
     expect(rentPricingPower(s, 'company')).toBe(0);
     cmd.setPropertyRent(s, bank.id, bank.marketRent * 0.8);
     cmd.setPropertyRent(s, mine.id, mine.marketRent * 0.8);
-    cmd.setExecDelegation(s, 'creo', 'bankRents', true);
+    cmd.setExecDelegation(s, 'cfo', 'bankRents', true);
     expect(bank.rent).toBe(bestRent(bank.marketRent, power));
     expect(bank.rent).toBeGreaterThan(bank.marketRent * 0.9);
     expect(mine.rent).toBeCloseTo(mine.marketRent * 0.8, 9);
 
     // The private switch covers your own building only; the bank's keeps its review.
-    cmd.setExecDelegation(s, 'creo', 'privateRents', true);
+    cmd.setExecDelegation(s, 'cfo', 'privateRents', true);
     expect(mine.rent).toBe(bestRent(mine.marketRent, power));
-    cmd.setExecDelegation(s, 'creo', 'privateRents', false);
+    cmd.setExecDelegation(s, 'cfo', 'privateRents', false);
     cmd.setPropertyRent(s, bank.id, bank.marketRent * 0.8);
     cmd.setPropertyRent(s, mine.id, mine.marketRent * 0.8);
     const every = EXEC_DELEGATION.rentEveryWeeks;
