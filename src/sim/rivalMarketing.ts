@@ -11,6 +11,7 @@ import { pushEvent } from './events';
 import { clamp } from './math';
 import { listLevel } from './nominal';
 import { stream } from './rng';
+import { syncRivalEquity } from './rivalFinance';
 import { trailingProfit } from './rivalExpansion';
 import { overallOf } from './rivals';
 import type { GameState, RivalBank, RivalBranch } from './state';
@@ -71,11 +72,12 @@ export function runRivalCampaigns(state: GameState): void {
         branches *
         (CITIES[cityId]?.costIndex ?? 1) *
         listLevel(state, cityId);
-      bank.equity -= cost;
+      bank.cash -= cost;
       bank.qtd.netIncome -= cost;
       c.weeksLeft -= 1;
       if (c.weeksLeft <= 0) delete bank.campaigns[cityId];
     }
+    syncRivalEquity(state, bank);
     if (Object.keys(bank.campaigns).length === 0) delete bank.campaigns;
   }
 }
@@ -85,7 +87,8 @@ export function investInTech(state: GameState, bank: RivalBank): boolean {
   const profit = trailingProfit(bank);
   if (profit <= 0) return false;
   const spend = RIVAL_TECH.spendShare * profit;
-  bank.equity -= spend;
+  bank.cash -= spend;
+  syncRivalEquity(state, bank);
   const before = bank.appRating;
   const cap = RIVAL_TECH.appCap[bank.strategy];
   if (bank.appRating < cap)

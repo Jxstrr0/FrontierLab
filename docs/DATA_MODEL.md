@@ -221,7 +221,9 @@ export interface Rfp {
 ```ts
 export interface RivalBank {
   id: Id; name: string; strategy: 'incumbent'|'disruptor'|'premium'|'community'; ink: string; monogram: string;
-  cities: Id[]; branches: RivalBranch[]; cash: Money; equity: Money; capitalRatio: number;
+  cities: Id[]; branches: RivalBranch[];
+  cash: Money; costs: Money /* last week's running costs; runway = cash ÷ costs */; negativeQuarters: number;
+  equity: Money;                                 // cash + offices at replacement value (synced weekly, schema 23)
   listed: boolean; ticker?: string; shares: number; price: Money; execs: { title: string; name: string }[];
   status: 'active'|'distressed'|'seized'|'acquired'|'merged'; priceLags: Record<string, { target: number; weeksLeft: number }>;
   home?: CountryId[]; charteredWeek?: Week;      // labs founded during play (v37)
@@ -230,7 +232,8 @@ export interface RivalBank {
 }
 export interface RivalBranch {
   id: Id; lotId: Id; size: number /* C2b: 0–3 like Branch.size */; openedWeek: Week; quality: [Stars, Stars, Stars, Stars]; // rates, products, service, branch
-  prices: Record<string, number>; deposits: Money; loans: Money; reviewCount: number; negativeWeeks: number;
+  customers: number; arr: Money;                 // the office's customers and the ARR they pay (schema 23)
+  contribution: Money; reviewCount: number; negativeWeeks: number;
 }
 export interface MarketState {
   companies: Record<Id, ListedCompany>; index: number;
@@ -370,6 +373,7 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 
 **Frontier Lab schema 19 (stage C8f, seed money):** no shape change. The bank's locked charter capital is gone: a new game starts with `treasury.reserves = 0` and `company.paidInCapital = startCash` (`meta.startCash` is one of 1M / 1.5M / 2M / 2.5M). Migration 18 → 19 (`src/sim/save/migrateSeedMoney.ts`) moves treasury reserves into `company.cash` when the save has no deposits, wholesale lots, overnight or central bank window borrowing; both are assets, so equity is unchanged. A save that still carries bank-era funding keeps its reserves. `CorporateDebt` lender ids (`CorporateLoan.lenderId`, `CorporateLoanOffer.lenderId`, the keys of `lines`) are now investment bank site ids; saves from before may still hold rival lab ids, which keep accruing and can be repaid but not drawn, and offers from them are replaced on the next tick. `company.riskAppetite` is unchanged in shape and now holds the launch posture. The `deposits_1b` milestone id stays and now means a billion in ARR.
 
+**Frontier Lab schema 23 (rival books on ARR and runway):** `RivalBank` gains `cash`, `costs` and `negativeQuarters` and loses `capitalRatio`; `RivalBranch` gains `customers` and `arr` and loses `deposits` and `loans`. Migration 22 → 23 (`src/sim/save/migrateRivalBooks.ts`) turns each office's deposits into customers (one per $10,000, the old `MERGERS.depositPerCustomer`) and ARR at the rival's prices, sets cash to the old equity less the offices' replacement value (at least 13 weeks of running costs for an active lab), fills costs and re-derives equity. The `DISTRESSED_SALE` event's `pb` becomes `multiple` (ask ÷ ARR per share); new event `RIVAL_RAISE`.
 **Frontier Lab schema 22 (seven executive seats, DESIGN decision log 2026-10-27):** `ExecSeat` is `'coo' | 'cfo' | 'cpo' | 'cmo' | 'cto' | 'cro'`; `csci` and `creo` are gone. The CFO seat gains the delegations `bankRents`, `privateRents`, `bankBuys` and `privateBuys` (reading `executives.occTargets`), the CPO seat gains `training`; the delegations `cfo.treasury`, `cfo.guidance` and `cro.guidance` are removed, `company.guidance` is `{ staffing, marketing, products }` and `people.hrHiring` is removed. Migration 21 → 22 (`src/sim/save/migrateSeats.ts`): a seated `csci` moves into an empty `cpo` seat (its other switches follow the seat's remembered toggles, else off), otherwise is released with grants settled (`settleOnExit`); the same for `creo` → `cfo`. The chief's switches (or, with no chief seated, the old seat's remembered ones) are set on the executive now in the seat and copied into `remembered.cpo` / `remembered.cfo`; waiting CPO and CFO candidates get the new switches on. The old seats' `seats`, `candidates`, `rerolls` and `remembered` entries and their open `EXEC_POACHED` cases are deleted, the dead delegation keys are deleted from seated executives, memories and candidates, `guidance.deposits`/`loans` are deleted, and a seated COO's `branchOps` is switched on where `hrHiring` was on before the field is deleted.
 
 **Frontier Lab schema 21 (content fills):** no new fields. Migration 20 → 21 re-runs `generatePersonalSites` for every generated city so the new vacation homes (CONTENT §20) get map sites; existing sites keep their tiles because the generator skips ids it already has before drawing.

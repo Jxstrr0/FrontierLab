@@ -90,7 +90,7 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
         tokens: {
           ...tokens,
           ask: `${ctx.sym}${num(p.ask).toFixed(2)}`,
-          pb: num(p.pb).toFixed(2),
+          multiple: num(p.multiple).toFixed(2),
           weeks: String(num(p.weeks)),
         },
       };

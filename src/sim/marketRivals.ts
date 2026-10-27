@@ -1,9 +1,10 @@
 // Rival lab shares (SIMULATION §19.5 applied to rivals, §18.1; stage C8d): a
-// listed rival's price follows its revenue × the §19.2 multiple (growth and its
-// model's lead over the bar), never below book, × a mean-reverting sentiment that also carries the banking sector's weekly
-// shock, eased in with an EMA plus noise; quarterly earnings growth nudges
-// sentiment. A private rival is priced at book every week and a seized one is
-// worth nothing. Randomness from the `market` stream.
+// listed rival's price follows its ARR × the §19.2 multiple (growth and its
+// model's lead over the bar), never below book, × a mean-reverting sentiment
+// that also carries the AI sector's weekly shock, eased in with an EMA plus
+// noise; quarterly earnings growth nudges sentiment. A private rival is priced
+// at that fair value every week and a wound-up one is worth nothing.
+// Randomness from the `market` stream.
 import { PUBLIC_PRICE, QUARTERS_PER_YEAR, WEEKS_PER_YEAR } from '../config/balance';
 import { CITIES } from '../data/cities';
 import { SECTOR_BETA, SECTOR_MU } from '../data/stocks';
@@ -11,10 +12,12 @@ import type { Phase } from '../data/types';
 import { clampSentiment, earningsShock, walkSentiment } from './equityModel';
 import { ema } from './math';
 import { recordClose } from './marketStocks';
+import { rivalFairPerShare } from './rivalFinance';
 import type { Rng } from './rng';
 import type { GameState, RivalBank } from './state';
 import { qualityBar } from './underwriting';
-import { multipleFor, quarterlyGrowth } from './valuation';
+
+export { rivalBookPerShare } from './rivalFinance';
 
 /** Trailing four quarters' net income, annualised when fewer have been reported. */
 export function rivalNetIncomeTtm(bank: RivalBank): number {
@@ -23,33 +26,14 @@ export function rivalNetIncomeTtm(bank: RivalBank): number {
   return (recent.reduce((x, q) => x + q.netIncome, 0) * QUARTERS_PER_YEAR) / recent.length;
 }
 
-/** Book value per share (0 when equity is gone). */
-export function rivalBookPerShare(bank: RivalBank): number {
-  return Math.max(0, bank.equity) / Math.max(1, bank.shares);
-}
-
-/** Trailing four quarters' revenue, annualised when fewer have been reported. */
-export function rivalRevenueTtm(bank: RivalBank): number {
-  const recent = bank.quarters.slice(-QUARTERS_PER_YEAR);
-  if (recent.length === 0) return 0;
-  return (recent.reduce((x, q) => x + q.revenue, 0) * QUARTERS_PER_YEAR) / recent.length;
-}
-
 /** The rival's model quality over today's bar (0 without a model). */
 export function rivalModelLead(state: GameState, bank: RivalBank): number {
   return bank.model ? bank.model.quality - qualityBar(state) : 0;
 }
 
-/**
- * §19.2 and §19.5 without the IR penalty: max(BVPS, revenue_ttm × multiple ÷
- * shares) × sentiment. Before a rival's first report it trades at book.
- */
+/** §19.2 and §19.5 without the IR penalty: max(BVPS, ARR × multiple ÷ shares) × sentiment. */
 export function rivalTargetPrice(bank: RivalBank, lead = 0): number {
-  const book = rivalBookPerShare(bank);
-  if (bank.quarters.length === 0) return book * bank.sentiment;
-  const multiple = multipleFor(quarterlyGrowth(bank.quarters), lead);
-  const byRevenue = (rivalRevenueTtm(bank) * multiple) / Math.max(1, bank.shares);
-  return Math.max(book, byRevenue) * bank.sentiment;
+  return rivalFairPerShare(bank, lead) * bank.sentiment;
 }
 
 /** The phase of the rival's home country (its first city), or the fallback. */
@@ -80,7 +64,7 @@ export function priceRivalShares(state: GameState, rng: Rng, phase: Phase, shock
       continue;
     }
     if (!bank.listed) {
-      bank.price = rivalBookPerShare(bank);
+      bank.price = rivalFairPerShare(bank, rivalModelLead(state, bank));
       continue;
     }
     const sector = bankingReturn(rivalPhase(state, bank, phase), shock);

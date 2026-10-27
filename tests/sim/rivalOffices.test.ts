@@ -55,12 +55,14 @@ describe('rival offices', () => {
     const s = game();
     const bank = Object.values(s.rivals)[0]!;
     split(s, bank, 4);
-    const deposits = bank.branches.reduce((x, b) => x + b.deposits, 0);
+    const customers = bank.branches.reduce((x, b) => x + b.customers, 0);
+    const arr = bank.branches.reduce((x, b) => x + b.arr, 0);
     const lots = bank.branches.map((b) => b.lotId);
     const office = foldRivalCity(s, bank, 'cal')!;
     expect(bank.branches).toEqual([office]);
     expect(office.size).toBe(nearestSize(4));
-    expect(office.deposits).toBeCloseTo(deposits, 0);
+    expect(office.customers).toBeCloseTo(customers, 6);
+    expect(office.arr).toBeCloseTo(arr, 0);
     for (const id of lots.slice(1)) expect(s.world.lots[id]!.occupant).toBeUndefined();
   });
 

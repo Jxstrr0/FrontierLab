@@ -229,7 +229,7 @@ After the wizard, the map opens with the tutorial (§27).
 
 No tabs: one overview page.
 - **Advisor:** "{Name} head office. Know your competition."
-- **Overview:** Sales offices, Cities, Shares (Listed · ticker, or Private), Share price, Credit ratio badge (Strong / Adequate / Watch / …), AI model (name · quality), Model released, Researchers, Chief executive, then recent quarters.
+- **Overview:** Sales offices, Cities, Shares (Listed · ticker, or Private), Share price, Customers, ARR (with its yearly growth once two quarters are in), Cash, Runway badge (Strong / Adequate / Watch / … from SIMULATION §18.5, with the runway in weeks or years), AI model (name · quality), Model released, Researchers, Chief executive, then recent quarters. The rival sales-office sheet (§2) adds the office's customers and ARR under its rating.
 - Rival labs don't lend to you; corporate borrowing is on the investment bank's Debt tab (§12).
 
 ## 8. Central bank
@@ -403,7 +403,7 @@ No tabs: one overview page.
 - **Your debt** (when you owe any): a card per term loan (Term loan from, Balance, Interest rate, Weekly payment, Weeks left, **Repay early ($X)**, disabled with a note when cash is short) and a card per line drawn at another lender, including rival labs in old saves (Credit line with, Used, Interest rate, **Repay $X**).
 
 **M&A:**
-- **Labs:** rival lab cards, like Market cards, plus Sales offices, Cities and Customers (the rival's book ÷ `MERGERS.depositPerCustomer`; SIMULATION §19.8); distressed sales get a special badge
+- **Labs:** rival lab cards, like Market cards, plus Sales offices, Cities, Customers, ARR and the Runway badge (SIMULATION §18.5), sorted by ARR; a private lab's reference row reads "Fair value / share" (§19.8); distressed sales get a special badge
 - **Offer M&A sheet:**
   - offer price per share stepper and premium % (as the board sees it, after any share-part discount)
   - shares outstanding

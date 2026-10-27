@@ -1,19 +1,18 @@
-// What buying a rival bank would do to your books (SIMULATION §19.8, §15).
+// What buying a rival lab would do to your books (SIMULATION §19.8, §15).
 // One plan feeds the offer sheet's regulator pre-check, the regulator's answer
 // and the closing entries, so all three always agree.
 //
-// C3a: the target's customers move onto your plans, and its book deposits D
-// and loans L settle inside it before closing (deposits paid out, loans sold),
-// so it brings cash R = E − X − LD, where E is its equity, X corporate debt you
-// owe it (settled on closing) and LD the lease deposits on its storefronts
-// (floored at zero). The net assets you take on are R + LD + X: its book equity
-// whenever R is positive. You pay C in cash and S in new
-// shares (a listed bank's share-for-share part, shareDeals.ts) and give up any
-// of its shares your company holds (V at market); goodwill = C + S + V − net
-// assets, or a bargain gain when that is negative.
+// The target's customers move onto your plans with their ARR, and it brings
+// cash R = K − X − LD, where K is its corporate cash, X corporate debt you owe
+// it (settled on closing) and LD the lease deposits on its storefronts (floored
+// at zero). The net assets you take on are R + LD + X. You pay C in cash and S
+// in new shares (a listed lab's share-for-share part, shareDeals.ts) and give
+// up any of its shares your company holds (V at market); goodwill = C + S + V −
+// net assets, or a bargain gain when that is negative.
 import { MERGERS, STOCK_RISK_WEIGHT } from '../config/balance';
 import { capitalSnapshot } from './capital';
 import { companySharesOf, sharesToBuy } from './mergerPricing';
+import { rivalArr, rivalCustomers } from './rivalFinance';
 import { securityPrice } from './securities';
 import { stockSplit, type StockSplit } from './shareDeals';
 import type { GameState, RivalBank } from './state';
@@ -21,7 +20,7 @@ import { rivalMult } from './rivalOffices';
 
 export interface CityShare {
   cityId: string;
-  /** Your deposit share in the city after the deal, 0–1. */
+  /** Your customer share in the city after the deal, 0–1. */
   share: number;
 }
 
@@ -42,8 +41,10 @@ export interface DealPlan {
   personalCash: number;
   /** Market value of the company's holding given up, V. */
   holdingValue: number;
-  /** The target's book deposits D: its customers in the share test (C3a). */
-  deposits: number;
+  /** The target's customers and the ARR they pay, which move onto your plans. */
+  customers: number;
+  arr: number;
+  /** The target's cash after settling its debts to you and its lease deposits, R. */
   reserves: number;
   leaseDeposits: number;
   /** Corporate debt you owe the target, settled on closing. */
@@ -53,7 +54,7 @@ export interface DealPlan {
   gain: number;
   proFormaCr: number;
   cityShares: CityShare[];
-  /** City deposit share limit: MERGERS.maxCityShare, or fastTrackShare after a won Lobbying fast-track. */
+  /** City customer share limit: MERGERS.maxCityShare, or fastTrackShare after a won Lobbying fast-track. */
   shareLimit: number;
   fastTrack: boolean;
 }
@@ -73,34 +74,34 @@ export function splitByMix(amount: number, mix: Record<string, number>): Record<
   return out;
 }
 
-/** Your customers in a city, in rival-deposit terms (MERGERS.depositPerCustomer, C3a). */
-export function yourDepositsIn(state: GameState, cityId: string): number {
+/** Your customers in a city (open and converting offices). */
+export function yourCustomersIn(state: GameState, cityId: string): number {
   let total = 0;
   for (const b of Object.values(state.branches)) {
     if (b.cityId === cityId && b.status !== 'closed') total += b.customers;
   }
-  return total * MERGERS.depositPerCustomer;
+  return total;
 }
 
-/** Deposits of rivals still holding branches (not seized, acquired or merged) in a city. */
-function rivalDepositsIn(state: GameState, cityId: string): number {
+/** Customers of rivals still holding offices (not seized, acquired or merged) in a city. */
+function rivalCustomersIn(state: GameState, cityId: string): number {
   let total = 0;
   for (const r of Object.values(state.rivals)) {
     if (r.status === 'seized' || r.status === 'acquired' || r.status === 'merged') continue;
-    for (const b of r.branches) if (b.cityId === cityId) total += b.deposits;
+    for (const b of r.branches) if (b.cityId === cityId) total += b.customers;
   }
   return total;
 }
 
-/** Your deposit share in every city the target operates in, after the deal (§19.8). */
+/** Your customer share in every city the target operates in, after the deal (§19.8). */
 export function cityShares(state: GameState, bank: RivalBank): CityShare[] {
   const cities = [...new Set(bank.branches.map((b) => b.cityId))].sort();
   return cities.map((cityId) => {
-    const mine = yourDepositsIn(state, cityId);
+    const mine = yourCustomersIn(state, cityId);
     const theirs = bank.branches
       .filter((b) => b.cityId === cityId)
-      .reduce((s, b) => s + b.deposits, 0);
-    const denom = mine + rivalDepositsIn(state, cityId);
+      .reduce((s, b) => s + b.customers, 0);
+    const denom = mine + rivalCustomersIn(state, cityId);
     return { cityId, share: denom > 0 ? (mine + theirs) / denom : 1 };
   });
 }
@@ -124,14 +125,13 @@ export function planDeal(
   const personalCash = personalValue * (1 - split.stockPct);
   const holdingValue = companyShares * securityPrice(state, bank.id);
 
-  const deposits = bank.branches.reduce((s, b) => s + b.deposits, 0);
   const leaseDeposits = bank.branches.reduce(
     (s, b) => s + (state.world.lots[b.lotId]?.deposit ?? 0) * rivalMult(b),
     0,
   );
   const debtSettled = debtOwedTo(state, bank.id);
-  // The cash the target holds once its books are settled, our debt and lease deposits counted.
-  const reserves = Math.max(0, bank.equity - debtSettled - leaseDeposits);
+  // The cash the target brings once our debt to it and its lease deposits are counted.
+  const reserves = Math.max(0, bank.cash - debtSettled - leaseDeposits);
   const netAssets = reserves + leaseDeposits + debtSettled;
   const paid = cash + split.stockValue + holdingValue;
   const goodwill = Math.max(0, paid - netAssets);
@@ -155,7 +155,8 @@ export function planDeal(
     split,
     personalCash,
     holdingValue,
-    deposits,
+    customers: rivalCustomers(bank),
+    arr: rivalArr(bank),
     reserves,
     leaseDeposits,
     debtSettled,
@@ -181,7 +182,7 @@ export interface RegulatorCheck {
 }
 
 /**
- * The regulator's two tests (§19.8): pro-forma CR and deposit share in every
+ * The regulator's two tests (§19.8): pro-forma CR and customer share in every
  * affected city. A distressed sale skips the share test (the regulator wants
  * the failed network rescued), which the one row says.
  */

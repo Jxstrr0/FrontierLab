@@ -1,9 +1,10 @@
 // Rival M&A rules (SIMULATION §19.8): the acceptance curve and required
 // premiums, reference prices, offer validation, the regulator's checks
-// (pro-forma capital and city deposit share), rejections and the retry window,
+// (pro-forma capital and city customer share), rejections and the retry window,
 // and closing with holdings of the target and corporate debt owed to it.
 import { describe, expect, it } from 'vitest';
-import { MERGERS, STOCK_RISK_WEIGHT } from '../../src/config/balance';
+import { MERGERS, RIVAL_RUNWAY_TIERS, STOCK_RISK_WEIGHT } from '../../src/config/balance';
+import { rivalFairPerShare } from '../../src/sim/rivalFinance';
 import { planDeal, regulatorBlock, regulatorChecks } from '../../src/sim/acquisitionPlan';
 import { capitalSnapshot } from '../../src/sim/capital';
 import { closeBranch } from '../../src/sim/commands';
@@ -31,12 +32,13 @@ describe('acceptance curve (§19.8)', () => {
     expect(acceptChance(-0.5, 0.3)).toBeLessThan(1e-5);
   });
 
-  it('asks healthy banks for 30%, Watch-tier banks for 15% and distressed sales for −20%', () => {
+  it('asks healthy labs for 30%, labs short of runway for 15% and distressed sales for −20%', () => {
     const s = capitalisedBank(4, 0);
     const bank = smallestRival(s);
-    bank.capitalRatio = 0.13;
+    bank.costs = 1_000_000;
+    bank.cash = 2 * RIVAL_RUNWAY_TIERS[1]!.minWeeks * bank.costs;
     expect(requiredPremium(bank)).toBe(0.3);
-    bank.capitalRatio = 0.09;
+    bank.cash = 0.5 * RIVAL_RUNWAY_TIERS[1]!.minWeeks * bank.costs;
     expect(requiredPremium(bank)).toBe(0.15);
     bank.status = 'distressed';
     expect(requiredPremium(bank)).toBe(-0.2);
@@ -44,7 +46,7 @@ describe('acceptance curve (§19.8)', () => {
 });
 
 describe('reference price', () => {
-  it('uses the market price if listed, book value per share if private, the ask if distressed', () => {
+  it('uses the market price if listed, fair value per share if private, the ask if distressed', () => {
     const s = capitalisedBank(4, 0);
     const bank = smallestRival(s);
     bank.listed = true;
@@ -52,7 +54,8 @@ describe('reference price', () => {
     expect(referencePrice(bank)).toBe(23.5);
     expect(offerPremium(bank, 23.5 * 1.3)).toBeCloseTo(0.3, 10);
     bank.listed = false;
-    expect(referencePrice(bank)).toBeCloseTo(bank.equity / bank.shares, 8);
+    expect(referencePrice(bank)).toBeCloseTo(rivalFairPerShare(bank), 8);
+    expect(referencePrice(bank)).toBeGreaterThanOrEqual(bank.equity / bank.shares);
     bank.status = 'distressed';
     bank.distressedAsk = 7.25;
     expect(referencePrice(bank)).toBe(7.25);
@@ -124,7 +127,8 @@ describe('regulator checks', () => {
     // C3a: an AI lab's acquired books are customers, not loans, so only the consumed
     // stake (if any) changes risk-weighted assets.
     const rwa = snap.rwa - plan.holdingValue * STOCK_RISK_WEIGHT;
-    expect(plan.goodwill).toBeCloseTo(plan.cash - bank.equity, 2);
+    // Net assets are the target's cash (less what you owe it and its lease deposits, both counted back).
+    expect(plan.goodwill).toBeCloseTo(plan.cash - bank.cash, 2);
     expect(plan.proFormaCr).toBeCloseTo((snap.cet1 - plan.goodwill) / rwa, 10);
     const weak = { ...plan, proFormaCr: MERGERS.minProFormaCr - 0.001 };
     expect(regulatorChecks(weak, cityName)[0]!.ok).toBe(false);
@@ -132,12 +136,12 @@ describe('regulator checks', () => {
     expect(regulatorBlock(plan, cityName)).toBeUndefined();
   });
 
-  it('blocks a deal that would give you over half of a city’s deposits', () => {
+  it('blocks a deal that would give you over half of a city’s customers', () => {
     const s = newGame({ seed: 42, cityId: 'cal', bankName: 'Test Bank', competitors: 2 });
     openScriptedBranch(s, 'midtown');
     advanceWeeks(s, 4);
     addCapital(s, 400_000_000);
-    // The bigger of the two rivals holds most of the city's deposits.
+    // The bigger of the two rivals holds most of the city's customers.
     const bank = Object.values(s.rivals)
       .filter((r) => r.status === 'active')
       .sort((a, b) => b.equity - a.equity)[0]!;
@@ -198,7 +202,7 @@ describe('closing', () => {
     expect(identityGap(s)).toBeLessThan(1);
 
     const price = referencePrice(bank) * 1.6;
-    const equity = bank.equity;
+    const equity = bank.cash;
     const value = held * bank.price;
     const personalBefore = s.personal.cash;
     expect(cmd.offerMerger(s, bank.id, price).ok).toBe(true);
@@ -209,7 +213,7 @@ describe('closing', () => {
     expect(s.market.holdings.personal[bank.id]).toBeUndefined();
     expect(s.corporateDebt.lines[bank.id]).toBeUndefined();
     expect(s.personal.cash - personalBefore).toBeGreaterThanOrEqual(mine * price - 1);
-    // Goodwill = C + V − equity (the rival's week of earnings before closing moves it a little).
+    // Goodwill = C + V − the target's cash (its week of earnings before closing moves it a little).
     const deal = s.mergers.deals[0]!;
     expect(deal.goodwill).toBe(s.company.goodwill);
     expect(Math.abs(deal.price - (price * (bank.shares - held) + value))).toBeLessThan(

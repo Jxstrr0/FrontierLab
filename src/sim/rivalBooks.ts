@@ -1,50 +1,45 @@
-// Rival branch books and weekly financials (SIMULATION §18.1, §18.5, simplified).
-// Each branch's deposits move toward its mature size, trimmed by local
-// competition (crowding and your strong branches nearby); loans follow at the
-// rival's loan-to-deposit ratio. Earnings per branch are NIM on loans plus fees,
-// less costs and expected losses; the bank accumulates the quarter, pays tax and
-// tracks equity and its capital ratio.
+// Rival office books and weekly financials (SIMULATION §18.1, §18.5). Each
+// office's customers move toward its mature size, trimmed by local competition
+// (crowding and your strong offices nearby), the ramp of a young office and the
+// business cycle (a downturn shrinks the customer pool); its ARR is customers ×
+// what each pays. Weekly earnings are ARR ÷ 52 less compute, offices and
+// training; the lab banks the after-tax result as cash and its equity follows.
 import {
   DISTANCE_FALLOFF,
-  RIVAL_BASE_LOSS_RATE,
-  RIVAL_BOOK_EMA,
-  RIVAL_BRANCH_COST,
+  RIVAL_BOOKS,
   RIVAL_COMPETITION,
-  RIVAL_FEE_YIELD,
-  RIVAL_FINANCE,
-  RIVAL_LDR,
-  RIVAL_LDR_DEMAND_SLOPE,
-  RIVAL_LOAN_RISK_WEIGHT,
-  RIVAL_LOAN_YIELD_SPREAD,
-  RIVAL_NIM_POLICY_SLOPE,
   RIVAL_RADIUS,
   RIVAL_RAMP_WEEKS,
   RIVAL_REVIEWS_PER_WEEK,
-  RIVAL_SERVICING,
-  WEEKS_PER_YEAR,
 } from '../config/balance';
-import { CITIES } from '../data/cities';
 import { COUNTRIES } from '../data/countries';
+import type { Strategy } from '../data/rivals';
 import { tileDistance } from './citygen';
-import { creditCycle, loanDemand } from './macro';
+import { creditCycle } from './macro';
 import { clamp } from './math';
-import { listLevel } from './nominal';
 import { countryOfCity } from './rates';
+import {
+  arrPerCustomer,
+  matureCustomers,
+  officeCosts,
+  rivalWeeklyCosts,
+  syncRivalEquity,
+} from './rivalFinance';
 import { rivalOverall } from './rivalMarketing';
-import { matureDeposits } from './rivals';
-import { priceWarBump } from './rivalPrices';
 import { rivalMult } from './rivalOffices';
 import { sizeMult } from './branch/officeSize';
-import type { GameState, Lot, RivalBank, RivalBranch } from './state';
+import type { CountryState, GameState, Lot, RivalBank, RivalBranch } from './state';
 
 /** Distance weight from the share formula: w = 1 / (1 + d / 6) (§9.3). */
 const weight = (d: number) => 1 / (1 + d / DISTANCE_FALLOFF);
 
 /**
- * Local competition factor on a rival office's target (assumption, DESIGN §7):
+ * Competition factor on a rival office's target (assumption, DESIGN §7):
  * crowding by every other office within RIVAL_RADIUS, weighted by its size
- * (C2b), plus pressure from your open offices nearby that win a strong share
- * of prospects.
+ * (C2b), plus pressure from your open offices in the city that win a strong
+ * share of prospects. AI customers shop city-wide (one office per city, C2a),
+ * so your share presses on every rival office in the city, not just the
+ * nearby ones (2026-10-27).
  */
 export function competitionFactor(state: GameState, branch: RivalBranch): number {
   const lot = state.world.lots[branch.lotId];
@@ -61,9 +56,8 @@ export function competitionFactor(state: GameState, branch: RivalBranch): number
   let pressure = 0;
   for (const own of Object.values(state.branches)) {
     if (own.status !== 'open' || own.cityId !== branch.cityId) continue;
-    const w = nearWeight(lot, state.world.lots[own.lotId]);
-    crowd += sizeMult(own) * w;
-    pressure += w * Math.max(0, own.last.share - c.playerShareRef);
+    crowd += sizeMult(own) * nearWeight(lot, state.world.lots[own.lotId]);
+    pressure += Math.max(0, own.last.share - c.playerShareRef);
   }
   const crowding = 1 / (1 + c.crowdK * Math.max(0, crowd - c.crowdFree));
   return clamp(crowding - c.playerK * pressure, c.min, 1);
@@ -85,64 +79,63 @@ export function rampShare(age: number): number {
   return 1 - left * left * left;
 }
 
-/** Deposits move toward target × ramp; loans follow at the LDR (§18.1). */
-export function updateBranchBooks(state: GameState, bank: RivalBank, branch: RivalBranch): void {
+/**
+ * §18.1: a downturn shrinks the customer pool: max(min, 1 − sens × cycleMult ×
+ * (creditCycle − 1)), so the credit cycle (§4.5) still reaches every lab, and
+ * thin-margin disruptors feel it most.
+ */
+export function downturnFactor(c: CountryState, strategy: Strategy): number {
+  const cycle = RIVAL_BOOKS.cycle;
+  const sens = cycle.sens * RIVAL_BOOKS.strategy[strategy].cycleMult;
+  return Math.max(cycle.min, 1 - sens * (creditCycle(c) - 1));
+}
+
+/** The customers an office is heading for this week (§18.1). */
+export function customerTarget(state: GameState, bank: RivalBank, branch: RivalBranch): number {
   const c = countryOfCity(state, branch.cityId);
   const age = state.clock.week - branch.openedWeek;
   const ramp = branch.openedWeek > 0 ? rampShare(age) : 1;
-  // A running campaign (§18.9) lifts the rating its deposits mature toward.
+  // A running campaign (§18.9) lifts the rating its customers mature toward.
   const rated = { cityId: branch.cityId, size: branch.size, overall: rivalOverall(bank, branch) };
-  const target = matureDeposits(state, rated) * competitionFactor(state, branch) * ramp;
-  branch.deposits += RIVAL_BOOK_EMA * (target - branch.deposits);
-  const ldr = RIVAL_LDR * (1 + RIVAL_LDR_DEMAND_SLOPE * (loanDemand(c) - 1));
-  branch.loans = branch.deposits * ldr;
+  return (
+    matureCustomers(rated) *
+    competitionFactor(state, branch) *
+    ramp *
+    downturnFactor(c, bank.strategy)
+  );
+}
+
+/**
+ * Customers move RIVAL_BOOKS.ema of the gap to their target; ARR follows
+ * (§18.1). A downturn also cuts what each customer pays at once (downgrades
+ * and less usage), so a recession reaches revenue before the customer count
+ * has drifted down.
+ */
+export function updateOfficeBooks(state: GameState, bank: RivalBank, branch: RivalBranch): void {
+  const target = customerTarget(state, bank, branch);
+  branch.customers += RIVAL_BOOKS.ema * (target - branch.customers);
+  const c = countryOfCity(state, branch.cityId);
+  branch.arr =
+    branch.customers *
+    arrPerCustomer(state, bank, branch.cityId) *
+    downturnFactor(c, bank.strategy);
   branch.reviewCount += RIVAL_REVIEWS_PER_WEEK;
 }
 
-export interface BranchEarnings {
+export interface OfficeEarnings {
   revenue: number;
+  costs: number;
   contribution: number;
 }
 
-/** One branch's week: NIM_city × loans + fees − costs − expected losses (§18.5). */
-export function branchEarnings(
+/** One office's week: ARR ÷ 52 − compute − offices − training (§18.5). */
+export function officeEarnings(
   state: GameState,
   bank: RivalBank,
   branch: RivalBranch,
-): BranchEarnings {
-  const c = countryOfCity(state, branch.cityId);
-  const f = RIVAL_FINANCE[bank.strategy];
-  const neutral = COUNTRIES[c.id].neutral;
-  // Price-war bumps raise what the rival pays savers, squeezing its margin.
-  const bump = priceWarBump(bank);
-  const nim =
-    f.nim +
-    RIVAL_NIM_POLICY_SLOPE * (c.policyRate - neutral) -
-    (bump * branch.deposits) / Math.max(1, branch.loans);
-  // Running costs follow the city's cost index and today's price list (§4.6).
-  const costIndex = (CITIES[branch.cityId]?.costIndex ?? 1) * listLevel(state, branch.cityId);
-  const fees = (branch.deposits * RIVAL_FEE_YIELD * f.feeMult) / WEEKS_PER_YEAR;
-  // An office costs what the branches it stands for did (C2b).
-  const costs =
-    RIVAL_BRANCH_COST * rivalMult(branch) * costIndex * f.costMult +
-    (branch.deposits * RIVAL_SERVICING) / WEEKS_PER_YEAR;
-  const lossRate = RIVAL_BASE_LOSS_RATE * f.lossMult * (1 + f.cycleSens * (creditCycle(c) - 1));
-  const losses = (branch.loans * Math.max(0, lossRate)) / WEEKS_PER_YEAR;
-  const nii = (branch.loans * nim) / WEEKS_PER_YEAR;
-  const revenue = (branch.loans * (c.policyRate + RIVAL_LOAN_YIELD_SPREAD)) / WEEKS_PER_YEAR + fees;
-  return { revenue, contribution: nii + fees - costs - losses };
-}
-
-/** Total loans across a rival's branches. */
-export function rivalLoans(bank: RivalBank): number {
-  return bank.branches.reduce((sum, b) => sum + b.loans, 0);
-}
-
-export function rivalCapitalRatio(bank: RivalBank): number {
-  const rwa = rivalLoans(bank) * RIVAL_LOAN_RISK_WEIGHT;
-  // A newly chartered bank has capital but no loans yet: count it as fully capitalised.
-  if (rwa <= 0) return bank.equity > 0 ? 1 : 0;
-  return bank.equity / rwa;
+): OfficeEarnings {
+  const c = officeCosts(state, bank, branch);
+  return { revenue: c.revenue, costs: c.total, contribution: c.revenue - c.total };
 }
 
 /** Weekly books and financials for every active rival (tick step 3). */
@@ -150,12 +143,14 @@ export function runRivalFinancials(state: GameState): void {
   for (const bank of Object.values(state.rivals)) {
     if (bank.status !== 'active') continue;
     let revenue = 0;
+    let costs = 0;
     let preTax = 0;
     for (const branch of bank.branches) {
-      updateBranchBooks(state, bank, branch);
-      const e = branchEarnings(state, bank, branch);
+      updateOfficeBooks(state, bank, branch);
+      const e = officeEarnings(state, bank, branch);
       branch.contribution = e.contribution;
       revenue += e.revenue;
+      costs += e.costs;
       preTax += e.contribution;
     }
     const home = bank.cities[0];
@@ -163,7 +158,14 @@ export function runRivalFinancials(state: GameState): void {
     const netIncome = preTax > 0 ? preTax * (1 - taxRate) : preTax;
     bank.qtd.revenue += revenue;
     bank.qtd.netIncome += netIncome;
-    bank.equity += netIncome;
-    bank.capitalRatio = rivalCapitalRatio(bank);
+    bank.cash += netIncome;
+    bank.costs = costs;
+    syncRivalEquity(state, bank);
   }
+}
+
+/** Sets a rival's running costs and equity from its books now (seeding, migration, mergers). */
+export function refreshRivalFinances(state: GameState, bank: RivalBank): void {
+  bank.costs = rivalWeeklyCosts(state, bank);
+  syncRivalEquity(state, bank);
 }
