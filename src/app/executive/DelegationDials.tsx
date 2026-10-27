@@ -6,6 +6,7 @@
 //   CMO · Brand campaigns   awareness target 40–70%
 //   CFO · Rents (the lab's, yours)   occupancy 80–100% (OccupancyDial.tsx)
 //   CTO · Compute   share of GPU demand covered outside spot 60 / 75 / 90%
+//   CPO · Training runs   Quantity / Balanced / Quality (TrainingStyleDial.tsx)
 import { CTO_COMPUTE, EXEC_DELEGATION } from '../../config/balance';
 import * as cmd from '../../sim/commands';
 import { computeCoverPlan } from '../../sim/execDelegationsCompute';
@@ -17,6 +18,7 @@ import { money, pct, signedPct } from '../format/format';
 import { act } from '../store';
 import { OccupancyDial } from './OccupancyDial';
 import { PayPolicy } from './PayPolicy';
+import { TrainingStyleDial } from './TrainingStyleDial';
 
 /** "+$1.2K/wk", "−$400/wk" or "no change" for a weekly cost difference. */
 function weeklyDelta(delta: number, sym: string): string {
@@ -136,6 +138,7 @@ export function DelegationDial(p: { s: GameState; seat: ExecSeat; id: string }) 
   if (p.seat === 'coo' && p.id === 'payReviews') return <CadenceDial s={p.s} />;
   if (p.seat === 'cmo' && p.id === 'brand') return <BrandDial s={p.s} />;
   if (p.seat === 'cto' && p.id === 'compute') return <ComputeCoverDial s={p.s} />;
+  if (p.seat === 'cpo' && p.id === 'training') return <TrainingStyleDial s={p.s} />;
   if (p.seat === 'cfo' && p.id === 'bankRents') return <OccupancyDial s={p.s} owner="company" />;
   if (p.seat === 'cfo' && p.id === 'privateRents')
     return <OccupancyDial s={p.s} owner="personal" />;

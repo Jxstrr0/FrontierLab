@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest';
 import { CPO_TRAINING, RESEARCHERS, TRAINING } from '../../src/config/balance';
 import * as cmd from '../../src/sim/commands';
 import { cpoModels } from '../../src/sim/execDelegationsFinance';
-import { cpoTraining } from '../../src/sim/execDelegationsResearch';
+import { cpoTraining, cpoTrainingPlan } from '../../src/sim/execDelegationsResearch';
 import { newGame } from '../../src/sim/newGame';
 import { migrations } from '../../src/sim/save/migrations';
 import type { GameState, Researcher } from '../../src/sim/state';
@@ -176,7 +176,7 @@ describe('the CPO and training', () => {
     s.company.paidInCapital += 20_000_000;
     cpoTraining(s);
     const run = s.training.run!;
-    expect(run.weeks).toBe(CPO_TRAINING.runWeeks);
+    expect(run.weeks).toBe(CPO_TRAINING.styles.balanced.runWeeks);
     const radar = activeModel(s).radar;
     expect(run.focus).toBe(radar.indexOf(Math.min(...radar)));
     expect(run.weeklyBudget).toBeLessThanOrEqual(CPO_TRAINING.maxWeekly);
@@ -194,6 +194,37 @@ describe('the CPO and training', () => {
     expect(s.underwriting.activeModelId).toBe(house.id);
     cpoModels(s);
     expect(s.underwriting.activeModelId).toBe('m_better');
+  });
+});
+
+describe('the CPO training style dial', () => {
+  it('Quantity runs short and lean, Quality long, well funded and with better odds', () => {
+    const s = execGame(['products']);
+    s.company.cash += 20_000_000;
+    s.company.paidInCapital += 20_000_000;
+    hire(s, 'cpo');
+    const strong = (o: number[]) => o[3]! + o[4]!;
+    const qty = cpoTrainingPlan(s, 'quantity');
+    const bal = cpoTrainingPlan(s, 'balanced');
+    const qual = cpoTrainingPlan(s, 'quality');
+    expect(qty.weeks).toBeLessThan(bal.weeks);
+    expect(qual.weeks).toBeGreaterThan(bal.weeks);
+    expect(qty.weeklyBudget).toBeLessThan(bal.weeklyBudget);
+    expect(qual.weeklyBudget).toBeGreaterThan(bal.weeklyBudget);
+    expect(strong(qty.odds)).toBeLessThan(strong(bal.odds));
+    expect(strong(qual.odds)).toBeGreaterThan(strong(bal.odds));
+    // The routine starts the run the dial describes.
+    expect(cmd.setTrainingStyle(s, 'quality').ok).toBe(true);
+    cpoTraining(s);
+    expect(s.training.run).toMatchObject({ weeks: qual.weeks, weeklyBudget: qual.weeklyBudget });
+    expect(cmd.setTrainingStyle(s, 'fast' as never).ok).toBe(false);
+  });
+
+  it('migration 25 → 26 sets Balanced', () => {
+    const s = execGame(['products']);
+    delete (s.executives as Partial<typeof s.executives>).trainingStyle;
+    migrations[25]!(s as never);
+    expect(s.executives.trainingStyle).toBe('balanced');
   });
 });
 

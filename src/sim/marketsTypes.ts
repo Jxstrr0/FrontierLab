@@ -77,6 +77,8 @@ export interface ExecutivesState {
   brandTarget: number;
   /** Share of GPU demand the CTO's Compute delegation covers outside spot (schema v20), one of CTO_COMPUTE.coverTargets. */
   computeCover: number;
+  /** How the CPO's Routine training runs trade quality for quantity (schema v26). */
+  trainingStyle: TrainingStyle;
   /** Occupancy the CFO's Rents price for, per owner (schema v30, the CFO's since schema 22), each one of EXEC_DELEGATION.occTargets. */
   occTargets: { company: number; personal: number };
   /** Stocks the CFO's Investing sold at a loss, per account: id → week sold (schema v31). */
@@ -84,6 +86,9 @@ export interface ExecutivesState {
 }
 
 export type PayReviewCadence = 'quarterly' | 'annual';
+
+/** The CPO's training style (schema v26): a key of CPO_TRAINING.styles. */
+export type TrainingStyle = 'quantity' | 'balanced' | 'quality';
 
 // ─── Board and dividends (DESIGN §5.13, SCREENS §10.2) ────────────────────────
 
