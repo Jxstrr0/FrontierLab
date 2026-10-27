@@ -112,7 +112,9 @@ export function runBooks(
       applications += orig.newAccounts / Math.max(orig.approval, APPROVAL_FLOOR_FOR_APPS);
       state.underwriting.loansBooked += orig.newAccounts;
     }
-    wk.servicing += book.accounts * spec.servicing;
+    // Plans and usage run on compute (C3b); the old bank books still pay servicing.
+    if (isRecurring(spec)) wk.compute += book.accounts * spec.servicing;
+    else wk.servicing += book.accounts * spec.servicing;
   }
 
   convertFreeTiers(state, branch);
@@ -179,7 +181,7 @@ function runRecurring(ctx: Ctx, spec: ProductSpec, book: Book, orig: Origination
     book.accounts -= book.last.churned;
     book.balance -= book.balance * k;
     // Compute behind the usage: units used this week × cost per unit.
-    if (price > 0) wk.servicing += ((spec.unitCost ?? 0) * book.balance) / (price * WEEKS_PER_YEAR);
+    if (price > 0) wk.compute += ((spec.unitCost ?? 0) * book.balance) / (price * WEEKS_PER_YEAR);
   }
   book.bookRate = price;
   const revenue = perWeek(book.balance);

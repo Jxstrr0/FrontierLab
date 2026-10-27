@@ -326,7 +326,7 @@ export const PLACE_TIPS: Record<string, TipText> = {
 export const OTHER_TIPS = {
   'branch-finance': {
     title: 'Sales office finance',
-    line: 'Each sales office’s own income statement. Deposits earn the sales office a funding credit and loans pay a funding charge, so you can see which sales offices gather cheap money and lend it well.',
+    line: 'Each sales office’s own income statement: what its plans, API, apps and Loan Desk bring in, less the compute behind them and its running costs, so you can see which sales offices pay their way.',
   },
   'ib-mna': {
     title: 'Mergers & acquisitions',

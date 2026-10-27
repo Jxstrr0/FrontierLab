@@ -3,13 +3,41 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C3a done (v0.1.10, save schema 6): the AI product catalog. Offices sell Plans, API usage and Apps & Services, measured in ARR. Next are C3b (compute charge, new P&L lines, a simpler balance sheet) and C3c (removing the leftover bank machinery). C2 (v0.1.5–v0.1.9) and C1 (v0.1.4) are done. The owner's decisions are in the design brief and CONVERSION_PLAN §5.
+**Current stage:** C3b done (v0.1.11, save schema 7): compute costs, AI-style statements and the Loan Desk's lending fund. C3a (v0.1.10, schema 6) brought the AI product catalog. Next is C3c (removing the leftover bank machinery). C2 (v0.1.5–v0.1.9) and C1 (v0.1.4) are done. The owner's decisions are in the design brief and CONVERSION_PLAN §5.
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `02c9cc6ca6a823` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `12083e8011b7b4` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-27 — Stage C3b: compute, AI statements and the lending fund (v0.1.11)
+
+**What you asked for:** "resume your task in the game". This is part 2 of C3: how the money is counted.
+
+**What changed.**
+- **Compute is a cost line.** Every plan seat and every million API tokens costs compute to serve. That cost now shows as **Compute** on each office's income statement and the company's, instead of being mixed into "servicing".
+- **Office income statements read like a lab's.**
+  - Revenue lines: Plans, API, Apps & services, Loan Desk interest, Other income.
+  - Expenses start with Compute, then the running costs (staff, rent, marketing and so on).
+  - The bank's "deposit funding credit" and "loan funding charge" are gone. They were internal bookkeeping between branches and the treasury, and an AI lab has no deposits to fund.
+- **The company income statement** goes Revenue → Compute → **Gross profit** → operating costs → net income.
+- **A simpler balance sheet.** Lines a lab doesn't use (deposits, wholesale funding, bonds, foreclosed homes, bond gains) only appear if an old save still has something in them. The Company screen's totals show ARR, the lending fund and Loan Desk loans instead of deposits.
+- **The Loan Desk has a lending fund.** Loans are paid from your treasury reserves (a new lab has about $1.4M there), and repayments flow back in. The Loan Desk tab shows how much is in the fund and has an **"Add $250k from company cash"** button. If a loan is bigger than the fund, it can't be approved until you top it up. Before this, lending quietly borrowed from the central bank once the money ran out.
+  - I first tried lending straight from company cash. In testing, a manager approving loans lent the lab's cash down to almost zero in six months, so a separate fund is safer.
+- **Words.** The office Finance tip now explains the lab's statement. Customer reviews talk about plans, the API, support and the office instead of mortgages and tellers. The Company screen's tips explain revenue and compute, and the lending fund.
+
+**Old saves.** Schema 6 → 7. Old office statement rows are moved onto the new lines, and every past week gets a zero Compute line. Any overnight or central bank borrowing is paid back from reserves, then cash. Equity doesn't move, and a new test checks an old save loads, balances and keeps playing.
+
+**Balance.** Across 20 cities over 6 years (the median city), every office checkpoint passes. ARR at weeks 26 / 52 / 104 / 156 / 208 / 260 reads $1.5M / $3.4M / $9.8M / $17.0M / $20.5M / $23.1M, payback is 42.5 weeks, and cash never goes below zero in any city. Seed 42 steady still reaches $1.0B ARR by year 10. The aggressive strategy dips below zero cash on seed 42 (−$112k at its lowest); it already did on main (−$54k), so this isn't new, and it's the strategy meant to push limits. The balance script's NIM column is now GM (gross margin), which runs about 70%.
+
+**Tests.** Two multi-country tests checked the old funding charge; they now check that a US rate rise moves only New York's Loan Desk rates. A loss-record test and the three-country test top up the lending fund first. One new migration test.
+
+**Checked in the browser** at iPhone size with a week-30 save: the office Finance tab (new lines), the Loan Desk tab (lending fund card and button) and the Company screen (totals, income statement, balance sheet). No console errors.
+
+**Checks.** `npm run lint`, all 885 tests and `npm run build` pass. The **determinism snapshot** moved from `02c9cc6ca6a823` to `12083e8011b7b4` (intended: compute line, lending fund, new review lines).
+
+**Next:** C3c removes the leftover bank machinery (foreclosed homes, bonds, the old deposit and loan book code, the treasury transfer).
 
 ### 2026-10-27 — Stage C3a: the AI product catalog (v0.1.10)
 

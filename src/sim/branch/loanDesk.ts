@@ -64,9 +64,12 @@ export function riskBandVisible(state: GameState, branch: Branch): boolean {
 }
 
 /** No new business lending during a funding freeze or at the Critical tier (§13.5, §15). */
-export function lendingBlocked(state: GameState): string | undefined {
+export function lendingBlocked(state: GameState, amount = 0): string | undefined {
   if (state.treasury.freeze) return 'Lending is frozen until liquidity recovers.';
   if (state.company.tier === 'critical') return 'No new lending at the Critical capital tier.';
+  // C3b: the Loan Desk lends from treasury reserves and no longer borrows to do it.
+  if (amount > 0 && state.treasury.reserves < amount)
+    return 'Treasury reserves cannot cover this loan. Move cash into the treasury first.';
   return undefined;
 }
 
@@ -315,7 +318,7 @@ function decideDelegated(
   app: LoanApplication,
 ): BusinessLoan | undefined {
   // Waiting applications sit untouched while lending is blocked; they may expire.
-  if (lendingBlocked(state)) return undefined;
+  if (lendingBlocked(state, app.amount)) return undefined;
   const threshold =
     (LOANDESK.delegatedThresholds[state.company.riskAppetite - 1] ?? 0) *
     ethicsStretch(state, branch) *
@@ -395,7 +398,6 @@ function runBusinessLoans(
         ? loan.balance
         : Math.min(loan.balance, Math.max(0, loan.payment - interest));
     wk.loanInterest += interest;
-    wk.fundingCharge += (loan.balance * ftpShort(country)) / WEEKS_PER_YEAR;
     loan.balance -= principal;
     loan.weeksLeft -= 1;
     state.treasury.reserves += principal;
