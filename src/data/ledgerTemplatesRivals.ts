@@ -55,10 +55,10 @@ export const RIVAL_TEMPLATES = {
   RIVAL_CHARTERED: [
     {
       h: 'New lab on the block: {bank} opens in {city}',
-      b: 'Regulators granted {bank} a charter this year. The new {kind} opened a sales office in {city} and says more will follow.',
+      b: '{bank} closed its seed round this year. The new {kind} opened a sales office in {city} and says more will follow.',
     },
     {
-      h: '{bank} wins a banking charter',
+      h: '{bank} launches',
       b: 'A new {kind}, {bank}, has opened its doors in {city}.',
     },
   ],
@@ -68,7 +68,7 @@ export const RIVAL_TEMPLATES = {
       b: '{buyer} has agreed to buy {bank} and its {n} sales offices. The combined lab serves {cities} cities.',
     },
     {
-      h: 'Bank merger: {bank} sold to {buyer}',
+      h: 'Lab merger: {bank} sold to {buyer}',
       b: "Shareholders accepted {buyer}'s {price} offer. {bank}'s {n} sales offices will carry the {buyer} name.",
     },
   ],
@@ -105,10 +105,10 @@ export const RIVAL_TEMPLATES = {
   CITY_GROWTH: [
     {
       h: '{city} grows: {lots} new storefronts',
-      b: 'Developers finished {lots} street-level units across {city} this year. Banks are already eyeing the best corners.',
+      b: 'Developers finished {lots} street-level units across {city} this year. Labs are already eyeing the best corners.',
     },
     {
-      h: 'New corners for {city} banks',
+      h: 'New corners for {city} labs',
       b: 'With {lots} storefronts newly open to lease, {city} has room for more sales offices.',
     },
   ],
@@ -181,17 +181,20 @@ export const RIVAL_TEMPLATES = {
     },
   ],
   BANK_FAILURE: [
-    { h: 'Regulators seize {bank}', b: "{bank}'s {n} sales offices will be offered to buyers." },
+    {
+      h: '{bank} collapses into administration',
+      b: "{bank}'s {n} sales offices will be offered to buyers.",
+    },
     {
       h: '{bank} collapses',
-      b: 'Supervisors stepped in over the weekend. Its {n} sales offices are up for sale.',
+      b: 'Administrators stepped in over the weekend. Its {n} sales offices are up for sale.',
     },
   ],
   RIVAL_NETWORK_SPLIT: [
     { h: "{bank}'s sales offices find new owners", b: 'The {n} sales offices go to {takers}.' },
     {
       h: 'Carve-up of {bank} complete',
-      b: "{takers} take over the failed bank's {n} sales offices.",
+      b: "{takers} take over the failed lab's {n} sales offices.",
     },
   ],
   RATE_WATCH: [

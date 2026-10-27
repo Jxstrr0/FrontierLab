@@ -1005,6 +1005,7 @@ A deliberately simple "country up or down" investment (DESIGN §5.12a). Your boo
     - **Ease the AI safety rules** (`easeBuffer`; $2.5M, 55% success, 12% exposure): the buffer in that country drops 1pp for 52 weeks, so every safety tier line drops 5 points (`SAFETY.bufferPerPp`, §15).
     - **Fast-track a merger review** ($1.5M, 60%, 10%): the next deal that closes may reach 65% of a city's market (MERGERS.fastTrackShare).
     - **Stall the AI safety bill** (`stallBuffer`; $1.2M, 50%, 15%): only while an AI safety buffer bill is pending there. A win makes it fail its vote.
+    - **Grant campaigns** (`computeSubsidy`, `dcPermits`, `fairUse`, `rdCredit`, `chipRelief`; fees, odds and grants in CONTENT §16): a win pays the lab a one-off grant, booked as a refund on the lobbying line (`spend('lobbying', -grant)`), so the year's lobbying cost nets down. No other effect.
   - The fee is paid at the start (`lobbying`, opex); the outcome arrives in 4–8 weeks (a stall no later than the vote). One pending campaign per type; a fast-track can't be bought while one is unused.
   - Exposure is rolled win or lose: a fine of 50% of the fee and −0.03 brand awareness in your cities in that country, plus a Ledger exposé.
 

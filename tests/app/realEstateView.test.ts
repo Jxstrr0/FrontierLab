@@ -4,6 +4,7 @@
 // with the reason a campaign can't start.
 import { describe, expect, it } from 'vitest';
 import { REAL_ESTATE } from '../../src/config/balance';
+import { LOBBY_CAMPAIGNS } from '../../src/data/lobbying';
 import { campaignCards, pendingCampaigns, winsInForce } from '../../src/app/lobbying/lobbyingView';
 import { propertyPinInfo } from '../../src/app/realEstate/propertyPin';
 import { offerBounds, ownedBuildings, propertyView } from '../../src/app/realEstate/realEstateView';
@@ -72,7 +73,12 @@ describe('lobbying firm views', () => {
     const s = game();
     const firm = 'site_cal_lobbyingFirm_parliamentRow';
     const cards = campaignCards(s, firm);
-    expect(cards.map((c) => c.spec.id)).toEqual(['easeBuffer', 'fastTrack', 'stallBuffer']);
+    expect(cards.map((c) => c.spec.id)).toEqual(LOBBY_CAMPAIGNS.map((c) => c.id));
+    expect(cards.map((c) => c.spec.id).slice(0, 3)).toEqual([
+      'easeBuffer',
+      'fastTrack',
+      'stallBuffer',
+    ]);
     expect(cards.find((c) => c.spec.id === 'stallBuffer')!.blocked).toMatch(/no AI safety bill/);
     expect(cards.find((c) => c.spec.id === 'easeBuffer')!.blocked).toBeUndefined();
     cmd.startLobbying(s, firm, 'fastTrack');

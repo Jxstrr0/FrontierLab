@@ -1,5 +1,5 @@
 // Digital projects on the IT floor (SCREENS §10, DESIGN §5.8.6): the digital
-// templates (Mobile App 2.0, Instant Decisions) with their effect and status:
+// templates (Mobile App 2.0, Fast Inference, the Model Playground…) with their effect and status:
 // available with Start (opens the New product form on that template), running
 // with progress, or done. They run as developments, so the Products team
 // builds them and a Products floor is needed to start one.

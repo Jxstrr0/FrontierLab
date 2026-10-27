@@ -27,7 +27,7 @@ export const MERGERS_TEMPLATES = {
   MERGER_BLOCKED: [
     {
       h: 'Regulator blocks {bank} bid for {target}',
-      b: 'Supervisors refused the deal. {reason}',
+      b: 'Regulators refused the deal. {reason}',
     },
     {
       h: 'Watchdog halts {bank}–{target} merger',
@@ -71,11 +71,11 @@ export const MERGERS_TEMPLATES = {
   ACQUISITION_CLOSED_DISTRESSED: [
     {
       h: '{bank} rescues {target} network',
-      b: 'Paying {price} for the failed bank, {bank} keeps its {n} sales offices open and its depositors whole.',
+      b: 'Paying {price} for the failed lab, {bank} keeps its {n} sales offices open and its customers served.',
     },
     {
       h: 'Failed {target} finds a buyer in {bank}',
-      b: 'Regulators accepted {price} for the seized bank. Its {n} sales offices reopen under new management.',
+      b: 'Administrators accepted {price} for the failed lab. Its {n} sales offices reopen under new management.',
     },
   ],
   CONVERSION_DONE: [
@@ -91,11 +91,11 @@ export const MERGERS_TEMPLATES = {
   DISTRESSED_SALE: [
     {
       h: 'Fire sale: {target} on the block at {ask} a share',
-      b: 'Regulators want about {pb}× book for the failed bank. Bids close in {weeks} weeks.',
+      b: 'Administrators want about {pb}× book for the failed lab. Bids close in {weeks} weeks.',
     },
     {
       h: 'Bargain hunters circle {target}',
-      b: 'The seized bank is priced at {ask} a share, roughly {pb}× book, with {weeks} weeks to find a buyer.',
+      b: 'The failed lab is priced at {ask} a share, roughly {pb}× book, with {weeks} weeks to find a buyer.',
     },
   ],
 } satisfies Record<string, LedgerTemplate[]>;

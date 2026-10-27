@@ -10,7 +10,7 @@ export const REAL_ESTATE_TEMPLATES = {
       b: 'The lab adds the {city} building to its books and says the tenants stay put.',
     },
     {
-      h: 'Landlord {bank}: lender snaps up {address}',
+      h: 'Landlord {bank}: lab snaps up {address}',
       b: 'A {price} purchase in {city}. Rent from the building will now flow to the lab.',
     },
   ],

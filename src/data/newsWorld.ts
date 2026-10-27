@@ -236,13 +236,43 @@ export const POLICIES: PolicySpec[] = [
     name: 'longer library hours',
     effect: 'keep public libraries open into the evening',
   },
+  {
+    id: 'training_copyright',
+    name: 'a training-data copyright bill',
+    effect: 'make AI labs license the books and articles their models learn from',
+  },
+  {
+    id: 'chip_exports',
+    name: 'tighter chip export rules',
+    effect: 'require a permit to ship the fastest AI chips abroad',
+  },
+  {
+    id: 'dc_power',
+    name: 'a data-centre power cap',
+    effect: 'limit how much grid power new data centres may draw',
+  },
+  {
+    id: 'model_licensing',
+    name: 'a model licensing scheme',
+    effect: 'require a licence before any frontier model goes on sale',
+  },
+  {
+    id: 'deepfake_labels',
+    name: 'mandatory deepfake labels',
+    effect: 'make AI-generated images and voices carry a visible label',
+  },
+  {
+    id: 'compute_credit',
+    name: 'a compute tax credit',
+    effect: 'refund part of what labs spend on GPUs built at home',
+  },
 ];
 
 /** Sectors for the weekly market story ("{sector} stocks"). */
 export const MARKET_SECTORS = [
   'technology',
   'energy',
-  'bank',
+  'AI',
   'retail',
   'healthcare',
   'industrial',

@@ -302,7 +302,7 @@ export interface TipText {
 export const FLOOR_TIPS: Record<DeptId, TipText> = {
   finance: {
     title: 'Finance floor',
-    line: 'Finance keeps the books: full statements, the credit ratio our lenders watch, and our risk appetite. Short-staffed, the statements run late, and once we’re public that costs fines and share price.',
+    line: 'Finance keeps the books: full statements, the credit ratio our lenders watch, and our launch posture. Short-staffed, the statements run late, and once we’re public that costs fines and share price.',
   },
   hr: {
     title: 'HR floor',
@@ -390,7 +390,7 @@ export const PLACE_TIPS: Record<string, TipText> = {
   },
   convention: {
     title: 'Conference',
-    line: 'Conferences run for one week and show AI startups you can’t find anywhere else. You have to be in the city to attend.',
+    line: 'Conferences run for four weeks and show AI startups you can’t find anywhere else. You have to be in the city to attend.',
   },
   lobbyingFirm: {
     title: 'Lobbying firm',

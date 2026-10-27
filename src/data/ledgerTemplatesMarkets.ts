@@ -13,7 +13,7 @@ export const MARKETS_TEMPLATES = {
     },
     {
       h: '{bank} raises {raised} from {investor}',
-      b: 'The private round sold {shares} new shares at {price}. The money goes straight into the capital base.',
+      b: 'The private round sold {shares} new shares at {price}. The money goes straight onto the balance sheet.',
     },
     {
       h: 'Private money backs {bank}',

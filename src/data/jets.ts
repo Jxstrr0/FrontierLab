@@ -24,4 +24,18 @@ export const JETS: Record<string, JetSpec> = {
     rangeKm: null,
     blurb: 'Long-range and lavish: any city on Earth without a stop.',
   },
+  kite350: {
+    id: 'kite350',
+    name: 'Kite 350',
+    price: 9_500_000,
+    rangeKm: 3_500,
+    blurb: 'A very light jet for short hops. Six seats and not much legroom.',
+  },
+  petrel7500: {
+    id: 'petrel7500',
+    name: 'Petrel 7500',
+    price: 46_000_000,
+    rangeKm: 11_000,
+    blurb: 'Crosses an ocean in one go, with a bedroom at the back.',
+  },
 };
