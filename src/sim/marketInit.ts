@@ -4,6 +4,7 @@
 // records. Used by newGame and the 6 → 7 save migration.
 import { emptyEmpire } from './personalInit';
 import {
+  CTO_COMPUTE,
   EXEC_DELEGATION,
   PAY_REVIEW,
   RIVAL_NOTIONAL_SHARE,
@@ -89,6 +90,7 @@ export function emptyExecutives(): ExecutivesState {
     payReviewCadence: PAY_REVIEW.defaultCadence,
     moraleTarget: EXEC_DELEGATION.moraleTarget,
     brandTarget: EXEC_DELEGATION.brandTarget,
+    computeCover: CTO_COMPUTE.coverTarget,
     occTargets: { company: EXEC_DELEGATION.occTarget, personal: EXEC_DELEGATION.occTarget },
     trimmedStocks: { company: {}, personal: {} },
   };

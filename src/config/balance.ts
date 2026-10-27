@@ -864,6 +864,19 @@ export const CHIEF_SCIENTIST = {
   cashFloorRuns: 40,
 } as const;
 /**
+ * The CTO's Compute delegation (§17.2, post-C8): each week, with a Compute
+ * floor, reserves GPU lots until data-center, power-deal, fit-out and rented
+ * GPUs cover coverTarget (a dial, coverTargets) of last week's demand. Acts
+ * only when the gap is at least slack of demand, and only on offers priced
+ * under spot. Terms follow the chip cycle: longest first in a glut, shortest
+ * first in a shortage, cheapest per GPU-week in a normal market.
+ */
+export const CTO_COMPUTE = {
+  coverTarget: 0.75,
+  coverTargets: [0.6, 0.75, 0.9] as readonly number[],
+  slack: 0.05,
+} as const;
+/**
  * The talent war (§16.13, stage C6c): named researchers, 1–5 stars, each with
  * a specialty axis. Salary a year = salaryBase × (1 + salaryPerStar × (stars − 1))
  * × the home city's wage level. Yours add scorePerStar × stars to a training

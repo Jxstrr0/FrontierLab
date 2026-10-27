@@ -4,6 +4,7 @@
 // Frontier Lab's chain starts at schema 1 (stage C0, DESIGN decision A6).
 // Vault Street's 37 steps were dropped: its saves live in a separate store
 // and its export codes are turned away, so none can reach this chain.
+import { CTO_COMPUTE } from '../../config/balance';
 import { foldRivalCity } from '../rivalOffices';
 import { migrateCatalog } from './migrateCatalog';
 import { migrateBankCleanup } from './migrateBankCleanup';
@@ -121,6 +122,11 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
   // 18 → 19 (stage C8f): treasury reserves become spendable seed money.
   18: (s) => {
     migrateSeedMoney(s as unknown as GameState);
+    return s;
+  },
+  // 19 → 20 (post-C8): the CTO's Compute delegation and its cover dial.
+  19: (s) => {
+    (s as unknown as GameState).executives.computeCover ??= CTO_COMPUTE.coverTarget;
     return s;
   },
 };

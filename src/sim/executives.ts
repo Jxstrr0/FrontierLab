@@ -33,6 +33,7 @@ import { runBranchGuidance } from './branchGuidance';
 import { csciTraining } from './execDelegationsResearch';
 import { runGrants } from './execGrants';
 import { cooPayReviews } from './payReviews';
+import { ctoCompute } from './execDelegationsCompute';
 import { delegationOn, execMarketSalary, resignChance, seatedExecs } from './execSeats';
 import { raiseIncident } from './incidents';
 import { spend } from './ledger';
@@ -52,6 +53,7 @@ const DELEGATIONS: [ExecSeat, string, (s: GameState) => void][] = [
   ['cfo', 'bankInvests', cfoBankInvests],
   ['cfo', 'privateInvests', cfoPrivateInvests],
   ['cto', 'digital', ctoDigital],
+  ['cto', 'compute', ctoCompute],
   ['cpo', 'developments', cpoDevelopments],
   ['cpo', 'models', cpoModels],
   ['cpo', 'pricing', cpoPricing],
