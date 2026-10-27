@@ -126,6 +126,11 @@ export interface EventPayloads {
   BREACH: { bank: string; n: number };
   BANK_RUN: { bank: string };
   BANK_RUN_ENDED: { bank: string };
+  // ─── Compute (compute.ts, C4c) ───
+  COMPUTE_BURST: { bank: string; gpus: number };
+  COMPUTE_CRUNCH: { bank: string };
+  COMPUTE_CRUNCH_ENDED: { bank: string };
+  COMPUTE_OUTAGE: { bank: string };
   RECAP: { bank: string; amount: Money; shares: number };
 
   // ─── Partnerships (partnerships.ts) ───────────────────────────────────────

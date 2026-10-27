@@ -285,7 +285,7 @@ Follows the brief's map structure (1–2 main offices worldwide, one sales offic
 ### C4 — Compute (split into C4a–C4c)
 - **C4a — Compute price index and pool: done (v0.1.13, schema 9).** A global chip cycle (glut, normal, shortage) moves a compute price index. Office compute is counted in GPU-weeks; data-center GPUs serve it first and the rest is bought at spot × index. A Compute card on the Company screen and each data center's panel shows the price, the chart, GPUs used and owned, and the spot bill. **Next: C4b.**
 - **C4b — Compute floor and GPU lots: done (v0.1.14, schema 10).** The HQ Treasury floor is now the Compute floor (same id). A GPU market offers 6-month, 1-year and 3-year reservations from fictional GPU clouds at a discount on spot; rented GPUs cover demand alongside data centers and are billed weekly for their whole term. The bank-era liquidity, funding and central bank cards show only for saves that still carry deposits or wholesale funding. **Next: C4c.**
-- **C4c:** spot limit and auto spot-buy, emergency burst with a price premium, capacity crunch (waitlist) and outages, and retiring the bank-era liquidity cards.
+- **C4c — Spot limits, crunch and outages: done (v0.1.15, schema 11).** Offices pay an internal compute charge at spot and the pool books the real cost (spot, burst, lots) on the company compute line. Spot is limited by your recent buying and a 20,000-GPU ceiling; past it, auto spot-buy takes emergency burst at 1.6× with a stigma on GPU offers, then demand goes unserved: new sign-ups wait (capacity crunch) and after 3 weeks outages raise churn. Auto spot-buy can be turned off. The bank-era cards stay hidden behind the legacy check from C4b. GPU halls and power already live in the data centers from C2c. Data-centre and power deals (the payroll-partnership rework) move to C8. **Next: C5.**
 - **Build:**
   - Compute floor (Treasury relabelled and re-pointed)
   - Compute price index (§3.6)
@@ -328,6 +328,7 @@ Follows the brief's map structure (1–2 main offices worldwide, one sales offic
 ### C8 — Polish and relaunch
 - **Build:**
   - Tutorial rewrite
+  - Data-centre and power deals on the regional energy sites (the payroll partnerships, moved from C4)
   - Art pass (campus and GPU-hall vignettes, icons)
   - Balance pass across every strategy
   - Docs sweep: DESIGN, SIMULATION, SCREENS and CONTENT fully in AI terms, and this file archived

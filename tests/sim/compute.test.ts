@@ -6,7 +6,7 @@ import { COMPUTE } from '../../src/config/balance';
 import { DEFAULT_DC_BUILD } from '../../src/data/dataCenters';
 import * as cmd from '../../src/sim/commands';
 import {
-  computePriceFactor,
+  spotCost,
   headroom,
   newComputeState,
   ownedShare,
@@ -46,7 +46,7 @@ describe('the chip cycle', () => {
 });
 
 describe('the compute pool', () => {
-  it('prices an office at spot × index when it owns no GPUs', () => {
+  it('charges an office spot × index for its GPUs', () => {
     const s = newGame({ seed: 3, cityId: 'cal' });
     const id = openScriptedBranch(s, 'midtown');
     advanceWeeks(s, 10);
@@ -75,12 +75,19 @@ describe('the compute pool', () => {
     // One 2,000-GPU hall covers a young office's demand outright.
     expect(s.compute.ownedGpus).toBe(2_000);
     expect(ownedShare(s)).toBe(1);
-    expect(computePriceFactor(s)).toBe(0);
-    expect(lastRow(s, id).lines.compute).toBe(0);
+    expect(spotCost(s)).toBe(0);
+    // C4c: the office still pays the internal price; the pool books it back,
+    // so the company's compute line nets to zero.
+    const row = lastRow(s, id);
+    expect(row.lines.compute).toBeGreaterThan(0);
+    expect(s.compute.weekCharge).toBeCloseTo(row.lines.compute, 6);
+    expect(s.compute.weekCost).toBe(0);
+    expect(s.history.weekly.at(-1)!.pnl.compute).toBeCloseTo(0, 6);
     expect(identityGap(s)).toBeLessThan(1);
-    // Half-covered demand pays half, at the index.
+    // Half-covered demand buys half at spot.
     s.compute.demandGpus = 4_000;
-    expect(computePriceFactor(s)).toBeCloseTo(0.5 * s.compute.index, 9);
+    s.compute.spotTrail = 10_000; // well inside the spot limit (C4c)
+    expect(spotCost(s)).toBeCloseTo(2_000 * spotPrice(s), 6);
   });
 });
 

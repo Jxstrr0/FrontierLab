@@ -55,7 +55,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState } from './personalTypes';
 
-export const SCHEMA_VERSION = 10;
+export const SCHEMA_VERSION = 11;
 
 export interface GameState {
   schemaVersion: number;
@@ -586,6 +586,19 @@ export interface ComputeState {
   offers: GpuOffer[];
   /** Week the next set of offers arrives; −1 without a Compute floor. */
   offersRefreshWeek: Week;
+  /** Buy the gap at spot, then emergency burst, automatically (C4c). */
+  autoSpotBuy: boolean;
+  /** EMA of spot + burst GPUs bought, which sets the spot limit. */
+  spotTrail: number;
+  /** Weeks in a row with a capacity crunch (waitlist). */
+  crunchWeeks: number;
+  /** Weeks of outage left: churn runs high while > 0. */
+  outageWeeksLeft: number;
+  /** Weeks GPU offers stay marked up after an emergency burst. */
+  burstStigmaWeeks: number;
+  /** Last week's internal compute charges to the offices, and what the pool really paid (spot, burst, lots). */
+  weekCharge: Money;
+  weekCost: Money;
 }
 
 /** A GPU reservation rented from the market: fixed GPUs at a fixed weekly price until endWeek. */

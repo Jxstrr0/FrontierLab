@@ -4,7 +4,7 @@
 // screen to open. Pure: reads state, mutates nothing. Thresholds in
 // ATTENTION (balance.ts); the capital tiers and the CRO's loss target are the
 // ones the rest of the sim already uses.
-import { ATTENTION, EXEC_DELEGATION, GRAND_OPENING_WEEKS, LIQ_MIN } from '../config/balance';
+import { ATTENTION, EXEC_DELEGATION, GRAND_OPENING_WEEKS, LIQ_MIN, SPOT } from '../config/balance';
 import { CITIES } from '../data/cities';
 import { EXEC_SEAT_ORDER, EXEC_SEATS } from '../data/executives';
 import type { DeptId } from '../data/types';
@@ -93,6 +93,42 @@ export function attentionItems(state: GameState): AttentionItem[] {
       detail:
         'Wages, rent and salaries would use it up in that time; hold off on builds until there is more cover.',
       route: { kind: 'company' },
+    });
+  }
+
+  // Compute (C4c): an outage, a capacity crunch, or paying for emergency burst.
+  const c = state.compute;
+  const computeRoute = state.departments.treasury
+    ? ({ kind: 'hq', dept: 'treasury' } as const)
+    : ({ kind: 'company' } as const);
+  if (c.outageWeeksLeft > 0) {
+    items.push({
+      id: 'compute',
+      tone: 'bad',
+      weight: 88,
+      title: 'Outage: too little compute',
+      detail:
+        'Demand has outrun your GPUs for weeks and customers are leaving. Reserve GPUs or build a data center.',
+      route: computeRoute,
+    });
+  } else if (c.crunchWeeks > 0) {
+    items.push({
+      id: 'compute',
+      tone: 'bad',
+      weight: 84,
+      title: 'Capacity crunch',
+      detail:
+        'New customers are on a waitlist. Reserve GPUs on the Compute floor before it turns into an outage.',
+      route: computeRoute,
+    });
+  } else if (c.burstStigmaWeeks >= SPOT.stigmaWeeks) {
+    items.push({
+      id: 'compute',
+      tone: 'warn',
+      weight: 62,
+      title: 'Buying emergency compute',
+      detail: 'Spot ran out, so burst GPUs cost a premium. Reserved GPUs are cheaper.',
+      route: computeRoute,
     });
   }
 
