@@ -147,7 +147,7 @@ describe('regulator checks', () => {
     advanceWeeks(s, 1);
     const o = s.mergers.offers[0]!;
     expect(o.status).toBe('blocked');
-    expect(o.reason).toMatch(/Deposit share in Calgary/);
+    expect(o.reason).toMatch(/Customer share in Calgary/);
     expect(s.events.log.some((e) => e.type === 'MERGER_BLOCKED')).toBe(true);
     expect(bank.status).toBe('active');
     expect(identityGap(s)).toBeLessThan(1);

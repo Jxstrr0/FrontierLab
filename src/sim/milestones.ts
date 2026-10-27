@@ -4,7 +4,8 @@
 import { MILESTONE_GOALS, MILESTONE_HQ_DEPTS } from '../config/balance';
 import { CITIES } from '../data/cities';
 import { MILESTONES } from '../data/milestones';
-import { balanceSheet, totalDeposits } from './balanceSheet';
+import { companyArr } from './arr';
+import { balanceSheet } from './balanceSheet';
 import { MAX_OFFICE_SIZE } from './branch/officeSize';
 import { pushEvent } from './events';
 import { yourClubs } from './franchise';
@@ -35,7 +36,8 @@ const REACHED: Record<string, (s: GameState) => boolean> = {
   first_acquisition: (s) => s.mergers.deals.length > 0,
   hundred_branches: (s) => flagships(s) >= MILESTONE_GOALS.flagships,
   ten_cities: (s) => cityCount(s) >= MILESTONE_GOALS.cities,
-  deposits_1b: (s) => totalDeposits(s) >= MILESTONE_GOALS.deposits,
+  // C8f: id kept for saves; now a billion in ARR.
+  deposits_1b: (s) => companyArr(s) >= MILESTONE_GOALS.arr,
   five_countries: (s) => countryCount(s) >= MILESTONE_GOALS.countries,
   assets_10b: (s) => balanceSheet(s).assets >= MILESTONE_GOALS.assets,
   five_acquisitions: (s) => s.mergers.deals.length >= MILESTONE_GOALS.acquisitions,

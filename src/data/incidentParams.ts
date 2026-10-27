@@ -46,8 +46,8 @@ export const INCIDENT_PARAMS = {
     ethicsBase: 1.6,
     appetiteFrom: 4,
     appetiteMult: 1.5,
+    /** Refunds: this share of the sales office's ARR (C8f; was a share of deposits). */
     compShare: 0.02,
-    compDiv: 10,
     denyFineChance: 0.4,
     denyFineMult: 5,
   },

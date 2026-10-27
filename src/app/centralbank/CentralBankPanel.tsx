@@ -23,6 +23,7 @@ import { homeCountry } from '../../sim/treasury';
 import { Badge, Card, Panel, Row, SectionTitle } from '../components';
 import { gameDate, pct, signedPct } from '../format/format';
 import { CentralBankFacility } from '../hq/treasury/CentralBankFacility';
+import { hasLegacyFunding } from '../hq/treasury/legacyFunding';
 import '../hq/treasury/treasury.css';
 import { closePanel, useGame } from '../store';
 import { CentralBankArt } from './CentralBankArt';
@@ -131,8 +132,8 @@ export function CentralBankPanel(p: { countryId: CountryId }) {
           {licensed && (
             <p class="muted small">
               Your {yours === 1 ? 'sales office' : `${yours} sales offices`} in{' '}
-              {theCountryName(p.countryId)} {yours === 1 ? 'prices' : 'price'} deposits and loans
-              off this rate.
+              {theCountryName(p.countryId)} {yours === 1 ? 'sells' : 'sell'} into an economy this
+              rate steers: customer budgets rise and fall with it.
             </p>
           )}
         </Card>
@@ -165,18 +166,8 @@ export function CentralBankPanel(p: { countryId: CountryId }) {
           </Card>
         </div>
 
-        {home ? (
-          <CentralBankFacility />
-        ) : (
-          <Card>
-            <div class="tr-card-title">Standing lending facility</div>
-            <p class="muted small">
-              {licensed
-                ? `Your treasury banks with the ${COUNTRIES[homeCountry(s).id].centralBank}, so its window is where you borrow in an emergency.`
-                : `You have no banking licence in ${theCountryName(p.countryId)} yet, so the ${spec.centralBank} won't lend to you.`}
-            </p>
-          </Card>
-        )}
+        {/* C8f: the standing facility lends only to bank-era saves with funding to manage. */}
+        {home && hasLegacyFunding(s) && <CentralBankFacility />}
       </div>
     </Panel>
   );

@@ -87,7 +87,7 @@ export function RivalSheet(p: { s: GameState; lotId: string; onClose: () => void
             )}
             {bank.charteredWeek !== undefined && (
               <div class="muted small">
-                A new lab, chartered in {yearOf(p.s, bank.charteredWeek)}
+                A new lab, founded in {yearOf(p.s, bank.charteredWeek)}
               </div>
             )}
           </div>

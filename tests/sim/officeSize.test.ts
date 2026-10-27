@@ -20,7 +20,7 @@ import { newGame } from '../../src/sim/newGame';
 import { REFERENCE_BUILDS } from '../../src/data/equipment';
 
 function openOffice() {
-  const s = newGame({ seed: 11, cityId: 'cal', startCash: 1_500_000 });
+  const s = newGame({ seed: 11, cityId: 'cal', startCash: 3_500_000 });
   const id = openScriptedBranch(s, 'midtown');
   addCapital(s, 20_000_000);
   while (s.branches[id]!.status !== 'open') advanceWeeks(s, 1);

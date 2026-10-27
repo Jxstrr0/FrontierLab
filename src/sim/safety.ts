@@ -7,6 +7,7 @@
 import {
   CAPITAL_GATE,
   HQ_COVERAGE,
+  LAUNCH_POSTURE,
   LICENCE,
   SAFETY,
   SAFETY_TIER_THRESHOLDS,
@@ -33,14 +34,29 @@ export function safetyStrength(state: GameState): number {
   return Math.min(1, c.kPrime) + clamp(c.k - 1, 0, HQ_COVERAGE.kMax - 1);
 }
 
-/** §15: 1 + frontierWeight × lead over the bar − modelSafetyWeight × (Safety axis − 5). */
+/** The launch posture's shift for this level (§16.8, C8f). */
+const posture = (state: GameState, table: readonly number[]) =>
+  table[state.company.riskAppetite - 1] ?? 0;
+
+/**
+ * §15: 1 + frontierWeight × lead over the bar − modelSafetyWeight × (Safety
+ * axis − 5) + the launch posture's exposure.
+ */
 export function safetyExposure(state: GameState): number {
   const m = activeModel(state);
   const lead = Math.max(0, modelQuality(m) - qualityBar(state));
   return Math.max(
     SAFETY.minExposure,
-    1 + SAFETY.frontierWeight * lead - SAFETY.modelSafetyWeight * (m.radar[RADAR.safety] - 5),
+    1 +
+      SAFETY.frontierWeight * lead -
+      SAFETY.modelSafetyWeight * (m.radar[RADAR.safety] - 5) +
+      posture(state, LAUNCH_POSTURE.exposure),
   );
+}
+
+/** §16.8: the launch posture's edge on every Deal Desk win and keep chance (C8f). */
+export function postureDealEdge(state: GameState): number {
+  return posture(state, LAUNCH_POSTURE.dealEdge);
 }
 
 /** True while the lab is under strict watch after a revoked licence. */

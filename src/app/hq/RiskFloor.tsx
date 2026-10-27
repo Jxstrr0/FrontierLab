@@ -26,10 +26,16 @@ import './risk/risk.css';
 const ELEVATED_FAIL = 2;
 
 export function RiskFloor() {
+  const s = useGame();
   return (
     <div class="stack rk-floor">
-      <SectionTitle>Losses</SectionTitle>
-      <LossCard />
+      {/* C8f: only bank-era saves still carry loans to report on. */}
+      {lossTable(s).length > 0 && (
+        <>
+          <SectionTitle>Losses</SectionTitle>
+          <LossCard />
+        </>
+      )}
       <SectionTitle>Model performance</SectionTitle>
       <ModelCard />
       <SectionTitle>Regulator and safety</SectionTitle>
@@ -43,15 +49,6 @@ function LossCard() {
   const sym = s.settings.currency;
   const rows = lossTable(s);
   const weeks = s.risk.losses.length;
-  if (rows.length === 0) {
-    return (
-      <Card>
-        <p class="muted small hq-note">
-          No loans on the books yet. Loss rates appear here once lending starts.
-        </p>
-      </Card>
-    );
-  }
   return (
     <Card>
       <Row label="Delinquency" value={pct(delinquency(s), 2)} strong />

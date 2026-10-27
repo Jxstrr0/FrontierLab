@@ -41,7 +41,7 @@ export function UniversityPanel(p: { siteId: string }) {
           <Row label="Staff" value={count(site.employer.employees)} />
           <Row label="Students" value={count(students)} />
           <Row
-            label="Payroll partner"
+            label="Plans partner"
             value={currentPartner(s, site, mine)}
             tone={mine ? 'good' : undefined}
           />

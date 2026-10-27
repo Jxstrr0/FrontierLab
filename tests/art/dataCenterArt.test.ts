@@ -108,7 +108,7 @@ describe('data center map art', () => {
 
 describe('data center occupants', () => {
   it('marks your data center lot and energy sites for the renderer', () => {
-    const s = newGame({ seed: 7, cityId: 'cal', startCash: 1_500_000 });
+    const s = newGame({ seed: 7, cityId: 'cal', startCash: 3_500_000 });
     addCapital(s, 60_000_000);
     const lot = freeLot(s);
     const r = cmd.buildDataCenter(s, { where: { lotId: lot.id }, build: DEFAULT_DC_BUILD });

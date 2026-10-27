@@ -63,7 +63,7 @@ export function EmployerPanel(p: { siteId: string }) {
         {/* Energy sites sign power deals; a payroll deal signed before C8a runs on. */}
         {(!energy || mine) && (
           <>
-            <SectionTitle>{mine ? 'Yours' : 'Payroll deal'}</SectionTitle>
+            <SectionTitle>{mine ? 'Yours' : 'Staff plan deal'}</SectionTitle>
             <DealCard site={site} kind="payroll" people={e.employees} />
           </>
         )}

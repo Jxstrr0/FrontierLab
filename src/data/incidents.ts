@@ -247,14 +247,14 @@ export const INCIDENT_SPECS: Record<string, IncidentSpec> = {
     scope: 'company',
     trigger: 'triggered',
     yours: true,
-    text: 'Rumours that we are about to go dark are spreading, and depositors are queueing to take their money out.',
-    money: ['window'],
+    text: 'Rumours that we are about to go dark are spreading, and customers are cancelling their plans before it happens.',
+    money: ['credits'],
     pct: ['odds'],
     options: [
       {
-        id: 'window',
-        label: 'Central bank window',
-        effect: 'Borrow {window} of liquidity. Ratings dip from the stigma.',
+        id: 'credits',
+        label: 'Service credits',
+        effect: 'Give every customer {credits} of credits in all. The rumour ends.',
       },
       {
         id: 'raise',
@@ -264,7 +264,7 @@ export const INCIDENT_SPECS: Record<string, IncidentSpec> = {
       {
         id: 'statement',
         label: 'Public statement',
-        effect: '{odds} chance it calms depositors and ends the run.',
+        effect: '{odds} chance it calms customers and ends the rumour.',
       },
     ],
     worst: 'statement',

@@ -31,7 +31,7 @@ import { freeLot } from '../helpers/scenario';
 
 /** A rich lab in Calgary, travelled to the Fort McMurray energy site. */
 function atEnergySite(): { s: GameState; site: Site } {
-  const s = newGame({ seed: 7, cityId: 'cal', startCash: 1_500_000 });
+  const s = newGame({ seed: 7, cityId: 'cal', startCash: 3_500_000 });
   addCapital(s, 60_000_000);
   cmd.travelTo(s, 'fmm');
   const site = Object.values(s.world.sites).find((x) => x.cityId === 'fmm' && x.employer)!;
