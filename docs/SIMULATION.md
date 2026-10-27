@@ -11,7 +11,7 @@ How the economy works, step by step. Every CAPS name is a key in `src/config/bal
 - **Ratings:** continuous 1.0–5.0, displayed as coins with one decimal.
 - **Scales:** skills and morale 0–100; awareness 0–1.
 - **Helpers:** `clamp(x, lo, hi)`, `ema(x, target, k) = x + k × (target − x)`, `pp` = percentage point (0.01).
-- **Expected values:** flows use expected values plus small seeded noise (`noise(±5%)` = ×(1 + U(−0.05, 0.05))). Use Poisson only where counts are small (Loan Desk applications, incidents).
+- **Expected values:** flows use expected values plus small seeded noise (`noise(±5%)` = ×(1 + U(−0.05, 0.05))). Use Poisson only where counts are small (incidents).
 - **Balance identity:** after every weekly tick, assets = liabilities + equity (to within $1). Assert this in tests.
 
 ## 2. Clock and tick order
@@ -32,7 +32,7 @@ How the economy works, step by step. Every CAPS name is a key in `src/config/bal
    4. ratings (§8)
    5. demand (§9)
    6. books: originate, run off, default, reprice (§10)
-   7. Loan Desk (§11)
+   7. Deal Desk (§11): RFPs, bids, contract revenue; then, after every office, business failures and outage losses (`runContracts`)
    8. branch P&L (§12)
 5. `partnerships.weekly` (§13.7)
 6. `treasury.weekly` (§13)
@@ -49,7 +49,7 @@ How the economy works, step by step. Every CAPS name is a key in `src/config/bal
     - ventures report and raise (§20)
     - regulator review (§15)
     - partnership reviews
-    - the renewal season for business contracts (§11.0, stage C5a)
+    - the renewal season for business contracts (§11.3, stage C5b; rival signings follow)
     - the quarter's report sums the weeks whose last day falls in it, so when this tick lands on the quarter's first day the week just closed still counts for the old quarter
 14. **Year-end** (first tick of a new year):
     - rankings: Fastest Growing Banks, Rich List
@@ -62,7 +62,7 @@ How the economy works, step by step. Every CAPS name is a key in `src/config/bal
 
 **Central bank meetings:** each country meets on the fixed week-of-year list in CONTENT (Countries table). A meeting in a given week is processed inside step 1.
 
-**Auto-pause** when any of these needs a decision: an unresolved incident, the results modal (every week, or the tick that closes a month's or quarter's last week, per the setting; a week belongs to the month its last day falls in, and the report rolls up every week of the period that just ended), the board meeting reminder (once per quarter), or Loan Desk applications expiring this week (optional setting). The clock also holds, without changing the speed setting, while any panel or sheet is open: days pass only on the map.
+**Auto-pause** when any of these needs a decision: an unresolved incident, the results modal (every week, or the tick that closes a month's or quarter's last week, per the setting; a week belongs to the month its last day falls in, and the report rolls up every week of the period that just ended), the board meeting reminder (once per quarter), or Deal Desk proposal requests expiring this week (optional setting). The clock also holds, without changing the speed setting, while any panel or sheet is open: days pass only on the map.
 
 ## 3. RNG and determinism
 
@@ -191,7 +191,7 @@ The §25 checkpoints are in start-of-game money: `npm run balance` deflates them
   - Skills: People, Product, Marketing and Ethics, each drawn from normal(62, 16) and clamped to 25–98 (v0.10.12: a slightly stronger pool, about one in eight scores 80+ rather than one in eleven).
   - Salary ask: `MANAGER_BASE_SALARY (72,000) × city.wageIndex × (0.7 + 0.6 × avgSkill/100)`.
 - **People** lifts morale and skill (§6.2, §6.3) and the Service rating (§8).
-- **Product** sets delegated pricing quality and Loan Desk estimate accuracy (§11, §17).
+- **Product** sets delegated pricing quality (§17).
 - **Marketing** multiplies campaign effects by `0.8 + 0.4 × marketing/100`.
 - **Ethics** multiplies mis-selling, fraud and walkout incident odds by `1.6 − ethics/100` (§23).
 - **No manager:** Service −0.3, morale −5, and no delegation.
@@ -407,47 +407,53 @@ A book's balance is its **ARR** (annual recurring revenue).
   - **Storefronts:** district by district (in id order), `round(free × BUSINESS.lotShare (0.5))` of the free storefronts become businesses, leaving at least `keepFreePerDistrict` (1) free. A business sets `lot.occupant = {type:'business'}`; it is never for lease. Rival growth still counts these storefronts as the city's room (`roomLot`).
   - **Sector:** weighted by district like the Loan Desk (`SECTOR_DISTRICT_WEIGHT`), from CONTENT §21b; farms only in S/M cities.
   - **Size:** small 55%, mid 33%, large 12% (`BUSINESS.sizes`).
-  - **Budget (a year):** `size.budget (30k / 120k / 450k) × lot.incomeIndex × sector.budgetMult × lognormal(1, 0.3) × list level`, rounded to $1k.
+  - **Budget (a year):** `size.budget (6k / 25k / 90k; C5a used 30k / 120k / 450k) × lot.incomeIndex × sector.budgetMult × lognormal(1, 0.3) × list level`, rounded to $100.
   - **Pentagon** (AI readiness, Budget, Data sensitivity, Switching cost, Financial health): `round(normal(sector.profile, 1.2))` clamped 1–10; Budget +size.budgetPip (−1/0/+1) and Switching cost +size.switchPip.
-  - **Anchors:** every employer site (not regional energy sites) becomes an anchor: `1.8M × employees / 2,500 × incomeMult × lognormal(1, 0.3) × list level`, the anchor profile (5, 8, 7, 8, 7) with +2 Budget and Switching cost.
+  - **Anchors:** every employer site (not regional energy sites) becomes an anchor: `360k (C5a: 1.8M) × employees / 2,500 × incomeMult × lognormal(1, 0.3) × list level`, the anchor profile (5, 8, 7, 8, 7) with +2 Budget and Switching cost.
   - **Rival contracts:** in a city with rival offices, a business starts with a rival with chance `rivalHeld` (50%; anchors `anchorRivalHeld` 70%), the rival picked by office size + 1 (an anchor keeps its payroll partner if that rival is there). Contract value = budget × U(0.7, 1), renewing at the `U{1, termMax}`-th quarter start from now.
-- **Renewal season** (tick step 13): a contract whose `renewalWeek` has come renews with the same vendor for `termQuarters[0]` quarters. A vendor that was bought by another rival hands it to the buyer; one no longer active in the city loses it (the business has no vendor). C5b replaces the roll-over with the Deal Desk's bidding.
+- **Renewal season** (tick step 13): a contract whose `renewalWeek` has come renews with the same vendor for `termQuarters[0]` quarters. A vendor that was bought by another rival hands it to the buyer; one no longer active in the city loses it (the business has no vendor). C5b settles renewals in the renewal season of §11.3.
 
-## 11. Loan Desk
+## 11. Deal Desk (stage C5b)
 
-- **Arrival rate:** `λ = LOANDESK_BASE (0.5) + 3.0 × mix_BIZ × (footTraffic/8000) × (0.25 + 0.75 × e) × loanDemand × searchBoost`. Applications this week = `poisson(λ)`.
-- **Each application:**
-  - **Sector:** weighted pick by district (CONTENT Loan Desk sectors).
-  - **Business name:** from the name generator.
-  - **Amount:** `lognormal(70,000 × incomeIndex × sector.amountMult, 0.7)` (tuned from 120,000), clamped to $20k–$3M.
-  - **Term:** within the sector's range.
-  - **Pentagon** (Management, Track record, Market, Competitiveness, Financial health): each score = round(normal(sector profile, 1.6)), clamped to 1–10. In a Recession, Financial health −1.
-  - **Collateral:** None 30%, Partial 45%, Full 25%.
-  - **Max rate they'll accept:** `FTP_short + 0.0525 + 0.006 × (5 − avg) + normal(0, 0.004)`. Typical applicants accept FTP + 5–5.5%, above the default SBL price of FTP + 4.5%; weaker businesses will pay more.
-  - **Hidden risk:**
-    - `avg = 0.30 × FinHealth + 0.20 × Track + 0.20 × Mgmt + 0.15 × Market + 0.15 × Comp`
-    - `pd = SBL_BASE_PD (0.025) × exp(−0.22 × (avg − 5)) × collateralPD (1.20 / 1.00 / 0.85) × creditCycle`, recomputed weekly for booked loans
-    - `lgd` by collateral: 0.75 / 0.50 / 0.30
-  - Expires after 2 weekly ticks.
-- **Player decision:**
-  - **Approve at rate r.** Acceptance probability is 0.97 if r ≤ maxRate, otherwise `clamp(0.97 − 0.6 × (r − maxRate)/0.01, 0, 0.97)`. Draw on approval; a refusal is shown as "They went elsewhere."
-  - **Decline**, or let it expire.
-- **Shown estimate:** "Low / Medium / High risk" from the estimated pd. Visible only with a Risk floor or manager Product ≥ 60. The estimate uses `avg + normal(0, σ)` with `σ = 0.6 × (1 − estimatorSkill/100)`, where estimatorSkill = max(manager Product, 40 + 50 × riskCoverage').
-- **Delegated:**
-  - The manager approves if the estimated pd ≤ the appetite threshold: {0.020, 0.030, 0.045, 0.060, 0.080} for appetite levels 1–5.
-  - Rate = `max(product price, FTP_short + estPd × lgd + 0.025)`.
-- **Booked loans** become a `BusinessLoan`:
-  - Each one amortizes and defaults on its own each week (default draw: `rng < pd × creditCycle / 52`).
-  - On default: `loss = balance × lgd` and the recovery goes to the liquid pool.
-- **Lending fund (C3b, 2026-10-27):** loans are paid out of treasury reserves and repayments and recoveries flow back in. The desk no longer borrows: an approval (yours or a delegated one) needs `reserves ≥ amount`, otherwise it fails with "Treasury reserves cannot cover this loan". The Loan Desk tab shows the fund and a button that moves `LOANDESK.fundTopUp` ($250k) of company cash into reserves (the existing treasury transfer). Business loans carry no internal funding charge any more.
-  - Defaults of $500k or more emit a Ledger event.
-- The SBL product card on the Products tab shows totals across business loans.
+The Loan Desk is gone (C5b, 2026-10-27). The Deal Desk sells enterprise contracts to the named businesses of §11.0. Constants are `DEAL` in balance.ts; code is `branch/dealDesk.ts`, `contracts.ts` and `commands/dealDesk.ts`.
+
+### 11.1 RFPs
+- **Where:** each open sales office takes requests from the businesses in its city (one office per city, C2b). The **Enterprise contracts** product (id `sbl`) must be on for new requests and bids on rival renewals; your own renewals always show.
+- **New RFP:** each week a business with no AI vendor, no open RFP and past its `quietUntil` asks with chance `rfpWeekly (0.04) × (0.25 + 0.75 × awareness) × (1 + 0.12 × (AI readiness − 5)) × campaign loanDesk effect`. It waits `expiryWeeks` (3) for a bid; an expired, declined or lost request makes the business wait `cooldownWeeks` (13).
+- **Renewal RFP (A7):** a contract whose `renewalWeek` (always a quarter start) is within `renewalNoticeWeeks` (4) gets a renewal RFP. Your own carries an offer that starts at the contract's current discount; a rival's has no offer until you make one.
+- **Bid:** a discount `d` (0–40%, 1% steps) off the business's budget. Contract value = `budget × (1 − d)`, rounded to $100.
+
+### 11.2 Win and keep chances
+Clamped to 5–95%. `stars` is your office's overall rating; the rival is the incumbent on a renewal, else the best-rated rival office in the city.
+- **Win** = `winBase (0.5) + discountSlope (1.5) × d + starSlope (0.15) × (stars − rival stars)`, or `+ noRivalBonus (0.2)` instead of the star term with no rival in the city; against an incumbent, `− switchSlope (0.04) × (Switching cost − 5)`.
+- **Keep** (your renewal) = `keepBase (0.8) + 1.5 × d + 0.04 × (Switching cost − 5) + 0.15 × (stars − best rival stars)` (or `+ 0.2` with no rival).
+- Worked example: a 5% discount, your 3.2 stars against a rival's 3.0, no incumbent → `0.5 + 0.075 + 0.03 = 60.5%`.
+
+### 11.3 Settlement
+- **New RFP:** a bid is drawn at once. A win signs the contract: the vendor is your office, `renewalWeek` is the `U{termQuarters}`-th quarter start, `underwriting.loansBooked` + 1 (it feeds the AI model's Internal History), event `CONTRACT_WON`.
+- **Renewal season** (tick step 13, a quarter start; `renewalSeason`): every contract due is settled in id order.
+  - Yours: no open office → lost. Otherwise keep with the keep chance at the offer; kept contracts reprice to `budget × (1 − offer)` for a new `U{termQuarters}`; lost ones go to the best rival in the city (or no vendor) with `CONTRACT_LOST` (reason `renewal`).
+  - A rival's: a merged rival hands it to its buyer; a rival gone from the city drops it. With your offer, you win it at the win chance (event `CONTRACT_WON` with `from`); otherwise the rival rolls over for `termQuarters[0]`.
+  - Then each business without a vendor or an open RFP, in a city with rival offices, signs with one at `rivalSignQuarterly` (12%), the rival picked by office size + 1.
+- **Mid-term loss only** (weekly after the offices, `runContracts`):
+  - A storefront business under contract fails at `failYear (0.03) × exp(−0.25 × (Financial health − 5)) × creditCycle / 52` a week. Its contract ends (`CONTRACT_LOST`, reason `failed`) and a new business moves into the storefront under the same id. Anchors don't fail.
+  - While an outage runs (§13.0), each of your contracts walks to the best rival at `0.02 × (1 + 0.1 × (Data sensitivity − 5))` a week (reason `outage`).
+- **Office changes:** closing an office moves its contracts to a target office in the same city, or ends them (reason `office`); offices folding together (C2b) move them to the keeper.
+
+### 11.4 Delegation
+A delegated manager (Delegation → Deal Desk, key `loans`) or the CRO's Deal Desk policy bids for the office within its **discount limit** (`branch.discountLimit`, default 10%): the smallest discount that reaches `delegateTarget` (60%), else the limit if that reaches `delegateFloor` (30%), else it declines. Renewal offers are set the week the renewal appears.
+
+### 11.5 Revenue and costs
+Each week an office earns `contractValue / 52` for every contract it holds (P&L line `loanDesk`, shown as Enterprise contracts), spends `computeShare` (30%) of it on compute (base spot dollars, so it joins the GPU demand of §13.0) and `serviceShare` (10%) on servicing. Contract values count in ARR (§10.7). Contracts of $250k a year or more make the news when won from a rival or lost.
+
+### 11.6 Migration 12 → 13
+Business loans still current are repaid into treasury reserves at their balance (equity unchanged) and the applications lapse. Offices get `discountLimit` and the renamed desk tally. Business budgets and rival contract values are rescaled from the C5a size bases (30k / 120k / 450k / 1.8M) to the C5b ones (6k / 25k / 90k / 360k).
 
 ## 12. Sales office P&L
 
 **C3b (2026-10-27):** funds transfer pricing is gone from the office P&L; the compute bill takes its place. Revenue goes straight to corporate cash, as before.
 
-- **Office revenue:** plan fees (Plans) + API usage (API) + Apps & services + Loan Desk interest + other income (origination and kiosk fees from older saves).
+- **Office revenue:** plan fees (Plans) + API usage (API) + Apps & services + Enterprise contracts (§11.5) + other income (origination and kiosk fees from older saves).
 - **Office expenses:**
   - **compute:** each plan seat's weekly compute cost (`spec.servicing` per seat) plus API usage (`units × unitCost`, units = ARR / (price × 52)). Posted to the company `compute` line.
   - loan losses
@@ -458,11 +464,11 @@ A book's balance is its **ARR** (annual recurring revenue).
   - equipment maintenance: EQUIP_MAINT (6%/yr) × the cost of the build slots / 52
   - fit-out upkeep: 2%/yr × the cost of the exterior and lobby / 52
   - overhead: BRANCH_OVERHEAD ($450) × city.costIndex
-  - support and underwriting (Loan Desk servicing, applications; deposit interest on any legacy bank book until C3c)
+  - support and underwriting (contract account management; deposit interest on any legacy bank book until C3c)
 - **Office income** = revenue − expenses. Keep 52 weeks of history (`BRANCH_PNL_WEEKS`) so the Finance tab can show a full year.
 - Depreciation is a company-level item, not part of office income.
 - **Statement line groups:**
-  - Revenues: Plans, API, Apps & services, Loan Desk interest, Other income
+  - Revenues: Plans, API, Apps & services, Enterprise contracts, Other income
   - Expenses: Compute, Loan losses, Staff, Manager, Rent, Marketing, Equipment & upkeep, Support & underwriting, Overhead
 
 ### 12.1 Worked example (bank era, kept for history; mature branch, policy 3.25%, term premium +0.40%)
@@ -497,7 +503,7 @@ The balance script should land near this; §25 targets match it. Treat it as cal
 - **Worked example:** an office whose seats and API cost $80,000 a week at base prices uses 2,000 GPU-weeks. At a 1.2 shortage index it is charged $96,000 either way (C4c). With one `hall_row` data center (2,000 GPUs, grid power) covering it, the pool pays $0 for those GPUs and books −$96,000 on the compute line, so the company's compute bill is the hall's power and lease; without one, the pool buys 2,000 GPUs at spot (if the spot limit allows) for $96,000 and books $0.
 
 ### 13.1 Pools
-- **Liquid assets `L`:** reserves `R`, the Loan Desk's lending fund (C3b). Government bonds were removed in C3c.
+- **Liquid assets `L`:** reserves `R` (the Loan Desk's lending fund until C5b). Government bonds were removed in C3c.
 - **Wholesale funding:** lots `W[]`.
 - **Corporate cash** is separate (§14). Deposits never flow into corporate cash.
 - **Charter capital** (CHARTER_CAPITAL, $2,000,000) sits in reserves from the start. It's part of L, counts in equity and can't be transferred out.
@@ -505,7 +511,7 @@ The balance script should land near this; §25 targets match it. Treat it as cal
 ### 13.2 Weekly flows into L
 - Plus: deposit net flows, loan principal repaid, recoveries, wholesale draws, lending-fund top-ups (company cash → L).
 - Minus: loan originations, wholesale maturities and repayments.
-- The player tops up the lending fund from the Loan Desk tab (`topUpLendingFund`, C3c; before C3c this was the HQ Treasury transfer). There is no reverse transfer.
+- `topUpLendingFund` (C3c) still moves cash into reserves, but no screen offers it since the Loan Desk went in C5b. There is no reverse transfer.
 
 ### 13.3 Liquidity ratio
 - `LR = L / totalDeposits` (∞ with no deposits).
@@ -591,11 +597,11 @@ Shown in the top bar. Moves only with cash items:
 - transfers to Treasury
 
 ### 14.2 Weekly company P&L
-**C3b (2026-10-27):** the statement now reads like a software company's: Plans, API, Apps & services, Loan Desk interest and Other income add up to **Revenue**; **Compute** comes off to give **Gross profit**; then operating expenses (excluding compute), interest expense (only when there is any), loan losses, depreciation, pre-tax income, tax and net income. The internal groups below still drive the sums (compute is an operating expense line).
+**C3b (2026-10-27):** the statement now reads like a software company's: Plans, API, Apps & services, Enterprise contracts (Loan Desk interest before C5b) and Other income add up to **Revenue**; **Compute** comes off to give **Gross profit**; then operating expenses (excluding compute), interest expense (only when there is any), loan losses, depreciation, pre-tax income, tax and net income. The internal groups below still drive the sums (compute is an operating expense line).
 
 | Line | Contents |
 |---|---|
-| Interest income | Loan Desk loans, reserves, venture debt |
+| Interest income | Reserves, venture debt |
 | Interest expense | deposits, wholesale funding, corporate debt |
 | **Net interest income** | |
 | Fee & other income | account fees, card fees and interchange, wealth, services, ATM, real estate rent, dividends received, realized gains/losses |
@@ -776,14 +782,14 @@ Levels 1–5 (Very conservative to Very aggressive):
 | CFO | Finance, Treasury | Halves statement delays. **Treasury:** auto-funding and buying funding offers when LR is more than 2pp under target. **Capital:** at Watch or worse, sells the company's stocks and steps risk appetite down every 4 weeks, 2 weeks after the CRO's turn (`cfoAppetitePhase`), so a seated CRO keeps tuning it too and the two never move it twice in one week. **Share sales** (its own switch since 2026-10-25, so the owner can keep their stake undiluted): at Restricted or Critical, sells new shares through the cheapest investment bank (private placement while private, within the round limits; secondary once listed), sized to reach 12% plus any regulator buffer. Never launches the IPO. **Investing: the bank's money** and **Investing: your money**: every `EXEC_DELEGATION.investEveryWeeks` (4) weeks, on weeks ≡ `investPhase` (2), each switch for its account (rival banks' shares are never touched): (1) sells every listed-company stock whose price is ≤ `investTrimAt` (75%) of its average cost, and doesn't buy it back for `investCooldownWeeks` (52); (2) buys one stock, the listed company with the largest gap `capShare × (held + budget) − heldValue` (capShare = its market cap ÷ all listed companies'), so holdings build toward a market-cap weighting, largest company first; buys under `investMinTrade` ($10K) are skipped; (3) backs one startup from the Investment floor pipeline: the highest pentagon average ≥ `investMinScore` (6) among those raising that the account doesn't already hold, taking one offer lot (§20.4); none without an Investment floor. Bank: never at a restricted or critical tier; stocks ≤ `investStockCap` (5%) and startup stakes ≤ `investVentureCap` (3%) of total assets; one stock buy ≤ `investStockLot` (1%) of total assets; the capital ratio after each buy stays ≥ `buyMinCr` (12%): a stock buy is at most `(CET1 − 0.12 × RWA) / (0.12 × STOCK_RISK_WEIGHT + COMMISSION)` and a lot needs `CET1 / (RWA + price × VENTURE_RISK_WEIGHT) ≥ 0.12`; `expansionReserveWeeks` (8) of costs stay in cash. You: keeps `buyReserveYears` (1) of CEO salary; one purchase spends at most `investSpareShare` (25%) of the personal cash above that. The Capital switch still sells all company stocks at Watch; buying stops above that line, at 12%. **Dividends:** proposes a dividend at board meetings. **Branch guidance (funding),** with the CRO: see below. |
 | CPO | Products | **Pricing:** keeps the company lineup priced like a delegated manager (§17.1) when Apply-to-all is on. **Developments:** starts one when none is running, within a budget cap of 1% of revenue. **Models:** switches to the bureau package with the best defaults saved per dollar. **Branch guidance (lineup):** see below. |
 | CTO | IT | App rating bonus (§16.9); runs digital projects. An empty seat applies the vacancy penalty. |
-| CRO | Risk | Tunes risk appetite to hold CR ≥ 12% and the annualized loss rate ≤ 1.2% (expansion target); Loan Desk policy. **Branch guidance (lending),** with the CFO: see below. |
+| CRO | Risk | Tunes risk appetite to hold CR ≥ 12% and the annualized loss rate ≤ 1.2% (expansion target); Deal Desk policy (§11.4). **Branch guidance (lending),** with the CFO: see below. |
 | CREO | Owned buildings (the bank's and yours) | **Rents: the bank's buildings** and **Rents: your own buildings** (two switches, so your private buildings can stay yours to price): every `EXEC_DELEGATION.rentEveryWeeks` (4) weeks, and at once when a switch goes on, each covered building's rent is set to hold that owner's **occupancy dial** (80 / 85 / 90 / 95 / 100%, default 100, one dial under each switch; `rentForOccupancy`, §21.2). At 100% that is `bestRent`: the highest rent that still fills it, counting the chief's pricing power, rounded down to the $5 step and kept inside the 50–160% range. Changing a dial reprices at once. **Buying: the bank's buildings** and **Buying: your own buildings**: every `EXEC_DELEGATION.buyEveryWeeks` (4) weeks each buys at most one listed building, in any city, at its asking price (always accepted, no travel needed): the listing with the best net yield, a year of `propertyWeek(…).net` at the rent the chief would set and the occupancy it settles at ÷ asking, among those the budget allows. Bank: never at a restricted or critical tier; its buildings' value stays ≤ `buyAssetCap` (5%) of total assets; the capital ratio after the purchase, `(CET1 + value − asking) / (RWA + value × PROPERTY_RISK_WEIGHT)`, stays ≥ `buyMinCr` (12%); `expansionReserveWeeks` (8) of weekly costs stay in cash. You: keeps `buyReserveYears` (1) of CEO salary, and a building may cost at most `buySpareShare` (50%) of the personal cash above that. Tenants of a covered building accept rent up to `marketRent × (1 + 0.10 × expertise/100)` with no loss of occupancy. The bank pays the chief either way. No branch guidance. |
 | CMO | Marketing | Runs brand campaigns to hold `b` near the **awareness target** you dial (`executives.brandTarget`, one of `EXEC_DELEGATION.brandTargets` 40–70%, default 50%) in active cities within a budget cap of 3% of revenue. **Branch guidance (marketing):** see below. |
 
 **Branch guidance** (`src/sim/branchGuidance.ts`, 2026-10-25): the C-suite steers the branch managers you delegate to, so managers still decide with their own skills but aim where HQ points them. The CFO and CRO steer managers who handle products or loan approvals (and the CPO's company pricing, which uses the same rule); the COO, CMO and CPO (schema v18) steer managers who handle staffing, marketing and products. `company.guidance` holds five whole steps in `GUIDANCE.min..max` (−1..+3), moved one step every `GUIDANCE.everyWeeks` (4):
 - **Deposits (CFO):** +1 while the liquidity ratio is below `liqTarget − 0.01`, −1 above `liqTarget + 0.05`.
 - **Loans (CRO):** +1 (tighter) while CR < 12% or losses > 1.2% a year; −1 when CR ≥ 14% and losses ≤ 0.9% (the CRO's appetite marks).
-- **Effect:** a delegated manager's deposit rate moves by `deposits × GUIDANCE.rateStep (0.10 pp)`, never above FTP; loan rates by `loans × 0.10 pp`, never below FTP; the delegated Loan Desk's PD threshold is × `(1 − 0.12 × loans)` and its offered rate rises by the same loan offset.
+- **Effect:** a delegated manager's deposit rate moves by `deposits × GUIDANCE.rateStep (0.10 pp)`, never above FTP; loan rates by `loans × 0.10 pp`, never below FTP; the Deal Desk ignores guidance since C5b.
 - **Staffing (COO):** +1 while open delegated-staffing branches average staff morale below `GUIDANCE.moraleLow` (65), −1 above `moraleHigh` (82). Effect: delegated wages × `(1 + 0.02 × staffing)` and staff target × `(1 + 0.05 × staffing)`, on top of the manager's People skill.
 - **Marketing (CMO):** +1 while average brand awareness across the cities of open delegated-marketing branches is below the dialled `brandTarget − GUIDANCE.brandBand` (40% at the default target), −1 above `brandTarget + brandBand` (60%). Effect: the awareness value a delegated manager weighs each campaign against (§17.1) × `(1 + 0.2 × marketing)`.
 - **Products (CPO):** +1 while open delegated-products branches average a products rating below `productsLow` (3★), −1 at `productsHigh` (4★) or better. Effect: delegated fee prices × `(1 − 0.03 × products)` (also the CPO's own company pricing) and the lineup's affinity bar (`DELEGATE.minAffinity`) × `(1 − 0.25 × products)`, so more products go on.

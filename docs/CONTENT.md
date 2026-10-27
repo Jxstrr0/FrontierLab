@@ -653,26 +653,9 @@ Announced in the Ledger 4 weeks before. Active for 4 weeks (was 2 and 1 until 20
 | Tokyo Tide | Tokyo | Baseball | 1.4B |
 | Sydney Breakers | Sydney | Rugby | 480M |
 
-## 21. Loan Desk sectors
+## 21. Loan Desk sectors (retired in C5b)
 
-Pentagon order: Management, Track record, Market, Competitiveness, Financial health.
-
-| Sector | Amount mult | Term (yr) | Pentagon profile | District weights |
-|---|---|---|---|---|
-| Café & restaurant | 0.6 | 3–5 | 5, 4, 5, 4, 4 | Downtown, University |
-| Retail shop | 0.8 | 3–5 | 5, 5, 5, 5, 5 | Downtown, Midtown |
-| Construction | 1.6 | 2–5 | 5, 6, 6, 5, 5 | Suburbs, Industrial |
-| Logistics | 1.4 | 3–7 | 6, 6, 6, 5, 5 | Industrial |
-| Medical/dental clinic | 1.2 | 5–7 | 7, 7, 6, 6, 7 | Midtown, Suburbs |
-| Tech startup | 1.0 | 1–3 | 6, 3, 8, 6, 3 | University, Financial |
-| Manufacturing | 2.0 | 5–7 | 6, 7, 5, 5, 6 | Industrial |
-| Farm & agri | 1.5 | 3–7 | 6, 7, 5, 5, 5 | Suburbs (S/M cities) |
-| Professional services | 0.7 | 2–4 | 7, 7, 5, 6, 7 | Financial |
-| Hotel & hospitality | 2.5 | 5–7 | 6, 6, 5, 5, 4 | Waterfront, Downtown |
-
-**Business names:** {prefix} {type}.
-- Prefixes: Northline, Maple, Riverside, Summit, Harbour, Golden Prairie, Blue Spruce, Ironwood, Lakeside, Cedar, Union, Granite, Bright Path, Old Mill, Copper Kettle, Westbrook.
-- Types match the sector: Bakery, Café, Logistics, Dental, Construction, Brewing Co., Auto Repair, Design Studio, Clinic, Outfitters, Farms, Robotics, Hotel, Law Group.
+The Loan Desk and its sector table are gone; the Deal Desk's businesses use the deal sectors of §21b.
 
 ## 21b. Deal sectors (stage C5a)
 
@@ -694,7 +677,7 @@ Customer businesses on spare storefronts (`src/data/dealSectors.ts`). Pentagon o
 | Hotel & hospitality | 1.0 | 4–6 | 4, 5, 5, 5, 4 | Waterfront, Downtown |
 | Major employer (anchor) | 1 | 8–12 | 5, 8, 7, 8, 7 | employer sites |
 
-Sizes (`BUSINESS.sizes` in balance.ts): small, mid and large weigh 0.55 / 0.33 / 0.12 with base budgets of $30k / $120k / $450k a year; anchors start at $1.8M scaled by headcount (per 2,500 staff) and pay.
+Sizes (`BUSINESS.sizes` in balance.ts): small, mid and large weigh 0.55 / 0.33 / 0.12 with base budgets of $6k / $25k / $90k a year; anchors start at $360k scaled by headcount (per 2,500 staff) and pay (C5b; C5a used $30k / $120k / $450k / $1.8M).
 
 ## 22. Incidents
 Implemented in `src/data/incidents.ts` (texts and options) and `src/data/incidentParams.ts` (numbers).

@@ -2,8 +2,8 @@
 // guilloche grid — four concentric wave-rings instead of straight polygons —
 // with the data polygon in brass at 25% fill and a 1.5 px stroke, 3 px vertex
 // dots and Public Sans 12 px labels outside the shape. Two sizes: 'full'
-// (Loan Desk applications, underwriting models, startups) and 'compact'
-// (funding lots).
+// (businesses, AI models, startups) and 'compact' (funding lots, Deal Desk
+// cards).
 import type { Pentagon } from '../../data/types';
 import { waveOval } from '../../art/engrave';
 
