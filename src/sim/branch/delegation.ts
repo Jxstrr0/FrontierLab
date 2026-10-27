@@ -23,6 +23,7 @@ import { stream, type Rng } from '../rng';
 import type { Branch, GameState } from '../state';
 import { marketingMult } from './marketing';
 import { lotAffinity } from './ratings';
+import { followsHq } from './pricing';
 import { managerOf, marketWage, staffNeeded } from './staff';
 import { difficultyOf } from '../difficulty';
 import { dpow } from '../detmath';
@@ -61,7 +62,7 @@ export function runDelegation(state: GameState, branch: Branch): void {
       WAGE_STEP,
     );
   }
-  if (branch.delegation.products && !state.company.applyRatesToAll)
+  if (branch.delegation.products && !followsHq(state, branch))
     delegatePricing(state, branch, mgr.skills.product);
   if (branch.delegation.marketing) delegateMarketing(state, branch);
 }

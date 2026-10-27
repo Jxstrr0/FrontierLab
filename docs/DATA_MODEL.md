@@ -122,6 +122,7 @@ export interface Branch {
   ratings: { rates: Stars; products: Stars; service: Stars; branch: Stars; overall: Stars; reviewCount: number };
   reviewCards: ReviewCard[];          // max 8
   offered: Record<string /*productId*/, { on: boolean; price: number }>;
+  ownPrices: boolean;                 // sets its own prices while HQ prices apply (schema 5)
   books: Record<string /*productId*/, Book>;
   campaigns: Record<string /*campaignId*/, number /*level, 0 = off*/>;
   signupChurn: { mult: number; weeksLeft: number };
@@ -344,6 +345,8 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 **Frontier Lab renumbering (stage C0, 2026-10-26):** the state below is Vault Street's final shape (its schema v38), renumbered as Frontier Lab schema 1. Vault Street's 37 migration steps were dropped, so the schema numbers and migrations mentioned in the entries below are history only.
 
 **Frontier Lab schema 4 (stage C2c, data centers):** `dataCenters: Record<Id, DataCenter>` (`id`, `cityId`, `lotId?` or `siteId?`, `name`, `status` fitout/open, `weeksLeft`, `builtWeek`, `openedWeek?`, `build { hall, power, cooling }` part ids, `lease { weeklyRent, deposit }`). A data center on a storefront sets that lot's occupant to `{ type: 'player', id: <data center id> }`, so code that reads a player occupant checks `dataCenters` before `branches`. Its parts are fixed assets owned by its id. Migration 3 → 4 adds an empty table. Events `DATA_CENTER_STARTED { dataCenterId, name, city, site, weeks }`, `DATA_CENTER_OPENED { …, gpus, refit }`, `DATA_CENTER_UPGRADED { …, slot, part }`, `DATA_CENTER_CLOSED`. Commands `buildDataCenter`, `upgradeDataCenter`, `renameDataCenter`, `closeDataCenter`.
+
+**Frontier Lab schema 5 (stage C2d2, main offices and company-wide prices):** `Branch.ownPrices: boolean`, true when a sales office sets its own prices and lineup while Apply-to-all is on. Migration 4 → 5 sets it false everywhere. Commands `setOwnPrices(branchId, on)` and `mainOfficeBlocker(cityId)` (the two-office cap, MAIN_OFFICES_MAX).
 
 **Frontier Lab schema 3 (stage C2b, rival sales offices):** `RivalBranch.size` (0–3). Migration 2 → 3 folds each rival's branches in a city into one office of the nearest size (`foldRivalCity`: books added, quality blended, the other lots freed). Events `RIVAL_OFFICE_GROWN` and `RIVAL_OFFICE_SHRUNK { rivalId, bank, city, size }`.
 

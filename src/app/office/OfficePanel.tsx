@@ -41,13 +41,14 @@ function Listing({ listing }: { listing: OfficeListing }) {
   const full = picked.length >= listing.floors;
   const district = DISTRICT_SPECS[listing.district]?.name;
   const blocker =
-    listing.cityId !== s.world.currentCityId
+    cmd.mainOfficeBlocker(s, listing.cityId) ??
+    (listing.cityId !== s.world.currentCityId
       ? "You can only lease offices in the city you're in."
       : picked.length === 0
         ? 'Choose at least one department to move in.'
         : s.company.cash < quote.total
           ? `Not enough cash: you need ${money(quote.total, sym)}.`
-          : null;
+          : null);
   const toggle = (d: DeptId, on: boolean) =>
     setPicked(on ? [...picked, d] : picked.filter((x) => x !== d));
   const rent = () => {

@@ -542,6 +542,8 @@ export const OFFICE_LISTINGS = {
 export const OFFICE_RENT_PER_FLOOR = 1_100;
 export const OFFICE_DEPOSIT_WEEKS = 8;
 export const FLOOR_FITOUT = 120_000;
+/** Main offices (HQ buildings) you can lease: HQ plus one more in another country (C2d2). */
+export const MAIN_OFFICES_MAX = 2;
 export const FLOOR_FITOUT_LIFE_WEEKS = 520;
 export const DESKS_PER_FLOOR_OPTIONS = [24, 32] as const;
 export const EXEC_SUITE_DESKS = 7;
