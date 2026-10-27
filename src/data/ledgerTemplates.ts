@@ -428,12 +428,12 @@ const BANK_TEMPLATES = {
   ],
   CORPORATE_LOAN: [
     {
-      h: '{bank} borrows {amount} from {lender}',
-      b: 'The corporate loan carries a rate of {rate}. Rivals by day, lenders by night.',
+      h: '{bank} raises {amount} in venture debt',
+      b: 'The term loan, arranged with {lender}, carries a rate of {rate}.',
     },
     {
-      h: '{lender} lends {amount} to {bank}',
-      b: "The facility, at {rate}, funds the lab's growth plans.",
+      h: '{bank} takes on {amount} of venture debt',
+      b: "The facility from {lender}, at {rate}, funds the lab's growth plans.",
     },
   ],
   BANK_WEEK_PROFIT: [
