@@ -1,17 +1,19 @@
-// The Chief Scientist and the talent war (stage C6c, SIMULATION §16.13):
-// seeding, hire terms and commands, the training-odds lift, rivals' release
-// lift, the quarterly market, the RESEARCHER_POACHED case, the Chief
-// Scientist's delegation and the 15 → 16 save migration.
+// The CPO's training lift and the talent war (stage C6c, SIMULATION §16.13;
+// the Chief Scientist's until schema 22): seeding, hire terms and commands, the
+// training-odds lift, rivals' release lift, the quarterly market, the
+// RESEARCHER_POACHED case, the CPO's Routine training runs and Models
+// delegations and the 15 → 16 save migration.
 import { describe, expect, it } from 'vitest';
-import { CHIEF_SCIENTIST, RESEARCHERS, TRAINING } from '../../src/config/balance';
+import { CPO_TRAINING, RESEARCHERS, TRAINING } from '../../src/config/balance';
 import * as cmd from '../../src/sim/commands';
-import { csciTraining } from '../../src/sim/execDelegationsResearch';
+import { cpoModels } from '../../src/sim/execDelegationsFinance';
+import { cpoTraining } from '../../src/sim/execDelegationsResearch';
 import { newGame } from '../../src/sim/newGame';
 import { migrations } from '../../src/sim/save/migrations';
 import type { GameState, Researcher } from '../../src/sim/state';
 import {
   allResearchers,
-  chiefScientistBonus,
+  cpoTrainingBonus,
   hireTerms,
   poachChance,
   researchBonus,
@@ -157,27 +159,28 @@ describe('the quarterly talent market', () => {
   });
 });
 
-describe('the Chief Scientist', () => {
+describe('the CPO and training', () => {
   it('lifts training odds by their expertise', () => {
     const s = execGame(['products']);
-    expect(chiefScientistBonus(s)).toBe(0);
+    expect(cpoTrainingBonus(s)).toBe(0);
     const before = mean(trainingOdds(s, 4, TRAINING.minWeekly));
-    const csci = hire(s, 'csci');
-    expect(chiefScientistBonus(s)).toBeCloseTo((CHIEF_SCIENTIST.scoreMax * csci.expertise) / 100);
+    const cpo = hire(s, 'cpo');
+    expect(cpo.delegations.training).toBe(true);
+    expect(cpoTrainingBonus(s)).toBeCloseTo((CPO_TRAINING.scoreMax * cpo.expertise) / 100);
     expect(mean(trainingOdds(s, 4, TRAINING.minWeekly))).toBeGreaterThan(before);
   });
 
-  it('starts routine runs on the weakest axis and switches to a better trained model', () => {
+  it('Routine training runs starts a run on the weakest axis and leaves the switch to Models', () => {
     const s = execGame(['products']);
     s.company.cash += 20_000_000;
     s.company.paidInCapital += 20_000_000;
-    csciTraining(s);
+    cpoTraining(s);
     const run = s.training.run!;
-    expect(run.weeks).toBe(CHIEF_SCIENTIST.runWeeks);
+    expect(run.weeks).toBe(CPO_TRAINING.runWeeks);
     const radar = activeModel(s).radar;
     expect(run.focus).toBe(radar.indexOf(Math.min(...radar)));
-    expect(run.weeklyBudget).toBeLessThanOrEqual(CHIEF_SCIENTIST.maxWeekly);
-    // A better trained model waiting in Manage Models gets switched on.
+    expect(run.weeklyBudget).toBeLessThanOrEqual(CPO_TRAINING.maxWeekly);
+    // A better trained model waiting in Manage Models: training runs leave it, Models switches it on.
     const house = activeModel(s);
     s.underwriting.models.m_better = {
       ...house,
@@ -187,19 +190,19 @@ describe('the Chief Scientist', () => {
       lift: [1, 1, 1, 1, 1],
       generation: 1,
     };
-    csciTraining(s);
+    cpoTraining(s);
+    expect(s.underwriting.activeModelId).toBe(house.id);
+    cpoModels(s);
     expect(s.underwriting.activeModelId).toBe('m_better');
   });
 });
 
 describe('save migration 15 → 16', () => {
-  it('seeds researchers and Chief Scientist candidates', () => {
+  it('seeds researchers', () => {
     const s = execGame();
     const raw = s as unknown as Record<string, unknown>;
     delete raw.talent;
-    delete s.executives.candidates.csci;
     migrations[15]!(raw as never);
     expect(allResearchers(s).length).toBe(RESEARCHERS.count);
-    expect(s.executives.candidates.csci!.length).toBeGreaterThan(0);
   });
 });

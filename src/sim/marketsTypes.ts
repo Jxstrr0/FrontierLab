@@ -10,7 +10,7 @@ import type { AvatarSpec } from './state';
 // ─── Executives (SIMULATION §17.2) ────────────────────────────────────────────
 
 /** The six hired seats; the CEO seat is you. */
-export type ExecSeat = 'coo' | 'cfo' | 'cpo' | 'cmo' | 'cto' | 'cro' | 'creo' | 'csci';
+export type ExecSeat = 'coo' | 'cfo' | 'cpo' | 'cmo' | 'cto' | 'cro';
 
 /** A stock option or RSU grant vesting yearly over four years (SCREENS §10.1). */
 export interface EquityGrant {
@@ -77,7 +77,7 @@ export interface ExecutivesState {
   brandTarget: number;
   /** Share of GPU demand the CTO's Compute delegation covers outside spot (schema v20), one of CTO_COMPUTE.coverTargets. */
   computeCover: number;
-  /** Occupancy the CREO's Rents price for, per owner (schema v30), each one of EXEC_DELEGATION.occTargets. */
+  /** Occupancy the CFO's Rents price for, per owner (schema v30, the CFO's since schema 22), each one of EXEC_DELEGATION.occTargets. */
   occTargets: { company: number; personal: number };
   /** Stocks the CFO's Investing sold at a loss, per account: id → week sold (schema v31). */
   trimmedStocks: { company: Record<Id, Week>; personal: Record<Id, Week> };

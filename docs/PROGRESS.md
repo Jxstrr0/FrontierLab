@@ -3,13 +3,30 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.31, save schema 21). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
+**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.32, save schema 22). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `057e043201ebad` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `1d68d256a0e64b` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-27 — Seven executive seats (v0.1.32, schema 22)
+
+Third audit release, the owner's choice from the staff review: fewer people to manage. The executive floor goes from nine seats to seven: you plus COO, CFO, CPO, CMO, CTO and the Chief Safety Officer.
+
+**What changed.**
+- **The Chief Scientist folds into the CPO.** The CPO gains a *Training* switch (routine training runs) and lifts training odds with their own expertise, as the Chief Scientist did. One routine now owns which model is active: the CPO's *Models* switch weighs trained models against data-vendor packages, so the two can no longer fight.
+- **The Chief Infrastructure Officer folds into the CFO.** The CFO gains *Rents* and *Buying* for the lab and for you, with the two occupancy dials, and their expertise sets rent pricing power. The CFO's profile groups its switches under *Investing* and *Buildings*. Owned buildings say "Managed by your CFO".
+- **Three switches that did nothing are gone:** the CFO's *Funding* and *Sales office guidance*, and the CSO's *Sales office guidance* (all three only moved deposit and loan rates no product uses).
+- **One way to auto-hire office managers.** The HR floor's *Hire managers* card is gone; the COO's *Sales office operations* switch does both jobs (hire a manager for every new office and turn on delegation).
+- The Executive floor has 7 desks.
+- **Save schema 22.** Migration 21 → 22: a seated Chief Scientist moves into an empty CPO seat, otherwise leaves with grants settled (no severance); the same for the Chief Infrastructure Officer and the CFO. Their switches carry over to the new seat, their candidates, rerolls and poaching cases are cleared, the dead switches are dropped, and an old *Hire managers* setting turns the COO's switch on if a COO is seated.
+- **Determinism snapshot** `057e043201ebad` → `1d68d256a0e64b`: the new-game state no longer carries the removed fields; intended.
+
+**Checked.** `npm run lint`, `npx vitest run` (1045 tests, 5 new migration tests) and `npm run build` pass. `npm run balance -- --years 10 --seed 42 --strategy steady`: all checkpoints in range.
+
+**Dependencies:** none added.
 
 ### 2026-10-27 — AI milestones and AI-native incidents (v0.1.31)
 

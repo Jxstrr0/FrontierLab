@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { DEV_MIN_WEEKLY, EXEC_DELEGATION } from '../../src/config/balance';
 import { DEV_TEMPLATES, isDigital } from '../../src/data/devTemplates';
 import * as cmd from '../../src/sim/commands';
-import { cfoTreasury, cpoDevelopments, ctoDigital } from '../../src/sim/execDelegationsFinance';
+import { cpoDevelopments, ctoDigital } from '../../src/sim/execDelegationsFinance';
 import { bestLot, cooExpansion, expansionPlan } from '../../src/sim/execDelegationsGrowth';
 import { tileDistance } from '../../src/sim/citygen';
 import {
@@ -68,18 +68,6 @@ describe('COO', () => {
     expect(averageMorale(s).morale).toBeLessThan(EXEC_DELEGATION.moraleTarget);
     cooBenefits(s);
     expect(Object.keys(s.people.benefits).length).toBeGreaterThan(0);
-  });
-});
-
-describe('CFO treasury', () => {
-  it('switches auto-funding on', () => {
-    const s = execGame();
-    openFirst(s);
-    s.treasury.autoFunding = false;
-    s.company.liquidityRatio = s.treasury.liqTarget + 0.1;
-    cfoTreasury(s);
-    expect(s.treasury.autoFunding).toBe(true);
-    expect(identityGap(s)).toBeLessThan(1);
   });
 });
 
