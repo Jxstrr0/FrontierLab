@@ -33,9 +33,9 @@ describe('new game options', () => {
   });
 
   it('starts with the chosen cash and rejects values off the list', () => {
-    const s = newGame({ ...base, startCash: 3_200_000 });
-    expect(s.company.cash).toBe(3_200_000);
-    expect(s.company.paidInCapital).toBe(3_200_000);
+    const s = newGame({ ...base, startCash: 2_000_000 });
+    expect(s.company.cash).toBe(2_000_000);
+    expect(s.company.paidInCapital).toBe(2_000_000);
     expect(s.treasury.reserves).toBe(0);
     expect(() => newGame({ ...base, startCash: 123 })).toThrow(/Starting cash/);
   });

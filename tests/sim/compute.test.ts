@@ -65,7 +65,7 @@ describe('the compute pool', () => {
   });
 
   it('lets data-center GPUs serve demand first', () => {
-    const s = newGame({ seed: 3, cityId: 'cal', startCash: 3_500_000 });
+    const s = newGame({ seed: 3, cityId: 'cal', startCash: 2_500_000 });
     addCapital(s, 60_000_000);
     const id = openScriptedBranch(s, 'midtown');
     const r = cmd.buildDataCenter(s, { where: { lotId: freeLot(s).id }, build: DEFAULT_DC_BUILD });
