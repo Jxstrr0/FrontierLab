@@ -61,6 +61,7 @@ import { runTreasury } from './treasury';
 import { updateModels } from './underwriting';
 import { runTraining } from './training';
 import { rivalModelsQuarter } from './rivalModels';
+import { runTalent, talentQuarter } from './talent';
 import { productSpec } from './products';
 
 /** Advances one game day; runs the weekly tick on every 7th day. */
@@ -121,6 +122,7 @@ export function weeklyTick(state: GameState): void {
   runBrandMarketing(state); // 8 (brand marketing)
   runCorporateDebt(state); // 8 (corporate debt)
   runExecutives(state); // 8 (executives, §17.2)
+  runTalent(state); // 8 (researcher pay, C6c)
   hrFillVacancies(state); // 8 (HR fills manager vacancies, §16.11)
   runManagerPoaching(state); // 8 (branch managers poached, §17.1)
   runGovernance(state); // 8 (dividends due)
@@ -145,6 +147,7 @@ export function weeklyTick(state: GameState): void {
     quarterEnd(state); // 13
     regulatorReview(state); // 13 (§15)
     rivalsQuarter(state); // 13 (rival earnings and failures)
+    talentQuarter(state); // 13 (the talent war, C6c)
     rivalModelsQuarter(state); // 13 (rival model releases, C6b)
     renewalSeason(state); // 13 (the renewal season for business contracts, C5b)
     marketsQuarter(state); // 13 (listed earnings, IPO listing)

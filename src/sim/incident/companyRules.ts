@@ -15,6 +15,7 @@ import { applyWindowStigma } from '../treasury';
 import { acceptRecap, endBankRun, recapQuote, statementOdds, takeover } from './capitalEvents';
 import { addEffect, incidentPMult } from './effects';
 import { DIVIDEND_DUE, EXEC_POACHED } from './execRules';
+import { RESEARCHER_POACHED } from './talentRules';
 import { fraudShield, num, ratingHit, type IncidentRule } from './helpers';
 import { INSIDER_PROBE } from './insiderRule';
 import { newsExact } from '../newsFormat';
@@ -218,6 +219,7 @@ export const COMPANY_RULES: Record<string, IncidentRule> = {
   BANK_RUN,
   RECAP_OFFER,
   EXEC_POACHED,
+  RESEARCHER_POACHED,
   DIVIDEND_DUE,
   INSIDER_PROBE, // Stage 9 (insiderRule.ts)
 };

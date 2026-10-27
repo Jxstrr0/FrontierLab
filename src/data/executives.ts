@@ -2,7 +2,8 @@
 // each executive lifts with execMult, and the delegation toggles on their
 // profile (some with a dial under them: DelegationDials.tsx). The CEO seat is
 // you and isn't listed. The CIO (seat id 'creo', Vault Street's CREO) lifts no department: its expertise is pricing
-// power on the buildings it manages (§21.2). Numbers live in balance.ts.
+// power on the buildings it manages (§21.2). The Chief Scientist (C6c) lifts no
+// department either: its expertise lifts training-run odds (§16.13). Numbers live in balance.ts.
 import type { ExecSeat } from '../sim/marketsTypes';
 import type { HqDeptId } from './types';
 
@@ -238,6 +239,20 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
       },
     ],
   },
+  csci: {
+    seat: 'csci',
+    title: 'Chief Scientist',
+    short: 'CSci',
+    depts: [],
+    delegations: [
+      {
+        id: 'training',
+        label: 'Routine training runs',
+        description:
+          'Starts a 12-week training run on the weakest of the model’s five scores whenever none is under way, spending about 1% of cash a week (up to $150k) while 40 weeks of that stays in cash. Switches to a newly trained model when it beats the one in use.',
+      },
+    ],
+  },
 };
 
 /** Seat order on the Executive floor grid (after the CEO). */
@@ -249,4 +264,5 @@ export const EXEC_SEAT_ORDER: readonly ExecSeat[] = [
   'cto',
   'cro',
   'creo',
+  'csci',
 ];

@@ -50,7 +50,7 @@ How the economy works, step by step. Every CAPS name is a key in `src/config/bal
     - regulator review (§15)
     - partnership reviews
     - the renewal season for business contracts (§11.3, stage C5b; rival signings follow)
-    - rival model releases (§16.12, stage C6b)
+    - the talent war (§16.13, stage C6c), then rival model releases (§16.12, stage C6b)
     - the quarter's report sums the weeks whose last day falls in it, so when this tick lands on the quarter's first day the week just closed still counts for the old quarter
 14. **Year-end** (first tick of a new year):
     - rankings: Fastest Growing Banks, Rich List
@@ -774,10 +774,29 @@ Levels 1–5 (Very conservative to Very aggressive):
   - The run pays `weeklyBudget × devSpeed` a week (P&L line `development`) and progresses at `devSpeed`; it pauses without a Products floor. Cancelling loses what was spent.
   - On finishing, stars are drawn from the odds (`training` stream). The new **trained model** copies the active model's mix and adds a lift: `TRAINING.starLift[stars−1]` on every axis plus `focusLift[stars−1]` on the focus axis, on top of the active model's own lift (so generations stack when you train from a trained model). Its radar = mix radar + lift, capped at 10; cost = the custom mix's cost. It is not switched on: use it in Manage Models (the usual 2-week switch).
 - **Rival models.** Every rival lab has a model (`RivalBank.model`) starting at `5.8 + U(−0.5, 0.1)`, generation 2. A lab that appears later starts `lateGap` (0.3) under the best rival model.
-  - Each quarter start, every active rival releases a new generation with chance 0.2, gaining `max(0.05, normal(0.22, 0.12))` quality (cap 10). A release that takes the lead is a bigger Ledger story.
-- **The frontier.** `frontierRise = max(0, best rival model − frontierBase)`, where `frontierBase` is the best rival model at the start (or at migration). `qualityBar = 5.8 + 0.6 × frontierRise` (`MODEL_EFFECTS.frontierWeight`) replaces 5.8 in price headroom, contract chances and the Model rating, so a model that stands still slowly loses pricing power and deals.
+  - Each quarter start, every active rival releases a new generation with chance 0.2, gaining `max(0.05, normal(0.18, 0.12)) + 0.005 × its researchers' stars` (§16.13; cap 10). A release that takes the lead is a bigger Ledger story.
+- **The frontier.** `frontierRise = max(0, best rival model − frontierBase)`, where `frontierBase` is the best rival model at the start (or at migration). `qualityBar = 5.8 + 0.5 × frontierRise` (`MODEL_EFFECTS.frontierWeight`; 0.6 in C6b) replaces 5.8 in price headroom, contract chances and the Model rating, so a model that stands still slowly loses pricing power and deals.
 - **Leaderboard:** every active lab's model by quality (your active model included).
 - **Balance check (seed 42, steady):** the strategy trains from its Products floor (~week 130) at 1% of cash a week (capped at $150k); by week 260 it is on generation 5 at quality 8.0 against the best rival's 8.3.
+
+### 16.13 The Chief Scientist and the talent war (stage C6c)
+- **Training score.** A run's score is `devScore + chiefScientistBonus + researchBonus(focus)` (§16.12), fixed when the run starts.
+  - `chiefScientistBonus = 0.15 × expertise/100` with a Chief Scientist seated, else 0.
+  - `researchBonus = min(0.2, Σ 0.012 × stars × (2 on the researcher's specialty = the run's focus, else 1))` over your researchers.
+- **Researchers** (`state.talent.researchers`): name, portrait, specialty axis, 1–5 stars (weights 30/30/20/12/8), salary, employer (you, a rival, or none).
+  - Market salary a year = `220,000 × (1 + 0.4 × (stars − 1)) × home city wage level`, rounded to $5k.
+  - A new game seeds 16, each at a random active rival with chance 0.6, otherwise on the market.
+  - **Hiring** (`hireResearcher`, Products floor required, team of up to 8): a free researcher at the higher of their salary and the market salary. From a rival: that × 1.3, plus a signing bonus of 13 weeks of it (P&L `hqStaff`). Cash must cover the bonus and a week's pay.
+  - **Letting go** (`releaseResearcher`): back on the market, no cost.
+  - Your researchers' salaries are paid weekly into `hqStaff` (tick step 8).
+- **Each quarter start** (tick step 13, before rival model releases):
+  - Researchers at a rival that closed or merged go back on the market.
+  - For each of yours, a random active rival bids with chance `0.12 × (market salary ÷ salary)²` (capped at 1), raising **RESEARCHER_POACHED**: *Counter-offer* (salary +25%) or *Let them go* (they join that rival).
+  - Each free researcher signs with a random rival with chance 0.2.
+  - New graduates join until at least 3 are on the market.
+- **The Chief Scientist** is a ninth executive seat (`csci`), lifting no department.
+  - Delegation **Routine training runs**: switches to the best trained model when it beats the one in use; when no run is under way and there's a Products floor, starts a 12-week run on the active model's weakest axis.
+  - That run's budget is 1% of cash a week, between $20k and $150k (step $5k), and needs 40 weeks of it in cash.
 
 ## 17. People AI
 

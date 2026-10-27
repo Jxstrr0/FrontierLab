@@ -757,7 +757,7 @@ export const MODEL_EFFECTS = {
   dealQuality: 0.05,
   dealSafety: 0.03,
   /** Share of the frontier's rise (C6b) that raises the quality bar. */
-  frontierWeight: 0.6,
+  frontierWeight: 0.5,
 } as const;
 /** CPO delegation: a local package must beat the model by minGain after costWeight × $ per customer. */
 export const MODEL_DELEGATE = { minGain: 0.3, costWeight: 0.02 } as const;
@@ -785,12 +785,56 @@ export const TRAINING = {
  */
 export const RIVAL_MODEL = {
   releaseQuarterly: 0.2,
-  gainMean: 0.22,
+  gainMean: 0.18,
   gainSigma: 0.12,
   minGain: 0.05,
   startQuality: 5.8,
   startSpread: [-0.5, 0.1] as readonly [number, number],
   lateGap: 0.3,
+} as const;
+/**
+ * The Chief Scientist (§16.13, stage C6c): adds scoreMax × expertise/100 to a
+ * training run's score. Its Routine training runs delegation starts a runWeeks
+ * run on the weakest axis at cashShare of cash a week (minWeekly to maxWeekly)
+ * while cashFloorRuns weeks of that budget stay in cash.
+ */
+export const CHIEF_SCIENTIST = {
+  scoreMax: 0.15,
+  runWeeks: 12,
+  cashShare: 0.01,
+  maxWeekly: 150_000,
+  cashFloorRuns: 40,
+} as const;
+/**
+ * The talent war (§16.13, stage C6c): named researchers, 1–5 stars, each with
+ * a specialty axis. Salary a year = salaryBase × (1 + salaryPerStar × (stars − 1))
+ * × the home city's wage level. Yours add scorePerStar × stars to a training
+ * run's score (× focusMatch on their specialty), up to maxBonus in all; a
+ * rival's add rivalGainPerStar × stars to each model release. Hiring from a
+ * rival costs poachPremium more salary and signingWeeks of it up front. Each
+ * quarter a rival bids for each of yours with chance poachQuarterly ×
+ * (market salary ÷ salary)², a free researcher signs with a rival with chance
+ * freeSignQuarterly, and new graduates keep freeMin on the market.
+ */
+export const RESEARCHERS = {
+  count: 16,
+  rivalShare: 0.6,
+  starWeights: [30, 30, 20, 12, 8] as readonly number[],
+  salaryBase: 220_000,
+  salaryPerStar: 0.4,
+  salaryStep: 5_000,
+  poachPremium: 0.3,
+  signingWeeks: 13,
+  scorePerStar: 0.012,
+  focusMatch: 2,
+  maxBonus: 0.2,
+  rivalGainPerStar: 0.005,
+  poachQuarterly: 0.12,
+  counterRaise: 0.25,
+  freeSignQuarterly: 0.2,
+  freeMin: 3,
+  /** The most researchers your lab can employ. */
+  maxTeam: 8,
 } as const;
 export const MODEL_SWITCH_WEEKS = 2;
 /** Mix weights must sum to 1 within this tolerance (sliders in whole percent). */

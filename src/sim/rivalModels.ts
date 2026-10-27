@@ -7,6 +7,7 @@ import { MODEL_RADAR_MAX, RIVAL_MODEL } from '../config/balance';
 import { MODEL_FAMILIES, RIVAL_START_GENERATION } from '../data/modelNames';
 import { pushEvent } from './events';
 import { stream, type Rng } from './rng';
+import { rivalResearchGain } from './talent';
 import type { GameState, RivalBank } from './state';
 
 const byId = (a: RivalBank, b: RivalBank) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
@@ -72,10 +73,10 @@ export function rivalModelsQuarter(state: GameState): void {
     }
     if (!rng.chance(RIVAL_MODEL.releaseQuarterly)) continue;
     const before = bestRivalModel(state) ?? 0;
-    const gain = Math.max(
-      RIVAL_MODEL.minGain,
-      rng.normal(RIVAL_MODEL.gainMean, RIVAL_MODEL.gainSigma),
-    );
+    // §16.13 (C6c): the rival's researchers make each release bigger.
+    const gain =
+      Math.max(RIVAL_MODEL.minGain, rng.normal(RIVAL_MODEL.gainMean, RIVAL_MODEL.gainSigma)) +
+      rivalResearchGain(state, r.id);
     const m = r.model;
     m.generation += 1;
     m.name = `${m.name.replace(/ \d+$/, '')} ${m.generation}`;
