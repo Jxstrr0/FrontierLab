@@ -588,7 +588,10 @@ Opened by tapping a business pin on the map (the **Businesses** layer, which als
   - sound, reduced motion, text size (100 / 115 / 130%)
   - edit founder avatar
   - **Tutorial:** Replay tutorial, the Guides switch and "Show the guides again" (§27)
-  - **Developer:** a "Developer tools" switch, saved on this device only (not in the game save). When on, in a game, a button adds `DEV_PAYMENT` ($10,000,000) to corporate cash as paid-in capital (`devPayment` command; no shares issued, the books still balance). From the title screen it only notes that the tools work inside a game.
+  - **Developer:** a "Developer tools" switch, saved on this device only (not in the game save). When on, in a game, a button adds `DEV_PAYMENT` ($10,000,000) to corporate cash as paid-in capital (`devPayment` command; no shares issued, the books still balance). Two more switches sit under it, in a game only, and are stored in the game save (`flags.devStaff`, `flags.devNoBankruptcy`, optional, no schema change):
+    - **Top staff** (`setDevStaff`): holds every sales office's staff and every HQ team's skill and morale at `DEV_STAFF` (95) or better, now and after every weekly update, so a high-staff game can be tested. Off, they drift back to where pay and management put them.
+    - **No bankruptcy** (`setDevNoBankruptcy`): weeks in the red never end the game. Cash still goes negative and the warnings still show.
+    From the title screen the section only notes that the tools work inside a game.
 - **Saves:**
   - autosave card
   - 3 slot cards (lab name, date, cash; Save here / Load / Delete)

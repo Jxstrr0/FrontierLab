@@ -27,6 +27,8 @@ export function checkFailure(state: GameState): void {
   if (c.negativeCashWeeks < FAILURE.insolvencyWeeks) return;
   // An undrawn line that could bring cash back above zero keeps the lab alive.
   if (creditAvailable(state) >= -c.cash) return;
+  // The developer tools' "No bankruptcy" switch: cash stays in the red, the game goes on.
+  if (state.flags.devNoBankruptcy) return;
   state.flags.gameOver = 'insolvency';
   pushEvent(state, 'GAME_OVER', { reason: 'insolvency' }, 3);
 }
