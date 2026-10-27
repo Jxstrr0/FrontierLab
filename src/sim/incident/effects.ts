@@ -7,11 +7,21 @@
 //   incidentP     branch id or 'company'; target an incident type: probability ×
 //   riskCoverage  'company': Risk coverage′ + value (capped at full coverage)
 //   planCut       'company' or a city id: plan prices × (1 − value)
+//   pulled        branch id; target a product id: not sold and earning nothing (DEEPFAKE)
+//   gpuDerate     data center id: share of its GPUs out of action (DC_FIRE)
 import { BANK_RUN } from '../../config/balance';
 import type { RatingCategory } from '../../data/types';
 import type { Branch, GameState, TimedEffect } from '../state';
 
-export type EffectKind = 'rating' | 'closed' | 'takeup' | 'incidentP' | 'riskCoverage' | 'planCut';
+export type EffectKind =
+  | 'rating'
+  | 'closed'
+  | 'takeup'
+  | 'incidentP'
+  | 'riskCoverage'
+  | 'planCut'
+  | 'pulled'
+  | 'gpuDerate';
 
 /** Adds an effect lasting `weeks` weekly ticks from now. */
 export function addEffect(
@@ -79,6 +89,16 @@ export function riskCoverageBonus(state: GameState): number {
 /** Share taken off plan prices in a city (price-war match, bank-run price cut). */
 export function planCut(state: GameState, cityId: string): number {
   return Math.min(1, sumOf(active(state, 'planCut', [cityId, 'company'])));
+}
+
+/** True while an incident has pulled a product from sale at a branch (DEEPFAKE). */
+export function isPulled(state: GameState, branchId: string, productId: string): boolean {
+  return active(state, 'pulled', [branchId], productId).length > 0;
+}
+
+/** Share of a data center's GPUs out of action after a fire (DC_FIRE), 0–1. */
+export function gpuDerate(state: GameState, dataCenterId: string): number {
+  return Math.min(1, sumOf(active(state, 'gpuDerate', [dataCenterId])));
 }
 
 /** Deposit churn multiplier during a bank run (§13.8). */

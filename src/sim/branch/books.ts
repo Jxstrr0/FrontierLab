@@ -16,7 +16,7 @@ import type { DemandResult, Origination } from './demand';
 import { signupChurnMult, type CampaignEffects } from './marketing';
 import { branchPrice, churnGap, isOffered } from './pricing';
 import type { BranchWeek } from './week';
-import { bankRunMult } from '../incident/effects';
+import { bankRunMult, isPulled } from '../incident/effects';
 import { outageChurnMult } from '../compute';
 import { allProducts } from '../products';
 import { inferenceMult, modelCostPerCustomer, priceHeadroom } from '../underwriting';
@@ -126,7 +126,8 @@ function runRecurring(ctx: Ctx, spec: ProductSpec, book: Book, orig: Origination
         ((spec.unitCost ?? 0) * book.balance * inferenceMult(state)) / (price * WEEKS_PER_YEAR);
   }
   book.bookRate = price;
-  const revenue = perWeek(book.balance);
+  // §23: a product pulled from sale (DEEPFAKE) bills nothing while it is off the shelf.
+  const revenue = isPulled(state, branch.id, spec.id) ? 0 : perWeek(book.balance);
   if (spec.category === 'deposits') wk.accountFees += revenue;
   else if (spec.category === 'lending') wk.serviceFees += revenue;
   else wk.cardFees += revenue;

@@ -5,6 +5,7 @@
 // are formatted as money and percentages. Per-incident numbers are in
 // incidentParams.ts; the engine is src/sim/incidents.ts.
 export { INCIDENT_PARAMS } from './incidentParams';
+import { AI_SPECS } from './incidentsAi';
 
 export interface IncidentOptionSpec {
   id: string;
@@ -40,6 +41,8 @@ export interface IncidentSpec {
   /** ROADMAP stage whose systems this incident needs; not raised before then. */
   stage?: number;
   text: string;
+  /** Alternative case texts; one of `text` and these is picked when the case is raised. */
+  texts?: string[];
   money?: string[];
   pct?: string[];
   options: IncidentOptionSpec[];
@@ -49,7 +52,7 @@ export interface IncidentSpec {
 
 const OK: IncidentOptionSpec[] = [{ id: 'ok', label: 'OK', effect: 'Noted.' }];
 
-export const INCIDENT_SPECS: Record<string, IncidentSpec> = {
+const BANK_ERA_SPECS: Record<string, IncidentSpec> = {
   ROBBERY: {
     id: 'ROBBERY',
     title: 'Server-room break-in',
@@ -419,3 +422,6 @@ export const INCIDENT_SPECS: Record<string, IncidentSpec> = {
     worst: 'decline',
   },
 };
+
+/** Every incident: the bank-era cases plus the AI-native ones (incidentsAi.ts). */
+export const INCIDENT_SPECS: Record<string, IncidentSpec> = { ...BANK_ERA_SPECS, ...AI_SPECS };

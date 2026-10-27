@@ -313,9 +313,10 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
     case 'INCIDENT_NEWS': {
       const key = `INCIDENT_NEWS_${str(p.type)}`;
       if (!(key in LEDGER_TEMPLATES)) return undefined;
+      // Company-level angles (a jailbreak) carry no office; the lab is the subject.
       return banking({
         key: key as TemplateKey,
-        subject: str(p.branchName),
+        subject: str(p.branchName) || bank,
         icon: 'alert',
         priority: P.company,
         group: 'incident',
@@ -355,6 +356,30 @@ function bankNamed(ctx: NewsContext, e: GameEvent): Story | undefined {
         icon: 'shield',
         priority: priority(true),
         tokens: { ...tokens, n: grouped(num(p.n)) },
+      });
+    case 'LAWSUIT_LOST':
+      return banking({
+        key: 'LAWSUIT_LOST',
+        subject: name,
+        icon: 'gavel',
+        priority: priority(true),
+        tokens: { ...tokens, amount: newsMoney(num(p.amount), ctx.sym) },
+      });
+    case 'WEIGHTS_LEAKED':
+      return banking({
+        key: 'WEIGHTS_LEAKED',
+        subject: name,
+        icon: 'shield',
+        priority: priority(true),
+        tokens,
+      });
+    case 'GRID_OUTAGE':
+      return banking({
+        key: 'GRID_OUTAGE',
+        subject: name,
+        icon: 'alert',
+        priority: priority(true),
+        tokens: { ...tokens, name: str(p.name, 'a data center') },
       });
     case 'BANK_RUN':
       return banking({

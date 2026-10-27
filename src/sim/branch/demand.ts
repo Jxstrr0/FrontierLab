@@ -31,7 +31,7 @@ import { waitlisted } from '../compute';
 import { difficultyOf } from '../difficulty';
 import { dpow } from '../detmath';
 import { brandSegmentMults } from '../hqMarketing';
-import { isClosed, takeupMult } from '../incident/effects';
+import { isClosed, isPulled, takeupMult } from '../incident/effects';
 import { affinityOf, allProducts, baseId, starsOf } from '../products';
 import { cityRoom } from './cityMarket';
 import { officeTraffic } from './officeSize';
@@ -165,6 +165,8 @@ export function runDemand(state: GameState, branch: Branch, fx: CampaignEffects)
   const regulator = salesGate(state);
   for (const spec of allProducts(state)) {
     if (spec.kind === 'sbl' || spec.kind === 'fx' || !isOffered(branch, spec.id)) continue;
+    // §23: a product pulled from sale after an incident (DEEPFAKE) signs nobody up.
+    if (isPulled(state, branch.id, spec.id)) continue;
     const price = branchPrice(state, branch, spec.id);
     const m =
       marketRef(state, branch.cityId, spec.id) *
