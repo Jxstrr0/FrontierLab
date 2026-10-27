@@ -2,13 +2,21 @@
 // pick a name, a focus, a training time and a weekly budget, see the odds of
 // each star result and the lift it gives, then start. While a run is under
 // way it shows progress, weeks left and money spent, with Cancel (asks first).
+// Past the frontier cost curve's start (§16.12) the budget's top grows and a
+// note says how much dearer each step has become.
 import { useState } from 'preact/hooks';
 import { DEV_TERMS, MODEL_NAME_MAX, TRAINING } from '../../../config/balance';
 import * as cmd from '../../../sim/commands';
 import { devSpeed } from '../../../sim/development';
+import { atModelCeiling, frontierCostMult } from '../../../sim/frontier';
 import type { TrainingRun } from '../../../sim/state';
 import { cpoTrainingBonus, researchBonus } from '../../../sim/talent';
-import { trainingLift, trainingOdds, trainingWeeksLeft } from '../../../sim/training';
+import {
+  trainingBudgetTop,
+  trainingLift,
+  trainingOdds,
+  trainingWeeksLeft,
+} from '../../../sim/training';
 import { Card, CoinRating, Confirm, Row, Stepper } from '../../components';
 import { moneyFull, moneyStepper } from '../../format/format';
 import { act, toast, useGame } from '../../store';
@@ -18,6 +26,8 @@ import { MODEL_AXES, oddsRows, TERM_OPTIONS } from './productSelectors';
 type Term = (typeof DEV_TERMS)[number];
 
 const axisName = (i: number) => MODEL_AXES[i]?.[0] ?? '';
+/** Show the frontier note once training costs at least this many times the base. */
+const FRONTIER_NOTE_FROM = 1.1;
 
 export function TrainingCard() {
   const s = useGame();
@@ -101,12 +111,13 @@ function NewRun() {
           label="Weekly budget"
           value={budget}
           min={TRAINING.minWeekly}
-          max={TRAINING.maxBudgetScoreAt}
+          max={trainingBudgetTop(s)}
           step={TRAINING.budgetStep}
           {...moneyStepper(sym)}
           onChange={setBudget}
         />
         <Row label="Total cost" value={moneyFull(budget * weeks, sym)} strong />
+        <FrontierNote />
       </div>
       <div class="pf-odds pf-train-odds" role="table" aria-label="Outcome estimate">
         <div class="field-label pf-label" role="caption">
@@ -202,5 +213,23 @@ function RunningRun(p: { run: TrainingRun }) {
         />
       )}
     </>
+  );
+}
+
+/** How much dearer training has become near the frontier, or that the model is at the ceiling. */
+function FrontierNote() {
+  const s = useGame();
+  if (atModelCeiling(s))
+    return (
+      <p class="muted small hq-note">
+        Every axis is at the ceiling: a run can’t lift this model any further.
+      </p>
+    );
+  const mult = frontierCostMult(s);
+  if (mult < FRONTIER_NOTE_FROM) return null;
+  return (
+    <p class="muted small hq-note">
+      Near the frontier every step costs more: budgets go {mult.toFixed(1)}× less far than they did.
+    </p>
   );
 }

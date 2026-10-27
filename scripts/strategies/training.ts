@@ -4,6 +4,7 @@
 // the current one.
 import { TRAINING } from '../../src/config/balance';
 import * as cmd from '../../src/sim/commands';
+import { atModelCeiling, frontierCostMult } from '../../src/sim/frontier';
 import type { GameState } from '../../src/sim/state';
 import { activeModel, modelQuality } from '../../src/sim/underwriting';
 
@@ -11,7 +12,7 @@ import { activeModel, modelQuality } from '../../src/sim/underwriting';
 const RUN_WEEKS = 24;
 /** Start a run only with this many minimum weekly budgets in cash. */
 const CASH_FLOOR_RUNS = 40;
-/** The most a strategy spends on training a week. */
+/** The most a strategy spends on training a week, × the frontier cost (§16.12). */
 const MAX_WEEKLY = 150_000;
 
 export function manageTraining(state: GameState, cashShare: number): void {
@@ -21,10 +22,10 @@ export function manageTraining(state: GameState, cashShare: number): void {
     .sort((a, b) => modelQuality(b) - modelQuality(a))[0];
   if (best && best.id !== current.id && modelQuality(best) > modelQuality(current))
     cmd.activateModel(state, best.id);
-  if (!state.departments.products || state.training.run) return;
+  if (!state.departments.products || state.training.run || atModelCeiling(state)) return;
   if (state.company.cash < CASH_FLOOR_RUNS * TRAINING.minWeekly) return;
   const weeklyBudget = Math.min(
-    MAX_WEEKLY,
+    MAX_WEEKLY * frontierCostMult(state),
     Math.max(TRAINING.minWeekly, state.company.cash * cashShare),
   );
   const radar = current.radar;
