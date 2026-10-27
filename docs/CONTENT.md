@@ -348,6 +348,18 @@ Content trim (2026-10-25): Brokered Deposits merged into Term Interbank and Seni
 
 Counterparty names: Harbor Clearing Bank · Meridian Treasury · Atlas Money Markets · Pinecrest Capital · Northwind Securities · Bellwether Funding · Granite Bay Trust · Cobalt Street Markets · Ironbridge Capital · Silverpine Partners.
 
+## 12b. GPU reservations (Compute floor, C4b; `src/data/gpuLots.ts`)
+
+Radar: Cost, Term, Reliability, Flexibility, Latency (1–10, higher is better for you).
+
+| type | Name | Term (wk) | Discount on spot | GPUs (× scale) | Weight | Cost | Term | Reliability | Flexibility | Latency |
+|---|---|---|---|---|---|---|---|---|---|---|
+| reserved_6m | 6-month reservation | 26 | 10% | 100–800 | 5 | 5 | 3 | 7 | 7 | 6 |
+| reserved_1y | 1-year reservation | 52 | 18% | 200–1,500 | 4 | 7 | 6 | 8 | 4 | 6 |
+| reserved_3y | 3-year reservation | 156 | 28% | 500–4,000 | 2 | 9 | 9 | 8 | 1 | 6 |
+
+Provider names (fictional GPU clouds): Northbeam Cloud · Halcyon Compute · Stratus Forge · Ironleaf Racks · Cobalt Grid · Lumen Hollow · Tidewater Compute · Saltmarsh Cloud · Kestrel Silicon · Bramblewood GPU.
+
 ## 13. Underwriting
 
 **Data inputs** (Accuracy, Speed, Inclusion, FraudShield, Fairness; cost per application):

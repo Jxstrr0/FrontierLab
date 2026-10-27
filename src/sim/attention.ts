@@ -130,7 +130,7 @@ export function attentionItems(state: GameState): AttentionItem[] {
       weight: 60,
       title: 'Liquidity under target',
       detail:
-        'Auto-funding is off, so nothing tops it up: borrow on the Treasury floor or turn auto-funding on.',
+        'Auto-funding is off, so nothing tops it up: borrow on the Compute floor or turn auto-funding on.',
       route: liqRoute,
     });
   }

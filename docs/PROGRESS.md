@@ -3,13 +3,36 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C4a done (v0.1.13, save schema 9): the compute price index and compute pool. C3 (v0.1.10–v0.1.12) turned the money model into a lab's. Next is C4b (the Compute floor and GPU lots), then C4c (capacity crunch and outages).
+**Current stage:** C4b done (v0.1.14, save schema 10): the Compute floor and GPU lots. C4a (v0.1.13) added the compute price index and pool; C3 (v0.1.10–v0.1.12) turned the money model into a lab's. Next is C4c (spot limits, emergency burst, capacity crunch and outages).
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `19f47039dbab9d` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `15dc2a49f9c8bf` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-27 — Stage C4b: the Compute floor and GPU lots (v0.1.14)
+
+**What you asked for:** keep rolling. This is part 2 of the compute stage.
+
+**What changed.**
+- **The Treasury floor at HQ is now the Compute floor** (server icon). Its advisor, lesson card and description talk about GPUs now.
+- **A GPU market.** Every two weeks, fictional GPU clouds (Northbeam Cloud, Stratus Forge, Ironleaf Racks and others) offer reservations: 6 months, 1 year or 3 years. Longer terms are cheaper: about 10%, 18% and 28% under today's spot price. A fuller Compute team brings more offers, and a short-staffed one pays up to 10% more.
+- **Renting GPUs.** Slide how many GPUs you want (50 or more) and tap Rent. Rented GPUs cover your customers' demand right alongside your data centers, so less is bought at spot. The catch: you pay every week of the term **whether you use them or not**, and you can't cancel. It's a bet on the chip market: lock in before a shortage and you save a lot; lock in before a glut and you overpay.
+- **The floor shows:** the Compute card (now with a "GPUs rented in lots" row), your rented GPUs (total and weekly bill, then a card per reservation with its end date), and the market.
+- **The old bank cards** (liquidity, funding market, central bank) are hidden unless an old save still has deposits or bank borrowing.
+
+**Old saves.** Schema 9 → 10 adds an empty GPU market and no rentals. A test checks it.
+
+**Balance.** The test strategies don't rent GPUs, so nothing moved: all 20 cities pass, and seed 42 shows the same six single-city warnings as before.
+
+**Tests.** A new `gpuMarket.test.ts`: offers need the floor and are priced and sized as documented; renting checks the floor, offer and size, adds capacity at once and cuts the spot bill; a lot is billed exactly its term, then retires, with the books balanced; the migration.
+
+**Checked in the browser** at iPhone size: the Compute tab, the pool card, a rented lot and the market's offer cards with the GPU slider. No console errors.
+
+**Checks.** `npm run lint`, all 888 tests and `npm run build` pass. The **determinism snapshot** moved from `19f47039dbab9d` to `15dc2a49f9c8bf` (intended: the game state now holds the GPU market).
+
+**Next:** C4c. Spot compute gets a limit, with an emergency burst at a premium; demand beyond capacity builds a waitlist; and outages arrive.
 
 ### 2026-10-27 — Stage C4a: the compute price index and compute pool (v0.1.13)
 

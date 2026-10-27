@@ -10,7 +10,18 @@ import { stream } from './rng';
 import type { ComputeState, GameState } from './state';
 
 export function newComputeState(): ComputeState {
-  return { index: 1, phase: 'normal', weeksInPhase: 0, demandGpus: 0, ownedGpus: 0, history: [] };
+  return {
+    index: 1,
+    phase: 'normal',
+    weeksInPhase: 0,
+    demandGpus: 0,
+    ownedGpus: 0,
+    history: [],
+    rentedGpus: 0,
+    lots: [],
+    offers: [],
+    offersRefreshWeek: -1,
+  };
 }
 
 /** Spot price of one GPU-week today. */
@@ -27,22 +38,28 @@ export function ownedGpus(state: GameState): number {
   return gpus;
 }
 
-/** Share of last week's demand your own GPUs covered (0–1). */
-export function ownedShare(state: GameState): number {
-  const c = state.compute;
-  if (c.demandGpus <= 0) return c.ownedGpus > 0 ? 1 : 0;
-  return Math.min(1, c.ownedGpus / c.demandGpus);
+/** GPUs you have outside the spot market: data centers plus rented lots. */
+export function capacityGpus(state: GameState): number {
+  return state.compute.ownedGpus + state.compute.rentedGpus;
 }
 
-/** Headroom: own capacity ÷ demand (C4b adds GPU lots). Null with no demand. */
+/** Share of last week's demand your data centers and GPU lots cover (0–1). */
+export function ownedShare(state: GameState): number {
+  const c = state.compute;
+  const cap = capacityGpus(state);
+  if (c.demandGpus <= 0) return cap > 0 ? 1 : 0;
+  return Math.min(1, cap / c.demandGpus);
+}
+
+/** Headroom: (data-center + rented GPUs) ÷ demand. Null with no demand. */
 export function headroom(state: GameState): number | null {
   const c = state.compute;
-  return c.demandGpus > 0 ? c.ownedGpus / c.demandGpus : null;
+  return c.demandGpus > 0 ? capacityGpus(state) / c.demandGpus : null;
 }
 
 /**
  * Multiplier from an office's compute at base prices to what it pays: only the
- * share your data centers didn't cover is bought, at the index. Uses last
+ * share your data centers and GPU lots didn't cover is bought, at the index. Uses last
  * week's pool, since this week's demand is known only once every office has run.
  */
 export function computePriceFactor(state: GameState): number {

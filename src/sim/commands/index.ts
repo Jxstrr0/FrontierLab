@@ -1,5 +1,6 @@
 // Every player action, one module per area (CLAUDE.md non-negotiable 6).
 export * from './branches';
+export * from './compute';
 export * from './development';
 export * from './loanDesk';
 export * from './marketing';
