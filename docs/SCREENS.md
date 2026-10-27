@@ -102,10 +102,10 @@ After the wizard, the map opens with the tutorial (§27).
 - **Pins** are DOM marks positioned over the canvas. The shape says the category, the colour and glyph say the type (ART_DIRECTION §2 Pins):
   - **crest** (shield) = a bank. Yours: filled with your brand ink and monogram. Rivals: ivory with their ink ring and monogram. Head offices (your HQ, rival HQs) wear a small brass crown. **Everything you own** is a brand-ink crest too, with its own ivory glyph in place of the monogram: office (HQ, crowned), building (property), villa (vacation home), trophy (club). They stack on top and cluster with your branches.
   - **coin** = an open branch location: a small ivory "$" coin, quieter than everything else.
-  - **medallion** = a place you deal with (bureau, investment bank, agency, convention, lobbying firm, employer, university, car dealer, auction house): filled with the type's own ink, ivory glyph.
+  - **medallion** = a place you deal with (data vendor, investment bank, agency, convention, lobbying firm, employer, university, car dealer, auction house): filled with the type's own ink, ivory glyph.
   - **price tag** = something to rent or buy: offices ("For lease"), buildings and vacation homes ("For sale"). Once yours they become crests; "Selling" and "Rebuilding" show as a note under the crest.
   - **seal** = a landmark (central bank, airport, stadium): larger, scalloped.
-- **Captions** from zoom 1.5: places show their type ("Credit bureau") in the type's ink; rival branches show the bank's short name. Captions follow the Text size setting.
+- **Captions** from zoom 1.5: places show their type ("Data vendor") in the type's ink; rival branches show the bank's short name. Captions follow the Text size setting.
 - At the far zoom, nearby pins cluster, but only like with like (yours, rivals, open locations, places, tags; landmarks never cluster). A cluster shows a fanned stack of up to three member marks with a count chip; open locations collapse into a quiet brass dot "×N". Its label names what's inside.
 - Tap a pin to open its panel. Tapping empty map does nothing.
 - **Layers sheet:** a key to the five pin shapes, then an "All" toggle plus one toggle per type (16). Each row shows the actual pins it toggles. Toggles persist in settings. **Sales Offices** (your offices, rival offices and open locations; id `branches` kept for saved toggles), **Data Centers** (yours, with your crest) and **Energy Sites** (the regional sites, an amber bolt medallion; they used to sit in the Employers layer) each have their own toggle (C2d1). The key's crest row reads "Labs".
@@ -165,7 +165,7 @@ After the wizard, the map opens with the tutorial (§27).
   - **With no manager:** "Hire a manager" opens a sheet of 3 candidate cards (skills, salary ask, Hire). Below the cards, "New candidates · $fee" pays a recruiter for 3 new ones (the fee doubles each time until the free refresh, which the note under it counts down); before your first hire, the tutorial guide stays as the first card.
 
 ### 5.2 Products
-- **House model card:** name, rosette, cost per application, "Manage models" (opens the HQ Products floor if it exists, otherwise a tip pointing to credit bureaus).
+- **AI model card (C6a):** name, rosette (Reasoning, Speed, Breadth, Safety, Efficiency), data licence per customer a year, "Manage models" (opens the HQ Products floor if it exists, otherwise a tip pointing to data vendors).
 - **Segmented control:** Plans | API | Apps (C3a; `CATEGORY_NAMES`: "Apps & Services" in full, shortened to fit the switch at 390 px).
 - **Product card carousel:**
   - icon, name, coins (product stars), Offered toggle
@@ -275,7 +275,7 @@ Tabs: Overview · Loans · Credit.
   - Employee benefits carousel (vignette, name, description, control stepper, estimated weekly cost, effect badge like "+3 morale")
   - "Close HR floor" (release the floor)
 - **Products:**
-  - house model (rosette, cost/app, model name) and Manage models (sliders for each data input that sum to 100%, with a live rosette and cost)
+  - AI model (rosette, licence per customer a year, model name), a **What it does** block (Compute per customer vs baseline, Price headroom over market, Data licence; C6a) and Manage models (sliders for each training dataset that sum to 100%, with a live rosette and cost; Customer Feedback shows "Unlocks at 5,000 customers")
   - company ARR line chart (the lending line went in C5b) with week-over-week changes (C3a; weeks closed before schema 6 read ARR as 0)
   - **Product lineup** (category Segmented + product cards like §5.2, at company level) and the "Apply rates to all branches" toggle
   - Product developments list (progress bar, weeks left) and New product
@@ -409,11 +409,11 @@ Tabs: Overview · Loans · Credit.
 - Below the cards: integrations in progress (bank, branches, weeks left) and completed deals.
 - **Converting branches (Stage 6):** while an acquired branch converts, its map pin keeps the old bank's ink and monogram with a brass progress ring and (at close zoom) a "Converting" label; the branch panel shows the old medallion and a "Converting from X: N weeks left" banner.
 
-## 13. Credit bureau
-- Header and advisor.
-- Packaged models carousel: name, tier, rosette, cost per application, "Use as house model".
-- The current house model is marked.
-- My model: commission a custom mix (sliders per data input, live rosette and cost), hosted by the bureau.
+## 13. Data vendor (C6a; was Credit bureau)
+- Header ("{Vendor} data vendor") and advisor.
+- Packaged models carousel: name, tier, rosette, licence per customer a year, "Use as AI model".
+- The current AI model is marked.
+- My model: commission a custom mix (sliders per training dataset, live rosette and cost), hosted by the vendor.
 
 ## 14. Employer (partnerships)
 
@@ -614,7 +614,7 @@ After Part 1 is finished or skipped, with Settings → Guides on (the default):
   | A second city | the city you're in is well covered (§3) and you've never flown | tap the city name → Go to the airport; read the departures, fly or close |
   | Your own fortune | personal cash reaches GUIDES.wealthCash | Menu → Personal wealth; read it, close it |
 
-- **First-look tips** show once, the first time you open each HQ floor, each map place (rival branch and HQ, central bank, bureau, agency, employer, university, investment bank and its M&A tab, startup, property, convention, lobbying firm, airport, vacation home, car dealer, auction house, sports club), Personal wealth, the Ledger, a branch's Finance tab, a board meeting and an incident. They end on "Got it" or when you move on. Popup tips dock at the top, clear of the choices. A finished guide marks the tips it already covered.
+- **First-look tips** show once, the first time you open each HQ floor, each map place (rival branch and HQ, central bank, data vendor, agency, employer, university, investment bank and its M&A tab, startup, property, convention, lobbying firm, airport, vacation home, car dealer, auction house, sports club), Personal wealth, the Ledger, a branch's Finance tab, a board meeting and an incident. They end on "Got it" or when you move on. Popup tips dock at the top, clear of the choices. A finished guide marks the tips it already covered.
 - **Settings:** a Guides switch, and "Show the guides again" to see every guide and tip once more.
 
 ## 28. Milestones (menu → Milestones)

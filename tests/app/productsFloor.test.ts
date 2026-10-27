@@ -1,4 +1,4 @@
-// Pure helpers behind the Products floor, credit bureau and digital projects
+// Pure helpers behind the Products floor, data vendor and digital projects
 // screens: the mix slider maths (always 100%), risk appetite and tier wording,
 // the odds table rows, the company lineup's price and Offered state, digital
 // project status and the line chart's point maths.
@@ -87,10 +87,12 @@ describe('mix slider maths', () => {
     }
   });
 
-  it('keeps Internal History locked until 5,000 loans are booked', () => {
-    const { s } = gameWithFloors();
+  it('keeps Customer Feedback locked until the lab has 5,000 customers', () => {
+    const { s, branchId } = gameWithFloors();
     expect(openInputs(s)).not.toContain('internal');
-    s.underwriting.loansBooked = 5_000;
+    const office = s.branches[branchId]!;
+    office.status = 'open';
+    office.customers = 5_000;
     expect(openInputs(s)).toContain('internal');
   });
 });

@@ -1,4 +1,4 @@
-/* Products floor, digital projects and credit bureau models (SCREENS §10, §13). */
+/* Products floor, digital projects and data vendor models (SCREENS §10, §13). */
 
 /* ─── House model ──────────────────────────────────────────────────────── */
 .pf-model {
@@ -288,7 +288,7 @@
   margin-top: var(--space-1);
 }
 
-/* ─── Credit bureau ────────────────────────────────────────────────────── */
+/* ─── Data vendor ────────────────────────────────────────────────────── */
 .bu-models .carousel > .bu-model {
   flex-basis: 88%;
   display: flex;
@@ -303,4 +303,10 @@
   justify-content: space-between;
   align-items: flex-start;
   gap: var(--space-2);
+}
+
+/* "What it does" block on the AI model card. */
+.pf-model-does {
+  margin: var(--space-3, 12px) 0 0;
+  font-weight: 600;
 }

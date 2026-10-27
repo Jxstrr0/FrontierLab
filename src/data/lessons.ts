@@ -214,7 +214,7 @@ export const FLOOR_TIPS: Record<DeptId, TipText> = {
   },
   products: {
     title: 'Products floor',
-    line: 'Set rates for every sales office at once, tune the house underwriting model, and develop new products. A better model lifts every sales office’s Products rating.',
+    line: 'Set rates for every sales office at once, tune the lab’s AI model, and develop new products. A better model lifts every sales office’s Model rating, lets prices sit higher and wins contracts.',
   },
   treasury: {
     title: 'Compute floor',
@@ -257,8 +257,8 @@ export const PLACE_TIPS: Record<string, TipText> = {
     line: 'The central bank sets the base rate. When it moves, loan demand, defaults and what savers expect all follow. Its meetings make the Inference.',
   },
   bureau: {
-    title: 'Credit bureau',
-    line: 'Bureaus sell underwriting models and can build us a custom one. A better model approves good borrowers and turns away bad ones.',
+    title: 'Data vendor',
+    line: 'Data vendors license training data as ready-made models and can train a custom mix for us. More efficient models need less compute; safer ones win businesses with sensitive data.',
   },
   agency: {
     title: 'Marketing agency',

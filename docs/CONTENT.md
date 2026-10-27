@@ -360,29 +360,29 @@ Radar: Cost, Term, Reliability, Flexibility, Latency (1–10, higher is better f
 
 Provider names (fictional GPU clouds): Northbeam Cloud · Halcyon Compute · Stratus Forge · Ironleaf Racks · Cobalt Grid · Lumen Hollow · Tidewater Compute · Saltmarsh Cloud · Kestrel Silicon · Bramblewood GPU.
 
-## 13. Underwriting
+## 13. The AI model's training data (C6a; was Underwriting)
 
-**Data inputs** (Accuracy, Speed, Inclusion, FraudShield, Fairness; cost per application):
+**Training datasets** (Reasoning, Speed, Breadth, Safety, Efficiency; licence per customer a year). Ids are the bank-era ones.
 
-| id | Input | Profile | $/app | Requirement |
+| id | Dataset | Profile | $/customer/yr | Requirement |
 |---|---|---|---|---|
-| bureau | Bureau Score | 6, 8, 4, 4, 7 | 1.20 | — |
-| cashflow | Cash-flow Data | 8, 5, 7, 5, 7 | 2.40 | — |
-| altdata | Alternative Data | 5, 7, 9, 3, 4 | 0.90 | — |
-| internal | Internal History | 4→9, 9, 6, 6, 7 | 0.20 | ≥ 5,000 loans booked |
-| fraud | Fraud Signals | 5, 4, 4, 10, 6 | 1.10 | — |
+| bureau | Web Crawl | 6, 8, 4, 4, 7 | 12 | — |
+| cashflow | Licensed Books & Papers | 8, 5, 7, 5, 7 | 24 | — |
+| altdata | Forum & Social Data | 5, 7, 9, 3, 4 | 9 | — |
+| internal | Customer Feedback | 4→9, 9, 6, 6, 7 | 2 | ≥ 5,000 customers |
+| fraud | Red-Team Data | 5, 4, 4, 10, 6 | 11 | — |
 
-**Credit bureau packages:**
+**Data vendor packages:**
 
-| Package | Bureau | Mix | $/app |
+| Package | Vendor | Mix | $/customer/yr |
 |---|---|---|---|
-| Clearline Basic Score (default) | Clearline | bureau 100 | 1.20 |
-| Clearline Premium Score | Clearline | bureau 70 / cashflow 30 | 1.95 |
-| Northscore Inclusion+ | Northscore | bureau 40 / altdata 60 | 1.35 |
-| Sentinel FraudGuard | Sentinel Data | bureau 60 / fraud 40 | 1.70 |
-| TrueMark Complete | TrueMark | bureau 40 / cashflow 30 / fraud 30 | 2.60 |
+| Clearline Web Base (default) | Clearline | bureau 100 | 12 |
+| Clearline Scholar | Clearline | bureau 70 / cashflow 30 | 19.50 |
+| Northscore Open Voices | Northscore | bureau 40 / altdata 60 | 13.50 |
+| Sentinel Guardrails | Sentinel Data | bureau 60 / fraud 40 | 17 |
+| TrueMark Complete | TrueMark | bureau 40 / cashflow 30 / fraud 30 | 26 |
 
-**Bureau locations:**
+**Vendor locations:**
 - Clearline: Toronto, New York, London.
 - Northscore: Saskatoon, Calgary, Chicago.
 - Sentinel Data: San Francisco, Frankfurt, Singapore.

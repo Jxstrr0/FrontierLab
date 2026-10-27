@@ -1,11 +1,11 @@
-// Mix editor for a custom underwriting model (SCREENS §10 Manage models, §13
+// Mix editor for a custom AI model (SCREENS §10 Manage models, §13
 // My model): one slider per data input, always adding up to 100% (moving one
-// rescales the others, see mixMath.ts), with a live rosette, cost per
-// application and any problem with the mix. Internal History stays locked
-// until enough loans are booked. Controlled: the parent keeps the percents.
+// rescales the others, see mixMath.ts), with a live rosette, data
+// licence per customer and any problem with the mix. Customer Feedback stays
+// locked until the lab has enough customers. Controlled: the parent keeps the percents.
 import { DATA_INPUTS } from '../../../data/bureaus';
 import type { ModelSource } from '../../../sim/underwriting';
-import { previewModel } from '../../../sim/underwriting';
+import { labCustomers, previewModel } from '../../../sim/underwriting';
 import { Card, Row } from '../../components';
 import { count, exactMoney } from '../../format/format';
 import { useGame } from '../../store';
@@ -27,10 +27,14 @@ export function MixEditor(p: {
     <div class="stack">
       <Card>
         <ModelRosette radar={preview.radar} label="Preview" />
-        <Row label="Cost per application" value={exactMoney(preview.costPerApp, sym)} strong />
+        <Row
+          label="Data licence per customer a year"
+          value={exactMoney(preview.costPerCustomer, sym)}
+          strong
+        />
         <Row label="Model quality" value={`${radarText(preview.quality)} / 10`} />
         {p.source === 'hosted' && (
-          <p class="muted small hq-note">Hosted models carry the bureau's markup.</p>
+          <p class="muted small hq-note">Hosted models carry the vendor's markup.</p>
         )}
       </Card>
       <div class="pf-mix" role="group" aria-label="Data inputs">
@@ -64,8 +68,8 @@ export function MixEditor(p: {
               />
               <div class="muted small">
                 {locked
-                  ? `Unlocks at ${count(input.minLoansBooked ?? 0)} loans booked (${count(s.underwriting.loansBooked)} so far)`
-                  : `${exactMoney(input.costPerApp, sym)} per application`}
+                  ? `Unlocks at ${count(input.minCustomers ?? 0)} customers (${count(labCustomers(s))} so far)`
+                  : `${exactMoney(input.costPerCustomer, sym)} per customer a year`}
               </div>
             </div>
           );

@@ -341,7 +341,7 @@ export const EXPENSE_LINES: [BranchPnlLine, string][] = [
   ['rent', 'Rent'],
   ['marketing', 'Marketing'],
   ['equipment', 'Equipment & upkeep'],
-  ['servicing', 'Support & underwriting'],
+  ['servicing', 'Support & data licences'],
   ['overhead', 'Overhead'],
 ];
 

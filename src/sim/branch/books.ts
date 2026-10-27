@@ -19,6 +19,7 @@ import type { BranchWeek } from './week';
 import { bankRunMult } from '../incident/effects';
 import { outageChurnMult } from '../compute';
 import { allProducts } from '../products';
+import { inferenceMult, modelCostPerCustomer, priceHeadroom } from '../underwriting';
 
 const NONE: Origination = { newAccounts: 0, newVolume: 0, approval: 1 };
 
@@ -62,8 +63,8 @@ export function runBooks(
     };
     runRecurring(ctx, spec, book, orig);
     book.last.deltaAccounts = book.accounts - before;
-    // Plans and usage run on compute (C3b).
-    wk.compute += book.accounts * spec.servicing;
+    // Plans and usage run on compute (C3b), less with an efficient model (C6a).
+    wk.compute += book.accounts * spec.servicing * inferenceMult(state);
   }
 
   convertFreeTiers(state, branch);
@@ -72,6 +73,8 @@ export function runBooks(
   const accounts = Object.values(branch.books).reduce((sum, b) => sum + b.accounts, 0);
   wk.marketing += accounts * fx.perAccount;
   branch.customers = Math.round(accounts / PRODUCTS_PER_CUSTOMER);
+  // The model's data licences, per customer (C6a).
+  wk.underwriting += perWeek(branch.customers * modelCostPerCustomer(state));
 }
 
 const perWeek = (annual: number) => annual / WEEKS_PER_YEAR;
@@ -92,7 +95,8 @@ export function periodsPerYear(spec: ProductSpec): number {
 function runRecurring(ctx: Ctx, spec: ProductSpec, book: Book, orig: Origination): void {
   const { state, branch, wk } = ctx;
   const price = branchPrice(state, branch, spec.id);
-  const m = marketRef(state, branch.cityId, spec.id);
+  // §16.7 (C6a): churn compares the price with the market the model allows.
+  const m = marketRef(state, branch.cityId, spec.id) * priceHeadroom(state);
   const periods = periodsPerYear(spec);
   const k =
     perWeek(spec.churn) *
@@ -117,7 +121,9 @@ function runRecurring(ctx: Ctx, spec: ProductSpec, book: Book, orig: Origination
     book.accounts -= book.last.churned;
     book.balance -= book.balance * k;
     // Compute behind the usage: units used this week × cost per unit.
-    if (price > 0) wk.compute += ((spec.unitCost ?? 0) * book.balance) / (price * WEEKS_PER_YEAR);
+    if (price > 0)
+      wk.compute +=
+        ((spec.unitCost ?? 0) * book.balance * inferenceMult(state)) / (price * WEEKS_PER_YEAR);
   }
   book.bookRate = price;
   const revenue = perWeek(book.balance);

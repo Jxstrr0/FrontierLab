@@ -1,6 +1,6 @@
-// Credit bureau panel body (SCREENS §13): this bureau's packaged models in a
-// carousel (name, rosette, cost per application, "Use as house model", the
-// current house model marked) and My model, a custom mix the bureau builds
+// Data vendor panel body (SCREENS §13): this bureau's packaged models in a
+// carousel (name, rosette, data licence per customer a year, "Use as AI model", the
+// current AI model marked) and My model, a custom mix the vendor builds
 // and hosts (no Products floor needed; hosted quality and pricing). Buying
 // or commissioning needs you to be in the bureau's city.
 import { useState } from 'preact/hooks';
@@ -72,7 +72,7 @@ export function BureauBody(p: { site: Site }) {
   );
 }
 
-/** One packaged model: name, rosette, cost, quality and "Use as house model". */
+/** One packaged model: name, rosette, cost, quality and "Use as AI model". */
 function PackageCard(p: { pkg: BureauPackageSpec; here: boolean }) {
   const s = useGame();
   const sym = s.settings.currency;
@@ -83,13 +83,17 @@ function PackageCard(p: { pkg: BureauPackageSpec; here: boolean }) {
     <Card class={`bu-model${current ? ' is-current' : ''}`}>
       <div class="bu-model-head">
         <div class="pf-model-name">{pkg.name}</div>
-        {current && <Badge tone="good">House model</Badge>}
+        {current && <Badge tone="good">AI model</Badge>}
       </div>
       <ModelRosette radar={radar} label={pkg.name} />
-      <Row label="Cost per application" value={exactMoney(pkg.costPerApp, sym)} strong />
+      <Row
+        label="Data licence per customer a year"
+        value={exactMoney(pkg.costPerCustomer, sym)}
+        strong
+      />
       <Row label="Model quality" value={`${radarText(modelQuality({ radar }))} / 10`} />
       {current ? (
-        <p class="muted small hq-note">Current house model.</p>
+        <p class="muted small hq-note">Current AI model.</p>
       ) : (
         <button
           type="button"
@@ -100,7 +104,7 @@ function PackageCard(p: { pkg: BureauPackageSpec; here: boolean }) {
               toast(`Switching to ${pkg.name} over the next two weeks.`, 'good');
           }}
         >
-          Use as house model
+          Use as AI model
         </button>
       )}
     </Card>
