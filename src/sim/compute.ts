@@ -3,9 +3,11 @@
 // rates. Each office's compute bill is counted in GPU-weeks; GPUs running in
 // your own data centers serve that demand first (their cost is the power bill
 // and lease), and the rest is bought at spot: spotPerGpuWeek × index.
-import { COMPUTE } from '../config/balance';
+import { COMPUTE, OUTAGE, SPOT } from '../config/balance';
 import { ema } from './math';
 import { usableGpus } from './dataCenters';
+import { pushEvent } from './events';
+import { spend } from './ledger';
 import { stream } from './rng';
 import type { ComputeState, GameState } from './state';
 
@@ -21,6 +23,13 @@ export function newComputeState(): ComputeState {
     lots: [],
     offers: [],
     offersRefreshWeek: -1,
+    autoSpotBuy: true,
+    spotTrail: 0,
+    crunchWeeks: 0,
+    outageWeeksLeft: 0,
+    burstStigmaWeeks: 0,
+    weekCharge: 0,
+    weekCost: 0,
   };
 }
 
@@ -57,13 +66,82 @@ export function headroom(state: GameState): number | null {
   return c.demandGpus > 0 ? capacityGpus(state) / c.demandGpus : null;
 }
 
+/** §13.0 (C4c): the most GPUs the clouds sell you at spot this week. */
+export function spotLimit(state: GameState): number {
+  const c = state.compute;
+  const trailLimit = SPOT.baseGpus + SPOT.trailMult * c.spotTrail;
+  return Math.min(trailLimit, SPOT.maxGpus) * SPOT.phaseMult[c.phase];
+}
+
+/** How last week's demand is met: own and rented GPUs, then spot, burst, and the unserved rest. */
+export interface ComputeAllocation {
+  demand: number;
+  capacity: number;
+  spot: number;
+  burst: number;
+  short: number;
+  spotLimit: number;
+  burstLimit: number;
+}
+
+export function allocation(state: GameState): ComputeAllocation {
+  const c = state.compute;
+  const capacity = capacityGpus(state);
+  const gap = Math.max(0, c.demandGpus - capacity);
+  const sLimit = spotLimit(state);
+  const bLimit = SPOT.burstShare * sLimit;
+  const spot = c.autoSpotBuy ? Math.min(gap, sLimit) : 0;
+  const burst = c.autoSpotBuy ? Math.min(gap - spot, bLimit) : 0;
+  return {
+    demand: c.demandGpus,
+    capacity,
+    spot,
+    burst,
+    short: gap - spot - burst,
+    spotLimit: sLimit,
+    burstLimit: bLimit,
+  };
+}
+
+/** Capacity crunch: unserved demand above SPOT.crunchFrom puts new sign-ups on a waitlist. */
+export function waitlisted(state: GameState): boolean {
+  const a = allocation(state);
+  return a.demand > 0 && a.short / a.demand > SPOT.crunchFrom;
+}
+
+/** Churn multiplier while an outage runs. */
+export function outageChurnMult(state: GameState): number {
+  return state.compute.outageWeeksLeft > 0 ? OUTAGE.churnMult : 1;
+}
+
 /**
- * Multiplier from an office's compute at base prices to what it pays: only the
- * share your data centers and GPU lots didn't cover is bought, at the index. Uses last
- * week's pool, since this week's demand is known only once every office has run.
+ * Multiplier from an office's compute at base prices to its internal charge
+ * (C4c, like funds transfer pricing): every GPU-week at today's spot index,
+ * wherever it really came from.
  */
-export function computePriceFactor(state: GameState): number {
-  return (1 - ownedShare(state)) * state.compute.index;
+export function internalComputePrice(state: GameState): number {
+  return state.compute.index;
+}
+
+/** What spot and burst GPUs cost this week, at the index (burst at its premium). */
+export function spotCost(state: GameState, a: ComputeAllocation = allocation(state)): number {
+  return (a.spot + a.burst * SPOT.burstPremium) * spotPrice(state);
+}
+
+/** Weekly bill of every active GPU lot. */
+export function lotsWeeklyCost(state: GameState): number {
+  return state.compute.lots.reduce((sum, l) => sum + l.gpus * l.price, 0);
+}
+
+/**
+ * Pool cost as a multiple of spot (C4c): what the lab pays for the GPUs it
+ * buys and rents, per GPU-week of demand, against the internal price. Below
+ * 1 the pool is saving money; data-center costs are on their own lines.
+ */
+export function poolCostFactor(state: GameState): number {
+  const c = state.compute;
+  if (c.weekCharge <= 0) return 0;
+  return c.weekCost / c.weekCharge;
 }
 
 /** Tick step 1 (after the macro): the chip cycle moves the index. */
@@ -93,10 +171,45 @@ export function updateComputeIndex(state: GameState): void {
 /** Tick step 4 (after the offices): this week's demand and running GPUs, for next week's prices. */
 export function tallyCompute(state: GameState): void {
   let demand = 0;
+  let charged = 0;
   for (const b of Object.values(state.branches)) {
     const row = b.pnl[b.pnl.length - 1];
-    if (b.status === 'open' && row?.week === state.clock.week) demand += row.gpus ?? 0;
+    if (row?.week !== state.clock.week) continue;
+    charged += row.lines.compute;
+    if (b.status === 'open') demand += row.gpus ?? 0;
   }
   state.compute.demandGpus = demand;
+  state.compute.weekCharge = charged;
   state.compute.ownedGpus = ownedGpus(state);
+}
+
+/**
+ * Tick step 4 (after the tally, C4c): with this week's demand, pay for the spot
+ * and burst GPUs and the active lots, booking the gap to the offices' internal
+ * charges on the compute line; then update the spot trail, burst stigma,
+ * capacity crunch and outages.
+ */
+export function settleCompute(state: GameState): void {
+  const c = state.compute;
+  const a = allocation(state);
+  const bank = state.meta.bankName;
+  c.weekCost = spotCost(state, a) + lotsWeeklyCost(state);
+  spend(state, 'compute', c.weekCost - c.weekCharge);
+  c.spotTrail = ema(c.spotTrail, a.spot + a.burst, SPOT.trailEma);
+  if (a.burst > 0) {
+    if (c.burstStigmaWeeks <= 0) pushEvent(state, 'COMPUTE_BURST', { bank, gpus: a.burst }, 2);
+    c.burstStigmaWeeks = SPOT.stigmaWeeks;
+  } else if (c.burstStigmaWeeks > 0) c.burstStigmaWeeks -= 1;
+
+  if (waitlisted(state)) {
+    if (c.crunchWeeks === 0) pushEvent(state, 'COMPUTE_CRUNCH', { bank }, 1);
+    c.crunchWeeks += 1;
+  } else if (c.crunchWeeks > 0) {
+    c.crunchWeeks = 0;
+    pushEvent(state, 'COMPUTE_CRUNCH_ENDED', { bank }, 2);
+  }
+  if (c.crunchWeeks >= OUTAGE.afterWeeks) {
+    if (c.outageWeeksLeft <= 0) pushEvent(state, 'COMPUTE_OUTAGE', { bank }, 1);
+    c.outageWeeksLeft = OUTAGE.weeks;
+  } else if (c.outageWeeksLeft > 0) c.outageWeeksLeft -= 1;
 }

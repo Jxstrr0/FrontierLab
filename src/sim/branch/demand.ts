@@ -29,6 +29,7 @@ import { activeModel, RADAR } from '../underwriting';
 import { effectiveAwareness, type CampaignEffects } from './marketing';
 import { branchPrice, isOffered, priceFactor } from './pricing';
 import { capacity, visitRate } from './staff';
+import { waitlisted } from '../compute';
 import { difficultyOf } from '../difficulty';
 import { dpow } from '../detmath';
 import { brandSegmentMults } from '../hqMarketing';
@@ -160,6 +161,8 @@ export function runDemand(state: GameState, branch: Branch, fx: CampaignEffects)
 
   // §9.6 take-up per offered product: new accounts and their seats or monthly usage
   const byProduct: Record<string, Origination> = {};
+  // §13.0 (C4c): in a capacity crunch, new plan and API sign-ups join a waitlist.
+  const waitlist = waitlisted(state);
   for (const spec of allProducts(state)) {
     if (spec.kind === 'sbl' || spec.kind === 'fx' || !isOffered(branch, spec.id)) continue;
     const price = branchPrice(state, branch, spec.id);
@@ -167,8 +170,11 @@ export function runDemand(state: GameState, branch: Branch, fx: CampaignEffects)
     const stars = starsOf(state, spec);
     const affinity = affinityOf(spec);
     const approval = approvalOf(state, spec);
+    const gate = waitlist && (spec.kind === 'plan' || spec.kind === 'usage') ? 0 : 1;
     const boost =
-      (spec.category === 'deposits' ? fx.depositTakeUp : 1) * takeupMult(state, baseId(spec));
+      (spec.category === 'deposits' ? fx.depositTakeUp : 1) *
+      takeupMult(state, baseId(spec)) *
+      gate;
     let accounts = 0;
     let volume = 0;
     for (const s of SEGMENTS) {

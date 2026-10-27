@@ -315,6 +315,31 @@ function bankNamed(ctx: NewsContext, e: GameEvent): Story | undefined {
         priority: priority(false),
         tokens,
       });
+    case 'COMPUTE_BURST':
+      return banking({
+        key: 'COMPUTE_BURST',
+        subject: name,
+        icon: 'alert',
+        priority: priority(true),
+        tokens: { ...tokens, gpus: grouped(Math.round(num(p.gpus))) },
+      });
+    case 'COMPUTE_CRUNCH':
+    case 'COMPUTE_OUTAGE':
+      return banking({
+        key: e.type,
+        subject: name,
+        icon: 'alert',
+        priority: priority(true),
+        tokens,
+      });
+    case 'COMPUTE_CRUNCH_ENDED':
+      return banking({
+        key: 'COMPUTE_CRUNCH_ENDED',
+        subject: name,
+        icon: 'shield',
+        priority: priority(false),
+        tokens,
+      });
     case 'RECAP':
       return banking({
         key: 'RECAP',

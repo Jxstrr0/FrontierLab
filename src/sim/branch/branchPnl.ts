@@ -13,7 +13,7 @@ import {
 } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { EQUIPMENT, isFitout, BUILD_SLOTS } from '../../data/equipment';
-import { computePriceFactor } from '../compute';
+import { internalComputePrice } from '../compute';
 import { earn, postPnl, spend } from '../ledger';
 import { listLevel } from '../nominal';
 import type { Branch, BranchPnl, GameState } from '../state';
@@ -49,10 +49,11 @@ export function addBranchCosts(
 
 /** Records the office P&L row (C3b: revenue by product line, then the compute bill) and posts company lines. */
 export function closeBranchWeek(state: GameState, branch: Branch, wk: BranchWeek): BranchPnl {
-  // C4a (§13.0): compute so far is at base spot prices; count it in GPU-weeks,
-  // then pay only for what your data centers didn't cover, at the price index.
+  // §13.0: compute so far is at base spot prices; count it in GPU-weeks, then
+  // charge it at the internal price, today's spot (C4c). The compute pool books
+  // the gap to what the lab actually paid (settleCompute).
   const gpus = wk.compute / COMPUTE.spotPerGpuWeek;
-  wk.compute *= computePriceFactor(state);
+  wk.compute *= internalComputePrice(state);
   const otherIncome = wk.atmFees;
   const servicing = wk.servicing + wk.underwriting;
   const lines = {
