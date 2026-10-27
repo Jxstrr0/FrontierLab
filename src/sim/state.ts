@@ -57,7 +57,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState } from './personalTypes';
 
-export const SCHEMA_VERSION = 13;
+export const SCHEMA_VERSION = 14;
 
 export interface GameState {
   schemaVersion: number;
@@ -813,12 +813,13 @@ export interface UnderwritingModel {
   id: Id;
   name: string;
   source: 'bureau' | 'custom';
-  /** Bureau hosting a custom model (no Products floor needed, §16.7). */
+  /** Data vendor hosting a custom model (no Products floor needed, §16.7). */
   hostedBy?: string;
   mix: Record<string, number>;
-  /** Accuracy, Speed, Inclusion, FraudShield, Fairness (1–10). */
+  /** Reasoning, Speed, Breadth, Safety, Efficiency (1–10, C6a). */
   radar: Pentagon;
-  costPerApp: Money;
+  /** Data licence per customer a year (C6a; was cost per loan application). */
+  costPerCustomer: Money;
 }
 
 export interface UnderwritingState {

@@ -19,6 +19,7 @@ import type {
   UnderwritingModel,
   WeeklySnapshot,
 } from '../../../sim/state';
+import { labCustomers } from '../../../sim/underwriting';
 import { apportion } from './mixMath';
 
 // ─── Development form ─────────────────────────────────────────────────────────
@@ -200,7 +201,7 @@ export function digitalEffectText(template: DevTemplate): string {
   if (!d) return '';
   const parts: string[] = [];
   if (d.appRating) parts.push(`App rating +${d.appRating.toFixed(1)} for good`);
-  if (d.modelSpeed) parts.push(`House model Speed +${d.modelSpeed}`);
+  if (d.modelSpeed) parts.push(`AI model Speed +${d.modelSpeed}`);
   return parts.join(' · ');
 }
 
@@ -208,26 +209,26 @@ export function digitalEffectText(template: DevTemplate): string {
 
 export const INPUT_IDS = Object.keys(DATA_INPUTS);
 
-/** Inputs the player can use now (Internal History waits for loans booked). */
+/** Inputs the player can use now (Customer Feedback waits for customers). */
 export function openInputs(s: GameState): string[] {
   return INPUT_IDS.filter((id) => {
-    const min = DATA_INPUTS[id]?.minLoansBooked;
-    return !min || s.underwriting.loansBooked >= min;
+    const min = DATA_INPUTS[id]?.minCustomers;
+    return !min || labCustomers(s) >= min;
   });
 }
 
 export function modelSourceText(m: UnderwritingModel): string {
-  if (m.source === 'bureau') return 'Bureau package';
+  if (m.source === 'bureau') return 'Data vendor package';
   return m.hostedBy ? `Hosted by ${m.hostedBy}` : 'Built on the Products floor';
 }
 
-/** Axis labels for underwriting model rosettes (SIMULATION §16.7 radar order). */
+/** Axis labels for AI model rosettes (SIMULATION §16.7 radar order). */
 export const MODEL_AXES = [
-  ['Accuracy'],
+  ['Reasoning'],
   ['Speed'],
-  ['Inclusion'],
-  ['Fraud', 'shield'],
-  ['Fairness'],
+  ['Breadth'],
+  ['Safety'],
+  ['Efficiency'],
 ] as const;
 
 export const radarText = (v: number) => v.toFixed(1);

@@ -32,10 +32,10 @@ export interface IncidentRule {
   apply(state: GameState, inc: Incident, optionId: string, rng: Rng): string | void;
 }
 
-/** 0–10: IT coverage′, the underwriting model's FraudShield and the ATM (decision log). */
+/** 0–10: IT coverage′, the AI model's Safety and the ATM (decision log). */
 export function fraudShield(state: GameState, branch?: Branch): number {
   const it = Math.min(1, state.hq.coverage.it?.kPrime ?? 1);
-  const model = activeModel(state).radar[RADAR.fraudShield];
+  const model = activeModel(state).radar[RADAR.safety];
   const atm = branch ? (FRAUD_SHIELD.atmBonus[branch.build.atm] ?? 0) : 0;
   return clamp(
     FRAUD_SHIELD.itWeight * it + FRAUD_SHIELD.modelWeight * model + atm,

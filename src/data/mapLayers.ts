@@ -37,7 +37,7 @@ export const MAP_LAYERS: readonly MapLayerSpec[] = [
   { id: 'dataCenters', label: 'Data Centers', feature: 'cityMap' },
   { id: 'offices', label: 'Offices', feature: 'hq' },
   { id: 'realEstate', label: 'Real Estate', feature: 'investments' },
-  { id: 'creditBureaus', label: 'Credit Bureaus', feature: 'hq' },
+  { id: 'creditBureaus', label: 'Data Vendors', feature: 'hq' },
   { id: 'banks', label: 'Rival Labs', feature: 'competition' },
   { id: 'investmentBanks', label: 'Investment Banks', feature: 'capitalMarkets' },
   { id: 'marketingAgencies', label: 'Marketing Agencies', feature: 'hq' },

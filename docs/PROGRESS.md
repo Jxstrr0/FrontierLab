@@ -3,13 +3,59 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C5 done (v0.1.16–v0.1.17, save schema 13): named customer businesses on the map, and the Deal Desk where you win and keep their contracts each renewal season. C4 (v0.1.13–v0.1.15) gave compute a price, a pool, a floor, GPU lots, spot limits, a crunch and outages. Next is C6 (the AI model and training runs).
+**Current stage:** C6a done (v0.1.18, save schema 14): the AI model, with a Reasoning/Speed/Breadth/Safety/Efficiency radar and real effects. C5 (v0.1.16–v0.1.17) added customer businesses and the Deal Desk. Next is C6b (training runs, rival model releases, the frontier bar), then C6c (the Chief Scientist).
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `19488695a0bca7` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `03e826dfac25bd` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-27 — Stage C6a: the AI model (v0.1.18)
+
+**What you asked for:** run C6 after C5. C6 is big, so I split it into three parts:
+- **C6a** (this one): turns the old underwriting model into the lab's AI model.
+- **C6b**: training runs, rival model releases and a rising frontier.
+- **C6c**: the Chief Scientist seat and the talent war.
+
+**What changed.**
+- **The model's five scores** are now **Reasoning, Speed, Breadth, Safety and Efficiency**. They reuse the old bank scores' slots and numbers, so nothing jumps when you load a game.
+- **Data vendors replace credit bureaus** on the map and in the Layers sheet.
+  - The data you mix is now training data: Web Crawl, Licensed Books & Papers, Forum & Social Data, Customer Feedback and Red-Team Data.
+  - The ready-made packages have new names, such as Clearline Web Base (the starting model) and Sentinel Guardrails.
+- **What a better model does** (new):
+  - **Efficiency** cuts the compute behind every customer: 5% less per point above 7.
+  - **Quality**, the average of the five scores, lets you charge more. Each point above the starting model lets prices sit 4% over market before customers balk.
+  - **Quality also wins contracts:** +5% win and keep chance per point on the Deal Desk.
+  - **Safety** matters to businesses with sensitive data, such as hospitals and banks. A safe model wins them more often; an unsafe one loses them.
+  - It still lifts the Model rating (Speed lifts Service, and Safety now guards against fraud).
+- **Data licences cost money again.** The old "cost per application" had stopped mattering when loans went away. It is now a **licence per customer a year** ($12 for the starting model, up to $26 for TrueMark Complete), charged weekly.
+- **Customer Feedback** now unlocks at 5,000 customers instead of loans booked, and gets smarter as you grow (best at 50,000).
+- The CPO's automatic model switch now weighs quality against licence cost.
+- The HQ Products floor's AI model card has a **What it does** block showing compute per customer, price headroom and the licence.
+
+**Why the starting model shows "0%".** I set the starting package exactly on every reference point, so a new game plays the same as before. All of the gain comes from upgrading the model. The training runs in C6b are where that gets exciting.
+
+**Old saves.** Schema 13 → 14. The old cost per application is multiplied by 10 into the new licence per customer, and ready-made models take their new names.
+
+**Balance.** The 20-city median passes every checkpoint (week 52 ARR $4.3M, week 260 ARR $25.8M, payback 39.5 weeks). The aggressive and turtle strategies stay above zero cash. The licences cost the steady run a little profit, and income at week 260 stays inside the target band.
+
+**Tests.** New `modelEffects.test.ts` covers:
+- the neutral starting model
+- Efficiency cutting an office's compute bill
+- price headroom
+- the Model rating lift
+- contract chances with Safety and sensitive data
+- weekly licence charges
+- the migration
+
+The model tests now check licences per customer and the Customer Feedback gate. The Deal Desk formula tests pin data sensitivity at 5 so the model's Safety doesn't move them.
+
+**How I worked.** I wrote the simulation. A helper relabelled the screens (the data vendor panel, the model card, the Mix editor and the map captions) and checked them at iPhone size with no console errors.
+
+**Checks.** `npm run lint`, all tests and `npm run build` pass. The **determinism snapshot** moved from `19488695a0bca7` to `03e826dfac25bd` (intended: licences are charged and the CPO's model choice changed).
+
+**Next:** C6b, training runs. You put the Products team to work training a new model generation. Rival labs release their own models, and the frontier keeps rising, so a model you don't update slowly falls behind.
 
 ### 2026-10-27 — Stage C5b: the Deal Desk (v0.1.17)
 

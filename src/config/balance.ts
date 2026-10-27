@@ -451,7 +451,6 @@ export const PRODUCTS_PER_CUSTOMER = 1.6;
 
 // ─── BOOKS (§10, §11) ─────────────────────────────────────────────────────────
 export const OVERALL_CHURN = { slope: 0.6, pivot: 3.2 } as const;
-export const MODEL_PD = { base: 1.3, accuracy: 0.06, inclusion: 0.02 } as const;
 export const INTERCHANGE = 0.015;
 // ─── DEAL DESK (§11, stage C5b) ───────────────────────────────────────────────
 /** Enterprise contracts with the businesses on the map (SIMULATION §11). */
@@ -729,13 +728,37 @@ export const DEV_TIER = {
 } as const;
 export const PRODUCT_NAME_MAX = 32;
 
-// ─── UNDERWRITING MODELS (§16.7) ──────────────────────────────────────────────
+// ─── THE AI MODEL (§16.7, stage C6a) ──────────────────────────────────────────
 /** Custom model quality: 0.9 + 0.2 × productsCoverage′ × avgSkill/100. */
 export const MODEL_QUALITY = { base: 0.9, slope: 0.2 } as const;
-/** Bureau-hosted custom model: fixed quality and a 15% hosting markup. */
+/** Vendor-hosted custom model: fixed quality and a 15% hosting markup. */
 export const BUREAU_HOSTED = { qualityMult: 0.95, costMult: 1.15 } as const;
-/** Internal History accuracy = 4 + min(5, loansBooked / 20,000 × 5). */
-export const INTERNAL_HISTORY = { accuracyBase: 4, accuracyGain: 5, fullLoans: 20_000 } as const;
+/**
+ * Customer Feedback Reasoning = 4 + min(5, customers / 50,000 × 5); it can be
+ * mixed in once the lab has minCustomers customers.
+ */
+export const INTERNAL_HISTORY = {
+  accuracyBase: 4,
+  accuracyGain: 5,
+  fullCustomers: 50_000,
+  minCustomers: 5_000,
+} as const;
+/**
+ * What the model does (C6a): Efficiency scales the compute behind every
+ * customer (×1 at efficiencyRef, the starting package), and model quality
+ * (the radar mean) above qualityRef lets prices sit above market and wins
+ * contracts; Safety counts with data-sensitive businesses.
+ */
+export const MODEL_EFFECTS = {
+  efficiencyRef: 7,
+  efficiencySlope: 0.05,
+  qualityRef: 5.8,
+  headroomSlope: 0.04,
+  dealQuality: 0.05,
+  dealSafety: 0.03,
+} as const;
+/** CPO delegation: a local package must beat the model by minGain after costWeight × $ per customer. */
+export const MODEL_DELEGATE = { minGain: 0.3, costWeight: 0.02 } as const;
 export const MODEL_SWITCH_WEEKS = 2;
 /** Mix weights must sum to 1 within this tolerance (sliders in whole percent). */
 export const MODEL_MIX_TOLERANCE = 0.005;
@@ -1196,7 +1219,7 @@ export const INCIDENTS = {
 } as const;
 /**
  * fraudShield, 0–10 (decision log): itWeight × IT coverage′ + modelWeight × the
- * active underwriting model's FraudShield (1–10) + the branch ATM's bonus. A
+ * AI model's Safety (1–10, C6a) + the branch ATM's bonus. A
  * company-level check (card fraud) has no ATM bonus.
  */
 export const FRAUD_SHIELD = {

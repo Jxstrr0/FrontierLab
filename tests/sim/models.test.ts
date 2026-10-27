@@ -1,13 +1,13 @@
-// Underwriting models (SIMULATION §16.7) and the company lineup: custom model
-// radar and cost, bureau hosting, the Internal History gate, the two-week
-// switching blend, and Apply-to-all pricing.
+// The AI model (SIMULATION §16.7, C6a) and the company lineup: custom model
+// radar and licence cost, vendor hosting, the Customer Feedback gate, the
+// two-week switching blend, and Apply-to-all pricing.
 import { describe, expect, it } from 'vitest';
 import * as cmd from '../../src/sim/commands';
 import { branchPrice } from '../../src/sim/branch/pricing';
 import {
   activeModel,
-  appCost,
   customFigures,
+  modelCostPerCustomer,
   previewModel,
   updateModels,
 } from '../../src/sim/underwriting';
@@ -24,29 +24,31 @@ describe('custom models', () => {
     const f = customFigures(s, MIX, 'custom');
     expect(f.radar[0]).toBeCloseTo(7 * 1.06, 12);
     expect(f.radar[1]).toBeCloseTo(6.5 * 1.06, 12);
-    expect(f.costPerApp).toBeCloseTo(1.8, 12);
+    expect(f.costPerCustomer).toBeCloseTo(18, 12);
     const hosted = customFigures(s, MIX, 'hosted');
     expect(hosted.radar[0]).toBeCloseTo(7 * 0.95, 12);
-    expect(hosted.costPerApp).toBeCloseTo(1.8 * 1.15, 12);
+    expect(hosted.costPerCustomer).toBeCloseTo(18 * 1.15, 12);
     const p = previewModel(s, { bureau: 50, cashflow: 50 }, 'custom');
     expect(p.radar[0]).toBeCloseTo(7 * 1.06, 12);
     expect(p.problem).toBe('The data inputs must add up to 100%.');
     expect(previewModel(s, MIX, 'custom').problem).toBeNull();
   });
 
-  it('gates Internal History on loans booked and grows its accuracy', () => {
-    const { s } = gameWithFloors(['products']);
+  it('gates Customer Feedback on customers and grows its Reasoning', () => {
+    const { s, branchId } = gameWithFloors(['products']);
+    const branch = s.branches[branchId]!;
+    branch.customers = 0;
     const mix = { internal: 1 };
     expect(cmd.saveCustomModel(s, { name: 'Home grown', mix })).toEqual({
       ok: false,
-      reason: 'Internal History needs 5,000 loans booked first.',
+      reason: 'Customer Feedback needs 5,000 customers first.',
     });
-    s.underwriting.loansBooked = 10_000;
+    branch.customers = 25_000;
     const r = cmd.saveCustomModel(s, { name: 'Home grown', mix });
     if (!r.ok) throw new Error(r.reason);
-    // accuracy = 4 + min(5, 10,000 / 20,000 × 5) = 6.5, × qualityMult 1.06
+    // Reasoning = 4 + min(5, 25,000 / 50,000 × 5) = 6.5, × qualityMult 1.06
     expect(s.underwriting.models[r.modelId]!.radar[0]).toBeCloseTo(6.5 * 1.06, 12);
-    s.underwriting.loansBooked = 40_000;
+    branch.customers = 100_000;
     updateModels(s);
     expect(s.underwriting.models[r.modelId]!.radar[0]).toBeCloseTo(9 * 1.06, 12);
   });
@@ -60,13 +62,13 @@ describe('custom models', () => {
     expect(cmd.activateModel(s, r.modelId).ok).toBe(true);
     const at = (w: number) => old.radar[0] * w + next.radar[0] * (1 - w);
     expect(activeModel(s).radar[0]).toBeCloseTo(at(2 / 3), 12);
-    expect(activeModel(s).costPerApp).toBeCloseTo((1.2 * 2) / 3 + 1.8 / 3, 12);
+    expect(activeModel(s).costPerCustomer).toBeCloseTo((12 * 2) / 3 + 18 / 3, 12);
     updateModels(s);
     expect(activeModel(s).radar[0]).toBeCloseTo(at(1 / 3), 12);
     updateModels(s);
     expect(s.underwriting.switching).toBeUndefined();
     expect(activeModel(s).radar[0]).toBeCloseTo(next.radar[0], 12);
-    expect(appCost(s)).toBeCloseTo(1.8, 12);
+    expect(modelCostPerCustomer(s)).toBeCloseTo(18, 12);
     expect(cmd.activateModel(s, r.modelId).ok).toBe(false);
   });
 
@@ -96,7 +98,7 @@ describe('custom models', () => {
     if (!r.ok) throw new Error(r.reason);
     const m = s.underwriting.models[r.modelId]!;
     expect(m.hostedBy).toBe('Northscore');
-    expect(m.costPerApp).toBeCloseTo(1.8 * 1.15, 12);
+    expect(m.costPerCustomer).toBeCloseTo(18 * 1.15, 12);
     expect(s.underwriting.activeModelId).toBe(r.modelId);
   });
 });

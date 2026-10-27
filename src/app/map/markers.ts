@@ -61,7 +61,7 @@ export const MARKERS: Record<MarkerId, MarkerStyle> = {
   creditBureaus: {
     icon: 'bureau',
     ink: 'var(--type-bureau)',
-    caption: 'Credit bureau',
+    caption: 'Data vendor',
     shape: 'medallion',
   },
   investmentBanks: {

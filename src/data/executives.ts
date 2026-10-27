@@ -136,7 +136,8 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
       {
         id: 'models',
         label: 'Models',
-        description: 'Switches to the bureau package that saves the most defaults per dollar.',
+        description:
+          'Switches to the local data-vendor model that gives the most quality for its licence cost.',
       },
       {
         id: 'guidance',

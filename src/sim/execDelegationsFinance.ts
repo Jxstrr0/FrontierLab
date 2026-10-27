@@ -6,8 +6,8 @@
 //                      while Apply-to-all is on
 //   CPO  developments  starts the next undeveloped template when none is running, on a
 //                      weekly budget of at most 1% of weekly revenue
-//   CPO  models        switches to the bureau package with the best net saving
-//                      (defaults avoided less extra application cost) over the house model
+//   CPO  models        switches to the local data-vendor package whose quality, less
+//                      its licence cost, beats the house model's by a margin (C6a)
 //   CTO  digital       starts the next digital project when no development is running
 // The CFO's halved statement delay is passive (hq.ts); the dividend proposal is a
 // selector the board meeting reads (governance.ts).
@@ -15,13 +15,12 @@ import {
   DEV_BUDGET_STEP,
   DEV_MIN_WEEKLY,
   EXEC_DELEGATION as X,
-  MODEL_PD,
-  WEEKS_PER_YEAR,
+  MODEL_DELEGATE,
 } from '../config/balance';
 import { BUREAU_PACKAGES, bureausIn } from '../data/bureaus';
 import { DEV_TEMPLATES, isDigital, type DevTemplate } from '../data/devTemplates';
 import { CITIES } from '../data/cities';
-import type { CountryId, Pentagon } from '../data/types';
+import type { CountryId } from '../data/types';
 import { delegatedPrice } from './branch/delegation';
 import { startDevelopment } from './commands/development';
 import { setCompanyPrice } from './commands/products';
@@ -32,7 +31,7 @@ import { hasTreasuryFloor, maxBorrow } from './fundingMarket';
 import { allProducts } from './products';
 import { stream } from './rng';
 import type { Branch, GameState } from './state';
-import { activeModel, mixRadar, RADAR } from './underwriting';
+import { activeModel, mixRadar, modelQuality } from './underwriting';
 
 /** Average weekly revenue over the last few closes (interest + fee income). */
 export function weeklyRevenue(state: GameState): number {
@@ -112,35 +111,26 @@ export function cpoDevelopments(state: GameState): void {
   if (next) start(state, next, budget);
 }
 
-/** Default-rate multiplier of a radar (§10.2): (base − accuracy × A) × (1 + inclusion × (I − 5)). */
-function pdMult(radar: Pentagon): number {
-  return (
-    (MODEL_PD.base - MODEL_PD.accuracy * radar[RADAR.accuracy]) *
-    (1 + MODEL_PD.inclusion * (radar[RADAR.inclusion] - 5))
-  );
-}
+/** A model's worth to the CPO: quality less costWeight × its licence per customer a year. */
+const modelScore = (quality: number, costPerCustomer: number) =>
+  quality - MODEL_DELEGATE.costWeight * costPerCustomer;
 
-/** Models: the local bureau package with the best yearly net saving over the house model. */
+/**
+ * Models (C6a): the local data-vendor package that beats the house model's
+ * score by at least minGain.
+ */
 export function cpoModels(state: GameState): void {
   const u = state.underwriting;
   if (u.switching) return;
-  const year = state.history.weekly.slice(-WEEKS_PER_YEAR);
-  if (year.length === 0) return;
-  const scale = WEEKS_PER_YEAR / year.length;
-  const losses = year.reduce((s, w) => s + w.pnl.loanLosses, 0) * scale;
   const current = activeModel(state);
-  const apps =
-    current.costPerApp > 0
-      ? (year.reduce((s, w) => s + w.pnl.underwriting, 0) * scale) / current.costPerApp
-      : 0;
-  const pdNow = pdMult(current.radar);
+  const now = modelScore(modelQuality(current), current.costPerCustomer);
   const local = bureausIn(state.world.currentCityId);
-  let best: { id: string; net: number } | undefined;
+  let best: { id: string; score: number } | undefined;
   for (const pkg of Object.values(BUREAU_PACKAGES)) {
     if (!local.includes(pkg.bureau) || pkg.id === u.activeModelId) continue;
-    const saved = pdNow > 0 ? ((pdNow - pdMult(mixRadar(pkg.mix))) / pdNow) * losses : 0;
-    const net = saved - (pkg.costPerApp - current.costPerApp) * apps;
-    if (net > 0 && (!best || net > best.net)) best = { id: pkg.id, net };
+    const score = modelScore(modelQuality({ radar: mixRadar(pkg.mix) }), pkg.costPerCustomer);
+    if (score >= now + MODEL_DELEGATE.minGain && (!best || score > best.score))
+      best = { id: pkg.id, score };
   }
   if (best) buyBureauModel(state, best.id);
 }

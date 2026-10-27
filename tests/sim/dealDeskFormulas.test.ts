@@ -26,6 +26,9 @@ function setup(stars: number, rivalStars?: number, switching = 5) {
   const b = lotBusinesses(s)[0]!;
   delete b.vendor;
   b.pentagon[3] = switching;
+  // Data sensitivity 5: the model's Safety doesn't count (C6a). The starting
+  // model's quality sits at MODEL_EFFECTS.qualityRef, so its edge is zero.
+  b.pentagon[2] = 5;
   return { s, branch, b, rival };
 }
 
