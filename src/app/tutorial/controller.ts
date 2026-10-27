@@ -2,9 +2,9 @@
 // the open panel and modal, and moves state.flags.tutorialStep on through the
 // setTutorialStep command when the step machine (steps.ts) says the player did
 // the thing. Side effects kept here: pausing the clock where a step needs
-// reading (the start and the loan step), asking for a tutorial application on
-// step 7, and opening the weekly results on step 5 when the player has them
-// switched off. The "seen" preference is written when the tutorial ends.
+// reading (the start and the contract step), asking for a tutorial proposal
+// request on step 7, and opening the weekly results on step 5 when the player
+// has them switched off. The "seen" preference is written when the tutorial ends.
 // Whenever Part 1 isn't running, Part 2's guides and tips take over
 // (lessonController.ts).
 import { effect, signal } from '@preact/signals';

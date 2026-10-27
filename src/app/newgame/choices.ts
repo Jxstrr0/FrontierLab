@@ -79,7 +79,7 @@ export const CITY_FLAVOUR: Record<string, string> = {
   ams: 'Canals, cyclists and a market that rewards good service.',
   zur: 'Rich clients and low rates: deposits come cheap, but loans earn little.',
   tyo: 'A vast market of patient savers where margins run thin.',
-  syd: 'Sun, surf and a housing market that keeps the loan desk busy.',
+  syd: 'Sun, surf and a startup scene that keeps the Deal Desk busy.',
   sin: 'A tidy trading hub with high rents and higher standards.',
   hkg: 'Dense, fast and expensive: a harbour city that never sleeps.',
   mos: 'A vast, crowded capital: packed streets, high rates and big state banks.',

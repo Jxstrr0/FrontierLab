@@ -2,7 +2,7 @@
 // Speed, Inclusion, Fraud shield and Fairness on the shared guilloche rosette,
 // with one decimal per score.
 import type { Pentagon } from '../../../data/types';
-import { PentagonRosette } from '../../branch/loandesk/PentagonRosette';
+import { PentagonRosette } from '../../business/PentagonRosette';
 import { MODEL_AXES, radarText } from './productSelectors';
 
 export function ModelRosette(p: { radar: Pentagon; label?: string }) {

@@ -25,7 +25,7 @@ Every building panel uses the same five parts, mirroring the original's structur
 - **Bottom-left:** Layers button.
 - **Bottom-center:** city pill with an engraved flag. Tap → Travel sheet (the nearest airport's departures, plus "Fly now" if you own a jet).
 - **Bottom-right:** Menu.
-- **Badges:** pins show a small oxblood dot for an unresolved incident, a brass dot for pending Loan Desk applications.
+- **Badges:** pins show a small oxblood dot for an unresolved incident, a brass dot for new proposal requests on the Deal Desk.
 - **Cases chip:** while incidents wait for a decision, an "N cases" chip sits under the date pill and reopens the incident modal.
 
 ### 0.3 Menu sheet
@@ -142,7 +142,7 @@ After the wizard, the map opens with the tutorial (§27).
 - **Header:** "{Bank} — {District}" with the address.
 - **Advisor:** the branch manager's portrait with a contextual line (CONTENT Advisor lines).
 - **Hero:** the exterior, with an **Inside / Outside** pill (44 px tall) in the corner that switches to the banking hall (ART_DIRECTION §3) and back; the choice holds for the session. The inside view shows the real staff, morale tint and a queue as long as the wait, with a caption such as "3 of 3 windows open · busy".
-- **Tabs:** Service · Products · Loan Desk · Marketing · Finance.
+- **Tabs:** Service · Products · Deal Desk · Marketing · Finance.
 
 ### 5.1 Service
 - **Customer reviews:**
@@ -160,7 +160,7 @@ After the wizard, the map opens with the tutorial (§27).
   - Manager skills bars: People, Product, Marketing, Ethics
   - "Manager since {date}"
   - Annual salary stepper, its hint showing market pay (SIMULATION §6.5) and the range, and a line under it: "Underpaid: rivals are more likely to poach them" (oxblood), "Paid about market" or "Well paid…", plus "Your COO reviews this pay once a quarter" while the COO's Pay reviews is on
-  - Delegation toggles: Staffing & wages · Products & rates · Branch marketing · Branch troubles · Loan approvals
+  - Delegation toggles: Staffing & wages · Products & rates · Branch marketing · Branch troubles · Deal Desk bids
   - Fire manager (confirm)
   - **With no manager:** "Hire a manager" opens a sheet of 3 candidate cards (skills, salary ask, Hire). Below the cards, "New candidates · $fee" pays a recruiter for 3 new ones (the fee doubles each time until the free refresh, which the note under it counts down); before your first hire, the tutorial guide stays as the first card.
 
@@ -173,24 +173,26 @@ After the wizard, the map opens with the tutorial (§27).
   - Balance (ARR for plans and usage products, C3a)
   - Funding cost (FTP) or unit cost
   - Margin ring (%) with a spread caption (`Spread +2.40%`)
-  - Price stepper (fee per seat a month or a year, $ per million tokens, or the Loan Desk rate)
+  - Price stepper (fee per seat a month or a year, or $ per million tokens; Enterprise contracts has no price stepper)
   - trash icon on developed variants
-  - The SBL card shows totals and "Managed on the Loan Desk →".
+  - The Enterprise contracts card shows Contracts, Contract ARR and Requests waiting, and "Managed on the Deal Desk →" (no ring gauge or price stepper, C5b).
 - **HQ lock:** when "Apply rates to all sales offices" is on at HQ, a **Set prices here** toggle card sits above the products (hint: which HQ list the office follows, or that it sets its own). Off, steppers and offer toggles lock and show "Set at HQ"; on, the office sets its own prices and lineup (C2d2).
 
-### 5.3 Loan Desk
-- **Summary strip:** applications this week · approved · declined · approval rate · business loan balance · delinquent count.
-- **Lending fund card (C3b):** the treasury reserves the desk lends from, a line saying repayments flow back and larger applications can't be approved until it grows, and a full-width "Add $250k from company cash" button (`LOANDESK.fundTopUp`, capped at the cash you have).
-- **Application cards:**
-  - sector icon, business name, sector
-  - amount · term · collateral
-  - "Will pay up to x.xx%"
-  - rosette (Management, Track record, Market, Competitiveness, Financial health)
-  - risk band badge (when visible)
-  - Rate stepper (defaults to the SBL price)
-  - Approve / Decline
-  - expiry chip ("Expires next week")
-- **Active business loans:** a collapsible list (name, balance, rate, weeks left, status).
+### 5.3 Deal Desk (C5b)
+- **Summary strip:** requests this week · won · lost · declined · win rate · contracts held · contract ARR.
+- **Discount limit card:** a stepper for the most the office will knock off a business's budget (`DEAL.defaultLimit` to start, up to `DEAL.discountMax`). A note says who bids when the desk is delegated (the office manager, or the CRO under Deal Desk policy).
+- **Proposal requests (RFP cards):**
+  - sector icon, business name, sector, size
+  - yearly budget, and the rival lab holding it (if any)
+  - rosette (AI readiness, Budget, Data sensitivity, Switching cost, Financial health)
+  - discount stepper (from the discount limit) with the contract value and the win chance
+  - Bid / Decline
+  - expiry chip ("Expires this week" when `dueWeek ≤ week + 1`)
+- **Renewals due:** cards for contracts renewing at the next quarter start (`DEAL.renewalNoticeWeeks` ahead, A7).
+  - Yours: the renewal offer stepper (starts at the current discount) and the keep chance.
+  - A rival's (needs Enterprise contracts on): a "Make an offer" toggle; on, it offers the discount limit and shows the stepper, the win chance and the rival's value next to yours.
+- **Contracts:** a collapsible list (open when 6 or fewer): business, value a year, renewal date. Rows are ≥ 44 px and open the business card.
+- **Badge:** the tab lights for any new RFP, or a rival renewal with no offer yet.
 
 ### 5.4 Marketing
 - **Two-column grid of campaign cards:**
@@ -203,7 +205,7 @@ After the wizard, the map opens with the tutorial (§27).
 - **Headline figures:** Branch revenue (with weekly change in $ and %) and Branch income (with change).
 - **Chart:** paired bars for the last 5 weeks.
 - **Branch income statement** (Week | Quarter | Year), with the line groups from SIMULATION §12.
-- **Balances box:** ARR, Loan Desk lending (when there is any), Customers (C3a).
+- **Balances box:** ARR (contracts included, C5b), Customers (C3a).
 - **Office size card (C2a):** the size (Starter, Standard, Large or Flagship), the cost to grow to the next one and its new weekly rent, and a **Grow office** button (confirm, showing fit-out, extra lease deposit, total and new rent; the reason shows under the button when it can't). At Flagship the card says it is the largest size.
 - **Footer:** Rename branch, Close branch (confirm, showing what you get back; with one office per city, accounts go to the office in the nearest city).
 
@@ -274,7 +276,7 @@ Tabs: Overview · Loans · Credit.
   - "Close HR floor" (release the floor)
 - **Products:**
   - house model (rosette, cost/app, model name) and Manage models (sliders for each data input that sum to 100%, with a live rosette and cost)
-  - company ARR and Loan Desk lending line chart with week-over-week changes (C3a; weeks closed before schema 6 read ARR as 0)
+  - company ARR line chart (the lending line went in C5b) with week-over-week changes (C3a; weeks closed before schema 6 read ARR as 0)
   - **Product lineup** (category Segmented + product cards like §5.2, at company level) and the "Apply rates to all branches" toggle
   - Product developments list (progress bar, weeks left) and New product
   - **New product form:**
@@ -293,7 +295,7 @@ Tabs: Overview · Loans · Credit.
   - **Partnerships** (below)
   - The bank-era cards below (liquidity, policy, funding inventory and market, central bank) show only while a save still carries deposits, wholesale lots, overnight or window borrowing.
 - **Treasury (legacy, see above):**
-  - liquidity gauge (LR vs minimum and target), with a funding freeze banner when active. (C3c: the one-way cash transfer moved to the Loan Desk tab's lending fund card as "Top up"; the bonds card and bond share slider are gone.)
+  - liquidity gauge (LR vs minimum and target), with a funding freeze banner when active. (C3c: the one-way cash transfer moved to the Loan Desk tab's lending fund card, which went with the Loan Desk in C5b; the bonds card and bond share slider are gone.)
   - Treasury policy: target LR slider, auto-funding toggle
   - **Funding inventory:** lot cards with counterparty, type, rate, amount, maturity date and rosette, plus Details and "Repay early" where flexibility allows
   - **Funding market:** offer cards with an amount slider and Borrow
@@ -545,18 +547,18 @@ Opened by tapping a business pin on the map (the **Businesses** layer, which als
 
 ## 24. Company summary (menu → Company)
 
-- **Where to look** at the top: the three things that most need you, worst first (Urgent / Watch / Note), each a tap to the right screen: capital tier, corporate cash below zero or under `ATTENTION.cashCoverWeeks` of running costs, open cases, a lending freeze or liquidity under the minimum (or under target with auto-funding off), expiring loan applications, branches losing money for 4 weeks, ratings under 2.5, understaffing, loan losses over the CRO ceiling, morale under 50, branches without a manager, empty executive seats, switched-off delegations, low awareness. "All clear" when nothing qualifies. Ranking in `src/sim/attention.ts`, thresholds in `ATTENTION`.
+- **Where to look** at the top: the three things that most need you, worst first (Urgent / Watch / Note), each a tap to the right screen: capital tier, corporate cash below zero or under `ATTENTION.cashCoverWeeks` of running costs, open cases, a lending freeze or liquidity under the minimum (or under target with auto-funding off), expiring proposal requests, branches losing money for 4 weeks, ratings under 2.5, understaffing, loan losses over the CRO ceiling, morale under 50, branches without a manager, empty executive seats, switched-off delegations, low awareness. "All clear" when nothing qualifies. Ranking in `src/sim/attention.ts`, thresholds in `ATTENTION`.
 - capital ratio with tier badge and a meter with thresholds
 - at Watch, Restricted or Critical, a "How to fix this" checklist under the meter (`src/data/capitalFixes.ts`): sell new shares at an investment bank (Private placement, or Secondary offering once listed), sell company stocks and startup stakes, turn risk appetite down (Finance floor), hold off on growth and dividends; at Critical, a line on the emergency rescue
 - **Cash** card: corporate cash, running costs a week and **cash cover** (weeks of running costs; red under `ATTENTION.cashCoverWeeks`)
 - liquidity ratio with the Treasury gauge's status badge, the target, overnight borrowing when any, and a line saying whether auto-funding is holding the target (C3b: only while an older save still holds deposits or overnight borrowing)
 - **Compute** card (C4a, SIMULATION §13.0): spot price per GPU-week with the chip phase badge (Chip glut green, Normal market, Chip shortage red), a line chart of the price index over the last 104 weeks, GPUs your customers used last week, GPUs running in your data centers, the share they covered, and what the rest costs at spot a week, with a one-line note
   - C4c: a red **Waitlist** or **Outage** badge under the phase badge; "Bought at spot" reads "N of M max" against the spot limit; red "Emergency burst" and "Not served (waitlist)" rows when non-zero; "Spot and burst bill" a week; "Pool cost vs spot" (green under 100%) once the pool has paid anything. The Company explainer "Compute: own it or rent it" covers the internal charge and the limit.
-- totals: assets, ARR, lending fund (treasury reserves), Loan Desk loans, equity (C3b)
+- totals: assets, ARR, treasury reserves, equity (C3b; the Loan Desk loans row went in C5b)
 - share price or private valuation, with the 52-week range, market cap, your stake and top shareholders
 - a Personal line: personal cash plus holdings
 - one-line explanations ("Grow recurring revenue; watch the compute bill") with a "Learn more" sheet (revenue and compute, owning or renting compute, capital, the lending fund, cash cover)
-- statements (C3b): the income statement runs Plans, API, Apps & services, Loan Desk interest, Other income → Revenue → Compute → Gross profit → Operating expenses → Interest expense (when any) → Loan losses → Depreciation → Pre-tax → Tax → Net income. The balance sheet shows reserves, bonds, foreclosed property, deposits, wholesale funding and unrealised bond gains only when non-zero.
+- statements (C3b): the income statement runs Plans, API, Apps & services, Enterprise contracts, Other income → Revenue → Compute → Gross profit → Operating expenses → Interest expense (when any) → Bad debts → Depreciation → Pre-tax → Tax → Net income. The balance sheet shows reserves, bonds, foreclosed property, deposits, wholesale funding and unrealised bond gains only when non-zero.
 - links to the full statements (Finance floor, or a simplified view without an HQ)
 
 ## 25. Branches list
@@ -593,7 +595,7 @@ Steps (each skipped when there's nothing to do, e.g. every branch already has a 
 4. Hire a manager
 5. Unpause and read the first weekly results
 6. Turn on the API
-7. Approve your first business loan
+7. Win your first contract (bid on the proposal request the tutorial sends)
 8. Run a campaign (Marketing tab: any campaign above Off; skipped where the manager runs marketing)
 9. Meet the lab (open the Company summary from your cash, top left: corporate cash and the capital ratio; done when you close it)
 

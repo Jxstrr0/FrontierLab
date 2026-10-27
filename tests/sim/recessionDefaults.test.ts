@@ -1,14 +1,12 @@
-// ROADMAP Stage 5 acceptance: a 10-year steady run (seed 42, Calgary) includes
-// at least one recession, with visibly higher loan defaults than in expansion.
-// Defaults are read against Canada's phase while every office is Canadian:
-// once the city-wide pool (SIMULATION §9.2) sends the company abroad, its loans
-// follow other countries' cycles.
-// C3a: the only loans left are the Loan Desk's business loans, a few dozen lumpy
-// whole-loan defaults, so realised losses are too noisy to compare by phase. The
-// check reads the default hazard the sim applies to each loan instead
-// (pd × creditCycle, SIMULATION §11), weighted by balance, and that loans default at all.
+// ROADMAP Stage 5 acceptance, as reworked in C5b: a 10-year steady run (seed 42,
+// Calgary) includes at least one recession, and businesses fail more often in it
+// than in an expansion. There are no loan defaults any more; the Deal Desk's
+// equivalent is the weekly failure odds of the businesses under contract
+// (failYear × exp(−failSlope × (Financial health − 5)) × credit cycle,
+// SIMULATION §11.2). As in the old test, that hazard is read against Canada's
+// phase while every office is Canadian, and the run must also see real failures.
 import { describe, expect, it } from 'vitest';
-import { WEEKS_PER_YEAR } from '../../src/config/balance';
+import { DEAL, WEEKS_PER_YEAR } from '../../src/config/balance';
 import { CITIES } from '../../src/data/cities';
 import { advanceWeeks } from '../../src/sim/engine';
 import { creditCycle } from '../../src/sim/macro';
@@ -16,31 +14,38 @@ import { newGame } from '../../src/sim/newGame';
 import { steady } from '../../scripts/strategies';
 
 describe('recession acceptance', () => {
-  it('a 10-year run has a recession with higher defaults', () => {
+  it('a 10-year run has a recession with higher business failure odds', () => {
     const s = newGame({ seed: 42, cityId: 'cal' });
     steady.setup(s);
-    const byPhase: Record<string, { hazard: number; balance: number }> = {};
+    const byPhase: Record<string, { hazard: number; weeks: number }> = {};
     let abroad = false;
-    let losses = 0;
+    let failed = 0;
+    const names = (): Map<string, string> =>
+      new Map(Object.values(s.businesses).map((b) => [b.id, b.name]));
+    let before = names();
     for (let w = 0; w < 10 * WEEKS_PER_YEAR; w++) {
       advanceWeeks(s, 1);
       steady.weekly(s);
-      losses += s.history.weekly.at(-1)!.pnl.loanLosses;
+      // A failed business is re-rolled in place under the same id (contracts.ts).
+      const after = names();
+      for (const [id, name] of before)
+        if (after.get(id) !== undefined && after.get(id) !== name) failed += 1;
+      before = after;
       abroad ||= Object.values(s.branches).some((b) => CITIES[b.cityId]?.country !== 'CA');
       if (abroad) continue;
       const ca = s.world.countries.CA!;
-      const row = (byPhase[ca.phase] ??= { hazard: 0, balance: 0 });
-      for (const loan of Object.values(s.loanDesk.loans)) {
-        if (loan.status !== 'current') continue;
-        row.hazard += loan.balance * loan.pd * creditCycle(ca);
-        row.balance += loan.balance;
+      const row = (byPhase[ca.phase] ??= { hazard: 0, weeks: 0 });
+      for (const b of Object.values(s.businesses)) {
+        if (b.cityId !== 'cal' || !b.vendor || b.size === 'anchor') continue;
+        row.hazard +=
+          DEAL.failYear * Math.exp(-DEAL.failSlope * (b.pentagon[4] - 5)) * creditCycle(ca);
+        row.weeks += 1;
       }
     }
-    const rate = (p: string) => (byPhase[p]?.balance ? byPhase[p].hazard / byPhase[p].balance : 0);
+    const rate = (p: string) => (byPhase[p]?.weeks ? byPhase[p].hazard / byPhase[p].weeks : 0);
     expect(byPhase.recession).toBeDefined();
     expect(s.flags.gameOver).toBeUndefined();
-    expect(losses).toBeGreaterThan(0);
-    // Annual default rates: recession clearly above expansion (SIMULATION §25).
+    expect(failed).toBeGreaterThan(0);
     expect(rate('recession')).toBeGreaterThan(rate('expansion') * 1.3);
   }, 120_000);
 });

@@ -171,9 +171,9 @@ export function attentionItems(state: GameState): AttentionItem[] {
     });
   }
 
-  // Loan applications about to expire.
-  const expiring = Object.values(state.loanDesk.applications).filter(
-    (a) => a.expiresWeek <= state.clock.week + 1,
+  // New RFPs about to expire (C5b).
+  const expiring = Object.values(state.dealDesk.rfps).filter(
+    (a) => a.kind === 'new' && a.dueWeek <= state.clock.week + 1,
   );
   if (expiring.length > 0) {
     const byBranch: Record<string, number> = {};
@@ -185,8 +185,8 @@ export function attentionItems(state: GameState): AttentionItem[] {
       id: 'applications',
       tone: 'warn',
       weight: 65,
-      title: `${expiring.length} loan application${expiring.length === 1 ? '' : 's'} expiring`,
-      detail: `Undecided applications lapse at the weekly close. Most at ${state.branches[worst[0]]?.name ?? 'a sales office'}.`,
+      title: `${expiring.length} proposal request${expiring.length === 1 ? '' : 's'} expiring`,
+      detail: `RFPs without a bid lapse at the weekly close. Most at ${state.branches[worst[0]]?.name ?? 'a sales office'}.`,
       route: { kind: 'branch', branchId: worst[0] },
     });
   }

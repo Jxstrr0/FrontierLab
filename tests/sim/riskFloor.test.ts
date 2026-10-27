@@ -16,8 +16,6 @@ import {
 } from '../../src/sim/riskFloor';
 import { stream } from '../../src/sim/rng';
 import { bankWithFloors, runScript } from '../helpers/scenario';
-import { addCapital } from '../helpers/markets';
-import * as cmd from '../../src/sim/commands';
 
 describe('loss records', () => {
   it('keeps 13 weeks and computes annualized rates and delinquency', () => {
@@ -52,22 +50,6 @@ describe('loss records', () => {
     expect(perf.actual).toBeCloseTo(0.0104);
     expect(perf.actualLoss).toBeCloseTo(500 * 13);
     expect(perf.expectedLoss).toBeCloseTo((500 + (4e6 * 0.01 * 0.2) / 52) * 13);
-  });
-
-  it('fills from the Loan Desk during play', () => {
-    // C3a: the Loan Desk holds the only loans left, so it is the only source in play.
-    // C3b: the desk lends only what reserves hold, so give it room to lend.
-    const s = runScript(40, (st, week) => {
-      if (week !== 1) return;
-      addCapital(st, 5_000_000);
-      cmd.topUpLendingFund(st, 5_000_000);
-    });
-    const ids = lossTable(s).map((r) => r.productId);
-    expect(ids).toEqual(['sbl']);
-    expect(s.risk.losses.at(-1)!.week).toBe(s.clock.week);
-    const perf = modelPerformance(s);
-    expect(perf.predicted).toBeGreaterThan(0);
-    expect(perf.actual).toBeGreaterThan(0);
   });
 });
 

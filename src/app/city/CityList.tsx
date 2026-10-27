@@ -13,6 +13,7 @@ import { average, cityCoverage, cityLots } from './lotInfo';
 import { sizeName } from '../../sim/branch/officeSize';
 import { RivalSheet } from './RivalSheet';
 import './city.css';
+import { newRfpsByBranch } from '../branch/dealDeskSelectors';
 
 type Filter = 'all' | 'lease';
 
@@ -45,8 +46,8 @@ export function CityList(p: { hideTitle?: boolean } = {}) {
   const rivals = lots.length - free - mine;
   const cover = cityCoverage(s, s.world.currentCityId);
 
-  // Applications waiting at each branch (brass dot).
-  const pending = pendingByBranch(s);
+  // Proposal requests waiting at each office (brass dot).
+  const pending = newRfpsByBranch(s);
 
   const toggle = (id: DistrictId) => {
     const next = new Set(collapsed);
@@ -182,7 +183,7 @@ function LotRow(p: {
           <span class="muted small">{facts}</span>
         </span>
         <span class="lot-tag">
-          {waiting > 0 && <span class="dot" aria-label="Loan applications waiting" />}
+          {waiting > 0 && <span class="dot" aria-label="Proposal requests waiting" />}
           <Badge tone={branch?.status === 'open' ? 'good' : 'warn'}>
             {branch?.status === 'fitout'
               ? 'Building'
@@ -236,11 +237,4 @@ function groupByDistrict(lots: Lot[]): { id: DistrictId; lots: Lot[] }[] {
       .filter((l) => l.district === id)
       .sort((a, b) => naturalOrder.compare(a.address, b.address)),
   })).filter((g) => g.lots.length > 0);
-}
-
-function pendingByBranch(s: GameState): Record<string, number> {
-  const out: Record<string, number> = {};
-  for (const a of Object.values(s.loanDesk.applications))
-    out[a.branchId] = (out[a.branchId] ?? 0) + 1;
-  return out;
 }

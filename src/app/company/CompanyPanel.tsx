@@ -35,8 +35,8 @@ const EXPLAINERS: { title: string; body: string }[] = [
     body: 'Capital is what the lab owns after its debts. The regulator compares it with your risky assets, and the tier decides how freely you can grow.',
   },
   {
-    title: 'The lending fund',
-    body: 'The Loan Desk lends out of your treasury reserves and repayments flow back in. Add company cash from the Loan Desk tab when you want it to lend more.',
+    title: 'Treasury reserves',
+    body: 'Cash the treasury holds apart from the operating account. When enterprise contracts replaced lending, any loans still on the books were repaid into reserves.',
   },
   {
     title: 'Cash cover',
@@ -93,9 +93,9 @@ export function CompanyPanel() {
           <CapitalMeter ratio={cap.capitalRatio} tier={cap.tier} />
           <p class="muted small cap-note">
             Capital divided by risk-weighted assets. Higher tiers cost less to fund; the lowest
-            tiers stop lending and growth.
+            tiers stop growth.
             {cap.capitalRatio > 1 &&
-              ' With few loans on the books yet, almost nothing you hold carries risk, so the ratio is off the scale. It settles as lending grows.'}
+              ' Almost nothing the lab holds carries risk yet, so the ratio is off the scale.'}
           </p>
           <CapitalFixes tier={cap.tier} listing={s.stock.status} />
         </Card>
@@ -161,8 +161,7 @@ export function CompanyPanel() {
           <Card>
             <Row label="Assets" value={money(bs.assets, sym)} />
             <Row label="ARR" value={money(companyArr(s), sym)} />
-            <Row label="Lending fund" value={money(s.treasury.reserves, sym)} />
-            <Row label="Loan Desk loans" value={money(bs.loans, sym)} />
+            <Row label="Treasury reserves" value={money(s.treasury.reserves, sym)} />
             <Row label="Equity" value={money(bs.equity, sym)} strong />
           </Card>
         </div>

@@ -1,7 +1,7 @@
 // The company balance sheet (SIMULATION §14.4), computed from state on demand.
 // Equity is assets minus liabilities; `expectedEquity` rolls paid-in capital,
 // retained earnings and AOCI forward, and the two must agree (balance identity).
-import { isDeposit, isLoan, PRODUCTS } from '../data/products';
+import { isDeposit, isLoan } from '../data/products';
 import { totalWholesale } from './fundingLots';
 import { summarize } from './ledger';
 import { fxValue } from './fx';
@@ -85,17 +85,11 @@ export function loanTotals(state: GameState): { total: number; rwa: number } {
   for (const b of Object.values(state.branches)) {
     for (const [pid, book] of Object.entries(b.books)) {
       const spec = productSpec(state, pid);
-      // SBL book totals mirror the individual loans below; skip them here.
+      // Enterprise contracts (kind 'sbl', C5b) are not loans.
       if (!spec || !isLoan(spec) || spec.kind === 'sbl') continue;
       total += book.balance;
       rwa += book.balance * spec.riskWeight;
     }
-  }
-  const sblWeight = PRODUCTS.sbl?.riskWeight ?? 1;
-  for (const loan of Object.values(state.loanDesk.loans)) {
-    if (loan.status !== 'current') continue;
-    total += loan.balance;
-    rwa += loan.balance * sblWeight;
   }
   return { total, rwa };
 }

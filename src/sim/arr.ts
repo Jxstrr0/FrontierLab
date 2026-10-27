@@ -1,19 +1,21 @@
 // Annual recurring revenue (C3a, SIMULATION §10.7): the yearly value of every
 // plan and usage book, the lab's headline growth number. Plan books hold seats
 // × price × billing periods; usage books hold a year of usage at today's price;
-// partnership mini-books hold their seats' ARR.
+// partnership mini-books hold their seats' ARR; enterprise contracts add their
+// yearly value (C5b).
 import { isRecurring } from '../data/products';
 import { productSpec } from './products';
+import { officeContractArr } from './contracts';
 import type { Branch, GameState } from './state';
 
-/** ARR of one office's plan and usage books. */
+/** ARR of one office's plan and usage books and its enterprise contracts. */
 export function branchArr(state: GameState, branch: Branch): number {
   let total = 0;
   for (const [pid, book] of Object.entries(branch.books)) {
     const spec = productSpec(state, pid);
     if (spec && isRecurring(spec)) total += book.balance;
   }
-  return total;
+  return total + officeContractArr(state, branch.id);
 }
 
 /** ARR across every open or converting office plus partnership plans. */

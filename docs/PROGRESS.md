@@ -3,13 +3,59 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C5a done (v0.1.16, save schema 12): named customer businesses on the map, some already on rival contracts. C4 (v0.1.13–v0.1.15) gave compute a price, a pool, a floor, GPU lots, spot limits, a crunch and outages. Next is C5b (the Deal Desk: RFPs, contracts, the renewal season).
+**Current stage:** C5 done (v0.1.16–v0.1.17, save schema 13): named customer businesses on the map, and the Deal Desk where you win and keep their contracts each renewal season. C4 (v0.1.13–v0.1.15) gave compute a price, a pool, a floor, GPU lots, spot limits, a crunch and outages. Next is C6 (the AI model and training runs).
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `1897f86dd7744b` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `19488695a0bca7` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-27 — Stage C5b: the Deal Desk (v0.1.17)
+
+**What you asked for:** finish C5, then go on to C6, with subagents allowed to help.
+
+**What changed.**
+- **The Loan Desk is gone; the Deal Desk replaces it.** The sales office tab is now **Deal Desk**. Businesses with no AI vendor send your office **requests for proposals (RFPs)**. More come when the business is keen on AI and your office is well known. Each request waits three weeks.
+- **Bidding.** On a request card you pick a **discount** off the business's yearly budget, see the contract value and your chance of winning, and press **Bid** or **Decline**. Your chance is better with a bigger discount and better stars than the best rival lab in town, and better still with no rival at all. A business you lose or turn down won't ask again for a quarter.
+- **Contracts pay every week.** A contract adds its value to your ARR and pays a 52nd of it each week. Running it costs some compute and some service time.
+- **The renewal season (your decision A7).** Every contract renews at a quarter start. Four weeks ahead it shows up under **Renewals due**:
+  - **Your own contracts:** you set the renewal discount and see your chance of keeping it.
+  - **A rival's contracts:** you can switch on **Make an offer** to try to take it.
+  - At the quarter start everything due is settled at once. Rival labs also sign some businesses that have no vendor.
+- **Losing a contract mid-term** happens only two ways, as you decided: the business fails (more likely in a downturn, and a new business then moves into its storefront), or it walks out during a compute outage.
+- **Discount limit and delegation.** Each office has a **discount limit**. When the office manager (or a seated CRO, under the renamed **Deal Desk policy**) runs the desk, they bid within that limit and only when the odds are decent.
+- **Elsewhere:**
+  - The Enterprise contracts product card shows contracts, contract ARR and requests waiting.
+  - Business cards say "Your contract" when you hold it, and point to an open request.
+  - News stories cover big wins (and who you won them from) and big losses.
+  - Tutorial step 7 is now **Win your first contract**.
+  - The company trend chart lost its old lending line.
+  - Leftover bank wording ("lending fund", "Loan Desk loans") is gone.
+
+**Balance.** The first run put Calgary's week-26 ARR at $7.2M against a $1–2.5M target: business budgets were far too big. I cut them about five-fold (small $6k, mid $25k, large $90k, anchor $360k base) and rounded them to $100. I then raised the request rate from 0.04 to 0.07, because the UI check showed a single office getting only one to four requests in 30 weeks. Seed 42 steady passes every checkpoint (week 52 ARR $3.8M, week 260 $22.8M). The 20-city median also passes everything (week 52 $4.3M, week 260 $25.1M, payback 39 weeks).
+
+**Old saves.** Schema 12 → 13:
+- Any business loans still on the books are repaid into treasury reserves.
+- Budgets and contract values are scaled down to match.
+- The desk tally is renamed (approved → won, refused → lost).
+- Each office gets the default discount limit.
+
+**Tests.** New Deal Desk tests cover:
+- requests arriving (and not while the product is off or the business is cooling down)
+- the win, keep and request formulas
+- bidding, declining, renewals and rival offers
+- failures and outage losses
+- closing or merging offices
+- the migration
+
+Some older tests were rewritten (the recession test now checks business failures instead of loan defaults). One test-only change to know about: the scripted 260-week determinism run used to rely on Loan Desk interest, and without it the run went broke after the week-80 HQ lease. The script now adds $5M of paid-in capital so it keeps going, and the test also checks it never hits game over. Three tests that compared ARR now leave contracts out, because a few big lumpy contracts were drowning out what they check.
+
+**How I worked.** I wrote the simulation myself. Two helpers ran alongside: one built the Deal Desk screens and checked them in the browser at iPhone size (no console errors), and one fixed and wrote the tests. I reviewed and merged their work.
+
+**Checks.** `npm run lint`, all 935 tests and `npm run build` pass. The **determinism snapshot** moved from `1897f86dd7744b` to `19488695a0bca7` (intended: contracts replace loans).
+
+**Next:** C6, the AI model: its five-point profile, data vendors, training runs, rival model releases and the Chief Scientist.
 
 ### 2026-10-27 — Stage C5a: customer businesses on the map (v0.1.16)
 

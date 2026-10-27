@@ -198,7 +198,7 @@ export function newGame(opts: NewGameOptions): GameState {
       offers: [],
       offersRefreshWeek: -1,
     },
-    loanDesk: { applications: {}, loans: {} },
+    dealDesk: { rfps: {} },
     rivals: {},
     businesses: {},
     marketing: { campaigns: [], packages: [], cityBonus: {} },

@@ -10,11 +10,12 @@ import { Medallion, Panel, type Tab } from '../components';
 import { gameDate } from '../format/format';
 import { closePanel, openPanel, useGame, type BranchTab } from '../store';
 import { FinanceTab } from './FinanceTab';
-import { LoanDeskTab } from './LoanDeskTab';
+import { DealDeskTab } from './DealDeskTab';
+import { officeRfps, rfpWaiting } from './dealDeskSelectors';
 import { MarketingTab } from './MarketingTab';
 import { ProductsTab } from './ProductsTab';
 import { BranchHero } from './BranchHero';
-import { advisorLines, businessLoans, openingDay } from './selectors';
+import { advisorLines, openingDay } from './selectors';
 import { ServiceTab } from './ServiceTab';
 import './branch.css';
 
@@ -26,13 +27,14 @@ export function BranchPanel(p: { branchId: string; tab: BranchTab }) {
   const district = lot ? DISTRICT_SPECS[lot.district]?.name : undefined;
   const mgr = managerOf(s, branch);
   const opening = gameDate(s.meta.startDate, openingDay(s, branch));
-  const pending = businessLoans(s, branch.id).pending > 0;
+  const rfps = officeRfps(s, branch.id);
+  const pending = [...rfps.fresh, ...rfps.renewals].some((r) => rfpWaiting(s, r));
   // An acquired branch converting to your brand (§19.8) still wears the old bank's colours.
   const conv = branch.converting;
   const tabs: Tab<BranchTab>[] = [
     { id: 'service', label: 'Service' },
     { id: 'products', label: 'Products' },
-    { id: 'loandesk', label: 'Loan Desk', badge: pending },
+    { id: 'loandesk', label: 'Deal Desk', badge: pending },
     { id: 'marketing', label: 'Marketing' },
     { id: 'finance', label: 'Finance' },
   ];
@@ -103,9 +105,9 @@ export function BranchPanel(p: { branchId: string; tab: BranchTab }) {
         )}
         {p.tab === 'service' && <ServiceTab branch={branch} />}
         {p.tab === 'products' && (
-          <ProductsTab branch={branch} onLoanDesk={() => setTab('loandesk')} />
+          <ProductsTab branch={branch} onDealDesk={() => setTab('loandesk')} />
         )}
-        {p.tab === 'loandesk' && <LoanDeskTab branchId={branch.id} />}
+        {p.tab === 'loandesk' && <DealDeskTab branchId={branch.id} />}
         {p.tab === 'marketing' && <MarketingTab branch={branch} />}
         {p.tab === 'finance' && <FinanceTab branch={branch} />}
       </div>
