@@ -2,7 +2,8 @@
 // wears the old bank's ink and monogram with progress and an accessible label,
 // re-renders as the weeks count down, and the renderer flags the old ink.
 import { describe, expect, it } from 'vitest';
-import { buildPins, occupantsOf, pinsKey } from '../../src/app/map/pins';
+import { occupantsOf } from '../../src/app/map/mapOccupants';
+import { buildPins, pinsKey } from '../../src/app/map/pins';
 import { generateCityMap } from '../../src/art/citygen';
 import { FEATURES, MERGERS } from '../../src/config/balance';
 import { CITIES } from '../../src/data/cities';

@@ -1,6 +1,6 @@
 // DOM pins over the map canvas (ART_DIRECTION §2; the shape language is in
-// markers.ts): bank crests for your branches and rivals', small "$" coins for
-// open branch locations, medallions in each place type's own ink, price tags
+// markers.ts): bank crests for your branches and rivals', small "+" coins for
+// open locations to build on, medallions in each place type's own ink, price tags
 // for buildings you rent or buy and larger seals for landmarks. At the far zoom
 // nearby pins of the same group merge into clusters that show what they hold;
 // at close zoom places add a short caption. Plain DOM managed imperatively:

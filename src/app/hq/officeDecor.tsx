@@ -3,7 +3,7 @@
 // door and clock, and something in the front. Finance keeps filing
 // cabinets and certificates, HR a water cooler and a pinboard, Products a
 // whiteboard sketch, Treasury and IT a live ticker, Marketing posters and an
-// easel, Risk a safe and a chart, the Executive suite books and a painting.
+// easel, Safety a caged eval rack and a chart, the Executive suite books and a painting.
 import type { ComponentChildren } from 'preact';
 import type { DeptId } from '../../sim/state';
 import { IsoBox, type Iso } from '../components/isoKit';
@@ -13,7 +13,7 @@ import {
   Easel,
   Plant,
   Rack,
-  Safe,
+  SandboxRack,
   Shelf,
   WaterCooler,
 } from '../components/isoProps';
@@ -64,7 +64,7 @@ export function DeptBackProps(p: { g: Iso; dept: Dept; w: number; windows: numbe
       break;
     case 'risk':
       items.push(
-        <Safe g={g} i={1.1} j={j} />,
+        <SandboxRack g={g} i={1.1} j={j} seed={5} />,
         <Cabinet g={g} i={1.9} j={j} />,
         <Cabinet g={g} i={far} j={j} />,
       );

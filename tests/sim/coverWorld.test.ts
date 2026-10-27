@@ -9,7 +9,9 @@ import { coverMetaFor } from '../../src/sim/coverMeta';
 import { coverWorld } from '../../src/sim/coverWorld';
 import { newGame } from '../../src/sim/newGame';
 import type { GameState } from '../../src/sim/state';
-import { runScript, openScriptedBranch } from '../helpers/scenario';
+import { freeLot, runScript, openScriptedBranch } from '../helpers/scenario';
+import { DEFAULT_DC_BUILD } from '../../src/data/dataCenters';
+import * as cmd from '../../src/sim/commands';
 import { addCapital } from '../helpers/markets';
 import { fly } from '../helpers/world';
 
@@ -77,5 +79,16 @@ describe('cover world', () => {
     const lots = Object.values(s.world.lots).filter((l) => !l.occupant);
     for (const lot of lots) lot.occupant = { type: 'player', id: 'b' };
     expect(coverMetaFor(s)!.flags).toHaveLength(Math.min(COVER_MAX_FLAGS, lots.length));
+  });
+
+  it('marks which flags are data centers, so the cover draws halls, not storefronts', () => {
+    const s = newGame({ seed: 42, cityId: 'cal', startCash: 2_500_000 });
+    addCapital(s, 20_000_000);
+    const r = cmd.buildDataCenter(s, { where: { lotId: freeLot(s).id }, build: DEFAULT_DC_BUILD });
+    if (!r.ok) throw new Error(r.reason);
+    const lotId = s.dataCenters[r.dataCenterId]!.lotId!;
+    const meta = coverMetaFor(s)!;
+    expect(meta.flags).toContain(lotId);
+    expect(meta.dataCenters).toEqual([lotId]);
   });
 });

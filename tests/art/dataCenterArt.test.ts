@@ -4,7 +4,7 @@
 // their tile, so nothing clips at a chunk edge; and the renderer is told which
 // lots and energy sites hold a data center.
 import { describe, expect, it } from 'vitest';
-import { occupantsKey, occupantsOf } from '../../src/app/map/pins';
+import { occupantsKey, occupantsOf } from '../../src/app/map/mapOccupants';
 import { drawBuilding } from '../../src/art/buildings';
 import { drawSite } from '../../src/art/buildingsOffice';
 import { generateCityMap, tileAt } from '../../src/art/citygen';

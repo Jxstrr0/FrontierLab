@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { clusterLevel, clusterPins, clusterRadius } from '../../src/app/map/cluster';
-import { buildPins, occupantsOf } from '../../src/app/map/pins';
+import { occupantsOf } from '../../src/app/map/mapOccupants';
+import { buildPins } from '../../src/app/map/pins';
 import { generateCityMap } from '../../src/art/citygen';
 import { roofAnchor } from '../../src/art/iso';
 import { FEATURES } from '../../src/config/balance';
