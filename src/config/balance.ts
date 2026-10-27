@@ -1219,7 +1219,7 @@ export const INCIDENTS = {
 } as const;
 /**
  * fraudShield, 0–10 (decision log): itWeight × IT coverage′ + modelWeight × the
- * active underwriting model's FraudShield (1–10) + the branch ATM's bonus. A
+ * AI model's Safety (1–10, C6a) + the branch ATM's bonus. A
  * company-level check (card fraud) has no ATM bonus.
  */
 export const FRAUD_SHIELD = {
