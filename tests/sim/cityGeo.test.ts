@@ -9,6 +9,7 @@ import { CITIES } from '../../src/data/cities';
 import { cityLook, CITY_LOOKS } from '../../src/data/cityLooks';
 import { cityGeometry } from '../../src/sim/cityGeo';
 import { isFrontage } from '../../src/sim/cityLayout';
+import { towerListingId } from '../../src/sim/landmarkTowers';
 import { newGame } from '../../src/sim/newGame';
 import type { GameState } from '../../src/sim/state';
 import { mapDigest, placesDigest } from '../helpers/layoutDigest';
@@ -123,6 +124,8 @@ describe('layout 1 never changes', () => {
       // Cities added after layout 2 (Moscow, St Petersburg) never had a layout 1.
       if (!digests.newGame11[id]) continue;
       const s = newGame({ seed: 11, cityId: id, layout: 1 });
+      // Landmark towers (schema 25) are added on top, placed last; everything else must match.
+      delete s.world.officeListings[towerListingId(id)];
       expect(placesDigest(s, id), id).toBe(digests.newGame11[id]!.places);
       expect(mapDigest(cityMap(s, id)), id).toBe(digests.newGame11[id]!.map);
     }

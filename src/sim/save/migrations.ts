@@ -23,6 +23,7 @@ import { SCHEMA_VERSION, type GameState } from '../state';
 import { migrateSeedMoney } from './migrateSeedMoney';
 import { migrateSeats } from './migrateSeats';
 import { generatePersonalSites } from '../personalSites';
+import { generateLandmarkTower } from '../landmarkTowers';
 
 type RawSave = Record<string, unknown> & { schemaVersion: number };
 
@@ -167,6 +168,15 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     for (const w of state.history.weekly) {
       delete w.capitalRatio;
       delete w.totals.rwa;
+    }
+    return s;
+  },
+  // 24 → 25: landmark towers. London and Moscow, if already generated, gain
+  // their giant Financial District office listing.
+  24: (s) => {
+    const state = s as unknown as GameState;
+    for (const city of Object.values(state.world.cities)) {
+      if (city.generated) generateLandmarkTower(state, city.id);
     }
     return s;
   },
