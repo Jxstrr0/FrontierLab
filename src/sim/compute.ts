@@ -5,7 +5,7 @@
 // and lease), and the rest is bought at spot: spotPerGpuWeek × index.
 import { COMPUTE, OUTAGE, SPOT } from '../config/balance';
 import { ema } from './math';
-import { usableGpus } from './dataCenters';
+import { runningGpus } from './dataCenters';
 import { dealGpus } from './powerDeals';
 import { pushEvent } from './events';
 import { spend } from './ledger';
@@ -43,7 +43,7 @@ export function spotPrice(state: GameState): number {
 export function ownedGpus(state: GameState): number {
   let gpus = 0;
   for (const dc of Object.values(state.dataCenters)) {
-    if (dc.status === 'open') gpus += usableGpus(dc.build);
+    if (dc.status === 'open') gpus += runningGpus(state, dc);
   }
   // Contracted GPUs from power deals at energy sites (C8a, §13.7a).
   return gpus + dealGpus(state);
@@ -183,6 +183,9 @@ export function tallyCompute(state: GameState): void {
   state.compute.demandGpus = demand;
   state.compute.weekCharge = charged;
   state.compute.ownedGpus = ownedGpus(state);
+  // DESIGN §5.18: weeks in a row that owned GPUs alone covered every GPU-week of demand.
+  const c = state.compute;
+  c.ownedStreak = demand > 0 && c.ownedGpus >= demand ? (c.ownedStreak ?? 0) + 1 : 0;
 }
 
 /**

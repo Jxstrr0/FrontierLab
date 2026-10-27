@@ -12,31 +12,21 @@ import { spend } from '../ledger';
 import { roundToStep } from '../math';
 import type { Branch, GameState } from '../state';
 import { addEffect, incidentPMult } from './effects';
-import { bumpMorale, fraudShield, nextVault, num, ratingHit, type IncidentRule } from './helpers';
+import {
+  bumpMorale,
+  fraudShield,
+  maybeNews,
+  nextVault,
+  num,
+  ratingHit,
+  type IncidentRule,
+} from './helpers';
 import { newsExact } from '../newsFormat';
 import { compactMoney } from './text';
 
 const P = INCIDENT_PARAMS;
 const baseP = (type: string) => INCIDENT_SPECS[type]?.baseP ?? 0;
 const branchOf = (state: GameState, id: string): Branch | undefined => state.branches[id];
-
-/** Chance an incident's press angle reaches The Weekly Ledger. */
-function maybeNews(
-  state: GameState,
-  chance: number,
-  rng: { chance(p: number): boolean },
-  type: string,
-  branch?: Branch,
-) {
-  if (!rng.chance(chance)) return;
-  pushEvent(
-    state,
-    'INCIDENT_NEWS',
-    { bank: state.meta.bankName, type, branchName: branch?.name ?? '', city: branch?.cityId ?? '' },
-    3,
-    branch?.id,
-  );
-}
 
 const ROBBERY: IncidentRule = {
   // × (6 − vault security)/3
