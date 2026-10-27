@@ -1,4 +1,4 @@
-// Every tuning constant for Vault Street lives here (CLAUDE.md non-negotiable 5).
+// Every tuning constant for Frontier Lab lives here (CLAUDE.md non-negotiable 5).
 // Names match the CAPS names used in docs/SIMULATION.md (§26 parameter index).
 // Constants that the docs give inline in a formula get a name here too, with the
 // section reference, so logic files never carry magic numbers.
@@ -290,7 +290,7 @@ export const CITY_SATURATION_EXP = 3;
 /** Advice only (UI and scripted strategies): about how many branches a city of each size supports. */
 export const CITY_BRANCH_GUIDE = { S: 5, M: 7, L: 9, XL: 12 } as const;
 /**
- * Sales office sizes (stage C2a, CONVERSION_PLAN §4): one office per city,
+ * Sales office sizes (stage C2a, archive/CONVERSION_PLAN §4): one office per city,
  * upgraded in place. `mult` scales seats (teller stations, advisor offices),
  * staff needed, ATM throughput, safe deposit boxes, rent, lease deposit,
  * overhead and the cost and upkeep of the interior slots (lobby, teller line,

@@ -35,7 +35,7 @@ export function ProductsFloor() {
       <SectionTitle>Leaderboard</SectionTitle>
       <LeaderboardCard />
 
-      <SectionTitle>Deposits and loans</SectionTitle>
+      <SectionTitle>ARR trend</SectionTitle>
       <CompanyTrend />
 
       <SectionTitle>Product lineup</SectionTitle>

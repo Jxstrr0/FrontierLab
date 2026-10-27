@@ -2,7 +2,7 @@
 
 You are building **Frontier Lab**, a browser tycoon game where the player founds an AI lab and grows it into a global company. It is a conversion of our bank tycoon *Vault Street* (itself a faithful, system-for-system remake of the mobile tycoon *Coffee Inc 2*), reusing as much of its code as possible: the same original "Banknote Deco" art direction, the same core mechanics and the same feel. All names stay fictional: no real AI companies, models or people.
 
-**Conversion in progress.** The code and most docs still describe the bank game. `docs/CONVERSION_PLAN.md` holds the proposed mapping and the staged plan. Until a conversion stage lands, treat bank terms in the docs as the current truth for the code.
+**Conversion done (2026-10-27).** Stages C0–C8 turned the bank game into the AI-lab game, and the docs now describe it in AI terms. The record of the mapping is in `docs/archive/CONVERSION_PLAN.md`. Some code identifiers keep bank names (`branch`, `bankName`, `capitalRatio`); the docs give their AI meaning.
 
 The owner (Kelbo, Longlight Interactive) mostly plays and tests on an iPhone and has beginner-level coding experience. You do the engineering. Explain decisions in plain language in PROGRESS.md.
 

@@ -1,5 +1,5 @@
 // Generates the PWA / home-screen icons in public/icons/ from an SVG brand mark:
-// a brass "VS" monogram medallion with a guilloche band on vault navy
+// a brass "FL" monogram medallion with a guilloche band on vault navy
 // (ART_DIRECTION §1, Banknote Deco; an original design). The SVG is built here,
 // then rasterised with Chromium through Playwright so the monogram uses the
 // bundled Bodoni Moda face. The PNGs are committed; re-run only when the mark changes.
@@ -13,8 +13,8 @@ import { createRequire } from 'node:module';
 import { rosettePaths } from '../src/art/guilloche';
 
 const C = 256; // master canvas is 512×512 SVG units
-const VAULT = '#18233a';
-const VAULT_DEEP = '#0f1828';
+const VAULT = '#131d33';
+const VAULT_DEEP = '#0a1222';
 const BRASS = '#b8913d';
 const BRASS_LIGHT = '#d9be7a';
 
@@ -38,7 +38,7 @@ function medallion(): string {
     <circle cx="${C}" cy="${C}" r="160" fill="${VAULT_DEEP}" stroke="${BRASS}" stroke-opacity="0.5" stroke-width="1.2"/>
     <g fill="${BRASS_LIGHT}">${diamonds}</g>
     <text x="${C}" y="${C + 50}" text-anchor="middle" font-family="Bodoni Moda" font-weight="900"
-      font-size="152" letter-spacing="-6" fill="${BRASS_LIGHT}">VS</text>
+      font-size="152" letter-spacing="-6" fill="${BRASS_LIGHT}">FL</text>
     <path d="M${C - 64} ${C + 82} h50 M${C + 14} ${C + 82} h50" stroke="${BRASS}" stroke-width="2"/>
     <path d="M${C} ${C + 74} l7 8 -7 8 -7 -8z" fill="${BRASS}"/>`;
 }

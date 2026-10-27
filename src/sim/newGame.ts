@@ -106,7 +106,7 @@ const DEFAULT_AVATAR: AvatarSpec = {
 export function newGame(opts: NewGameOptions): GameState {
   const city = CITIES[opts.cityId];
   if (!city) throw new Error(`Unknown city ${opts.cityId}`);
-  const bankName = opts.bankName ?? 'Vault Street Bank';
+  const bankName = opts.bankName ?? 'Frontier Lab';
   const model = packagedModel(DEFAULT_MODEL_ID);
   const startCash = opts.startCash ?? START_CASH;
   if (!(START_CASH_OPTIONS as readonly number[]).includes(startCash)) {
@@ -121,7 +121,7 @@ export function newGame(opts: NewGameOptions): GameState {
     meta: {
       saveName: bankName,
       bankName,
-      monogram: opts.monogram ?? 'VS',
+      monogram: opts.monogram ?? 'FL',
       brandInk: opts.brandInk ?? '#2C4A7A',
       founderName: opts.founderName ?? 'Founder',
       founderAvatar: opts.founderAvatar ?? DEFAULT_AVATAR,
