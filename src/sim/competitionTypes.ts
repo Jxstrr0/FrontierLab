@@ -258,10 +258,35 @@ export interface Business {
   pentagon: Pentagon;
   /** Yearly AI budget in money of the week it was set. */
   budget: Money;
-  /** Who serves it today: you or a rival lab. None while it has no AI vendor. */
+  /**
+   * Who serves it today: one of your sales offices (`id` is the office id) or a
+   * rival lab. None while it has no AI vendor.
+   */
   vendor?: { type: 'player' | 'rival'; id: Id };
   /** Yearly value of its current contract. */
   contractValue?: Money;
   /** The quarter-start week its contract comes up for renewal. */
   renewalWeek?: Week;
+  /** The week your contract with it began (C5b). */
+  startWeek?: Week;
+  /** It won't ask you for a proposal again before this week (C5b). */
+  quietUntil?: Week;
+}
+
+/**
+ * A request for proposal on the Deal Desk (stage C5b, SIMULATION §11): a new
+ * one from a business without an AI vendor (bid now), or a renewal due at the
+ * next quarter start (set an offer; it is settled in the renewal season).
+ */
+export interface Rfp {
+  id: Id;
+  /** Your sales office in the business's city. */
+  branchId: Id;
+  businessId: Id;
+  kind: 'new' | 'renewal';
+  createdWeek: Week;
+  /** New: the last week to bid. Renewal: the quarter-start week it is settled. */
+  dueWeek: Week;
+  /** Renewals: your offered discount off the business's budget (none = no bid on a rival's contract). */
+  offer?: number;
 }
