@@ -4,7 +4,7 @@
 import { useState } from 'preact/hooks';
 import { CORPORATE_LENDING } from '../../config/balance';
 import * as cmd from '../../sim/commands';
-import { creditLimit, lineRate } from '../../sim/corporateDebt';
+import { creditLimit, creditRoom, lineRate } from '../../sim/corporateDebt';
 import { Card, Row, Segmented } from '../components';
 import { money, pct } from '../format/format';
 import { AmountSlider } from '../hq/treasury/AmountSlider';
@@ -17,7 +17,7 @@ export function CreditLineCard(p: { siteId: string; near: boolean }) {
   const line = s.corporateDebt.lines[p.siteId];
   const used = line?.drawn ?? 0;
   const limit = creditLimit(s);
-  const available = p.near ? Math.max(0, limit - used) : 0;
+  const available = p.near ? creditRoom(s) : 0;
   const repayMax = Math.min(used, Math.max(0, s.company.cash));
   const [mode, setMode] = useState<'draw' | 'repay'>('draw');
   const [amount, setAmount] = useState(0);
@@ -39,15 +39,15 @@ export function CreditLineCard(p: { siteId: string; near: boolean }) {
   return (
     <>
       <Card>
-        <Row label="Limit" value={money(limit, sym)} />
+        <Row label="Limit (all lines)" value={money(limit, sym)} />
         <Row label="Used" value={money(used, sym)} />
         <Row label="Available" value={money(available, sym)} strong />
         <Row label="Interest rate" value={pct(line?.rate ?? lineRate(s))} />
       </Card>
       <p class="muted small">
         A revolving line: draw or repay any week. The limit is{' '}
-        {CORPORATE_LENDING.lineEquityShare * 100}% of your equity and moves with it; interest is
-        charged weekly on what you use.
+        {CORPORATE_LENDING.lineEquityShare * 100}% of your equity, shared by all your credit lines,
+        and moves with it; interest is charged weekly on what you use.
       </p>
       {!p.near && used === 0 ? (
         <p class="muted small">You can draw on it once you have a sales office here.</p>

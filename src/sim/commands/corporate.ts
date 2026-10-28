@@ -4,7 +4,7 @@
 // from rival labs in older saves can still be repaid. Borrowed money arrives in
 // corporate cash (financing), never deposits.
 import { CORPORATE_LENDING } from '../../config/balance';
-import { creditLimit, isLenderNearYou, lenderName, lineRate, loanRoom } from '../corporateDebt';
+import { creditRoom, isLenderNearYou, lenderName, lineRate, loanRoom } from '../corporateDebt';
 import { pushEvent } from '../events';
 import { newId } from '../ids';
 import { postCash } from '../ledger';
@@ -77,8 +77,7 @@ export function drawCredit(state: GameState, lenderId: string, amount: number): 
   if (!isLenderNearYou(state, lenderId))
     return fail(`${lenderName(state, lenderId)} lends to labs with a sales office in its city.`);
   const line = state.corporateDebt.lines[lenderId];
-  const drawn = line?.drawn ?? 0;
-  const available = Math.max(0, creditLimit(state) - drawn);
+  const available = creditRoom(state);
   if (amount > available + CORPORATE_LENDING.dust)
     return fail(`You can draw up to ${money(available)} on this line.`);
   if (line) line.drawn += amount;

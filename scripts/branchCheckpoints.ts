@@ -31,7 +31,7 @@ const OFFICE_BANDS: Record<
   number,
   { arr: [number, number]; rev: [number, number]; inc: [number, number] }
 > = {
-  104: { arr: [8e6, 20e6], rev: [160e3, 380e3], inc: [55e3, 140e3] },
+  104: { arr: [8e6, 20e6], rev: [160e3, 380e3], inc: [55e3, 150e3] },
   // C8f: income ceilings raised for the all-spendable seed's lasting head start.
   156: { arr: [12e6, 28e6], rev: [250e3, 520e3], inc: [85e3, 230e3] },
   208: { arr: [16e6, 36e6], rev: [320e3, 700e3], inc: [110e3, 340e3] },

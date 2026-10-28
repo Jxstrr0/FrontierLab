@@ -2,6 +2,7 @@
 import {
   AWARENESS_DECAY,
   BRAND_DECAY,
+  CAMPAIGN_COST_SCALE,
   BRAND_PASSIVE_PER_BRANCH,
   GRAND_OPENING_BONUS,
   GRAND_OPENING_WEEKS,
@@ -14,6 +15,7 @@ import { campaignMult } from '../hq';
 import { clamp } from '../math';
 import { listLevel } from '../nominal';
 import type { Branch, GameState } from '../state';
+import { sizeMult } from './officeSize';
 
 export interface CampaignEffects {
   awareness: number;
@@ -40,11 +42,20 @@ export function activeLevels(branch: Branch): { id: string; level: CampaignLevel
   return out;
 }
 
+/**
+ * What one unit of a weekly campaign cost costs this office: city costIndex ×
+ * price list (§4.6) × office size mult × CAMPAIGN_COST_SCALE (CONTENT §8).
+ */
+export function campaignCostIndex(state: GameState, branch: Branch): number {
+  const city = CITIES[branch.cityId]?.costIndex ?? 1;
+  return city * listLevel(state, branch.cityId) * sizeMult(branch) * CAMPAIGN_COST_SCALE;
+}
+
 /** Sums every active campaign's effects at this branch (CONTENT §8). */
 export function campaignEffects(state: GameState, branch: Branch): CampaignEffects {
   // Costs at the city's cost index and today's price list (§4.6).
   const priceLevel = listLevel(state, branch.cityId);
-  const costIndex = (CITIES[branch.cityId]?.costIndex ?? 1) * priceLevel;
+  const costIndex = campaignCostIndex(state, branch);
   const fx: CampaignEffects = {
     awareness: 0,
     bumps: { rates: 0, products: 0, service: 0, branch: 0 },

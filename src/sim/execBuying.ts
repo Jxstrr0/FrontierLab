@@ -14,7 +14,7 @@ import { EXEC_DELEGATION, RUNWAY, WEEKS_PER_YEAR } from '../config/balance';
 import { balanceSheet } from './balanceSheet';
 import { setPropertyRent } from './commands/realEstate';
 import { ventureTierBlock } from './commands/ventures';
-import { expansionReserve } from './execDelegationsGrowth';
+import { fixedReserve } from './execDelegationsGrowth';
 import { delegationOn, rentPricingPower, rentsManaged } from './execSeats';
 import { completePurchase } from './propertyBuy';
 import { marketRentNow, occupancyTarget, propertyWeek, rentForOccupancy } from './propertyMath';
@@ -80,8 +80,8 @@ function bankBlocker(state: GameState, c: BuyPick): string | undefined {
   const d = EXEC_DELEGATION;
   const tier = ventureTierBlock(state);
   if (tier) return tier;
-  if (c.asking > state.company.cash - expansionReserve(state))
-    return 'Waiting for spare cash: the chief keeps 8 weeks of costs in reserve.';
+  if (c.asking > state.company.cash - fixedReserve(state))
+    return `Waiting for spare cash: the chief keeps ${d.expansionReserveWeeks} weeks of costs in reserve.`;
   const bs = balanceSheet(state);
   if (bs.realEstate + c.value > d.buyAssetCap * bs.assets)
     return `The lab's buildings would pass ${Math.round(d.buyAssetCap * 100)}% of its assets.`;

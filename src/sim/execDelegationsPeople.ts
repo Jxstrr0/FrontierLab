@@ -185,13 +185,14 @@ export function cmoBrand(state: GameState): void {
       const next = cityCampaigns.find((spec) => !running.some((c) => c.campaignId === spec.id));
       if (
         next &&
-        brandCampaignsWeeklyCost(state) + brandCampaignCost(state, next, 'city') <= budget
+        brandCampaignsWeeklyCost(state, 'city') + brandCampaignCost(state, next, 'city') <= budget
       )
         startBrandCampaign(state, { campaignId: next.id, scope: 'city', targetId: cityId });
     }
   }
-  // Over budget (revenue fell): drop the dearest city campaign.
-  if (brandCampaignsWeeklyCost(state) > budget) {
+  // Over budget (revenue fell): drop the dearest city campaign. The budget
+  // covers city campaigns only, so your country campaigns never count against it.
+  if (brandCampaignsWeeklyCost(state, 'city') > budget) {
     const dearest = state.marketing.campaigns
       .filter((c) => c.scope === 'city')
       .sort(
