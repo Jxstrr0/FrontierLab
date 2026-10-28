@@ -1,5 +1,6 @@
-/* Founder avatar picker: the portrait stage with Shuffle, the Face and Style
-   groups of part rows, and the tone swatches. */
+/* Founder avatar picker: the portrait stage (pinned to the top of the
+   scrolling area so the portrait stays in view), the Face, Hair and Style
+   groups of part rows, and the colour swatches. */
 .avatar-picker {
   display: flex;
   flex-direction: column;
@@ -22,15 +23,31 @@
   letter-spacing: 0.04em;
 }
 .avatar-stage {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  background: var(--vault);
+  border-bottom: 1px solid var(--hairline);
+}
+.avatar-stage-side {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--space-2);
 }
 .avatar-summary {
   margin: 0;
-  max-width: 28em;
-  text-align: center;
+}
+.part-chosen {
+  margin-left: var(--space-2);
+  color: var(--ivory);
+  font-weight: 600;
 }
 
 .part-list {
@@ -95,4 +112,8 @@
   inset: 3px;
   border-radius: 50%;
   border: 2px solid var(--brass);
+}
+/* The wizard's scrolling body has top padding; pin over it so nothing peeks above. */
+.wizard-body .avatar-stage {
+  top: calc(-1 * var(--space-3));
 }

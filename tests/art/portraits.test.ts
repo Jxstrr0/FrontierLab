@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { avatarFromSeed, PART_COUNTS, portraitMarkup, SKIN_TONES } from '../../src/art/portraits';
-import { AVATAR_PARTS } from '../../src/data/avatarParts';
+import { AVATAR_PARTS, HAIR_TONES, OUTFIT_TONES } from '../../src/data/avatarParts';
 import type { AvatarSpec } from '../../src/sim/state';
 
 const BASE: AvatarSpec = {
@@ -15,6 +15,9 @@ const BASE: AvatarSpec = {
   brows: 0,
   mouth: 0,
   age: 0,
+  look: 0,
+  hairTone: 0,
+  outfit: 0,
 };
 
 describe('portrait generator', () => {
@@ -52,7 +55,7 @@ describe('portrait generator', () => {
   });
 
   it('wraps out-of-range indices instead of failing (old saves, bad specs)', () => {
-    expect(portraitMarkup({ ...BASE, hair: 13, head: -1 })).toBe(
+    expect(portraitMarkup({ ...BASE, hair: 16, head: -1 })).toBe(
       portraitMarkup({ ...BASE, hair: 1, head: 3 }),
     );
   });
@@ -76,5 +79,25 @@ describe('portrait generator', () => {
       }
     }
     expect(avatarFromSeed(1)).not.toEqual(avatarFromSeed(2));
+  });
+
+  it('never gives a soft face from a seed facial hair', () => {
+    let soft = 0;
+    for (let seed = 0; seed < 400; seed++) {
+      const a = avatarFromSeed(seed);
+      if (a.look !== 1) continue;
+      soft++;
+      expect(a.facial).toBe(0);
+    }
+    expect(soft).toBeGreaterThan(100);
+  });
+
+  it('tints hair and outfit with their chosen colours', () => {
+    for (let t = 0; t < HAIR_TONES.length; t++) {
+      expect(portraitMarkup({ ...BASE, hairTone: t })).toContain(`fill:${HAIR_TONES[t]}`);
+    }
+    for (let o = 0; o < OUTFIT_TONES.length; o++) {
+      expect(portraitMarkup({ ...BASE, outfit: o })).toContain(`fill:${OUTFIT_TONES[o]}`);
+    }
   });
 });

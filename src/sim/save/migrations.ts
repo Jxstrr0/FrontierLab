@@ -22,6 +22,7 @@ import { migrateRivalBooks } from './migrateRivalBooks';
 import { SCHEMA_VERSION, type GameState } from '../state';
 import { migrateSeedMoney } from './migrateSeedMoney';
 import { migrateSeats } from './migrateSeats';
+import { migrateAvatars } from './migrateAvatars';
 import { generatePersonalSites } from '../personalSites';
 import { generateLandmarkTower } from '../landmarkTowers';
 
@@ -192,11 +193,16 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
   },
   // Schema 28 (new regions): CityState.licensed is optional; no city has paid yet.
   27: (s) => s,
-  // Schema 29 (C-suite dials): the CSO's posture ceiling, the COO's expansion
+  // 28 → 29 (portrait rework): looks, hair colours and outfit colours.
+  28: (s) => {
+    migrateAvatars(s as unknown as GameState);
+    return s;
+  },
+  // Schema 30 (C-suite dials): the CSO's posture ceiling, the COO's expansion
   // reserve and the CPO's product focus start at the old fixed behaviour. The
   // CPO's new Research talent switch is a delegation toggle like any other, so a
   // seated CPO has it off until you switch it on.
-  28: (s) => {
+  29: (s) => {
     const ex = (s as unknown as GameState).executives;
     ex.postureCeiling ??= EXEC_DELEGATION.croMaxAppetite;
     ex.expansionReserveWeeks ??= EXEC_DELEGATION.expansionReserveWeeks;
