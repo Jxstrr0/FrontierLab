@@ -3,6 +3,7 @@
 import { CITIES } from '../../data/cities';
 import { JETS } from '../../data/jets';
 import { pushEvent } from '../events';
+import { cityOpen } from '../regions';
 import { spend } from '../ledger';
 import { listPrice } from '../nominal';
 import type { GameState } from '../state';
@@ -21,6 +22,7 @@ export function travelTo(
   opts: { jet?: boolean } = {},
 ): CommandResult<{ km: number; mode: 'free' | 'fare' | 'jet'; fare: number }> {
   if (!CITIES[cityId]) return fail('Unknown destination.');
+  if (!cityOpen(state, cityId)) return fail('That city is not open to AI labs yet.');
   const from = state.world.currentCityId;
   if (cityId === from) return fail("You're already here.");
   const q = flightQuote(state, cityId, opts.jet);

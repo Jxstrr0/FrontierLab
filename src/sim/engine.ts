@@ -61,6 +61,7 @@ import { runTreasury } from './treasury';
 import { updateModels } from './underwriting';
 import { runTraining } from './training';
 import { runProjects } from './projects';
+import { runRegions } from './regions';
 import { boardCapitalReview } from './incident/capitalReview';
 import { rivalModelsQuarter } from './rivalModels';
 import { runTalent, talentQuarter } from './talent';
@@ -165,6 +166,7 @@ export function weeklyTick(state: GameState): void {
   runIncidents(state); // 15
   recordNetWorth(state); // 15 (the Personal Wealth screen's weekly change, §22)
   checkMilestones(state); // 15 (DESIGN §5.18)
+  runRegions(state); // 15 (the new regions open, §20a)
   composeNews(state); // 16
 
   for (const cityId of Object.keys(state.world.cities)) {

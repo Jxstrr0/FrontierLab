@@ -15,6 +15,7 @@ import { CITIES, DESTINATIONS } from '../../data/cities';
 import { landPath } from '../../art/worldOutline';
 import { useDialog } from '../components/dialog';
 import { money } from '../format/format';
+import { cityOpen } from '../../sim/regions';
 import { useGame } from '../store';
 import { PLANE_PATH, PlaneIcon } from './AirportMedallion';
 import { distanceText } from './departures';
@@ -123,7 +124,11 @@ function FlightScene({ f }: { f: Flight }) {
         {WRAPS.map((dx) => (
           <path d={LAND} transform={`translate(${dx} 0)`} class="flight-land" stroke-width={px} />
         ))}
-        <CityDots box={box} px={px} skip={[f.from, f.to]} />
+        <CityDots
+          box={box}
+          px={px}
+          skip={[f.from, f.to, ...DESTINATIONS.filter((id) => !cityOpen(s, id))]}
+        />
         <path
           d={pathD(pts)}
           class="flight-route"

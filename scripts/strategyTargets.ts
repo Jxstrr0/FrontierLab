@@ -129,8 +129,9 @@ export function strategyChecks(name: string, opts: NewGameOptions, log: RunLog):
       checks.push({
         label: 'Year 10 cities with an office',
         value: String(n),
-        ok: n >= 10 && n <= 25,
-        target: '10–25',
+        // §20a: eight late cities open at week 260, so a steady lab can reach about 30.
+        ok: n >= 10 && n <= 32,
+        target: '10–32',
       });
       checks.push({
         label: 'Year 10 ARR (real)',

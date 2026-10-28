@@ -7,7 +7,7 @@ import {
   fareLabel,
   rowNote,
 } from '../../src/app/airport/departures';
-import { FLIGHT_FARE, TRAVEL_KM_PER_WEEK } from '../../src/config/balance';
+import { FLIGHT_FARE, NEW_REGIONS, TRAVEL_KM_PER_WEEK } from '../../src/config/balance';
 import { CITIES, DESTINATIONS } from '../../src/data/cities';
 import * as cmd from '../../src/sim/commands';
 import { cityDistanceKm } from '../../src/sim/geo';
@@ -17,10 +17,12 @@ import { openScriptedBranch } from '../helpers/scenario';
 const game = () => newGame({ seed: 42, cityId: 'cal', bankName: 'Board Bank' });
 
 describe('departure rows', () => {
-  it('lists every destination but here, nearest first, with real distances', () => {
+  it('lists every open destination but here, nearest first, with real distances', () => {
     const s = game();
     const rows = departureRows(s);
-    expect(rows).toHaveLength(DESTINATIONS.length - 1);
+    const late = DESTINATIONS.filter((id) => CITIES[id]!.late).length;
+    expect(rows).toHaveLength(DESTINATIONS.length - 1 - late);
+    expect(rows.some((r) => r.id === 'bos')).toBe(false);
     expect(rows.some((r) => r.id === 'cal')).toBe(false);
     for (let i = 1; i < rows.length; i++)
       expect(rows[i]!.km).toBeGreaterThanOrEqual(rows[i - 1]!.km);
@@ -28,6 +30,12 @@ describe('departure rows', () => {
     expect(van.km).toBe(cityDistanceKm('cal', 'van'));
     expect(van.code).toBe('VAN');
     expect(rows[0]!.id).toBe('sas'); // Saskatoon is the closest airport to Calgary.
+  });
+
+  it('adds the late regions from week NEW_REGIONS.openWeek', () => {
+    const s = game();
+    s.clock.week = NEW_REGIONS.openWeek;
+    expect(departureRows(s)).toHaveLength(DESTINATIONS.length - 1);
   });
 
   it('marks new places, regional sites and your branches', () => {

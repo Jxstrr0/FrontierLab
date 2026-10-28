@@ -117,6 +117,9 @@ export function BuildPanel(p: { lotId: string }) {
             <Row label="Parts subtotal" value={moneyFull(quote.parts, sym)} />
             <Row label="Lease deposit" value={moneyFull(quote.deposit, sym)} />
             <Row label="First week's rent" value={moneyFull(quote.rent, sym)} />
+            {quote.licence > 0 && (
+              <Row label="Market-entry licence" value={moneyFull(quote.licence, sym)} />
+            )}
             <Row label="Total" value={moneyFull(quote.total, sym)} strong />
             <Row
               label="Cash available"
