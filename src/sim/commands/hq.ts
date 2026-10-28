@@ -25,6 +25,8 @@ import { postCash, postPnl, spend } from '../ledger';
 import { roundToStep } from '../math';
 import type { GameState, Office } from '../state';
 import { fireExec } from './executives';
+import { releaseResearcher } from './talent';
+import { yourResearchers } from '../talent';
 import { fail, money, ok, type CommandResult } from './result';
 
 /** Salary stepper bounds, re-exported for the HQ screens. */
@@ -150,7 +152,9 @@ function trimToDesks(state: GameState, dept: DeptId): void {
     spend(state, 'hqStaff', (d.staff * d.salary * SEVERANCE_WEEKS) / WEEKS_PER_YEAR);
     delete state.departments[dept];
     // Without an Executive suite every executive leaves, with severance.
-    if (dept === 'executive') for (const seat of EXEC_SEAT_ORDER) fireExec(state, seat);
+    if (dept === 'executive') for (const seat of EXEC_SEAT_ORDER) fireExec(state, seat, true);
+    // Researchers work on the Products floor: without it they go back on the market.
+    if (dept === 'products') for (const r of yourResearchers(state)) releaseResearcher(state, r.id);
     return;
   }
   const over = Math.max(0, d.staff - desks);

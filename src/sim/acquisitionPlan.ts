@@ -139,7 +139,7 @@ export function planDeal(
   const gain = Math.max(0, netAssets - paid);
 
   // Pro-forma runway (§15, §19.8): the cash price leaves corporate cash; the
-  // target's reserves go to the treasury, and its burn is not counted.
+  // target's cash goes to company cash, and its burn is not counted.
   const proFormaRunway = runwaySnapshot(state, -cash);
 
   return {

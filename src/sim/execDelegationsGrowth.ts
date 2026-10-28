@@ -66,6 +66,11 @@ export function expansionReserve(state: GameState): number {
   return state.executives.expansionReserveWeeks * weeklyCosts(state);
 }
 
+/** Cash the CFO's buying and investing keep back: the fixed EXEC_DELEGATION.expansionReserveWeeks of costs (§17.4). */
+export function fixedReserve(state: GameState): number {
+  return X.expansionReserveWeeks * weeklyCosts(state);
+}
+
 /** "the COO keeps 8 weeks of costs in reserve", for the blockers below. */
 const reserveNote = (state: GameState) =>
   `the COO keeps ${state.executives.expansionReserveWeeks} weeks of costs in reserve`;

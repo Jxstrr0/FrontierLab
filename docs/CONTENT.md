@@ -329,6 +329,8 @@ Chosen on New Game (`src/data/logoShapes.ts`); the outline of the lab's mark eve
 
 ## 8. Sales office campaigns
 
+Weekly costs below are base amounts: the game charges them × `CAMPAIGN_COST_SCALE` (4) × the office's size multiplier (Starter 1, Standard 2.5, Large 5, Flagship 9) × the city's costIndex × today's price list, so Drip costs about $480 a week at a Starter and $4,300 at a Flagship in a 1.0 city at launch.
+
 | id | Name | Levels: label (cost) | Effects per level |
 |---|---|---|---|
 | lobby_coffee | Coffee & Live Demos | Drip ($120/wk) · Espresso bar ($260/wk) | Office +0.20 / +0.40; awareness +0.004 / +0.008 |

@@ -222,6 +222,9 @@ describe('buying and running a building', () => {
     fund(s, 50_000_000);
     const l = firstListing(s);
     cmd.offerProperty(s, l.siteId, l.asking, 'company');
+    // A building just bought can't be listed until it has been held minHoldWeeks.
+    expect(cmd.setPropertyForSale(s, l.siteId, true).ok).toBe(false);
+    s.realEstate.properties[l.siteId]!.boughtWeek -= REAL_ESTATE.minHoldWeeks;
     expect(cmd.setPropertyForSale(s, l.siteId, true).ok).toBe(true);
     const p = s.realEstate.properties[l.siteId]!;
     const weeks = p.saleWeek! - s.clock.week;

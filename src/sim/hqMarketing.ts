@@ -82,9 +82,10 @@ export function agencyPackagePrice(state: GameState, pkg: { cost: number }): num
   return listPrice(state, pkg.cost);
 }
 
-/** Weekly cost of every running brand campaign. */
-export function brandCampaignsWeeklyCost(state: GameState): number {
+/** Weekly cost of every running brand campaign, or only those of one scope. */
+export function brandCampaignsWeeklyCost(state: GameState, scope?: 'city' | 'country'): number {
   return state.marketing.campaigns.reduce((sum, c) => {
+    if (scope && c.scope !== scope) return sum;
     const spec = BRAND_CAMPAIGNS[c.campaignId];
     return sum + (spec ? brandCampaignCost(state, spec, c.scope) : 0);
   }, 0);

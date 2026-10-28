@@ -78,7 +78,8 @@ describe('renting GPUs', () => {
     expect(lot.endWeek - lot.startWeek).toBe(offer.termWeeks);
     let bills = 0;
     const probe = structuredClone(s) as GameState;
-    for (let w = start; w < start + offer.termWeeks + 3; w++) {
+    // The tick that bills a lot runs once clock.week has turned to the next week.
+    for (let w = start + 1; w <= start + offer.termWeeks + 3; w++) {
       const before = probe.compute.lots.length;
       probe.clock.week = w;
       retireGpuLots(probe);

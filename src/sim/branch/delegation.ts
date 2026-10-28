@@ -16,12 +16,12 @@ import { EQUIPMENT } from '../../data/equipment';
 import type { ProductSpec } from '../../data/products';
 import { loanDemand } from '../macro';
 import { cityRoom } from './cityMarket';
-import { listLevel } from '../nominal';
 import { clamp, roundToStep } from '../math';
 import { countryOfCity, defaultPrice, ftpFor, marketRef } from '../rates';
 import { stream, type Rng } from '../rng';
 import type { Branch, GameState } from '../state';
-import { marketingMult } from './marketing';
+import { campaignCostIndex, marketingMult } from './marketing';
+import { officeTraffic } from './officeSize';
 import { lotAffinity } from './ratings';
 import { followsHq } from './pricing';
 import { managerOf, marketWage, staffNeeded } from './staff';
@@ -124,16 +124,19 @@ function delegateMarketing(state: GameState, branch: Branch): void {
   const last = branch.pnl.at(-1);
   if (!lot || !last) return;
   const country = countryOfCity(state, branch.cityId);
-  const priceLevel = listLevel(state, branch.cityId);
+  // As campaignEffects: a weekly campaign's amount × campaignCostIndex.
+  const costIndex = campaignCostIndex(state, branch);
   const customers = Math.max(branch.customers, 1);
   // Contribution per customer per week: revenue less compute and loan losses.
   const l = last.lines;
   const perCustomer = Math.max(0, (last.revenue - l.compute - l.losses) / customers);
   const mult = marketingMult(state, branch);
   const b = state.world.cities[branch.cityId]?.brandAwareness ?? 0;
-  const pen = clamp(branch.customers / (lot.footTraffic * CATCHMENT_MULT), 0, 1);
+  // As runDemand: the office's reach is its city traffic (C2a), not its own storefront's.
+  const traffic = officeTraffic(state, branch);
+  const pen = clamp(branch.customers / Math.max(1e-9, traffic * CATCHMENT_MULT), 0, 1);
   const prospectsPerAwareness =
-    lot.footTraffic *
+    traffic *
     PROSPECT_RATE *
     difficultyOf(state).demandMult *
     (1 - AWARENESS_FLOOR) *
@@ -159,7 +162,7 @@ function delegateMarketing(state: GameState, branch: Branch): void {
       const extraCustomersPerWeek = prospectsPerAwareness * da * share;
       // A customer won mid-horizon earns for half of it on average.
       const value = extraCustomersPerWeek * perCustomer * H * (H / 2) * cmo;
-      const net = value - level.cost.amount * priceLevel * H;
+      const net = value - level.cost.amount * costIndex * H;
       if (net > bestNet) {
         bestNet = net;
         bestLevel = i + 1;

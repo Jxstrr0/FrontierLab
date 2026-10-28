@@ -216,6 +216,7 @@ The build slots keep their bank ids: `teller` = sales desks, `vault` = machine r
   - `mktMult = (0.8 + 0.4 × managerMarketing/100) × marketingFloorMult`, where `marketingFloorMult` is 1.0 below founder-mode thresholds and otherwise `0.5 + 0.5 × marketingCoverage'`.
 - **City brand awareness `b`** (HQ brand campaigns, kit sponsorship, your offices in the city): decays at BRAND_DECAY (0.02) with the same gain shape. Each office in a city adds a passive gain of 0.002.
 - **Effective awareness:** `e = 1 − (1 − a)(1 − b)`.
+- **Campaign cost:** a weekly campaign costs its CONTENT amount × `CAMPAIGN_COST_SCALE` (4) × the office's size mult × city costIndex × today's price list (`campaignCostIndex`), so it grows with the reach it buys. Per-sign-up and per-customer costs follow the price list only. A delegated manager values a campaign with the office's own reach (`officeTraffic`) at that cost.
 - **Campaign effects** (CONTENT Campaigns):
   - awareness gain per week
   - rating bumps (category and amount)
@@ -229,7 +230,7 @@ The build slots keep their bank ids: `teller` = sales desks, `vault` = machine r
 
 Targets are computed each week. Displayed ratings follow them with `ema(rating, target, 0.20)`.
 
-- **Price (`Rates`):** for each offered product p, take its competitiveness `c_p`, clamped to [−2, +2]:
+- **Price (`Rates`):** for each offered product p (and each withdrawn one that still has customers, since it still bills them), take its competitiveness `c_p`, clamped to [−2, +2]:
   - Plans, API and apps: `c_p = (m − price) / max(0.25 × m, FEE_COMP_MIN)`, with floors of $1 for dollar prices, 0.25pp for percent prices and $0.10 for per-unit (per million tokens) prices.
   - Enterprise contracts' rate (the one rate product): `(m − price)/0.005`.
   - Weight each product by `w_p = balanceShare_p + 0.1`.
@@ -944,7 +945,7 @@ At each year start (tick step 14, after the year's close), the board looks at **
   - **Limits:** one deal may issue at most 50% new shares (`maxNewSharePct`). The issue moves your price −2% to −6% by size up to that cap (`SHARE_DEALS.impact`).
 - **On close:**
   - Offices convert over 8 weeks: REBRAND_COST ($60,000) per office unit (spread evenly over the 8 weeks), staff morale −10, managers kept.
-- **Closing details:** the target brings cash R = max(0, K − X − LD), where K is its corporate cash (§18.5), X the corporate debt you owe it (settled) and LD the lease deposits on its lots (which move to you). Net assets = R + LD + X. Goodwill = cash paid + new shares + your company's holding of it at market − net assets (a negative difference is a bargain gain). Personal holdings are paid out at the offer price. Acquired fit-outs aren't booked as fixed assets. An acquired office brings its real customers: it starts with customers × `PRODUCTS_PER_CUSTOMER` plan seats, split by `ACQUIRED_PLAN_MIX` (Plus 60%, Team 20%, Pro 15%, Campus Plan 5%) and billed at your prices, so its customer count carries over. Build by seller strategy: premium → premium, incumbent and community → mid, disruptor → basic. City share compares your customers (plus the target's) with every active rival's customers in the city. A regulator block doesn't start the retry wait; an accepted deal that can no longer close (cash or tier) lapses.
+- **Closing details:** the target brings cash R = max(0, K − X − LD), where K is its corporate cash (§18.5), X the corporate debt you owe it (settled) and LD the lease deposits on its lots (which move to you). R lands in company cash, free to spend. Net assets = R + LD + X. Goodwill = cash paid + new shares + your company's holding of it at market − net assets (a negative difference is a bargain gain). Personal holdings are paid out at the offer price; while your offer awaits its answer neither you nor the company can buy the target's shares (`offerPending`). Acquired fit-outs aren't booked as fixed assets. An acquired office brings its real customers: it starts with customers × `PRODUCTS_PER_CUSTOMER` plan seats, split by `ACQUIRED_PLAN_MIX` (Plus 60%, Team 20%, Pro 15%, Campus Plan 5%) and billed at your prices, so its customer count carries over. Build by seller strategy: premium → premium, incumbent and community → mid, disruptor → basic. City share compares your customers (plus the target's) with every active rival's customers in the city. A regulator block doesn't start the retry wait; an accepted deal that can no longer close (cash or tier) lapses.
 - **Distressed ask:** ARR × a multiple rolled once at failure in `MERGERS.distressedMultiple` (0.5–0.8) ÷ shares, floored at $1 per share. Offers to a distressed lab compare with the ask.
 
 ### 19.9 Corporate debt from investment banks
@@ -955,7 +956,7 @@ Investment banks lend to you on their Debt tab (`src/sim/corporateDebt.ts`, `COR
   - rate `policy + 0.05` (`spreadWorst`) down to `+0.025` (`spreadBest`) by a score from 0 to 1: the average of runway (months ÷ `bestRunwayMonths` 24, capped at 1, and 1 with no burn) and ARR (÷ `bestArr` $50M, capped at 1); ± a little noise
   - term 52–156 weeks
   - weekly payment amortized; payments are taken even when cash is short (the insolvency rule then applies)
-- **Credit line** (one per lender): limit = `lineEquityShare` (60%) × equity, live; rate `policy + lineSpread` (4%); draw or repay any week; never drawn automatically. The share was 20% when each city had about three rival lenders; a city has about one investment bank.
+- **Credit line** (one per lender): one limit = `lineEquityShare` (60%) × equity, live, shared by all your lines (`creditRoom`), so more lenders don't add more credit; rate `policy + lineSpread` (4%); draw or repay any week; never drawn automatically. The share was 20% when each city had about three rival lenders; a city has about one investment bank.
 - These are corporate debt and flow through corporate cash.
 - **Old saves:** loans and lines taken from rival labs keep accruing and can be repaid from any Debt tab ("Your debt"), but a rival line can't be drawn. Offers still held from rival labs are replaced on the next tick.
 
@@ -1033,7 +1034,7 @@ Eight more cities (CONTENT §2, marked *late*) are closed to AI labs at the star
   - net = revenue − maintenance − vacancy
   - ROI = annualized net / purchase price
   - Value tracks `cre`: `size × baseRent × 3.2 × cre/100`, i.e. size × today's market rent × 3.2, whatever the building's own `marketRent` has caught up to.
-  - **For Sale** toggle: sells within 2–8 weeks at value × normal(1, 0.04).
+  - **For Sale** toggle: sells within 2–8 weeks at value × normal(1, 0.04), less the agent's `REAL_ESTATE.saleFee` (5%). A building can be listed only after `minHoldWeeks` (26) weeks of ownership, so bargain buys can't be flipped at once.
   - Reference: the original showed about 8.7% ROI at 85% occupancy.
 - **21.3 REO:** Retired: foreclosed homes came from defaulted mortgages, which an AI lab doesn't hold.
 - **21.4 Ownership:** choose Company or Private at purchase. Private property counts in personal wealth only.
@@ -1128,7 +1129,7 @@ Run `npm run balance` with seed 42 and the start city Calgary, unless noted. Off
 | First office weekly income turns positive | week 6–16 | branchCheckpoints |
 | Office at week 26 | ARR $1.5–5M; income positive | branchCheckpoints |
 | Office at week 52 | ARR $3–8M; customers 3,500–9,500; income +$24k–$65k/week | branchCheckpoints |
-| Growing home office | week 104: ARR $8–20M, revenue $160–380k/week, income $55–140k/week; week 156: $12–28M, $250–520k, $85–230k; week 208: $16–36M, $320–700k, $110–340k; week 260: $16–38M, $320–720k, $110–360k | branchCheckpoints |
+| Growing home office | week 104: ARR $8–20M, revenue $160–380k/week, income $55–150k/week; week 156: $12–28M, $250–520k, $85–230k; week 208: $16–36M, $320–700k, $110–340k; week 260: $16–38M, $320–720k, $110–360k | branchCheckpoints |
 | Payback of a mid build on an average lot | ≤ 44 weeks from opening | branchCheckpoints |
 | Year 2 (steady) | 1–4 sales offices; HQ required; cash never < 0 | strategyTargets, balance |
 | IPO (steady) | listed in years 3–6 | balance |
@@ -1173,6 +1174,8 @@ Sweep results (seeds 1–20, 10 years): turtle 20/20 clean (was 8), aggressive 1
 
 **Output:** a yearly table (year, offices, ARR, loans, equity, safety ratio, gross margin, loss, ROE, cash, safety tier, policy rate and phase, HQ staff, minimum HQ coverage, nominal index) plus a warning list for every out-of-range target.
 
+**Note (polish pass, 2026-10-28):** a playtest read found that a delegated office manager measured an office's reach by its own storefront, not the city it serves (C2a), so from about week 20 every delegated office ran no marketing at all; the strategies, which delegate marketing, were tuned that way. Fixed, the managers of grown offices ran every campaign, because a campaign cost the same for a Flagship as for a Starter, from the bank-era table (about $3.5k a week for all of them against $100k+ of weekly revenue). Weekly campaign costs now scale with the office's size multiplier, the one that also sets its reach (Starter 1×, Standard 2.5×, Large 5×, Flagship 9×), and `CAMPAIGN_COST_SCALE` (4). A Starter in a new city still runs one or two campaigns; a grown office runs the few that pay back. Offices that market earn a little more in year 2, so the week-104 income ceiling rose from $140k to $150k. The 20-seed steady median sits inside every band; steady, aggressive and turtle on seed 42 pass every check.
+
 ## 26. Parameter index (`balance.ts`)
 
 The main groups, with the defaults shown above. Names marked (legacy) belong to bank machinery that still runs but no longer shapes play.
@@ -1192,7 +1195,7 @@ The main groups, with the defaults shown above. Names marked (legacy) belong to 
 - **MACRO:** `MACRO_TRANSITIONS`, `MACRO_TARGETS`, `MACRO_EMA`, `MACRO_SIGMA`, `MACRO_MIN_PHASE_WEEKS`, `POLICY_*` (rule weights, steps, `POLICY_FLOOR`, `POLICY_CAP`), `CREDIT_CYCLE`, `LOAN_DEMAND`, `NOMINAL_INDEX`, `EQUITY_MARKET_DRIFT`, `MARKET_SHOCK_SIGMA`
 - **PRICES:** `RIVAL_PRICE_DRIFT`, `FEE_COMP_MIN`, `FEE_COMP_SCALE`, `FEE_STEP_MIN`, `FEE_PF_SCALE`, `PRICE_FACTOR_CLAMP`; (legacy) `DEPOSIT_BETA_UP`, `DEPOSIT_BETA_DOWN`, `LOAN_PASS_THROUGH`, `CARD_REPRICE_GAP`, `PF_RATE_STEP`
 - **STAFF:** `BASE_TELLER_WAGE`, `HOURS_PER_WEEK`, `MANAGER_BASE_SALARY`, `QUIT_BASE`, `HIRE_BASE`, `SERVICE_VISIT_RATE`, `MORALE`, `SKILL`, `CANDIDATE_REROLL`, `MANAGER_PAY`
-- **MARKETING:** `START_AWARENESS`, `GRAND_OPENING_BONUS`, `AWARENESS_DECAY`, `BRAND_DECAY`, `BRAND_PASSIVE_PER_BRANCH`
+- **MARKETING:** `START_AWARENESS`, `GRAND_OPENING_BONUS`, `AWARENESS_DECAY`, `BRAND_DECAY`, `BRAND_PASSIVE_PER_BRANCH`, `CAMPAIGN_COST_SCALE` (4, office campaigns' weekly costs, × the office size mult)
 - **RATINGS:** `RATING_EMA`, `PRODUCTS_RATING`, `SERVICE_RATING`, `BRANCH_RATING_WEIGHTS`, `NO_ATM_QUALITY`, `UPKEEP_PENALTY`, `OVERALL_WEIGHTS`, `REVIEW_RATE`
 - **DEMAND:** `PROSPECT_RATE`, `CATCHMENT_MULT`, `SATURATION_EXP`, `SHARE_EXP`, `CITY_MARKET`, `CITY_SATURATION_EXP`, `CITY_BRANCH_GUIDE`, `OFFICE_SIZES`, `OFFICE_TRAFFIC_MULT`, `TAKEUP_CAP`, `STARS_TAKEUP`, `PRODUCTS_PER_CUSTOMER`, `OVERALL_CHURN`, `INTEREST_PERIODS`; (legacy) `RIVAL_RADIUS`, `DISTANCE_FALLOFF`, `MORTGAGE_SPECIAL`, `APPROVAL_INCLUSION`, `INTERCHANGE`
 - **COMPUTE:** `COMPUTE`, `GPU_MARKET`, `SPOT`, `OUTAGE`, `DATA_CENTER`, `POWER_DEAL`
