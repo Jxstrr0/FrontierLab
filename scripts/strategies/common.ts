@@ -109,21 +109,25 @@ const avgSkill = (m: { skills: Record<string, number> }) =>
  * recapitalisation, fund a frontier project at the board's capital review
  * (else bank the cash), otherwise take the option a branch manager would pick
  * (falling back to the first affordable one).
+ * `fixed` names an option by incident type that the strategy always takes when it can.
  */
-export function handleIncidents(state: GameState): void {
+export function handleIncidents(state: GameState, fixed: Record<string, string> = {}): void {
   for (const inc of [...state.incidents.active]) {
+    const own = fixed[inc.type];
     const pick =
-      inc.type === 'RECAP_OFFER'
-        ? 'accept'
-        : inc.type === 'CAPITAL_REVIEW'
-          ? optionBlocker(state, inc, 'project')
-            ? 'bank'
-            : 'project'
-          : (() => {
-              const choice = managerChoice(state, inc);
-              if (!optionBlocker(state, inc, choice)) return choice;
-              return inc.options.find((o) => !optionBlocker(state, inc, o.id))?.id;
-            })();
+      own && !optionBlocker(state, inc, own)
+        ? own
+        : inc.type === 'RECAP_OFFER'
+          ? 'accept'
+          : inc.type === 'CAPITAL_REVIEW'
+            ? optionBlocker(state, inc, 'project')
+              ? 'bank'
+              : 'project'
+            : (() => {
+                const choice = managerChoice(state, inc);
+                if (!optionBlocker(state, inc, choice)) return choice;
+                return inc.options.find((o) => !optionBlocker(state, inc, o.id))?.id;
+              })();
     if (pick) cmd.resolveIncident(state, inc.id, pick);
   }
 }
