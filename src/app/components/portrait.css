@@ -41,9 +41,6 @@
   fill-opacity: 0.3;
   stroke: none;
 }
-.portrait .pt-grey {
-  fill-opacity: 0.1;
-}
 .portrait .pt-white {
   fill: var(--ivory);
   stroke: none;
@@ -135,4 +132,20 @@
 }
 .portrait.is-coarse .pt-frame-in {
   stroke-width: 1.4;
+}
+/* Tinted cloth keeps some paper showing through, like a hand-coloured print. */
+.portrait .pt-cloth {
+  fill-opacity: 0.8;
+}
+.portrait .pt-hair {
+  fill-opacity: 0.85;
+}
+.portrait .pt-tie {
+  fill: var(--ivory);
+  stroke: none;
+}
+.portrait .pt-lips {
+  fill: #b5545c;
+  fill-opacity: 0.32;
+  stroke: none;
 }
