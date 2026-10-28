@@ -1,6 +1,6 @@
 // The part every HQ department floor shares (SCREENS §10): Employees stepper
-// (`18 / 24`) with an Open positions chip, Annual salary with the market hint,
-// staff figures tinted by mood, Skill and Morale bars, and the coverage meter
+// (`18 / 24`) with an Open positions chip, Annual salary with the market hint
+// (and a note when the COO's Pay reviews set it), staff figures tinted by mood, Skill and Morale bars, and the coverage meter
 // ("Needs 21 · Coverage 86%").
 import { HQ_COVERAGE } from '../../config/balance';
 import * as cmd from '../../sim/commands';
@@ -20,6 +20,7 @@ export function DeptStaffing(p: { dept: DeptId }) {
   const desks = deptDesks(s, p.dept);
   const open = Math.max(0, d.target - d.staff);
   const pay = salaryBounds(s, p.dept);
+  const reviews = !!s.executives.seats.coo?.delegations.payReviews;
   return (
     <section>
       <SectionTitle>Team</SectionTitle>
@@ -57,6 +58,12 @@ export function DeptStaffing(p: { dept: DeptId }) {
               hint={`Market ${moneyFull(pay.market, sym)}`}
             />
           </div>
+          {reviews && (
+            <p class="muted small">
+              Your COO reviews this pay{' '}
+              {s.executives.payReviewCadence === 'annual' ? 'once a year' : 'once a quarter'}.
+            </p>
+          )}
           <TeamFigures staff={d.staff} target={d.target} morale={d.morale} />
           <div>
             <StatBar label="Skill" value={d.skill} />
