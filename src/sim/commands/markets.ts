@@ -89,7 +89,7 @@ export function trade(
     if (offerPending(state, securityId))
       return fail('You have an offer pending for this company. Wait for its answer.');
     if (value + commission > accountCash(state, account))
-      return fail(`You need ${money(value + commission)} to buy these shares.`);
+      return fail(`You need ${money(state, value + commission)} to buy these shares.`);
     if (shares > maxBuy(state, account, securityId))
       return fail(
         securityId === SELF_ID

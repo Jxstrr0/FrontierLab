@@ -186,6 +186,9 @@
 .lg-inc::before {
   background: var(--brass-light);
 }
+.lg-loss::before {
+  background: var(--oxblood);
+}
 
 .medallion {
   flex: none;

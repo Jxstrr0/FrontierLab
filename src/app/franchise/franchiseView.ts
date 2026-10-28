@@ -1,12 +1,13 @@
 // Read-only views for the sports franchise panel (SCREENS §20): the club with
 // its spec, who owns it, whether you can buy here, the offer stepper's bounds,
 // the transfer-window status line and the Finance tab's statement rows.
-import { FRANCHISE } from '../../config/balance';
+import { DAYS_PER_WEEK, FRANCHISE, WEEKS_PER_YEAR } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { COUNTRIES } from '../../data/countries';
 import { FRANCHISES, type FranchiseSpec } from '../../data/franchises';
 import { clubWeek, nextWindowStart, openWindow, seasonNet } from '../../sim/franchiseMath';
 import type { ClubState, GameState } from '../../sim/state';
+import { shortDate } from '../format/format';
 
 export interface ClubView {
   spec: FranchiseSpec;
@@ -48,12 +49,21 @@ export function offerBounds(value: number): { min: number; max: number; step: nu
   return { min, max: Math.round(value / step) * step, step };
 }
 
-/** "Open until week 34" or "Transfer window closed until week 27". */
+/** The date `weekOfYear` falls on, counting forward from this week (wrapping into next year). */
+function dateOfWeek(s: GameState, weekOfYear: number): string {
+  const ahead = (weekOfYear - clubWeek(s) + WEEKS_PER_YEAR) % WEEKS_PER_YEAR;
+  return shortDate(s.meta.startDate, s.clock.day + ahead * DAYS_PER_WEEK);
+}
+
+/** "Transfer window open until 24 Aug" or "Transfer window closed until 1 Jan". */
 export function windowStatus(s: GameState): { open: boolean; text: string } {
   const woy = clubWeek(s);
   const w = openWindow(woy);
-  if (w) return { open: true, text: `Transfer window open until week ${w[1]}` };
-  return { open: false, text: `Transfer window closed until week ${nextWindowStart(woy)}` };
+  if (w) return { open: true, text: `Transfer window open until ${dateOfWeek(s, w[1])}` };
+  return {
+    open: false,
+    text: `Transfer window closed until ${dateOfWeek(s, nextWindowStart(woy))}`,
+  };
 }
 
 /** Fan mood in words for the Club tab. */

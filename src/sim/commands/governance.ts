@@ -3,6 +3,7 @@
 // board votes on each (governanceVotes.ts). An approved dividend is declared
 // and paid GOVERNANCE.payDelayWeeks later; an approved salary takes effect at
 // once. The regulator's cap (§15) refuses dividends above it outright.
+import { exactMoney } from '../../data/settingsOptions';
 import { BOARD_VOTE, GOVERNANCE, QUARTERS_PER_YEAR, RUNWAY } from '../../config/balance';
 import { spendableCash } from '../runway';
 import { boardBlocker, declareDividend, quarterLabel } from '../governance';
@@ -41,7 +42,7 @@ export function proposalProblem(
   if (cap !== null && dps > cap + 1e-9)
     return cap <= 0
       ? 'The regulator forbids dividends in this safety tier.'
-      : `The regulator caps this quarter's dividend at $${cap.toFixed(2)} a share.`;
+      : `The regulator caps this quarter's dividend at ${exactMoney(cap, state.settings.currency)} a share.`;
   if (dps > 0 && state.governance.pendingDividend)
     return 'The last dividend has not been paid yet. Propose no dividend this time.';
   // §14: a dividend may only pay out cash above the runway gate's reserve.
@@ -49,9 +50,9 @@ export function proposalProblem(
   if (dps * state.company.sharesOutstanding > room + 1e-6)
     return room <= 0
       ? `No dividend while runway is under ${RUNWAY.gateMonths} months.`
-      : `Cash allows at most $${(Math.floor((room / Math.max(1, state.company.sharesOutstanding)) * 100) / 100).toFixed(2)} a share and keeps ${RUNWAY.gateMonths} months of runway.`;
+      : `Cash allows at most ${exactMoney(Math.floor((room / Math.max(1, state.company.sharesOutstanding)) * 100) / 100, state.settings.currency)} a share and keeps ${RUNWAY.gateMonths} months of runway.`;
   const max = maxCeoSalary(state);
-  if (ceoSalary > max) return `The board won't consider a salary above ${money(max)}.`;
+  if (ceoSalary > max) return `The board won't consider a salary above ${money(state, max)}.`;
   return undefined;
 }
 

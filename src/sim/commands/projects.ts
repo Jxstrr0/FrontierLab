@@ -14,12 +14,12 @@ export function startProject(state: GameState, projectId: string): CommandResult
   if (!spec) return fail('Unknown project.');
   const block = projectBlock(state, spec);
   if (block === 'ARR too low.')
-    return fail(`${spec.name} needs ${money(spec.minArr)} of ARR to start.`);
+    return fail(`${spec.name} needs ${money(state, spec.minArr)} of ARR to start.`);
   if (block) return fail(block);
   const upfront = projectUpfront(state, spec);
   if (state.company.cash < upfront)
     return fail(
-      `Keep ${money(upfront)} in cash to start: ${FRONTIER_PROJECTS.startWeeks} weeks of payments.`,
+      `Keep ${money(state, upfront)} in cash to start: ${FRONTIER_PROJECTS.startWeeks} weeks of payments.`,
     );
   beginProject(state, spec);
   return ok();

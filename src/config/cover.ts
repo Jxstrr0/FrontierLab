@@ -19,7 +19,7 @@ export const COVER_MAX_FLAGS = 12;
 export const COVER_MAX_RIVAL_FLAGS = 40;
 /** Showcase flags on the cover for a new player, on the free lots nearest the financial district. */
 export const COVER_SHOWCASE_FLAGS = 3;
-/** Ink of the showcase flags (Vault Blue, the default brand ink). */
+/** Ink of the showcase flags (Midnight Blue, the default brand ink). */
 export const COVER_SHOWCASE_INK = '#2C4A7A';
 /** The signature landmark pulls the camera halfway toward it when it's within this many world px of the centre. */
 export const COVER_SIGNATURE_REACH = 520;

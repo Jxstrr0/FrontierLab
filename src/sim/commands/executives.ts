@@ -76,7 +76,8 @@ export function rerollExecCandidates(
   if (!isSeat(seat)) return fail('Unknown seat.');
   if (state.executives.seats[seat]) return fail(`You already have a ${EXEC_SEATS[seat].short}.`);
   const fee = execRerollFee(state, seat);
-  if (state.company.cash < fee) return fail(`Not enough cash: new candidates cost ${money(fee)}.`);
+  if (state.company.cash < fee)
+    return fail(`Not enough cash: new candidates cost ${money(state, fee)}.`);
   spend(state, 'execPay', fee);
   const pool: Executive[] = [];
   for (let i = 0; i < EXECUTIVES.candidatesPerSeat; i++) {
@@ -99,7 +100,7 @@ export function fireExec(
   if (!exec) return fail('That seat is already empty.');
   const severance = execSeverance(exec.salary);
   if (!force && state.company.cash < severance)
-    return fail(`Severance is ${money(severance)}. Not enough cash.`);
+    return fail(`Severance is ${money(state, severance)}. Not enough cash.`);
   spend(state, 'execPay', severance);
   vacateSeat(state, seat, 'fired', severance);
   return ok({ severance });
@@ -112,7 +113,7 @@ export function setExecSalary(state: GameState, seat: ExecSeat, salary: number):
   const b = execSalaryBounds(state);
   const s = roundToStep(salary, EXEC_PAY.salaryStep);
   if (s < b.min || s > b.max)
-    return fail(`Salary can be set from ${money(b.min)} to ${money(b.max)}.`);
+    return fail(`Salary can be set from ${money(state, b.min)} to ${money(state, b.max)}.`);
   exec.salary = s;
   return ok();
 }

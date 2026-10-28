@@ -10,7 +10,7 @@ import type { Partnership, Site } from '../../sim/state';
 import { Card, Confirm, LineChart, Row, StatBar } from '../components';
 import { branchPrice } from '../../sim/branch/pricing';
 import { productSpec } from '../../sim/products';
-import { count, money } from '../format/format';
+import { count, money, weeksText } from '../format/format';
 import { priceText } from '../branch/selectors';
 import { act, toast, useGame } from '../store';
 import { contractCurve, productName } from './partnerView';
@@ -31,7 +31,7 @@ export function YoursCard(p: { site: Site; partnership: Partnership }) {
     ? s.company.cash < fee
       ? `Not enough cash: you need ${money(fee, sym)}.`
       : 'Another full contract from the end of this one.'
-    : `Renewal opens in ${count(weeksToWindow)} weeks, in the contract's last year.`;
+    : `Renewal opens in ${weeksText(weeksToWindow)}, in the contract's last year.`;
   const name = site.employer?.name ?? site.refId;
 
   const renew = () => {

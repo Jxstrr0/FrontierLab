@@ -20,7 +20,7 @@ import {
 } from '../../sim/powerDeals';
 import type { PowerDeal, Site } from '../../sim/state';
 import { Card, Confirm, Row, SectionTitle, StatBar } from '../components';
-import { count, money } from '../format/format';
+import { count, money, weeksText } from '../format/format';
 import { act, toast, useGame } from '../store';
 
 const discountPct = Math.round((1 - POWER_DEAL.powerDiscount) * 100);
@@ -113,7 +113,7 @@ function Yours(p: { site: Site; deal: PowerDeal }) {
       <p class="small pt-center muted">
         {renewable
           ? 'Another full contract from the end of this one.'
-          : `Renewal opens in ${count(weeksToWindow)} weeks, in the contract's last year.`}
+          : `Renewal opens in ${weeksText(weeksToWindow)}, in the contract's last year.`}
       </p>
       <button type="button" class="btn btn-secondary btn-block" onClick={() => setConfirm(true)}>
         Release

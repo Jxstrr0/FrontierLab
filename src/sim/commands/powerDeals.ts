@@ -27,7 +27,7 @@ export function powerDealBlocker(state: GameState, siteId: string): string | und
   const paused = pauseBlock(state);
   if (paused) return paused;
   const fee = powerDealFee(state, site);
-  if (state.company.cash < fee) return `Not enough cash: you need ${money(fee)}.`;
+  if (state.company.cash < fee) return `Not enough cash: you need ${money(state, fee)}.`;
   return undefined;
 }
 
@@ -68,7 +68,7 @@ export function renewPowerDeal(state: GameState, dealId: string): CommandResult<
   if (!d || !isEnergySite(site) || d.status !== 'active') return fail('That deal has ended.');
   if (!canRenewDeal(state, d)) return fail('Renewal opens in the last year of the contract.');
   const fee = powerDealRenewalFee(state, site, d);
-  if (state.company.cash < fee) return fail(`Not enough cash: you need ${money(fee)}.`);
+  if (state.company.cash < fee) return fail(`Not enough cash: you need ${money(state, fee)}.`);
   postCash(state, -fee, 'investing');
   d.termWeeks += PARTNER_CONTRACT_WEEKS;
   d.fee += fee;

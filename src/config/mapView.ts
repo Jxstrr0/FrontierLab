@@ -91,7 +91,7 @@ export const CLUSTER_MARK_PX = { crest: 26, medallion: 25, coin: 14 } as const;
 export const CLUSTER_STACK_MAX = 3;
 /**
  * From this zoom up, places show a short caption under the pin ("Credit bureau"),
- * notes ("Sale wk 4"), the words on price tags ("For lease") and the coins' "$".
+ * notes ("Sale 14 Mar"), the words on price tags ("For lease") and the coins' "$".
  */
 export const PIN_CAPTION_FROM_ZOOM = 1.5;
 /** Words dropped from a rival lab's name for the caption under its crest. */
