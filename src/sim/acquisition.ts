@@ -51,8 +51,8 @@ export function closeAcquisition(
   settleDebt(state, bank.id);
   // A won Lobbying fast-track covers one deal (§19.8).
   if (state.lobbying?.fastTrack) delete state.lobbying.fastTrack;
-  // The target's cash (and the loans' fair-value markdown, if any) arrives as reserves.
-  state.treasury.reserves += plan.reserves;
+  // The target's cash arrives in company cash, free to spend (§19.8).
+  postCash(state, plan.reserves, 'investing');
   state.company.leaseDeposits += plan.leaseDeposits;
 
   const converted = bank.branches.map((rb) => convertRivalBranch(state, bank, rb, rng));

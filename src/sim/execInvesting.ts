@@ -20,7 +20,7 @@ import { COMMISSION, EXEC_DELEGATION as X, RUNWAY } from '../config/balance';
 import { balanceSheet } from './balanceSheet';
 import { maxBuy, trade } from './commands/markets';
 import { buyStartupLot, ventureTierBlock } from './commands/ventures';
-import { expansionReserve } from './execDelegationsGrowth';
+import { fixedReserve } from './execDelegationsGrowth';
 import { delegationOn } from './execSeats';
 import { startupShares, type Account } from './portfolio';
 import { holdingsValue } from './securities';
@@ -64,7 +64,7 @@ export function weeksToInvest(state: GameState): number {
 
 const SPARE_CASH =
   'Waiting for spare cash: the chief keeps a year of your salary and spends at most a quarter of the rest at a time.';
-const RESERVE = 'Waiting for spare cash: the chief keeps 8 weeks of costs in reserve.';
+const RESERVE = `Waiting for spare cash: the chief keeps ${X.expansionReserveWeeks} weeks of costs in reserve.`;
 const RUNWAY_SHORT = `Runway would fall under ${RUNWAY.gateMonths} months.`;
 
 /** The most one purchase may spend from your own cash. */
@@ -94,7 +94,7 @@ function coolingOff(state: GameState, account: Account, id: string): boolean {
 function bankStockBudget(state: GameState): number | string {
   const tier = ventureTierBlock(state);
   if (tier) return tier;
-  const cash = state.company.cash - expansionReserve(state);
+  const cash = state.company.cash - fixedReserve(state);
   if (cash <= 0) return RESERVE;
   const bs = balanceSheet(state);
   const room = X.investStockCap * bs.assets - holdingsValue(state, 'company');
@@ -137,7 +137,7 @@ export function nextStock(state: GameState, account: Account): Plan<StockPick> {
 function bankStartupBlocker(state: GameState, price: number): string | undefined {
   const tier = ventureTierBlock(state);
   if (tier) return tier;
-  if (price > state.company.cash - expansionReserve(state)) return RESERVE;
+  if (price > state.company.cash - fixedReserve(state)) return RESERVE;
   const bs = balanceSheet(state);
   if (bs.ventures + price > X.investVentureCap * bs.assets)
     return `The lab's startup stakes would pass ${Math.round(X.investVentureCap * 100)}% of its assets.`;

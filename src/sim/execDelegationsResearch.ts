@@ -133,7 +133,7 @@ export function talentPlan(state: GameState): TalentPlan {
     if (salary / WEEKS_PER_YEAR > spare) continue;
     return { ...plan, pick: r, salary };
   }
-  const cheapest = hireTerms(state, free[free.length - 1]!).salary;
+  const cheapest = Math.min(...free.map((r) => hireTerms(state, r).salary));
   return {
     ...plan,
     blocker:

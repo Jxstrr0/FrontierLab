@@ -60,7 +60,7 @@ export function hireExec(state: GameState, seat: ExecSeat, candidateId: string):
   const exec = state.executives.candidates[seat]?.find((c) => c.id === candidateId);
   if (!exec) return fail('That candidate has taken another job.');
   seatExecutive(state, exec);
-  seedGrowthCities(state);
+  if (seat === 'coo') seedGrowthCities(state);
   return ok();
 }
 
@@ -89,10 +89,17 @@ export function rerollExecCandidates(
   return ok({ fee });
 }
 
-export function fireExec(state: GameState, seat: ExecSeat): CommandResult<{ severance: number }> {
+/** Fires the executive in `seat` with severance; `force` (a floor released) skips the cash check. */
+export function fireExec(
+  state: GameState,
+  seat: ExecSeat,
+  force = false,
+): CommandResult<{ severance: number }> {
   const exec = state.executives.seats[seat];
   if (!exec) return fail('That seat is already empty.');
   const severance = execSeverance(exec.salary);
+  if (!force && state.company.cash < severance)
+    return fail(`Severance is ${money(severance)}. Not enough cash.`);
   spend(state, 'execPay', severance);
   vacateSeat(state, seat, 'fired', severance);
   return ok({ severance });
@@ -120,7 +127,8 @@ export function setExecDelegation(
   if (!exec) return fail('Hire an executive for that seat first.');
   if (!EXEC_SEATS[seat].delegations.some((d) => d.id === id)) return fail('Unknown delegation.');
   exec.delegations[id] = on;
-  seedGrowthCities(state);
+  // Only switching Expansion on seeds the growth cities, so a list you cleared stays cleared.
+  if (seat === 'coo' && id === 'expansion' && on) seedGrowthCities(state);
   // Switching Pay reviews on runs the first review at once; so does a Rents switch.
   if (seat === 'coo' && id === 'payReviews' && on) runPayReview(state);
   if (seat === 'cfo' && on && (id === 'bankRents' || id === 'privateRents'))

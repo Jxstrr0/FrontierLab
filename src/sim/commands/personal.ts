@@ -27,8 +27,8 @@ const NOT_HERE = 'You need to be in this city to buy here.';
 /**
  * Offers on the vacation home at a map building, with personal cash. The seller
  * answers at once (§21.1-style ramp); a refusal shuts the door for
- * HOMES_CFG.refusalWeeks. The home is worth its asking price, so a bargain
- * shows as a gain.
+ * HOMES_CFG.refusalWeeks. The home is booked at the price paid, so buying
+ * and selling at once only loses the sale fee.
  */
 export function offerHome(
   state: GameState,
@@ -59,7 +59,7 @@ export function offerHome(
     id: newId(state, 'home'),
     homeId: spec.id,
     price: offer,
-    value: asking,
+    value: offer,
     boughtWeek: state.clock.week,
     hpiRef: homeHpi(state, spec.id),
   });

@@ -26,18 +26,20 @@ function equityNow(state: GameState): number {
   return Math.max(0, balanceSheet(state).equity);
 }
 
-/** A line of credit's limit from any one lender: 20% of equity, computed live (§19.9). */
+/** The credit limit shared by all your lines: lineEquityShare of equity, computed live (§19.9). */
 export function creditLimit(state: GameState): number {
   return CORPORATE_LENDING.lineEquityShare * equityNow(state);
 }
 
 /** Undrawn credit you could draw today across every lender near you (DESIGN §5.18). */
 export function creditAvailable(state: GameState): number {
-  const limit = creditLimit(state);
-  return lendersNearYou(state).reduce(
-    (sum, r) => sum + Math.max(0, limit - (state.corporateDebt.lines[r.id]?.drawn ?? 0)),
-    0,
-  );
+  return lendersNearYou(state).length > 0 ? creditRoom(state) : 0;
+}
+
+/** Credit left to draw: one limit shared by all your lines, less what they have drawn (§19.9). */
+export function creditRoom(state: GameState): number {
+  const drawn = Object.values(state.corporateDebt.lines).reduce((sum, l) => sum + l.drawn, 0);
+  return Math.max(0, creditLimit(state) - drawn);
 }
 
 /** Line of credit rate: home policy + 4% (§19.9). */

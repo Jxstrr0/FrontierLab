@@ -70,12 +70,14 @@ function runProperty(state: GameState, p: Property): void {
 }
 
 /**
- * Completes a For Sale listing at value × normal(1, 0.04). The company's
- * proceeds are investing cash and the difference from value is a property
- * gain or loss, so equity moves only by that difference.
+ * Completes a For Sale listing at value × normal(1, 0.04), less the agent's
+ * REAL_ESTATE.saleFee. The company's proceeds are investing cash and the
+ * difference from value is a property gain or loss, so equity moves only by
+ * that difference.
  */
 function sell(state: GameState, p: Property): void {
-  const price = Math.max(0, p.value * stream(state, 'realEstate').normal(1, REAL_ESTATE.saleSigma));
+  const gross = p.value * stream(state, 'realEstate').normal(1, REAL_ESTATE.saleSigma);
+  const price = Math.max(0, gross * (1 - REAL_ESTATE.saleFee));
   if (p.owner === 'company') {
     postCash(state, price, 'investing');
     postPnl(state, 'propertyGains', price - p.value);

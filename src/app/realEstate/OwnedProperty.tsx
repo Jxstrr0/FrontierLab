@@ -33,6 +33,8 @@ export function OwnedProperty(p: { property: Property; site: Site }) {
   const chief = s.executives.seats.cfo;
   const weeksLeft = prop.saleWeek !== undefined ? Math.max(1, prop.saleWeek - s.clock.week) : 0;
   const [lo, hi] = REAL_ESTATE.saleWeeks;
+  const holdLeft = cmd.saleWaitWeeks(s, prop);
+  const fee = `less a ${pct(REAL_ESTATE.saleFee, 0)} agent's fee`;
   return (
     <div class="stack">
       <Card>
@@ -87,10 +89,13 @@ export function OwnedProperty(p: { property: Property; site: Site }) {
           label="For Sale"
           checked={prop.forSale}
           onChange={(on) => act(cmd.setPropertyForSale, prop.id, on)}
+          disabled={!prop.forSale && holdLeft > 0}
           hint={
             prop.forSale
-              ? `Sells in about ${weeksLeft === 1 ? '1 week' : `${weeksLeft} weeks`}, near its estimated value.`
-              : `Sells within ${lo}–${hi} weeks, near its estimated value.`
+              ? `Sells in about ${weeksLeft === 1 ? '1 week' : `${weeksLeft} weeks`}, near its estimated value ${fee}.`
+              : holdLeft > 0
+                ? `You can list it in ${holdLeft === 1 ? '1 week' : `${holdLeft} weeks`} (buildings are held at least ${REAL_ESTATE.minHoldWeeks} weeks).`
+                : `Sells within ${lo}–${hi} weeks, near its estimated value ${fee}.`
           }
         />
       </Card>

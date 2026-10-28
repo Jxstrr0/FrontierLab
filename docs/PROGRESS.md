@@ -3,13 +3,42 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.48, save schema 30). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
+**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.49, save schema 30). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `0ca1e708522f78` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `118f39c1c8c317` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-28 — Polish and bug pass, batch 1: exploits and sim bugs (v0.1.49)
+
+The owner asked for a polish and bug pass. Four Claude reviewers each read one part of the code like a playtester: the core economy, rivals and markets, people and personal life, and the screens (the last one also played the game in a phone-sized browser). Every finding was checked against the code before it was fixed. This batch fixes the exploits and the simulation bugs; the balance and screen findings follow in their own batches.
+
+**Exploits closed.**
+- **Dividends could empty the lab.** While private you hold every share, so the board passes any dividend, and nothing checked cash: a $6M lab could pay out $18M, straight into your personal cash. A dividend now has to leave 12 months of runway in the bank; the board meeting says the most a share it allows.
+- **Buying a rival under your own offer.** You could offer a premium for a rival, buy its shares cheaply in the meantime, and have your company pay you the premium. While your offer awaits its answer, nobody can buy that rival's shares.
+- **Home and building flips.** A home bought below asking was booked at the asking price and could be sold at once for free money; a building bought cheap could be put up for sale the same week. Homes are now booked at what you paid; a building can be listed only after 26 weeks and its sale pays a 5% agent's fee.
+- **Credit lines stacked.** Each investment bank lent up to 60% of your equity, so ten cities meant six times your equity in credit. All your lines now share one 60% limit.
+- **Withdrawn products kept billing at any price.** Switching a product off, then raising its price, kept charging its customers without touching your Price stars. A withdrawn product with customers now counts in the Price rating.
+
+**Bugs fixed.**
+- **Delegated office managers stopped marketing.** They measured an office's reach by one storefront, not the whole city, so from about week 20 every delegated office ran no campaigns. Fixed — and that showed campaigns cost the same for a Flagship as for a Starter, from the old bank prices, so a big office marketed almost for free. Campaign costs now grow with office size (Starter 1×, Standard 2.5×, Large 5×, Flagship 9×, × a scale of 4), so a Starter still runs a campaign or two and a big office runs the few that pay back. See the balance note below.
+- **An acquired rival's cash was locked away** in old bank-style reserves you could never spend. It now lands in company cash.
+- **The CMO shut down city campaigns because of your country campaigns.** Their budget counted every brand campaign; it now counts only the city ones they run.
+- **Growth cities came back by themselves.** Flipping any executive switch re-marked every city for the COO. Now only hiring a COO or switching Expansion on does.
+- **The CFO followed the COO's reserve dial.** Buying and investing now keep their fixed 8 weeks, as the doc says, and the message says so.
+- **Firing an executive could overdraw cash.** It now needs the severance in cash (releasing the Executive floor still lets everyone go).
+- **Researchers stayed on the payroll without a Products floor.** Releasing the floor now lets them go.
+- **GPU lots ran a week short** (a 26-week lot served 25). They now run their full term.
+- **A blank discount on the Deal Desk silently lost the bid.** It's now refused with "Enter a discount."
+- **The CPO's research-hire message** picked the wrong "cheapest" researcher.
+
+**Balance.** Working office marketing makes offices grow a little faster. With the size-scaled costs, the 20-seed steady median passes every band once the week-104 income ceiling moves from $140k to $150k. Steady, aggressive and turtle on seed 42 pass every check. The determinism snapshot moved to `118f39c1c8c317` (intended: the fixes above change the simulation). No state changed shape, so the schema stays 30.
+
+**Checked.** `npm run lint`, 1,137 tests (a new `polishPass.test.ts` covers each fix), `npm run build`, `npm run balance` for three strategies and a 20-seed sweep.
+
+**Still to come.** Batch 2 is balance (researcher pay and pay reviews, lobbying grants that always pay, startup acquisitions that always lose, currencies drifting to their ceiling, distressed rivals' prices, a one-share grant halving resignations). Batch 3 is screens (money shown in dollars whatever currency you picked, number fields that reset when cleared, "$1000K", wording leftovers, the tutorial guide covering the top bar).
 
 ### 2026-10-28 — COO sets floor pay; results dated like the calendar (v0.1.48)
 

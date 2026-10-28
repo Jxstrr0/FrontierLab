@@ -37,6 +37,7 @@ describe('property pins', () => {
     const site = s.world.sites[listing.siteId]!;
     expect(propertyPinInfo(s, site)).toMatchObject({ visible: true, owned: true });
     expect(propertyPinInfo(s, site).tag).toBeUndefined();
+    s.realEstate.properties[site.id]!.boughtWeek -= REAL_ESTATE.minHoldWeeks;
     cmd.setPropertyForSale(s, site.id, true);
     expect(propertyPinInfo(s, site).tag).toBe('Selling');
   });
