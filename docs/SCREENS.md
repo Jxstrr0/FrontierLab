@@ -641,6 +641,12 @@ After Part 1 is finished or skipped, with Settings → Guides on (the default):
 - One row per milestone (data/milestones.ts) in order: a filled brass diamond ◆ when reached with "Reached {date}", an outline ◇ with the goal otherwise.
 - Read-only. Reaching one toasts "Milestone reached: …"; the big ones also make a Ledger story.
 
+## 28a. Frontier projects (menu → Frontier projects)
+
+- **Under way** card (when one runs): name, a progress bar with the percent done, weeks left, weekly payment, spent so far, "Stalled: not enough cash" when stalled, and a Cancel button that asks to confirm ("what was spent is gone").
+- One card per project (SIMULATION §16.14, CONTENT §7d): name, blurb, reward line, today's price, length and minimum ARR. A Start button when it can start, otherwise the reason (finished, needs another first, ARR too low, another under way, not enough cash).
+- The house model card shows "/ {ceiling}" and its rosettes scale to the raised ceiling.
+
 ## 29. Portfolio (menu → Portfolio)
 
 The same view as the HQ Investment floor's portfolio, reachable from anywhere:

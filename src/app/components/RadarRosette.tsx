@@ -40,6 +40,8 @@ export function RadarRosette(p: {
   label?: string;
   format?: (v: number) => string;
   class?: string;
+  /** The score at the outer ring (10 unless a model's ceiling has risen). */
+  max?: number;
 }) {
   const size = p.size ?? 'full';
   const g = SIZES[size];
@@ -50,9 +52,8 @@ export function RadarRosette(p: {
     g.cy + r * Math.sin(angle(i, n)),
   ];
   const fmt = p.format ?? String;
-  const points = p.scores.map((v, i) =>
-    at(i, (g.r * Math.max(0, Math.min(MAX_SCORE, v))) / MAX_SCORE),
-  );
+  const max = p.max ?? MAX_SCORE;
+  const points = p.scores.map((v, i) => at(i, (g.r * Math.max(0, Math.min(max, v))) / max));
   const polygon = points.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
   const summary = p.axes.map((a, i) => `${a.join(' ')} ${fmt(p.scores[i] ?? 0)}`).join(', ');
   return (

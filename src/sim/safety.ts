@@ -6,6 +6,7 @@
 // instead (runway.ts).
 import {
   CAPITAL_GATE,
+  FRONTIER_PROJECTS,
   HQ_COVERAGE,
   LAUNCH_POSTURE,
   LICENCE,
@@ -15,6 +16,7 @@ import {
 import type { Tier } from '../data/types';
 import { capitalBufferPp } from './capital';
 import { clamp } from './math';
+import { hasInstitute } from './projects';
 import type { Business, GameState } from './state';
 import { RADAR, activeModel, modelQuality, qualityBar } from './underwriting';
 
@@ -40,7 +42,7 @@ const posture = (state: GameState, table: readonly number[]) =>
 
 /**
  * §15: 1 + frontierWeight × lead over the bar − modelSafetyWeight × (Safety
- * axis − 5) + the launch posture's exposure.
+ * axis − 5) + the launch posture's exposure − the Safety Institute's cut (§16.14).
  */
 export function safetyExposure(state: GameState): number {
   const m = activeModel(state);
@@ -50,7 +52,8 @@ export function safetyExposure(state: GameState): number {
     1 +
       SAFETY.frontierWeight * lead -
       SAFETY.modelSafetyWeight * (m.radar[RADAR.safety] - 5) +
-      posture(state, LAUNCH_POSTURE.exposure),
+      posture(state, LAUNCH_POSTURE.exposure) -
+      (hasInstitute(state) ? FRONTIER_PROJECTS.instituteExposureCut : 0),
   );
 }
 

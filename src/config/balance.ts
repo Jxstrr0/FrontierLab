@@ -858,6 +858,24 @@ export const TRAINING = {
  */
 export const FRONTIER_COST = { fromQuality: 7, perPoint: 2.5 } as const;
 /**
+ * Frontier projects (post-C8, SIMULATION §16.14): multi-year builds bought
+ * from the Frontier projects panel, one at a time, paid weekly (cost ÷ weeks
+ * at the home price list when started). To start, cash must cover startWeeks
+ * of payments. A week cash can't cover stalls the project. Each quarter start an
+ * active project overruns with chance overrunP, adding U(overrunShare) to
+ * its weeks and its cost. Rewards are in src/data/frontierProjects.ts.
+ */
+export const FRONTIER_PROJECTS = {
+  startWeeks: 13,
+  overrunP: 0.15,
+  overrunShare: [0.1, 0.25] as readonly [number, number],
+  /** The Gigawatt Campus's power: GPUs × DATA_CENTER.powerPerGpuWeek × campusPue × energySitePower a week. */
+  campusPue: 1.05,
+  /** The Safety Institute: safety exposure − exposureCut, company incident chances × incidentMult. */
+  instituteExposureCut: 0.3,
+  instituteIncidentMult: 0.7,
+} as const;
+/**
  * Rival model releases (§16.12): each quarter an active rival ships a new
  * generation with chance releaseQuarterly, gaining normal(gainMean, gainSigma)
  * quality (at least minGain, capped at MODEL_RADAR_MAX). Rivals start at
