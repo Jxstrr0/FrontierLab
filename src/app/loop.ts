@@ -267,6 +267,7 @@ const EVENT_TEXT: Record<string, (p: Record<string, unknown>) => string> = {
   PROJECT_DONE: (p) => `${String(p.name)} is finished.`,
   PROJECT_OVERRUN: (p) => `${String(p.name)} is running late: ${Number(p.weeks)} more weeks.`,
   PROJECT_STALLED: (p) => `${String(p.name)} has stalled: not enough cash for this week's payment.`,
+  SPECIAL_DIVIDEND: () => 'The special dividend has been paid. Your share is in personal cash.',
 };
 
 /** Events about a country toast only when it is your home country (nine central banks meet). */

@@ -92,7 +92,7 @@ export function IncidentModal() {
             >
               <span class="inc-option-head">
                 <span class="inc-option-label">{o.label}</span>
-                {!spec?.info && (
+                {!spec?.info && !spec?.hideCosts && (
                   <span class="inc-option-cost">
                     {o.cost > 0 ? money(o.cost, s.settings.currency) : 'No cost'}
                   </span>

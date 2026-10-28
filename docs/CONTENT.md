@@ -846,7 +846,7 @@ Sizes (`BUSINESS.sizes` in balance.ts): small, mid and large weigh 0.55 / 0.33 /
 ## 22. Incidents
 Implemented in `src/data/incidents.ts` (texts and options) and `src/data/incidentParams.ts` (numbers). The case ids are bank-era; the title column is what the player sees.
 
-Default cooldown: 8 weeks per scope. The flat costs of the jailbreak fix and post-mortem, the weights rotation and the breach's forensic firm grow with the lab: × `max(1, company ARR ÷ $50M)^0.8` (`INCIDENT_SCALE`), so a $2.5B lab pays about 23× the listed price. Office cases go to a manager trusted with Sales office troubles; company and city cases to a COO trusted with Company troubles (SIMULATION §17.2), except those marked **yours** below (EXEC_POACHED, RESEARCHER_POACHED, BANK_RUN, RECAP_OFFER), which always reach you. `penaltyWeeks` on an option is how a delegated decider values its non-cash effects, in weeks of revenue.
+Default cooldown: 8 weeks per scope. The flat costs of the jailbreak fix and post-mortem, the weights rotation and the breach's forensic firm grow with the lab: × `max(1, company ARR ÷ $50M)^0.8` (`INCIDENT_SCALE`), so a $2.5B lab pays about 23× the listed price. Office cases go to a manager trusted with Sales office troubles; company and city cases to a COO trusted with Company troubles (SIMULATION §17.2), except those marked **yours** below (EXEC_POACHED, RESEARCHER_POACHED, BANK_RUN, RECAP_OFFER, CAPITAL_REVIEW), which always reach you. `penaltyWeeks` on an option is how a delegated decider values its non-cash effects, in weeks of revenue.
 
 | id | Title | Scope | Weekly base p | Condition / multiplier | Options (cost → effect) |
 |---|---|---|---|---|---|
@@ -863,6 +863,7 @@ Default cooldown: 8 weeks per scope. The flat costs of the jailbreak fix and pos
 | CARD_FRAUD | Abuse ring | company offering the API | 0.0015 | × (1.3 − model Safety/10) | Absorb the losses (2% of API ARR) · Freeze API sign-ups for a week (API take-up −50% for 4 wk) · Absorb and call a fraud firm |
 | STAFF_WALKOUT | Staff walkout | office | 0.03 | morale < 25 | Raise wages 10% · Pay a bonus ($1,000 per staff, morale +20) · Wait it out (closed 1 wk, then morale +10) |
 | DIVIDEND_DUE | Dividend due | company | 3 weeks before payment | info | OK |
+| CAPITAL_REVIEW | Board capital review | company | year start, surplus cash ≥ $250M (SIMULATION §19.6b) | yours; no cost tags | Fund a frontier project (+3% sentiment) · Buy back shares (up to the amount) · Special dividend (the amount, paid now) · Bank it (−4% sentiment; the deadline's pick) |
 | PRICE_WAR | Price war | city | SIMULATION §18.6 | — | Match it (plan prices −10% at your office in the city for 26 wk, `planCut`) · Hold our prices |
 | BIG_DEFAULT | Big customer failure | office | — | no longer raised; big contract losses make the paper instead (§23) | OK |
 | INSIDER_PROBE | Insider trading probe | personal | SIMULATION §22 | — | Settle (fine) · Fight it (50%: cleared, or fine ×2 and news) |
