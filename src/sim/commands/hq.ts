@@ -2,6 +2,8 @@
 // its first floors, add or release floors, release a whole office, and set a
 // department's staff target, salary or an HR benefit.
 import {
+  DEPT_SALARY_RANGE,
+  DEPT_SALARY_STEP,
   FEATURES,
   FLOOR_FITOUT,
   FLOOR_FITOUT_LIFE_WEEKS,
@@ -25,9 +27,8 @@ import type { GameState, Office } from '../state';
 import { fireExec } from './executives';
 import { fail, money, ok, type CommandResult } from './result';
 
-/** Salary stepper: $1,000 steps between half and three times the market salary. */
-export const DEPT_SALARY_STEP = 1_000;
-export const DEPT_SALARY_RANGE: [number, number] = [0.5, 3];
+/** Salary stepper bounds, re-exported for the HQ screens. */
+export { DEPT_SALARY_RANGE, DEPT_SALARY_STEP };
 
 /** Fit-out of one floor in a city (§16.1), at today's price list there (§4.6). */
 export function floorFitout(state: GameState, cityId: string): number {

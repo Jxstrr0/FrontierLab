@@ -9,8 +9,14 @@ import type { GameState, WeeklySnapshot } from '../../sim/state';
 
 export type ResultsPeriod = 'weekly' | 'monthly' | 'quarterly';
 
-/** The calendar day a snapshot's week ended on. */
+/** The calendar day a snapshot's week ended on (it decides the month or quarter). */
 export const snapshotEndDay = (week: number): number => week * DAYS_PER_WEEK - 1;
+
+/**
+ * The day a snapshot's week closed: the date on the top bar when its results
+ * open, and the date the Ledger, the Finance floor and the charts give it.
+ */
+export const snapshotCloseDay = (week: number): number => week * DAYS_PER_WEEK;
 
 /** Snapshot weeks with the same key fall in the same week, month or quarter. */
 export function periodKey(period: ResultsPeriod, startDate: string, week: number): string {
