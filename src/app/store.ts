@@ -6,6 +6,7 @@ import { signal } from '@preact/signals';
 import type { CommandResult } from '../sim/commands';
 import type { CountryId } from '../data/types';
 import type { DeptId, GameState } from '../sim/state';
+import { localizeMoney } from './format/format';
 
 export type Screen = 'title' | 'newgame' | 'game' | 'saves' | 'settings' | 'credits';
 
@@ -119,7 +120,9 @@ export function toast(
   ms = 3200,
   action?: Toast['action'],
 ): void {
-  const t: Toast = { id: ++toastId, text, tone, action };
+  // Amounts the simulation wrote in dollars follow the currency setting.
+  const sym = current?.settings.currency ?? '$';
+  const t: Toast = { id: ++toastId, text: localizeMoney(text, sym), tone, action };
   toasts.value = [...toasts.value, t].slice(-3);
   setTimeout(() => {
     toasts.value = toasts.value.filter((x) => x.id !== t.id);

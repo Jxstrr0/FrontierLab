@@ -24,19 +24,31 @@ const MONTH_NAMES = [
 
 /** Compact money for cards and headlines: $2.10T, $1.48B, $29.8M, $83.7K, $950. */
 export function money(x: number, symbol = '$'): string {
-  const sign = x < 0 ? '−' : '';
   const a = Math.abs(toCurrency(x, symbol));
-  if (a >= 1e12) return `${sign}${symbol}${trim(a / 1e12)}T`;
-  if (a >= 1e9) return `${sign}${symbol}${trim(a / 1e9)}B`;
-  if (a >= 1e6) return `${sign}${symbol}${trim(a / 1e6)}M`;
-  if (a >= 1e4) return `${sign}${symbol}${trim(a / 1e3)}K`;
-  return `${sign}${symbol}${Math.round(a).toLocaleString('en-US')}`;
+  // Pick the unit after rounding, so 999,999 reads $1.00M, not $1000K.
+  const units: [number, string][] = [
+    [1e12, 'T'],
+    [1e9, 'B'],
+    [1e6, 'M'],
+    [1e3, 'K'],
+  ];
+  let body = String(Math.round(a).toLocaleString('en-US'));
+  for (const [size, unit] of units) {
+    if (a < (unit === 'K' ? 1e4 : size * 0.9995)) continue;
+    const t = trim(a / size);
+    if (Number(t) >= 1000 && unit !== 'T') continue;
+    body = `${t}${unit}`;
+    break;
+  }
+  const sign = x < 0 && body.replace(/[^1-9]/g, '') !== '' ? '−' : '';
+  return `${sign}${symbol}${body}`;
 }
 
 /** Full money for statements: $1,482,140. */
 export function moneyFull(x: number, symbol = '$'): string {
-  const sign = x < 0 ? '−' : '';
-  return `${sign}${symbol}${Math.round(Math.abs(toCurrency(x, symbol))).toLocaleString('en-US')}`;
+  const v = Math.round(Math.abs(toCurrency(x, symbol)));
+  const sign = x < 0 && v > 0 ? '−' : '';
+  return `${sign}${symbol}${v.toLocaleString('en-US')}`;
 }
 
 /**
@@ -64,8 +76,30 @@ export function figure(x: number, symbol = '$'): string {
   return `${sign}${Math.round(Math.abs(toCurrency(x, symbol))).toLocaleString('en-US')}`;
 }
 
+const SUFFIX: Record<string, number> = { K: 1e3, M: 1e6, B: 1e9, T: 1e12 };
+
+/**
+ * Rewrites dollar amounts the simulation wrote into a sentence ("$1,250",
+ * "$18.2M", "$4.50") in the chosen currency, so command reasons, incident
+ * text and labels follow the currency setting. Unchanged for "$".
+ */
+export function localizeMoney(text: string, symbol: string): string {
+  if (symbol === '$') return text;
+  return text.replace(
+    /(?<![A-Za-z])\$(\d(?:[\d,]*\d)?(?:\.\d+)?)([KkMBT](?![a-z]))?/g,
+    (_, n, suf) => {
+      const v = Number(String(n).replace(/,/g, '')) * (suf ? SUFFIX[suf.toUpperCase()]! : 1);
+      if (suf) return money(v, symbol);
+      return String(n).includes('.') ? exactMoney(v, symbol) : moneyFull(v, symbol);
+    },
+  );
+}
+
+/** Three significant figures, judged after rounding (99.96 → "100", not "100.0"). */
 function trim(v: number): string {
-  return v >= 100 ? v.toFixed(0) : v >= 10 ? v.toFixed(1) : v.toFixed(2);
+  if (Number(v.toFixed(1)) >= 100) return v.toFixed(0);
+  if (Number(v.toFixed(2)) >= 10) return v.toFixed(1);
+  return v.toFixed(2);
 }
 
 /** A decimal rate as a percentage with two decimals: 0.0325 → "3.25%". */
@@ -80,6 +114,11 @@ export function signedPct(rate: number, digits = 2): string {
 }
 
 /** Plain count with separators. */
+/** A week count with its noun: "1 week", "3 weeks". */
+export function weeksText(n: number): string {
+  return `${count(n)} ${n === 1 ? 'week' : 'weeks'}`;
+}
+
 export function count(x: number): string {
   return Math.round(x).toLocaleString('en-US');
 }

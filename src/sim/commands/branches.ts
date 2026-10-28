@@ -114,7 +114,8 @@ export function buildBlocker(
     return `The regulator won't allow new sales offices at the ${tier} safety tier.`;
   }
   const quote = buildQuote(state, lotId, build, size);
-  if (state.company.cash < quote.total) return `Not enough cash: you need ${money(quote.total)}.`;
+  if (state.company.cash < quote.total)
+    return `Not enough cash: you need ${money(state, quote.total)}.`;
   return undefined;
 }
 
@@ -301,7 +302,8 @@ export function upgradeBlocker(state: GameState, branchId: string): string | und
   if (tier === 'restricted' || tier === 'critical') {
     return `The regulator won't allow expansion at the ${tier} safety tier.`;
   }
-  if (state.company.cash < quote.total) return `Not enough cash: you need ${money(quote.total)}.`;
+  if (state.company.cash < quote.total)
+    return `Not enough cash: you need ${money(state, quote.total)}.`;
   return undefined;
 }
 

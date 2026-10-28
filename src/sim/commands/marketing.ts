@@ -87,7 +87,9 @@ export function buyAgencyPackage(
     );
   const price = agencyPackagePrice(state, pkg);
   if (price > state.company.cash)
-    return fail(`${pkg.name} costs ${money(price)}; you have ${money(state.company.cash)}.`);
+    return fail(
+      `${pkg.name} costs ${money(state, price)}; you have ${money(state, state.company.cash)}.`,
+    );
   spend(state, 'marketing', price);
   const id = newId(state, 'ap');
   state.marketing.packages.push({

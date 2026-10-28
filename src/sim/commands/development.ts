@@ -44,9 +44,9 @@ export function startDevelopment(
   if (!Number.isFinite(input.weeklyBudget)) return fail('Enter a weekly budget.');
   const weeklyBudget = roundToStep(input.weeklyBudget, DEV_BUDGET_STEP);
   if (weeklyBudget < DEV_MIN_WEEKLY)
-    return fail(`The weekly budget starts at ${money(DEV_MIN_WEEKLY)}.`);
+    return fail(`The weekly budget starts at ${money(state, DEV_MIN_WEEKLY)}.`);
   if (state.company.cash < weeklyBudget)
-    return fail(`You need ${money(weeklyBudget)} in cash for the first week.`);
+    return fail(`You need ${money(state, weeklyBudget)} in cash for the first week.`);
 
   const odds = devOdds(state, input.weeks, weeklyBudget);
   const id = newId(state, 'proj');

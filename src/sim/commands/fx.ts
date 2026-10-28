@@ -36,7 +36,7 @@ export function tradeFx(
   if (amount > 0) {
     const spread = amount * FX.spread;
     if (amount + spread > accountCash(state, account))
-      return fail(`You need ${money(amount + spread)} for this trade.`);
+      return fail(`You need ${money(state, amount + spread)} for this trade.`);
     pos.units += amount / rate;
     pos.cost += amount;
     book[country] = pos;

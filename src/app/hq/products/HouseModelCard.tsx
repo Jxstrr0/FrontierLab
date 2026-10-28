@@ -21,6 +21,13 @@ import { exactMoney, signedPct } from '../../format/format';
 /** A paid cost this much above the model's list cost reads as a surcharge. */
 const SURCHARGE_SHOWN = 0.005;
 
+/** "+5% over market", "3% under market" or "At market", rounded to whole percents. */
+export function headroomText(d: number): string {
+  const pts = Math.round(d * 100);
+  if (pts === 0) return 'At market';
+  return pts > 0 ? `+${pts}% over market` : `${-pts}% under market`;
+}
+
 export function HouseModelCard() {
   const s = useGame();
   const [managing, setManaging] = useState(false);
@@ -44,14 +51,14 @@ export function HouseModelCard() {
       <Row label="Data licence per customer a year" value={exactMoney(paid, sym)} strong />
       {surcharge && (
         <p class="small tone-bad hq-note">
-          Includes a short-staffing surcharge: the model lists at {sym}
-          {model.costPerCustomer.toFixed(2)}.
+          Includes a short-staffing surcharge: the model lists at{' '}
+          {exactMoney(model.costPerCustomer, sym)}.
         </p>
       )}
       <Row label="Model quality" value={`${radarText(modelQuality(model))} / ${modelCeiling(s)}`} />
       <h4 class="small muted pf-model-does">What it does</h4>
       <Row label="Compute per customer" value={signedPct(inferenceMult(s) - 1, 0)} />
-      <Row label="Price headroom" value={`${signedPct(priceHeadroom(s) - 1, 0)} over market`} />
+      <Row label="Price headroom" value={headroomText(priceHeadroom(s) - 1)} />
       <Row label="Data licence" value={`${exactMoney(paid, sym)} per customer a year`} />
       {u.switching && (
         <p class="muted small hq-note" role="status">

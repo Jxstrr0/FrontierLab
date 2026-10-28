@@ -46,7 +46,9 @@ export function mergerQuote(
       : !(stockPct >= 0 && stockPct <= 1)
         ? 'Choose how much to pay in shares.'
         : shareDealBlocker(state, plan.split, stockPct)) ??
-    (state.company.cash < plan.cash ? `Not enough cash: you need ${money(plan.cash)}.` : undefined);
+    (state.company.cash < plan.cash
+      ? `Not enough cash: you need ${money(state, plan.cash)}.`
+      : undefined);
   if (blocker) quote.blocker = blocker;
   return quote;
 }

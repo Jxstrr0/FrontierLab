@@ -8,7 +8,7 @@ import { DC_PARTS, DC_SLOTS, DC_SLOT_NAMES, dcPartsFor, type DcSlot } from '../.
 import * as cmd from '../../sim/commands';
 import { dataCenterPowerBill, hallGpus, pueOf, runningGpus } from '../../sim/dataCenters';
 import { Badge, Card, Confirm, Panel, Row, SectionTitle } from '../components';
-import { count, money, moneyFull } from '../format/format';
+import { count, money, moneyFull, weeksText } from '../format/format';
 import { act, closePanel, toast, useGame } from '../store';
 import { ComputeCard } from '../company/ComputeCard';
 import { DataCenterHero } from './DataCenterHero';
@@ -135,7 +135,7 @@ export function DataCenterPanel(p: { dataCenterId: string }) {
             if (act(cmd.upgradeDataCenter, dc.id, slot, id).ok) {
               toast(
                 slot === 'hall'
-                  ? `Refit started: back online in ${s.dataCenters[dc.id]?.weeksLeft ?? 0} weeks`
+                  ? `Refit started: back online in ${weeksText(s.dataCenters[dc.id]?.weeksLeft ?? 0)}`
                   : `${DC_PARTS[id]?.name} fitted`,
                 'good',
               );

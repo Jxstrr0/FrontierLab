@@ -45,7 +45,7 @@ Spend the boldness on the map and the illustrations, the way a banknote's engrav
 | Seattle | Evergreen #355E45 | Hong Kong | Jade Harbour #2F7A6A |
 | Moscow | Brick Crimson #8C2F2F | St Petersburg | Neva Blue #3E6A8A |
 
-**Brand inks.** The player picks one of 12: eight banknote colours (Vault Blue #2C4A7A, Emerald #2F7D5B, Garnet #8E2F3E, Royal Purple #5A3E7A, Copper #A8643A, Slate #4A5568, Gold #A88A2E, Teal #2A7A80) and four sharper modern ones (Graphite #22262D, Circuit Blue #1E5BD6, Ultraviolet #4B2DB5, Magenta #B0176B). All carry ivory text at ≥ 4.5:1. Rival brand inks are in CONTENT.
+**Brand inks.** The player picks one of 12: eight banknote colours (Midnight Blue #2C4A7A, Emerald #2F7D5B, Garnet #8E2F3E, Royal Purple #5A3E7A, Copper #A8643A, Slate #4A5568, Gold #A88A2E, Teal #2A7A80) and four sharper modern ones (Graphite #22262D, Circuit Blue #1E5BD6, Ultraviolet #4B2DB5, Magenta #B0176B). All carry ivory text at ≥ 4.5:1. Rival brand inks are in CONTENT.
 
 **Material washes.** A second, pale printing under the hatching on the branch fronts (§3), the way a banknote's underprint sits under its engraving. Each is laid at about a third strength, so a front still reads as a line drawing with a little colour in it.
 

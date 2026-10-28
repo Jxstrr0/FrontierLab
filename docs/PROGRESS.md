@@ -3,13 +3,36 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.50, save schema 31). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
+**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.51, save schema 31). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
 **Determinism snapshot:** `18d23d581bed69` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-28 — Polish and bug pass, batch 3: screens and wording (v0.1.51)
+
+The last batch of the polish pass fixes things you see on screen: money in the wrong currency, odd number formats, and words left over from the bank game. No save change.
+
+**Money in your currency.**
+- **Messages used dollars.** When you picked pounds, euros or another currency in Settings, most messages from your actions ("You need $2,000,000…"), incident options, campaign labels and pop-up notes still showed dollars. They now use the currency you chose, converted at the same rate as the rest of the screens.
+- **Number formats.** $999,999 showed as "$1000K"; it now shows "$1.00M". A loss that rounds to nothing no longer shows as "−$0".
+
+**Small fixes.**
+- Clearing a number box and tapping away no longer sets it to 0; it keeps the old value.
+- "1 weeks" is now "1 week" on the partner, power-deal and data-center screens.
+- The profit chart legend shows a "Loss" swatch when a week lost money.
+- The club transfer window and auction pins show dates ("open until 24 Aug") instead of week numbers, like the rest of the game.
+- The house-model card says how far your price is over or under market in plain words.
+- The Settings switch now says it pauses for incidents and board meetings, which is what it does.
+
+**Bank leftovers.**
+- The brand colour "Vault Blue" is now "Midnight Blue" (saved games keep the same colour).
+- A startup message said it already had a "loan" from you; it now says compute credits.
+- The city info sheet dropped its "Homeowners" row, which meant nothing in the lab game.
+
+**Checked:** lint, 1,150 tests, type-check and build all pass. The determinism snapshot is unchanged.
 
 ### 2026-10-28 — Polish and bug pass, batch 2: balance (v0.1.50, schema 31)
 
