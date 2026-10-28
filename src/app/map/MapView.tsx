@@ -13,6 +13,7 @@ import { openPanel, useGame } from '../store';
 import { initialCamera, mapPlaces, rememberCamera, sceneFor } from './mapScene';
 import { MapController } from './mapController';
 import { landmarkCentre } from './landmarkPins';
+import { cityMood, moodKey } from './cityMood';
 import { occupantsKey, occupantsOf } from './mapOccupants';
 import { buildPins, pinsKey } from './pins';
 import './map.css';
@@ -49,21 +50,27 @@ export function MapView() {
   const s = useGame();
   const container = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
+  const lifeCanvas = useRef<HTMLCanvasElement>(null);
   const pinHost = useRef<HTMLDivElement>(null);
   const ctrl = useRef<MapController | null>(null);
-  const keys = useRef({ scene: '', build: '', pins: STALE, occupants: STALE });
+  const keys = useRef({ scene: '', build: '', pins: STALE, occupants: STALE, mood: STALE });
   const [rivalLotId, setRivalLotId] = useState<string | null>(null);
   const [fontsReady, setFontsReady] = useState(fontsLoaded);
   // Read through a ref so the controller always sees the latest settings.
   const reduced = useRef(false);
   reduced.current = s.settings.reducedMotion || systemReducedMotion();
+  // City life stands still while the game is paused (ART_DIRECTION §2.3).
+  const frozen = useRef(false);
+  frozen.current = reduced.current || s.clock.speed === 0;
 
   useEffect(() => {
     const c = new MapController({
       container: container.current!,
       canvas: canvas.current!,
+      lifeCanvas: lifeCanvas.current!,
       pinHost: pinHost.current!,
       reducedMotion: () => reduced.current,
+      lifeFrozen: () => frozen.current,
       onCamera: (cam) => rememberCamera(keys.current.scene, cam),
       onPin: (pin) => {
         if (pin.dataCenterId) openPanel({ type: 'dataCenter', dataCenterId: pin.dataCenterId });
@@ -102,7 +109,7 @@ export function MapView() {
     });
     ctrl.current = c;
     active = c;
-    keys.current = { scene: '', build: '', pins: STALE, occupants: STALE };
+    keys.current = { scene: '', build: '', pins: STALE, occupants: STALE, mood: STALE };
     if (!fontsLoaded()) void document.fonts.ready.then(() => setFontsReady(true));
     return () => {
       rememberCamera(keys.current.scene, c.camera);
@@ -123,9 +130,15 @@ export function MapView() {
     const build = `${scene.key}|${lots.length}|${fontsReady ? 'fonts' : 'fallback'}`;
     if (build !== keys.current.build) {
       if (keys.current.scene) rememberCamera(keys.current.scene, c.camera);
-      keys.current = { scene: scene.key, build, pins: STALE, occupants: STALE };
-      c.setScene(scene.map, scene.createRenderer(), initialCamera(s, scene));
+      keys.current = { scene: scene.key, build, pins: STALE, occupants: STALE, mood: STALE };
+      c.setScene(scene.map, scene.createRenderer(), scene.createLife(), initialCamera(s, scene));
     }
+    const mood = cityMood(s);
+    const mKey = moodKey(mood);
+    if (mKey !== keys.current.mood) {
+      keys.current.mood = mKey;
+      c.setLifeMood(mood);
+    } else c.wakeLife();
     const occupants = occupantsOf(s, lots);
     const oKey = occupantsKey(occupants);
     if (oKey !== keys.current.occupants) {
@@ -149,6 +162,7 @@ export function MapView() {
     <>
       <div class="map-view" ref={container} style={counterZoom(s.settings.textScale)}>
         <canvas class="map-canvas" ref={canvas} aria-hidden="true" />
+        <canvas class="map-canvas map-life" ref={lifeCanvas} aria-hidden="true" />
         <div class="pin-layer" ref={pinHost} role="group" aria-label="Places on the map" />
       </div>
       {rivalLotId && <RivalSheet s={s} lotId={rivalLotId} onClose={() => setRivalLotId(null)} />}

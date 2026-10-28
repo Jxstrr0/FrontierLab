@@ -182,7 +182,13 @@ export const createMapRenderer: CreateMapRenderer = (map, style) => {
       for (const id of new Set([...Object.keys(prev), ...Object.keys(next)])) {
         const a = prev[id];
         const b = next[id];
-        if (a?.type === b?.type && a?.ink === b?.ink && a?.building === b?.building) continue;
+        if (
+          a?.type === b?.type &&
+          a?.ink === b?.ink &&
+          a?.building === b?.building &&
+          a?.fitout === b?.fitout
+        )
+          continue;
         const index = tileOfLot.get(id);
         if (index === undefined) continue;
         changed.push(tileBounds(map, index % map.tiles, Math.floor(index / map.tiles)));

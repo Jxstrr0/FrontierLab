@@ -26,6 +26,9 @@
   height: 100%;
   display: block;
 }
+.map-life {
+  pointer-events: none;
+}
 .pin-layer {
   position: absolute;
   inset: 0;
