@@ -12,6 +12,7 @@ import type { GameState, Lot } from '../../src/sim/state';
 import { cityRoom } from '../../src/sim/branch/cityMarket';
 import { nextSizeAddsReach, officeInCity } from '../../src/sim/branch/officeSize';
 import type { Branch } from '../../src/sim/state';
+import { cityOpen } from '../../src/sim/regions';
 import { isGenerated } from '../../src/sim/worldGen';
 import { bestLot, goodLots } from './common';
 
@@ -26,8 +27,9 @@ export function expansionOrder(home: string): string[] {
   return [home, ...domestic, ...abroad];
 }
 
-/** A city still worth an office: not yet visited (so unknown), or without one and with a good free lot. */
+/** A city still worth an office (and open to flights): not yet visited (so unknown), or without one and with a good free lot. */
 export function hasRoom(state: GameState, cityId: string): boolean {
+  if (!cityOpen(state, cityId)) return false;
   if (!isGenerated(state, cityId)) return true;
   return !officeInCity(state, cityId) && goodLots(state, cityId).length > 0;
 }

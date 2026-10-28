@@ -282,6 +282,16 @@ const BANK_TEMPLATES = {
       b: 'Its licence restored, the lab can sign customers again, under strict watch for a year.',
     },
   ],
+  REGIONS_OPENED: [
+    {
+      h: 'New markets open to AI labs',
+      b: '{names}: {count} cities now welcome AI labs, for a licence fee. Expect a land grab.',
+    },
+    {
+      h: 'Regulators wave the labs in',
+      b: '{count} more cities have opened their doors to AI labs: {names}. Entry comes with a one-off licence.',
+    },
+  ],
   PROJECT_DONE: [
     {
       h: '{bank} completes {name}',

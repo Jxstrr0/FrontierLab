@@ -8,6 +8,7 @@ import { KM_PER_MILE } from '../../config/balance';
 import { CITIES, DESTINATIONS } from '../../data/cities';
 import { COUNTRIES } from '../../data/countries';
 import type { CountryId } from '../../data/types';
+import { cityOpen } from '../../sim/regions';
 import type { GameState } from '../../sim/state';
 import { flightQuote, kmRemaining, type FlightQuote } from '../../sim/travel';
 import { count, money } from '../format/format';
@@ -80,7 +81,7 @@ export function departureRows(s: GameState, jet = false, region: RegionId = 'all
   const rows: DepartureRow[] = [];
   for (const id of DESTINATIONS) {
     const spec = CITIES[id];
-    if (!spec || id === here) continue;
+    if (!spec || id === here || !cityOpen(s, id)) continue;
     const r = REGION_OF[spec.country];
     if (region !== 'all' && r !== region) continue;
     const quote = flightQuote(s, id, jet);

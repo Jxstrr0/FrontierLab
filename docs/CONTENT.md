@@ -47,6 +47,20 @@ Starting values are fictional. Meeting weeks are weeks of the year.
 | mos | Moscow | RU | XL | 84 | 55.76, 37.62 | 1.05 | 0.70 | 0.85 | 0.80 | 0.50 | 5 | Brick Crimson | density 1.35 |
 | spb | St Petersburg | RU | L | 64 | 59.94, 30.31 | 0.85 | 0.65 | 0.90 | 0.75 | 0.42 | 4 | Neva Blue | density 1.15 |
 
+### New regions (late cities, SIMULATION §20a)
+Closed until week 260 (`late: true`); never a start city. The first sales office in each pays a market-entry licence: S $15M, M $30M, L $60M, XL $120M (`NEW_REGIONS.licence`).
+
+| id | City | Country | Size | Tiles | Lat, Lon | rentIndex | wageIndex | incomeIndex | costIndex | Incumbent | Rivals | Ink |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| bos | Boston | US | L | 60 | 42.36, −71.06 | 1.25 | 1.15 | 1.30 | 1.15 | 0.38 | 4 | Harbour Brick |
+| aus | Austin | US | M | 54 | 30.27, −97.74 | 0.95 | 1.05 | 1.15 | 0.95 | 0.30 | 3 | Hill Country Rust |
+| lax | Los Angeles | US | XL | 78 | 34.05, −118.24 | 1.45 | 1.20 | 1.30 | 1.25 | 0.42 | 5 | Sunset Amber |
+| ber | Berlin | EA | L | 66 | 52.52, 13.4 | 0.95 | 1.00 | 1.05 | 0.95 | 0.38 | 4 | Spree Slate |
+| dub | Dublin | EA | M | 52 | 53.35, −6.26 | 1.20 | 1.05 | 1.15 | 1.10 | 0.33 | 3 | Liffey Green |
+| man | Manchester | UK | M | 54 | 53.48, −2.24 | 0.90 | 1.00 | 1.00 | 0.95 | 0.33 | 3 | Mill Red |
+| osa | Osaka | JP | L | 66 | 34.69, 135.5 | 1.05 | 0.95 | 1.00 | 1.00 | 0.40 | 4 | Plum Lacquer |
+| mel | Melbourne | AU | L | 64 | −37.81, 144.96 | 1.05 | 1.08 | 1.15 | 1.08 | 0.38 | 4 | Laneway Blue |
+
 **Density** (optional, default 1): how crowded a city is. It multiplies every lot's foot traffic and the city-wide customer pool (`CITY_MARKET`, SIMULATION §9.2) and `CITY_BRANCH_GUIDE` (how far a sales office's reach grows with its size), so each office reaches more people. Rent still follows `rentIndex`.
 
 ### Regional sites

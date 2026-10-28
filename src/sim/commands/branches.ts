@@ -48,6 +48,7 @@ import { listPrice } from '../nominal';
 import { postCash, postPnl, spend } from '../ledger';
 import { roundToStep } from '../math';
 import { countryOfCity, defaultPrice } from '../rates';
+import { cityLicenceDue } from '../regions';
 import { seedCountryPrices } from './products';
 import type { Book, Branch, GameState } from '../state';
 import { fail, money, ok, type CommandResult } from './result';
@@ -76,7 +77,9 @@ export function buildQuote(state: GameState, lotId: string, build: BuildSpec, si
   const mult = sizeMultOf(size);
   const deposit = (lot?.deposit ?? 0) * mult;
   const rent = (lot?.weeklyRent ?? 0) * mult;
-  return { parts, deposit, rent, total: parts + deposit + rent };
+  // A new region's market-entry licence on the first office there (§20a).
+  const licence = lot ? cityLicenceDue(state, lot.cityId) : 0;
+  return { parts, deposit, rent, licence, total: parts + deposit + rent + licence };
 }
 
 /**
@@ -234,6 +237,10 @@ export function buildBranch(
   postCash(state, -quote.deposit, 'investing');
   state.company.leaseDeposits += quote.deposit;
   spend(state, 'rent', quote.rent);
+  if (quote.licence > 0) {
+    spend(state, 'overhead', quote.licence);
+    state.world.cities[lot.cityId]!.licensed = true;
+  }
 
   state.events.scheduled.push({
     day: state.clock.day + FITOUT_DAYS,

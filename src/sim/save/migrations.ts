@@ -190,6 +190,8 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     (s as unknown as GameState).projects ??= { done: [] };
     return s;
   },
+  // Schema 28 (new regions): CityState.licensed is optional; no city has paid yet.
+  27: (s) => s,
 };
 
 /** Upgrades a raw save to the current schema, or throws if it can't. */
