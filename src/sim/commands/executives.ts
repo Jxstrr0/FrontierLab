@@ -2,7 +2,9 @@
 // candidate pool, fire (severance in weeks of salary, P&L execPay), set salary,
 // switch delegations and add stock option or RSU grants. All need an Executive
 // floor at HQ. Also the COO's growth cities and "Open a branch now" (§17.2),
-// and the delegation dials: pay review cadence, morale target, brand target.
+// and the delegation dials: pay review cadence, morale target, brand target,
+// compute cover, training style, occupancy, posture ceiling, expansion reserve
+// and product focus.
 import {
   CPO_TRAINING,
   CTO_COMPUTE,
@@ -27,7 +29,8 @@ import { payReviewsOn, runPayReview } from '../payReviews';
 import { spend } from '../ledger';
 import { roundToStep } from '../math';
 import type { EquityGrant, ExecSeat, Executive, GameState } from '../state';
-import type { PayReviewCadence, TrainingStyle } from '../marketsTypes';
+import type { DevFocus, PayReviewCadence, TrainingStyle } from '../marketsTypes';
+import { CATEGORY_NAMES } from '../../data/products';
 import { fail, money, ok, type CommandResult } from './result';
 
 const NO_FLOOR = 'Executives work from the Executive floor. Add one at HQ first.';
@@ -260,4 +263,28 @@ export function addGrant(
     expensed: 0,
   });
   return ok({ grantId });
+}
+
+/** The posture the CSO's Launch posture may step up to while Strong (one of EXEC_DELEGATION.croCeilings). */
+export function setPostureCeiling(state: GameState, level: number): CommandResult {
+  const stops = EXEC_DELEGATION.croCeilings;
+  if (!stops.includes(level)) return fail(`Pick a posture ceiling of ${stops.join(', ')}.`);
+  state.executives.postureCeiling = level;
+  return ok();
+}
+
+/** Weeks of costs the COO's Expansion keeps in cash (one of EXEC_DELEGATION.expansionReserves). */
+export function setExpansionReserve(state: GameState, weeks: number): CommandResult {
+  const stops = EXEC_DELEGATION.expansionReserves;
+  if (!stops.includes(weeks)) return fail(`Pick a reserve of ${stops.join(', ')} weeks of costs.`);
+  state.executives.expansionReserveWeeks = weeks;
+  return ok();
+}
+
+/** Which products the CPO's Developments builds first: a category, or any. */
+export function setDevFocus(state: GameState, focus: DevFocus): CommandResult {
+  if (focus !== 'any' && !CATEGORY_NAMES.some((c) => c.value === focus))
+    return fail('Pick Plans, API, Apps or Any.');
+  state.executives.devFocus = focus;
+  return ok();
 }

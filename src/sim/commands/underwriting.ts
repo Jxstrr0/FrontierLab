@@ -24,14 +24,29 @@ export function activateModel(state: GameState, modelId: string): CommandResult 
   return ok();
 }
 
-/** "Use as house model" on a packaged model at a bureau in the current city. */
+/**
+ * Data vendors the lab can deal with: those in the current city; for the CPO's
+ * Models delegation (SIMULATION §17.2), who travels for you, also those in any
+ * city with an open sales office.
+ */
+export function reachableBureaus(state: GameState, via: 'player' | 'cpo' = 'player'): string[] {
+  const cities = new Set([state.world.currentCityId]);
+  if (via === 'cpo')
+    for (const b of Object.values(state.branches)) if (b.status === 'open') cities.add(b.cityId);
+  const out = new Set<string>();
+  for (const cityId of cities) for (const id of bureausIn(cityId)) out.add(id);
+  return [...out].sort();
+}
+
+/** "Use as house model" on a packaged model at a bureau in the current city (or, via the CPO, in any office city). */
 export function buyBureauModel(
   state: GameState,
   packageId: string,
+  via: 'player' | 'cpo' = 'player',
 ): CommandResult<{ modelId: string }> {
   const pkg = BUREAU_PACKAGES[packageId];
   if (!pkg) return fail('Unknown data package.');
-  if (!bureausIn(state.world.currentCityId).includes(pkg.bureau))
+  if (!reachableBureaus(state, via).includes(pkg.bureau))
     return fail(`${pkg.bureau} has no office in this city.`);
   const u = state.underwriting;
   if (u.activeModelId === pkg.id) return fail("That's already your AI model.");

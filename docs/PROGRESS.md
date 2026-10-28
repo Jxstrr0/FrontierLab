@@ -3,13 +3,35 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.44, save schema 28). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
+**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.45, save schema 29). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `031d3063aa4ddd` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `177f0e30c7c9c9` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-28 — C-suite deep dive: direction dials and the research hire (v0.1.45, schema 29)
+
+The owner asked for a deep dive on the hired executives: do their tasks and sliders make sense for the AI game, and can you delegate while still steering? I read every seat's routine against the game as it stands.
+
+**What holds up.** All seven seats run through the normal player commands and fit the AI game: the COO (offices, expansion, troubles, HR, pay), the CFO (runway, raises, investing, buildings), the CTO (compute cover, digital projects), the CMO (awareness) and the CPO's training style. Nothing bank-shaped is left in their jobs.
+
+**What didn't, and what changed.**
+- **The Chief Safety Officer had no dial.** Their Launch posture stepped up to Bold by a hidden constant. It now has a **Posture ceiling** (Balanced / Bold / Very bold, default Bold, so nothing changes until you move it). Stepping down at Watch or worse has no floor. The Finance floor's posture card says the ceiling too.
+- **The COO's Expansion had no reserve control.** It kept a fixed 8 weeks of costs. A **Cash reserve** dial (8 / 13 / 26 weeks) sits under the switch, with a tagline for what it keeps back and the next move (open or grow, where, for how much, when). The CFO's buying and investing keep their own fixed 8 weeks.
+- **The CPO's Developments picked products in file order.** A **Product focus** dial (Plans / API / Apps / Any) says which category comes first; once that category is developed it continues with the rest.
+- **Bug: the CPO's Models only saw data vendors where you happened to be standing.** A delegated model switch depended on where you last flew. The CPO now reaches any city with an open sales office, the way the COO already travels for you. Your own buying still needs you in the city.
+- **Nobody hired researchers.** The CPO leads research but a hands-off lab never built a team. A new **Research talent** switch hires the best free-agent researcher every 4 weeks (most stars, then cheapest) while researcher pay stays within 3% of revenue and 8 weeks of costs stay in cash. It never poaches from a rival (the premium and signing bonus stay yours) and never answers a rival's bid for your people. A CPO already seated has it off; new hires come with it on, like every switch.
+- **Stale descriptions** fixed: Expansion also grows offices; Routine training runs follow the style dial, not "12 weeks at $150k".
+
+**Left alone, on purpose.** The CFO's dividend payout (the board meeting is already your moment to set it). Data centers and power deals (you kept those manual on 2026-10-27). Lobbying and frontier projects (strategic calls with real downside, yours). Counter-offers for poached executives and researchers (your call, as decided before).
+
+**Save and determinism.** Schema 29 adds three executive fields with defaults that reproduce the old behaviour. The determinism snapshot moved to `177f0e30c7c9c9` only because the save carries the new fields and schema number; with those stripped it hashes to the old `031d3063aa4ddd`, so the simulation itself is unchanged.
+
+**Checked.** `npm run lint`, 1,111 tests (new `tests/sim/directionDials.test.ts`: the dial commands, the ceiling, the reserve, the focus, the wider model search, the talent routine and migration 28 → 29), `npm run build`, and `npm run balance` on steady seed 42 (all checkpoints in range; the strategies hire no executives, so it could not move). The COO, CPO and CSO profiles were opened at 390×844 in Chromium from a prepared save: the three dials and the research note render with no console errors.
+
+**Next.** ROADMAP Stage 10 launch items, as before.
 
 ### 2026-10-28 — Balance fix: turtle profits and the aggressive stall (v0.1.44)
 

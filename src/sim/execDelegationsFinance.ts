@@ -3,11 +3,13 @@
 //   CPO  pricing       prices the company lineup like a delegated manager (§17.1)
 //                      while Apply-to-all is on
 //   CPO  developments  starts the next undeveloped template when none is running, on a
-//                      weekly budget of at most 1% of weekly revenue
+//                      weekly budget of at most 1% of weekly revenue; the product
+//                      focus dial (executives.devFocus) says which category first
 //   CPO  models        switches to the model whose quality, less its licence cost,
-//                      beats the one in use by a margin: a local data-vendor package
-//                      (C6a) or a model you have trained (the CPO's Routine training
-//                      runs leave the switch to this routine)
+//                      beats the one in use by a margin: a data-vendor package (C6a)
+//                      from any city where the lab has an office, since the CPO
+//                      travels for you, or a model you have trained (the CPO's
+//                      Routine training runs leave the switch to this routine)
 //   CTO  digital       starts the next digital project when no development is running
 // The CFO's halved statement delay is passive (hq.ts); the dividend proposal is a
 // selector the board meeting reads (governance.ts).
@@ -17,14 +19,16 @@ import {
   EXEC_DELEGATION as X,
   MODEL_DELEGATE,
 } from '../config/balance';
-import { BUREAU_PACKAGES, bureausIn } from '../data/bureaus';
+import { BUREAU_PACKAGES } from '../data/bureaus';
 import { DEV_TEMPLATES, isDigital, type DevTemplate } from '../data/devTemplates';
 import { CITIES } from '../data/cities';
 import type { CountryId } from '../data/types';
 import { delegatedPrice } from './branch/delegation';
 import { startDevelopment } from './commands/development';
 import { setCompanyPrice } from './commands/products';
-import { activateModel, buyBureauModel } from './commands/underwriting';
+import { activateModel, buyBureauModel, reachableBureaus } from './commands/underwriting';
+import { PRODUCTS } from '../data/products';
+import type { DevFocus } from './marketsTypes';
 import { allProducts } from './products';
 import { stream } from './rng';
 import type { Branch, GameState } from './state';
@@ -80,16 +84,39 @@ function start(state: GameState, template: DevTemplate, weeklyBudget: number): v
   });
 }
 
-/** Developments: the next template nobody has developed yet, when none is running. */
-export function cpoDevelopments(state: GameState): void {
-  if (!state.departments.products) return;
-  const running = state.products.developments.some((d) => !isDigital(DEV_TEMPLATES[d.templateId]!));
-  if (running) return;
-  const budget = devBudget(state);
-  if (budget < DEV_MIN_WEEKLY) return;
+export interface DevPlan {
+  /** A Products floor is in place. */
+  active: boolean;
+  /** The product the CPO would develop next, or undefined when every one is developed. */
+  template?: DevTemplate;
+  /** False when the focus category is exhausted and the pick comes from the rest. */
+  inFocus: boolean;
+  /** A product development is already under way. */
+  running: boolean;
+  budget: number;
+}
+
+/** The next undeveloped product under `focus`: that category first, then any. Changes nothing. */
+export function nextDevelopment(state: GameState, focus: DevFocus): DevPlan {
   const done = new Set(Object.values(state.products.catalog).map((e) => e.templateId));
-  const next = Object.values(DEV_TEMPLATES).find((t) => !isDigital(t) && !done.has(t.id));
-  if (next) start(state, next, budget);
+  const left = Object.values(DEV_TEMPLATES).filter((t) => !isDigital(t) && !done.has(t.id));
+  const focused =
+    focus === 'any' ? [] : left.filter((t) => t.base && PRODUCTS[t.base]?.category === focus);
+  const template = focused[0] ?? left[0];
+  return {
+    active: !!state.departments.products,
+    template,
+    inFocus: focus === 'any' || focused.length > 0,
+    running: state.products.developments.some((d) => !isDigital(DEV_TEMPLATES[d.templateId]!)),
+    budget: devBudget(state),
+  };
+}
+
+/** Developments: the next undeveloped product (focus category first), when none is running. */
+export function cpoDevelopments(state: GameState): void {
+  const plan = nextDevelopment(state, state.executives.devFocus);
+  if (!plan.active || plan.running || plan.budget < DEV_MIN_WEEKLY || !plan.template) return;
+  start(state, plan.template, plan.budget);
 }
 
 /** A model's worth to the CPO: quality less costWeight × its licence per customer a year. */
@@ -106,7 +133,7 @@ export function cpoModels(state: GameState): void {
   if (u.switching) return;
   const current = activeModel(state);
   const now = modelScore(modelQuality(current), current.costPerCustomer);
-  const local = bureausIn(state.world.currentCityId);
+  const local = reachableBureaus(state, 'cpo');
   let best: { id: string; score: number; trained: boolean } | undefined;
   const consider = (id: string, score: number, trained: boolean) => {
     if (score >= now + MODEL_DELEGATE.minGain && (!best || score > best.score))
@@ -126,7 +153,7 @@ export function cpoModels(state: GameState): void {
   for (const m of trained) consider(m.id, modelScore(modelQuality(m), m.costPerCustomer), true);
   if (!best) return;
   if (best.trained) activateModel(state, best.id);
-  else buyBureauModel(state, best.id);
+  else buyBureauModel(state, best.id, 'cpo');
 }
 
 // ─── CTO ──────────────────────────────────────────────────────────────────────

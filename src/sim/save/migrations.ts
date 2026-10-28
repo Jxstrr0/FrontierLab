@@ -4,7 +4,7 @@
 // Frontier Lab's chain starts at schema 1 (stage C0, DESIGN decision A6).
 // Vault Street's 37 steps were dropped: its saves live in a separate store
 // and its export codes are turned away, so none can reach this chain.
-import { CPO_TRAINING, CTO_COMPUTE } from '../../config/balance';
+import { CPO_TRAINING, CTO_COMPUTE, EXEC_DELEGATION } from '../../config/balance';
 import { foldRivalCity } from '../rivalOffices';
 import { migrateCatalog } from './migrateCatalog';
 import { migrateBankCleanup } from './migrateBankCleanup';
@@ -192,6 +192,17 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
   },
   // Schema 28 (new regions): CityState.licensed is optional; no city has paid yet.
   27: (s) => s,
+  // Schema 29 (C-suite dials): the CSO's posture ceiling, the COO's expansion
+  // reserve and the CPO's product focus start at the old fixed behaviour. The
+  // CPO's new Research talent switch is a delegation toggle like any other, so a
+  // seated CPO has it off until you switch it on.
+  28: (s) => {
+    const ex = (s as unknown as GameState).executives;
+    ex.postureCeiling ??= EXEC_DELEGATION.croMaxAppetite;
+    ex.expansionReserveWeeks ??= EXEC_DELEGATION.expansionReserveWeeks;
+    ex.devFocus ??= EXEC_DELEGATION.devFocus;
+    return s;
+  },
 };
 
 /** Upgrades a raw save to the current schema, or throws if it can't. */

@@ -30,5 +30,6 @@ export function riskHint(level: number): string {
  */
 export function riskSteering(s: GameState): string | undefined {
   if (!s.executives.seats.cro?.delegations.appetite) return undefined;
-  return `Your CSO tunes this to the safety tier every ${EXEC_DELEGATION.croEveryWeeks} weeks. You can still set it yourself.`;
+  const ceiling = RISK_LABELS[s.executives.postureCeiling - 1] ?? '';
+  return `Your CSO tunes this to the safety tier every ${EXEC_DELEGATION.croEveryWeeks} weeks, never above ${ceiling}. You can still set it yourself.`;
 }

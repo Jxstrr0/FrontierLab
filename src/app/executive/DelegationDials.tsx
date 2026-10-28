@@ -7,6 +7,7 @@
 //   CFO · Rents (the lab's, yours)   occupancy 80–100% (OccupancyDial.tsx)
 //   CTO · Compute   share of GPU demand covered outside spot 60 / 75 / 90%
 //   CPO · Training runs   Quantity / Balanced / Quality (TrainingStyleDial.tsx)
+//   CSO · Launch posture, COO · Expansion, CPO · Developments: DirectionDials.tsx
 import { CTO_COMPUTE, EXEC_DELEGATION } from '../../config/balance';
 import * as cmd from '../../sim/commands';
 import { computeCoverPlan } from '../../sim/execDelegationsCompute';
@@ -16,6 +17,7 @@ import type { GameState } from '../../sim/state';
 import { StepSlider } from '../components';
 import { money, pct, signedPct } from '../format/format';
 import { act } from '../store';
+import { DevFocusDial, ExpansionReserveDial, PostureCeilingDial } from './DirectionDials';
 import { OccupancyDial } from './OccupancyDial';
 import { PayPolicy } from './PayPolicy';
 import { TrainingStyleDial } from './TrainingStyleDial';
@@ -144,5 +146,8 @@ export function DelegationDial(p: { s: GameState; seat: ExecSeat; id: string }) 
   if (p.seat === 'cfo' && p.id === 'bankRents') return <OccupancyDial s={p.s} owner="company" />;
   if (p.seat === 'cfo' && p.id === 'privateRents')
     return <OccupancyDial s={p.s} owner="personal" />;
+  if (p.seat === 'cro' && p.id === 'appetite') return <PostureCeilingDial s={p.s} />;
+  if (p.seat === 'coo' && p.id === 'expansion') return <ExpansionReserveDial s={p.s} />;
+  if (p.seat === 'cpo' && p.id === 'developments') return <DevFocusDial s={p.s} />;
   return null;
 }
