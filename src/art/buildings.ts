@@ -18,6 +18,8 @@ import { gableHouse } from './gables';
 import { spire } from './rooftop';
 import { drawDataCenterLot, isDataCenter } from './buildingsDataCenter';
 import { castShadow, onFace, type Face } from './solids';
+import { crane, washingLine } from './streetProps';
+import { tileHeightPx } from './drawList';
 import { styledHouse } from './styleHouses';
 import { barrelShed, grainElevator } from './styleIndustry';
 import { STYLE_PROFILES, type Fabric } from './styleProfiles';
@@ -47,6 +49,7 @@ export function drawBuilding(
 ): void {
   if (t.kind === 'lot' && occupant && isDataCenter(occupant)) {
     drawDataCenterLot(e, t, occupant);
+    if (occupant.fitout) crane(e, STOREY_PX * 1.5, tileHeightPx(map, t.y * map.tiles + t.x));
     return;
   }
   e.origin(t.x, t.y);
@@ -55,12 +58,16 @@ export function drawBuilding(
   // Storefronts need walls tall enough to glaze.
   const floors = lot ? Math.max(2, t.floors) : t.floors;
   const shell = styled(e, t, floors, rng, lot, map) ?? classic(e, t, floors, rng, lot);
-  if (!lot) return;
+  if (!lot) {
+    if (t.district === 'suburbs') washingLine(e, shell.rect, t.seed);
+    return;
+  }
   for (const face of ['left', 'right'] as const) shopfront(e, face, shell);
   if (occupant?.type === 'rival' || occupant?.type === 'business') {
     for (const face of ['left', 'right'] as const) awning(e, face, shell, occupant.ink);
   }
   if (occupant?.type === 'player') roofFlag(e, shell.roof, occupant.ink);
+  if (occupant?.fitout) crane(e, shell.wall, tileHeightPx(map, t.y * map.tiles + t.x));
 }
 
 /** The style's building for this tile, or undefined to use the classic one. */

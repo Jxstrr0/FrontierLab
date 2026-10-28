@@ -144,8 +144,9 @@ describe('map pins', () => {
   it('tells the renderer who occupies each lot, in their ink', () => {
     const { s, lots } = setup();
     const occ = Object.values(occupantsOf(s, lots, NO_HQ));
+    // A sales office still being fitted out has a crane over it.
     expect(occ.filter((o) => o.type === 'player')).toEqual([
-      { type: 'player', ink: s.meta.brandInk },
+      { type: 'player', ink: s.meta.brandInk, fitout: true },
     ]);
     expect(occ.some((o) => o.type === 'rival')).toBe(true);
   });

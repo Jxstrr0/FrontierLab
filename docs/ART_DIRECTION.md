@@ -139,7 +139,7 @@ Every city has its own look (`src/data/cityLooks.ts`), so no two maps read alike
 - **Local style** (`style`): one of 14 vernaculars (prairie, glass, brick, painted, coastal, terrace, mansard, timber, canal, alpine, dense, colonial, tropical, outback). It changes rooflines (gables, mansards, stepped and bell gables, flat roofs with tanks), proportions, facade marks (chimney stacks, bay windows, fire escapes, shutters, verandahs, half-timbering, arcades), suburban houses, towers, industry and trees. Rows on neighbouring tiles join into continuous terraces around a court.
 - **Signature landmark** (`signature`): one engraved one-of-a-kind building per city, described generically (a giant observation wheel, an iron lattice tower, a tall broadcast tower, a shell-roofed harbour hall, a stepped stone tower with a needle spire, a church crowned with onion domes, and for the new regions a brick clock tower, a capitol dome, hilltop observatory domes, a columned gate, a plaza needle, mill chimneys, a castle keep and a glass cone …), never by a real name. Drawn with heavier lines so it reads at zoom 0.5. Water's-edge kinds sit on the block with the most open water beside them. Heights per kind are `SIGNATURE_HEIGHT_PX`.
 - **Tint underprint** (`tint`): a pale second ink, like a banknote's underprint. Roof slopes get hatching over tinted paper, flat roofs a tinted fill, and lawns, yards and tree crowns a see-through wash. It stays restrained (about a third of the way from paper to tint) so the map still reads as an engraving.
-- **Street life:** tree-lined avenues, plazas with fountains, and park furniture (paths, a fountain, pond, bandstand or statue in the middle of each park block).
+- **Street life:** tree-lined avenues, plazas with fountains, and park furniture (paths, a fountain, pond, bandstand or statue in the middle of each park block). Moving life and lived-in details are in §2.3.
 - **Old saves:** cities generated before this change keep their original map (layout 1, see DATA_MODEL `CityState.layout`); new games and cities first visited later use these looks (layout 2).
 
 ### 2.2 The cover
@@ -150,6 +150,31 @@ The title screen leads with the map, the game's boldest art ("Living skyline", d
 - **Framing:** the panel is flat map paper on navy with no shadow or gradient, a 1 px outer rule and a hairline inner rule in the city ink, and the city name as all-caps microprint between them (the microprint and the logotype are the only all-caps text on the screen).
 - **Motion:** a slow sideways drift of the printed strip (CSS only, nothing redraws). It's ambient motion, not a second signature moment; the Ledger press keeps that title. Reduced motion holds the strip still.
 - **Before it prints:** paper, the rules and a faint guilloche in the city ink, then a 400 ms crossfade to the city.
+
+### 2.3 City life
+
+The engraving is still art, so the map gets a little life on top of it and a few lived-in details in it (owner's ask, 2026-10-28). Tuning lives in `src/config/cityLife.ts`.
+
+- **The moving layer** (`src/art/lifeLayer.ts`): a second, transparent canvas over the map that draws only what moves; the city chunks are never redrawn for it.
+  - **Traffic:** small engraved cars both ways along every straight street run, bridges included, each lane at one speed with its cars evenly spaced so they never collide; buses downtown and in the financial district. Cars fade in and out at the ends of a run.
+  - **People:** figures strolling the pavements, wandering plazas and parks stop to stop, and stepping out of offices onto the street and back.
+  - **Water and air:** launches cruising clear water lines with a fanned wake, spray falling from every fountain, and the odd flock of birds crossing the city.
+  - **Your data centers:** delivery trucks in your brand ink pull up at the dock and drive on; steam rises from the chillers.
+  - **Hidden when behind things:** anything a building or park in front would cover is left out (`lifeOcclusion.ts`).
+  - **Cost:** each mover's position is a pure function of time, only movers near the screen are drawn, and the layer redraws at most 30 times a second. People and spray drop out below zoom 0.45.
+  - **Paused and reduced motion:** while the game is paused, or with reduced motion on, everything holds still where it is (still drawn, so the city doesn't empty).
+- **It follows the game** (`src/app/map/cityMood.ts`):
+  - the home country's economy sets how busy streets and pavements are (×1.15 in an expansion down to ×0.6 in a recession, nudged by GDP growth);
+  - each district has its own crowd level (downtown busiest, suburbs quietest);
+  - your sales offices draw people in line with how close to capacity they run; your HQ floors a steady trickle;
+  - a struggling rival office (losing money, or the lab in trouble) goes nearly quiet; a healthy one draws people in line with its rating;
+  - data center trucks and steam follow compute load.
+- **Lived-in details** (`src/art/streetProps.ts`, drawn with the city):
+  - cars parked along the kerbs of plain streets, more in midtown and downtown;
+  - café tables under tinted umbrellas on plazas without a fountain;
+  - washing lines in some suburban yards;
+  - a tower crane over any sales office or data center being fitted out, gone once it opens.
+  - Roof gardens were already part of several local styles (§2.1).
 
 ## 3. Vignettes (panel hero art)
 
