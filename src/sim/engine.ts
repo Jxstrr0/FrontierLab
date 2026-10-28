@@ -61,6 +61,7 @@ import { runTreasury } from './treasury';
 import { updateModels } from './underwriting';
 import { runTraining } from './training';
 import { runProjects } from './projects';
+import { boardCapitalReview } from './incident/capitalReview';
 import { rivalModelsQuarter } from './rivalModels';
 import { runTalent, talentQuarter } from './talent';
 import { productSpec } from './products';
@@ -157,7 +158,10 @@ export function weeklyTick(state: GameState): void {
     venturesQuarter(state); // 13 (ventures report and raise, §20.2)
     insiderQuarter(state); // 13 (insider-trading cases, §22)
   }
-  if (isYearStart(state.meta.startDate, state.clock.day)) yearEnd(state); // 14
+  if (isYearStart(state.meta.startDate, state.clock.day)) {
+    yearEnd(state); // 14
+    boardCapitalReview(state); // 14 (the board's capital review, §19.6b)
+  }
   runIncidents(state); // 15
   recordNetWorth(state); // 15 (the Personal Wealth screen's weekly change, §22)
   checkMilestones(state); // 15 (DESIGN §5.18)

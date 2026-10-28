@@ -913,6 +913,15 @@ Late-game builds (`FRONTIER_PROJECTS`, `src/data/frontierProjects.ts`, `src/sim/
   - at least `RUNWAY.gateMonths` (12) months of runway must remain once the cost leaves cash (§15)
 - Price impact: +1% to +4%, scaled by size up to the 10% cap. The weekly price then follows its target as usual.
 
+### 19.6b The board's capital review
+At each year start (tick step 14, after the year's close), the board looks at **surplus cash** = cash − `BOARD_CAPITAL.reserveArrShare` (0.5) × company ARR − what the frontier project under way still costs (§16.14) − a declared dividend not yet paid. When it is at least `minSurplus` ($250M, home price list), it raises **CAPITAL_REVIEW** (CONTENT §22), asking where `deployShare` (50%) of the surplus (the *amount*) goes. It always reaches you, never the COO, and the deadline banks it.
+- **Fund a frontier project:** starts the first project in list order that could start now (§16.14), at today's price. Blocked when none can.
+- **Buy back shares:** a §19.6a programme worth up to the amount (`buybackQuote` with pct = amount ÷ (price × 1.02 × 1.01) ÷ outstanding, then its usual caps). Listed labs only, and the usual limits apply.
+- **Special dividend:** pays the amount at once: cash −amount (financing) and retained earnings −amount; the founder's share (stake × amount) goes to personal cash (SPECIAL_DIVIDEND).
+- **Bank it:** nothing moves.
+- A listed lab's sentiment is multiplied by 1 + `sentiment[choice]`: bank −4%, buyback +2% (on top of its price impact), dividend +4%, project +3%.
+- **Balance check (seed 42, steady, 15 years):** reviews in years 7, 10 and 13, each funding a project (the strategy funds one when it can, else banks it); year-15 cash $4.3B (was $11.5B before the review), with Lodestar, Meridian and the Gigawatt Campus finished and Zenith under way.
+
 ### 19.7 Trading
 - Two accounts: company (Investment floor or portfolio) and personal.
 - Commission 0.1% (`COMMISSION`).

@@ -6,11 +6,16 @@
 // Institute cuts exposure and company incident chances, and the Global Edge
 // Network lifts Service in every office. Tick step 7, after training.
 import { DATA_CENTER, FRONTIER_PROJECTS, MODEL_RADAR_MAX } from '../config/balance';
-import { FRONTIER_PROJECTS_BY_ID, type FrontierProject } from '../data/frontierProjects';
+import {
+  FRONTIER_PROJECT_LIST,
+  FRONTIER_PROJECTS_BY_ID,
+  type FrontierProject,
+} from '../data/frontierProjects';
 import { companyArr } from './arr';
 import { isQuarterStart } from './calendar';
 import { pushEvent } from './events';
 import { spend } from './ledger';
+import { listPrice } from './nominal';
 import { stream } from './rng';
 import type { ActiveProject, GameState } from './state';
 
@@ -69,6 +74,35 @@ export function projectBlock(state: GameState, spec: FrontierProject): string | 
   if (companyArr(state) < spec.minArr) return 'ARR too low.';
   if (state.projects.active) return 'Another project is under way.';
   return undefined;
+}
+
+/** Today's price of a project: its base cost on the home price list. */
+export function projectPrice(state: GameState, projectId: string): number {
+  return listPrice(state, FRONTIER_PROJECTS_BY_ID[projectId]?.cost ?? 0);
+}
+
+/** Cash a start needs in hand: startWeeks of payments at today's price. */
+export function projectUpfront(state: GameState, spec: FrontierProject): number {
+  return (projectPrice(state, spec.id) / spec.weeks) * FRONTIER_PROJECTS.startWeeks;
+}
+
+/** The first project in list order that could start now, cash included. */
+export function nextStartableProject(state: GameState): FrontierProject | undefined {
+  return FRONTIER_PROJECT_LIST.find(
+    (p) => !projectBlock(state, p) && state.company.cash >= projectUpfront(state, p),
+  );
+}
+
+/** Starts `spec` at today's price (callers check projectBlock and the cash first). */
+export function beginProject(state: GameState, spec: FrontierProject): void {
+  state.projects.active = {
+    id: spec.id,
+    startWeek: state.clock.week,
+    cost: projectPrice(state, spec.id),
+    weeks: spec.weeks,
+    weeksDone: 0,
+    spent: 0,
+  };
 }
 
 /** Tick step 7: pay this week's share, roll an overrun at a quarter start, finish at the last week. */

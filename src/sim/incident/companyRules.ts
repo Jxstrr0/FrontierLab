@@ -23,6 +23,7 @@ import { DIVIDEND_DUE, EXEC_POACHED } from './execRules';
 import { RESEARCHER_POACHED } from './talentRules';
 import { fraudShield, incidentScale, num, ratingHit, type IncidentRule } from './helpers';
 import { INSIDER_PROBE } from './insiderRule';
+import { CAPITAL_REVIEW } from './capitalReview';
 import { compactMoney } from './text';
 
 const P = INCIDENT_PARAMS;
@@ -224,6 +225,7 @@ export const COMPANY_RULES: Record<string, IncidentRule> = {
   RESEARCHER_POACHED,
   DIVIDEND_DUE,
   INSIDER_PROBE, // Stage 9 (insiderRule.ts)
+  CAPITAL_REVIEW, // post-C8 (capitalReview.ts)
 };
 
 /** This week's data-breach odds, for the IT floor's security posture (CONTENT §22). */
