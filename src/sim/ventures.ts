@@ -131,7 +131,12 @@ function quarter(state: GameState, s: Startup, rng: Rng, recession: boolean): vo
   } else if (ipoEligible(s.stage, revenue, netIncome) && ipoRoll < VENTURES.ipoChance) {
     ipoStartup(state, s, rng);
   } else if (saleRoll < VENTURES.acquireChance) {
-    acquireStartup(state, s, saleMult * annualRevenue(s));
+    // A buyer pays the better of a revenue multiple and a premium on the last mark.
+    acquireStartup(
+      state,
+      s,
+      Math.max(saleMult * annualRevenue(s), VENTURES.acquireMarkPremium * s.lastPrice * s.shares),
+    );
   } else if (!s.round && runwayQuarters(s.cash, netIncome) < VENTURES.runwayQuarters) {
     raiseNow(state, s, rng, g, state.clock.week + VENTURES.roundWeeks);
   }

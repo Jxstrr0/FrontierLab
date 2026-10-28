@@ -376,6 +376,8 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 
 **Frontier Lab schema 30 (C-suite direction dials, SIMULATION §17.2):** `ExecutivesState.postureCeiling` (one of `EXEC_DELEGATION.croCeilings` 3 / 4 / 5, default 4), `expansionReserveWeeks` (one of `expansionReserves` 8 / 13 / 26, default 8) and `devFocus` (`'any' | CategoryId`, default `'any'`). Migration 29 → 30 fills the defaults, which reproduce the old fixed behaviour. The CPO's **Research talent** switch (id `talent`) is an ordinary delegation toggle: a seated CPO has it off until switched on; new candidates come with it on.
 
+**Frontier Lab schema 31 (polish pass, v0.1.50):** `Executive.counterWeek?` records the week you last matched a rival's offer for that executive; a pay review won't cut them for `PAY_REVIEW.counterHoldWeeks` (52) after it. Optional, so migration 30 → 31 changes nothing.
+
 **Frontier Lab schema 28 (new regions, SIMULATION §20a):** `CityState.licensed?: boolean`, set when the first sales office in a late city pays its market-entry licence. Optional, so migration 27 → 28 changes nothing.
 
 **Frontier Lab schema 27 (frontier projects, SIMULATION §16.14):** `GameState.projects = { active?: ActiveProject; done: string[] }` with `ActiveProject { id, startWeek, cost, weeks, weeksDone, spent, stalled? }` (`cost` and `weeks` grow on an overrun). Migration 26 → 27 adds `{ done: [] }`. New RNG stream: `projects`.

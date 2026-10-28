@@ -3,7 +3,9 @@
 // one each week, more often when they're underpaid and less when well paid.
 // The COO's Pay reviews delegation sets every executive, branch manager and HQ
 // department floor to market × (1 + your pay premium) once a quarter or once a
-// year, as you choose, so pay keeps up with the market.
+// year, as you choose, so pay keeps up with the market. Researchers are raised
+// to their market pay × (1 + premium) but never cut, and an executive you
+// countered for keeps the counter for PAY_REVIEW.counterHoldWeeks.
 import {
   DEPT_SALARY_RANGE,
   DEPT_SALARY_STEP,
@@ -13,6 +15,7 @@ import {
   MANAGER_SALARY_RANGE,
   MANAGER_SALARY_SPREAD,
   PAY_REVIEW,
+  RESEARCHERS,
   WEEKS_PER_YEAR,
 } from '../config/balance';
 import { CITIES } from '../data/cities';
@@ -22,8 +25,10 @@ import { delegationOn, execMarketSalary, seatedExecs } from './execSeats';
 import { deptMarketSalary } from './hq';
 import { clamp, roundToStep } from './math';
 import { stream } from './rng';
+import { researcherMarketSalary, yourResearchers } from './talent';
 import { nominalIndex } from './nominal';
-import type { Branch, Department, GameState, Manager } from './state';
+import type { Executive } from './marketsTypes';
+import type { Branch, Department, GameState, Manager, Researcher } from './state';
 
 const avgSkill = (m: Manager) =>
   (m.skills.people + m.skills.product + m.skills.marketing + m.skills.ethics) / 4;
@@ -134,6 +139,20 @@ export function reviewedDeptSalary(state: GameState, d: Department): number {
   );
 }
 
+/** An executive's reviewed pay: no cut while a counter-offer is recent (PAY_REVIEW.counterHoldWeeks). */
+export function reviewedPayFor(state: GameState, e: Executive): number {
+  const pay = reviewedExecSalary(state);
+  const held =
+    e.counterWeek !== undefined && state.clock.week - e.counterWeek < PAY_REVIEW.counterHoldWeeks;
+  return held ? Math.max(pay, e.salary) : pay;
+}
+
+/** §16.13: a researcher's reviewed pay, market × (1 + premium) in steps; never a cut. */
+export function reviewedResearcherSalary(state: GameState, r: Researcher): number {
+  const target = researcherMarketSalary(state, r.stars) * (1 + state.executives.payPremium);
+  return Math.max(r.salary, roundToStep(target, RESEARCHERS.salaryStep));
+}
+
 /** HQ department floors with a staff market (not the Executive floor's seats), in a fixed order. */
 const floors = (state: GameState): Department[] =>
   Object.values(state.departments)
@@ -141,8 +160,8 @@ const floors = (state: GameState): Department[] =>
     .sort((a, b) => a.id.localeCompare(b.id));
 
 /**
- * Sets every executive, branch manager and HQ department floor to their
- * reviewed pay; returns how many salaries changed (a floor counts once).
+ * Sets every executive, branch manager, researcher and HQ department floor to
+ * their reviewed pay; returns how many salaries changed (a floor counts once).
  */
 export function runPayReview(state: GameState): { raised: number; cut: number } {
   let raised = 0;
@@ -152,12 +171,13 @@ export function runPayReview(state: GameState): { raised: number; cut: number } 
     else if (to < from) cut += 1;
     return to;
   };
-  const execPay = reviewedExecSalary(state);
-  for (const e of seatedExecs(state)) e.salary = apply(e.salary, execPay);
+  for (const e of seatedExecs(state)) e.salary = apply(e.salary, reviewedPayFor(state, e));
   for (const m of Object.values(state.people.managers)) {
     if (!m.branchId) continue;
     m.salary = apply(m.salary, reviewedManagerSalary(state, m));
   }
+  for (const r of yourResearchers(state))
+    r.salary = apply(r.salary, reviewedResearcherSalary(state, r));
   for (const d of floors(state)) d.salary = apply(d.salary, reviewedDeptSalary(state, d));
   state.executives.lastPayReviewWeek = state.clock.week;
   pushEvent(
@@ -182,20 +202,23 @@ export function cooPayReviews(state: GameState): void {
 }
 
 /**
- * What the next review would add to annual pay across executives, managers and
- * department staff (negative when it cuts), and how many people it covers.
+ * What the next review would add to annual pay across executives, managers,
+ * researchers and department staff (negative when it cuts), and how many people it covers.
  */
 export function nextReviewDelta(state: GameState): { delta: number; people: number } {
   let delta = 0;
   let people = 0;
-  const execPay = reviewedExecSalary(state);
   for (const e of seatedExecs(state)) {
-    delta += execPay - e.salary;
+    delta += reviewedPayFor(state, e) - e.salary;
     people += 1;
   }
   for (const m of Object.values(state.people.managers)) {
     if (!m.branchId) continue;
     delta += reviewedManagerSalary(state, m) - m.salary;
+    people += 1;
+  }
+  for (const r of yourResearchers(state)) {
+    delta += reviewedResearcherSalary(state, r) - r.salary;
     people += 1;
   }
   for (const d of floors(state)) {

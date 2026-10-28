@@ -44,6 +44,7 @@ export const EXEC_POACHED: IncidentRule = {
     if (optionId === 'counter') {
       exec.salary = roundToStep(exec.salary * (1 + EXECUTIVES.counterRaise), EXEC_PAY.salaryStep);
       exec.loyalty = clamp(exec.loyalty + EXECUTIVES.counterLoyalty, 0, LOYALTY_MAX);
+      exec.counterWeek = state.clock.week;
       return `${exec.name} stays on.`;
     }
     vacateSeat(state, exec.seat, 'resigned');

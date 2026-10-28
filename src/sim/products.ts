@@ -65,6 +65,7 @@ export function developedSpec(entry: ProductEntry): ProductSpec | undefined {
     spec.baseApproval = clamp(base.baseApproval + (m.approvalAdd ?? 0), 0, 1);
   if (base.spendPerMonth !== undefined)
     spec.spendPerMonth = base.spendPerMonth * (m.spendMult ?? 1);
+  if (base.unitCost !== undefined) spec.unitCost = base.unitCost * (m.unitCostMult ?? 1);
   if (m.annualFee !== undefined) spec.annualFee = m.annualFee;
   if (m.interchangeAdd !== undefined) spec.interchange = INTERCHANGE + m.interchangeAdd;
   if (m.noAdvisorOffice) spec.noAdvisorOffice = true;

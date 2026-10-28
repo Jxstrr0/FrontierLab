@@ -3,9 +3,11 @@ import {
   BASE_TELLER_WAGE,
   CAPACITY_MORALE,
   CAPACITY_SKILL,
+  HOURS_PER_WEEK,
   MORALE,
   QUIT_BASE,
   SERVICE_VISIT_RATE,
+  SEVERANCE_WEEKS,
   SKILL,
   VISIT_APP,
 } from '../../config/balance';
@@ -46,8 +48,16 @@ export function skillTarget(state: GameState, branch: Branch): number {
   );
 }
 
-/** Morale, skill, quits and hiring for one branch (§6.2–6.3). */
-export function updateStaff(state: GameState, branch: Branch): void {
+/** Severance for letting `n` office staff go: SEVERANCE_WEEKS of wages each. */
+export function staffSeverance(branch: Branch, n: number): number {
+  return n * branch.staff.wage * HOURS_PER_WEEK * SEVERANCE_WEEKS;
+}
+
+/**
+ * Morale, skill, quits and hiring for one branch (§6.2–6.3). Returns the
+ * severance owed for staff let go this week (above a lowered target).
+ */
+export function updateStaff(state: GameState, branch: Branch): number {
   const s = branch.staff;
   const mgr = managerOf(state, branch);
   const ratio = s.wage / marketWage(state, branch.cityId);
@@ -78,7 +88,9 @@ export function updateStaff(state: GameState, branch: Branch): void {
   s.quitAccumulator -= quits;
   s.count -= quits;
 
+  let severance = 0;
   if (s.count > s.target) {
+    severance = staffSeverance(branch, s.count - s.target);
     s.count = s.target;
   } else if (s.count < s.target) {
     const hires = Math.min(s.target - s.count, hiresPerWeek(ratio, mods, sizeMult(branch)));
@@ -88,6 +100,7 @@ export function updateStaff(state: GameState, branch: Branch): void {
     }
   }
   holdTopStaff(state, s);
+  return severance;
 }
 
 /** Customer interactions per week C (§6.4). */

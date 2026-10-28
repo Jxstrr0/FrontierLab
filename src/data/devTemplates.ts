@@ -21,6 +21,8 @@ export interface TemplateMods {
   approvalAdd?: number;
   /** × take-up probability q (SIMULATION §9.6). */
   takeUpMult?: number;
+  /** × compute cost per unit used (usage products). */
+  unitCostMult?: number;
   /** × card spend per month (interchange). */
   spendMult?: number;
   /** Card annual fee in $. */
@@ -100,7 +102,14 @@ export const DEV_TEMPLATES: Record<string, DevTemplate> = {
     id: 'enterprise',
     name: 'Enterprise',
     base: 'team',
-    mods: { affinity: { BIZ: 0.2 }, ticketMult: 5, churnMult: 0.6, defaultFee: 45 },
+    // Big contracts: many seats a sign-up, but far fewer prospects sign (polish pass).
+    mods: {
+      affinity: { BIZ: 0.2 },
+      ticketMult: 5,
+      churnMult: 0.6,
+      defaultFee: 45,
+      takeUpMult: 0.2,
+    },
   },
   // ─── API ────────────────────────────────────────────────────────────────────
   realtime_api: {
@@ -113,7 +122,7 @@ export const DEV_TEMPLATES: Record<string, DevTemplate> = {
     id: 'dedicated_capacity',
     name: 'Dedicated Capacity',
     base: 'api',
-    mods: { affinity: { BIZ: 0.2 }, ticketMult: 4, churnMult: 0.5 },
+    mods: { affinity: { BIZ: 0.2 }, ticketMult: 4, churnMult: 0.5, takeUpMult: 0.3 },
   },
   research_credits: {
     id: 'research_credits',
@@ -125,7 +134,8 @@ export const DEV_TEMPLATES: Record<string, DevTemplate> = {
     id: 'embeddings_api',
     name: 'Embeddings API',
     base: 'batch_api',
-    mods: { defaultFee: 0.5, ticketMult: 3 },
+    // Embeddings are cheap to serve, so the low price keeps a margin.
+    mods: { defaultFee: 0.5, ticketMult: 3, unitCostMult: 0.2 },
   },
   // ─── Apps & Services ────────────────────────────────────────────────────────
   study_buddy: {

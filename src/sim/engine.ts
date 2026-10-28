@@ -183,7 +183,7 @@ export function weeklyTick(state: GameState): void {
 /** Tick step 4 for one open branch, in the documented order. */
 function runBranch(state: GameState, branch: Branch, deals: DealIndex): void {
   runDelegation(state, branch);
-  updateStaff(state, branch); // 4.1
+  const severance = updateStaff(state, branch); // 4.1
   const fx = campaignEffects(state, branch);
   updateAwareness(state, branch, fx); // 4.3
   updateRatings(state, branch, fx); // 4.4
@@ -197,6 +197,7 @@ function runBranch(state: GameState, branch: Branch, deals: DealIndex): void {
     share: demand.share,
   };
   const wk = emptyWeek();
+  wk.staff += severance; // staff let go above a lowered target
   runBooks(state, branch, demand, fx, wk); // 4.6
   runDealDesk(state, branch, fx, wk, deals); // 4.7
   let newDepositAccounts = 0;

@@ -13,6 +13,7 @@
 // telling managers (GuidanceNote.tsx); the CFO shows what it invests in next
 // (InvestNote.tsx) and the buildings it manages (PropertyNote.tsx); the CPO
 // its training-odds boost and the researcher it would hire next (TalentNote.tsx).
+import { EXECUTIVES } from '../../config/balance';
 import { useState } from 'preact/hooks';
 import * as cmd from '../../sim/commands';
 import type { ExecSeat } from '../../sim/state';
@@ -121,7 +122,8 @@ export function ExecProfileSheet(p: { seat: ExecSeat; onClose: () => void }) {
             <Card>
               {exec.grants.length === 0 && (
                 <p class="muted small exec-note">
-                  No grants yet. Unvested grants halve the chance of losing{' '}
+                  No grants yet. Unvested grants worth at least{' '}
+                  {Math.round(EXECUTIVES.grantMinValue * 100)}% of salary halve the chance of losing{' '}
                   {exec.name.split(' ')[0]} to a rival.
                 </p>
               )}
