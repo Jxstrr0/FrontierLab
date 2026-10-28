@@ -12,6 +12,8 @@ import {
   tileRangeForRect,
 } from '../../src/art/drawList';
 import { tileTop, worldSize } from '../../src/art/iso';
+import { hasParkedCars } from '../../src/art/streetProps';
+import { PROPS } from '../../src/config/cityLife';
 import { CITIES } from '../../src/data/cities';
 import { newGame } from '../../src/sim/newGame';
 import {
@@ -56,7 +58,8 @@ describe('draw list', () => {
       const t = tileAt(sas, i % sas.tiles, Math.floor(i / sas.tiles))!;
       const h = tileHeightPx(sas, i);
       const avenue = (sas.decor[i]! & DECOR.avenue) !== 0;
-      if (t.kind === 'street') expect(h).toBe(avenue ? AVENUE_TREE_PX : 0);
+      const parked = hasParkedCars(sas, i) ? PROPS.parkedPx : 0;
+      if (t.kind === 'street') expect(h).toBe(avenue ? AVENUE_TREE_PX : parked);
       if (t.kind === 'water' || t.kind === 'landmark') expect(h).toBe(0);
       if (t.kind === 'building') expect(h).toBe((t.floors + ROOF_EXTRA_STOREYS) * STOREY_PX);
       if (t.kind === 'lot') expect(h).toBe((t.floors + ROOF_EXTRA_STOREYS) * STOREY_PX + FLAG_PX);

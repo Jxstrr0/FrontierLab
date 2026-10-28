@@ -3,11 +3,12 @@
 // own, the credit bureau (an archive block with slit windows and a mast) and
 // the marketing agency (a glass studio with a rooftop billboard). Each look
 // comes only from the tile's art seed, so it draws the same in every chunk.
-import { STOREY_PX } from '../config/map';
+import { ROOF_EXTRA_STOREYS, STOREY_PX } from '../config/map';
 import { roofFlag } from './buildings';
 import type { TileInfo } from './citygen';
 import type { Engraver, Vec3 } from './engraver';
 import { drawEnergySite } from './buildingsDataCenter';
+import { crane } from './streetProps';
 import type { LotOccupant } from './mapRenderer';
 import { artRng } from './prng';
 import { bands, box, castShadow, cylinder, onFace, ribs, windowSlits, type Face } from './solids';
@@ -95,6 +96,8 @@ function letBanner(e: Engraver, face: Face, r: Rect, top: number): void {
 export function drawSite(e: Engraver, t: TileInfo, occupant?: LotOccupant): void {
   if (occupant?.building) {
     drawEnergySite(e, t, occupant);
+    // A hall being fitted out at the site has a crane over it (reach as drawList bounds sites).
+    if (occupant.fitout) crane(e, STOREY_PX * 1.5, (t.floors + ROOF_EXTRA_STOREYS) * STOREY_PX);
     return;
   }
   e.origin(t.x, t.y);
