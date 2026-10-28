@@ -174,11 +174,11 @@ Prices in the tier column are the default price × 0.85 / 1 / 1.25 for Low / Med
 | plus_annual | Plus Annual | plus | churn ×0.5; take-up ×0.85 |
 | carbon_neutral | Carbon-Neutral Plan | plus | reputation +0.05; YP +0.05 |
 | max_plan | Max | pro | default $200; Products +0.1 where offered; YP/BIZ +0.05 |
-| enterprise | Enterprise | team | BIZ +0.2; ticket ×5; churn ×0.6; default $45 |
+| enterprise | Enterprise | team | BIZ +0.2; ticket ×5; churn ×0.6; default $45; take-up ×0.2 |
 | realtime_api | Realtime API | api | default $6; take-up ×1.1; YP/BIZ +0.05 |
-| dedicated_capacity | Dedicated Capacity | api | BIZ +0.2; ticket ×4; churn ×0.5 |
+| dedicated_capacity | Dedicated Capacity | api | BIZ +0.2; ticket ×4; churn ×0.5; take-up ×0.3 |
 | research_credits | Research Credits | api | STU +0.15; default $1.50 |
-| embeddings_api | Embeddings API | batch_api | default $0.50; ticket ×3 |
+| embeddings_api | Embeddings API | batch_api | default $0.50; ticket ×3; compute cost ×0.2 |
 | study_buddy | Study Buddy | creative_suite | STU +0.2; default $8 |
 | voice_companion | Voice Companion | creative_suite | RET/FAM +0.1; take-up ×1.15 |
 | contract_copilot | Contract Copilot | agent_studio | BIZ +0.15; default $149; reputation +0.05 |
@@ -357,7 +357,7 @@ Department ids keep their bank-era names; the screens show the AI names. "Units"
 | finance | Finance | 24 | 82,000 | 2 + 0.35 × units + 1 per $2B assets (+4 if public) | statement delay `ceil((0.9 − k′) × 10)` weeks; IR discount; public & k′ < 0.6 → late filing fine of 0.02% of revenue per quarter; IPO needs k′ ≥ 0.8 |
 | hr | HR | 24 | 68,000 | 1 + employees / 80 | hiring ×k′; morale −(1 − k′) × 15 company-wide |
 | products | Products | 24 | 90,000 | 2 + 0.2 × units + 2 per active development | development time ÷ max(0.3, k′); data licence +(1 − k′) × 30% |
-| treasury | Compute | 24 | 95,000 | 1 (+1 per $1B of old deposits and wholesale funding, which a lab no longer has) | fewer GPU offers, priced up to 10% higher |
+| treasury | Compute | 24 | 95,000 | 1 (+1 per 2,000 GPUs of weekly compute demand) | fewer GPU offers, priced up to 10% higher |
 | marketing | Marketing | 24 | 72,000 | 1 + 0.15 × units + 2 per active brand campaign | all campaign effects ×(0.5 + 0.5k′) |
 | it | Platform & Security | 24 | 98,000 | 2 + 0.25 × units + 1 per $5B assets | app rating target ×k′; breach and outage odds ×(1 + 2(1 − k′)) |
 | risk | Safety & Alignment | 24 | 88,000 | 2 + 0.15 × units + 1 per $50M of ARR | sets the safety ratio's strength (SIMULATION §15); audit odds ×(1 + 3(1 − k′)) |
@@ -548,7 +548,7 @@ New labs founded during a game (SIMULATION §18.7) take an invented name from `s
 
   Cities not listed borrow the nearest house: Saskatoon and Montréal → Ashgrove Capital, Seattle → Whitlock & Rowe, Frankfurt, Amsterdam, Moscow and St Petersburg → Meridian Partners. Implemented in `src/data/investmentBanks.ts`. Each office is also a lender: its Debt tab offers venture debt and a credit line to labs with a sales office in its city (SIMULATION §19.9).
 - **Marketing agencies:** Brightwell Creative, Northwind & Pike, Studio Halcyon. Present in L and XL cities; M cities get one.
-- **Lobbying firms:** Capitol Bridge Advisors (US), Parliament Row Partners (CA, UK), Rue Royale Affairs (EA, and CH by borrowing), Harbourline Policy Group (AU, SG, HK, and JP by borrowing), Granite Quay Advisors (RU). Campaigns (`src/data/lobbying.ts`; the first three are in SIMULATION §21.6, the rest pay a one-off grant on a win):
+- **Lobbying firms:** Capitol Bridge Advisors (US), Parliament Row Partners (CA, UK), Rue Royale Affairs (EA, and CH by borrowing), Harbourline Policy Group (AU, SG, HK, and JP by borrowing), Granite Quay Advisors (RU). Campaigns (`src/data/lobbying.ts`; the first three are in SIMULATION §21.6, the rest pay a one-off grant on a win, scaled with the price list like the fee, and each grant can be won once per country):
 
   | id | Campaign | Fee | Success | Exposure | Win |
   |---|---|---|---|---|---|

@@ -3,13 +3,40 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.49, save schema 30). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
+**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.50, save schema 31). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `118f39c1c8c317` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `18d23d581bed69` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-28 — Polish and bug pass, batch 2: balance (v0.1.50, schema 31)
+
+The second batch of the polish pass fixes balance problems the reviewers found: loops that always pay, rules that undo your decisions, and leftovers from the bank game.
+
+**Your decisions now stick.**
+- **Researchers get pay reviews.** The COO's reviews skipped researchers, so their pay froze while the market rose and rivals poached them more and more. A review now raises them to market pay plus your premium. It never cuts them, because their pay is a contract you agreed, often with a poaching premium.
+- **A counter-offer lasts.** When you matched a rival's offer to keep an executive, the next quarterly review set them back to the standard pay. Now a review won't cut them for a year after the counter. The game remembers the week of the counter (save schema 31; old saves load unchanged).
+- **New executives don't touch your own money until you say so.** A new CFO came with Share sales and your personal Investing and Buying switched on, so hiring one could sell shares (diluting you) or spend your personal cash. Those three now start off. A seat still remembers whatever its last holder had.
+
+**Loops that always paid.**
+- **A one-share grant halved resignations.** Grants now count only if the unvested part is worth at least 25% of the executive's salary.
+- **Lobbying grants.** The five grant campaigns paid more than they cost on average and could be repeated forever. Each grant can now be won once per country, and its size moves with prices like the fee does.
+- **Startup buyouts always lost money.** A buyer paid 2–6× revenue even when the last round valued the startup far higher. A sale now pays at least 1.25× the last valuation.
+
+**Bank leftovers in the economy.**
+- **Currencies all climbed to their ceiling.** Every currency grew with its own country's growth and rates, so after 15–20 years they all sat at the maximum. They now move against the world average, so some rise and some fall.
+- **The Compute floor always needed one person,** because its need was tied to bank deposits. It now needs one more person per 2,000 GPUs of demand.
+- **A failing listed rival kept its full share price** while its sale asked a fraction of that. Its price now heads toward the asking price.
+- **Firing sales office staff was free.** Lowering the staff target now pays each person 4 weeks' wages, like HQ floors already did.
+- **Developed products.** Enterprise and Dedicated Capacity beat their base products on every count. They now sign far fewer prospects (big contracts, fewer buyers). Embeddings was priced at exactly its compute cost, so it earned nothing. It now costs a fifth as much to serve.
+
+**Balance.** No targets changed. The 20-seed steady sweep passes every band, and steady, aggressive and turtle on seed 42 pass every check. The determinism snapshot moved to `18d23d581bed69` (intended: the fixes change the simulation).
+
+**Checked.** `npm run lint`, the full test suite (a new `polishBalance.test.ts` covers each fix), `npm run build`, `npm run balance` for three strategies and a 20-seed sweep.
+
+**Still to come.** Batch 3 is screens: money shown in dollars whatever currency you picked, number fields that reset when cleared, "$1000K", wording leftovers, and the tutorial guide covering the top bar.
 
 ### 2026-10-28 — Polish and bug pass, batch 1: exploits and sim bugs (v0.1.49)
 

@@ -70,9 +70,11 @@ function applyWin(state: GameState, c: LobbyCampaign): void {
   const lob = state.lobbying;
   const week = state.clock.week;
   // SIMULATION §21.6: the newer campaigns pay a one-off grant, booked as a refund
-  // on the lobbying line so the year's lobbying cost nets down.
-  const grant = campaignSpec(c.campaignId)?.grant;
-  if (grant) spend(state, 'lobbying', -grant);
+  // on the lobbying line so the year's lobbying cost nets down. The grant moves
+  // with the price list like the fee did (fee paid ÷ base fee), and a country
+  // pays each grant once (commands/lobbying.ts).
+  const spec = campaignSpec(c.campaignId);
+  if (spec?.grant) spend(state, 'lobbying', (-spec.grant * c.cost) / spec.cost);
   if (c.campaignId === 'easeBuffer') {
     lob.bufferRelief = {
       country: c.country,
