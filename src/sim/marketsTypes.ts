@@ -41,6 +41,8 @@ export interface Executive {
   /** Annual salary. */
   salary: Money;
   hiredWeek: Week;
+  /** Week you last matched a rival's offer (schema v31); a pay review can't cut them for a while after. */
+  counterWeek?: Week;
   /** Delegation toggles by id (src/data/executives.ts). */
   delegations: Record<string, boolean>;
   grants: EquityGrant[];

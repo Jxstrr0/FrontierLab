@@ -16,6 +16,7 @@ import { rivalFairPerShare } from './rivalFinance';
 import type { Rng } from './rng';
 import type { GameState, RivalBank } from './state';
 import { qualityBar } from './underwriting';
+import { distressedAsk } from './mergerPricing';
 
 export { rivalBookPerShare } from './rivalFinance';
 
@@ -71,11 +72,12 @@ export function priceRivalShares(state: GameState, rng: Rng, phase: Phase, shock
     bank.sentiment = walkSentiment(bank.sentiment, rng.normal(0, 1)) * (1 + sector);
     bank.sentiment = clampSentiment(bank.sentiment);
     const noise = rng.normal(0, PUBLIC_PRICE.noise);
-    bank.price = Math.max(
-      0,
-      ema(bank.price, rivalTargetPrice(bank, rivalModelLead(state, bank)), PUBLIC_PRICE.ema) *
-        (1 + noise),
-    );
+    // A distressed rival trades toward its asking price in M&A (§18.5), not full value.
+    const target =
+      bank.status === 'distressed'
+        ? distressedAsk(bank)
+        : rivalTargetPrice(bank, rivalModelLead(state, bank));
+    bank.price = Math.max(0, ema(bank.price, target, PUBLIC_PRICE.ema) * (1 + noise));
     recordClose(bank, bank.price);
   }
 }

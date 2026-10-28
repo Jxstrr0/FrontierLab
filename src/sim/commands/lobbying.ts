@@ -1,7 +1,8 @@
 // Lobbying commands (DESIGN §5.8.10, SCREENS §15): hire the firm in the city
 // you're in for a campaign. The fee is paid now; the outcome arrives in 4–8
-// weeks (lobbying.ts). One pending campaign per type, and the buffer-bill stall
-// only while such a bill is waiting for its vote in that country.
+// weeks (lobbying.ts). One pending campaign per type, a grant can be won once
+// per country, and the buffer-bill stall only while such a bill is waiting for
+// its vote in that country.
 import { LOBBYING } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { COUNTRIES } from '../../data/countries';
@@ -34,6 +35,14 @@ export function lobbyBlock(
     return `Your safety rules are set at home in ${COUNTRIES[home ?? country].name}, so this campaign only helps there.`;
   if (campaignId === 'stallBuffer' && !pendingBufferBill(state, country))
     return 'There is no AI safety bill before lawmakers here right now.';
+  // A grant pays once per country: a won grant can't be lobbied for again there.
+  if (
+    spec.grant &&
+    state.lobbying.campaigns.some(
+      (c) => c.campaignId === campaignId && c.country === country && c.status === 'won',
+    )
+  )
+    return `You have already won this grant in ${COUNTRIES[country].name}.`;
   if (campaignId === 'fastTrack' && state.lobbying.fastTrack)
     return 'Your next merger review is already fast-tracked.';
   const price = lobbyingPrice(state, spec, site.cityId);

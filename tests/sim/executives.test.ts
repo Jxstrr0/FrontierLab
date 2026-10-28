@@ -234,9 +234,12 @@ describe('resignation (§17.2)', () => {
     expect(resignChance(exec, 120_000)).toBeCloseTo(0.002 * 0.9 * 2);
     const granted = {
       ...exec,
-      grants: [{ shares: 100, vested: 0 }],
+      grants: [{ shares: 100, vested: 0, fairValue: 250 }],
     } as unknown as Executive;
     expect(resignChance(granted, 120_000)).toBeCloseTo(0.002 * 0.9 * 2 * 0.5);
+    // A token grant (one share) doesn't count.
+    const token = { ...exec, grants: [{ shares: 1, vested: 0, fairValue: 250 }] };
+    expect(resignChance(token as unknown as Executive, 120_000)).toBeCloseTo(0.002 * 0.9 * 2);
   });
 });
 
@@ -328,6 +331,9 @@ describe('delegation defaults and seat memory (schema v13)', () => {
     hire(s, 'cfo');
     cmd.setExecDelegation(s, 'cfo', 'dividends', false);
     cmd.setExecDelegation(s, 'cfo', 'capital', false);
+    // Share sales start off on a new hire (defaultOff); switch them on to remember.
+    expect(s.executives.seats.cfo!.delegations.shares).toBe(false);
+    cmd.setExecDelegation(s, 'cfo', 'shares', true);
     cmd.fireExec(s, 'cfo');
     expect(s.executives.remembered.cfo).toMatchObject({
       shares: true,

@@ -58,17 +58,25 @@ export function fxWeeklyMove(state: GameState, c: CountryId): number {
 export function runFx(state: GameState): void {
   const rng = stream(state, 'fx');
   const before = fxValue(state, 'company');
+  // SIMULATION §19.10: growth and rate pull plus cycle drift, less the world
+  // average drift so levels move against each other instead of all rising
+  // together into the FX.max ceiling; then noise. Rates against home follow.
+  const drift: Partial<Record<CountryId, number>> = {};
   for (const c of COUNTRY_IDS) {
-    const spec = CURRENCIES[c];
     const country = state.world.countries[c];
-    if (spec.peggedTo || !country) continue;
-    const draw = COUNTRIES[c].ownStream ? stream(state, `fx:${c}`) : rng;
-    // SIMULATION §19.10: growth and rate pull, cycle drift, noise; rates against home follow.
-    const r =
+    if (CURRENCIES[c].peggedTo || !country) continue;
+    drift[c] =
       (FX.growthW * country.gdp) / 100 / WEEKS_PER_YEAR +
       (FX.rateW * country.policyRate) / WEEKS_PER_YEAR +
-      FX.phase[country.phase] +
-      draw.normal(0, spec.vol * FX.volMult);
+      FX.phase[country.phase];
+  }
+  const drifts = Object.values(drift);
+  const mean = drifts.reduce((a, b) => a + b, 0) / Math.max(1, drifts.length);
+  for (const c of COUNTRY_IDS) {
+    const d = drift[c];
+    if (d === undefined) continue;
+    const draw = COUNTRIES[c].ownStream ? stream(state, `fx:${c}`) : rng;
+    const r = d - mean + draw.normal(0, CURRENCIES[c].vol * FX.volMult);
     const level = (state.fx.level[c] ?? FX_START_INDEX) * (1 + r);
     state.fx.level[c] = clamp(level, FX.min * FX_START_INDEX, FX.max * FX_START_INDEX);
   }

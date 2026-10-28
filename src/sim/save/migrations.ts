@@ -209,6 +209,8 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     ex.devFocus ??= EXEC_DELEGATION.devFocus;
     return s;
   },
+  // Schema 31 (polish pass): Executive.counterWeek is optional; no counter is on record yet.
+  30: (s) => s,
 };
 
 /** Upgrades a raw save to the current schema, or throws if it can't. */

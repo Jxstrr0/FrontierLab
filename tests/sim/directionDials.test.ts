@@ -197,6 +197,6 @@ describe('migration 29 → 30', () => {
     expect(out.executives.postureCeiling).toBe(EXEC_DELEGATION.croMaxAppetite);
     expect(out.executives.expansionReserveWeeks).toBe(EXEC_DELEGATION.expansionReserveWeeks);
     expect(out.executives.devFocus).toBe('any');
-    expect(SCHEMA_VERSION).toBe(30);
+    expect(SCHEMA_VERSION).toBeGreaterThanOrEqual(30);
   });
 });
