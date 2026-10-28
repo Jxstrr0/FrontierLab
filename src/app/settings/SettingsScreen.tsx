@@ -121,8 +121,8 @@ export function SettingsScreen(p: { inGame?: boolean }) {
             onChange={(autoPauseApplications) => change({ autoPauseApplications })}
           />
           <Toggle
-            label="Pause for incidents"
-            hint="Stops time when something goes wrong."
+            label="Pause for incidents and board meetings"
+            hint="Stops time when something goes wrong, and reminds you of each quarter's board meeting."
             checked={s.autoPauseIncidents}
             onChange={(autoPauseIncidents) => change({ autoPauseIncidents })}
           />

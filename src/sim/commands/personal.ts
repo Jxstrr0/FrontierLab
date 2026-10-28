@@ -46,7 +46,7 @@ export function offerHome(
     return fail(`The seller won't hear another offer for ${lock} week${lock === 1 ? '' : 's'}.`);
   const asking = homeAsking(state, spec.id);
   if (offer > asking) return fail('Offer the asking price at most.');
-  if (offer > state.personal.cash) return fail(`You need ${money(offer)} in personal cash.`);
+  if (offer > state.personal.cash) return fail(`You need ${money(state, offer)} in personal cash.`);
 
   const e = state.personal.empire;
   if (!stream(state, 'personal').chance(homeOfferAcceptance(offer, asking))) {
@@ -73,7 +73,7 @@ export function rebuildHome(state: GameState, homeId: string): CommandResult<{ c
   if (!home) return fail("You don't own this home.");
   if (home.rebuildDoneWeek !== undefined) return fail('A rebuild is already under way.');
   const cost = rebuildCost(home.value);
-  if (cost > state.personal.cash) return fail(`You need ${money(cost)} in personal cash.`);
+  if (cost > state.personal.cash) return fail(`You need ${money(state, cost)} in personal cash.`);
   state.personal.cash -= cost;
   home.rebuildDoneWeek = state.clock.week + HOMES_CFG.rebuildWeeks;
   return ok({ cost });
@@ -103,7 +103,7 @@ export function buyCar(state: GameState, siteId: string, carId: string): Command
     return fail(`Only one ${spec.name} per owner.`);
   // Dealer prices follow today's price list in the dealer's country (§4.6).
   const price = listPrice(state, spec.price, site.cityId);
-  if (price > state.personal.cash) return fail(`You need ${money(price)} in personal cash.`);
+  if (price > state.personal.cash) return fail(`You need ${money(state, price)} in personal cash.`);
   state.personal.cash -= price;
   e.cars.push({
     id: newId(state, 'car'),

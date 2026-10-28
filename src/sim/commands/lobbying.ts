@@ -46,7 +46,7 @@ export function lobbyBlock(
   if (campaignId === 'fastTrack' && state.lobbying.fastTrack)
     return 'Your next merger review is already fast-tracked.';
   const price = lobbyingPrice(state, spec, site.cityId);
-  if (price > state.company.cash) return `You need ${money(price)} in corporate cash.`;
+  if (price > state.company.cash) return `You need ${money(state, price)} in corporate cash.`;
   return undefined;
 }
 

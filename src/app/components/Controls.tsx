@@ -49,6 +49,8 @@ export function Stepper(p: StepperProps) {
 
   const commit = () => {
     setEditing(false);
+    // A cleared field (or one with no digits) keeps the old value instead of the minimum.
+    if (!/\d/.test(text)) return;
     const raw = (p.parse ?? Number)(text);
     if (Number.isFinite(raw)) p.onChange(clampV(raw));
   };

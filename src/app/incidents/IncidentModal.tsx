@@ -8,7 +8,7 @@ import * as cmd from '../../sim/commands';
 import { optionBlocker, troublesDelegated } from '../../sim/incidents';
 import type { GameState, Incident } from '../../sim/state';
 import { Medallion, Modal, Portrait } from '../components';
-import { gameDate, money } from '../format/format';
+import { gameDate, localizeMoney, money } from '../format/format';
 import { act, modal, openPanel, toast, useGame } from '../store';
 import './incidents.css';
 
@@ -99,7 +99,7 @@ export function IncidentModal() {
                 )}
               </span>
               <span class="inc-option-effect" id={`inc-${inc.id}-${o.id}`}>
-                {blocked ?? o.effect}
+                {localizeMoney(blocked ?? o.effect, s.settings.currency)}
               </span>
             </button>
           );

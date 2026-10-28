@@ -3,6 +3,7 @@
 // fee, plus the IPO eligibility checklist. Read by the Equity tab (as
 // selectors) and by the commands in commands/marketsEquity.ts, so the screen
 // and the action always agree.
+import { toCurrency } from '../data/settingsOptions';
 import { IPO, PLACEMENT, SECONDARY } from '../config/balance';
 import { INVESTMENT_BANKS } from '../data/investmentBanks';
 import { FUND_NAMES } from '../data/names';
@@ -85,7 +86,11 @@ export interface EligibilityRule {
   detail: string;
 }
 
-const money = (x: number) => `$${(x / 1e6).toFixed(1)}M`;
+/** Millions in the chosen currency, e.g. "$18.2M" or "£14.6M". */
+const money = (state: GameState, x: number) => {
+  const symbol = state.settings.currency;
+  return `${symbol}${(toCurrency(x, symbol) / 1e6).toFixed(1)}M`;
+};
 
 /** §19.4 eligibility, one row per rule. */
 export function ipoChecklist(state: GameState): EligibilityRule[] {
@@ -99,9 +104,9 @@ export function ipoChecklist(state: GameState): EligibilityRule[] {
   return [
     {
       id: 'arr',
-      label: `ARR of at least ${money(IPO.minArr)}`,
+      label: `ARR of at least ${money(state, IPO.minArr)}`,
       ok: arr >= IPO.minArr,
-      detail: money(arr),
+      detail: money(state, arr),
     },
     {
       id: 'profitable',

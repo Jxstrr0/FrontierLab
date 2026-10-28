@@ -17,7 +17,7 @@ export function hireResearcher(state: GameState, researcherId: string): CommandR
     return fail(`Your research team is full (${RESEARCHERS.maxTeam}).`);
   const { salary, signing } = hireTerms(state, r);
   const upFront = signing + salary / WEEKS_PER_YEAR;
-  if (state.company.cash < upFront) return fail(`You need ${money(upFront)} in cash.`);
+  if (state.company.cash < upFront) return fail(`You need ${money(state, upFront)} in cash.`);
   const from = r.employer?.type === 'rival' ? state.rivals[r.employer.id]?.name : undefined;
   if (signing > 0) spend(state, 'hqStaff', signing);
   r.salary = salary;

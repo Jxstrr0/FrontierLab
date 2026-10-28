@@ -32,7 +32,7 @@ function checkAccount(state: GameState, account: Account, amount: number): strin
     if (block) return block;
   }
   if (amount > accountCash(state, account))
-    return `You need ${money(amount)} ${account === 'company' ? 'in corporate cash' : 'of your own'}.`;
+    return `You need ${money(state, amount)} ${account === 'company' ? 'in corporate cash' : 'of your own'}.`;
   return undefined;
 }
 
@@ -91,11 +91,11 @@ export function offerVentureDebt(
   if (typeof s === 'string') return fail(s);
   const blocked = accessBlock(state, s);
   if (blocked) return fail(blocked);
-  if (s.ventureDebt) return fail(`${s.name} already has a venture loan.`);
+  if (s.ventureDebt) return fail(`${s.name} already has compute credits from you.`);
   if (!Number.isFinite(amount) || amount <= 0) return fail('Choose an amount.');
   if (amount > maxVentureDebt(s) + 1e-6)
     return fail(
-      `${s.name} borrows at most ${money(maxVentureDebt(s))} (${VENTURE_DEBT.maxShare * 100}% of its valuation).`,
+      `${s.name} borrows at most ${money(state, maxVentureDebt(s))} (${VENTURE_DEBT.maxShare * 100}% of its valuation).`,
     );
   if (!Number.isFinite(rate) || rate <= 0 || rate >= 1) return fail('Choose a rate.');
   const problem = checkAccount(state, account, amount);

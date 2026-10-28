@@ -18,7 +18,7 @@ import { fail, money, ok, type CommandResult } from './result';
 export function topUpLendingFund(state: GameState, amount: number): CommandResult {
   if (!Number.isFinite(amount) || amount <= 0) return fail('Enter an amount above zero.');
   if (amount > state.company.cash)
-    return fail(`You only have ${money(state.company.cash)} in corporate cash.`);
+    return fail(`You only have ${money(state, state.company.cash)} in corporate cash.`);
   postCash(state, -amount, 'investing');
   addToLendingFund(state, amount);
   return ok();
@@ -59,7 +59,7 @@ export function borrowOffer(
   if (!offer) return fail('That offer is no longer available.');
   if (!Number.isFinite(amount) || amount <= 0) return fail('Enter an amount above zero.');
   const max = maxBorrow(state, offer);
-  if (amount > max) return fail(`This offer is for at most ${money(max)}.`);
+  if (amount > max) return fail(`This offer is for at most ${money(state, max)}.`);
   const lotId = newId(state, 'fl');
   t.lots.push({
     id: lotId,
@@ -90,7 +90,7 @@ export function repayLot(state: GameState, lotId: string): CommandResult {
     return fail(`${spec?.name ?? 'This funding'} can't be repaid early; it runs to maturity.`);
   if (lot.amount > liquidityHeadroom(state))
     return fail(
-      `Repaying ${money(lot.amount)} would take liquid assets below the ${LIQ_MIN * 100}% minimum. ` +
+      `Repaying ${money(state, lot.amount)} would take liquid assets below the ${LIQ_MIN * 100}% minimum. ` +
         'Transfer cash to Treasury first.',
     );
   t.reserves -= lot.amount;
@@ -113,10 +113,10 @@ export function repayWindow(state: GameState, amount: number): CommandResult {
   const t = state.treasury;
   if (t.window <= 0) return fail('You have no central bank borrowing to repay.');
   if (!Number.isFinite(amount) || amount <= 0) return fail('Enter an amount above zero.');
-  if (amount > t.window) return fail(`You only owe ${money(t.window)} at the window.`);
+  if (amount > t.window) return fail(`You only owe ${money(state, t.window)} at the window.`);
   if (amount > liquidityHeadroom(state))
     return fail(
-      `You can repay at most ${money(Math.max(0, liquidityHeadroom(state)))} ` +
+      `You can repay at most ${money(state, Math.max(0, liquidityHeadroom(state)))} ` +
         `without dropping below the ${LIQ_MIN * 100}% liquidity minimum.`,
     );
   t.window -= amount;

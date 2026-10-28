@@ -92,7 +92,8 @@ export function dataCenterBlocker(
     return `The regulator won't allow new builds at the ${tier} tier.`;
   }
   const quote = dataCenterQuote(state, where, build);
-  if (state.company.cash < quote.total) return `Not enough cash: you need ${money(quote.total)}.`;
+  if (state.company.cash < quote.total)
+    return `Not enough cash: you need ${money(state, quote.total)}.`;
   return undefined;
 }
 
@@ -186,7 +187,7 @@ export function dcUpgradeBlocker(
   if (part.cost <= now.cost) return 'Pick a part better than the one fitted.';
   if (slot === 'hall' && dc.status === 'fitout') return 'Wait for the fit-out to finish.';
   const cost = partPrice(state, partId, dc.cityId);
-  if (state.company.cash < cost) return `Not enough cash: you need ${money(cost)}.`;
+  if (state.company.cash < cost) return `Not enough cash: you need ${money(state, cost)}.`;
   return undefined;
 }
 

@@ -35,9 +35,9 @@ export function startTrainingRun(
   if (!Number.isFinite(input.weeklyBudget)) return fail('Enter a weekly budget.');
   const weeklyBudget = roundToStep(input.weeklyBudget, TRAINING.budgetStep);
   if (weeklyBudget < TRAINING.minWeekly)
-    return fail(`The weekly budget starts at ${money(TRAINING.minWeekly)}.`);
+    return fail(`The weekly budget starts at ${money(state, TRAINING.minWeekly)}.`);
   if (state.company.cash < weeklyBudget)
-    return fail(`You need ${money(weeklyBudget)} in cash for the first week.`);
+    return fail(`You need ${money(state, weeklyBudget)} in cash for the first week.`);
   const odds = trainingOdds(state, input.weeks, weeklyBudget, input.focus);
   const id = newId(state, 'train');
   state.training.run = {

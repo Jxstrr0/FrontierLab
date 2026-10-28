@@ -53,7 +53,8 @@ export function appraiseCollectible(
   if (c.appraised) return fail('That piece has already been appraised.');
   if (c.appraisalWeek !== undefined) return fail('That piece is already with the appraisers.');
   const fee = appraisalFee(c);
-  if (state.personal.cash < fee) return fail(`The appraisal costs ${money(fee)} of personal cash.`);
+  if (state.personal.cash < fee)
+    return fail(`The appraisal costs ${money(state, fee)} of personal cash.`);
   state.personal.cash -= fee;
   c.appraisalWeek = state.clock.week + AUCTIONS.appraiseWeeks;
   return ok({ fee, week: c.appraisalWeek });
