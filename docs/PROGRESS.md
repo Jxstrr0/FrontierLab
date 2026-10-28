@@ -3,13 +3,23 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.43, save schema 28). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
+**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.44, save schema 28). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `01df274c16f993` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `031d3063aa4ddd` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-28 — Balance fix: turtle profits and the aggressive stall (v0.1.44)
+
+The small balance fix from the late-game pitch. A sweep of seeds 1–20 on all five strategies had found the one-office turtle losing money in year 5 on half the seeds, and aggressive seed 20 stuck at one office forever.
+
+- **Why turtle lost money:** the Team plan cost $6 of compute per seat each week but only earned $30 a month, so it barely broke even, and lost money whenever GPUs got pricey. Team is the turtle's biggest plan. Team's compute is now $2.50 a seat (a normal margin, like the other plans). Turtle also now refuses to match rivals' price cuts, since one office can't afford half a year of cheaper plans.
+- **Why aggressive seed 20 stalled:** Calgary on that seed only offers 3- and 4-floor office buildings, and the script only leased buildings with 7+ floors. So it never got a Safety floor, the regulator kept it at Restricted, and Restricted blocks new offices. The script now takes the tallest building on offer, and when both main offices are full it stops waiting for floors it can't add and expands abroad.
+- **Smaller script fixes:** cash reserves now count tax that is owed but not yet paid (the cause of most small cash dips), and the Safety Institute project goes first when the safety tier slips.
+- **Results (seeds 1–20):** turtle 20/20 clean (was 8), aggressive 17/20 (was 14), stress 18/20 (was 17), nohq 20/20. Seed 42 and the 20-city median pass every target. The week-52 office bands moved up a little (customers to 9,500, income to $65k a week) because offices now earn more from Team.
+- Determinism snapshot changed on purpose to `031d3063aa4ddd` (Team's compute cost).
 
 ### 2026-10-28 — Late game, part 4: new regions after year 5 (v0.1.43)
 

@@ -8,6 +8,7 @@ import { HQ_COVERAGE } from '../../src/config/balance';
 import { HQ_DEPTS } from '../../src/data/departments';
 import type { HqDeptId } from '../../src/data/types';
 import * as cmd from '../../src/sim/commands';
+import { mainOfficeBlocker } from '../../src/sim/commands/hq';
 import { deptDesks, founderRamp, requiredStaff } from '../../src/sim/hq';
 import type { GameState } from '../../src/sim/state';
 
@@ -55,11 +56,17 @@ export function manageHq(state: GameState): void {
   }
 }
 
-/** The cheapest free office building in the city you're in with at least `floors` floors. */
+/**
+ * The cheapest free office building in the city you're in with at least
+ * `floors` floors; when none is that tall, the tallest one (a small city may
+ * only list short buildings, and a Safety floor is still worth having).
+ */
 function cheapestListing(state: GameState, floors: number) {
-  return Object.values(state.world.officeListings)
-    .filter((l) => !l.officeId && l.cityId === state.world.currentCityId && l.floors >= floors)
-    .sort((a, b) => a.weeklyRent - b.weeklyRent)[0];
+  const free = Object.values(state.world.officeListings).filter(
+    (l) => !l.officeId && l.cityId === state.world.currentCityId,
+  );
+  const tall = free.filter((l) => l.floors >= floors).sort((a, b) => a.weeklyRent - b.weeklyRent);
+  return tall[0] ?? free.sort((a, b) => b.floors - a.floors || a.weeklyRent - b.weeklyRent)[0];
 }
 
 function ensureFloors(state: GameState): void {
@@ -110,5 +117,17 @@ export function hqReady(state: GameState): boolean {
   // Keep a reserve for HQ payroll and rent before spending on branches.
   if (state.company.cash < HQ_RESERVE_WEEKS * hqWeeklyCost(state)) return false;
   if (founderRamp(state) < LEASE_AT_RAMP) return true;
-  return Object.values(state.hq.coverage).every((c) => c.kPrime >= READY_K);
+  // A department with no floor and nowhere here to put one (every floor full and
+  // no building you may lease, C2d2) doesn't hold expansion back: a city abroad can house it.
+  const homeless = !roomForFloor(state);
+  return Object.entries(state.hq.coverage).every(
+    ([id, c]) => c.kPrime >= READY_K || (homeless && !state.departments[id as HqDeptId]),
+  );
+}
+
+/** True when an office has a free floor or the city you're in has a building you may lease. */
+function roomForFloor(state: GameState): boolean {
+  if (Object.values(state.offices).some((o) => o.floors.includes(null))) return true;
+  const city = state.world.currentCityId;
+  return cheapestListing(state, 1) !== undefined && !mainOfficeBlocker(state, city);
 }

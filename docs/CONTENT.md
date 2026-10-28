@@ -147,7 +147,7 @@ The three categories keep their bank-era ids (`deposits`, `lending`, `cards`) so
 | free_tier | Free Tier | Plans | plan | fee $/mo | $0 | 0–5 / 1 | 1 seat | 25% | 0.05 | 12%/yr upgrade to Plus |
 | plus | Plus | Plans | plan | fee $/mo | $20 | 5–60 / 1 | 1 seat | 14% | 1.00 | rateChurnSens 0.3; starts 3.0★ |
 | pro | Pro | Plans | plan | fee $/mo | $60 | 20–250 / 5 | 1 seat | 12% | 3.00 | rateChurnSens 0.3 |
-| team | Team | Plans | plan | fee $/mo | $30 | 10–90 / 1 | 6 seats | 8% | 6.00 | rateChurnSens 0.2 |
+| team | Team | Plans | plan | fee $/mo | $30 | 10–90 / 1 | 6 seats | 8% | 2.50 | rateChurnSens 0.2 |
 | campus_plan | Campus Plan | Plans | plan | fee $/mo | $8 | 0–20 / 1 | 1 seat | 20% | 0.60 | the student partnership package |
 | api | Standard API | API | usage | $ per M tokens | $3 | 0.5–15 / 0.25 | 40 M tok/mo | 10% | 0.50 | compute $1.00/unit; organic +25%/yr; starts 3.0★ |
 | batch_api | Batch API | API | usage | $ per M tokens | $1.50 | 0.25–6 / 0.25 | 80 M tok/mo | 9% | 0.50 | compute $0.50/unit; organic +20%/yr |
