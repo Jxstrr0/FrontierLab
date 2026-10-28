@@ -264,6 +264,9 @@ const EVENT_TEXT: Record<string, (p: Record<string, unknown>) => string> = {
   COMPUTE_CRUNCH: () => 'Capacity crunch: new customers are on a waitlist until we add GPUs.',
   COMPUTE_CRUNCH_ENDED: () => 'The waitlist has cleared.',
   COMPUTE_OUTAGE: () => 'Outage: too little compute for too long. Customers are leaving.',
+  PROJECT_DONE: (p) => `${String(p.name)} is finished.`,
+  PROJECT_OVERRUN: (p) => `${String(p.name)} is running late: ${Number(p.weeks)} more weeks.`,
+  PROJECT_STALLED: (p) => `${String(p.name)} has stalled: not enough cash for this week's payment.`,
 };
 
 /** Events about a country toast only when it is your home country (nine central banks meet). */
@@ -275,6 +278,8 @@ const BAD_EVENTS = new Set([
   'COMPUTE_BURST',
   'COMPUTE_CRUNCH',
   'COMPUTE_OUTAGE',
+  'PROJECT_OVERRUN',
+  'PROJECT_STALLED',
   ...MNA_BAD_EVENTS,
   ...VENTURE_BAD_EVENTS,
   ...AUCTION_BAD_EVENTS,

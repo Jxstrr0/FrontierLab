@@ -5,13 +5,15 @@ import type { Pentagon } from '../../../data/types';
 import { PentagonRosette } from '../../business/PentagonRosette';
 import { MODEL_AXES, radarText } from './productSelectors';
 
-export function ModelRosette(p: { radar: Pentagon; label?: string }) {
+/** `max` is the model ceiling (raised by breakthroughs, §16.14); 10 by default. */
+export function ModelRosette(p: { radar: Pentagon; label?: string; max?: number }) {
   return (
     <PentagonRosette
       scores={p.radar}
       axes={MODEL_AXES}
       label={p.label ?? 'Model profile'}
       format={radarText}
+      max={p.max}
     />
   );
 }

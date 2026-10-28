@@ -8,6 +8,7 @@ import { VacationHomePanel } from '../personal/VacationHomePanel';
 import { WealthPanel } from '../personal/WealthPanel';
 import { PortfolioPanel } from '../investment/PortfolioPanel';
 import { MilestonesPanel } from '../milestones/MilestonesPanel';
+import { ProjectsPanel } from '../projects/ProjectsPanel';
 import { AirportPanel } from '../airport/AirportPanel';
 import { FlightOverlay } from '../airport/FlightOverlay';
 import { TravelSheet } from '../airport/TravelSheet';
@@ -178,6 +179,8 @@ function PanelHost() {
       return FEATURES.investments ? <PortfolioPanel /> : null;
     case 'milestones':
       return <MilestonesPanel />;
+    case 'projects':
+      return <ProjectsPanel />;
     case 'credits':
       return <CreditsScreen inGame />;
   }

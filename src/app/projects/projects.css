@@ -1,0 +1,29 @@
+/* Frontier projects panel (SCREENS §28a). */
+.fp-intro {
+  margin: 0 0 var(--space-3);
+}
+.fp-card {
+  display: grid;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+.fp-card.is-done {
+  opacity: 0.75;
+}
+.fp-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+.fp-name {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+}
+.fp-reward {
+  margin: 0;
+  font-weight: 600;
+}
+.fp-why {
+  margin: 0;
+}

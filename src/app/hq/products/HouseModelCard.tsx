@@ -11,6 +11,7 @@ import {
   priceHeadroom,
 } from '../../../sim/underwriting';
 import { Badge, Card, Row } from '../../components';
+import { modelCeiling } from '../../../sim/projects';
 import { useGame } from '../../store';
 import { ManageModelsSheet } from './ManageModelsSheet';
 import { ModelRosette } from './ModelRosette';
@@ -39,7 +40,7 @@ export function HouseModelCard() {
         </div>
         {u.switching && <Badge tone="warn">Switching</Badge>}
       </div>
-      <ModelRosette radar={model.radar} label="AI model" />
+      <ModelRosette radar={model.radar} label="AI model" max={modelCeiling(s)} />
       <Row label="Data licence per customer a year" value={exactMoney(paid, sym)} strong />
       {surcharge && (
         <p class="small tone-bad hq-note">
@@ -47,7 +48,7 @@ export function HouseModelCard() {
           {model.costPerCustomer.toFixed(2)}.
         </p>
       )}
-      <Row label="Model quality" value={`${radarText(modelQuality(model))} / 10`} />
+      <Row label="Model quality" value={`${radarText(modelQuality(model))} / ${modelCeiling(s)}`} />
       <h4 class="small muted pf-model-does">What it does</h4>
       <Row label="Compute per customer" value={signedPct(inferenceMult(s) - 1, 0)} />
       <Row label="Price headroom" value={`${signedPct(priceHeadroom(s) - 1, 0)} over market`} />

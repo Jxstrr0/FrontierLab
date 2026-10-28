@@ -273,6 +273,17 @@ Reference builds (Starter size):
 
 The default (and cheapest) build is Row hall, Grid feed, Air handlers. Default name "{City} Data Center", numbered when taken.
 
+### 7d. Frontier projects (`src/data/frontierProjects.ts`)
+
+| Project | Cost | Weeks | Min ARR | Needs | Reward |
+|---|---|---|---|---|---|
+| Project Lodestar | $300M | 52 | $300M | — | Model ceiling +1 |
+| Project Meridian | $1.2B | 78 | $1B | Lodestar | Model ceiling +1 |
+| Project Zenith | $4B | 104 | $2.5B | Meridian | Model ceiling +1 |
+| Gigawatt Campus | $2B | 104 | $1B | — | 200,000 GPUs |
+| Safety Institute | $600M | 52 | $500M | — | Exposure −0.3, company incidents ×0.7 |
+| Global Edge Network | $1B | 78 | $750M | — | Service +0.15 in every office |
+
 ### 7a. House styles
 
 Chosen on New Game (`src/data/houseStyles.ts`); every sales office front wears it, whatever the exterior option. A game started without a style, and saves from before styles existed, draw one of the first five from the seed (`SEEDED_HOUSE_STYLE_IDS`), so adding a style never changes an old game.

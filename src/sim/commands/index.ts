@@ -31,4 +31,5 @@ export * from './tutorial';
 export * from './dev';
 export * from './dataCenters';
 export * from './training';
+export * from './projects';
 export * from './talent';

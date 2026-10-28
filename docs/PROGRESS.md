@@ -3,13 +3,31 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.40, save schema 26). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
+**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.41, save schema 27). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `17f6a4f80a983b` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `1980106f70da7f` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-28 — Late game, part 2: frontier projects (v0.1.41, schema 27)
+
+Second of the owner's four late-game picks. The lab had nothing big to spend on once every city had an office, and the model stopped improving at 10 on every axis. **Frontier projects** (menu → Frontier projects) are multi-year builds that cost hundreds of millions to billions, one at a time, paid weekly.
+
+**What changed.**
+- **Six projects.** Three breakthroughs in a chain (Lodestar $300M → Meridian $1.2B → Zenith $4B), each raising the model's ceiling by 1, so training has somewhere to go past 10. A Gigawatt Campus ($2B, 200,000 GPUs with its own power bill), a Safety Institute ($600M: lower exposure, rarer company-wide incidents) and a Global Edge Network ($1B: +0.15 Service in every office). Each needs a minimum ARR.
+- **Risk.** Starting needs 13 weeks of payments in cash. A week you can't pay stalls the project. Each quarter there's a 15% chance of an overrun: 10–25% more weeks at the same weekly cost. Cancelling loses what was spent.
+- **Rival labs** can now also pass 10 once your ceiling rises (they share it), so the race carries on.
+- The model card shows "/ ceiling" and its rosettes scale to it. The steady and aggressive strategies start a project when cash is twice its price.
+
+**Save.** Schema 27 adds `projects`; old saves start with none done.
+
+**Checked.**
+- `npm run lint`, `npx vitest run` (new `tests/sim/projects.test.ts`) and `npm run build` pass.
+- Balance on seed 42 is in range for all five strategies.
+- 15-year steady run: Lodestar done in year 7, Meridian in year 13, model quality 12, year-15 cash $11.5B (was $14.8B).
+- The determinism snapshot changed on purpose to `1980106f70da7f` (new state field and the projects stream).
 
 ### 2026-10-27 — Late game, part 1: costs that grow with the lab (v0.1.40)
 
