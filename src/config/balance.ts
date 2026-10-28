@@ -232,6 +232,13 @@ export const GRAND_OPENING_WEEKS = 6;
 export const AWARENESS_DECAY = 0.03;
 export const BRAND_DECAY = 0.02;
 export const BRAND_PASSIVE_PER_BRANCH = 0.002;
+/**
+ * Office campaigns' weekly costs (CONTENT §8) × this × the office's size
+ * multiplier (OFFICE_SIZES mult, which also sets its reach), × city costIndex
+ * × price list. Before the polish pass (2026-10-28) a campaign cost the same
+ * for a Flagship as for a Starter, so big offices marketed almost for free.
+ */
+export const CAMPAIGN_COST_SCALE = 4;
 
 // ─── RATINGS (§8) ─────────────────────────────────────────────────────────────
 export const RATING_EMA = 0.2;
@@ -2649,6 +2656,10 @@ export const REAL_ESTATE = {
   /** For Sale: completes in 2–8 weeks at value × normal(1, saleSigma). */
   saleWeeks: [2, 8] as [number, number],
   saleSigma: 0.04,
+  /** The agent's fee on a building sale, as a share of the price. */
+  saleFee: 0.05,
+  /** A building can be listed For Sale only after you've owned it this many weeks. */
+  minHoldWeeks: 26,
   /**
    * Property buildings per city by size, their floor area and starting occupancy.
    * Bigger cities have more buildings and taller, higher-value ones (owner's

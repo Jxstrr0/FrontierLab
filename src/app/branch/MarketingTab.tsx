@@ -1,8 +1,7 @@
 // Branch Marketing tab (SCREENS §5.4): a two-column grid of campaign cards, each
 // with a level selector (Off + levels), its cost and an effect hint.
 import { CAMPAIGNS, type CampaignSpec } from '../../data/campaigns';
-import { CITIES } from '../../data/cities';
-import { campaignEffects } from '../../sim/branch/marketing';
+import { campaignCostIndex, campaignEffects } from '../../sim/branch/marketing';
 import * as cmd from '../../sim/commands';
 import type { Branch } from '../../sim/state';
 import { Card, Row } from '../components';
@@ -40,7 +39,7 @@ export function MarketingTab({ branch }: { branch: Branch }) {
 function CampaignCard({ branch, spec }: { branch: Branch; spec: CampaignSpec }) {
   const s = useGame();
   const level = branch.campaigns[spec.id] ?? 0;
-  const costIndex = CITIES[branch.cityId]?.costIndex ?? 1;
+  const costIndex = campaignCostIndex(s, branch);
   const priceLevel = listLevel(s, branch.cityId);
   const active = level > 0 ? spec.levels[level - 1] : undefined;
   const first = spec.levels[0];

@@ -112,7 +112,7 @@ export function brandEstimate(state: GameState, target: number): BrandEstimate {
   const cheapest = Object.values(BRAND_CAMPAIGNS)
     .filter((c) => c.scopes.includes('city') && !c.needsFranchise)
     .sort((a, b) => brandCampaignCost(state, a, 'city') - brandCampaignCost(state, b, 'city'));
-  const current = brandCampaignsWeeklyCost(state);
+  const current = brandCampaignsWeeklyCost(state, 'city');
   const revenue = weeklyRevenue(state);
   const budget = X.brandBudgetShare * revenue;
   let cost = current;

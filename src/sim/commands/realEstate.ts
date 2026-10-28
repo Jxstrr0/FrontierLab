@@ -7,7 +7,7 @@ import { pushEvent } from '../events';
 import { completePurchase } from '../propertyBuy';
 import { offerAcceptance, rentBounds } from '../propertyMath';
 import { stream } from '../rng';
-import type { GameState } from '../state';
+import type { GameState, Property } from '../state';
 import { fail, money, ok, type CommandResult } from './result';
 import { ventureTierBlock } from './ventures';
 
@@ -74,10 +74,18 @@ export function setPropertyRent(
 }
 
 /** Lists an owned building for sale (it sells within 2–8 weeks) or takes it off the market. */
+/** Weeks until an owned building may be listed For Sale (REAL_ESTATE.minHoldWeeks). */
+export function saleWaitWeeks(state: GameState, p: Property): number {
+  return Math.max(0, p.boughtWeek + REAL_ESTATE.minHoldWeeks - state.clock.week);
+}
+
 export function setPropertyForSale(state: GameState, siteId: string, on: boolean): CommandResult {
   const p = state.realEstate.properties[siteId];
   if (!p) return fail("You don't own this building.");
   if (on === p.forSale) return ok();
+  const wait = saleWaitWeeks(state, p);
+  if (on && wait > 0)
+    return fail(`You can list this building in ${wait} week${wait === 1 ? '' : 's'}.`);
   p.forSale = on;
   if (on) {
     const [lo, hi] = REAL_ESTATE.saleWeeks;

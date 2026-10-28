@@ -29,7 +29,13 @@ export function positionOf(state: GameState, account: TradeAccount, id: string):
 }
 
 /** Most shares an account may buy now: the stake cap, the float (for 'self') and cash. */
+/** §19.8: no buying into a rival while your own takeover offer awaits its answer. */
+export function offerPending(state: GameState, id: string): boolean {
+  return state.mergers.offers.some((o) => o.rivalId === id && o.status === 'pending');
+}
+
 export function maxBuy(state: GameState, account: TradeAccount, id: string): number {
+  if (offerPending(state, id)) return 0;
   const price = securityPrice(state, id);
   if (price <= 0) return 0;
   const byCash = Math.floor(accountCash(state, account) / (price * (1 + COMMISSION)));
@@ -80,6 +86,8 @@ export function trade(
   const { value, commission } = tradeQuote(state, securityId, shares);
 
   if (shares > 0) {
+    if (offerPending(state, securityId))
+      return fail('You have an offer pending for this company. Wait for its answer.');
     if (value + commission > accountCash(state, account))
       return fail(`You need ${money(value + commission)} to buy these shares.`);
     if (shares > maxBuy(state, account, securityId))

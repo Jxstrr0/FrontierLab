@@ -346,20 +346,20 @@ export const EXPENSE_LINES: [BranchPnlLine, string][] = [
 ];
 
 /**
- * "$126/wk", "$50 per new deposit account" or "$0.05 per account a week";
- * `level` is today's price list (§4.6), `costIndex` the city's cost index.
+ * "$126/wk", "$50 per new plan sign-up" or "$0.05 per customer a week";
+ * `weeklyIndex` is the office's campaignCostIndex, `level` today's price list (§4.6).
  */
 export function campaignCostText(
   cost: CampaignCost,
-  costIndex: number,
+  weeklyIndex: number,
   level: number,
   sym: string,
 ): string {
-  if (cost.type === 'weekly') return `${money(cost.amount * costIndex * level, sym)}/wk`;
+  if (cost.type === 'weekly') return `${money(cost.amount * weeklyIndex, sym)}/wk`;
   if (cost.type === 'perNewDepositAccount') {
     return `${money(cost.amount * level, sym)} per new plan sign-up`;
   }
-  return `${exactMoney(cost.amount * level, sym)} per account a week`;
+  return `${exactMoney(cost.amount * level, sym)} per customer a week`;
 }
 
 /** Game day at the close of a sim week, for dates on week-indexed records. */

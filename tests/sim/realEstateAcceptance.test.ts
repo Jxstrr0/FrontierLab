@@ -5,6 +5,7 @@
 // company's buildings, the balance identity holds, the private building never touches the bank's books, and
 // portfolioBreakdown sums.
 import { describe, expect, it } from 'vitest';
+import { REAL_ESTATE } from '../../src/config/balance';
 import { balanceSheet } from '../../src/sim/balanceSheet';
 import * as cmd from '../../src/sim/commands';
 import { advanceWeeks } from '../../src/sim/engine';
@@ -64,6 +65,7 @@ describe('real estate ties out', () => {
         expect(cmd.setPropertyRent(s, companyId, p.marketRent * 1.2).ok).toBe(true);
       }
       if (week === 12) {
+        s.realEstate.properties[companyId]!.boughtWeek -= REAL_ESTATE.minHoldWeeks;
         expect(cmd.setPropertyForSale(s, companyId, true).ok).toBe(true);
       }
       checkIdentity(s);

@@ -15,6 +15,7 @@ export function bidOnRfp(
   const rfp = state.dealDesk.rfps[rfpId];
   if (!rfp) return fail('That request has expired.');
   if (rfp.kind !== 'new') return fail('Renewals are settled at the quarter start: set an offer.');
+  if (!Number.isFinite(discount)) return fail('Enter a discount.');
   const paused = pauseBlock(state);
   if (paused) return fail(paused);
   return ok({ won: bidRfp(state, rfp, cleanDiscount(discount)) });
@@ -44,6 +45,8 @@ export function setRenewalOffer(
   if (discount === undefined) {
     if (isOwnRenewal(rfp, b)) return fail('Your own renewal needs an offer.');
     delete rfp.offer;
+  } else if (!Number.isFinite(discount)) {
+    return fail('Enter a discount.');
   } else rfp.offer = cleanDiscount(discount);
   return ok();
 }

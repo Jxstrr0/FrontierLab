@@ -76,12 +76,13 @@ export function rentedGpus(state: GameState): number {
 
 /**
  * Tick step 4 (after settleCompute has billed this week's lots, C4c): retire
- * the lots whose last week this was. A lot runs startWeek to endWeek − 1, so
- * it is billed termWeeks times.
+ * the lots whose last week this was. The tick runs as clock.week turns to the
+ * next week, so a lot rented in week startWeek is billed at the ticks for
+ * startWeek + 1 … endWeek: termWeeks times.
  */
 export function retireGpuLots(state: GameState): void {
   const c = state.compute;
   const week = state.clock.week;
-  c.lots = c.lots.filter((l) => l.endWeek > week + 1);
+  c.lots = c.lots.filter((l) => l.endWeek > week);
   c.rentedGpus = rentedGpus(state);
 }

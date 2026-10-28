@@ -55,14 +55,17 @@ export function lotAffinity(state: GameState, branch: Branch, productId: string)
 }
 
 export function ratesTarget(state: GameState, branch: Branch, fx: CampaignEffects): number {
+  // A withdrawn product still bills its customers, so its price counts while it has any.
+  const counts = (pid: string) =>
+    isOffered(branch, pid) || Math.abs(branch.books[pid]?.balance ?? 0) > 0;
   let totalBalance = 0;
   for (const [pid, book] of Object.entries(branch.books)) {
-    if (isOffered(branch, pid)) totalBalance += Math.abs(book.balance);
+    if (counts(pid)) totalBalance += Math.abs(book.balance);
   }
   let wSum = 0;
   let cSum = 0;
   for (const spec of allProducts(state)) {
-    if (!isOffered(branch, spec.id) || spec.kind === 'sbl') continue;
+    if (!counts(spec.id) || spec.kind === 'sbl') continue;
     const bal = Math.abs(branch.books[spec.id]?.balance ?? 0);
     const w = (totalBalance > 0 ? bal / totalBalance : 0) + BALANCE_WEIGHT_FLOOR;
     const c = competitiveness(
