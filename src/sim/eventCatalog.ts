@@ -46,6 +46,10 @@ export interface EventPayloads {
   BRAND_CAMPAIGN_ENDED: { campaignId: string; reason: string };
   DIGITAL_PROJECT_DONE: { templateId: string; name: string };
   PRODUCT_DEVELOPED: { productId: string; name: string; stars: number };
+  /** Frontier projects (projects.ts, §16.14): finished, overrun by `weeks`, or stalled for cash. */
+  PROJECT_DONE: { bank: string; projectId: string; name: string };
+  PROJECT_OVERRUN: { bank: string; name: string; weeks: number };
+  PROJECT_STALLED: { bank: string; name: string };
   /** A training run finished: a new model generation (training.ts, C6b). */
   MODEL_TRAINED: { modelId: Id; name: string; stars: number; quality: number; leads: boolean };
   /** You hired a researcher; `from` names the rival lab they left (commands/talent.ts, C6c). */

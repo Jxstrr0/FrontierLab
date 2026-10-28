@@ -282,6 +282,26 @@ const BANK_TEMPLATES = {
       b: 'Its licence restored, the lab can sign customers again, under strict watch for a year.',
     },
   ],
+  PROJECT_DONE: [
+    {
+      h: '{bank} completes {name}',
+      b: 'Years of spending pay off as the lab’s biggest project yet comes in. Rivals are taking notes.',
+    },
+    {
+      h: '{name} is finished',
+      b: '{bank} calls it the most ambitious thing the lab has built. Analysts are already asking what comes next.',
+    },
+  ],
+  PROJECT_OVERRUN: [
+    {
+      h: '{name} runs late',
+      b: '{bank} says its flagship project needs {weeks} more weeks, and the money to match.',
+    },
+    {
+      h: 'Delays at {bank}’s {name}',
+      b: 'Sources say the project has slipped {weeks} weeks. The lab says the goal hasn’t changed.',
+    },
+  ],
   MODEL_TRAINED: [
     {
       h: '{bank} finishes training {name}',

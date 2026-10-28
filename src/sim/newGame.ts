@@ -188,6 +188,7 @@ export function newGame(opts: NewGameOptions): GameState {
     underwriting: { activeModelId: model.id, models: { [model.id]: model }, loansBooked: 0 },
     training: { generation: 0, frontierBase: 0 },
     talent: { researchers: {} },
+    projects: { done: [] },
     treasury: {
       reserves: 0,
       liqTarget: LIQ_TARGET_DEFAULT,

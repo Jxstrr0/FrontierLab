@@ -735,6 +735,17 @@ The Finance floor's 1–5 dial (code `company.riskAppetite`, set by `setRiskAppe
   - That run's budget is `cashShare` (1%) × the style's `budgetMult` of cash a week, between $20k and `maxWeekly` ($150k) × `budgetMult` × `frontierCostMult` (§16.12, step $5k), and needs `cashFloorRuns` (40) weeks of it in cash. With every axis at the ceiling the CPO starts no run.
   - It never switches models: the CPO's **Models** delegation (§17.2) switches to a trained model when its quality less licence cost beats the active model's by `MODEL_DELEGATE.minGain`, the same test it applies to data-vendor packages.
 
+### 16.14 Frontier projects
+Late-game builds (`FRONTIER_PROJECTS`, `src/data/frontierProjects.ts`, `src/sim/projects.ts`, menu → Frontier projects). One runs at a time; each has a base cost (on the home price list when started), a length in weeks, a minimum company ARR and sometimes a project that must finish first.
+- **Starting** (`startProject`): needs the ARR, the prerequisite, no other project under way and `startWeeks` (13) weeks of payments in cash. **Cancelling** (`cancelProject`) loses what was spent.
+- **Each week** (tick step 7, after training): pays `cost ÷ weeks` (P&L line `development`). A week cash can't cover **stalls** the project (no progress, PROJECT_STALLED once); it resumes when cash is back. At each quarter start, with chance `overrunP` (0.15, `projects` stream) it **overruns**: `weeks × U(0.10, 0.25)` more weeks (at least 1) at the same weekly payment, so the cost grows with them (PROJECT_OVERRUN).
+- **On finishing** (PROJECT_DONE) the reward lasts for good:
+  - **Breakthroughs** (Lodestar → Meridian → Zenith): each raises the **model ceiling** by 1. `modelCeiling = MODEL_RADAR_MAX (10) + lifts`; trained models, rival models and §16.12's at-ceiling check all cap at it.
+  - **Gigawatt Campus:** 200,000 GPUs join owned compute (§13), with a weekly power bill of `GPUs × powerPerGpuWeek × campusPue (1.05) × energySitePower` (P&L `equipment`).
+  - **Safety Institute:** exposure (§15) − `instituteExposureCut` (0.3), and company-wide incident chances × `instituteIncidentMult` (0.7).
+  - **Global Edge Network:** +0.15 to every sales office's Service target (§10).
+- **Balance check (seed 42, steady, 15 years):** the strategy starts a project once cash is twice its price; Lodestar finishes in year 7, Meridian in year 13, the model reaches quality 12, and year-15 cash is $11.5B (was $14.8B).
+
 ## 17. People AI
 
 ### 17.1 Sales office manager (when delegated)
