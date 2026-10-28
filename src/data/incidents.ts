@@ -33,6 +33,8 @@ export interface IncidentSpec {
   trigger: 'rolled' | 'triggered';
   /** Information only: one OK option, nothing to decide. */
   info?: boolean;
+  /** The options move money outside the P&L (their effects say how much): no cost tag. */
+  hideCosts?: boolean;
   /** Always lands on your desk: a COO trusted with Company troubles never settles it (§17.2). */
   yours?: boolean;
   baseP?: number;
@@ -326,6 +328,40 @@ const BANK_ERA_SPECS: Record<string, IncidentSpec> = {
     money: ['amount'],
     options: OK,
     worst: 'ok',
+  },
+  CAPITAL_REVIEW: {
+    id: 'CAPITAL_REVIEW',
+    title: 'Board capital review',
+    scope: 'company',
+    trigger: 'triggered',
+    yours: true,
+    hideCosts: true,
+    cooldownWeeks: 0,
+    text: 'The year is closed, and the board sees {surplus} of cash beyond what the lab needs. It wants a plan for {amount} of it.',
+    money: ['surplus', 'amount'],
+    options: [
+      {
+        id: 'project',
+        label: 'Fund a frontier project',
+        effect: 'Start {project} now. Investors like the ambition.',
+      },
+      {
+        id: 'buyback',
+        label: 'Buy back shares',
+        effect: 'Up to {amount} of shares from the public. Your stake grows; the price lifts.',
+      },
+      {
+        id: 'dividend',
+        label: 'Special dividend',
+        effect: '{amount} paid to shareholders now. Your share lands in personal cash.',
+      },
+      {
+        id: 'bank',
+        label: 'Bank it',
+        effect: 'Keep the cash. Investors had hoped for more: share sentiment falls.',
+      },
+    ],
+    worst: 'bank',
   },
   PRICE_WAR: {
     id: 'PRICE_WAR',

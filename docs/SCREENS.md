@@ -543,7 +543,7 @@ Opened by tapping a business pin on the map (the **Businesses** layer, which als
 - **Header:** "Incident" with the scope (sales office name or company).
 - **Advisor:** portrait with the incident text.
 - **Pager:** "Case 1 of N".
-- **Options:** 2–3 buttons, each with its cost and an effect preview.
+- **Options:** 2–4 buttons, each with its cost and an effect preview. Cases marked `hideCosts` (the board's capital review) show no cost tag: their effects state the amounts.
 - **Footer:** "Your manager can handle these" (link to delegation) for office incidents.
 
 ## 23. Personal wealth

@@ -876,6 +876,19 @@ export const FRONTIER_PROJECTS = {
   instituteIncidentMult: 0.7,
 } as const;
 /**
+ * The board's capital review (SIMULATION §19.6b): at each year start, when
+ * surplus cash (cash − reserveArrShare × ARR − what the project under way still
+ * costs − a declared dividend) is at least minSurplus (home price list), the
+ * board asks where deployShare of it goes. A listed lab's sentiment moves by
+ * the choice: banking it disappoints, paying it out or building pleases.
+ */
+export const BOARD_CAPITAL = {
+  minSurplus: 250_000_000,
+  reserveArrShare: 0.5,
+  deployShare: 0.5,
+  sentiment: { bank: -0.04, buyback: 0.02, dividend: 0.04, project: 0.03 },
+} as const;
+/**
  * Rival model releases (§16.12): each quarter an active rival ships a new
  * generation with chance releaseQuarterly, gaining normal(gainMean, gainSigma)
  * quality (at least minGain, capped at MODEL_RADAR_MAX). Rivals start at

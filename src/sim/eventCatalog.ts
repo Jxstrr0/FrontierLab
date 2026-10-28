@@ -229,6 +229,8 @@ export interface EventPayloads {
     yieldPct: number;
   };
   DIVIDEND_PAID: { bank: string; dps: Money; total: Money; personal: Money };
+  /** The board's capital review paid a one-off dividend at once (§19.6b). */
+  SPECIAL_DIVIDEND: { bank: string; total: Money; personal: Money };
   EXEC_HIRED: { seat: string; title: string; name: string };
   /** An executive resigned or was poached (EXEC_POACHED decides first). */
   EXEC_RESIGNED: { seat: string; title: string; name: string; bank: string };

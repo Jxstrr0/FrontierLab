@@ -3,13 +3,36 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.41, save schema 27). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
+**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.42, save schema 27). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
 **Determinism snapshot:** `1980106f70da7f` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-28 — Late game, part 3: the board's capital review (v0.1.42)
+
+Third of the owner's late-game picks: a yearly moment where the player decides what happens to spare cash, even with every executive delegated.
+
+**What changed.**
+- **Board capital review.** At each new year, if the lab holds at least $250M more than it needs, a case lands on your desk. "What it needs" means half a year of ARR, plus what the frontier project under way still costs, plus any dividend already declared. The board wants a plan for half of the surplus:
+  - **Fund a frontier project:** starts the next one that can start.
+  - **Buy back shares:** listed labs only. Your stake grows.
+  - **Special dividend:** paid now. Your share goes to personal cash.
+  - **Bank it:** keep the cash.
+- **Market reaction.** For a listed lab, the market reacts: banking it costs 4% of sentiment, a dividend adds 4%, a project 3% and a buyback 2% (on top of its usual lift). If you don't answer by the deadline, the board banks it. The COO never answers it for you.
+- The balance strategies fund a project when they can, else bank it.
+- Small refactor: starting a frontier project now lives in the sim (`beginProject`), shared by the command and the review.
+- The pitch also listed an "acquisition budget" option. I left it out: the game has no budget a board could set aside for deals, and adding one would be a new system. A buyout via the investment bank's M&A tab still works as before.
+
+**Not changed.** Save shape (still schema 27). The determinism snapshot is unchanged: the scripted 5-year run never reaches the surplus bar.
+
+**Checked.**
+- `npm run lint`, `npx vitest run` (new `tests/sim/capitalReview.test.ts`) and `npm run build` pass.
+- Balance on seed 42 is in range for all five strategies.
+- 15-year steady run: reviews in years 7, 10 and 13, each funding a project; year-15 cash $4.3B (was $11.5B).
+- The modal is checked at 390×844 with no console errors.
 
 ### 2026-10-28 — Late game, part 2: frontier projects (v0.1.41, schema 27)
 
