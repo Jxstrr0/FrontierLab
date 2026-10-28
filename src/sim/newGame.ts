@@ -99,6 +99,9 @@ const DEFAULT_AVATAR: AvatarSpec = {
   brows: 0,
   mouth: 0,
   age: 0,
+  look: 0,
+  hairTone: 1,
+  outfit: 0,
 };
 
 export function newGame(opts: NewGameOptions): GameState {
@@ -122,7 +125,7 @@ export function newGame(opts: NewGameOptions): GameState {
       monogram: opts.monogram ?? 'FL',
       brandInk: opts.brandInk ?? '#2C4A7A',
       founderName: opts.founderName ?? 'Founder',
-      founderAvatar: opts.founderAvatar ?? DEFAULT_AVATAR,
+      founderAvatar: { ...(opts.founderAvatar ?? DEFAULT_AVATAR) },
       seed: opts.seed,
       startDate: opts.startDate ?? START_DATE,
       createdWith: opts.version ?? 'dev',

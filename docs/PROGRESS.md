@@ -3,15 +3,15 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.45, save schema 28). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
+**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.46, save schema 29). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `031d3063aa4ddd` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `0115c24f75d753` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
 
-### 2026-10-28 — City life on the map (v0.1.45)
+### 2026-10-28 — City life on the map (v0.1.46)
 
 Owner's ask: make the cities feel more alive and lived in. Picked options 1, 2 and 4 from the pitch (time of day was left for later).
 
@@ -21,6 +21,26 @@ Owner's ask: make the cities feel more alive and lived in. Picked options 1, 2 a
 - **Battery.** It redraws at most 30 times a second and only draws what's near the screen (about 1–1.5 ms a frame on a laptop). While the game is paused, or with reduced motion on, everything holds still and nothing redraws.
 - View-only: no game state or save change, determinism snapshot unchanged. New config file `src/config/cityLife.ts`; ART_DIRECTION §2.3 describes it all; a decision-log line in DESIGN.
 - Checked: lint, 1,110 tests (new `tests/art/cityLife.test.ts`: routes, lane spacing, crowds following the economy and offices, occlusion, props and cranes inside their draw bounds), build, and screenshots at 390×844 in New York and Calgary at zooms 1 and 2.
+### 2026-10-28 — Portrait rework (v0.1.45)
+
+The owner asked for better character models and a preview that stays visible while scrolling, and pointed out that some women had beards.
+
+- **Why women had beards:** a portrait had no idea of a person's features, so a randomly generated person could get a bob or a bun together with a full beard. Every portrait now has **Features: Strong or Soft**. Soft faces have a finer chin and brows, lashes and tinted lips. The generator never gives a soft face facial hair or a bald or buzzed head, and never gives a strong face a bob, pixie or braids. The founder can still combine anything they like.
+- **Better models:**
+  - The portrait is now a proper bust: a bigger head, a short neck and broad shoulders. Before, it was a small head on a long neck.
+  - Hair has a colour: black, dark brown, chestnut, auburn, copper, blonde or silver. Brows match the hair colour.
+  - Clothes have a colour: charcoal, navy, burgundy, forest, camel or stone.
+  - Long hair, locs and braids now fall over the shoulders.
+  - New hair styles: quiff, pixie and braids (15 in total).
+  - New outfits: hoodie, and blazer with a tee (6 in total).
+- **Picker:**
+  - The portrait stays pinned at the top while you scroll the options, in both the New Game wizard and Settings → Edit founder avatar.
+  - The options are in three groups: Face, Hair and Style.
+  - Skin, hair and outfit colours are rows of swatches.
+- **Saves:** schema 29. Old saves give everyone a look, hair colour and outfit colour. Generated people get them the same way new people do, and any soft-featured face loses its beard. Your founder keeps what you picked: a veteran gets silver hair, and everyone else gets dark brown.
+- **Gameplay unchanged:** balance output for seed 42 is byte-identical to main. The determinism snapshot changed on purpose to `0115c24f75d753`, because portraits are stored in the save.
+- **Bug fixed along the way:** the default founder portrait was shared between games, so editing it in one game could change the default for the next. Each game now gets its own copy.
+
 
 ### 2026-10-28 — Balance fix: turtle profits and the aggressive stall (v0.1.44)
 

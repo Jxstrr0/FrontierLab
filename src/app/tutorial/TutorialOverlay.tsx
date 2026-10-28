@@ -31,6 +31,9 @@ const FALLBACK_AVATAR: AvatarSpec = {
   brows: 0,
   mouth: 0,
   age: 1,
+  look: 0,
+  hairTone: 1,
+  outfit: 0,
 };
 
 export function TutorialOverlay() {
