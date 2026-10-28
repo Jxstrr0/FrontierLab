@@ -108,7 +108,7 @@ export function leaseOffice(
   if (unavailable) return fail(`${DEPARTMENTS[unavailable]?.name ?? 'That'} floors arrive later.`);
   const quote = officeQuote(state, listingId, depts.length);
   if (state.company.cash < quote.total)
-    return fail(`Not enough cash: you need ${money(quote.total)}.`);
+    return fail(`Not enough cash: you need ${money(state, quote.total)}.`);
 
   const office: Office = {
     id: newId(state, 'off'),
@@ -138,7 +138,8 @@ export function addFloor(state: GameState, officeId: string, dept: DeptId): Comm
   if (floor < 0)
     return fail('Every floor in this office is in use. Release one or lease another office.');
   const cost = floorFitout(state, office.cityId);
-  if (state.company.cash < cost) return fail(`Not enough cash: fit-out costs ${money(cost)}.`);
+  if (state.company.cash < cost)
+    return fail(`Not enough cash: fit-out costs ${money(state, cost)}.`);
   fitFloor(state, office, floor, dept);
   return ok();
 }

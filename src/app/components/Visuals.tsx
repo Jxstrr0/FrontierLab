@@ -210,6 +210,7 @@ export function BarChart(p: {
       <div class="barchart-legend">
         <span class="lg-rev">Revenue</span>
         <span class="lg-inc">Income</span>
+        {p.data.some((d) => d.income < 0) && <span class="lg-loss">Loss</span>}
         <span class="barchart-hint">Tap a week for values</span>
       </div>
     </div>

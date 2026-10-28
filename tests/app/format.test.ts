@@ -4,6 +4,7 @@ import {
   exactMoney,
   figure,
   gameDate,
+  localizeMoney,
   money,
   moneyFull,
   moneyStepper,
@@ -70,5 +71,29 @@ describe('format', () => {
     expect(runwayText(7.46)).toBe('7.4 months');
     expect(runwayText(18.9)).toBe('18 months');
     expect(runwayText(400)).toBe('10 years+');
+  });
+});
+
+describe('format edge cases (polish pass)', () => {
+  it('picks the unit after rounding', () => {
+    expect(money(999_999)).toBe('$1.00M');
+    expect(money(999_400)).toBe('$999K');
+    expect(money(99_960)).toBe('$100K');
+    expect(money(999_600_000)).toBe('$1.00B');
+    expect(money(9_999)).toBe('$9,999');
+    expect(money(1.48e9)).toBe('$1.48B');
+  });
+
+  it('never shows minus zero', () => {
+    expect(money(-0.4)).toBe('$0');
+    expect(moneyFull(-0.3)).toBe('$0');
+    expect(moneyFull(-5)).toBe('−$5');
+  });
+
+  it('rewrites dollar amounts in sim text into the chosen currency', () => {
+    expect(localizeMoney('You need $1,000.', '$')).toBe('You need $1,000.');
+    expect(localizeMoney('You need $1,000, then $10M and $4.50, C$5.', '£')).toBe(
+      'You need £800, then £8.00M and £3.60, C$5.',
+    );
   });
 });

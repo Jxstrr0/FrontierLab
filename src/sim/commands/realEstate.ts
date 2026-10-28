@@ -29,7 +29,7 @@ export function offerProperty(
   if (!Number.isFinite(offer) || offer <= 0) return fail('Enter an offer above zero.');
   if (listing.rejectedOffer !== undefined)
     return fail(
-      `The seller turned down ${money(listing.rejectedOffer)}. Try again when the listings refresh.`,
+      `The seller turned down ${money(state, listing.rejectedOffer)}. Try again when the listings refresh.`,
     );
   if (account === 'company') {
     const block = ventureTierBlock(state);
@@ -38,7 +38,7 @@ export function offerProperty(
   const cash = account === 'company' ? state.company.cash : state.personal.cash;
   if (offer > cash)
     return fail(
-      `You need ${money(offer)} in ${account === 'company' ? 'corporate' : 'personal'} cash.`,
+      `You need ${money(state, offer)} in ${account === 'company' ? 'corporate' : 'personal'} cash.`,
     );
 
   const accepted = stream(state, 'realEstate').chance(offerAcceptance(offer, listing.asking));
@@ -68,7 +68,9 @@ export function setPropertyRent(
   if (!p) return fail("You don't own this building.");
   const { min, max } = rentBounds(p.marketRent);
   if (!Number.isFinite(rentPerSqm) || rentPerSqm < min - 1e-6 || rentPerSqm > max + 1e-6)
-    return fail(`Rent must be between ${money(min)} and ${money(max)} per m² a year.`);
+    return fail(
+      `Rent must be between ${money(state, min)} and ${money(state, max)} per m² a year.`,
+    );
   p.rent = rentPerSqm;
   return ok();
 }

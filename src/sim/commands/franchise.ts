@@ -67,10 +67,10 @@ export function buyClub(
     if (block) return fail(block);
   }
   if (offer > ownerCash(state, account))
-    return fail(`You need ${money(offer)} in ${cashWord(account)} cash.`);
+    return fail(`You need ${money(state, offer)} in ${cashWord(account)} cash.`);
   if (offer < F.offerMin * club.value)
     return fail(
-      `${capital(club.ownerName)} turned the offer down: they won't sell for less than ${money(F.offerMin * club.value)}.`,
+      `${capital(club.ownerName)} turned the offer down: they won't sell for less than ${money(state, F.offerMin * club.value)}.`,
     );
 
   if (account === 'company') postCash(state, -offer, 'investing');
@@ -176,7 +176,7 @@ export function signPlayer(state: GameState, clubId: string, playerId: string): 
   const fee = player.fee ?? 0;
   const owner = club.owner as ClubAccount;
   if (fee > ownerCash(state, owner))
-    return fail(`You need ${money(fee)} in ${cashWord(owner)} cash for the fee.`);
+    return fail(`You need ${money(state, fee)} in ${cashWord(owner)} cash for the fee.`);
   payFromOwner(state, club, fee);
   club.market = club.market.filter((p) => p !== player);
   delete player.fee;
@@ -205,7 +205,9 @@ export function releasePlayer(state: GameState, clubId: string, playerId: string
   const cost = releaseCost(player);
   const owner = club.owner as ClubAccount;
   if (cost > ownerCash(state, owner))
-    return fail(`You need ${money(cost)} in ${cashWord(owner)} cash to pay off the contract.`);
+    return fail(
+      `You need ${money(state, cost)} in ${cashWord(owner)} cash to pay off the contract.`,
+    );
   payFromOwner(state, club, cost);
   club.stars = club.stars.filter((p) => p !== player);
   return ok();

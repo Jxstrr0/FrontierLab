@@ -61,7 +61,7 @@ export function signBlocker(
   if (!spec || !isPackage(state, productId) || !isOffered(host, productId))
     return 'Pick a plan the host sales office offers as the package.';
   const fee = signingFee(state, site, kind);
-  if (state.company.cash < fee) return `Not enough cash: you need ${money(fee)}.`;
+  if (state.company.cash < fee) return `Not enough cash: you need ${money(state, fee)}.`;
   return undefined;
 }
 
@@ -124,7 +124,7 @@ export function renewPartnership(
   if (!p || !site || p.status !== 'active') return fail('That partnership has ended.');
   if (!canRenew(state, p)) return fail('Renewal opens in the last year of the contract.');
   const fee = renewalFee(state, site, p);
-  if (state.company.cash < fee) return fail(`Not enough cash: you need ${money(fee)}.`);
+  if (state.company.cash < fee) return fail(`Not enough cash: you need ${money(state, fee)}.`);
   postCash(state, -fee, 'investing');
   p.termWeeks += PARTNER_CONTRACT_WEEKS;
   // `fee` totals every fee paid; the new one joins the intangible and amortizes over the new end.
@@ -154,7 +154,7 @@ export function startGradProgram(state: GameState, siteId: string): CommandResul
   if (!site || site.kind !== 'university') return fail('That university is no longer on the map.');
   if (state.company.gradProgram) return fail('You already run a graduate program.');
   const cost = gradProgramCost(site);
-  if (state.company.cash < cost) return fail(`Not enough cash: you need ${money(cost)}.`);
+  if (state.company.cash < cost) return fail(`Not enough cash: you need ${money(state, cost)}.`);
   spend(state, 'benefits', cost);
   state.company.gradProgram = {
     siteId,

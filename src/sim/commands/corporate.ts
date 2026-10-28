@@ -27,7 +27,7 @@ export function acceptCorporateLoan(
     return fail('That investment bank lends to labs with a sales office in its city.');
   if (offer.amount > loanRoom(state) + CORPORATE_LENDING.dust) {
     return fail(
-      `Corporate debt is capped at ${CORPORATE_LENDING.maxEquityShare * 100}% of equity. You can borrow up to ${money(loanRoom(state))} more.`,
+      `Corporate debt is capped at ${CORPORATE_LENDING.maxEquityShare * 100}% of equity. You can borrow up to ${money(state, loanRoom(state))} more.`,
     );
   }
   const loanId = newId(state, 'cl');
@@ -63,7 +63,7 @@ export function repayCorporateLoan(state: GameState, loanId: string): CommandRes
   const loan = state.corporateDebt.loans[loanId];
   if (!loan) return fail('That loan is already repaid.');
   if (loan.balance > state.company.cash)
-    return fail(`You need ${money(loan.balance)} in corporate cash to repay this loan.`);
+    return fail(`You need ${money(state, loan.balance)} in corporate cash to repay this loan.`);
   postCash(state, -loan.balance, 'financing');
   delete state.corporateDebt.loans[loanId];
   return ok();
@@ -79,7 +79,7 @@ export function drawCredit(state: GameState, lenderId: string, amount: number): 
   const line = state.corporateDebt.lines[lenderId];
   const available = creditRoom(state);
   if (amount > available + CORPORATE_LENDING.dust)
-    return fail(`You can draw up to ${money(available)} on this line.`);
+    return fail(`You can draw up to ${money(state, available)} on this line.`);
   if (line) line.drawn += amount;
   else state.corporateDebt.lines[lenderId] = { lenderId, drawn: amount, rate: lineRate(state) };
   postCash(state, amount, 'financing');
@@ -93,7 +93,7 @@ export function repayCredit(state: GameState, lenderId: string, amount: number):
   if (!line || line.drawn <= 0) return fail('Nothing is drawn on that line.');
   const pay = Math.min(amount, line.drawn);
   if (pay > state.company.cash)
-    return fail(`You only have ${money(state.company.cash)} in corporate cash.`);
+    return fail(`You only have ${money(state, state.company.cash)} in corporate cash.`);
   line.drawn -= pay;
   postCash(state, -pay, 'financing');
   if (line.drawn <= CORPORATE_LENDING.dust) {

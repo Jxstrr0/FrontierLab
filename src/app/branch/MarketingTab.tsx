@@ -6,7 +6,7 @@ import * as cmd from '../../sim/commands';
 import type { Branch } from '../../sim/state';
 import { Card, Row } from '../components';
 import { SpotArt } from '../components/SpotArt';
-import { money } from '../format/format';
+import { localizeMoney, money } from '../format/format';
 import { act, useGame } from '../store';
 import { campaignCostText } from './selectors';
 import { listLevel } from '../../sim/nominal';
@@ -49,7 +49,7 @@ function CampaignCard({ branch, spec }: { branch: Branch; spec: CampaignSpec }) 
       ? `From ${campaignCostText(first.cost, costIndex, priceLevel, s.settings.currency)}`
       : '';
   const locked = branch.delegation.marketing;
-  const options = ['Off', ...spec.levels.map((l) => l.label)];
+  const options = ['Off', ...spec.levels.map((l) => localizeMoney(l.label, s.settings.currency))];
   return (
     <Card class={`br-campaign${active ? ' is-on' : ''}`}>
       <div class="br-campaign-head">

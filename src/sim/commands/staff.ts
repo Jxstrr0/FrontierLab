@@ -1,4 +1,5 @@
 // Branch staff, manager, delegation and marketing commands.
+import { exactMoney } from '../../data/settingsOptions';
 import {
   MANAGER_POOL_SIZE,
   MANAGER_SALARY_RANGE,
@@ -38,7 +39,7 @@ export function setWage(state: GameState, branchId: string, wage: number): Comma
   const w = roundToStep(wage, WAGE_STEP);
   if (!(w >= mkt * lo && w <= mkt * hi))
     return fail(
-      `Wages can be set from $${(mkt * lo).toFixed(2)} to $${(mkt * hi).toFixed(2)} an hour.`,
+      `Wages can be set from ${exactMoney(mkt * lo, state.settings.currency)} to ${exactMoney(mkt * hi, state.settings.currency)} an hour.`,
     );
   branch.staff.wage = w;
   return ok();
@@ -92,7 +93,8 @@ export function rerollManagerCandidates(
 ): CommandResult<{ fee: number }> {
   if (!CITIES[cityId]) return fail('Unknown city.');
   const fee = managerRerollFee(state, cityId);
-  if (state.company.cash < fee) return fail(`Not enough cash: new candidates cost ${money(fee)}.`);
+  if (state.company.cash < fee)
+    return fail(`Not enough cash: new candidates cost ${money(state, fee)}.`);
   spend(state, 'managers', fee);
   const old = state.people.managerCandidates[cityId] ?? [];
   const keepGuide =
@@ -129,7 +131,7 @@ export function setManagerSalary(
   const ref = managerBaseSalary(state, branch.cityId);
   const [lo, hi] = MANAGER_SALARY_RANGE;
   if (!(salary >= ref * lo && salary <= ref * hi))
-    return fail(`Salary can be set from ${money(ref * lo)} to ${money(ref * hi)}.`);
+    return fail(`Salary can be set from ${money(state, ref * lo)} to ${money(state, ref * hi)}.`);
   mgr.salary = Math.round(salary);
   return ok();
 }
