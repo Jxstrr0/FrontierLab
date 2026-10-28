@@ -3,7 +3,7 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.46, save schema 30). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
+**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.47, save schema 30). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
 **Determinism snapshot:** `0ca1e708522f78` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
@@ -11,7 +11,7 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
-### 2026-10-28 — C-suite deep dive: direction dials and the research hire (v0.1.46, schema 30)
+### 2026-10-28 — C-suite deep dive: direction dials and the research hire (v0.1.47, schema 30)
 
 The owner asked for a deep dive on the hired executives: do their tasks and sliders make sense for the AI game, and can you delegate while still steering? I read every seat's routine against the game as it stands.
 
@@ -32,6 +32,16 @@ The owner asked for a deep dive on the hired executives: do their tasks and slid
 **Checked.** `npm run lint`, 1,111 tests (new `tests/sim/directionDials.test.ts`: the dial commands, the ceiling, the reserve, the focus, the wider model search, the talent routine and migration 29 → 30), `npm run build`, and `npm run balance` on steady seed 42 (all checkpoints in range; the strategies hire no executives, so it could not move). The COO, CPO and CSO profiles were opened at 390×844 in Chromium from a prepared save: the three dials and the research note render with no console errors.
 
 **Next.** ROADMAP Stage 10 launch items, as before.
+### 2026-10-28 — City life on the map (v0.1.46)
+
+Owner's ask: make the cities feel more alive and lived in. Picked options 1, 2 and 4 from the pitch (time of day was left for later).
+
+- **A moving layer over the map.** The city art is drawn once and cached, so nothing in it can move. A second, see-through canvas now sits on top and draws only the moving things: cars and buses both ways along the streets (and over bridges), people on pavements, plazas and park paths, launches with a wake on open water, spray from the fountains and a flock of birds now and then. Anything behind a building is left out, so cars don't float over towers.
+- **It follows the game.** Streets are busier in a boom and thinner in a recession. Your offices have people coming and going in line with how busy they are; a struggling rival's office goes quiet. Your data centers get delivery trucks in your brand colour and steam over the roof, more when the compute runs hard.
+- **Lived-in details** drawn with the city: parked cars along the kerbs, café tables with umbrellas on plazas, washing lines in some suburban yards, and a tower crane over any office or data center being fitted out (it goes once it opens).
+- **Battery.** It redraws at most 30 times a second and only draws what's near the screen (about 1–1.5 ms a frame on a laptop). While the game is paused, or with reduced motion on, everything holds still and nothing redraws.
+- View-only: no game state or save change, determinism snapshot unchanged. New config file `src/config/cityLife.ts`; ART_DIRECTION §2.3 describes it all; a decision-log line in DESIGN.
+- Checked: lint, 1,110 tests (new `tests/art/cityLife.test.ts`: routes, lane spacing, crowds following the economy and offices, occlusion, props and cranes inside their draw bounds), build, and screenshots at 390×844 in New York and Calgary at zooms 1 and 2.
 ### 2026-10-28 — Portrait rework (v0.1.45)
 
 The owner asked for better character models and a preview that stays visible while scrolling, and pointed out that some women had beards.
