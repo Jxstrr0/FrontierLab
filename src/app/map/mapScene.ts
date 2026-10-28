@@ -5,6 +5,7 @@
 import { generateCityMap, type CityMap, type MapPlaces } from '../../art/citygen';
 import { tileCenter } from '../../art/iso';
 import { createMapRenderer } from '../../art/isoRenderer';
+import { createLifeLayer, type LifeLayer } from '../../art/lifeLayer';
 import type { MapRenderer } from '../../art/mapRenderer';
 import { FEATURES } from '../../config/balance';
 import { BRANCH_ZOOM, OVERVIEW_ZOOM } from '../../config/mapView';
@@ -24,6 +25,8 @@ export interface Scene {
   city: CitySpec;
   map: CityMap;
   createRenderer(): MapRenderer;
+  /** City life over the map (ART_DIRECTION §2.3). */
+  createLife(): LifeLayer;
 }
 
 let cached: Scene | null = null;
@@ -64,6 +67,8 @@ export function sceneFor(city: CitySpec, seed: number, lots: Lot[], places: MapP
     map,
     createRenderer: () =>
       createMapRenderer(map, { ink: city.ink, paper: paperColour(), cityName: city.name }),
+    createLife: () =>
+      createLifeLayer(map, { ink: city.ink, paper: paperColour(), cityName: city.name }),
   };
   return cached;
 }

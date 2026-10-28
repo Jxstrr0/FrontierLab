@@ -29,8 +29,10 @@ export function occupantsOf(
       continue;
     }
     // Your data center stands as a low hall (C8c), not a storefront.
-    if (occ.type === 'player' && s.dataCenters[occ.id]) {
+    const dc = occ.type === 'player' ? s.dataCenters[occ.id] : undefined;
+    if (dc) {
       out[lot.id] = { type: 'player', ink: s.meta.brandInk, building: 'dataCenter' };
+      if (dc.status === 'fitout') out[lot.id]!.fitout = true;
       continue;
     }
     // A converting branch still flies the old bank's colours (§19.8).
@@ -38,15 +40,19 @@ export function occupantsOf(
       occ.type === 'player'
         ? { type: 'player', ink: s.branches[occ.id]?.converting?.ink ?? s.meta.brandInk }
         : { type: 'rival', ink: s.rivals[occ.id]?.ink ?? '#5a5a5a' };
+    // A sales office being fitted out has a crane over it.
+    if (occ.type === 'player' && s.branches[occ.id]?.status === 'fitout')
+      out[lot.id]!.fitout = true;
   }
   // Energy sites (C2d) draw a substation yard, with your hall once you build there (C8c).
   if (features.hq) {
     for (const site of Object.values(s.world.sites)) {
       if (site.cityId !== s.world.currentCityId || !isEnergySite(site)) continue;
-      const dc = Object.values(s.dataCenters).some((d) => d.siteId === site.id);
+      const dc = Object.values(s.dataCenters).find((d) => d.siteId === site.id);
       out[site.id] = dc
         ? { type: 'player', ink: s.meta.brandInk, building: 'dataCenter' }
         : { type: 'site', ink: '', building: 'energySite' };
+      if (dc?.status === 'fitout') out[site.id]!.fitout = true;
     }
   }
   if (features.hq) {
@@ -61,6 +67,6 @@ export function occupantsOf(
 export function occupantsKey(o: Record<string, LotOccupant>): string {
   return Object.keys(o)
     .sort()
-    .map((k) => `${k}:${o[k]!.type}:${o[k]!.ink}:${o[k]!.building ?? ''}`)
+    .map((k) => `${k}:${o[k]!.type}:${o[k]!.ink}:${o[k]!.building ?? ''}:${o[k]!.fitout ? 1 : 0}`)
     .join(';');
 }

@@ -1,8 +1,10 @@
-// Layout-2 street life drawn as raised items (ART_DIRECTION §2): small lollipop
-// trees lining avenue kerbs and a fountain in the middle of each plaza. Plaza
-// paving is flat and drawn by ground.ts. Heights stay within AVENUE_TREE_PX and
-// FOUNTAIN_PX (config/map.ts) so drawList bounds them.
+// Street life drawn as raised items (ART_DIRECTION §2, §2.3): in layout 2,
+// small lollipop trees lining avenue kerbs, a fountain in the middle of each
+// plaza and café tables on the rest; in every layout, cars parked along the
+// kerbs (streetProps.ts). Plaza paving is flat and drawn by ground.ts. Heights
+// stay within AVENUE_TREE_PX, FOUNTAIN_PX and PROPS so drawList bounds them.
 import { CITY_LAYOUT } from '../config/balance';
+import { PROPS } from '../config/cityLife';
 import { AVENUE_TREE_PX, FOUNTAIN_PX } from '../config/map';
 import { KIND } from './cityBlocks';
 import { DECOR } from './cityDecor';
@@ -10,6 +12,7 @@ import type { CityMap } from './citygen';
 import type { Engraver } from './engraver';
 import { tree } from './flora';
 import { artRng } from './prng';
+import { cafeTables, hasCafe, hasParkedCars, parkedCars } from './streetProps';
 
 /** Visual tuning, in tiles and world px. */
 const LIFE = {
@@ -26,10 +29,15 @@ const LIFE = {
 /** Extra height a tile's street life reaches (0 when it has none), for drawList bounds. */
 export function streetLifeHeight(map: CityMap, index: number): number | undefined {
   const d = map.decor[index]!;
-  if (!d) return undefined;
   const kind = map.kind[index];
-  if (kind === KIND.street && d & DECOR.avenue) return AVENUE_TREE_PX;
-  if (kind === KIND.park && d & DECOR.plaza) return d & DECOR.fountain ? FOUNTAIN_PX : 0;
+  if (kind === KIND.street) {
+    if (d & DECOR.avenue) return AVENUE_TREE_PX;
+    return hasParkedCars(map, index) ? PROPS.parkedPx : undefined;
+  }
+  if (kind === KIND.park && d & DECOR.plaza) {
+    if (d & DECOR.fountain) return FOUNTAIN_PX;
+    return hasCafe(map, index) ? PROPS.cafePx : 0;
+  }
   return undefined;
 }
 
@@ -37,14 +45,15 @@ export function streetLifeHeight(map: CityMap, index: number): number | undefine
 export function drawStreetLife(e: Engraver, map: CityMap, x: number, y: number): boolean {
   const i = y * map.tiles + x;
   const d = map.decor[i]!;
-  if (!d) return false;
   const kind = map.kind[i];
-  if (kind === KIND.street && d & DECOR.avenue) {
-    avenueTrees(e, x, y, map.seed[i]!);
+  if (kind === KIND.street) {
+    if (d & DECOR.avenue) avenueTrees(e, x, y, map.seed[i]!);
+    else if (hasParkedCars(map, i)) parkedCars(e, map, x, y);
     return true;
   }
   if (kind === KIND.park && d & DECOR.plaza) {
     if (d & DECOR.fountain) fountain(e, x, y);
+    else if (hasCafe(map, i)) cafeTables(e, map, x, y);
     return true;
   }
   return false;
