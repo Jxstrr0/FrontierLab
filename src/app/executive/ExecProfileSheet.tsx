@@ -3,14 +3,16 @@
 // what each does, some under a group heading (the CFO's Investing and
 // Buildings) and some with a dial under them (DelegationDials.tsx: the COO's
 // morale target and review cadence with the pay premium, the CMO's awareness
-// target, the CFO's occupancy dials); the salary stepper with the market hint;
+// target, the CFO's occupancy dials, DirectionDials.tsx: the CSO's posture
+// ceiling, the COO's cash reserve, the CPO's product focus); the salary
+// stepper with the market hint;
 // the grants list with vesting progress, Add grant, and Fire with a confirm
 // showing severance. The COO's sheet adds the growth cities their Expansion
 // delegation may build in, each with an "Open a branch now" button
 // (GrowthCities.tsx). Seats that give sales office guidance show what they are
 // telling managers (GuidanceNote.tsx); the CFO shows what it invests in next
 // (InvestNote.tsx) and the buildings it manages (PropertyNote.tsx); the CPO
-// its training-odds boost.
+// its training-odds boost and the researcher it would hire next (TalentNote.tsx).
 import { useState } from 'preact/hooks';
 import * as cmd from '../../sim/commands';
 import type { ExecSeat } from '../../sim/state';
@@ -33,6 +35,7 @@ import { GUIDANCE_SEATS, GuidanceNote } from './GuidanceNote';
 import { InvestNote } from './InvestNote';
 import { cpoTrainingBonus } from '../../sim/talent';
 import { PropertyNote } from './PropertyNote';
+import { TalentNote } from './TalentNote';
 import { dayOf, execSalaryStepper, seatSpec, vestProgress } from './execSelectors';
 
 export function ExecProfileSheet(p: { seat: ExecSeat; onClose: () => void }) {
@@ -85,6 +88,7 @@ export function ExecProfileSheet(p: { seat: ExecSeat; onClose: () => void }) {
               {GUIDANCE_SEATS.includes(p.seat) && <GuidanceNote s={s} seat={p.seat} />}
               {p.seat === 'cfo' && <InvestNote s={s} />}
               {p.seat === 'cfo' && <PropertyNote s={s} />}
+              {p.seat === 'cpo' && <TalentNote s={s} />}
               {p.seat === 'cfo' && (
                 <p class="muted small exec-note">
                   Statement delays are halved while a CFO is seated.

@@ -2,8 +2,8 @@
 // (P&L execPay, cash), equity grants (execGrants.ts), the delegations each
 // executive has switched on (execDelegations*.ts, payReviews.ts; the CFO's
 // rents in execDelegationsProperty.ts, its buying in execBuying.ts and its
-// investing in execInvesting.ts; the CPO's training runs in
-// execDelegationsResearch.ts), the COO, CMO and CPO's sales office guidance
+// investing in execInvesting.ts; the CPO's training runs and research hiring
+// in execDelegationsResearch.ts), the COO, CMO and CPO's sales office guidance
 // (branchGuidance.ts) and resignations, which raise the EXEC_POACHED incident. Hiring, firing and grants are player commands in
 // commands/executives.ts; seat lookups other systems read are in execSeats.ts.
 import { WEEKS_PER_YEAR } from '../config/balance';
@@ -24,7 +24,7 @@ import {
   croAppetite,
 } from './execDelegationsPeople';
 import { runBranchGuidance } from './branchGuidance';
-import { cpoTraining } from './execDelegationsResearch';
+import { cpoTalent, cpoTraining } from './execDelegationsResearch';
 import { runGrants } from './execGrants';
 import { cooPayReviews } from './payReviews';
 import { ctoCompute } from './execDelegationsCompute';
@@ -54,6 +54,7 @@ const DELEGATIONS: [ExecSeat, string, (s: GameState) => void][] = [
   ['cpo', 'developments', cpoDevelopments],
   ['cpo', 'models', cpoModels],
   ['cpo', 'training', cpoTraining],
+  ['cpo', 'talent', cpoTalent],
   ['cpo', 'pricing', cpoPricing],
   ['cmo', 'brand', cmoBrand],
   ['cro', 'appetite', croAppetite],

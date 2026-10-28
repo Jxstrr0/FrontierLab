@@ -3,8 +3,9 @@
 // while you run the top of it. Each week it picks the growth city with the most
 // room: one without an office gets one on the busiest free storefront with your
 // usual fit-out; one whose office is busy (C2a) gets it grown a size. It acts
-// when the cash left after still covers EXEC_DELEGATION.expansionReserveWeeks
-// of weekly costs, at most once every expansionEveryWeeks. `expansionPlan` is
+// when the cash left after still covers the weeks of costs you dial
+// (executives.expansionReserveWeeks, the cash reserve dial under the switch),
+// at most once every expansionEveryWeeks. `expansionPlan` is
 // the same choice without acting, for the COO's profile and "Open now".
 import { EXEC_DELEGATION as X } from '../config/balance';
 import { CITIES } from '../data/cities';
@@ -60,10 +61,14 @@ export function canGrowIn(state: GameState, cityId: string): boolean {
   return isGenerated(state, cityId) && !CITIES[cityId]?.regional;
 }
 
-/** Cash the COO keeps back: expansionReserveWeeks of weekly costs. */
+/** Cash the COO keeps back: the dialled weeks of weekly costs (executives.expansionReserveWeeks). */
 export function expansionReserve(state: GameState): number {
-  return X.expansionReserveWeeks * weeklyCosts(state);
+  return state.executives.expansionReserveWeeks * weeklyCosts(state);
 }
+
+/** "the COO keeps 8 weeks of costs in reserve", for the blockers below. */
+const reserveNote = (state: GameState) =>
+  `the COO keeps ${state.executives.expansionReserveWeeks} weeks of costs in reserve`;
 
 /** The busiest free storefront, discounted when it sits near one of yours. */
 export function bestLot(state: GameState, cityId: string): Lot | undefined {
@@ -126,7 +131,7 @@ export function expansionPlan(state: GameState, cityId: string, keepReserve = tr
     lot,
     total: cheapest,
     blocker: keepReserve
-      ? 'Not enough spare cash: the COO keeps 8 weeks of costs in reserve.'
+      ? `Not enough spare cash: ${reserveNote(state)}.`
       : 'Not enough cash for the build.',
   };
 }
@@ -152,7 +157,7 @@ function growPlan(state: GameState, branchId: string, keepReserve: boolean): Exp
     return {
       ...plan,
       blocker: keepReserve
-        ? 'Not enough spare cash: the COO keeps 8 weeks of costs in reserve.'
+        ? `Not enough spare cash: ${reserveNote(state)}.`
         : 'Not enough cash to grow the office.',
     };
   return plan;
@@ -180,4 +185,35 @@ export function cooExpansion(state: GameState): void {
       return;
     }
   }
+}
+
+export interface ExpansionNext {
+  /** The next move the COO would make with the reserve kept, if any growth city is ready. */
+  plan?: ExpansionPlan;
+  /** Why no growth city is ready right now (the first city's blocker, or no cities). */
+  blocker?: string;
+  /** Cash the dialled reserve holds back. */
+  reserve: number;
+  /** Weeks until the cadence allows the next build (0 = this week). */
+  weeksTo: number;
+}
+
+/** What Expansion would do next at the current reserve, for the dial's tagline. Changes nothing. */
+export function expansionNext(state: GameState): ExpansionNext {
+  const ex = state.executives;
+  const since =
+    ex.lastExpansionWeek < 0 ? X.expansionEveryWeeks : state.clock.week - ex.lastExpansionWeek;
+  const weeksTo = Math.max(0, X.expansionEveryWeeks - since);
+  const reserve = expansionReserve(state);
+  const cities = growthCities(state).sort(
+    (a, b) => cityRoom(state, b) - cityRoom(state, a) || a.localeCompare(b),
+  );
+  if (cities.length === 0) return { reserve, weeksTo, blocker: 'No growth city marked.' };
+  let first: ExpansionPlan | undefined;
+  for (const cityId of cities) {
+    const plan = expansionPlan(state, cityId);
+    first ??= plan;
+    if (!plan.blocker) return { plan, reserve, weeksTo };
+  }
+  return { reserve, weeksTo, blocker: first?.blocker };
 }

@@ -3,7 +3,7 @@
 // market price, placements, IPO), the stock market with company and personal
 // holdings, the personal account and rival M&A. Re-exported from state.ts.
 // See docs/DATA_MODEL.md §7, §8 and SIMULATION §17.2, §19.
-import type { Id, Money, Rate, Score, Week } from '../data/types';
+import type { CategoryId, Id, Money, Rate, Score, Week } from '../data/types';
 import type { PersonalEmpire } from './personalTypes';
 import type { AvatarSpec } from './state';
 
@@ -79,6 +79,12 @@ export interface ExecutivesState {
   computeCover: number;
   /** How the CPO's Routine training runs trade quality for quantity (schema v26). */
   trainingStyle: TrainingStyle;
+  /** The posture the CSO's Launch posture may step up to (schema 30), one of EXEC_DELEGATION.croCeilings. */
+  postureCeiling: number;
+  /** Weeks of costs the COO's Expansion keeps in cash (schema 30), one of EXEC_DELEGATION.expansionReserves. */
+  expansionReserveWeeks: number;
+  /** Which products the CPO's Developments builds first (schema 30): a category, or any. */
+  devFocus: DevFocus;
   /** Occupancy the CFO's Rents price for, per owner (schema v30, the CFO's since schema 22), each one of EXEC_DELEGATION.occTargets. */
   occTargets: { company: number; personal: number };
   /** Stocks the CFO's Investing sold at a loss, per account: id → week sold (schema v31). */
@@ -89,6 +95,8 @@ export type PayReviewCadence = 'quarterly' | 'annual';
 
 /** The CPO's training style (schema v26): a key of CPO_TRAINING.styles. */
 export type TrainingStyle = 'quantity' | 'balanced' | 'quality';
+/** The CPO's product focus: Plans ('deposits'), API ('lending'), Apps ('cards') or any. */
+export type DevFocus = 'any' | CategoryId;
 
 // ─── Board and dividends (DESIGN §5.13, SCREENS §10.2) ────────────────────────
 
