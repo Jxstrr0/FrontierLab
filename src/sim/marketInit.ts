@@ -93,6 +93,9 @@ export function emptyExecutives(): ExecutivesState {
     brandTarget: EXEC_DELEGATION.brandTarget,
     computeCover: CTO_COMPUTE.coverTarget,
     trainingStyle: CPO_TRAINING.defaultStyle,
+    postureCeiling: EXEC_DELEGATION.croMaxAppetite,
+    expansionReserveWeeks: EXEC_DELEGATION.expansionReserveWeeks,
+    devFocus: EXEC_DELEGATION.devFocus,
     occTargets: { company: EXEC_DELEGATION.occTarget, personal: EXEC_DELEGATION.occTarget },
     trimmedStocks: { company: {}, personal: {} },
   };

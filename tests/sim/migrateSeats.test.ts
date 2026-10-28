@@ -46,6 +46,7 @@ describe('save migration 21 → 22', () => {
       developments: true,
       models: false,
       training: false,
+      talent: false,
       guidance: false,
     });
     expect(s.executives.remembered.cpo).toMatchObject({ training: false });

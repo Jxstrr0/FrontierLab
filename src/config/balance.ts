@@ -2098,6 +2098,16 @@ export const EXEC_DELEGATION = {
   devWeeks: 12,
   devTier: 'medium',
   devBudgetShare: 0.01,
+  /** CPO Developments: the product focus dial (a category id, or 'any' for the next undeveloped product). */
+  devFocus: 'any' as 'any' | 'deposits' | 'lending' | 'cards',
+  /**
+   * CPO Research talent (§16.13): every talentEveryWeeks weeks hires the best
+   * free researcher while researcher pay stays within talentBudgetShare of
+   * annual revenue and expansionReserveWeeks of costs stay in cash. Never
+   * poaches from a rival: that premium, and the signing bonus, stay your call.
+   */
+  talentEveryWeeks: 4,
+  talentBudgetShare: 0.03,
   revenueWeeks: 13,
   /** Brand campaigns: the awareness the CMO holds in each city (a dial on their profile), default and stops. */
   brandTarget: 0.5,
@@ -2106,7 +2116,13 @@ export const EXEC_DELEGATION = {
   brandBudgetShare: 0.03,
   croEveryWeeks: 4,
   croMaxLoss: 0.012,
+  /**
+   * CSO Launch posture: the posture the CSO may step up to while the safety
+   * tier is Strong (the posture ceiling dial on their profile), default and stops
+   * (3 Balanced, 4 Bold, 5 Very bold). Stepping down at Watch or worse has no floor.
+   */
   croMaxAppetite: 4,
+  croCeilings: [3, 4, 5] as readonly number[],
   /**
    * CFO Capital and Share sales (§17.2): act on runway (RUNWAY); a raise sells
    * shares in steps of cfoRaiseStep of the lab.
@@ -2121,6 +2137,8 @@ export const EXEC_DELEGATION = {
    */
   expansionEveryWeeks: 4,
   expansionReserveWeeks: 8,
+  /** The COO's cash reserve dial under Expansion: weeks of costs kept in cash, default expansionReserveWeeks. */
+  expansionReserves: [8, 13, 26] as readonly number[],
   expansionMinRoom: 0.2,
   expansionSpacing: 12,
   /** COO Company troubles: option error shrinks with the COO's expertise like a manager's skills. */
