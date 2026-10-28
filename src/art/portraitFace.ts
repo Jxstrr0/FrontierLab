@@ -54,7 +54,14 @@ const EYE_SHAPES = [
  * heavier upper lid with a lash flick, a faint lower lid and the socket
  * shadow under the brow on the shadow (right) side.
  */
-export function eyes(h: HeadGeom, g: FaceGeom, kind: number, sp: number, fine: boolean): string {
+export function eyes(
+  h: HeadGeom,
+  g: FaceGeom,
+  kind: number,
+  sp: number,
+  fine: boolean,
+  soft = false,
+): string {
   const s = EYE_SHAPES[kind] ?? EYE_SHAPES[0];
   const out: string[] = [];
   for (const side of [-1, 1]) {
@@ -89,6 +96,16 @@ export function eyes(h: HeadGeom, g: FaceGeom, kind: number, sp: number, fine: b
         'pt-line pt-lid',
       ),
     );
+    if (soft) {
+      // Soft features: a fan of lashes along the outer half of the upper lid.
+      const lashes = [0.55, 0.75, 0.92]
+        .map((t) => {
+          const p = upper[Math.round(t * (upper.length - 1))]!;
+          return `M${f1(p[0])} ${f1(p[1])}l${f1(side * (0.5 + t * 0.6))} ${f1(-0.9 - t * 0.3)}`;
+        })
+        .join('');
+      out.push(path(lashes, fine ? 'pt-line pt-fine' : 'pt-line pt-lid'));
+    }
     if (s.fold && fine) {
       out.push(
         path(
@@ -111,7 +128,15 @@ export function eyes(h: HeadGeom, g: FaceGeom, kind: number, sp: number, fine: b
 }
 
 /** Brow outlines: soft arch, straight, bold. Each is a tapered strip of hair strokes. */
-export function brows(h: HeadGeom, g: FaceGeom, kind: number, sp: number, fine: boolean): string {
+export function brows(
+  h: HeadGeom,
+  g: FaceGeom,
+  kind: number,
+  sp: number,
+  fine: boolean,
+  soft = false,
+  tint = '',
+): string {
   const out: string[] = [];
   for (const side of [-1, 1]) {
     const x = h.cx + side * g.ex;
@@ -129,12 +154,13 @@ export function brows(h: HeadGeom, g: FaceGeom, kind: number, sp: number, fine: 
       top = quad(inner, [x - side * 0.4, g.ey - 5.5], outer);
       thick = 1.0;
     }
-    // The strip tapers toward the outer end.
+    // The strip tapers toward the outer end; soft features draw it finer.
+    const t = thick * (soft ? 0.7 : 1.15);
     const bottom = top.map(
-      ([px, py], i) => [px, py + thick * (1 - (i / (top.length - 1)) * 0.6)] as Pt,
+      ([px, py], i) => [px, py + t * (1 - (i / (top.length - 1)) * 0.6)] as Pt,
     );
     const strip = [...top, ...bottom.reverse()];
-    out.push(fill(strip, 'pt-hair'));
+    out.push(fill(strip, 'pt-hair', tint ? ` style="fill:${tint}"` : ''));
     if (fine) out.push(path(hatch(strip, Math.max(0.5, sp * 0.3), side * 70), 'pt-brow-hair'));
     out.push(path(poly(top, false), 'pt-line pt-brow'));
   }
