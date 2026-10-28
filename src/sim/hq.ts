@@ -31,7 +31,6 @@ import { CITIES } from '../data/cities';
 import { DEPARTMENTS, HQ_DEPTS } from '../data/departments';
 import { dpow, dtanh } from './detmath';
 import { execMult, seated } from './execSeats';
-import { totalWholesale } from './fundingLots';
 import { holdTopStaff } from './devStaff';
 import { riskCoverageBonus } from './incident/effects';
 import { spend } from './ledger';
@@ -89,7 +88,6 @@ export function requiredStaff(state: GameState, id: HqDeptId): number {
   const last = state.history.weekly.at(-1)?.totals;
   const assets = last?.assets ?? 0;
   const branches = officeUnits(state);
-  const wholesale = totalWholesale(state);
   const r = DEPT_REQUIREMENTS;
   switch (id) {
     // +4 once listed: investor relations and quarterly filings (CONTENT §9).
@@ -109,7 +107,7 @@ export function requiredStaff(state: GameState, id: HqDeptId): number {
         r.products.perDevelopment * state.products.developments.length
       );
     case 'treasury':
-      return r.treasury.base + r.treasury.perFunding * ((last?.deposits ?? 0) + wholesale);
+      return r.treasury.base + r.treasury.perGpu * (state.compute?.demandGpus ?? 0);
     case 'marketing':
       return (
         r.marketing.base +

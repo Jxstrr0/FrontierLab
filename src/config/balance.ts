@@ -732,7 +732,8 @@ export const DEPT_REQUIREMENTS = {
   finance: { base: 2, perBranch: 0.35, perAssets: 1 / 2e9, public: 4 },
   hr: { base: 1, perEmployee: 1 / 80 },
   products: { base: 2, perBranch: 0.2, perDevelopment: 2 },
-  treasury: { base: 1, perFunding: 1 / 1e9 },
+  /** Compute floor: +1 per perGpu⁻¹ GPUs of weekly demand (polish pass; was legacy bank funding). */
+  treasury: { base: 1, perGpu: 1 / 2_000 },
   marketing: { base: 1, perBranch: 0.15, perCampaign: 2 },
   it: { base: 2, perBranch: 0.25, perAssets: 1 / 5e9 },
   risk: { base: 2, perBranch: 0.15, perArr: 1 / 50e6 },
@@ -2010,7 +2011,8 @@ export const INSIDER = {
  * execMult = multBase + multSlope × expertise/100 on the departments in an
  * executive's domain; an empty CTO seat reads `vacantCtoExpertise`.
  * Resignation p/week = resignBase × (resignLoyalty − loyalty/100) ×
- * (pay/market < underpaidRatio ? underpaidMult : 1) × (unvested grants ? grantMult : 1).
+ * (pay/market < underpaidRatio ? underpaidMult : 1) × (unvested grants worth at least
+ * grantMinValue × salary ? grantMult : 1).
  * Market salary = (salaryBase + salaryPerBillion × total assets in $B) × city
  * wageIndex, capped at salaryMax (assumption, decision log). Candidates per seat
  * refresh every `refreshWeeks`; skills roll in `skillRange`.
@@ -2027,6 +2029,8 @@ export const EXECUTIVES = {
   wellPaidRatio: 1.1,
   wellPaidMult: 0.5,
   grantMult: 0.5,
+  /** grantMult needs unvested grants worth this share of annual salary (grant-date value). */
+  grantMinValue: 0.25,
   salaryBase: 180_000,
   salaryPerBillion: 60_000,
   salaryMax: 2_500_000,
@@ -2242,6 +2246,8 @@ export const PAY_REVIEW = {
   premiumRange: [-0.1, 0.3] as [number, number],
   premiumStep: 0.05,
   defaultPremium: 0.05,
+  /** Weeks after a counter-offer during which a review won't cut that executive's pay. */
+  counterHoldWeeks: 52,
 } as const;
 
 /**
@@ -2540,9 +2546,13 @@ export const VENTURES = {
   /** IPO chance per quarter once quarterly revenue > min, net income > 0 and stage ≥ C. */
   ipoChance: 0.25,
   ipoMinQuarterRevenue: 50_000_000,
-  /** Acquisition chance per quarter at a multiple of annual revenue. */
+  /**
+   * Acquisition chance per quarter; the price is the larger of a multiple of
+   * annual revenue and acquireMarkPremium × the last mark (price × shares).
+   */
   acquireChance: 0.05,
   acquireMult: [2, 6] as [number, number],
+  acquireMarkPremium: 1.25,
   /** Quarterly results kept per startup. */
   quartersKept: 12,
 } as const;

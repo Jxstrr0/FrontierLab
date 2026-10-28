@@ -92,14 +92,19 @@ export function unvestedShares(g: EquityGrant): number {
   return Math.max(0, g.shares - g.vested);
 }
 
+/**
+ * True when the executive's unvested grants are worth at least grantMinValue ×
+ * their salary at grant-date value, so a token grant doesn't hold anyone.
+ */
 export function hasUnvested(exec: Executive): boolean {
-  return exec.grants.some((g) => unvestedShares(g) > 0);
+  const value = exec.grants.reduce((sum, g) => sum + unvestedShares(g) * g.fairValue, 0);
+  return value > 0 && value >= EXECUTIVES.grantMinValue * exec.salary;
 }
 
 /**
  * §17.2 weekly resignation probability:
  * 0.002 × (1.5 − loyalty/100) × (pay/market < 0.9 ? 2 : pay/market ≥ 1.1 ? 0.5 : 1)
- * × (unvested grants ? 0.5 : 1).
+ * × (unvested grants worth ≥ grantMinValue × salary ? 0.5 : 1).
  * `loyaltyBonus` adds the Employee Stock Plan's +5 (CONTENT §10).
  */
 export function resignChance(exec: Executive, market: number, loyaltyBonus = 0): number {

@@ -15,6 +15,11 @@ export interface DelegationSpec {
   description: string;
   /** Heading the toggle sits under on the profile; toggles without one come first. */
   group?: string;
+  /**
+   * Off on a new candidate (polish pass): switches that spend your own money or
+   * dilute your stake wait for you to turn them on.
+   */
+  defaultOff?: boolean;
 }
 
 export interface ExecSeatSpec {
@@ -65,7 +70,7 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
         id: 'payReviews',
         label: 'Pay reviews',
         description:
-          'Sets every executive, office manager and HQ department floor to market pay plus your pay premium, as often as you choose, so pay keeps rising with the market, morale holds and rivals struggle to poach your people.',
+          'Sets every executive, office manager, researcher and HQ department floor to market pay plus your pay premium (researchers are never cut, and an executive you countered for keeps that pay for a year), as often as you choose, so pay keeps rising with the market, morale holds and rivals struggle to poach your people.',
       },
       {
         id: 'guidance',
@@ -89,6 +94,7 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
       },
       {
         id: 'shares',
+        defaultOff: true,
         label: 'Share sales',
         description:
           'With under 12 months of runway, sells new shares to get back to 18 months: a private placement while private, a secondary offering once listed. Never launches your IPO.',
@@ -107,6 +113,7 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
       },
       {
         id: 'privateInvests',
+        defaultOff: true,
         label: 'Your money',
         group: 'Investing',
         description:
@@ -135,6 +142,7 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
       },
       {
         id: 'privateBuys',
+        defaultOff: true,
         label: 'Buying: your own buildings',
         group: 'Buildings',
         description:
