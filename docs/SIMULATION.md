@@ -1123,7 +1123,7 @@ Run `npm run balance` with seed 42 and the start city Calgary, unless noted. Off
 | First office build + lease deposit (mid build, average lot) | $300k–$450k out of the $1.5M seed | branchCheckpoints |
 | First office weekly income turns positive | week 6–16 | branchCheckpoints |
 | Office at week 26 | ARR $1.5–5M; income positive | branchCheckpoints |
-| Office at week 52 | ARR $3–8M; customers 3,500–9,000; income +$24k–$60k/week | branchCheckpoints |
+| Office at week 52 | ARR $3–8M; customers 3,500–9,500; income +$24k–$65k/week | branchCheckpoints |
 | Growing home office | week 104: ARR $8–20M, revenue $160–380k/week, income $55–140k/week; week 156: $12–28M, $250–520k, $85–230k; week 208: $16–36M, $320–700k, $110–340k; week 260: $16–38M, $320–720k, $110–360k | branchCheckpoints |
 | Payback of a mid build on an average lot | ≤ 44 weeks from opening | branchCheckpoints |
 | Year 2 (steady) | 1–4 sales offices; HQ required; cash never < 0 | strategyTargets, balance |
@@ -1150,11 +1150,20 @@ Run `npm run balance` with seed 42 and the start city Calgary, unless noted. Off
 
 **Note (rival books on ARR, 2026-10-27):** rival labs now keep books on customers, ARR, cash and runway (§18.1, §18.5) instead of deposits, loans and a capital ratio. The player's checkpoints above are unchanged by it (seed 42 steady passes every one). The rivals' own aggregate was re-based rather than matched: on the old books 34 of 53 rivals failed in ten years of seed 42 steady, almost all with an income of −$30M to −$90M a year on networks of 5–9 units, which came from the price-war cut (a 20% plan-price cut, §18.6) being applied as a 20-point cut to their net interest margin. On the new books the cut reaches ARR as a 20% price cut, so in the same run 0 of 43 fail, 19 offices shrink and 7 close, 11 new labs are founded (21 before), 5 offices grow and 15 open (7 and 21 before), no rival-to-rival deal closes in that run (one at $11M before; they close at fair value plus a premium when a buyer has the cash), and the rivals' combined ARR at year 10 is $1.9B against your $2.3B (their revenue was $0.4B before). Failures still happen under a forced recession and when a lab's cash runs out (tests in `tests/sim/rivalBooks.test.ts`). No target in the table above describes rivals; this note is the reference for the next pass.
 
+**Note (balance fix, 2026-10-28):** a 20-seed sweep of every strategy found turtle losing money in year 5 on half the seeds and aggressive seed 20 stuck at one office. Causes and fixes:
+- **Team plan compute** (CONTENT §5) was $6 a seat a week against $30 a month, a 13% margin that turned into a loss in a compute shortage. It is now $2.50 a seat a week (about 64%). Offices earn a little more, so the week-52 office bands are customers 3,500–9,500 and income $24–65k.
+- **Turtle** now holds its prices in price wars.
+- **The strategies' HQ** fell back to nothing when the home city listed no building of 7+ floors, which left aggressive seed 20 at the Restricted tier for good. It now takes the tallest building, and a department it can't house doesn't hold back expansion (the second main office must be abroad, C2d2).
+- **Reserves** count the tax owed (paid each quarter end), which caused most of aggressive's small cash dips.
+- **The Safety Institute** comes first when the tier slips, so late-game steady rarely hits Critical.
+
+Sweep results (seeds 1–20, 10 years): turtle 20/20 clean (was 8), aggressive 17/20 (was 14; two seeds trail steady at year 3, one dips to −$22k cash), stress 18/20 (was 17), nohq 20/20. Steady's single-seed misses are first-office bands, judged on the median, which passes.
+
 **Strategies** (`scripts/strategies/*.ts`):
 - `idle`: one sales office, no further actions.
-- `steady`: follows default prices; staffs HQ floors to 100%; takes up to 2 placements when runway is under 7 months and cash is short (`manageEquity`); grows the busiest office a size, or else opens an office in the next city, when cash > 2× the cost, runway is over 6 months (or the lab isn't burning cash) and 2 weeks of running costs stay in reserve; builds a data center at 4× its cost from year 5; reserves GPU lots; trains at 1% of cash a week.
-- `turtle`: declines new RFPs and turns Enterprise contracts off; grows its one office to Standard at most, and only after a profitable quarter with 26 weeks of running costs in hand. It never lists, but once runway falls out of Comfortable (under 12 months) it sells a private placement of half the largest size, as a CFO's Share sales switch would.
-- `aggressive`: launch posture 5 (Very bold); default prices with rate offsets (which touch only the Enterprise contracts' list rate); expands at 1.2× the cost with over 3 months of runway (grows offices down to 2) and 3 weeks of costs in reserve; a data center at 3× its cost; trains at 1.5% of cash.
+- `steady`: follows default prices; staffs HQ floors to 100%; takes up to 2 placements when runway is under 7 months and cash is short (`manageEquity`); grows the busiest office a size, or else opens an office in the next city, when cash > 2× the cost, runway is over 6 months (or the lab isn't burning cash) and 2 weeks of running costs plus the tax owed stay in reserve; builds a data center at 4× its cost from year 5; reserves GPU lots; trains at 1% of cash a week; starts frontier projects in list order, but the Safety Institute first while the safety tier is Watch or worse. Its HQ leases the cheapest building with 7+ floors, else the tallest one, and a department it has no room for (both main offices full) doesn't hold back expansion.
+- `turtle`: declines new RFPs and turns Enterprise contracts off; grows its one office to Standard at most, and only after a profitable quarter with 26 weeks of running costs in hand. It holds its prices in a price war (one office can't afford half a year of plan cuts). It never lists, but once runway falls out of Comfortable (under 12 months) it sells a private placement of half the largest size, as a CFO's Share sales switch would.
+- `aggressive`: launch posture 5 (Very bold); default prices with rate offsets (which touch only the Enterprise contracts' list rate); expands at 1.2× the cost with over 3 months of runway (grows offices down to 2) and 3 weeks of costs plus the tax owed in reserve; a data center at 3× its cost; trains at 1.5% of cash.
 - `stress`: steady plus `forceRecessionAtWeek = 156` (and aggressive under the same recession).
 - `nohq`: steady without HQ floors, for comparison.
 
