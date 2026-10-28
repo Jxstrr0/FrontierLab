@@ -3,7 +3,7 @@
 import { describe, expect, it } from 'vitest';
 import { PART_COUNTS } from '../../src/art/portraits';
 import { newGame } from '../../src/sim/newGame';
-import { faceDetail, randomAvatar } from '../../src/sim/people';
+import { faceDetail, randomAvatar, SOFT_LOOK } from '../../src/sim/people';
 import { stream } from '../../src/sim/rng';
 import { type AvatarSpec } from '../../src/sim/state';
 
@@ -39,10 +39,28 @@ describe('face detail', () => {
 
   it('derives the detail from the other parts, the same every time', () => {
     const s = newGame({ seed: 3, cityId: 'cal' });
-    const a = randomAvatar(stream(s, 'people'));
-    const { eyes, brows, mouth, age, ...base } = a;
+    // A strong face whose hair wasn't swapped to suit its look keeps its drawn parts.
+    const rng = stream(s, 'people');
+    let a = randomAvatar(rng);
+    while (a.look !== 0 || [0, 11, 12].includes(a.hair)) a = randomAvatar(rng);
+    const { eyes, brows, mouth, age, head, hair, facial, glasses, attire, tone, shade } = a;
+    const base = { head, hair, facial, glasses, attire, tone, shade };
     expect(faceDetail(base)).toEqual({ eyes, brows, mouth, age });
-    expect(faceDetail({ ...base, hair: (base.hair + 1) % 12 })).not.toEqual(faceDetail(base));
+    expect(faceDetail({ ...base, hair: (base.hair + 1) % 15 })).not.toEqual(faceDetail(base));
+  });
+
+  it('never gives a soft-featured person facial hair', () => {
+    const s = newGame({ seed: 5, cityId: 'cal' });
+    const rng = stream(s, 'people');
+    const people = Array.from({ length: 300 }, () => randomAvatar(rng));
+    const soft = people.filter((a) => a.look === SOFT_LOOK);
+    expect(soft.length).toBeGreaterThan(80);
+    expect(soft.every((a) => a.facial === 0)).toBe(true);
+    expect(people.some((a) => a.look === 0 && a.facial > 0)).toBe(true);
+    for (const a of people) {
+      expect(a.hairTone).toBeLessThan(PART_COUNTS.hairTone);
+      expect(a.outfit).toBeLessThan(PART_COUNTS.outfit);
+    }
   });
 
   it('varies across people', () => {
