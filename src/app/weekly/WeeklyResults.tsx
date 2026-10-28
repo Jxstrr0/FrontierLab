@@ -16,6 +16,7 @@ import {
   periodIssues,
   periodSnapshots,
   periodTotals,
+  snapshotCloseDay,
   snapshotEndDay,
   type ResultsPeriod,
 } from './resultsPeriod';
@@ -49,7 +50,7 @@ export function WeeklyResults(p: { week: number; period?: ResultsPeriod }) {
   const { now, prev } = periodSnapshots(s, period, week);
   const totals = periodTotals(now);
   const before = periodTotals(prev);
-  const date = gameDate(s.meta.startDate, snapshotEndDay(week));
+  const date = gameDate(s.meta.startDate, snapshotCloseDay(week));
   const issues = period === 'weekly' ? [] : periodIssues(s, period, week);
   const issue = s.news.issues.find((i) => i.week === week);
   const delay = statementDelayWeeks(s);
@@ -82,10 +83,10 @@ export function WeeklyResults(p: { week: number; period?: ResultsPeriod }) {
       <div class="stack">
         <p class="weekly-date">
           {period === 'weekly'
-            ? `Week ${week} · ending ${date}`
+            ? `Week ${week} · closed ${date}`
             : `${periodLabel(s, period, week)} · ${totals?.weeks ?? 0} ${
                 totals?.weeks === 1 ? 'week' : 'weeks'
-              }, ending ${date}`}
+              }, closed ${date}`}
         </p>
         {totals && delay > 0 ? (
           <Delayed weeks={delay} noun={noun} />
@@ -154,7 +155,7 @@ function EarlierIssues(p: { issues: LedgerIssue[]; startDate: string; noun: stri
             const lead = articlesFor(i, 'top')[0];
             return (
               <li key={i.week} class="earlier-issue">
-                <span class="earlier-date">{shortDate(p.startDate, snapshotEndDay(i.week))}</span>
+                <span class="earlier-date">{shortDate(p.startDate, snapshotCloseDay(i.week))}</span>
                 <span class="earlier-headline">{lead?.headline ?? 'A quiet week.'}</span>
               </li>
             );

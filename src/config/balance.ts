@@ -2238,6 +2238,14 @@ export const PAY_REVIEW = {
 } as const;
 
 /**
+ * HQ department pay (§16.2): the salary stepper moves in DEPT_SALARY_STEP
+ * between DEPT_SALARY_RANGE × the department's market salary. The COO's Pay
+ * reviews set each floor to market × (1 + the pay premium) inside that range.
+ */
+export const DEPT_SALARY_STEP = 1_000;
+export const DEPT_SALARY_RANGE: [number, number] = [0.5, 3];
+
+/**
  * Branch manager pay market and poaching (§17.1). Market pay is the hiring ask
  * (MANAGER_BASE_SALARY × wageIndex × the skill spread) × (1 + tenureGrowth ×
  * years at the bank): rivals pay more for experience. Weekly poaching chance:

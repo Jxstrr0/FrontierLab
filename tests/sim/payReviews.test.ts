@@ -5,9 +5,12 @@ import { describe, expect, it } from 'vitest';
 import { EXECUTIVES, MANAGER_PAY, WEEKS_PER_YEAR } from '../../src/config/balance';
 import * as cmd from '../../src/sim/commands';
 import { execMarketSalary, resignChance } from '../../src/sim/execSeats';
+import { deptMarketSalary, newDepartment } from '../../src/sim/hq';
 import {
   managerMarketSalary,
   managerPoachChance,
+  nextReviewDelta,
+  reviewedDeptSalary,
   reviewedManagerSalary,
   runManagerPoaching,
 } from '../../src/sim/payReviews';
@@ -69,6 +72,36 @@ describe('COO pay reviews', () => {
     expect(m.salary).toBeGreaterThan(managerMarketSalary(s, m));
     expect(coo.salary).toBeGreaterThanOrEqual(execMarketSalary(s) * 1.1 - 5_000);
     expect(s.executives.lastPayReviewWeek).toBe(s.clock.week);
+    expect(identityGap(s)).toBeLessThan(1);
+  });
+
+  it('sets every HQ department floor to market plus the premium too', () => {
+    const s = execGame();
+    hire(s, 'coo');
+    expect(cmd.setExecDelegation(s, 'coo', 'payReviews', false).ok).toBe(true);
+    expect(cmd.setPayPremium(s, 0.1).ok).toBe(true);
+    s.departments.hr = newDepartment(s, 'hr');
+    s.departments.finance = newDepartment(s, 'finance');
+    const floors = [s.departments.hr, s.departments.finance];
+    expect(floors.length).toBeGreaterThan(0);
+    for (const d of floors) {
+      d.staff = 5;
+      d.salary = reviewedDeptSalary(s, d);
+    }
+    const before = nextReviewDelta(s);
+    for (const d of floors) d.salary = 20_000;
+    const owed = floors.reduce((sum, d) => sum + (reviewedDeptSalary(s, d) - 20_000) * 5, 0);
+    expect(owed).toBeGreaterThan(0);
+    expect(nextReviewDelta(s).delta - before.delta).toBeCloseTo(owed);
+    const exec = s.departments.executive;
+    const execPay = exec?.salary;
+    expect(cmd.setExecDelegation(s, 'coo', 'payReviews', true).ok).toBe(true);
+    expect(exec?.salary).toBe(execPay);
+    for (const d of floors) {
+      expect(d.salary).toBe(reviewedDeptSalary(s, d));
+      expect(d.salary).toBeGreaterThan(deptMarketSalary(s, d.id) * 1.09);
+      expect(d.salary % 1_000).toBe(0);
+    }
     expect(identityGap(s)).toBeLessThan(1);
   });
 
