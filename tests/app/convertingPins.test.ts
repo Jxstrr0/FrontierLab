@@ -34,7 +34,11 @@ describe('converting branch pins', () => {
     expect(mine.label).toContain('converting from Old Bank, 3 weeks left');
     const total = MERGERS.conversionWeeks;
     expect(mine.converting?.progress).toBeCloseTo((total - 3) / total, 10);
-    expect(occupantsOf(s, lots, NO_HQ)[branch.lotId]).toEqual({ type: 'player', ink: '#123456' });
+    expect(occupantsOf(s, lots, NO_HQ)[branch.lotId]).toEqual({
+      type: 'player',
+      ink: '#123456',
+      fitout: true,
+    });
 
     const before = pinsKey(pins);
     branch.converting.weeksLeft = 2;

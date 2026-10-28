@@ -18,6 +18,8 @@ export interface LotOccupant {
    * center's low hall, or an energy site's substation yard.
    */
   building?: 'dataCenter' | 'energySite';
+  /** Being fitted out: a tower crane stands over it (ART_DIRECTION §2.3). */
+  fitout?: boolean;
 }
 
 export interface MapStyle {
