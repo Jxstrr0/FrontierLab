@@ -3,13 +3,17 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.42, save schema 27). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
+**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.43, save schema 28). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `1980106f70da7f` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `01df274c16f993` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-28 — Late game, part 4: new regions after year 5 (v0.1.43)
+
+Fourth and last late-game pick. Eight new cities open to AI labs at the end of year 5 (week 260): Boston, Austin, Los Angeles, Berlin, Dublin, Manchester, Osaka and Melbourne. Before then they are left off the departures board and the flight map. A news story announces the opening. The first sales office you build in one pays a one-off market-entry licence ($15M small city up to $120M for Los Angeles, rising with inflation), shown as its own line on the build sheet; an office bought from a rival comes with its licence. Each city has its own ink, map look and a new engraved landmark (clock tower, capitol dome, observatory domes, columned gate, plaza needle, mill chimneys, castle keep, glass cone). Save schema 28 (one optional field, no data moved). The scripted strategies skip closed cities; a steady lab now reaches 28 cities by year 10, so the balance band moves from 10–25 to 10–32. The determinism snapshot changed on purpose to `01df274c16f993`: world-news stories pick host cities from the longer list. Checked: lint, 1,100 tests, build, balance on all five strategies, and the landmarks at 390×844.
 
 ### 2026-10-28 — Late game, part 3: the board's capital review (v0.1.42)
 

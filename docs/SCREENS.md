@@ -133,7 +133,7 @@ After the wizard, the map opens with the tutorial (§27).
 - **Five tiles:** Exterior, Lobby, Sales desks, Machine room, Demo kiosks (slot ids `teller`, `vault`, `atm`). Each shows the current pick's thumbnail and price. Option names follow, e.g. Standard Sales Floor, Machine Room, Wall Kiosk (`src/app/build/builds.ts`).
 - **Tap a tile** to open a picker sheet: a carousel of options with name, one-line description, coins (Quality, Productivity, or Security for the machine room), extra facts (stations, "meeting rooms" for the lobby, "storage bays" for the machine room, kiosk traffic), price, and Select.
 - **Summary:**
-  - itemized parts, lease deposit and first week's rent
+  - itemized parts, lease deposit and first week's rent, plus a **Market-entry licence** row on the first office in a new region (SIMULATION §20a)
   - total vs available cash
   - cash after build, and the cash cover it leaves (weeks of running costs, `src/sim/cashCover.ts`); both turn red with a warning line when under `ATTENTION.cashCoverWeeks`, because a new office loses money for its first couple of months
   - **Build** button, then "Opening in 1 week" on the pin
@@ -502,7 +502,7 @@ Opened by tapping a business pin on the map (the **Businesses** layer, which als
 - **Header:** airport name; advisor.
 - **Hero:** terminal vignette.
 - **Stats:** flown this week and remaining mileage (weekly allowance).
-- **Departures board:** split-flap styled rows (airport code tiles, destination, country, distance in km or mi), nearest first, with a region filter (All / Americas / Europe / Asia-Pac). Rows mark "New" for places you haven't visited, "regional site", and whether you have a sales office there. Tap a row to fly: the plane follows a dotted great-circle arc across a world map (tap to skip; a still frame with reduced motion), then the destination map loads and a toast welcomes you. Rows beyond the remaining mileage stay tappable and show the one-way fare ("$104K ticket"); a confirm shows what personal cash pays and what the lab pays as a travel expense. Travel is never blocked.
+- **Departures board:** split-flap styled rows (airport code tiles, destination, country, distance in km or mi), nearest first, with a region filter (All / Americas / Europe / Asia-Pac). The new regions (SIMULATION §20a) are left off the board and the flight map until they open at week 260. Rows mark "New" for places you haven't visited, "regional site", and whether you have a sales office there. Tap a row to fly: the plane follows a dotted great-circle arc across a world map (tap to skip; a still frame with reduced motion), then the destination map loads and a toast welcomes you. Rows beyond the remaining mileage stay tappable and show the one-way fare ("$104K ticket"); a confirm shows what personal cash pays and what the lab pays as a travel expense. Travel is never blocked.
 - **Private jet card:** without a jet, both models (price, range, Buy with confirm). With one: value, weekly upkeep, Fly now (the board in jet mode: rows within range read "Jet") and Sell (shows resale, confirm).
 - **City pill** (bottom centre of the map, SCREENS §0.2): tap for the Travel sheet — where you are, this week's mileage, Go to the airport, and Fly now with a jet.
 

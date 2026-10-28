@@ -882,6 +882,15 @@ export const FRONTIER_PROJECTS = {
  * board asks where deployShare of it goes. A listed lab's sentiment moves by
  * the choice: banking it disappoints, paying it out or building pleases.
  */
+/**
+ * New regions (SIMULATION §20a): eight cities closed to flights until openWeek
+ * (the end of year 5). The first sales office in one pays a one-off
+ * market-entry licence by city size (home price list, P&L overhead).
+ */
+export const NEW_REGIONS = {
+  openWeek: 260,
+  licence: { S: 15_000_000, M: 30_000_000, L: 60_000_000, XL: 120_000_000 },
+} as const;
 export const BOARD_CAPITAL = {
   minSurplus: 250_000_000,
   reserveArrShare: 0.5,

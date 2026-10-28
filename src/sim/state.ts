@@ -58,7 +58,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState } from './personalTypes';
 
-export const SCHEMA_VERSION = 27;
+export const SCHEMA_VERSION = 28;
 
 export interface GameState {
   schemaVersion: number;
@@ -360,6 +360,8 @@ export interface CityState {
   marketRef: Record<string, number>;
   /** Storefronts added since the city was generated (city growth, CONTENT §3). */
   grownLots?: number;
+  /** A new region's market-entry licence is paid (SIMULATION §20a, schema 28). */
+  licensed?: boolean;
 }
 
 export interface Lot {

@@ -54,7 +54,7 @@ How the economy works, step by step. Every CAPS name is a key in `src/config/bal
 12. Treasury: reserve interest and any legacy funding (§13).
 13. Offer refreshes: funding offers (§13.6), then GPU offers (§13.0).
 14. HQ: floors, coverage and benefits (§16), then product developments (§16.6), the training run (§16.12), the AI model (§16.7) and the app rating (§16.9).
-15. Corporate items: brand marketing, corporate debt, executives, the talent market, HR manager hiring, manager poaching, governance, M&A, real estate, ventures, conventions, lobbying, depreciation (§14, §16–§21).
+15. Corporate items: brand marketing, corporate debt, executives, the talent market, HR manager hiring, manager poaching, governance, M&A, real estate, ventures, conventions, lobbying, depreciation, then the new regions opening (§14, §16–§21, §20a).
 16. Close the week: P&L, cash flow, balance sheet, tax and the weekly snapshot (§14).
 17. The safety ratio and regulator tier (`evaluateSafety`), then the pause and failure checks (§15). Runway (§15) is not stored: it is worked out from cash and the weekly closes whenever it is read.
 18. Personal: cash and salary, travel (reset the km allowance, jet upkeep), personal assets, auctions, sports franchises (§22).
@@ -1003,6 +1003,14 @@ A deliberately simple "country up or down" investment (DESIGN §5.12a). Your boo
   - **Housekeeping:** convention exclusives you never backed leave at year end; finished startups you didn't hold keep only the last 12; held ones stay.
 - **20.8 Conventions:** this year's and next year's runs are kept (`state.conventions.runs`), from the CONTENT §19 calendar. CONVENTIONS.announceWeeks (4) before opening a run is announced (Ledger story) and 3–6 exclusive startups appear with rounds open through the event; it is open for CONVENTIONS.activeWeeks (4), a month each way so a player reading monthly results never misses one. Its startups are visible and buyable only from that city's convention centre while it is open, and never enter the Investment floor pipeline. The convention centre's map pin shows only from announcement to close.
 
+## 20a. New regions
+
+Eight more cities (CONTENT §2, marked *late*) are closed to AI labs at the start: they don't appear on the departures board or the flight map, and `travelTo` refuses them. They open at `NEW_REGIONS.openWeek` (260, the end of year 5); that week a `REGIONS_OPENED` story names them.
+
+- **Market-entry licence:** the first sales office you build in a late city pays a one-off `NEW_REGIONS.licence[size]` (S $15M, M $30M, L $60M, XL $120M, at today's price list, `listPrice`), booked as overhead. It is added to the build quote and then marked on `CityState.licensed`, so it is never charged twice. An office bought from a rival comes with its licence (none is due while you have an office in the city).
+- **Why:** after year 5 a steady lab has offices in most cities and cash with little to buy. The new cities give it fresh ground to expand into, priced so each licence is a real decision rather than a formality.
+- **Balance:** a steady lab reaches about 28 cities by year 10, so the §25 band is 10–32 (was 10–25).
+
 ## 21. Real estate
 
 - **21.1 Listings** (per city, refreshed every 4 weeks):
@@ -1120,7 +1128,7 @@ Run `npm run balance` with seed 42 and the start city Calgary, unless noted. Off
 | Payback of a mid build on an average lot | ≤ 44 weeks from opening | branchCheckpoints |
 | Year 2 (steady) | 1–4 sales offices; HQ required; cash never < 0 | strategyTargets, balance |
 | IPO (steady) | listed in years 3–6 | balance |
-| Year 10 (steady) | offices in 10–25 cities; company ARR $0.5–5B (real) | strategyTargets |
+| Year 10 (steady) | offices in 10–32 cities (§20a); company ARR $0.5–5B (real) | strategyTargets |
 | Year 15 (steady) | weekly revenue $20–80M; founder net worth $2–40B | not checked (a design aim) |
 | ROE | 8–18% in Expansion | printed, not checked |
 | Turtle (no Enterprise contracts) | profitable by year 5, but < 40% of steady's year-5 equity | strategyTargets |

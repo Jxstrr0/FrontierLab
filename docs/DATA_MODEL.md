@@ -82,6 +82,7 @@ export interface CityState {
   id: Id; generated: boolean; brandAwareness: Pct; marketRef: Record<string /*productId*/, number>;
   layout?: 1 | 2;   // map layout version: 1 = the original shared grid (cities generated before schema 11), 2 = per-city looks (ART_DIRECTION §2.1); missing = 1
   grownLots?: number; // storefronts added since generation (city growth, CONTENT §3; v35)
+  licensed?: boolean; // a new region's market-entry licence is paid (SIMULATION §20a; schema 28)
 }
 export interface Lot {
   id: Id; cityId: Id; tile: { x: number; y: number }; district: DistrictId;
@@ -372,6 +373,8 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 **Frontier Lab schema 18 (stage C8a, data-centre and power deals):** `GameState.powerDeals: Record<Id, PowerDeal>` (types in `src/sim/competitionTypes.ts`): `siteId`, `startWeek`, `termWeeks`, `fee` (total paid) and `unamortized` (an intangible, as for partnerships), `gpus` (contracted this week), `price` (per GPU-week, fixed at signing), `health`, `lowHealthWeeks`, `status` active/runoff, `runoffWeeksLeft?`. Migration 17 → 18 adds an empty book. New events: `POWER_DEAL_SIGNED`, `POWER_DEAL_RENEWED`, `POWER_DEAL_ENDED`.
 
 **Frontier Lab schema 19 (stage C8f, seed money):** no shape change. The bank's locked charter capital is gone: a new game starts with `treasury.reserves = 0` and `company.paidInCapital = startCash` (`meta.startCash` is one of 1M / 1.5M / 2M / 2.5M). Migration 18 → 19 (`src/sim/save/migrateSeedMoney.ts`) moves treasury reserves into `company.cash` when the save has no deposits, wholesale lots, overnight or central bank window borrowing; both are assets, so equity is unchanged. A save that still carries bank-era funding keeps its reserves. `CorporateDebt` lender ids (`CorporateLoan.lenderId`, `CorporateLoanOffer.lenderId`, the keys of `lines`) are now investment bank site ids; saves from before may still hold rival lab ids, which keep accruing and can be repaid but not drawn, and offers from them are replaced on the next tick. `company.riskAppetite` is unchanged in shape and now holds the launch posture. The `deposits_1b` milestone id stays and now means a billion in ARR.
+
+**Frontier Lab schema 28 (new regions, SIMULATION §20a):** `CityState.licensed?: boolean`, set when the first sales office in a late city pays its market-entry licence. Optional, so migration 27 → 28 changes nothing.
 
 **Frontier Lab schema 27 (frontier projects, SIMULATION §16.14):** `GameState.projects = { active?: ActiveProject; done: string[] }` with `ActiveProject { id, startWeek, cost, weeks, weeksDone, spent, stalled? }` (`cost` and `weeks` grow on an overrun). Migration 26 → 27 adds `{ done: [] }`. New RNG stream: `projects`.
 
