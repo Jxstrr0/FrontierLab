@@ -128,6 +128,14 @@ export const SIGNATURE_HEIGHT_PX: Record<Signature, number> = {
   prismTower: 252,
   steppedSpire: 258,
   onionDomes: 140,
+  clockTower: 248,
+  capitolDome: 136,
+  observatoryDomes: 70,
+  columnGate: 102,
+  plazaNeedle: 252,
+  millChimneys: 170,
+  castleKeep: 162,
+  glassCone: 192,
   none: LANDMARK_MAX_PX,
 };
 /** Signature art may reach this many tiles past its block's sides (the bridge deck). */

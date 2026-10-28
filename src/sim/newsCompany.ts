@@ -200,6 +200,14 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
         },
       });
     }
+    case 'REGIONS_OPENED':
+      return business({
+        key: 'REGIONS_OPENED',
+        subject: 'regions',
+        icon: 'spark',
+        priority: P.company,
+        tokens: { names: str(p.names), count: String(num(p.count)) },
+      });
     case 'PROJECT_DONE':
     case 'PROJECT_OVERRUN':
       return business({

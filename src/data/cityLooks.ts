@@ -58,6 +58,14 @@ export type Signature =
   | 'prismTower' // an angular tower of stacked triangles
   | 'steppedSpire' // a stepped stone tower with low wings and a needle spire
   | 'onionDomes' // a church crowned with onion domes beside a bell tower
+  | 'clockTower' // a granite clock tower with a pyramid spire on a low hall
+  | 'capitolDome' // a two-winged state house with a tall drum dome
+  | 'observatoryDomes' // a hilltop observatory with three domes
+  | 'columnGate' // a columned gate with a chariot group on top
+  | 'plazaNeedle' // a very tall steel needle on a city square
+  | 'millChimneys' // red-brick mills with tall chimneys
+  | 'castleKeep' // a tiered castle keep on a stone base
+  | 'glassCone' // a glass cone over an old brick tower
   | 'none';
 
 export interface CityLook {
@@ -266,6 +274,70 @@ export const CITY_LOOKS: Record<string, CityLook> = {
     signature: 'none',
     tint: '#CDB38A',
     skyline: 1,
+  }),
+  bos: look({
+    water: 'harbour',
+    arrange: { turn: 1, mirror: false },
+    style: 'brick',
+    signature: 'clockTower',
+    tint: '#C9A28A',
+    skyline: 1.0,
+  }),
+  aus: look({
+    water: 'river',
+    arrange: { turn: 3, mirror: true },
+    style: 'glass',
+    signature: 'capitolDome',
+    tint: '#D2B48A',
+    skyline: 0.9,
+  }),
+  lax: look({
+    water: 'coast',
+    arrange: { turn: 2, mirror: false },
+    style: 'glass',
+    signature: 'observatoryDomes',
+    tint: '#D9B98A',
+    skyline: 0.95,
+  }),
+  ber: look({
+    water: 'river',
+    arrange: { turn: 1, mirror: true },
+    style: 'mansard',
+    signature: 'columnGate',
+    tint: '#A9B0B5',
+    skyline: 0.9,
+  }),
+  dub: look({
+    water: 'bay',
+    arrange: { turn: 0, mirror: true },
+    style: 'terrace',
+    signature: 'plazaNeedle',
+    tint: '#A9C2A0',
+    skyline: 0.8,
+  }),
+  man: look({
+    water: 'canals',
+    arrange: { turn: 3, mirror: false },
+    style: 'brick',
+    signature: 'millChimneys',
+    tint: '#C49A8C',
+    skyline: 0.85,
+  }),
+  osa: look({
+    water: 'bay',
+    arrange: { turn: 2, mirror: true },
+    style: 'dense',
+    signature: 'castleKeep',
+    tint: '#D1A3AE',
+    skyline: 1.05,
+  }),
+  mel: look({
+    water: 'bay',
+    arrange: { turn: 0, mirror: false },
+    style: 'colonial',
+    signature: 'glassCone',
+    tint: '#A8B2C9',
+    skyline: 1.0,
   }),
 };
 

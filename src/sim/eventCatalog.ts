@@ -50,6 +50,8 @@ export interface EventPayloads {
   PROJECT_DONE: { bank: string; projectId: string; name: string };
   PROJECT_OVERRUN: { bank: string; name: string; weeks: number };
   PROJECT_STALLED: { bank: string; name: string };
+  /** The new regions opened to flights (regions.ts, §20a). */
+  REGIONS_OPENED: { count: number; names: string };
   /** A training run finished: a new model generation (training.ts, C6b). */
   MODEL_TRAINED: { modelId: Id; name: string; stars: number; quality: number; leads: boolean };
   /** You hired a researcher; `from` names the rival lab they left (commands/talent.ts, C6c). */
