@@ -3,13 +3,24 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.47, save schema 30). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
+**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.48, save schema 30). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
 **Determinism snapshot:** `0ca1e708522f78` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-28 — COO sets floor pay; results dated like the calendar (v0.1.48)
+
+Two asks from the owner.
+
+- **The COO now sets department floor pay too.** With Pay reviews on, each review (quarterly or yearly, as you choose) moves every HQ department floor's salary to its market pay plus your pay premium, like it already did for executives and office managers. The Executive floor is skipped because its people are the executives, who get their own review. Each floor's Team card now says "Your COO reviews this pay once a quarter" (or once a year) under the salary. The COO's description, the pay premium note and the "next review" estimate now include floor staff. You can still change a floor's salary by hand; the next review resets it. The floor salary limits moved into `balance.ts` (DEPT_SALARY_STEP, DEPT_SALARY_RANGE) so the COO and the stepper share them.
+- **The calendar and the results report agree.** It wasn't the Next week button. The report dated each week by its last day (a Sunday), while the top bar, the Finance floor charts and the newspaper archive all use the day the week closes (the Monday). After a week closed, the calendar showed 18 Jan and the report said "ending 17 Jan". The report now reads "Week 2 · closed 18 Jan 2027", the same date as the calendar, and the newspaper and "Earlier this month" dates match. Which month or quarter a week belongs to hasn't changed.
+
+**Save and determinism.** No state change, so schema stays 30. The determinism snapshot is unchanged, and `npm run balance` (steady and aggressive, seed 42) prints exactly what main prints: the strategies don't hire a COO.
+
+**Checked.** `npm run lint`, 1,127 tests (a new pay review test covers the floors, the Executive floor being skipped and the estimate), `npm run build`. In Chromium at 390×844 I pressed Next week three times: each report's date matched the top bar.
 
 ### 2026-10-28 — C-suite deep dive: direction dials and the research hire (v0.1.47, schema 30)
 

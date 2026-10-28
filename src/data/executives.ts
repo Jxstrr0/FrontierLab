@@ -65,7 +65,7 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
         id: 'payReviews',
         label: 'Pay reviews',
         description:
-          'Sets every executive and office manager to market pay plus your pay premium, as often as you choose, so pay keeps rising with the market and rivals struggle to poach them.',
+          'Sets every executive, office manager and HQ department floor to market pay plus your pay premium, as often as you choose, so pay keeps rising with the market, morale holds and rivals struggle to poach your people.',
       },
       {
         id: 'guidance',
