@@ -88,14 +88,15 @@ export function branchCheckpoints(m: BranchMetrics): Check[] {
       {
         label: 'Week 52 customers',
         value: String(Math.round(w52.cust)),
-        ok: inRange(w52.cust, 3500, 9000),
-        target: '3,500–9,000',
+        // §25 (balance fix): a Team seat now earns a margin, so the office sells a little more.
+        ok: inRange(w52.cust, 3500, 9500),
+        target: '3,500–9,500',
       },
       {
         label: 'Week 52 income / week',
         value: K(w52.inc),
-        ok: inRange(w52.inc, 24e3, 60e3),
-        target: '$24–60k',
+        ok: inRange(w52.inc, 24e3, 65e3),
+        target: '$24–65k',
       },
     );
   }

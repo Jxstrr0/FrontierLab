@@ -171,7 +171,7 @@ export const PRODUCTS: Record<string, ProductSpec> = {
     ticket: 6,
     riskWeight: 0,
     churn: 0.08,
-    servicing: 6.0,
+    servicing: 2.5,
     rateChurnSens: 0.2,
     startStars: 2.5,
   },

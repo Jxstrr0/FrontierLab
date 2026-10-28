@@ -8,7 +8,14 @@ import { manageProjects } from './projects';
 import { manageTraining } from './training';
 import { maybeBuildDataCenter } from './dataCenter';
 import { forceRecession } from './stress';
-import { averageLot, bestLot, buildCost, followDefaults, openBranch } from './common';
+import {
+  averageLot,
+  bestLot,
+  buildCost,
+  followDefaults,
+  handleIncidents,
+  openBranch,
+} from './common';
 import { manageEquity, topUpRunway } from './equity';
 import { hqReady, manageHq } from './hq';
 import { cityFull, growableOffice, hasRoom, nextExpansionLot } from './expansion';
@@ -55,8 +62,9 @@ function expand(
 ): void {
   const { hq = true, travel = true, growRunway = minRunway, reserveWeeks = 0 } = opts;
   if (hq && !hqReady(state)) return;
-  // Cash kept back for running costs (aggressive keeps a few weeks, C5a).
-  const reserve = reserveWeeks * weeklyCosts(state);
+  // Cash kept back for running costs (aggressive keeps a few weeks, C5a) and
+  // the tax already owed, which is paid at the quarter's end.
+  const reserve = reserveWeeks * weeklyCosts(state) + state.company.taxPayable;
   if (growOffice(state, mult, growRunway, Infinity, reserve)) return;
   if (travel && cityFull(state) && !runwayClears(state, minRunway)) return;
   if (!travel && !hasRoom(state, state.world.currentCityId)) return;
@@ -112,6 +120,8 @@ export const turtle: Strategy = {
   name: 'turtle',
   setup: (s) => firstBranch(s, false, { ...DELEGATE_OPS, loans: false }),
   weekly: (s) => {
+    // One office can't afford half a year of plan cuts: a turtle holds its prices in a price war.
+    handleIncidents(s, { PRICE_WAR: 'hold' });
     followDefaults(s);
     manageHq(s);
     topUpRunway(s);
