@@ -2,7 +2,7 @@
 // ceiling, the COO's cash reserve and the CPO's product focus are settings the
 // routines read and the commands only accept the stops; the CPO's Models
 // reaches data vendors in any office city; Research talent hires from the open
-// market within the budget; migration 28 → 29 fills the defaults.
+// market within the budget; migration 29 → 30 fills the defaults.
 import { describe, expect, it } from 'vitest';
 import { EXEC_DELEGATION, RESEARCHERS } from '../../src/config/balance';
 import { BUREAU_PACKAGES } from '../../src/data/bureaus';
@@ -185,18 +185,18 @@ describe('CPO Research talent', () => {
   });
 });
 
-describe('migration 28 → 29', () => {
+describe('migration 29 → 30', () => {
   it('fills the new dials with the old fixed behaviour', () => {
     const s = execGame();
     const raw = s as unknown as { schemaVersion: number; executives: Record<string, unknown> };
     delete raw.executives.postureCeiling;
     delete raw.executives.expansionReserveWeeks;
     delete raw.executives.devFocus;
-    raw.schemaVersion = 28;
-    const out = migrations[28]!(raw as never) as unknown as GameState;
+    raw.schemaVersion = 29;
+    const out = migrations[29]!(raw as never) as unknown as GameState;
     expect(out.executives.postureCeiling).toBe(EXEC_DELEGATION.croMaxAppetite);
     expect(out.executives.expansionReserveWeeks).toBe(EXEC_DELEGATION.expansionReserveWeeks);
     expect(out.executives.devFocus).toBe('any');
-    expect(SCHEMA_VERSION).toBe(29);
+    expect(SCHEMA_VERSION).toBe(30);
   });
 });

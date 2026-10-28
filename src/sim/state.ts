@@ -58,7 +58,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState } from './personalTypes';
 
-export const SCHEMA_VERSION = 29;
+export const SCHEMA_VERSION = 30;
 
 export interface GameState {
   schemaVersion: number;
@@ -227,6 +227,10 @@ export interface AvatarSpec {
   brows: number;
   mouth: number;
   age: number;
+  /** Portrait rework (schema v29): strong or soft features, hair colour, outfit colour. */
+  look: number;
+  hairTone: number;
+  outfit: number;
 }
 
 // ─── World ────────────────────────────────────────────────────────────────────

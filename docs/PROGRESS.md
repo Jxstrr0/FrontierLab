@@ -3,15 +3,15 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.45, save schema 29). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
+**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.46, save schema 30). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `177f0e30c7c9c9` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `0ca1e708522f78` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
 
-### 2026-10-28 — C-suite deep dive: direction dials and the research hire (v0.1.45, schema 29)
+### 2026-10-28 — C-suite deep dive: direction dials and the research hire (v0.1.46, schema 30)
 
 The owner asked for a deep dive on the hired executives: do their tasks and sliders make sense for the AI game, and can you delegate while still steering? I read every seat's routine against the game as it stands.
 
@@ -27,11 +27,31 @@ The owner asked for a deep dive on the hired executives: do their tasks and slid
 
 **Left alone, on purpose.** The CFO's dividend payout (the board meeting is already your moment to set it). Data centers and power deals (you kept those manual on 2026-10-27). Lobbying and frontier projects (strategic calls with real downside, yours). Counter-offers for poached executives and researchers (your call, as decided before).
 
-**Save and determinism.** Schema 29 adds three executive fields with defaults that reproduce the old behaviour. The determinism snapshot moved to `177f0e30c7c9c9` only because the save carries the new fields and schema number; with those stripped it hashes to the old `031d3063aa4ddd`, so the simulation itself is unchanged.
+**Save and determinism.** Schema 30 (main took 29 for the portrait rework while this was in flight) adds three executive fields with defaults that reproduce the old behaviour. The determinism snapshot moved to `0ca1e708522f78` only because the save carries the new fields and schema number; before the merge with main it was verified to hash to the previous value once those were stripped, so the simulation itself is unchanged.
 
-**Checked.** `npm run lint`, 1,111 tests (new `tests/sim/directionDials.test.ts`: the dial commands, the ceiling, the reserve, the focus, the wider model search, the talent routine and migration 28 → 29), `npm run build`, and `npm run balance` on steady seed 42 (all checkpoints in range; the strategies hire no executives, so it could not move). The COO, CPO and CSO profiles were opened at 390×844 in Chromium from a prepared save: the three dials and the research note render with no console errors.
+**Checked.** `npm run lint`, 1,111 tests (new `tests/sim/directionDials.test.ts`: the dial commands, the ceiling, the reserve, the focus, the wider model search, the talent routine and migration 29 → 30), `npm run build`, and `npm run balance` on steady seed 42 (all checkpoints in range; the strategies hire no executives, so it could not move). The COO, CPO and CSO profiles were opened at 390×844 in Chromium from a prepared save: the three dials and the research note render with no console errors.
 
 **Next.** ROADMAP Stage 10 launch items, as before.
+### 2026-10-28 — Portrait rework (v0.1.45)
+
+The owner asked for better character models and a preview that stays visible while scrolling, and pointed out that some women had beards.
+
+- **Why women had beards:** a portrait had no idea of a person's features, so a randomly generated person could get a bob or a bun together with a full beard. Every portrait now has **Features: Strong or Soft**. Soft faces have a finer chin and brows, lashes and tinted lips. The generator never gives a soft face facial hair or a bald or buzzed head, and never gives a strong face a bob, pixie or braids. The founder can still combine anything they like.
+- **Better models:**
+  - The portrait is now a proper bust: a bigger head, a short neck and broad shoulders. Before, it was a small head on a long neck.
+  - Hair has a colour: black, dark brown, chestnut, auburn, copper, blonde or silver. Brows match the hair colour.
+  - Clothes have a colour: charcoal, navy, burgundy, forest, camel or stone.
+  - Long hair, locs and braids now fall over the shoulders.
+  - New hair styles: quiff, pixie and braids (15 in total).
+  - New outfits: hoodie, and blazer with a tee (6 in total).
+- **Picker:**
+  - The portrait stays pinned at the top while you scroll the options, in both the New Game wizard and Settings → Edit founder avatar.
+  - The options are in three groups: Face, Hair and Style.
+  - Skin, hair and outfit colours are rows of swatches.
+- **Saves:** schema 29. Old saves give everyone a look, hair colour and outfit colour. Generated people get them the same way new people do, and any soft-featured face loses its beard. Your founder keeps what you picked: a veteran gets silver hair, and everyone else gets dark brown.
+- **Gameplay unchanged:** balance output for seed 42 is byte-identical to main. The determinism snapshot changed on purpose to `0115c24f75d753`, because portraits are stored in the save.
+- **Bug fixed along the way:** the default founder portrait was shared between games, so editing it in one game could change the default for the next. Each game now gets its own copy.
+
 
 ### 2026-10-28 — Balance fix: turtle profits and the aggressive stall (v0.1.44)
 

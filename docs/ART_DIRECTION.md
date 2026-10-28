@@ -185,19 +185,22 @@ The title screen leads with the map, the game's boldest art ("Living skyline", d
 ## 4. Portraits
 
 - **Frame:** an oval vignette with a guilloche border, like a banknote portrait.
-- **Generator** (`src/art/portraits.ts`, with `portraitParts`, `portraitFace`, `portraitTrim` and `portraitAttire`), drawn in fine hatch lines from parts:
-  - head shapes 4, hair 12, facial hair 4, glasses 4 (none, round, square, half-rim)
+- **Generator** (`src/art/portraits.ts`, with `portraitParts`, `portraitHair`, `portraitFace`, `portraitTrim` and `portraitAttire`), drawn in fine hatch lines from parts (names and colours in `src/data/avatarParts.ts`):
+  - features 2 (strong, soft), head shapes 4, hair 15, hair colour 7, facial hair 4, glasses 4 (none, round, square, half-rim)
   - eyes 4 (almond, round, hooded, upturned), brows 3 (soft arch, straight, bold), mouth 3 (smile, composed, grin), age 3 (fresh, seasoned, veteran)
-  - attire: suit, blouse, sweater, turtleneck
+  - attire 6: suit, blouse, sweater, turtleneck, hoodie, blazer & tee; outfit colour 6
   - shading density 3
-- **Face detail (v0.10.18):** eyes are paper whites with an ink iris, a pupil and a catchlight, a heavier upper lid with a lash flick and a faint lower lid; brows are tapered strips of hair strokes; the nose has a bridge shadow on the shadow side, wings and nostrils; lips have a cupid's bow and a hatched lower lip with a chin shadow beneath. Age adds smile lines, crow's feet and forehead lines, and veterans get pouches, hollow cheeks, neck lines and silver hair (a fainter fill, wider hatching). Ears show an inner helix. Light comes from the upper left: the right cheek, jaw, temple, eye socket and shoulder carry the shade.
-- **Hair:** tinted fill, engraved hatching in the style's direction, and sparser strand lines over it; close crops are stippled.
-- **Attire detail:** the suit has a knotted tie with cross-hatching, a shaded right lapel, buttons, a pocket square and sleeve seams; the blouse has shoulder folds and a pendant; the sweater a cross-knit texture and a shirt collar under the crew band; the turtleneck fold lines and a band of shade under the collar.
+- **Proportions (v0.1.45):** a bust, like a banknote portrait. The head fills the upper oval (figure scale 1.42), the neck is short, and the shoulders run out past the frame.
+- **Features:** strong features keep a squarer jaw and heavier brows; soft features narrow the chin, draw finer brows, add a fan of lashes and tint the lips. A generated soft face never has facial hair, and its hair never comes out bald or buzzed; a strong face never gets a bob, pixie or braids. The founder can still combine anything.
+- **Face detail (v0.10.18):** eyes are paper whites with an ink iris, a pupil and a catchlight, a heavier upper lid with a lash flick and a faint lower lid; brows are tapered strips of hair strokes; the nose has a bridge shadow on the shadow side, wings and nostrils; lips have a cupid's bow and a hatched lower lip with a chin shadow beneath. Age adds smile lines, crow's feet and forehead lines, and veterans get pouches, hollow cheeks and neck lines (silver hair is a hair colour, which generated veterans usually have). Ears show an inner helix. Light comes from the upper left: the right cheek, jaw, temple, eye socket and shoulder carry the shade.
+- **Hair:** a fill in the hair colour, engraved hatching in the style's direction (wider on light hair), and sparser strand lines over it; close crops are stippled. Hair has three layers: behind the shoulders, over the shoulders but behind the face (long locks, braids, locs, a bob's sides), and over the skull. Brows take the hair colour.
+- **Outfit colour:** the attire is filled in a muted outfit colour under its hatching, like a hand-coloured print; ties stay paper.
+- **Attire detail:** the suit has a knotted tie with cross-hatching, a shaded right lapel, buttons, a pocket square and sleeve seams; the blouse has shoulder folds and a pendant; the sweater a cross-knit texture and a shirt collar under the crew band; the turtleneck fold lines and a band of shade under the collar; the hoodie a hood folded behind the neck, drawstrings and a centre seam; the blazer & tee the suit's lapels over a crew-neck tee.
 - **Background:** ruled horizontal lines behind the figure, denser in a band at the rim, so the plate fades toward the frame like a banknote vignette.
 - **Tiny plates (under 44 px):** the coarse plate keeps the whites, iris, pupil, lids, brows, nose, mouth and attire shapes and drops the catchlight, strands, age lines, seams, glints and the ruled ground, with heavier strokes.
 - **Skin tone:** a subtle ink-tinted fill under the hatching. Offer 6 tones; never render tone by line density alone.
-- **Diversity:** the name pools and portrait parts are diverse. Pick parts deterministically from `people` RNG plus the person id; eyes, brows, mouth and age hash from the other parts (`people.ts` faceDetail) so the stream stays as it was.
-- **Founder avatar:** the player chooses the parts in the wizard, in two groups (Face: head, eyes, brows, mouth, age, skin tone; Style: hair, facial hair, glasses, attire), with a Shuffle button for a random face.
+- **Diversity:** the name pools and portrait parts are diverse. Pick parts deterministically from `people` RNG plus the person id; eyes, brows, mouth and age hash from the other parts (`people.ts` faceDetail), and features, hair colour and outfit colour likewise (`styleDetail`, then `fitLook`), so the stream stays as it was. Deeper skin tones lean to darker hair.
+- **Founder avatar:** the player chooses the parts in the wizard, in three groups (Face: features, head, eyes, brows, mouth, age, skin tone; Hair: style, colour, facial hair; Style: glasses, attire, outfit colour), with a Shuffle button for a random face. The portrait stays pinned at the top while the parts scroll beneath it.
 
 ## 5. Data visuals
 

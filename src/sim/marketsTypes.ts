@@ -79,11 +79,11 @@ export interface ExecutivesState {
   computeCover: number;
   /** How the CPO's Routine training runs trade quality for quantity (schema v26). */
   trainingStyle: TrainingStyle;
-  /** The posture the CSO's Launch posture may step up to (schema 29), one of EXEC_DELEGATION.croCeilings. */
+  /** The posture the CSO's Launch posture may step up to (schema 30), one of EXEC_DELEGATION.croCeilings. */
   postureCeiling: number;
-  /** Weeks of costs the COO's Expansion keeps in cash (schema 29), one of EXEC_DELEGATION.expansionReserves. */
+  /** Weeks of costs the COO's Expansion keeps in cash (schema 30), one of EXEC_DELEGATION.expansionReserves. */
   expansionReserveWeeks: number;
-  /** Which products the CPO's Developments builds first (schema 29): a category, or any. */
+  /** Which products the CPO's Developments builds first (schema 30): a category, or any. */
   devFocus: DevFocus;
   /** Occupancy the CFO's Rents price for, per owner (schema v30, the CFO's since schema 22), each one of EXEC_DELEGATION.occTargets. */
   occTargets: { company: number; personal: number };
