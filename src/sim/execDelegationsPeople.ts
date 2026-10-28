@@ -7,7 +7,9 @@
 //   COO  hrDivision  sets every HQ team's target to cover its requirement
 //   CMO  brand       starts or stops city brand campaigns to hold awareness near
 //                    the target you dial (executives.brandTarget) within 3% of revenue
-//   CRO  appetite    every few weeks, one appetite step toward CR ≥ 12% and losses ≤ 1.2%
+//   CSO  appetite    every few weeks, one launch posture step: down while the safety
+//                    tier is weak, up while Strong, no higher than the posture
+//                    ceiling you dial (executives.postureCeiling)
 // The CRO's Loan Desk policy runs inside the Loan Desk (branch/loanDesk.ts).
 import { DEPT_DEFAULT_EFF, EXEC_DELEGATION as X, WEEKS_PER_YEAR } from '../config/balance';
 import { BENEFITS } from '../data/benefits';
@@ -203,13 +205,42 @@ export function cmoBrand(state: GameState): void {
 
 // ─── CRO ──────────────────────────────────────────────────────────────────────
 
-/** Launch posture (C8f): one step down while the safety tier is weak, up while it is Strong. */
-export function croAppetite(state: GameState): void {
-  if (state.clock.week % X.croEveryWeeks !== 0) return;
+export interface PosturePlan {
+  level: number;
+  ceiling: number;
+  tier: GameState['company']['tier'];
+  /** The step the CSO's next check would take. */
+  next: 'up' | 'down' | 'hold';
+  /** Weeks until that check (croEveryWeeks when it ran this week). */
+  weeksTo: number;
+}
+
+/** The CSO's next posture step under `ceiling`, for the dial's tagline. Changes nothing. */
+export function posturePlan(state: GameState, ceiling: number): PosturePlan {
   const tier = state.company.tier;
   const level = state.company.riskAppetite;
-  if (CSO_STEP_DOWN.has(tier) && level > 1) setRiskAppetite(state, level - 1);
-  else if (tier === 'strong' && level < X.croMaxAppetite) setRiskAppetite(state, level + 1);
+  const next =
+    CSO_STEP_DOWN.has(tier) && level > 1
+      ? 'down'
+      : tier === 'strong' && level < ceiling
+        ? 'up'
+        : 'hold';
+  const rem = state.clock.week % X.croEveryWeeks;
+  return {
+    level,
+    ceiling,
+    tier,
+    next,
+    weeksTo: rem === 0 ? X.croEveryWeeks : X.croEveryWeeks - rem,
+  };
+}
+
+/** Launch posture (C8f): one step down while the safety tier is weak, up while it is Strong, up to the dialled ceiling. */
+export function croAppetite(state: GameState): void {
+  if (state.clock.week % X.croEveryWeeks !== 0) return;
+  const { level, next } = posturePlan(state, state.executives.postureCeiling);
+  if (next === 'down') setRiskAppetite(state, level - 1);
+  else if (next === 'up') setRiskAppetite(state, level + 1);
 }
 
 const CSO_STEP_DOWN = new Set(['watch', 'restricted', 'critical']);

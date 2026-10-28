@@ -43,7 +43,7 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
         id: 'expansion',
         label: 'Expansion',
         description:
-          'Opens a sales office every 4 weeks in a growth city with room to grow: the busiest free storefront, your usual fit-out, while 8 weeks of costs stay in cash.',
+          'Every 4 weeks opens a sales office in a growth city with room, or grows a busy one a size: the busiest free storefront, your usual fit-out, while the cash reserve you dial stays in hand.',
       },
       {
         id: 'troubles',
@@ -156,19 +156,26 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
       {
         id: 'developments',
         label: 'Developments',
-        description: 'Starts a new product when none is running, within 1% of revenue.',
+        description:
+          'Develops the next product when none is under way, within 1% of revenue, starting with the category you dial.',
       },
       {
         id: 'models',
         label: 'Models',
         description:
-          'Switches to the model that gives the most quality for its licence cost: a local data-vendor package, or a model you have trained.',
+          'Switches to the model that gives the most quality for its licence cost: a data-vendor package in any city with one of your offices, or a model you have trained.',
       },
       {
         id: 'training',
         label: 'Routine training runs',
         description:
-          'Starts a 12-week training run on the weakest of the model’s five scores whenever none is under way, spending about 1% of cash a week (up to $150k) while 40 weeks of that stays in cash. Models decides when to switch to the result.',
+          'Trains the weakest of the model’s five scores whenever no run is under way, as long and as well funded as the style you dial, while 40 weeks of the budget stays in cash. Models decides when to switch to the result.',
+      },
+      {
+        id: 'talent',
+        label: 'Research talent',
+        description:
+          'Every 4 weeks hires the best researcher on the open market while researcher pay stays within 3% of revenue. Never poaches from a rival: those bids, and counter-offers for your own people, stay with you.',
       },
       {
         id: 'guidance',
@@ -227,7 +234,7 @@ export const EXEC_SEATS: Record<ExecSeat, ExecSeatSpec> = {
         id: 'appetite',
         label: 'Launch posture',
         description:
-          'Steps the launch posture down while the safety tier is Watch or worse, and back up while it is Strong.',
+          'Steps the launch posture down while the safety tier is Watch or worse, and back up while it is Strong, never above the ceiling you dial.',
       },
       {
         id: 'loanPolicy',
