@@ -15,13 +15,61 @@ import { managerBaseSalary } from './payReviews';
 import type { AvatarSpec, GameState, Manager } from './state';
 
 /** Portrait part counts (ART_DIRECTION §4). */
-const PORTRAIT_PARTS = { head: 4, hair: 12, facial: 4, glasses: 4, attire: 4, tone: 6, shade: 3 };
+const PORTRAIT_PARTS = { head: 4, hair: 15, facial: 4, glasses: 4, attire: 6, tone: 6, shade: 3 };
+/** Hair colours and outfit colours (CONTENT avatar parts). */
+const STYLE_DETAIL = { hairTones: 7, outfits: 6, silver: 6 };
+/** Strong (0) or soft (1) features: a soft face never has facial hair. */
+export const SOFT_LOOK = 1;
+/** Hair styles that swap on a face of the other look (CONTENT avatar parts). */
+const SOFT_HAIR_SWAP: Record<number, number> = { 2: 13, 3: 6 };
+const STRONG_HAIR_SWAP: Record<number, number> = { 6: 0, 13: 12, 14: 11 };
 const FACE_DETAIL = { eyes: 4, brows: 3, mouth: 3 };
 /** Age by weight: fresh and seasoned faces are common, veterans rarer. */
 const AGE_WEIGHTS = [0, 0, 1, 1, 2];
 
 /** The parts a v22 save already had; eyes, brows, mouth and age derive from them. */
-export type BaseAvatar = Omit<AvatarSpec, 'eyes' | 'brows' | 'mouth' | 'age'>;
+export type BaseAvatar = Omit<
+  AvatarSpec,
+  'eyes' | 'brows' | 'mouth' | 'age' | 'look' | 'hairTone' | 'outfit'
+>;
+
+function hashParts(values: readonly number[], salt: number): number {
+  let h = 0x811c9dc5 ^ salt;
+  for (const v of values) h = Math.imul(h ^ (v + 1), 0x01000193) >>> 0;
+  return Math.imul(h ^ (h >>> 13), 0x5bd1e995) >>> 0;
+}
+
+/**
+ * Look, hair colour and outfit colour for a generated face, hashed from its
+ * other parts like faceDetail (so no people-RNG draws change). Older hair
+ * turns silver; deeper skin tones lean to darker hair. Save migration v28 → v29
+ * uses the same rule for everyone but the founder.
+ */
+export function styleDetail(
+  a: BaseAvatar,
+  age: number,
+): Pick<AvatarSpec, 'look' | 'hairTone' | 'outfit'> {
+  const h = hashParts([a.head, a.hair, a.facial, a.glasses, a.attire, a.tone, a.shade], 0x2f);
+  const silver = age === 2 ? (h >>> 3) % 4 !== 0 : age === 1 && (h >>> 3) % 5 === 0;
+  // Light skin tones draw from every colour but silver; deeper ones from the darker three.
+  const palette = a.tone >= 3 ? 3 : STYLE_DETAIL.hairTones - 1;
+  return {
+    look: h % 2,
+    hairTone: silver ? STYLE_DETAIL.silver : (h >>> 6) % palette,
+    outfit: (h >>> 10) % STYLE_DETAIL.outfits,
+  };
+}
+
+/** Makes a generated face consistent with its look: soft faces lose facial hair, hair swaps. */
+export function fitLook(a: AvatarSpec): AvatarSpec {
+  if (a.look === SOFT_LOOK) {
+    a.facial = 0;
+    a.hair = SOFT_HAIR_SWAP[a.hair] ?? a.hair;
+  } else {
+    a.hair = STRONG_HAIR_SWAP[a.hair] ?? a.hair;
+  }
+  return a;
+}
 
 /**
  * Eyes, brows, mouth and age for a face, hashed from its other parts so the
@@ -53,7 +101,8 @@ export function randomAvatar(rng: Rng): AvatarSpec {
     tone: rng.int(0, PORTRAIT_PARTS.tone - 1),
     shade: rng.int(0, PORTRAIT_PARTS.shade - 1),
   };
-  return { ...base, ...faceDetail(base) };
+  const face = faceDetail(base);
+  return fitLook({ ...base, ...face, ...styleDetail(base, face.age) });
 }
 
 export function personName(rng: Rng): string {

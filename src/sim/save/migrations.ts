@@ -22,6 +22,7 @@ import { migrateRivalBooks } from './migrateRivalBooks';
 import { SCHEMA_VERSION, type GameState } from '../state';
 import { migrateSeedMoney } from './migrateSeedMoney';
 import { migrateSeats } from './migrateSeats';
+import { migrateAvatars } from './migrateAvatars';
 import { generatePersonalSites } from '../personalSites';
 import { generateLandmarkTower } from '../landmarkTowers';
 
@@ -192,6 +193,11 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
   },
   // Schema 28 (new regions): CityState.licensed is optional; no city has paid yet.
   27: (s) => s,
+  // 28 → 29 (portrait rework): looks, hair colours and outfit colours.
+  28: (s) => {
+    migrateAvatars(s as unknown as GameState);
+    return s;
+  },
 };
 
 /** Upgrades a raw save to the current schema, or throws if it can't. */
