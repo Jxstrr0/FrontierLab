@@ -18,6 +18,7 @@ import { BUREAU_PACKAGES, DATA_INPUTS } from '../data/bureaus';
 import type { Pentagon } from '../data/types';
 import { shortfall } from './hq';
 import { digitalBonus } from './products';
+import { modelCeiling } from './projects';
 import { frontierRise } from './rivalModels';
 import type { Business, GameState, UnderwritingModel } from './state';
 
@@ -153,7 +154,9 @@ export function previewModel(
 export function trainedRadar(state: GameState, m: UnderwritingModel): Pentagon {
   const base = customFigures(state, m.mix, 'custom').radar;
   const lift = m.lift ?? [0, 0, 0, 0, 0];
-  return base.map((v, i) => Math.min(MODEL_RADAR_MAX, v + lift[i]!)) as Pentagon;
+  // The ceiling rises with finished breakthroughs (§16.14).
+  const ceiling = modelCeiling(state);
+  return base.map((v, i) => Math.min(ceiling, v + lift[i]!)) as Pentagon;
 }
 
 /** Weekly: custom and trained models track the Products team and Customer Feedback; a switch counts down. */

@@ -3,8 +3,9 @@
 // budgets count for less past FRONTIER_COST.fromQuality, and researchers ask
 // more as the best model anywhere climbs. Read by training runs, the CPO's
 // routine, the training card and the talent market.
-import { FRONTIER_COST, MODEL_RADAR_MAX } from '../config/balance';
+import { FRONTIER_COST } from '../config/balance';
 import { dpow } from './detmath';
+import { modelCeiling } from './projects';
 import { bestRivalModel } from './rivalModels';
 import type { GameState } from './state';
 import { activeModel, modelQuality } from './underwriting';
@@ -25,5 +26,6 @@ export function frontierPoints(state: GameState): number {
 
 /** The house model has every axis at the radar's ceiling: training can't lift it further. */
 export function atModelCeiling(state: GameState): boolean {
-  return activeModel(state).radar.every((v) => v >= MODEL_RADAR_MAX);
+  const ceiling = modelCeiling(state);
+  return activeModel(state).radar.every((v) => v >= ceiling);
 }

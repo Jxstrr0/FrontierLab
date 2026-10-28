@@ -60,6 +60,7 @@ import { renewalSeason, runContracts } from './contracts';
 import { runTreasury } from './treasury';
 import { updateModels } from './underwriting';
 import { runTraining } from './training';
+import { runProjects } from './projects';
 import { rivalModelsQuarter } from './rivalModels';
 import { runTalent, talentQuarter } from './talent';
 import { productSpec } from './products';
@@ -118,6 +119,7 @@ export function weeklyTick(state: GameState): void {
   runHq(state); // 7
   runDevelopments(state);
   runTraining(state); // 7 (training runs, C6b)
+  runProjects(state); // 7 (frontier projects, §16.14)
   updateModels(state);
   updateAppRating(state);
   runBrandMarketing(state); // 8 (brand marketing)

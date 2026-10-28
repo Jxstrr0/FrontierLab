@@ -3,9 +3,10 @@
 // rival model is the frontier, and how far it has risen since the game began
 // raises the bar your own model is judged against (price headroom, the Model
 // rating, contract chances). The benchmark leaderboard ranks every lab.
-import { MODEL_RADAR_MAX, RIVAL_MODEL } from '../config/balance';
+import { RIVAL_MODEL } from '../config/balance';
 import { MODEL_FAMILIES, RIVAL_START_GENERATION } from '../data/modelNames';
 import { pushEvent } from './events';
+import { modelCeiling } from './projects';
 import { stream, type Rng } from './rng';
 import { rivalResearchGain } from './talent';
 import type { GameState, RivalBank } from './state';
@@ -80,7 +81,8 @@ export function rivalModelsQuarter(state: GameState): void {
     const m = r.model;
     m.generation += 1;
     m.name = `${m.name.replace(/ \d+$/, '')} ${m.generation}`;
-    m.quality = Math.min(MODEL_RADAR_MAX, m.quality + gain);
+    // Your breakthroughs (§16.14) raise every lab's ceiling: the ideas spread.
+    m.quality = Math.min(modelCeiling(state), m.quality + gain);
     m.releasedWeek = state.clock.week;
     pushEvent(
       state,

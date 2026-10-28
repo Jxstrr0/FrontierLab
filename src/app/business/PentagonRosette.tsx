@@ -23,6 +23,8 @@ export function PentagonRosette(p: {
   format?: (v: number) => string;
   /** 'compact' for the smaller rosette on Deal Desk cards. */
   size?: 'full' | 'compact';
+  /** The score at the outer ring (default 10). */
+  max?: number;
 }) {
   return (
     <RadarRosette
@@ -31,6 +33,7 @@ export function PentagonRosette(p: {
       label={p.label ?? 'Business profile'}
       format={p.format}
       size={p.size}
+      max={p.max}
     />
   );
 }

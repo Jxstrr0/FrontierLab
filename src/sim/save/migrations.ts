@@ -185,6 +185,11 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     (s as unknown as GameState).executives.trainingStyle ??= CPO_TRAINING.defaultStyle;
     return s;
   },
+  // 26 → 27: frontier projects, none under way or finished.
+  26: (s) => {
+    (s as unknown as GameState).projects ??= { done: [] };
+    return s;
+  },
 };
 
 /** Upgrades a raw save to the current schema, or throws if it can't. */

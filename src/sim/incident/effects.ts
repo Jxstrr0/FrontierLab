@@ -9,7 +9,8 @@
 //   planCut       'company' or a city id: plan prices × (1 − value)
 //   pulled        branch id; target a product id: not sold and earning nothing (DEEPFAKE)
 //   gpuDerate     data center id: share of its GPUs out of action (DC_FIRE)
-import { BANK_RUN } from '../../config/balance';
+import { BANK_RUN, FRONTIER_PROJECTS } from '../../config/balance';
+import { hasInstitute } from '../projects';
 import type { RatingCategory } from '../../data/types';
 import type { Branch, GameState, TimedEffect } from '../state';
 
@@ -78,7 +79,10 @@ export function takeupMult(state: GameState, baseProductId: string): number {
 
 /** Probability multiplier for an incident type at a scope (firmware, forensic firm). */
 export function incidentPMult(state: GameState, type: string, scope: string): number {
-  return productOf(active(state, 'incidentP', [scope, 'company'], type));
+  // The Safety Institute (§16.14) makes company-wide cases rarer.
+  const institute =
+    scope === 'company' && hasInstitute(state) ? FRONTIER_PROJECTS.instituteIncidentMult : 1;
+  return productOf(active(state, 'incidentP', [scope, 'company'], type)) * institute;
 }
 
 /** Risk coverage′ bonus from hired consultants (REGULATOR_AUDIT). */

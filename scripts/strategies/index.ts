@@ -4,6 +4,7 @@
 // data center once rich (dataCenter.ts, C2c), and reserve GPU lots once spot
 // runs short (compute.ts, C4c), and train new models (training.ts, C6b).
 import { manageCompute } from './compute';
+import { manageProjects } from './projects';
 import { manageTraining } from './training';
 import { maybeBuildDataCenter } from './dataCenter';
 import { forceRecession } from './stress';
@@ -103,6 +104,7 @@ export const steady: Strategy = {
     maybeBuildDataCenter(s, 4);
     manageCompute(s);
     manageTraining(s, STEADY_TRAINING_SHARE);
+    manageProjects(s);
   },
 };
 
@@ -150,6 +152,7 @@ export const aggressive: Strategy = {
     maybeBuildDataCenter(s, 3);
     manageCompute(s);
     manageTraining(s, AGGRESSIVE_TRAINING_SHARE);
+    manageProjects(s);
   },
 };
 

@@ -53,6 +53,8 @@ export type PanelRoute =
   // Menu screens added by the audit fixes (SCREENS §0.3).
   | { type: 'portfolio' }
   | { type: 'milestones' }
+  // Late game (§16.14): the frontier projects list.
+  | { type: 'projects' }
   // Stage 10: the credits, opened from Settings in game (from the title it is a screen).
   | { type: 'credits' };
 

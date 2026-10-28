@@ -58,7 +58,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState } from './personalTypes';
 
-export const SCHEMA_VERSION = 26;
+export const SCHEMA_VERSION = 27;
 
 export interface GameState {
   schemaVersion: number;
@@ -87,6 +87,8 @@ export interface GameState {
   training: TrainingState;
   /** Named researchers and who employs them: the talent war (stage C6c, schema 16). */
   talent: TalentState;
+  /** Frontier projects: the one under way and those finished (post-C8, schema 27). */
+  projects: ProjectsState;
   treasury: Treasury;
   /** Open RFPs on the Deal Desk (stage C5b; schema 13). Contracts live on the businesses. */
   dealDesk: { rfps: Record<Id, Rfp> };
@@ -874,6 +876,25 @@ export interface Researcher {
   employer?: { type: 'player' } | { type: 'rival'; id: Id };
   /** Week they joined their current lab. */
   joinedWeek?: Week;
+}
+
+/** A frontier project under way (CONTENT §7d). Cost and weeks grow on an overrun. */
+export interface ActiveProject {
+  id: string;
+  startWeek: Week;
+  /** Total cost at the price list when started, plus overruns. */
+  cost: number;
+  weeks: number;
+  weeksDone: number;
+  spent: number;
+  /** Cash couldn't cover last week's payment; cleared when it resumes. */
+  stalled?: boolean;
+}
+
+export interface ProjectsState {
+  active?: ActiveProject;
+  /** Ids of finished projects, in the order they finished. */
+  done: string[];
 }
 
 export interface TalentState {

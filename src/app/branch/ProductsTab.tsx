@@ -10,6 +10,7 @@ import type { CategoryId } from '../../data/types';
 import * as cmd from '../../sim/commands';
 import { theCountryName } from '../../sim/newsStory';
 import { allProducts } from '../../sim/products';
+import { modelCeiling } from '../../sim/projects';
 import { activeModel } from '../../sim/underwriting';
 import type { Branch, GameState } from '../../sim/state';
 import { Card, Segmented, Toggle } from '../components';
@@ -38,7 +39,7 @@ export function ProductsTab(p: { branch: Branch; onDealDesk: () => void }) {
             {model.costPerCustomer.toFixed(2)} per customer a year
           </div>
         </div>
-        <ModelRosette radar={model.radar} label="AI model" />
+        <ModelRosette radar={model.radar} label="AI model" max={modelCeiling(s)} />
         {hasProductsFloor ? (
           <button
             type="button"
