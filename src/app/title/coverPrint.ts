@@ -154,7 +154,13 @@ export async function printCover(
           },
         );
   const camera = coverCamera(worldSize(map.tiles), strip, COVER_ZOOM, focus);
-  const view = { width: strip.width, height: strip.height, devicePixelRatio: ratio };
+  // A still strip: paint only what it shows, nothing around it to pan or zoom to.
+  const view = {
+    width: strip.width,
+    height: strip.height,
+    devicePixelRatio: ratio,
+    prefetch: false,
+  };
 
   const renderer = createMapRenderer(map, {
     ink: city.ink,
@@ -163,7 +169,18 @@ export async function printCover(
   });
   try {
     renderer.setOccupants(occupants);
-    for (let frame = 0; renderer.render(ctx, camera, view) && frame < COVER_MAX_FRAMES; frame++) {
+    // Paint the chunks against a 1 × 1 scratch canvas, so a frame costs only its
+    // chunk work and not a full repaint of the big strip; then print the strip
+    // once from the finished chunks.
+    const tiny = document.createElement('canvas');
+    tiny.width = 1;
+    tiny.height = 1;
+    const scratch = tiny.getContext('2d') ?? ctx;
+    for (
+      let frame = 0;
+      renderer.render(scratch, camera, view) && frame < COVER_MAX_FRAMES;
+      frame++
+    ) {
       await nextFrame();
       if (cancelled()) {
         canvas.width = 0;
@@ -171,6 +188,7 @@ export async function printCover(
         return null;
       }
     }
+    renderer.render(ctx, camera, view);
   } finally {
     renderer.dispose();
   }
