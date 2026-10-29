@@ -232,13 +232,15 @@ export const createMapRenderer: CreateMapRenderer = (map, style) => {
       const tasks: Task[] = visible
         .filter(({ i, j }) => needsWork(grid, i, j))
         .map((c) => ({ grid, ...c }));
-      const ring = rangeByDistance(growRange(grid, range, PREFETCH_RING));
-      for (const c of ring) if (needsWork(grid, c.i, c.j)) tasks.push({ grid, ...c });
-      const lower = [...grids.values()].filter((g) => g.stop < stop).pop();
-      const lowerRange = lower && chunksInRect(lower, view0);
-      if (lower && lowerRange) {
-        for (const c of rangeByDistance(lowerRange))
-          if (needsWork(lower, c.i, c.j)) tasks.push({ grid: lower, ...c });
+      if (view.prefetch !== false) {
+        const ring = rangeByDistance(growRange(grid, range, PREFETCH_RING));
+        for (const c of ring) if (needsWork(grid, c.i, c.j)) tasks.push({ grid, ...c });
+        const lower = [...grids.values()].filter((g) => g.stop < stop).pop();
+        const lowerRange = lower && chunksInRect(lower, view0);
+        if (lower && lowerRange) {
+          for (const c of rangeByDistance(lowerRange))
+            if (needsWork(lower, c.i, c.j)) tasks.push({ grid: lower, ...c });
+        }
       }
       const seen = new Set<string>();
       let pending = 0;

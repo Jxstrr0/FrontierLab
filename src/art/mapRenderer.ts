@@ -46,6 +46,8 @@ export interface Viewport {
   width: number;
   height: number;
   devicePixelRatio: number;
+  /** Also paint chunks around the view and one zoom stop down (default true); a still picture skips them. */
+  prefetch?: boolean;
 }
 
 export interface MapRenderer {

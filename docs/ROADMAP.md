@@ -200,6 +200,8 @@ Eleven stages. Each one ends playable and deployed. A stage usually takes severa
 - Credits screen
 - In a separate session in the hub repo, add a Frontier Lab card to Kelbo.Website
 
+**Launch re-check (Frontier Lab v0.1.52, 2026-10-29):** Lighthouse mobile 93 performance on the release build (the live site read 67 before the title-cover fix), 95 accessibility, 96 best practices, 100 SEO. 20-seed sweeps: stress 18/20, aggressive 17/20, turtle 20/20, steady median passes every band. The tutorial is unchanged since its 5–8 minute timing. Only the hub card remains, in its own session.
+
 **Accept:**
 - Lighthouse mobile ≥ 90.
 - A new player finishes the tutorial in under 10 minutes.
