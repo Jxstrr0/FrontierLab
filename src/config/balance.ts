@@ -733,7 +733,7 @@ export const DEPT_REQUIREMENTS = {
   hr: { base: 1, perEmployee: 1 / 80 },
   products: { base: 2, perBranch: 0.2, perDevelopment: 2 },
   /** Compute floor: +1 per perGpu⁻¹ GPUs of weekly demand (polish pass; was legacy bank funding). */
-  treasury: { base: 1, perGpu: 1 / 2_000 },
+  treasury: { base: 1, perGpu: 1 / 15_000 },
   marketing: { base: 1, perBranch: 0.15, perCampaign: 2 },
   it: { base: 2, perBranch: 0.25, perAssets: 1 / 5e9 },
   risk: { base: 2, perBranch: 0.15, perArr: 1 / 50e6 },

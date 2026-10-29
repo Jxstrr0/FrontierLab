@@ -3,13 +3,31 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** C8 done: the bank-to-AI conversion is complete (v0.1.51, save schema 31). C8a–C8d added power deals, the new tutorial, the art pass and the balance pass; C8e rewrote the docs in AI terms; C8f reworked the last bank leftovers. Next: ROADMAP Stage 10 launch items (the hub card happens in its own session).
+**Current stage:** launch-ready (v0.1.52, save schema 31). The bank-to-AI conversion (C0–C8) is complete, and the Stage 10 launch checks pass again after the polish pass. Next: the Kelbo.Website hub card, in its own session in that repo.
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `18d23d581bed69` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `0ecc3d788a8928` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-29 — Stage 10 launch re-check (v0.1.52)
+
+The launch checks were last measured at v0.1.24, before the polish pass. Running them again on v0.1.51 found two problems; both are fixed. No save change.
+
+**Speed: the title screen was slow on phones.** Lighthouse mobile scored 67 for performance on the live site (target 90). The city picture at the top of the title screen is drawn in small pieces over several frames. Every frame also repainted the whole 4-megapixel picture, which on a slow phone kept the page busy for 4–5 seconds and, under phone-speed testing, took about a minute to finish. The pieces are now prepared out of sight and the picture is painted once at the end. It looks the same, appears sooner, and the release build now scores **93** (total blocking time 90 ms, down from 4–5 s).
+
+**Balance: big labs couldn't staff their Safety floor.** The polish pass made the Compute floor grow with your GPUs: one more person per 2,000. By year 10 that was about 155 people. You can run only two main offices, so the Compute floor took the desks the Safety floor needed, and in the recession test the steady lab slid to a Critical safety rating. The Compute floor now needs one more person per 15,000 GPUs (about 20 at year 10). The balance script's lab also leases the roomiest building it can afford when it outgrows its first one, instead of the cheapest.
+
+**Launch checks now.**
+- Lighthouse mobile: performance 93, accessibility 95, best practices 96, SEO 100.
+- Balance, 20 seeds each over 10 years: stress 18/20, aggressive 17/20, turtle 20/20, and the steady median passes every band. That's the same picture the launch balance pass accepted.
+- The tutorial hasn't changed since it was timed at 5–8 minutes.
+- No known blocking bugs.
+
+**Left for launch:** the Frontier Lab card on Kelbo.Website, done in its own session in that repo.
+
+**Checked:** lint, 1,150 tests, type-check and build all pass. The title cover was checked at 390×844 with no console errors. The determinism snapshot moved to `0ecc3d788a8928` (intended: the Compute floor change alters the scripted run).
 
 ### 2026-10-28 — Polish and bug pass, batch 3: screens and wording (v0.1.51)
 
