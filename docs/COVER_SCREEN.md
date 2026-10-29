@@ -88,7 +88,7 @@ Don't run a live pannable map on the title screen. Instead:
 
 1. Create the renderer once for the chosen city.
 2. Render **one wide strip** into an offscreen canvas: panel height × (panel width + 2 × pan distance), at `devicePixelRatio`, at a fixed zoom (start at **0.75** and tune between 0.5 and 1). Centre the camera on `map.geo.focus` (the financial district), nudged so the signature landmark is in frame if it's close (`map.landmarks.find(l => l.id === 'signature')`).
-3. `render()` returns `true` while chunks are still painting. Keep calling it on `requestAnimationFrame` until it returns `false`, then **`dispose()` the renderer** to free the chunk cache.
+3. `render()` returns `true` while chunks are still painting. Keep calling it on `requestAnimationFrame` until it returns `false`, against a 1 × 1 scratch canvas and with `prefetch: false` (no ring around the view, no lower zoom stop), so each frame costs only its chunk work; then render the strip **once** onto the real canvas from the finished chunks and **`dispose()` the renderer** to free the chunk cache. (Repainting the 4 M px strip every frame cost 4–5 s of main-thread blocking on a slow phone; launch re-check, 2026-10-29.)
 4. Show that canvas inside the panel and **pan it with a CSS `transform: translateX()` animation**: ±26 px (scale with width), 26 s per sweep, `ease-in-out`, `alternate`, infinite. No canvas redraws while panning.
 5. **Memory:** the strip at DPR 3 on a 390 px phone is ~2–3 M px. That's fine, but cap the backing store at ~4 M px (lower the DPR if needed) to stay well inside iOS Safari's canvas limits.
 
