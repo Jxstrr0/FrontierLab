@@ -69,6 +69,19 @@ function cheapestListing(state: GameState, floors: number) {
   return tall[0] ?? free.sort((a, b) => b.floors - a.floors || a.weeklyRent - b.weeklyRent)[0];
 }
 
+/**
+ * A lab that has outgrown its first building leases the one with the most desks
+ * it can afford here, not the cheapest: the second building is the last one
+ * allowed, and a late-game Safety floor needs the room.
+ */
+function roomiestListing(state: GameState) {
+  const desks = (l: { floors: number; desksPerFloor: number }) => l.floors * l.desksPerFloor;
+  return Object.values(state.world.officeListings)
+    .filter((l) => !l.officeId && l.cityId === state.world.currentCityId)
+    .filter((l) => state.company.cash > cmd.officeQuote(state, l.id, 1).total * LEASE_BUFFER)
+    .sort((a, b) => desks(b) - desks(a) || a.weeklyRent - b.weeklyRent)[0];
+}
+
 function ensureFloors(state: GameState): void {
   if (Object.keys(state.offices).length === 0) {
     const listing = cheapestListing(state, MIN_FLOORS);
@@ -91,7 +104,7 @@ function ensureFloors(state: GameState): void {
 function addFloorFor(state: GameState, id: HqDeptId): void {
   const office = Object.values(state.offices).find((o) => o.floors.includes(null));
   if (!office) {
-    const listing = cheapestListing(state, MIN_FLOORS);
+    const listing = roomiestListing(state) ?? cheapestListing(state, MIN_FLOORS);
     if (!listing) return;
     if (state.company.cash > cmd.officeQuote(state, listing.id, 1).total * LEASE_BUFFER)
       cmd.leaseOffice(state, listing.id, [id]);
