@@ -357,7 +357,7 @@ Department ids keep their bank-era names; the screens show the AI names. "Units"
 | finance | Finance | 24 | 82,000 | 2 + 0.35 × units + 1 per $2B assets (+4 if public) | statement delay `ceil((0.9 − k′) × 10)` weeks; IR discount; public & k′ < 0.6 → late filing fine of 0.02% of revenue per quarter; IPO needs k′ ≥ 0.8 |
 | hr | HR | 24 | 68,000 | 1 + employees / 80 | hiring ×k′; morale −(1 − k′) × 15 company-wide |
 | products | Products | 24 | 90,000 | 2 + 0.2 × units + 2 per active development | development time ÷ max(0.3, k′); data licence +(1 − k′) × 30% |
-| treasury | Compute | 24 | 95,000 | 1 (+1 per 2,000 GPUs of weekly compute demand) | fewer GPU offers, priced up to 10% higher |
+| treasury | Compute | 24 | 95,000 | 1 (+1 per 15,000 GPUs of weekly compute demand) | fewer GPU offers, priced up to 10% higher |
 | marketing | Marketing | 24 | 72,000 | 1 + 0.15 × units + 2 per active brand campaign | all campaign effects ×(0.5 + 0.5k′) |
 | it | Platform & Security | 24 | 98,000 | 2 + 0.25 × units + 1 per $5B assets | app rating target ×k′; breach and outage odds ×(1 + 2(1 − k′)) |
 | risk | Safety & Alignment | 24 | 88,000 | 2 + 0.15 × units + 1 per $50M of ARR | sets the safety ratio's strength (SIMULATION §15); audit odds ×(1 + 3(1 − k′)) |
