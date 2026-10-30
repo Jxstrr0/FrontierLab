@@ -3,13 +3,32 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** launch-ready (v0.1.52, save schema 31). The bank-to-AI conversion (C0–C8) is complete, and the Stage 10 launch checks pass again after the polish pass. Next: the Kelbo.Website hub card, in its own session in that repo.
+**Current stage:** post-launch content and streamlining pass (v0.1.53, save schema 31), from the owner's review of 2026-10-30: batch 1 (incidents and the founder's desk) is in; batches 2–5 (streamlining, model launches, public-sector tenders, goals) follow. The Kelbo.Website hub card still needs its own session in that repo.
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `0ecc3d788a8928` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `04d4072dcbb83a` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-30 — Review batch 1: incidents that follow the lab, and the founder's desk (v0.1.53)
+
+The owner asked for a look over the game for fun and for overlap. The review found that the surprises were in the wrong places, and this batch fixes that. No save change.
+
+**What was wrong.** Counting what a player sees in a 10-year steady game: no incident at all in years 1 and 2, one in year 3, then 22–26 price-war popups a year from year 7 (one per city), while the seven AI cases added on 2026-10-27 fired six times in a decade and the bank-era "server-room break-in" came 2–4 times a year. The AI cases rolled company-wide at a flat tiny chance; the office cases rolled once per office, so only they grew with the lab.
+
+**Incidents now follow the lab.**
+- Company-wide cases (jailbreak, hallucination lawsuit, copyright suit, weights leak, data breach, abuse ring) scale with your customers: about 0.7× for a founder, up to 4× for a worldwide lab. Their base odds went up too.
+- The break-in and the heatwave no longer happen (they were bank-branch troubles). An old save with one open still resolves it. The API key leak and deepfake cases come half as often.
+- A **price war is one decision a quarter**: the case names every rival that cut this month and every city ("Calgary, Toronto, Vancouver and 4 more cities"), and Match it answers in all of them. Older saves' per-city cases still work.
+- The same 10-year run now shows 5, 2, 3, 3 cases in years 1–4 and 6–10 a year by year 10, of a dozen kinds, with price wars capped at three a year.
+
+**The founder's desk.** Eight small cases for the first three years, each once a game, at least six weeks apart: a demo clip goes viral, a customer asks for a feature, an angel offers a cheque for 5% of the lab, a reporter wants an interview, a rival wants your office manager, your GPU cloud goes down, a hackathon wants a sponsor, and a professor asks for course credits. Each has a real choice with a cost, and each makes the paper. A COO with Company troubles can settle them like any company case.
+
+**Checked:** lint, 1,162 tests (a new `founderDesk.test.ts`), type-check and build pass; steady, aggressive and stress on seed 42 pass every checkpoint. The determinism snapshot moved to `04d4072dcbb83a` (intended: the incident rolls change the scripted run).
+
+**Next:** batch 2 (one employer deal, one model mixer, posture on the Safety floor, a shorter menu, template trims, currencies cut).
+
 
 ### 2026-10-29 — Stage 10 launch re-check (v0.1.52)
 

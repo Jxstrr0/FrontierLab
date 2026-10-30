@@ -6,6 +6,7 @@ import { INCIDENT_PARAMS as P } from '../../src/data/incidentParams';
 import { INCIDENT_SPECS } from '../../src/data/incidents';
 import { LEDGER_TEMPLATES } from '../../src/data/ledgerTemplates';
 import { gpuDerate, isPulled, ratingMod, riskCoverageBonus } from '../../src/sim/incident/effects';
+import { labSizeMult } from '../../src/sim/incident/helpers';
 import * as cmd from '../../src/sim/commands';
 import { dataCenterPowerBill, runningGpus, usableGpus } from '../../src/sim/dataCenters';
 import { weeklyTick } from '../../src/sim/engine';
@@ -73,8 +74,15 @@ describe('AI incident preconditions', () => {
     m.radar[RADAR.reasoning] = 3;
     const jail = incidentChance(s, 'JAILBREAK', 'company');
     const suit = incidentChance(s, 'HALLUCINATION_SUIT', 'company');
-    expect(jail).toBeCloseTo(0.002 * (1.3 - 0.3));
-    expect(suit).toBeCloseTo(0.001 * (1.3 - 0.3));
+    // 2,000 customers sit under INCIDENT_SIZE's floor (0.6×); odds grow with the lab from there.
+    const size = labSizeMult(s);
+    expect(size).toBeCloseTo(0.6);
+    expect(jail).toBeCloseTo(0.008 * (1.3 - 0.3) * size, 6);
+    expect(suit).toBeCloseTo(0.005 * (1.3 - 0.3) * size, 6);
+    b.customers = 160_000;
+    expect(labSizeMult(s)).toBeCloseTo(4);
+    expect(incidentChance(s, 'JAILBREAK', 'company')).toBeCloseTo(jail * (4 / 0.6), 6);
+    b.customers = 2_000;
     m.radar[RADAR.safety] = 9;
     m.radar[RADAR.reasoning] = 9;
     expect(incidentChance(s, 'JAILBREAK', 'company')).toBeLessThan(jail);
