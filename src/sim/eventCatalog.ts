@@ -40,6 +40,22 @@ export interface EventPayloads {
     reason: 'renewal' | 'outage' | 'failed' | 'office';
     to?: string;
   };
+  /** Public tenders (tenders.ts, §11.7): a city's public body asks for sealed bids. */
+  TENDER_OPENED: { tenderId: Id; name: string; city: Id; budget: Money; weeks: number };
+  /** Your sealed bid won; `years` is the term. */
+  TENDER_WON: { tenderId: Id; name: string; city: Id; value: Money; years: number };
+  /** Your bid lost (`rival` took it), or the tier fell below Adequate before the award. */
+  TENDER_LOST: { tenderId: Id; name: string; city: Id; reason: 'bid' | 'tier'; rival?: string };
+  /** A public contract you held was cancelled: the tier fell to Restricted or worse, or its office closed. */
+  TENDER_CANCELLED: {
+    tenderId: Id;
+    name: string;
+    city: Id;
+    value: Money;
+    reason: 'tier' | 'office';
+  };
+  /** A public contract ran its full term. */
+  TENDER_ENDED: { tenderId: Id; name: string; city: Id; value: Money };
   WINDOW_USE: { amount: Money };
   FUNDING_MATURED: { lotId: Id; type: string; counterparty: string; amount: Money };
   REGULATOR_AUDIT: { fine: Money };

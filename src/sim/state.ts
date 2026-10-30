@@ -27,6 +27,7 @@ import type {
 import type {
   Business,
   Rfp,
+  Tender,
   CompetitionState,
   CorporateDebt,
   EmployerInfo,
@@ -57,7 +58,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState } from './personalTypes';
 
-export const SCHEMA_VERSION = 34;
+export const SCHEMA_VERSION = 35;
 
 export interface GameState {
   schemaVersion: number;
@@ -90,7 +91,8 @@ export interface GameState {
   projects: ProjectsState;
   treasury: Treasury;
   /** Open RFPs on the Deal Desk (stage C5b; schema 13). Contracts live on the businesses. */
-  dealDesk: { rfps: Record<Id, Rfp> };
+  /** Proposal requests, and public-sector tenders open or held (§11.7, schema 35). */
+  dealDesk: { rfps: Record<Id, Rfp>; tenders: Record<Id, Tender> };
   rivals: Record<Id, RivalBank>;
   /** Customer businesses and anchor accounts in generated cities (stage C5a; schema 12). */
   businesses: Record<Id, Business>;

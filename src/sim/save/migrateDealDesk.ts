@@ -22,7 +22,8 @@ export function migrateDealDesk(state: GameState): void {
   for (const loan of Object.values(raw.loanDesk?.loans ?? {}))
     if (loan.status === 'current') state.treasury.reserves += loan.balance ?? 0;
   delete raw.loanDesk;
-  state.dealDesk = { rfps: {} };
+  // Tenders arrive with migration 34 → 35.
+  state.dealDesk = { rfps: {} } as unknown as GameState['dealDesk'];
   for (const b of Object.values(state.businesses ?? {})) {
     const k = BUSINESS.sizes[b.size].budget / BUSINESS.oldBudgets[b.size];
     b.budget = Math.round((b.budget * k) / 100) * 100;

@@ -307,6 +307,34 @@ export interface Business {
  * one from a business without an AI vendor (bid now), or a renewal due at the
  * next quarter start (set an offer; it is settled in the renewal season).
  */
+/**
+ * A public-sector tender (SIMULATION §11.7, owner's review A4): a city's public
+ * body asks for sealed bids, awards one long contract, and drops a lab the
+ * regulator restricts.
+ */
+export interface Tender {
+  id: Id;
+  /** The public body, e.g. "Calgary Transit Commission". */
+  name: string;
+  /** Its PUBLIC_BODIES row (icon and wording). */
+  bodyId: string;
+  cityId: Id;
+  /** Your sales office in the city that bids for it and earns it. */
+  branchId: Id;
+  /** Yearly budget: the contract's value at no discount. */
+  budget: Money;
+  termWeeks: number;
+  status: 'open' | 'active';
+  openWeek: Week;
+  /** Open: the week bids close and the award is made. */
+  closeWeek: Week;
+  /** Open: your sealed bid as a discount off the budget (none = not bidding). */
+  bid?: number;
+  /** Active: the yearly value you won it at, and the week it ends. */
+  value?: Money;
+  endWeek?: Week;
+}
+
 export interface Rfp {
   id: Id;
   /** Your sales office in the business's city. */

@@ -9,6 +9,7 @@ import { addBranchCosts, closeBranchWeek } from './branch/branchPnl';
 import { runDelegation } from './branch/delegation';
 import { runDemand } from './branch/demand';
 import { dealIndex, runDealDesk, type DealIndex } from './branch/dealDesk';
+import { earnTenders, runTenders, tendersQuarter } from './tenders';
 import { campaignEffects, updateAwareness, updateBrandAwareness } from './branch/marketing';
 import { addReviews, updateRatings } from './branch/ratings';
 import { updateStaff } from './branch/staff';
@@ -103,6 +104,7 @@ export function weeklyTick(state: GameState): void {
   updateMarketRefs(state); // 2
   runRivals(state); // 3 (books, financials, expansion, price wars)
   runDataCenters(state); // 4 (data centers, C2c: before the offices they lift)
+  runTenders(state); // 4 (public tenders, §11.7: awards, ends, cancellations)
   const deals = dealIndex(state);
   for (const branch of Object.values(state.branches)) {
     if (branch.status === 'open') runBranch(state, branch, deals); // 4
@@ -152,6 +154,7 @@ export function weeklyTick(state: GameState): void {
     talentQuarter(state); // 13 (the talent war, C6c)
     rivalModelsQuarter(state); // 13 (rival model releases, C6b)
     renewalSeason(state); // 13 (the renewal season for business contracts, C5b)
+    tendersQuarter(state); // 13 (public tenders, §11.7)
     marketsQuarter(state); // 13 (listed earnings, IPO listing)
     governanceQuarter(state); // 13 (board meeting unlocks)
     venturesQuarter(state); // 13 (ventures report and raise, §20.2)
@@ -198,6 +201,7 @@ function runBranch(state: GameState, branch: Branch, deals: DealIndex): void {
   wk.staff += severance; // staff let go above a lowered target
   runBooks(state, branch, demand, fx, wk); // 4.6
   runDealDesk(state, branch, fx, wk, deals); // 4.7
+  earnTenders(state, branch, wk); // 4.7 (public tenders, §11.7)
   let newDepositAccounts = 0;
   for (const [pid, o] of Object.entries(demand.byProduct)) {
     if (productSpec(state, pid)?.category === 'deposits') newDepositAccounts += o.newAccounts;

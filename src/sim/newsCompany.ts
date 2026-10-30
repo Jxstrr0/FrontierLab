@@ -143,6 +143,29 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
         },
       });
     }
+    case 'TENDER_WON':
+      return business({
+        key: 'TENDER_WON',
+        subject: str(p.tenderId),
+        icon: 'coin',
+        priority: P.company,
+        tokens: {
+          bank,
+          body: str(p.name, 'A public body'),
+          city: cityName(str(p.city)),
+          amount: m(p.value),
+          years: String(num(p.years)),
+        },
+      });
+    case 'TENDER_CANCELLED':
+      if (p.reason !== 'tier') return undefined;
+      return business({
+        key: 'TENDER_CANCELLED',
+        subject: str(p.tenderId),
+        icon: 'alert',
+        priority: P.company,
+        tokens: { bank, body: str(p.name, 'A public body'), amount: m(p.value) },
+      });
     case 'CONTRACT_LOST': {
       if (num(p.value) < DEAL.bigDeal) return undefined;
       return business({

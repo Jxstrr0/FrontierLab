@@ -182,6 +182,10 @@ After the wizard, the map opens with the tutorial (§27).
 ### 5.3 Deal Desk
 - **Summary strip:** requests this week · won · lost · declined · win rate · contracts held · contract ARR.
 - **Discount limit card:** a stepper for the most the office will knock off a business's budget (`DEAL.defaultLimit` to start, up to `DEAL.discountMax`). A note says who bids when the desk is delegated (the office manager, or the Chief Safety Officer under Deal Desk policy).
+- **Public tenders** (SIMULATION §11.7; shown when the office has any, or as a one-line note when the lab is below Adequate after `TENDER.firstWeek`):
+  - Open tender card: dome icon, body name ("Calgary Transit Commission"), what it's for, a "Closes in N weeks" chip, yearly budget and term, the discount stepper with the win chance and contract value, the sealed bid if any, and Seal bid / Update bid / Withdraw.
+  - Held tender card: body name, a "Yours" chip, contract value a year and end date.
+  - A foot note: bids are sealed, Safety weighs most, Restricted cancels.
 - **Proposal requests (RFP cards):**
   - sector icon, business name, sector, size
   - yearly budget, and the rival lab holding it (if any)
@@ -193,7 +197,7 @@ After the wizard, the map opens with the tutorial (§27).
   - Yours: the renewal offer stepper (starts at the current discount) and the keep chance.
   - A rival's (needs Enterprise contracts on): a "Make an offer" toggle; on, it offers the discount limit and shows the stepper, the win chance and the rival's value next to yours.
 - **Contracts:** a collapsible list (open when 6 or fewer): business, value a year, renewal date. Rows are ≥ 44 px and open the business card.
-- **Badge:** the tab lights for any new RFP, or a rival renewal with no offer yet.
+- **Badge:** the tab lights for any new RFP, a rival renewal with no offer yet, or an open tender with no bid.
 
 ### 5.4 Marketing
 - **Two-column grid of campaign cards:**
