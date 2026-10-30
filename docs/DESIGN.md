@@ -31,7 +31,7 @@ You found an AI lab with a fresh seed round: $1,500,000, all of it yours to spen
   - **Safety ratio** with AI regulator tiers, a quarterly safety audit and a mandated pause (§5.6)
   - **The AI model and training runs**, judged against a rising frontier set by rival labs (§5.8.3)
   - **Deal Desk:** enterprise contracts with named businesses on the map, using the startup pentagon (§5.4.3)
-  - **Data-centre and power deals** at energy sites, and staff plan partnerships with employers, in place of plantations (§5.8.4)
+  - **Data-centre and power deals** at energy sites in place of plantations (§5.8.4); an employer is one deal, its anchor account on the Deal Desk
   - **Central banks** per country and a **business cycle** that move customer budgets, business failures and stock prices (§5.7)
   - **Compute credits** alongside equity investing (§5.12)
   - **Insider-trading** risk on your personal trades (§5.16)
@@ -57,7 +57,7 @@ How each of the original game's systems appears in Frontier Lab. The code-name c
 | Roasters selling packaged blends and roasting your custom blend | Data vendors selling dataset packages | `bureau`, layer `creditBureaus` | Map layer |
 | Develop new product | Product development, plus training runs for new model generations | `development`, `training` | Same terms and star-odds table |
 | Coffee bean inventory: lots, harvest year, price/lb, quantity, radar | Compute: GPU reservations (provider, term, price per GPU-week, size, radar) | `gpuLots` | Compute floor |
-| Plantations: hectares, yield curve, "year X of Y", replant | Data-centre and power deals at energy sites; staff plan partnerships with employers | `powerDeals`, `partnerships` | Same curve, health and renewal |
+| Plantations: hectares, yield curve, "year X of Y", replant | Data-centre and power deals at energy sites; student partnerships at universities | `powerDeals`, `partnerships` | Same curve, health and renewal |
 | Ten marketing campaigns with levels and weekly costs | Ten office campaigns with levels and weekly costs | | See CONTENT §8 |
 | HQ floors: Finance, HR, Product, Supply, Marketing, IT, Executive, Investment, Add Floor | Finance, HR, Products, Compute, Marketing, Platform & Security, Safety & Alignment, Executive, Investment, Add Floor | `treasury` = Compute, `it` = Platform & Security, `risk` = Safety & Alignment | Safety is new |
 | Understaffing warnings from floor advisors | Same, plus coverage % per floor | | |
@@ -283,7 +283,7 @@ The Compute floor (code `treasury`).
 - **GPU market:** 6-month, 1-year and 3-year reservations from fictional GPU clouds at a discount on spot. Offers refresh every two weeks; a fuller Compute team brings more and cheaper offers.
 - **Partnerships:**
   - **Data-centre and power deals** at regional energy sites: contracted GPUs at a fixed price (take-or-pay) plus cheaper power for your data centers in that country. "Year 3 of 7", relationship health, renew or let lapse.
-  - **Staff plan partnerships** with employers: their staff join a plan (Team by default), adding ARR along the same curve.
+  - **Employers are one deal:** an employer's business is its anchor account, won and renewed on the Deal Desk like any business. The bank-era staff plan partnership beside it was retired on 2026-10-30 (owner's review, B1); universities keep the student partnership.
 - Bank-era liquidity, funding and central bank cards show only for old saves that still carry deposits or wholesale funding.
 
 #### 5.8.5 Marketing
@@ -766,3 +766,4 @@ Add one dated line per decision. Never delete entries; supersede them.
 - 2026-10-30 (owner's review, B5): **Launch posture sits with the safety ratio.** The dial trades deal odds against safety exposure, so it moves from the Finance floor to the Safety & Alignment floor, under the regulator card.
 - 2026-10-30 (owner's review, B6): **Three development templates retired.** Researcher Plan, Family Plan and Carbon-Neutral Plan were bank-era segment variants of Plus (the last duplicating the Green Compute Pledge campaign). They leave the New product form; products already developed from them keep working.
 - 2026-10-30 (owner's review, B7): **Currencies cut.** The country-bet investment added its own Market section, portfolio slice and balance-sheet line for little play; it is removed, and old saves sell their positions at the last value into the owner's cash (schema 32).
+- 2026-10-30 (owner's review, B1): **One deal per employer.** An employer offered both a staff plan partnership and an anchor-account contract on the Deal Desk: two deals with the same company, priced and grown in different ways. The staff plan partnership is retired; the anchor account is the employer's deal, and universities keep the student partnership. Old saves run off any active staff plan deal over 12 weeks as if released (schema 33).

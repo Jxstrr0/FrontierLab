@@ -1,6 +1,6 @@
 // Read-only views for the employer and university panels (SCREENS §14–15):
-// the expected-ARR curve, the type label, average income, who holds the
-// payroll today and the default host/package picks. Formulas come from
+// the expected-ARR curve, the type label, average income and the default
+// host/package picks for the student partnership. Formulas come from
 // src/sim/partnerships.ts so the panel and the simulation always agree.
 import { PARTNER_CONTRACT_WEEKS, PARTNER_HEALTH } from '../../config/balance';
 import { CITIES } from '../../data/cities';
@@ -52,27 +52,15 @@ export function averageIncome(site: Site): number {
   return BASE_ANNUAL_INCOME * (site.employer?.incomeMult ?? 1) * city;
 }
 
-/** "You", the rival bank holding the payroll, or "None". */
-export function currentPartner(state: GameState, site: Site, mine: boolean): string {
-  if (mine) return state.meta.bankName;
-  const rival = site.employer?.partnerRivalId;
-  return rival ? (state.rivals[rival]?.name ?? 'Another lab') : 'None';
-}
-
-/** Default package: the Campus Plan for students, Team for payroll, else the first offered. */
-export function defaultPackage(
-  state: GameState,
-  hostId: string | undefined,
-  kind: PartnershipKind,
-) {
+/** Default package: the Campus Plan when the host offers it, else the first offered plan. */
+export function defaultPackage(state: GameState, hostId: string | undefined) {
   const host = hostId ? state.branches[hostId] : undefined;
   if (!host) return undefined;
   const options = packageOptions(state, host);
-  const want = kind === 'student' ? 'campus_plan' : 'team';
   return (
     options.find((pid) => {
       const spec = productSpec(state, pid);
-      return spec && baseId(spec) === want;
+      return spec && baseId(spec) === 'campus_plan';
     }) ?? options[0]
   );
 }

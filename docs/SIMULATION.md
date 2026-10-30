@@ -459,16 +459,16 @@ Retired in play. `runTreasury` still runs the bank's overnight and central bank 
 ### 13.6 Funding market
 Legacy. With a Compute floor, funding offers (Term Interbank, CONTENT §12) still refresh every 2 weeks (`FUNDING_REFRESH_WEEKS`), and any wholesale lot an old save holds still pays weekly interest from corporate cash and repays at maturity. The Compute floor shows the funding cards only for a save that still has deposits, lots or overnight borrowing (`hasLegacyFunding`). The rating spread (`RATING_SPREADS`, by runway tier, §15: Strong −0.10pp, Comfortable 0, Tight +0.35pp, Critical +1.00pp) and TREASURY_PENALTY (0.5pp × the Compute floor's shortfall) still price them.
 
-### 13.7 Plans partnerships (employers)
+### 13.7 Student partnerships (universities)
 - **Signing:**
-  - Signing fee paid from corporate cash (`PARTNER_FEE_PER_EMPLOYEE` $160 × employees × list level). It becomes an intangible asset amortized over the contract.
+  - Signing fee paid from corporate cash (`STUDENT_PARTNERSHIP.feePerStudent` $30 × students × incomeIndex × list level). It becomes an intangible asset amortized over the contract.
   - Choose a host sales office in the same city and a package: any plan the host offers that isn't a free tier.
 - **Participation curve** over a contract of `L` weeks (default 364):
   - rises along an S-curve from 0 to 0.65 by week 52
   - linear to 0.80 by week 104
   - flat at 0.80 until `L − 104`
   - linear down to 0.45 at `L`
-- **ARR target:** `employees × participation × ARR_PER_EMPLOYEE (300) × incomeIndex × (0.5 + 0.6 × health/100)`. The partnership keeps its own mini-book of plan seats and their ARR. It moves toward target at 0.15 of the gap per week and earns `balance / 52` a week as `accountFees` (Plans). Seats are reported inside the host office's product card as "incl. partners".
+- **ARR target:** `students × participation × arrPerStudent × incomeIndex × (0.5 + 0.6 × health/100)`. The partnership keeps its own mini-book of plan seats and their ARR. It moves toward target at 0.15 of the gap per week and earns `balance / 52` a week as `accountFees` (Plans). Seats are reported inside the host office's product card as "incl. partners".
 - **Health:**
   - target = `40 + 12 × (hostOverall − 3) + 10 × c_package + perksBonus`, where `c_package` is the competitiveness of the package (§8)
   - `health = ema(health, target, 0.05)`
@@ -476,7 +476,7 @@ Legacy. With a Compute floor, funding offers (Term Interbank, CONTENT §12) stil
 - **End of term:**
   - Renew at fee × `(1.5 − health/100)` for another full term.
   - Or let it lapse: run off over 12 weeks.
-- **Student partnership (universities):** students by city size S 6,000 / M 10,000 / L 16,000 / XL 24,000; fee $30 × students × incomeIndex; ARR $80 per participating student (`STUDENT_PARTNERSHIP.arrPerStudent`); same curve, health and term rules. A university has one staff-plans deal and one student deal at a time.
+- **Student partnership (universities):** students by city size S 6,000 / M 10,000 / L 16,000 / XL 24,000; fee $30 × students × incomeIndex; ARR $80 per participating student (`STUDENT_PARTNERSHIP.arrPerStudent`); same curve, health and term rules. A university has one student deal at a time. Employers' staff plan (`payroll`) deals were retired on 2026-10-30 (owner's review, B1): an employer's deal is its anchor account (§11.0), and a pre-schema-33 deal runs off over 12 weeks.
 - **Graduate program (universities):** $120,000 × city wageIndex a year, charged up front and every 52 weeks; +10 skill for manager candidates and +1 hire a week at offices and HQ floors.
 
 ### 13.7a Data-centre and power deals (`src/sim/powerDeals.ts`)
@@ -1196,7 +1196,7 @@ The main groups, with the defaults shown above. Names marked (legacy) belong to 
 - **DEALS:** `BUSINESS`, `DEAL`, `SECTOR_DISTRICT_WEIGHT`
 - **SALES OFFICE:** `EQUIP_MAINT`, `FITOUT_UPKEEP`, `BRANCH_OVERHEAD`, `ATM_FEE`, `CLOSE_RECOVERY = 0.30`, `CLOSE_RENT_WEEKS`, `LEASE_DEPOSIT_WEEKS`, `BRANCH_PNL_WEEKS`, `FITOUT_LIFE_WEEKS`, `EQUIPMENT_LIFE_WEEKS`
 - **TREASURY (legacy except reserves):** `RESERVE_RATE_SPREAD`, `LIQ_MIN`, `LIQ_TARGET_DEFAULT`, `OVERNIGHT_SPREAD`, `OVERNIGHT_LIMIT`, `WINDOW_SPREAD`, `WINDOW_STIGMA`, `RATING_SPREADS`, `TREASURY_PENALTY`, `FUNDING_REFRESH_WEEKS = 2`, `FUNDING_OFFERS`, `FUNDING_SIZE`, `FUNDING_RATE_NOISE = 0.0008`
-- **PARTNERSHIPS:** `PARTNER_CONTRACT_WEEKS`, `PARTNER_FEE_PER_EMPLOYEE`, `ARR_PER_EMPLOYEE`, `PARTICIPATION`, `PARTNER_HEALTH`, `PARTNER_PERKS`, `PARTNER_RUNOFF_WEEKS`, `PARTNER_RENEWAL`, `STUDENT_PARTNERSHIP`, `GRAD_PROGRAM`
+- **PARTNERSHIPS:** `PARTNER_CONTRACT_WEEKS`, `PARTICIPATION`, `PARTNER_HEALTH`, `PARTNER_PERKS`, `PARTNER_RUNOFF_WEEKS`, `PARTNER_RENEWAL`, `STUDENT_PARTNERSHIP`, `GRAD_PROGRAM`
 - **SAFETY AND CREDIT:** `SAFETY`, `SAFETY_TIER_THRESHOLDS`, `CAPITAL_GATE`, `MANDATED_PAUSE`, `LICENCE`, `REGULATOR_REVIEW` (fail base 0.02, ethics base 1.6, fine 0.05–0.3% of trailing revenue), `FAILURE`, `CAPITAL_BUFFER_PP`, `CAPITAL_BUFFER_WEEKS`, `BANK_RUN` (`creditShare` 0.02 for service credits); runway: `RUNWAY` (tiers, `gateMonths`, the CFO's `cfoRaiseBelowMonths` and `cfoTargetMonths`); `LAUNCH_POSTURE`, `DEFAULT_LAUNCH_POSTURE`, `RISK_LOSS_WEEKS`, `DELINQUENCY`
 - **INCIDENTS:** `INCIDENTS` (`onceWeeks` for once-a-game cases), `INCIDENT_SCALE`, `INCIDENT_SIZE` (company cases grow with customers), `FOUNDER_DESK` (untilWeek 156, gapWeeks 6, baseP 0.012, angelPct 0.05, angelDiscount 0.3), `INCIDENT_PRICE_SEVERITY`, `FRAUD_SHIELD`; per-case numbers in `src/data/incidentParams.ts`
 - **RIVALS:** `RIVAL_EXPANSION`, `RIVAL_LEARNING`, `RIVAL_CHARTER`, `RIVAL_MERGERS`, `RIVAL_MARKETING`, `RIVAL_TECH`, `RIVAL_CLOSURE`, `RIVAL_FAILURE`, `RIVAL_RAISE`, `RIVAL_RUNWAY_TIERS`, `RIVAL_PAYOUT`, `PRICE_WAR` (`caseWeeks` 13, `namedCities` 3); the rival books: `RIVAL_BOOKS` (matureCustomers, ema, usagePerCustomer, cycle, computeShare, officeCost, trainingShare, cashTargetWeeks, startRunwayWeeks, strategy multipliers), `RIVAL_QUALITY_REF`, `RIVAL_RAMP_WEEKS`, `RIVAL_COMPETITION`

@@ -177,7 +177,7 @@ describe('Ledger stories from events', () => {
       partnershipId: 'p1',
       siteId: 's1',
       employer: 'Northfield Hospital',
-      kind: 'payroll',
+      kind: 'student',
       branchName: 'Midtown',
       fee: 80_000,
     });

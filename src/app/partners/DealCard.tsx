@@ -1,8 +1,7 @@
-// A partnership deal at an employer or university (SCREENS §14): the signing
+// The student partnership deal at a university (SCREENS §15): the signing
 // fee and contract length, the expected-ARR curve, the package and host
-// branch pickers and Sign, with the reason shown when it can't be signed. Once
-// signed it shows the Yours card instead (YoursCard.tsx). Used for payroll at
-// employers and universities, and for the university's student partnership.
+// office pickers and Sign, with the reason shown when it can't be signed. Once
+// signed it shows the Yours card instead (YoursCard.tsx).
 import { useState } from 'preact/hooks';
 import { PARTNER_CONTRACT_WEEKS, WEEKS_PER_YEAR } from '../../config/balance';
 import * as cmd from '../../sim/commands';
@@ -38,7 +37,7 @@ function Deal(p: { site: Site; kind: PartnershipKind; people: number }) {
   const host = hostId ? s.branches[hostId] : undefined;
   const options = host ? packageOptions(s, host) : [];
   const [pkgPick, setPkg] = useState<string | undefined>(undefined);
-  const pkg = pkgPick && options.includes(pkgPick) ? pkgPick : defaultPackage(s, hostId, kind);
+  const pkg = pkgPick && options.includes(pkgPick) ? pkgPick : defaultPackage(s, hostId);
   const fee = signingFee(s, site, kind);
   const curve = expectedCurve(site, kind);
   const regional = CITIES[site.cityId]?.regional ? CITIES[site.cityId]!.country : undefined;
@@ -62,10 +61,8 @@ function Deal(p: { site: Site; kind: PartnershipKind; people: number }) {
   return (
     <Card class="pt-deal">
       <div class="pt-deal-head">
-        <div class="pt-deal-name">{kind === 'student' ? 'Student plans' : 'Staff plans'}</div>
-        <span class="small muted">
-          {count(p.people)} {kind === 'student' ? 'students' : 'staff'}
-        </span>
+        <div class="pt-deal-name">Student plans</div>
+        <span class="small muted">{count(p.people)} students</span>
       </div>
       <Row label="Signing fee" value={money(fee, sym)} strong />
       <Row label="Contract" value={`${years} years`} />

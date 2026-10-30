@@ -3,13 +3,38 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** post-launch content and streamlining pass (v0.1.53, save schema 31), from the owner's review of 2026-10-30: batch 1 (incidents and the founder's desk) is in; batches 2–5 (streamlining, model launches, public-sector tenders, goals) follow. The Kelbo.Website hub card still needs its own session in that repo.
+**Current stage:** post-launch content and streamlining pass (v0.1.54, save schema 33), from the owner's review of 2026-10-30: batches 1 (incidents and the founder's desk) and 2 (streamlining) are in; batches 3–5 (model launches, public-sector tenders, goals) follow. The Kelbo.Website hub card still needs its own session in that repo.
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `04d4072dcbb83a` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `193f6e9e3607b5` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-30 — Review batch 2: fewer places doing the same job (v0.1.54)
+
+The second half of the review was about overlap: places in the game where two screens did one job. This batch removes six of them. Old saves load and are upgraded (save schema 31 → 33).
+
+**One deal per employer.** An employer used to offer two deals: a staff plan partnership (its staff on your Team plan) and its anchor account on the Deal Desk. They were two ways to sell to the same company. The staff plan partnership is gone; the anchor account, bid for on a sales office's Deal Desk, is the employer's deal. Universities keep the student partnership. In an old save, a running staff plan deal winds down over 12 weeks as if you had released it.
+
+**One place to mix a model.** Data vendors had their own "My model" sliders, the same ones as Manage models on the HQ Products floor. Vendors now sell their packaged models only; custom mixes are built at HQ. A custom model you already use keeps working.
+
+**A shorter menu.** Eleven entries become eight. Portfolio opens from Personal wealth, and Milestones and Frontier projects sit in a new Goals section on the Company screen.
+
+**Launch posture moves to the Safety floor.** The dial trades deal odds against safety risk, so it now sits under the safety ratio it moves instead of on the Finance floor.
+
+**Three product templates retired.** Researcher Plan, Family Plan and Carbon-Neutral Plan were bank-era copies of Plus. They leave the New product form; products you already built from them keep working.
+
+**Currencies cut.** The currency bets had their own market section, portfolio slice and balance-sheet line for very little play. They are gone; an old save sells any positions at their last value into cash.
+
+**How it was built.** Two helpers worked on the employer deal and the currencies cut at the same time in separate copies of the code; the employer-deal one was stopped partway, so I finished it. One fix on the way: it had removed a random roll from city generation, which would have quietly rebuilt every city map differently. That roll is back (it decides which rival starts with each employer's account), so maps from the same seed don't change.
+
+**Commits are now authored as Claude** (the owner's choice), so GitHub shows them as Verified. CLAUDE.md says so.
+
+**Checked:** lint, 1,164 tests (new `migrateCurrencies.test.ts` and `migratePayroll.test.ts`), type-check and build pass; steady, aggressive and stress on seed 42 pass every target. The determinism snapshot moved to `193f6e9e3607b5` (intended: the currencies and staff-plan deals no longer run).
+
+**Next:** batch 3 (model launches and open weights, agencies selling launch campaigns).
+
 
 ### 2026-10-30 — Review batch 1: incidents that follow the lab, and the founder's desk (v0.1.53)
 

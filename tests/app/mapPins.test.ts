@@ -250,7 +250,7 @@ describe('Stage 5 pins', () => {
       expect(kinds.has(k)).toBe(false);
   });
 
-  it('marks an employer you partner with in your brand ink', () => {
+  it('marks a university you partner with in your brand ink', () => {
     const s = newGame({ seed: 42, cityId: 'cal', bankName: 'Pin Bank' });
     const branchId = openScriptedBranch(s, 'midtown');
     s.branches[branchId]!.status = 'open';
@@ -258,11 +258,11 @@ describe('Stage 5 pins', () => {
     const lots = Object.values(s.world.lots).filter((l) => l.cityId === 'cal');
     const sites = Object.values(s.world.sites).filter((x) => x.cityId === 'cal');
     const map = generateCityMap(CITIES.cal!, s.meta.seed, lots, { sites });
-    const employer = sites.find((x) => x.kind === 'employer')!;
-    const before = buildPins(s, map, lots, STAGE5).find((p) => p.id === employer.id)!;
+    const university = sites.find((x) => x.kind === 'university')!;
+    const before = buildPins(s, map, lots, STAGE5).find((p) => p.id === university.id)!;
     expect(before.partner).toBeUndefined();
-    expect(cmd.signPartnership(s, employer.id, branchId, 'plus').ok).toBe(true);
-    const after = buildPins(s, map, lots, STAGE5).find((p) => p.id === employer.id)!;
+    expect(cmd.signPartnership(s, university.id, branchId, 'plus', 'student').ok).toBe(true);
+    const after = buildPins(s, map, lots, STAGE5).find((p) => p.id === university.id)!;
     expect(after.partner).toBe(true);
     expect(after.ink).toBe(s.meta.brandInk);
     expect(after.label).toMatch(/your partner/);

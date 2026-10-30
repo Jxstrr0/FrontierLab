@@ -1,8 +1,9 @@
-// Partnership cards on the Treasury floor (SCREENS §10 Treasury): one card per
-// payroll or student partnership with the employer or university, the people
-// it covers, "Year X of Y", ARR, seats and a health bar. Tapping a
-// card opens that employer's or university's panel (SCREENS §14–15). With no
-// partnerships it points the player to the Employers layer on the map.
+// Student partnership cards on the Compute floor (SCREENS §10 Treasury): one
+// card per student partnership with a university (or a retired staff-plan deal
+// from an old save, running off), the people it covers, "Year X of Y", ARR,
+// seats and a health bar. Tapping a card opens that university's or employer's
+// panel (SCREENS §14–15). With none it points the player to the Universities
+// layer on the map.
 import { Badge, Card, Row, StatBar } from '../../components';
 import { count, money } from '../../format/format';
 import { openPanel, useGame } from '../../store';
@@ -15,8 +16,8 @@ export function PartnershipCards() {
     return (
       <Card>
         <p class="muted small hq-note">
-          No partnerships yet. Turn on the Employers layer on the map and tap a large employer to
-          offer a staff plan deal that puts its staff on your plans.
+          No student partnerships yet. Turn on the Universities layer on the map and tap a
+          university to offer its students the Campus Plan.
         </p>
       </Card>
     );
