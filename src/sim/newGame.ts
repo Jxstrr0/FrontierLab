@@ -237,7 +237,7 @@ export function newGame(opts: NewGameOptions): GameState {
     clubs: {},
     ledger: emptyLedger(),
     events: { log: [], scheduled: [] },
-    history: { weekly: [], quarterly: [] },
+    history: { weekly: [], quarterly: [], yearly: [] },
     milestones: {},
     flags: { lessonsDone: [] },
     nextId: 0,

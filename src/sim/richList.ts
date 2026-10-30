@@ -31,11 +31,27 @@ export function seedRichList(state: GameState): void {
     for (let t = 0; t < NAME_TRIES && (name === '' || used.has(name)); t++)
       name = `${rng.pick(FIRST_NAMES)} ${rng.pick(LAST_NAMES)}`;
     used.add(name);
-    // Log-uniform: as many fortunes between $1.5B and $15B as between $12B and $120B.
+    // Log-uniform: as many fortunes between $0.5B and $3B as between $5B and $30B.
     const worth = round(dexp(rng.range(dlog(lo), dlog(hi))));
     fortunes.push({ id: `rich_${i + 1}`, name, source: rng.pick(RICH_SOURCES), worth });
   }
   state.personal.empire.richList = { fortunes: fortunes.sort(byWorth) };
+}
+
+/**
+ * Migration 35 → 36: re-spread the fortunes over RICH_LIST.fortune by place
+ * (log-even, the richest at the top), times the economy's growth since the
+ * start (`nominalRef`, 1 before the first ranking). Order and names are kept.
+ */
+export function rescaleFortunes(list: GameState['personal']['empire']['richList']): void {
+  const [lo, hi] = RICH_LIST.fortune;
+  const economy = list.nominalRef ?? 1;
+  const n = list.fortunes.length;
+  list.fortunes.sort(byWorth);
+  list.fortunes.forEach((f, i) => {
+    const t = (i + 0.5) / n;
+    f.worth = round(economy * dexp(dlog(hi) - t * (dlog(hi) - dlog(lo))));
+  });
 }
 
 /** Your rank among the fortunes for a net worth (undefined below the last place). */

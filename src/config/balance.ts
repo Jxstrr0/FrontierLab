@@ -2078,10 +2078,26 @@ export const FRANCHISE = {
  */
 export const RICH_LIST = {
   size: 50,
-  growth: [-0.02, 0.05],
-  fortune: [0.15e9, 2e9],
+  growth: [-0.01, 0.04],
+  fortune: [0.5e9, 30e9],
   /** Fortunes are rounded to this. */
   roundTo: 1e6,
+} as const;
+/**
+ * The annual report (§22a, owner's review A5): a front page at each year end.
+ * ARR growth of at least `doubled` (100%) leads with the "doubled" headline,
+ * below `hardYear` (0%) with the hard-year one, and a close at a `safetyTiers`
+ * tier with the regulator one (ahead of both); every `decadeYears` (10) years
+ * of play it opens on the decade in review.
+ */
+export const ANNUAL_REPORT = {
+  doubled: 1,
+  hardYear: 0,
+  decadeYears: 10,
+  /** Tiers at the close that lead with the regulator headline. */
+  safetyTiers: ['restricted', 'critical'] as readonly string[],
+  /** At most this many milestones named in the year's story. */
+  milestonesShown: 3,
 } as const;
 /** Insider trading (§22): trades in your own shares within 2 weeks of a quarter-end. */
 export const INSIDER = {
