@@ -250,13 +250,10 @@ describe('closing', () => {
     expect(identityGap(s)).toBeLessThan(1);
   });
 
-  it('takes the rival off the market with its employer partnerships', () => {
+  it('takes the rival off the market', () => {
     const s = capitalisedBank();
     const bank = smallestRival(s);
-    const site = Object.values(s.world.sites).find((x) => x.employer);
-    if (site?.employer) site.employer.partnerRivalId = bank.id;
     buy(s);
-    if (site?.employer) expect(site.employer.partnerRivalId).toBeUndefined();
     expect(cmd.offerMerger(s, bank.id, 30).ok).toBe(false);
     expect(rivalBvps(bank)).toBeGreaterThan(0);
   });

@@ -6,6 +6,7 @@
 // and its export codes are turned away, so none can reach this chain.
 import { CPO_TRAINING, CTO_COMPUTE, EXEC_DELEGATION } from '../../config/balance';
 import { foldRivalCity } from '../rivalOffices';
+import { startRunoff } from '../partnerships';
 import { migrateCatalog } from './migrateCatalog';
 import { migrateBankCleanup } from './migrateBankCleanup';
 import { migrateCompute } from './migrateCompute';
@@ -216,6 +217,17 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
   // positions are sold at their last rate into the owner's cash and `fx` goes.
   31: (s) => {
     migrateCurrencies(s as unknown as GameState);
+    return s;
+  },
+  // Schema 33 (owner's review, B1: one deal per employer): staff-plan (`payroll`)
+  // partnerships are retired. An active one starts its 12-week run-off as if
+  // released (the rest of its fee is written off, its seats fade); one already
+  // running off is left alone.
+  32: (s) => {
+    const state = s as unknown as GameState;
+    for (const p of Object.values(state.partnerships ?? {})) {
+      if (p.kind === 'payroll' && p.status === 'active') startRunoff(state, p, 'released');
+    }
     return s;
   },
 };

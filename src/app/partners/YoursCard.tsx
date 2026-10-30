@@ -47,9 +47,7 @@ export function YoursCard(p: { site: Site; partnership: Partnership }) {
   return (
     <Card class="pt-deal pt-yours">
       <div class="pt-deal-head">
-        <div class="pt-deal-name">
-          {ps.kind === 'student' ? 'Student plans' : 'Staff plans'} · yours
-        </div>
+        <div class="pt-deal-name">Student plans · yours</div>
         <span class="small muted">
           Year {year} of {of}
         </span>

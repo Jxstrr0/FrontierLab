@@ -432,18 +432,9 @@ No tabs: one overview page.
 
 - **Header:** employer name with its type.
 - **Advisor** and **hero** vignette.
-- **Stats:** Employees, Average income, Plans partner (a rival or none), then the **Anchor account** card (§14b).
-- **Staff plan deal** ("Yours" once signed): the **Staff plans** deal card:
-  - signing fee and contract length
-  - Peak ARR and an Expected ARR curve chart
-  - package selector (a plan the host offers; Team by default)
-  - host sales office selector
-  - Sign partnership
+- **Stats:** Employees, Average income, then the **Anchor account** card (§14b): the employer's one deal, bid for on the sales office's Deal Desk.
 - An energy site shows the power deal instead (§5b).
-- **Yours** ("Staff plans · yours"):
-  - health bar, "Year X of 7", ARR, package price and accounts
-  - curve with a "you are here" marker
-  - Renew (shows the fee) / Release
+- The staff plan deal card went on 2026-10-30 (owner's review, B1). A staff plan deal from an older save shows under **Yours** while it runs off.
 
 ## 14b. Business
 
@@ -468,8 +459,7 @@ Opened by tapping a business pin on the map (the **Businesses** layer, which als
   - campaigns: "Ease the AI safety rules for 4 quarters", "Fast-track a merger review", "Stall the AI safety bill" (only while one is pending; there is no price-cap law to delay)
   - sections: In force, Under way (weeks left), Past campaigns
 - **University:**
-  - stats: Staff, Students, Plans partner
-  - Staff plans: the employer deal (§14)
+  - stats: Staff, Students
   - Student partnership: the same deal card as **Student plans**, with Campus Plan by default
   - Graduate program: yearly cost ($120k × wageIndex); adds +10 to candidate skill and +1 hire a week
 

@@ -258,7 +258,7 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
         tokens: {
           bank,
           employer: str(p.employer),
-          kind: p.kind === 'student' ? 'campus plans' : 'staff plans',
+          kind: p.kind === 'payroll' ? 'staff plans' : 'campus plans',
           branch: str(p.branchName, 'its local sales office'),
           fee: m(p.fee),
         },

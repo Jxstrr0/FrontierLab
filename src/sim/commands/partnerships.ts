@@ -1,6 +1,7 @@
-// Partnership commands (SIMULATION §13.7, DESIGN §5.8.10): sign a payroll or
-// student partnership at an employer or university, renew it in its last year,
-// release it, and start or end a university graduate program.
+// Partnership commands (SIMULATION §13.7, DESIGN §5.8.10): sign a student
+// partnership at a university, renew it in its last year, release it, and start
+// or end a university graduate program. Staff-plan (`payroll`) deals with
+// employers are refused: businesses buy enterprise contracts on the Deal Desk.
 import { PARTNER_CONTRACT_WEEKS, PARTNER_HEALTH, WEEKS_PER_YEAR } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { COUNTRIES } from '../../data/countries';
@@ -28,7 +29,7 @@ const siteLabel = (site: Site) => site.employer?.name ?? site.refId;
 export function activePartnership(
   state: GameState,
   siteId: string,
-  kind: PartnershipKind = 'payroll',
+  kind: PartnershipKind = 'student',
 ): Partnership | undefined {
   return Object.values(state.partnerships).find(
     (p) => p.siteId === siteId && p.kind === kind && p.status === 'active',
@@ -41,15 +42,15 @@ export function signBlocker(
   siteId: string,
   hostBranchId: string,
   productId: string,
-  kind: PartnershipKind = 'payroll',
+  kind: PartnershipKind,
 ): string | undefined {
+  if (kind === 'payroll') return 'Businesses buy enterprise contracts on the Deal Desk now.';
   const site = state.world.sites[siteId];
   if (!site || (site.kind !== 'employer' && site.kind !== 'university') || !site.employer)
     return 'That employer is no longer on the map.';
   if (site.kind === 'employer' && CITIES[site.cityId]?.regional)
-    return 'Energy sites sign data-centre and power deals, not staff plan deals.';
-  if (kind === 'student' && site.kind !== 'university')
-    return 'Only universities offer student partnerships.';
+    return 'Energy sites sign data-centre and power deals, not partnerships.';
+  if (site.kind !== 'university') return 'Only universities offer student partnerships.';
   if (activePartnership(state, siteId, kind)) return 'You already have this partnership.';
   const host = state.branches[hostBranchId];
   // A regional site has no storefronts: any open branch in its country can host (hostCandidates).
@@ -71,7 +72,7 @@ export function signPartnership(
   siteId: string,
   hostBranchId: string,
   productId: string,
-  kind: PartnershipKind = 'payroll',
+  kind: PartnershipKind,
 ): CommandResult<{ partnershipId: string }> {
   const blocker = signBlocker(state, siteId, hostBranchId, productId, kind);
   if (blocker) return fail(blocker);
@@ -95,8 +96,6 @@ export function signPartnership(
   };
   state.partnerships[p.id] = p;
   postCash(state, -fee, 'investing');
-  // You won the payroll from whichever rival held it.
-  if (kind === 'payroll' && site.employer) delete site.employer.partnerRivalId;
   pushEvent(
     state,
     'PARTNERSHIP_SIGNED',

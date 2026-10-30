@@ -51,7 +51,7 @@ export function TreasuryFloor() {
         </>
       )}
 
-      <SectionTitle>Partnerships</SectionTitle>
+      <SectionTitle>Student partnerships</SectionTitle>
       <PartnershipCards />
     </div>
   );

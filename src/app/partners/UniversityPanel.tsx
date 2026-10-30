@@ -1,8 +1,7 @@
-// University panel (SCREENS §15, DESIGN §5.8.10): the staff payroll deal (the
-// same deal card as an employer), the student partnership (student accounts)
+// University panel (SCREENS §15, DESIGN §5.8.10): staff and student counts,
+// the student partnership (the Campus Plan deal card, or yours once signed)
 // and the graduate program card.
 import { DISTRICT_SPECS } from '../../data/districts';
-import * as cmd from '../../sim/commands';
 import { headcount } from '../../sim/partnerships';
 import { Card, Panel, Row, SectionTitle } from '../components';
 import { count } from '../format/format';
@@ -11,7 +10,6 @@ import { closePanel, useGame } from '../store';
 import { DealCard } from './DealCard';
 import { GradProgramCard } from './GradProgramCard';
 import { PartnerArt } from './PartnerArt';
-import { currentPartner } from './partnerView';
 import './partners.css';
 
 export function UniversityPanel(p: { siteId: string }) {
@@ -25,7 +23,6 @@ export function UniversityPanel(p: { siteId: string }) {
     );
   }
   const students = headcount(site, 'student');
-  const mine = !!cmd.activePartnership(s, site.id, 'payroll');
   const district = DISTRICT_SPECS[site.district]?.name;
   return (
     <Panel
@@ -40,14 +37,7 @@ export function UniversityPanel(p: { siteId: string }) {
         <Card>
           <Row label="Staff" value={count(site.employer.employees)} />
           <Row label="Students" value={count(students)} />
-          <Row
-            label="Plans partner"
-            value={currentPartner(s, site, mine)}
-            tone={mine ? 'good' : undefined}
-          />
         </Card>
-        <SectionTitle>Staff plans</SectionTitle>
-        <DealCard site={site} kind="payroll" people={site.employer.employees} />
         <SectionTitle>Student partnership</SectionTitle>
         <DealCard site={site} kind="student" people={students} />
         <SectionTitle>Graduate program</SectionTitle>

@@ -74,9 +74,9 @@ describe('signing a power deal', () => {
     if (city) expect(cmd.powerDealBlocker(s, city.id)).toMatch(/energy sites/);
   });
 
-  it('replaces payroll partnerships at energy sites', () => {
+  it('replaces partnerships at energy sites', () => {
     const { s, site } = atEnergySite();
-    expect(cmd.signBlocker(s, site.id, 'x', 'x')).toMatch(/power deals/);
+    expect(cmd.signBlocker(s, site.id, 'x', 'x', 'student')).toMatch(/power deals/);
   });
 });
 

@@ -558,8 +558,6 @@ export const OVERNIGHT_LIMIT_MULT: Record<Tier, number> = {
   restricted: 0.5,
   critical: 0.25,
 };
-/** ARR per participating employee in a company partnership (§13.7, C3a): about a Team seat. */
-export const ARR_PER_EMPLOYEE = 300;
 /** Funding market (§13.6): offers regenerate every 2 weeks while you have a Treasury floor. */
 export const FUNDING_REFRESH_WEEKS = 2;
 /** Offer count = base + floor(perCoverage × treasuryCoverage′) + (CFO expertise ≥ cfoExpertise ? cfoBonus : 0). */
@@ -1147,7 +1145,7 @@ export const BRANCH_NAME_MAX = 32;
 // Each system below owns its own section; keep additions inside the right one.
 
 // ─── STAGE 5 MAP SITES (CONTENT §14, §16) ─────────────────────────────────────
-/** Chance an employer's payroll already sits with one of the city's rivals. */
+/** Chance a rival already holds an employer's anchor account when its city is seeded. */
 export const EMPLOYER_PARTNER_CHANCE = 0.6;
 
 // ─── RIVAL AI (§18) ───────────────────────────────────────────────────────────
@@ -1766,9 +1764,6 @@ export const YIELD_CURVE: { label: string; premiumShare: number }[] = [
 // ─── PARTNERSHIPS AND UNIVERSITIES (§13.7) ────────────────────────────────────
 /** Contract length L in weeks ("Year X of 7", CONTENT §14). */
 export const PARTNER_CONTRACT_WEEKS = 364;
-/** Signing fee = employees × PARTNER_FEE_PER_EMPLOYEE × income mult × city incomeIndex (CONTENT §14). */
-export const PARTNER_FEE_PER_EMPLOYEE = 160;
-// ARR_PER_EMPLOYEE ($300 per participating employee) sits with the treasury constants above.
 /**
  * Participation curve over a contract of L weeks (§13.7): an S-curve from 0 to
  * `rampTo` by `rampWeeks` (logistic with this `steepness`, rescaled to hit both

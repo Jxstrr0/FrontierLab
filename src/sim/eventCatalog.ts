@@ -194,6 +194,7 @@ export interface EventPayloads {
     partnershipId: Id;
     siteId: Id;
     employer: string;
+    /** Only student deals are signed now; `payroll` is kept for old saves' logs. */
     kind: 'payroll' | 'student';
     branchName: string;
     fee: Money;
