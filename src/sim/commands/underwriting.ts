@@ -13,14 +13,29 @@ import {
   type ModelSource,
 } from '../underwriting';
 import { fail, ok, type CommandResult } from './result';
+import { maybeLaunch, publishWeights } from '../modelLaunch';
 
 /** Makes a stored model the house model, blending out the old one over two weeks. */
 export function activateModel(state: GameState, modelId: string): CommandResult {
   const u = state.underwriting;
   if (!u.models[modelId]) return fail('Unknown model.');
   if (u.activeModelId === modelId) return fail("That's already your AI model.");
-  u.switching = { fromId: u.activeModelId, weeksLeft: MODEL_SWITCH_WEEKS };
+  const prevId = u.activeModelId;
+  u.switching = { fromId: prevId, weeksLeft: MODEL_SWITCH_WEEKS };
   u.activeModelId = modelId;
+  // §16.15: the first switch to a trained model is its launch.
+  maybeLaunch(state, u.models[modelId]!, prevId);
+  return ok();
+}
+
+/** §16.16: publish a trained model's weights, once per model. */
+export function openWeights(state: GameState, modelId: string): CommandResult {
+  const m = state.underwriting.models[modelId];
+  if (!m) return fail('Unknown model.');
+  if (m.source !== 'trained')
+    return fail('Only models you trained can be released as open weights.');
+  if (m.openWeek !== undefined) return fail(`${m.name}'s weights are already public.`);
+  publishWeights(state, m);
   return ok();
 }
 

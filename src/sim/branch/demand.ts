@@ -161,6 +161,7 @@ export function runDemand(state: GameState, branch: Branch, fx: CampaignEffects)
   const waitlist = waitlisted(state);
   // §16.7 (C6a): a better model lets plan and usage prices sit above market.
   const headroom = priceHeadroom(state);
+  const usageHeadroom = priceHeadroom(state, 'usage');
   // §15 (C7a): the regulator's tier gates every new sign-up; a pause stops them.
   const regulator = salesGate(state);
   for (const spec of allProducts(state)) {
@@ -170,7 +171,7 @@ export function runDemand(state: GameState, branch: Branch, fx: CampaignEffects)
     const price = branchPrice(state, branch, spec.id);
     const m =
       marketRef(state, branch.cityId, spec.id) *
-      (spec.kind === 'plan' || spec.kind === 'usage' ? headroom : 1);
+      (spec.kind === 'plan' ? headroom : spec.kind === 'usage' ? usageHeadroom : 1);
     const stars = starsOf(state, spec);
     const affinity = affinityOf(spec);
     const approval = approvalOf(state, spec);

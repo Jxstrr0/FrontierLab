@@ -54,6 +54,15 @@ export interface EventPayloads {
   REGIONS_OPENED: { count: number; names: string };
   /** A training run finished: a new model generation (training.ts, C6b). */
   MODEL_TRAINED: { modelId: Id; name: string; stars: number; quality: number; leads: boolean };
+  MODEL_LAUNCHED: {
+    modelId: Id;
+    name: string;
+    quality: number;
+    leads: boolean;
+    rivalsCut: number;
+    headroom: number;
+  };
+  WEIGHTS_OPENED: { modelId: Id; name: string };
   /** You hired a researcher; `from` names the rival lab they left (commands/talent.ts, C6c). */
   RESEARCHER_HIRED: { researcherId: Id; name: string; stars: number; from?: string };
   /** One of your researchers left for a rival (RESEARCHER_POACHED, C6c). */

@@ -57,7 +57,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState } from './personalTypes';
 
-export const SCHEMA_VERSION = 33;
+export const SCHEMA_VERSION = 34;
 
 export interface GameState {
   schemaVersion: number;
@@ -847,6 +847,10 @@ export interface UnderwritingModel {
   /** Trained models: the generation number and the week training finished. */
   generation?: number;
   trainedWeek?: Week;
+  /** Trained models: the week it launched (first switched on, §16.15). */
+  launchedWeek?: Week;
+  /** Trained models: the week its weights were published (§16.16). */
+  openWeek?: Week;
 }
 
 /** A training run on the Products floor (C6b, SIMULATION §16.12). */
@@ -928,6 +932,11 @@ export interface UnderwritingState {
   switching?: { fromId: Id; weeksLeft: number };
   models: Record<Id, UnderwritingModel>;
   loansBooked: number;
+  /**
+   * The latest model launch (§16.15): its hype headroom at launch, and the week
+   * an agency launch campaign holds the hype at full strength until (B3).
+   */
+  launch?: { modelId: Id; week: Week; headroom: number; awareness: number; holdUntil?: Week };
 }
 
 // ─── Treasury, Loan Desk ──────────────────────────────────────────────────────

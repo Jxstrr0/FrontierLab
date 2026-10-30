@@ -33,6 +33,16 @@ const game = () => {
 const siteOf = (s: GameState, kind: string, cityId: string) =>
   Object.values(s.world.sites).find((x) => x.kind === kind && x.cityId === cityId)!;
 
+/** B3: agencies sell launch campaigns only just after a model launch; open that window. */
+function openLaunchWindow(s: GameState): void {
+  s.underwriting.launch = {
+    modelId: s.underwriting.activeModelId,
+    week: s.clock.week,
+    headroom: 0,
+    awareness: 0,
+  };
+}
+
 describe('rivals in cities generated later', () => {
   it('keeps rival branch ids unique when a bank is seeded again after closures', () => {
     const s = game();
@@ -170,6 +180,7 @@ describe('HQ for several countries', () => {
     fly(s, 'lon');
     const packageId = AGENCIES[agency.refId]!.packages[0]!.id;
     const pkg = { agencyId: agency.refId, packageId, cityId: 'nyc' };
+    openLaunchWindow(s);
     expect(cmd.buyAgencyPackage(s, pkg)).toEqual({
       ok: false,
       reason: 'You need to be in New York to visit the agency.',

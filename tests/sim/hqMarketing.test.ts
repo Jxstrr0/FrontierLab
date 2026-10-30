@@ -2,6 +2,7 @@
 // brand awareness and cost money, agency packages spread their boost, and the
 // Prestige package lifts the Branch rating in its city.
 import { describe, expect, it } from 'vitest';
+import type { GameState } from '../../src/sim/state';
 import { AGENCIES, BRAND_CAMPAIGNS } from '../../src/data/brandCampaigns';
 import { campaignEffects } from '../../src/sim/branch/marketing';
 import { branchTarget } from '../../src/sim/branch/ratings';
@@ -15,6 +16,16 @@ import {
 } from '../../src/sim/hqMarketing';
 import { balanceSheet } from '../../src/sim/balanceSheet';
 import { bankWithFloors } from '../helpers/scenario';
+
+/** B3: agencies sell launch campaigns only just after a model launch; open that window. */
+function openLaunchWindow(s: GameState): void {
+  s.underwriting.launch = {
+    modelId: s.underwriting.activeModelId,
+    week: s.clock.week,
+    headroom: 0,
+    awareness: 0,
+  };
+}
 
 describe('brand campaigns', () => {
   it('needs a Marketing floor and refuses what can’t run yet', () => {
@@ -123,6 +134,7 @@ describe('agency packages', () => {
     const s = bankWithFloors([], { cityId: 'tor' });
     const city = s.world.cities.tor!;
     city.brandAwareness = 0;
+    openLaunchWindow(s);
     const cash0 = s.company.cash;
     const r = cmd.buyAgencyPackage(s, {
       agencyId: 'brightwell',
@@ -150,6 +162,7 @@ describe('agency packages', () => {
     const fx = campaignEffects(s, branch);
     const before = branchTarget(s, branch, fx);
     const pkg = AGENCIES.halcyon!.packages[0]!;
+    openLaunchWindow(s);
     const r = cmd.buyAgencyPackage(s, { agencyId: 'halcyon', packageId: pkg.id, cityId: 'tor' });
     expect(r.ok).toBe(true);
     expect(cityBrandBonus(s, 'tor')).toBe(0.1);

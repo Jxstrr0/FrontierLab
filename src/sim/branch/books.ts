@@ -96,7 +96,7 @@ function runRecurring(ctx: Ctx, spec: ProductSpec, book: Book, orig: Origination
   const { state, branch, wk } = ctx;
   const price = branchPrice(state, branch, spec.id);
   // §16.7 (C6a): churn compares the price with the market the model allows.
-  const m = marketRef(state, branch.cityId, spec.id) * priceHeadroom(state);
+  const m = marketRef(state, branch.cityId, spec.id) * priceHeadroom(state, spec.kind);
   const periods = periodsPerYear(spec);
   const k =
     perWeek(spec.churn) *

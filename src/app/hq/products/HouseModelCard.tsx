@@ -1,7 +1,8 @@
 // AI model card on the Products floor (SCREENS §10, DESIGN §5.8.3): the
 // model's rosette, name, where it comes from, data licence per customer a year (with the
 // short-staffing surcharge when the team is short), the "Switching" state
-// while the old model blends out, and Manage models.
+// while the old model blends out, a launch's fading hype and the open-weights
+// drag on API prices (§16.15–16.16), and Manage models.
 import { useState } from 'preact/hooks';
 import {
   activeModel,
@@ -11,6 +12,7 @@ import {
   priceHeadroom,
 } from '../../../sim/underwriting';
 import { Badge, Card, Row } from '../../components';
+import { launchHeadroom, openWeightsDrag } from '../../../sim/modelLaunch';
 import { modelCeiling } from '../../../sim/projects';
 import { useGame } from '../../store';
 import { ManageModelsSheet } from './ManageModelsSheet';
@@ -38,6 +40,8 @@ export function HouseModelCard() {
   const from = u.switching ? u.models[u.switching.fromId] : undefined;
   const paid = modelCostPerCustomer(s);
   const surcharge = paid - model.costPerCustomer > SURCHARGE_SHOWN;
+  const hype = launchHeadroom(s);
+  const drag = openWeightsDrag(s, modelQuality(model));
   return (
     <Card class="pf-model">
       <div class="pf-model-head">
@@ -59,6 +63,16 @@ export function HouseModelCard() {
       <h4 class="small muted pf-model-does">What it does</h4>
       <Row label="Compute per customer" value={signedPct(inferenceMult(s) - 1, 0)} />
       <Row label="Price headroom" value={headroomText(priceHeadroom(s) - 1)} />
+      {hype > 0 && (
+        <Row
+          label="Launch buzz"
+          value={`+${Math.round(hype * 100)}% headroom, fading`}
+          tone="good"
+        />
+      )}
+      {drag > 0 && (
+        <Row label="API headroom (open weights)" value={`−${Math.round(drag * 100)}%`} tone="bad" />
+      )}
       <Row label="Data licence" value={`${exactMoney(paid, sym)} per customer a year`} />
       {u.switching && (
         <p class="muted small hq-note" role="status">
