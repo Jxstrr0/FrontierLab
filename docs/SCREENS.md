@@ -538,6 +538,16 @@ Opened by tapping a business pin on the map (the **Businesses** layer, which als
 - When Finance is short-staffed, the figures read "Delayed".
 - Close resumes the game.
 
+### 21b. Annual report (modal)
+
+Opens on the first tick of a new year, after the results modal closes (before any incident or board reminder). Reopened from the Ledger archive, whose list starts with the annual reports, newest first ("Annual report 2031" and its headline).
+- **Header:** your lab's medallion, "Annual report {year}" ("The decade in review" every tenth year), ✕.
+- **Front page:** the Weekly Inference masthead with "Annual edition · year N" (or "Decade edition") and the date, then a headline and standfirst (SIMULATION §22a, CONTENT §26b).
+- **Story:** ARR, sales offices and valuation at the close; the milestones reached this year (up to three named, then "and N more"); your net worth and rich list place.
+- **The year in figures:** a table of revenue, net income, ARR, valuation, sales offices, customers, model quality, safety, your net worth and rich list place, this year beside last year.
+- **Decade edition:** instead of the year table, a bar chart of yearly revenue and net income for the last ten years, and the same table as "Then and now" (the first year of the decade beside this one).
+- **Continue** closes it and resumes the game.
+
 ## 22. Incident (modal)
 
 - **Header:** "Incident" with the scope (sales office name or company).
