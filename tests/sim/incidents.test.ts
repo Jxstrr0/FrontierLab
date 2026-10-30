@@ -3,6 +3,7 @@
 import { describe, expect, it } from 'vitest';
 import { INCIDENTS } from '../../src/config/balance';
 import { INCIDENT_SPECS } from '../../src/data/incidents';
+import { FOUNDER_SPECS } from '../../src/data/incidentsFounder';
 import { balanceSheet } from '../../src/sim/balanceSheet';
 import { emptyBook } from '../../src/sim/branch/books';
 import { branchPrice } from '../../src/sim/branch/pricing';
@@ -21,8 +22,9 @@ import { exportCode, importCode } from '../../src/sim/save/serialize';
 import { execGame, hire } from '../helpers/executives';
 import { aiReady, openBank } from '../helpers/incidents';
 
+// The founder's desk cases roll on their own terms (once a game, founderDesk.test.ts).
 const ROLLED = Object.values(INCIDENT_SPECS)
-  .filter((x) => x.trigger === 'rolled')
+  .filter((x) => x.trigger === 'rolled' && !(x.id in FOUNDER_SPECS))
   .map((x) => x.id);
 
 describe('incident catalog', () => {

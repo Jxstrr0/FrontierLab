@@ -6,6 +6,7 @@ import {
   BANK_RUN as BANK_RUN_P,
   LICENCE,
   MANDATED_PAUSE,
+  PRICE_WAR as PRICE_WAR_P,
   WEEKS_PER_YEAR,
 } from '../../config/balance';
 import { CITIES } from '../../data/cities';
@@ -21,7 +22,14 @@ import { acceptPause, pauseFee, revokeLicence } from '../mandatedPause';
 import { addEffect, incidentPMult } from './effects';
 import { DIVIDEND_DUE, EXEC_POACHED } from './execRules';
 import { RESEARCHER_POACHED } from './talentRules';
-import { fraudShield, incidentScale, num, ratingHit, type IncidentRule } from './helpers';
+import {
+  fraudShield,
+  incidentScale,
+  labSizeMult,
+  num,
+  ratingHit,
+  type IncidentRule,
+} from './helpers';
 import { INSIDER_PROBE } from './insiderRule';
 import { CAPITAL_REVIEW } from './capitalReview';
 import { compactMoney } from './text';
@@ -49,6 +57,7 @@ const DATA_BREACH: IncidentRule = {
       baseP('DATA_BREACH') *
       (1 + P.DATA_BREACH.itSlope * (1 - it)) *
       (P.DATA_BREACH.ctoBase - ctoExpertise(state) / 100) *
+      labSizeMult(state) *
       incidentPMult(state, 'DATA_BREACH', 'company')
     );
   },
@@ -104,6 +113,7 @@ const CARD_FRAUD: IncidentRule = {
     return (
       baseP('CARD_FRAUD') *
       Math.max(0, P.CARD_FRAUD.shieldBase - fraudShield(state) / 10) *
+      labSizeMult(state) *
       incidentPMult(state, 'CARD_FRAUD', 'company')
     );
   },
@@ -157,16 +167,35 @@ const REGULATOR_AUDIT: IncidentRule = {
   },
 };
 
+/** The cities a price-war case covers: `cityIds` from the rival's monthly cuts, or the city scope of an older save's case. */
+function warCities(inc: { scope: string; data: Record<string, number | string> }): string[] {
+  const ids = typeof inc.data.cityIds === 'string' ? inc.data.cityIds.split(',') : [];
+  return ids.filter((id) => id.length > 0).length > 0 ? ids : [inc.scope];
+}
+
+/** "Calgary", "Calgary and Toronto", "Calgary, Toronto, Seattle and 4 more cities". */
+export function cityList(ids: string[]): string {
+  const names = ids.map((id) => CITIES[id]?.name ?? id);
+  const shown = names.slice(0, PRICE_WAR_P.namedCities);
+  const more = names.length - shown.length;
+  if (more > 0) return `${shown.join(', ')} and ${more} more ${more === 1 ? 'city' : 'cities'}`;
+  if (shown.length <= 1) return shown[0] ?? 'the city';
+  return `${shown.slice(0, -1).join(', ')} and ${shown.at(-1)}`;
+}
+
+// One case a quarter (2026-10-30): `cityIds` lists every city a rival cut in
+// this month and Match it answers in all of them.
 const PRICE_WAR: IncidentRule = {
   prepare(_s, scope, data) {
-    data.city = CITIES[scope]?.name ?? scope;
+    data.cities = cityList(warCities({ scope, data }));
     if (typeof data.bank !== 'string') data.bank = 'A rival';
     if (typeof data.bump !== 'number') data.bump = P.PRICE_WAR.matchCut;
   },
   costs: () => ({ match: 0, hold: 0 }),
   apply(state, inc, optionId) {
-    if (optionId === 'match')
-      addEffect(state, 'planCut', inc.scope, P.PRICE_WAR.matchCut, P.PRICE_WAR.matchWeeks);
+    if (optionId !== 'match') return;
+    for (const city of warCities(inc))
+      addEffect(state, 'planCut', city, P.PRICE_WAR.matchCut, P.PRICE_WAR.matchWeeks);
   },
 };
 

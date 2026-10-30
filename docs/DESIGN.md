@@ -379,14 +379,15 @@ Investment banks on the map, with tabs Market / Equity / Debt / M&A:
 
 ### 5.14 Incidents
 - Case-based modals ("Case 1 of 2") with two or three choices:
-  - server-room break-in and API key leak
-  - data breach, abuse ring and capability over-claim
+  - API key leak, data breach, abuse ring and capability over-claim
   - safety audit and insider-trading probe
-  - viral complaint, staff walkout and data-centre heatwave
-  - executive poached, researcher poached and price war
+  - viral complaint and staff walkout
+  - executive poached, researcher poached and price war (one case a quarter, naming every rival and city that cut)
   - outage rumour, the regulator's letter and the mandated pause
   - dividend reminders
   - the AI-native cases (2026-10-27): a jailbreak going viral, a hallucination lawsuit, a training-data copyright suit, a model weights leak, deepfake misuse of the Creative Suite in a city, a data-centre fire and a grid failure at an energy site
+  - **the founder's desk (2026-10-30, CONTENT §22b):** eight small cases for the first three years, each once a game: a demo clip goes viral, a customer asks for a feature, an angel offers a cheque, a reporter wants an interview, a rival wants your office manager, your GPU cloud goes down, a hackathon wants a sponsor, a professor asks for course credits
+- Company-wide cases grow with the lab's customers, so a founder meets a few a year and a worldwide lab a few more, never a flood. The bank-branch break-in and heatwave are retired.
 - Sales office incidents can be delegated to managers. The code keeps the bank-era case ids (CONTENT §22).
 
 ### 5.15 The Weekly Inference
@@ -764,3 +765,5 @@ Add one dated line per decision. Never delete entries; supersede them.
 - 2026-10-28 (polish pass, batch 3): **Dates over week numbers, and no dead rows.** The club transfer window and auction pins show calendar dates like the rest of the game. The city sheet drops the bank-era homeowners row because no lab system reads it.
 - 2026-10-29 (launch re-check): **Compute floor needs a person per 15,000 GPUs.** The polish pass's 1 per 2,000 grew to about 155 people by year 10, more than two HQ buildings hold next to a growing Safety floor, so a big lab could not staff Safety and slid to Critical. At 1 per 15,000 the floor still grows with compute but leaves the room to Safety.
 - 2026-10-29 (launch re-check): **The title cover prints its chunks off-screen, then paints once.** Repainting the whole 4-megapixel strip every frame while the chunks came in cost 4–5 s of main-thread blocking on a slow phone and took Lighthouse performance to 67. The cover now prepares chunks against a 1 × 1 scratch canvas without the map's prefetch ring and paints the strip once at the end; it looks the same and shows sooner.
+- 2026-10-30 (owner's review, A1): **Incidents follow the lab, not the bank.** A 10-year steady run saw no case at all in years 1–2, then 22–26 price-war popups a year by year 8, while the seven AI-native cases fired six times in a decade: they rolled company-wide at a flat 0.1–0.2% a week and the bank-era office cases rolled once per office, so only the latter grew with the lab. Company cases now scale with customers (`INCIDENT_SIZE`), the break-in and heatwave are retired from the roll, the API key leak and deepfake cases roll at half their odds, and a month's price cuts raise one Price war case a quarter naming every rival and city, answered everywhere at once.
+- 2026-10-30 (owner's review, A2): **The founder's desk.** Eight once-a-game company cases for the first three years (CONTENT §22b) so the founder phase has choices beyond prices and campaigns: a viral demo, a feature request, an angel's cheque (5% at a 30% discount to the private valuation), a press interview, a poached office manager, a cloud outage, a hackathon and course credits. The desk rests six weeks between cases and closes at week 156.

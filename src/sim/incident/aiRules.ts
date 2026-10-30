@@ -1,7 +1,8 @@
 // AI-native company incidents (CONTENT §22, 2026-10-27): a jailbreak going
 // viral, a hallucination lawsuit, a training-data copyright suit and a leak of
 // the model's weights. Each rule gives the weekly chance, the rolled amounts,
-// option costs and what each option does; numbers in incidentParams.ts.
+// option costs and what each option does; numbers in incidentParams.ts. Their
+// odds grow with the lab's customers (labSizeMult, 2026-10-30).
 import { INCIDENT_PARAMS, INCIDENT_SPECS } from '../../data/incidents';
 import { companyArr } from '../arr';
 import { ctoExpertise } from '../execSeats';
@@ -11,13 +12,19 @@ import { safetyStrength } from '../safety';
 import type { GameState } from '../state';
 import { RADAR, activeModel, trainedRadar } from '../underwriting';
 import { addEffect, incidentPMult } from './effects';
-import { incidentScale, maybeNews, num, ratingHit, type IncidentRule } from './helpers';
+import {
+  incidentScale,
+  labSizeMult,
+  maybeNews,
+  num,
+  ratingHit,
+  totalCustomers,
+  type IncidentRule,
+} from './helpers';
 import { compactMoney } from './text';
 
 const P = INCIDENT_PARAMS;
 const baseP = (type: string) => INCIDENT_SPECS[type]?.baseP ?? 0;
-const totalCustomers = (state: GameState) =>
-  Object.values(state.branches).reduce((s, b) => s + (b.status === 'open' ? b.customers : 0), 0);
 const trainedModels = (state: GameState) =>
   Object.values(state.underwriting.models).filter((m) => m.source === 'trained');
 
@@ -29,6 +36,7 @@ const JAILBREAK: IncidentRule = {
     return (
       baseP('JAILBREAK') *
       Math.max(0, P.JAILBREAK.safetyBase - safety / 10) *
+      labSizeMult(state) *
       incidentPMult(state, 'JAILBREAK', 'company')
     );
   },
@@ -63,6 +71,7 @@ const HALLUCINATION_SUIT: IncidentRule = {
     return (
       baseP('HALLUCINATION_SUIT') *
       Math.max(0, P.HALLUCINATION_SUIT.reasoningBase - reasoning / 10) *
+      labSizeMult(state) *
       incidentPMult(state, 'HALLUCINATION_SUIT', 'company')
     );
   },
@@ -103,7 +112,11 @@ const COPYRIGHT_SUIT: IncidentRule = {
   // Only once a trained model exists.
   chance(state) {
     if (trainedModels(state).length === 0) return 0;
-    return baseP('COPYRIGHT_SUIT') * incidentPMult(state, 'COPYRIGHT_SUIT', 'company');
+    return (
+      baseP('COPYRIGHT_SUIT') *
+      labSizeMult(state) *
+      incidentPMult(state, 'COPYRIGHT_SUIT', 'company')
+    );
   },
   roll(state) {
     const models = Math.max(1, trainedModels(state).length);
@@ -144,6 +157,7 @@ const WEIGHTS_LEAK: IncidentRule = {
       baseP('WEIGHTS_LEAK') *
       (1 + P.WEIGHTS_LEAK.itSlope * (1 - it)) *
       (P.WEIGHTS_LEAK.ctoBase - ctoExpertise(state) / 100) *
+      labSizeMult(state) *
       incidentPMult(state, 'WEIGHTS_LEAK', 'company')
     );
   },
