@@ -295,7 +295,8 @@ No tabs: one overview page.
   - **Training run:** with no run, the model name (default "Gen N"), a focus picker over the five axes, training time (the development terms), weekly budget stepper ($20k up, step $5k) with total cost, an odds table (each star result with its % and lift, e.g. "+0.4 on all, +0.4 more Reasoning") and Start. While a run is under way: name, focus, progress bar, weeks left, budget and spent so far, and Cancel (with a confirm). "Paused: no Products floor" if the floor goes.
   - **Leaderboard:** a line on today's quality bar and your price headroom, then every lab ranked by model quality (rank, lab, model, quality to one decimal), your row highlighted. A rival HQ panel's Overview shows that lab's AI model (name · quality) and when it shipped.
   - **Research team:** "Your team: N of 8", the training boost, and your researchers (portrait, name, stars, specialty, salary a year, **Let go** with a confirm) with the team's weekly pay. Then the **Talent market**: everyone else, best first (top 8, Show all), with where they work ("At <rival>" or "Available"), salary a year, the signing bonus when poaching, and **Hire** / **Poach**. The Training run card adds a line under its odds: "Your research team adds +N, your CPO +M." The CPO's profile shows their training-odds boost, and a rival HQ panel's Overview lists its researchers (count and stars).
-  - Manage models lists trained models as "Trained · Gen N" with **Use as AI model**.
+  - Manage models lists trained models as "Trained · Gen N" with **Launch** (a model never switched on; its first switch is the launch, §16.15) or **Use as AI model**, and **Open weights** (a confirm card spells out the trade; an "Open weights" badge once released).
+  - The What it does block adds **Launch buzz** ("+7% headroom, fading") while a launch's hype lasts and **API headroom (open weights)** (red) while an open model drags usage prices.
 - **Compute** (dept id `treasury`):
   - An **Outage** or **Capacity crunch** banner at the top while either runs
   - **Compute pool:** the Compute card (§24), with a "GPUs rented in lots" row when you have any, then the **Compute policy** card: spot limit this week, emergency burst on top, the "GPU offers +8%" stigma row while it lasts, a note on how the limit moves, and the **Auto spot-buy** toggle (hint: buys at spot then burst / runs on your own GPUs only, with a waitlist)
@@ -452,7 +453,7 @@ Opened by tapping a business pin on the map (the **Businesses** layer, which als
 
 ## 15. Marketing agency · Lobbying firm · University
 
-- **Marketing agency:** package cards (name, cities, weeks, cost, awareness boost) with Buy.
+- **Marketing agency:** a status line ("{Model} just launched: book a launch campaign in the next N weeks", or how to open the window), then **Launch campaigns**: package cards (name, city, weeks, cost, awareness boost, "Launch buzz held at full for N weeks") with Buy, disabled outside the 8-week window.
 - **Lobbying firm:**
   - campaign cards with cost, success %, exposure risk %, and Lobby
   - the outcome arrives in 4–8 weeks

@@ -230,6 +230,16 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     }
     return s;
   },
+  // Schema 34 (owner's review A3, B3: model launches and open weights): new
+  // optional fields only (UnderwritingModel.launchedWeek / openWeek,
+  // UnderwritingState.launch). Models switched on before this count as launched.
+  33: (s) => {
+    const state = s as unknown as GameState;
+    for (const m of Object.values(state.underwriting?.models ?? {}))
+      if (m.source === 'trained' && m.id === state.underwriting.activeModelId)
+        m.launchedWeek ??= m.trainedWeek ?? state.clock.week;
+    return s;
+  },
 };
 
 /** Upgrades a raw save to the current schema, or throws if it can't. */
