@@ -1,9 +1,9 @@
 // Deal Desk tab of the sales office panel (SCREENS §5.3, SIMULATION §11, stage
 // C5b): a summary strip (this week's RFPs, won, lost, win rate, contracts held
-// and their yearly value), the office's discount limit, new requests for
-// proposal to bid on, renewals due at the next quarter start, and the
-// office's contracts.
-import { DEAL } from '../../config/balance';
+// and their yearly value), the office's discount limit, public tenders open
+// and held (§11.7), new requests for proposal to bid on, renewals due at the
+// next quarter start, and the office's contracts.
+import { DEAL, TENDER } from '../../config/balance';
 import { contractsOf, dealsOffered, deskDelegated } from '../../sim/branch/dealDesk';
 import * as cmd from '../../sim/commands';
 import { act, useGame } from '../store';
@@ -13,6 +13,8 @@ import { ContractList } from './dealdesk/ContractList';
 import { DiscountStepper } from './dealdesk/dealParts';
 import { RenewalCard } from './dealdesk/RenewalCard';
 import { RfpCard } from './dealdesk/RfpCard';
+import { PublicContractCard, TENDER_TIER_NOTE, TenderCard } from './dealdesk/TenderCard';
+import { officeTenders, tenderEligible } from '../../sim/tenders';
 import { dealDeskStrip, officeRfps } from './dealDeskSelectors';
 import './dealdesk/dealdesk.css';
 
@@ -72,6 +74,8 @@ export function DealDeskTab({ branchId }: { branchId: string }) {
         </Card>
       )}
 
+      <PublicTenders branchId={branchId} limit={limit} />
+
       <SectionTitle>Proposal requests · {count(fresh.length)}</SectionTitle>
       {fresh.length === 0 ? (
         <Card>
@@ -105,6 +109,40 @@ export function DealDeskTab({ branchId }: { branchId: string }) {
         startDate={s.meta.startDate}
       />
     </div>
+  );
+}
+
+/** Public tenders this office is bidding for or holds, or why there are none. */
+function PublicTenders(p: { branchId: string; limit: number }) {
+  const s = useGame();
+  const branch = s.branches[p.branchId];
+  const tenders = officeTenders(s, p.branchId);
+  const eligible = tenderEligible(s);
+  const showNote =
+    !eligible && !!branch && dealsOffered(branch) && s.clock.week >= TENDER.firstWeek;
+  if (tenders.length === 0 && !showNote) return null;
+  return (
+    <>
+      <SectionTitle>Public tenders · {count(tenders.length)}</SectionTitle>
+      {showNote && (
+        <Card>
+          <p class="dealdesk-note">{TENDER_TIER_NOTE}</p>
+        </Card>
+      )}
+      {tenders.map((t) =>
+        t.status === 'open' ? (
+          <TenderCard key={t.id} t={t} startDiscount={p.limit} />
+        ) : (
+          <PublicContractCard key={t.id} t={t} />
+        ),
+      )}
+      {tenders.some((t) => t.status === 'open') && (
+        <p class="muted small dealdesk-foot">
+          Bids are sealed and the award is made when bids close. Public bodies judge the AI model's
+          Safety most, and cancel a contract if the regulator's rating falls to Restricted.
+        </p>
+      )}
+    </>
   );
 }
 

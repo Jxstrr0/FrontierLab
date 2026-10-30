@@ -240,6 +240,13 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
         m.launchedWeek ??= m.trainedWeek ?? state.clock.week;
     return s;
   },
+  // Schema 35 (owner's review A4: public-sector tenders): the Deal Desk holds
+  // tenders open or won, none yet in an older save.
+  34: (s) => {
+    const state = s as unknown as GameState;
+    if (state.dealDesk) state.dealDesk.tenders ??= {};
+    return s;
+  },
 };
 
 /** Upgrades a raw save to the current schema, or throws if it can't. */

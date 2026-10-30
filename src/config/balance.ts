@@ -513,6 +513,38 @@ export const DEAL = {
   bigDeal: 250_000,
 } as const;
 
+// ─── PUBLIC TENDERS (§11.7, owner's review A4) ────────────────────────────────
+/**
+ * Public-sector tenders: big, long contracts from a city's public bodies,
+ * offered only to labs the AI regulator rates Adequate or better, and won
+ * mostly on the AI model's Safety axis.
+ */
+export const TENDER = {
+  /** Each quarter start, a city with your sales office (Enterprise contracts on) posts a tender at this chance. */
+  quarterlyChance: 0.25,
+  /** No tenders before this week: a public body wants a lab with a track record. */
+  firstWeek: 26,
+  /** Safety tiers a public body invites and awards to. */
+  tiers: ['strong', 'adequate'] as readonly string[],
+  /** Tiers at which a public body cancels a contract it awarded (Watch only stops new awards). */
+  cancelTiers: ['restricted', 'critical'] as readonly string[],
+  /** Bids are sealed and the award is made this many weeks after the tender opens. */
+  bidWeeks: 6,
+  /** Yearly budget at the start of a game, before the body's multiplier, the city size and the nominal index. */
+  budget: [600_000, 1_800_000] as [number, number],
+  /** Budget × this by city size. */
+  citySize: { S: 0.7, M: 1, L: 1.3, XL: 1.6 } as Record<string, number>,
+  /** Term in years, drawn evenly. */
+  termYears: [3, 5] as [number, number],
+  /** Win chance = winBase + safetySlope × (Safety − 5) + qualitySlope × (quality − bar) + tierEdge + discountSlope × discount. */
+  winBase: 0.3,
+  safetySlope: 0.06,
+  qualitySlope: 0.03,
+  tierEdge: { strong: 0.1, adequate: 0 } as Record<string, number>,
+  discountSlope: 1,
+  winClamp: [0.05, 0.9] as [number, number],
+} as const;
+
 // ─── BRANCH (§12, §5.3) ───────────────────────────────────────────────────────
 export const EQUIP_MAINT = 0.06;
 export const FITOUT_UPKEEP = 0.02;
