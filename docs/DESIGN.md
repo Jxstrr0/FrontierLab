@@ -271,6 +271,8 @@ Shown to the player in one place, the Company summary:
   - Efficiency cuts the compute behind every customer. Speed lifts Service. Safety counts with data-sensitive businesses and lowers safety risk.
 - **The frontier.** Every rival lab has a named model, and some ship a new generation each quarter. The best rival model is the frontier; as it rises, the bar your model is judged against rises with it. A leaderboard ranks every lab's model.
 - **Training runs:** name, focus axis, term (4/8/12/24/48 weeks), weekly budget and a live star-odds table. The finished model waits in Manage Models to switch on.
+- **Launches** (2026-10-30, owner's review A3): switching a trained model on for the first time launches it. The paper runs the story, awareness rises at every sales office, and price headroom gets a boost that fades over a quarter; the bigger the jump over the old model, the bigger both. A model that tops every rival makes the rivals cut their plan prices where you sell. An agency launch campaign booked in the following weeks holds the buzz at full strength while it runs.
+- **Open weights:** a trained model can be released for anyone to run, once. Developers love it (awareness at every office, API sign-ups up for half a year), but while your AI model is within 1.5 quality points of it, API customers pay less over market.
 - **Research team:** up to eight named researchers hired from the market or poached from rivals. They lift training odds, most on their specialty, and rivals bid for them each quarter.
 - Company product lineup with "Apply prices to all sales offices".
 - Product development: type, target price tier, 4/8/12/24/48 weeks and a weekly budget, with a live star-odds table.
@@ -316,7 +318,7 @@ Brand awareness by city, brand campaigns (TV, billboards, podcasts, creators, ar
 - Ventures pipeline. More staff finds more startups.
 
 #### 5.8.10 Outside HQ: agencies, lobbyists, universities
-- **Marketing agencies** sell city-wide campaign packages.
+- **Marketing agencies** sell launch campaigns: city packages on sale for 8 weeks after a model launch, which hold the launch buzz while they run (2026-10-30, B3).
 - **Lobbying firms** push AI policy at a price (ease the AI safety rules, stall the AI safety bill, fast-track a merger review), with a chance of failing and a chance of an exposé in the paper.
 - **Universities** offer a student partnership (the Campus Plan) and a graduate program that improves hiring pools.
 
@@ -767,3 +769,5 @@ Add one dated line per decision. Never delete entries; supersede them.
 - 2026-10-30 (owner's review, B6): **Three development templates retired.** Researcher Plan, Family Plan and Carbon-Neutral Plan were bank-era segment variants of Plus (the last duplicating the Green Compute Pledge campaign). They leave the New product form; products already developed from them keep working.
 - 2026-10-30 (owner's review, B7): **Currencies cut.** The country-bet investment added its own Market section, portfolio slice and balance-sheet line for little play; it is removed, and old saves sell their positions at the last value into the owner's cash (schema 32).
 - 2026-10-30 (owner's review, B1): **One deal per employer.** An employer offered both a staff plan partnership and an anchor-account contract on the Deal Desk: two deals with the same company, priced and grown in different ways. The staff plan partnership is retired; the anchor account is the employer's deal, and universities keep the student partnership. Old saves run off any active staff plan deal over 12 weeks as if released (schema 33).
+- 2026-10-30 (owner's review, A3): **Model launches and open weights.** A finished training run waited in a sheet for a tap; the most AI-lab moment had no fanfare. The first switch to a trained model is now a launch (story, awareness, headroom hype that fades over 13 weeks, rival price cuts when it tops the board), and a trained model can be released as open weights (awareness, API sign-ups ×1.3 for 26 weeks, but usage headroom falls by up to 12% while your AI model is within 1.5 points of it). Older saves count the trained model in use as already launched (schema 34).
+- 2026-10-30 (owner's review, B3): **Agencies sell launch campaigns.** Agency packages were one-off brand boosts, the job brand campaigns already do. They now sell only in the 8 weeks after a launch and hold its buzz at full strength for the package's length, so agencies have a job of their own.

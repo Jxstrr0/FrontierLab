@@ -1,7 +1,10 @@
 // HQ marketing commands (SIMULATION §16.10, CONTENT §11, SCREENS §10 and §15):
 // start and stop brand campaigns (Marketing floor required) in any city or
 // country you've reached, from anywhere, and buy agency packages at a
-// marketing agency's office in the city you're in (no floor needed).
+// marketing agency's office in the city you're in (no floor needed). Agency
+// packages are launch campaigns: on sale for a few weeks after a model launch,
+// they hold the launch hype at full strength while they run (B3).
+import { MODEL_LAUNCH } from '../../config/balance';
 import { AGENCIES, BRAND_CAMPAIGNS } from '../../data/brandCampaigns';
 import { CITIES } from '../../data/cities';
 import { pushEvent } from '../events';
@@ -14,6 +17,7 @@ import {
 } from '../hqMarketing';
 import { newId } from '../ids';
 import { spend } from '../ledger';
+import { holdHype, launchWindowOpen } from '../modelLaunch';
 import type { GameState } from '../state';
 import { fail, money, ok, type CommandResult } from './result';
 
@@ -78,6 +82,11 @@ export function buyAgencyPackage(
   const agency = AGENCIES[order.agencyId];
   const pkg = agency?.packages.find((p) => p.id === order.packageId);
   if (!agency || !pkg) return fail('That package is not available.');
+  // B3 (owner's review): agencies sell launch campaigns, for a few weeks after a model launch.
+  if (!launchWindowOpen(state))
+    return fail(
+      `${agency.name} runs launch campaigns. Launch a model you trained, then book within ${MODEL_LAUNCH.windowWeeks} weeks.`,
+    );
   if (!agenciesInCity(state, order.cityId).includes(agency.id))
     return fail(`${agency.name} has no office in ${CITIES[order.cityId]?.name ?? 'that city'}.`);
   // DESIGN §5.17: visiting a building means being in its city.
@@ -91,6 +100,7 @@ export function buyAgencyPackage(
       `${pkg.name} costs ${money(state, price)}; you have ${money(state, state.company.cash)}.`,
     );
   spend(state, 'marketing', price);
+  holdHype(state, pkg.weeks);
   const id = newId(state, 'ap');
   state.marketing.packages.push({
     id,

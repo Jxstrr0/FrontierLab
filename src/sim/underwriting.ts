@@ -21,6 +21,7 @@ import { digitalBonus } from './products';
 import { modelCeiling } from './projects';
 import { frontierRise } from './rivalModels';
 import type { Business, GameState, UnderwritingModel } from './state';
+import { launchHeadroom, openWeightsDrag } from './modelLaunch';
 
 /** Radar index constants: Reasoning, Speed, Breadth, Safety, Efficiency. */
 export const RADAR = { reasoning: 0, speed: 1, breadth: 2, safety: 3, efficiency: 4 } as const;
@@ -228,10 +229,15 @@ export function qualityBar(state: GameState): number {
   return MODEL_EFFECTS.qualityRef + MODEL_EFFECTS.frontierWeight * frontierRise(state);
 }
 
-/** §16.7: price headroom, the market price multiplier customers accept, 1 + 0.04 × (quality − bar). */
-export function priceHeadroom(state: GameState): number {
+/**
+ * §16.7: price headroom, the market price multiplier customers accept,
+ * 1 + 0.04 × (quality − bar), plus a launch's fading hype (§16.15). Usage
+ * products also lose the open-weights drag (§16.16); pass the product kind.
+ */
+export function priceHeadroom(state: GameState, kind?: string): number {
   const q = modelQuality(activeModel(state));
-  return 1 + MODEL_EFFECTS.headroomSlope * (q - qualityBar(state));
+  const drag = kind === 'usage' ? openWeightsDrag(state, q) : 0;
+  return 1 + MODEL_EFFECTS.headroomSlope * (q - qualityBar(state)) + launchHeadroom(state) - drag;
 }
 
 /**

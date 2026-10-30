@@ -333,6 +333,46 @@ const BANK_TEMPLATES = {
       b: 'A {score} benchmark score puts the new model first on the board. Rival labs are expected to answer.',
     },
   ],
+  MODEL_LAUNCHED: [
+    {
+      h: '{bank} launches {name}',
+      b: 'The new model is live for every customer this week, with a {score} benchmark score. Sign-ups are already climbing.',
+    },
+    {
+      h: '{name} goes live at {bank}',
+      b: 'Launch-day demos drew a crowd. Analysts expect the lab to price its plans a little higher while the buzz lasts.',
+    },
+  ],
+  MODEL_LAUNCHED_LEADS: [
+    {
+      h: '{bank} launches {name}, the best model on the market',
+      b: 'At {score} on the benchmark board, nothing a rival lab sells comes close. The launch buzz should last a quarter.',
+    },
+    {
+      h: '{name} takes the crown',
+      b: '{bank} switched on its new model this week. A {score} benchmark score puts it ahead of every rival release.',
+    },
+  ],
+  MODEL_LAUNCHED_WAR: [
+    {
+      h: '{name} launches; rivals slash prices',
+      b: '{bank}’s new model scores {score}, ahead of every rival, and {rivals} rival labs cut their plan prices within hours to hold on to customers.',
+    },
+    {
+      h: 'Price cuts follow {bank}’s {name} launch',
+      b: 'With a {score} benchmark score at the top of the board, {bank} has rivals scrambling: {rivals} labs answered with cheaper plans.',
+    },
+  ],
+  WEIGHTS_OPENED: [
+    {
+      h: '{bank} releases {name} as open weights',
+      b: 'Anyone can now download and run the model. Developers are delighted; analysts wonder what it does to the lab’s API prices.',
+    },
+    {
+      h: '{name} is now open',
+      b: '{bank} has published the weights of {name}. Hobbyists, researchers and start-ups are already building on it.',
+    },
+  ],
   RESEARCHER_HIRED: [
     {
       h: '{bank} hires researcher {name}',

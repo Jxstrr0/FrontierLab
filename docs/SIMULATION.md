@@ -699,7 +699,7 @@ The Finance floor's 1–5 dial (code `company.riskAppetite`, set by `setRiskAppe
 
 ### 16.10 HQ marketing
 - **Brand campaigns** run per city or per country with a weekly cost and a gain to `b`.
-- **Agency packages:** a one-time `b` boost spread over the package length, with no staff needed.
+- **Agency packages** (launch campaigns since 2026-10-30): a one-time `b` boost spread over the package length, with no staff needed. On sale only within `MODEL_LAUNCH.windowWeeks` (8) of a model launch (§16.15); each holds the launch hype at full strength for its length.
 
 ### 16.11 Hiring sales office managers for you
 - The COO's **Sales office operations** (§17.2) is the one way managers are hired for you: each week every **open** office with no manager gets the candidate in its city with the highest total of the four skills (people + product + marketing + ethics; ties go to the first listed, `strongestCandidate`), hired with the player's own `hireManager`, so at the candidate's asking salary, and the office gets the default delegation `EXEC_DELEGATION.cooDelegation`. An office still being built waits until it opens; a city with no candidates waits for its next pool.
@@ -747,6 +747,17 @@ Late-game builds (`FRONTIER_PROJECTS`, `src/data/frontierProjects.ts`, `src/sim/
   - **Safety Institute:** exposure (§15) − `instituteExposureCut` (0.3), and company-wide incident chances × `instituteIncidentMult` (0.7).
   - **Global Edge Network:** +0.15 to every sales office's Service target (§10).
 - **Balance check (seed 42, steady, 15 years):** the strategy starts a project once cash is twice its price; Lodestar finishes in year 7, Meridian in year 13, the model reaches quality 12, and year-15 cash is $11.5B (was $14.8B).
+
+### 16.15 Model launches
+A trained model's first switch-on (`activateModel`, by you, the CPO or a strategy) is its **launch** (`src/sim/modelLaunch.ts`, `MODEL_LAUNCH`). Let `gain` = quality of the new model − quality of the one it replaces (floored at 0).
+- **Hype headroom** `h0 = min(0.12, 0.02 + 0.05 × gain)` is added to price headroom (§16.7): `headroom = 1 + 0.04 × (quality − bar) + h(t)`, with `h(t) = h0 × max(0, 1 − (week − from) / 13)` and `from` = the launch week, or the end of the last agency launch campaign if later. It applies only while the launched model is the AI model.
+- **Awareness** at every open sales office + `min(0.12, 0.02 + 0.04 × gain)`, once.
+- **Rival answer:** if the new model beats the best rival model, every active rival cuts its plan prices by `rivalCut` (5%) in each of its cities where you have an open office, as a price-war bump (§18.6; capped at 20%, fading 0.5 points a week once no price war holds it).
+- **Story:** `MODEL_LAUNCHED` (front-page priority `companyLaunch` when it leads). Agencies sell launch campaigns for 8 weeks after (§16.10).
+- **Example:** a model 1.0 point better than the old one gets `h0 = 0.07` (7% over market on top of quality), 3.5% after 6.5 weeks, nothing after 13; awareness +0.06.
+
+### 16.16 Open weights
+`openWeights(modelId)` (trained models, once each, `OPEN_WEIGHTS`): awareness + 0.08 at every open sales office, and API sign-ups × 1.3 for 26 weeks (a company `takeup` effect on `api`). From then on usage products lose `drag = 0.12 × (1 − gap / 1.5)` of headroom, where `gap` = your AI model's quality − the open model's (floored at 0) for the closest open model, and 0 once `gap ≥ 1.5`. Plans keep their headroom. Story: `WEIGHTS_OPENED`.
 
 ## 17. People AI
 
@@ -1201,7 +1212,7 @@ The main groups, with the defaults shown above. Names marked (legacy) belong to 
 - **INCIDENTS:** `INCIDENTS` (`onceWeeks` for once-a-game cases), `INCIDENT_SCALE`, `INCIDENT_SIZE` (company cases grow with customers), `FOUNDER_DESK` (untilWeek 156, gapWeeks 6, baseP 0.012, angelPct 0.05, angelDiscount 0.3), `INCIDENT_PRICE_SEVERITY`, `FRAUD_SHIELD`; per-case numbers in `src/data/incidentParams.ts`
 - **RIVALS:** `RIVAL_EXPANSION`, `RIVAL_LEARNING`, `RIVAL_CHARTER`, `RIVAL_MERGERS`, `RIVAL_MARKETING`, `RIVAL_TECH`, `RIVAL_CLOSURE`, `RIVAL_FAILURE`, `RIVAL_RAISE`, `RIVAL_RUNWAY_TIERS`, `RIVAL_PAYOUT`, `PRICE_WAR` (`caseWeeks` 13, `namedCities` 3); the rival books: `RIVAL_BOOKS` (matureCustomers, ema, usagePerCustomer, cycle, computeShare, officeCost, trainingShare, cashTargetWeeks, startRunwayWeeks, strategy multipliers), `RIVAL_QUALITY_REF`, `RIVAL_RAMP_WEEKS`, `RIVAL_COMPETITION`
 - **HQ:** `OFFICE_LISTINGS`, `OFFICE_RENT_PER_FLOOR`, `OFFICE_DEPOSIT_WEEKS`, `FLOOR_FITOUT`, `MAIN_OFFICES_MAX`, `DESKS_PER_FLOOR_OPTIONS = [24, 32]` (the Executive suite's 7 desks come from `src/data/departments.ts`), `FOUNDER_MODE_ASSETS = 250_000_000`, `FOUNDER_RAMP`, `DEPT_REQUIREMENTS`, `HQ_COVERAGE`, `HQ_EFFECTS`, `APP_RATING`
-- **PRODUCTS AND MODELS:** `DEV_TERMS`, `DEV_*` (score, budget, `DEV_SIGMA`, `DEV_TIER`), `MODEL_QUALITY`, `BUREAU_HOSTED`, `INTERNAL_HISTORY`, `MODEL_EFFECTS`, `MODEL_DELEGATE`, `MODEL_SWITCH_WEEKS`, `TRAINING`, `RIVAL_MODEL`, `CPO_TRAINING`, `RESEARCHERS`, `DELEGATE`
+- **PRODUCTS AND MODELS:** `DEV_TERMS`, `DEV_*` (score, budget, `DEV_SIGMA`, `DEV_TIER`), `MODEL_QUALITY`, `BUREAU_HOSTED`, `INTERNAL_HISTORY`, `MODEL_EFFECTS`, `MODEL_DELEGATE`, `MODEL_SWITCH_WEEKS`, `MODEL_LAUNCH`, `OPEN_WEIGHTS`, `TRAINING`, `RIVAL_MODEL`, `CPO_TRAINING`, `RESEARCHERS`, `DELEGATE`
 - **PEOPLE:** `EXECUTIVES` (`grantMinValue` 0.25: unvested grants must be worth a quarter of salary to cut resignations), `EXEC_PAY`, `EXEC_DELEGATION`, `GUIDANCE`, `PAY_REVIEW` (`counterHoldWeeks` 52), `GOVERNANCE`, `BOARD_VOTE`
 - **MARKETS:** `COE`, `VALUATION`, `PRIVATE_VALUATION = 0.8`, `PLACEMENT`, `IPO` (`minArr` 100M), `PUBLIC_PRICE`, `SECONDARY`, `SECONDARY_DISCOUNT = 0.03`, `BUYBACK`, `STOCK_MARKET`, `COMMISSION = 0.001`, `MERGERS`, `SHARE_DEALS`, `REBRAND_COST`, `INCIDENT_PRICE_SEVERITY`, `LATE_FILING`
 - **CORPORATE DEBT:** `CORPORATE_LENDING` (`refreshWeeks` 4, `offersPerLender` [2, 3], `maxEquityShare` 0.4, `lineEquityShare` 0.6, `lineSpread` 0.04; §19.9)
