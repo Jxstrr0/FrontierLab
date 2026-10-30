@@ -268,6 +268,17 @@ const EVENT_TEXT: Record<string, (p: Record<string, unknown>) => string> = {
   PROJECT_OVERRUN: (p) => `${String(p.name)} is running late: ${Number(p.weeks)} more weeks.`,
   PROJECT_STALLED: (p) => `${String(p.name)} has stalled: not enough cash for this week's payment.`,
   REGIONS_OPENED: (p) => `New regions are open: ${String(p.names)}. Fly there from any airport.`,
+  TENDER_OPENED: (p) =>
+    `${String(p.name)} is asking for bids. Seal one on the Deal Desk within ${Number(p.weeks)} weeks.`,
+  TENDER_WON: (p) => `${String(p.name)} picked us: a ${Number(p.years)}-year public contract.`,
+  TENDER_LOST: (p) =>
+    p.reason === 'tier'
+      ? `${String(p.name)} set our bid aside: our safety rating is below Adequate.`
+      : `${String(p.name)} awarded its tender to ${p.rival ? String(p.rival) : 'another lab'}.`,
+  TENDER_CANCELLED: (p) =>
+    p.reason === 'tier'
+      ? `${String(p.name)} cancelled our contract: the regulator has restricted us.`
+      : `${String(p.name)} ended our contract when the sales office closed.`,
   SPECIAL_DIVIDEND: () => 'The special dividend has been paid. Your share is in personal cash.',
 };
 
@@ -282,6 +293,8 @@ const BAD_EVENTS = new Set([
   'COMPUTE_OUTAGE',
   'PROJECT_OVERRUN',
   'PROJECT_STALLED',
+  'TENDER_LOST',
+  'TENDER_CANCELLED',
   ...MNA_BAD_EVENTS,
   ...VENTURE_BAD_EVENTS,
   ...AUCTION_BAD_EVENTS,

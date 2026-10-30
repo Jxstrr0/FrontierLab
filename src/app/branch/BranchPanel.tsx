@@ -17,6 +17,7 @@ import { ProductsTab } from './ProductsTab';
 import { BranchHero } from './BranchHero';
 import { advisorLines, openingDay } from './selectors';
 import { ServiceTab } from './ServiceTab';
+import { officeTenders } from '../../sim/tenders';
 import './branch.css';
 
 export function BranchPanel(p: { branchId: string; tab: BranchTab }) {
@@ -28,7 +29,9 @@ export function BranchPanel(p: { branchId: string; tab: BranchTab }) {
   const mgr = managerOf(s, branch);
   const opening = gameDate(s.meta.startDate, openingDay(s, branch));
   const rfps = officeRfps(s, branch.id);
-  const pending = [...rfps.fresh, ...rfps.renewals].some((r) => rfpWaiting(s, r));
+  const pending =
+    [...rfps.fresh, ...rfps.renewals].some((r) => rfpWaiting(s, r)) ||
+    officeTenders(s, branch.id).some((t) => t.status === 'open' && t.bid === undefined);
   // An acquired branch converting to your brand (§19.8) still wears the old bank's colours.
   const conv = branch.converting;
   const tabs: Tab<BranchTab>[] = [
