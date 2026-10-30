@@ -164,15 +164,15 @@ Plans and Enterprise contracts start switched on in a new sales office; the API 
 
 ## 6. Product development templates
 
-Prices in the tier column are the default price × 0.85 / 1 / 1.25 for Low / Medium / Premium (`DEV_TIER.feeMult`); Premium also adds +0.05 Products rating where offered. A template that sets its own default price scales the market reference with it.
+Prices in the tier column are the default price × 0.85 / 1 / 1.25 for Low / Medium / Premium (`DEV_TIER.feeMult`); Premium also adds +0.05 Products rating where offered. A template that sets its own default price scales the market reference with it. Templates marked retired stay in `DEV_TEMPLATES` so old saves' products work but are left off the New product form (`DEV_TEMPLATE_IDS`).
 
 | id | Name | Base | Effect |
 |---|---|---|---|
 | student_plus | Student Plus | plus | STU affinity +0.15; default $10 |
-| golden_years | Researcher Plan | plus | RET (Researchers) affinity +0.15; default $12 |
-| family_plan | Family Plan | plus | FAM affinity +0.15; 4 seats per sign-up; default $12 per seat |
+| golden_years | Researcher Plan (retired 2026-10-30) | plus | RET (Researchers) affinity +0.15; default $12 |
+| family_plan | Family Plan (retired 2026-10-30) | plus | FAM affinity +0.15; 4 seats per sign-up; default $12 per seat |
 | plus_annual | Plus Annual | plus | churn ×0.5; take-up ×0.85 |
-| carbon_neutral | Carbon-Neutral Plan | plus | reputation +0.05; YP +0.05 |
+| carbon_neutral | Carbon-Neutral Plan (retired 2026-10-30) | plus | reputation +0.05; YP +0.05 |
 | max_plan | Max | pro | default $200; Products +0.1 where offered; YP/BIZ +0.05 |
 | enterprise | Enterprise | team | BIZ +0.2; ticket ×5; churn ×0.6; default $45; take-up ×0.2 |
 | realtime_api | Realtime API | api | default $6; take-up ×1.1; YP/BIZ +0.05 |

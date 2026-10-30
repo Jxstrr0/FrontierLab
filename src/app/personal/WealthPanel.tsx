@@ -6,7 +6,8 @@ import { useState } from 'preact/hooks';
 import { netWorthWeeklyChange } from '../../sim/personalAssets';
 import { Card, Donut, Panel, Portrait, Row } from '../components';
 import { delta, money } from '../format/format';
-import { closePanel, useGame } from '../store';
+import { FEATURES } from '../../config/balance';
+import { closePanel, openPanel, useGame } from '../store';
 import { RichListSheet } from './RichListSheet';
 import { wealthSlices } from './wealthView';
 import { OtherAssets, RealEstateSection, StocksSection } from './WealthSections';
@@ -65,6 +66,16 @@ export function WealthPanel() {
         <StocksSection />
         <RealEstateSection />
         <OtherAssets />
+        {FEATURES.investments && (
+          <button
+            type="button"
+            class="btn btn-secondary btn-block"
+            data-tutorial="wealth-portfolio"
+            onClick={() => openPanel({ type: 'portfolio' })}
+          >
+            Portfolio: every holding, the lab's and yours
+          </button>
+        )}
       </div>
       {richList && <RichListSheet onClose={() => setRichList(false)} />}
     </Panel>

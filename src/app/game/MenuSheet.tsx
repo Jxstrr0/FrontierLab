@@ -28,14 +28,9 @@ export function MenuSheet() {
     ...(FEATURES.personalEmpire
       ? [{ label: 'Personal wealth', onClick: () => openPanel({ type: 'wealth' }) }]
       : []),
-    ...(FEATURES.investments
-      ? [{ label: 'Portfolio', onClick: () => openPanel({ type: 'portfolio' }) }]
-      : []),
     ...(FEATURES.competition
       ? [{ label: 'The Inference', onClick: () => openPanel({ type: 'ledger' }) }]
       : []),
-    { label: 'Frontier projects', onClick: () => openPanel({ type: 'projects' }) },
-    { label: 'Milestones', onClick: () => openPanel({ type: 'milestones' }) },
     { label: 'Settings', onClick: () => openPanel({ type: 'settings' }) },
     { label: 'Save game', onClick: () => openPanel({ type: 'saves' }) },
     { label: 'Exit to title', onClick: exit },
