@@ -313,7 +313,7 @@ No tabs: one overview page.
   - Board meeting card: explanation, last meeting date, Hold meeting (enabled once per quarter)
   - Senior executives grid: seven seats (CEO, COO, CFO, CPO, CMO, CTO, Chief Safety Officer; on a phone the last cell spans both columns) with portrait, name and title; empty seats show Hire, which opens a sheet of the seat's candidates with a paid "New candidates · $fee" button at the bottom (as for office managers)
 - **Investment:**
-  - portfolio value with weekly change, a donut (Stocks, Ventures, Real estate, Compute credits, Currencies) and List portfolio
+  - portfolio value with weekly change, a donut (Stocks, Ventures, Real estate, Compute credits) and List portfolio
   - Ventures carousel (vignette, name, sector, short description, founded, Details)
 - **Add floor sheet:** department choices with descriptions, desks and fit-out cost.
 
@@ -375,8 +375,7 @@ No tabs: one overview page.
 
 **Market:**
 - the Inference Composite index card (value, weekly change, sparkline)
-- sector Segmented: AI labs, Technology, Energy, Auto, Retail, Real estate, Currencies
-- **Currencies** (SIMULATION §19.10): one card per foreign currency with flag-free country medallion, name, index vs home with weekly change and sparkline, a one-line "why it's moving" (growth, rates, cycle), your position (company / personal) and Buy / Sell with an amount stepper and Company | Private toggle
+- sector Segmented: AI labs, Technology, Energy, Auto, Retail, Real estate
 - company card carousel:
   - monogram, name, ticker and exchange
   - sparkline and price
@@ -576,7 +575,7 @@ Opened by tapping a business pin on the map (the **Businesses** layer, which als
 - share price or private valuation, with the 52-week range, market cap, your stake and top shareholders
 - a Personal line: personal cash plus holdings
 - one-line explanations ("Grow recurring revenue; watch the compute bill") with a "Learn more" sheet: Revenue recurs, compute bills · Compute: own it or rent it · Safety limits growth · Treasury reserves · Cash cover
-- statements: the income statement runs Plans, API, Apps & services, Enterprise contracts, Other income → Revenue → Compute → Gross profit → Operating expenses → Interest expense (when any) → Bad debts → Depreciation → Pre-tax → Tax → Net income. The balance sheet lines are in SIMULATION §14.4; treasury reserves, loans, stocks, ventures, compute credits, real estate, currencies, partnership fees, goodwill, deposits, wholesale funding, corporate debt and dividends payable show only when non-zero.
+- statements: the income statement runs Plans, API, Apps & services, Enterprise contracts, Other income → Revenue → Compute → Gross profit → Operating expenses → Interest expense (when any) → Bad debts → Depreciation → Pre-tax → Tax → Net income. The balance sheet lines are in SIMULATION §14.4; treasury reserves, loans, stocks, ventures, compute credits, real estate, partnership fees, goodwill, deposits, wholesale funding, corporate debt and dividends payable show only when non-zero.
 - **Goals:** two buttons, Milestones (n of 32) and Frontier projects (n of 6), which open §28 and §28a
 - links to the full statements (Finance floor, or a simplified view without an HQ)
 
@@ -659,5 +658,5 @@ After Part 1 is finished or skipped, with Settings → Guides on (the default):
 
 The same view as the HQ Investment floor's portfolio, reachable from Personal wealth:
 - Company / Private toggle
-- portfolio value with weekly change and the donut (Stocks, Ventures, Real estate, Venture debt, Currencies)
+- portfolio value with weekly change and the donut (Stocks, Ventures, Real estate, Venture debt)
 - the holdings list; empty states point to investment banks, the Investment floor and conventions

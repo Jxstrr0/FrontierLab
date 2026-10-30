@@ -23,6 +23,7 @@ import { SCHEMA_VERSION, type GameState } from '../state';
 import { migrateSeedMoney } from './migrateSeedMoney';
 import { migrateSeats } from './migrateSeats';
 import { migrateAvatars } from './migrateAvatars';
+import { migrateCurrencies } from './migrateCurrencies';
 import { generatePersonalSites } from '../personalSites';
 import { generateLandmarkTower } from '../landmarkTowers';
 
@@ -211,6 +212,12 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
   },
   // Schema 31 (polish pass): Executive.counterWeek is optional; no counter is on record yet.
   30: (s) => s,
+  // Schema 32 (owner's review B7): the Currencies investment is cut. Old
+  // positions are sold at their last rate into the owner's cash and `fx` goes.
+  31: (s) => {
+    migrateCurrencies(s as unknown as GameState);
+    return s;
+  },
 };
 
 /** Upgrades a raw save to the current schema, or throws if it can't. */

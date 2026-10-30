@@ -365,12 +365,6 @@ Investment banks on the map, with tabs Market / Equity / Debt / M&A:
 - **Lifecycle.** Startups grow, raise up or down rounds, IPO, get acquired, or fail.
 - **AI-lab twist:** offer **compute credits** (code `ventureDebt`) instead of buying shares.
 
-### 5.12a Currencies (FX)
-- **A country bet.** Every country's currency is an investment: buy it when you think that country will do well against your home country, sell when you think it will slip. It's deliberately simple, a "country up or down" position, not real currency trading.
-- **What moves it:** the country's growth and interest rate against your home country's, its business cycle (recessions weaken a currency), plus noise. The Hong Kong currency is pegged to the US one.
-- **Where:** a Currencies view at any investment bank (beside the stock market), for the company or personally. Positions appear in the Investment floor portfolio and on the balance sheet.
-- Your operations are still booked in one currency; FX here is only an investment.
-
 ### 5.13 Governance
 - **Quarterly board meeting.** Set the dividend per share and your CEO compensation, then the board votes. Your ownership, company performance and how reasonable the proposal is decide the result.
 - **Regulator caps** dividends in weak safety tiers.
@@ -442,7 +436,7 @@ Investment banks on the map, with tabs Market / Equity / Debt / M&A:
 - Everything is skippable, Part 2 can be switched off in Settings, and hints stay available in the advisor bar.
 
 ## 6. Out of scope for v1
-- FX conversion between currencies (one display currency; currencies exist only as an investment, §5.12a)
+- FX of any kind: one display currency, no conversion and no currency investments (the Currencies bet was cut 2026-10-30, §7)
 - Multiplayer
 - Derivatives and crypto
 - Real-world street maps
@@ -542,7 +536,7 @@ Add one dated line per decision. Never delete entries; supersede them.
 - 2026-10-24: M&A closing keeps the books balanced by treating the target's cash as D + E − L (less corporate debt you owed it, which is settled, and its lease deposits, which move to you); if that is negative its loans are written down to fair value. Your company's existing stake counts toward the price at market; personal shares are bought out at the offer price. Acquired fit-outs aren't booked as fixed assets. Converted branches get a build by the seller's strategy, full staff with morale −10, a generated manager with every delegation on, every product they can serve, and books split by a mature mix. The rebrand cost is spread over the 8 conversion weeks. A regulator block doesn't start the 4-week retry wait; an accepted deal you can no longer afford lapses. A distressed network's ask is rolled once at failure (P/B 0.4–0.7, floored at $1 a share); while you have an offer pending it isn't split. Converting branches keep the old bank's ink on the map with a progress ring and a "Converting" label.
 - 2026-10-24: The steady balance strategy takes a 25% private placement when its capital ratio is under 13% and cash is short, and launches a 25%-float IPO as soon as eligible; it lists in years 5–6 on seeds 42, 7 and 99.
 - 2026-10-24 (owner): One global enterprise. You can travel to any city at any time and buy any asset there; everything you own in every city runs at once. Supersedes the weekly travel cap: flights inside the 24,140 km weekly allowance are free, flights past it cost a flat one-way fare from personal cash (the original's behaviour), and jet flights are always free.
-- 2026-10-24 (owner): Currencies become an investment category (DESIGN §5.12a, SIMULATION §19.10): a simplified "country up or down" position per foreign currency, traded at investment banks as the company or personally, built with Stage 7. Operations stay in one currency.
+- 2026-10-24 (owner): Currencies become an investment category: a simplified "country up or down" position per foreign currency, traded at investment banks as the company or personally, built with Stage 7. Operations stay in one currency. (Cut 2026-10-30, below.)
 - 2026-10-24 (owner): The New Game options step offers a starting currency ($, C$, £, €, ¥), as the original does. It sets the display symbol only (defaulting to the saved preference); books stay in one currency.
 - 2026-10-24: Stage 7 buildings. Every city has property buildings (4/6/8/10 by size); a convention centre stands in L/XL cities and every host city; each country's lobbying firm has an office in its cities (Switzerland borrows Rue Royale Affairs, Japan Harbourline Policy Group). Calgary gains the Foothills Founders Fair (week 28) so every start city has a convention before travel arrives.
 - 2026-10-24: Stage 7 books. New P&L lines: venture debt interest (interest income), rental income and property gains (fee & other income; property gains are non-cash) and property costs and lobbying (opex). Venture marks use investment gains and venture debt write-offs loan losses. Risk weights: ventures 2.5, venture debt 1.5, buildings 1.0, currencies 1.0. Company investing in startups, venture debt and buildings is refused at the Restricted and Critical tiers, like acquisitions.
@@ -771,3 +765,4 @@ Add one dated line per decision. Never delete entries; supersede them.
 - 2026-10-30 (owner's review, B4): **A shorter menu.** Portfolio lives under Personal wealth, Milestones and Frontier projects under Company (a Goals section); the menu drops from eleven entries to eight.
 - 2026-10-30 (owner's review, B5): **Launch posture sits with the safety ratio.** The dial trades deal odds against safety exposure, so it moves from the Finance floor to the Safety & Alignment floor, under the regulator card.
 - 2026-10-30 (owner's review, B6): **Three development templates retired.** Researcher Plan, Family Plan and Carbon-Neutral Plan were bank-era segment variants of Plus (the last duplicating the Green Compute Pledge campaign). They leave the New product form; products already developed from them keep working.
+- 2026-10-30 (owner's review, B7): **Currencies cut.** The country-bet investment added its own Market section, portfolio slice and balance-sheet line for little play; it is removed, and old saves sell their positions at the last value into the owner's cash (schema 32).

@@ -1,24 +1,20 @@
 // Read-only views for the Investment floor (SCREENS §10): the donut slices,
 // the portfolio's weekly change, every holding for the List portfolio sheet
-// (stocks, ventures, venture debt, buildings, currencies) and the ventures
+// (stocks, ventures, venture debt, buildings) and the ventures
 // carousel of pipeline startups.
 import { CITIES } from '../../data/cities';
-import { CURRENCIES } from '../../data/currencies';
-import type { CountryId } from '../../data/types';
-import { fxRate } from '../../sim/fx';
 import { portfolioBreakdown, startupMark, startupShares, type Account } from '../../sim/portfolio';
 import { securityPrice } from '../../sim/securities';
 import type { GameState, Startup } from '../../sim/state';
 import { sectorOf } from '../../sim/ventureModel';
 
-export type SliceId = 'stocks' | 'ventures' | 'realEstate' | 'ventureDebt' | 'currencies';
+export type SliceId = 'stocks' | 'ventures' | 'realEstate' | 'ventureDebt';
 
 export const SLICES: { id: SliceId; label: string }[] = [
   { id: 'stocks', label: 'Stocks' },
   { id: 'ventures', label: 'Ventures' },
   { id: 'realEstate', label: 'Real estate' },
   { id: 'ventureDebt', label: 'Compute credits' },
-  { id: 'currencies', label: 'Currencies' },
 ];
 
 export interface Slice {
@@ -115,18 +111,6 @@ export function portfolioRows(s: GameState, account: Account): HoldingRow[] {
       value: p.value,
       gain: p.value - p.purchasePrice,
       siteId: p.id,
-    });
-  }
-  for (const [c, pos] of Object.entries(s.fx.positions[account])) {
-    if (!pos || pos.units <= 0) continue;
-    const value = pos.units * fxRate(s, c as CountryId);
-    rows.push({
-      key: `fx:${c}`,
-      kind: 'currencies',
-      name: CURRENCIES[c as CountryId]?.name ?? c,
-      detail: CURRENCIES[c as CountryId]?.code ?? '',
-      value,
-      gain: value - pos.cost,
     });
   }
   const order = SLICES.map((x) => x.id);

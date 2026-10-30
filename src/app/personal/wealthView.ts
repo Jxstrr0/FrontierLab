@@ -28,7 +28,7 @@ export const SLICE_PARTS: Record<WealthSliceId, (keyof Omit<NetWorth, 'total'>)[
   cash: ['cash'],
   stocks: ['ownShares', 'stocks'],
   realEstate: ['realEstate', 'homes'],
-  others: ['ventures', 'ventureDebt', 'currencies', 'cars', 'collectibles', 'jet', 'franchise'],
+  others: ['ventures', 'ventureDebt', 'cars', 'collectibles', 'jet', 'franchise'],
 };
 
 const LABELS: Record<WealthSliceId, string> = {

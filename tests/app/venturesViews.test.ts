@@ -38,13 +38,7 @@ describe('Investment floor views', () => {
     const r = cmd.offerVentureDebt(s, st.id, 100_000, 0.05, 'company');
     expect(r.ok).toBe(true);
     const { slices, total } = portfolioSlices(s, 'company');
-    expect(slices.map((x) => x.id)).toEqual([
-      'stocks',
-      'ventures',
-      'realEstate',
-      'ventureDebt',
-      'currencies',
-    ]);
+    expect(slices.map((x) => x.id)).toEqual(['stocks', 'ventures', 'realEstate', 'ventureDebt']);
     expect(slices.reduce((t, x) => t + x.value, 0)).toBeCloseTo(total, 4);
     const rows = portfolioRows(s, 'company');
     expect(rows.reduce((t, x) => t + x.value, 0)).toBeCloseTo(

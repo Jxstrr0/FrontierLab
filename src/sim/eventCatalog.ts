@@ -307,9 +307,6 @@ export interface EventPayloads {
     n: number;
   };
 
-  /** A currency moved ≥ FX.newsMove against your home currency this week (fx.ts, §19.10). */
-  FX_MOVE: { country: string; currency: string; home: string; pct: number };
-
   // ─── Travel (Stage 8, travel.ts) ──────────────────────────────────────────
   /** You flew. `mode`: inside the weekly allowance, a paid fare, or your jet. */
   FLIGHT_TAKEN: {
