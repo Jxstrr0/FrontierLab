@@ -839,6 +839,42 @@ export const MODEL_EFFECTS = {
   /** Share of the frontier's rise (C6b) that raises the quality bar. */
   frontierWeight: 0.5,
 } as const;
+/**
+ * Model launches (SIMULATION §16.15, owner's review A3): the first switch to a
+ * trained model is a launch. Hype adds price headroom of `headroomBase` +
+ * `headroomPerPoint` × the quality gained over the model it replaces (capped at
+ * `headroomMax`), fading to nothing over `hypeWeeks`; awareness at every open
+ * sales office rises by the same rule. A launch that tops every rival model
+ * makes each rival cut its plan prices by `rivalCut` in the cities where you
+ * sell (the cut fades like a price war's). Agencies sell launch campaigns for
+ * `windowWeeks` after a launch (B3).
+ */
+export const MODEL_LAUNCH = {
+  hypeWeeks: 13,
+  headroomBase: 0.02,
+  headroomPerPoint: 0.05,
+  headroomMax: 0.12,
+  awarenessBase: 0.02,
+  awarenessPerPoint: 0.04,
+  awarenessMax: 0.12,
+  rivalCut: 0.05,
+  windowWeeks: 8,
+} as const;
+/**
+ * Open weights (SIMULATION §16.16, owner's review A3): publishing a trained
+ * model's weights, once per model. Awareness +`awareness` at every open sales
+ * office and API sign-ups ×`apiTakeup` for `takeupWeeks`. While the open model
+ * sits within `nearGap` quality points of your AI model, usage prices lose up
+ * to `maxDrag` of their headroom (all of it at no gap, none at `nearGap`).
+ */
+export const OPEN_WEIGHTS = {
+  awareness: 0.08,
+  apiProduct: 'api',
+  apiTakeup: 1.3,
+  takeupWeeks: 26,
+  nearGap: 1.5,
+  maxDrag: 0.12,
+} as const;
 /** CPO delegation: a local package must beat the model by minGain after costWeight × $ per customer. */
 export const MODEL_DELEGATE = { minGain: 0.3, costWeight: 0.02 } as const;
 
@@ -1577,6 +1613,8 @@ export const NEWS_PRIORITY = {
   companyAlarm: 120,
   company: 100,
   companyRoutine: 82,
+  /** A model launch that tops the leaderboard leads the front page. */
+  companyLaunch: 110,
   /** Your week's figures: below rivals in your cities, above central banks abroad. */
   companyWeek: 66,
   cbHome: 95,

@@ -394,7 +394,7 @@ Benefit effects scale linearly up to the stated amount, then flatten (capped at 
 | creators | Creator Partnerships | country | 12,000 | +0.010 per city | STU, YP ×1.08 |
 | naming | Arena Naming Rights | city | 40,000 | +0.030 | needs a sports franchise in the city; news event |
 
-**Agencies** sell one-off packages that apply a brand boost evenly over the package length:
+**Agencies** sell launch campaigns (since 2026-10-30): one-off packages, on sale for 8 weeks after a model launch, that apply a brand boost evenly over the package length and hold the launch buzz at full strength for as long (SIMULATION §16.10, §16.15):
 
 | Agency | Package | Length | Cost | Total brand boost |
 |---|---|---|---|---|

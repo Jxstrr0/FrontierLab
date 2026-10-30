@@ -9,7 +9,7 @@ import { raiseIncident } from './incidents';
 import { clamp } from './math';
 import { rivalPriceInCity } from './rivalPrices';
 import { stream } from './rng';
-import type { GameState } from './state';
+import type { GameState, RivalBank } from './state';
 
 /** Your average Rates rating per city, over open branches. */
 function ratesByCity(state: GameState): Record<string, number> {
@@ -23,6 +23,25 @@ function ratesByCity(state: GameState): Record<string, number> {
   const out: Record<string, number> = {};
   for (const [city, s] of Object.entries(sums)) out[city] = s.total / s.n;
   return out;
+}
+
+/**
+ * A rival cuts its plan prices in a city by `step` (its price-war bump, capped
+ * at PRICE_WAR.cap) and returns the cut it made. The sheet moves now; the
+ * target (rivalTargetPrice) carries the bump, which fades once the war ends.
+ */
+export function cutRivalPlans(bank: RivalBank, city: string, step: number): number {
+  const before = bank.priceWar[city] ?? 0;
+  const after = Math.min(PRICE_WAR.cap, before + step);
+  const bump = after - before;
+  if (bump <= 0) return 0;
+  bank.priceWar[city] = after;
+  for (const spec of Object.values(PRODUCTS)) {
+    const price = bank.prices[spec.id];
+    if (spec.kind !== 'plan' || spec.category !== 'deposits' || price === undefined) continue;
+    bank.prices[spec.id] = clamp(price * (1 - bump), spec.min, spec.max);
+  }
+  return bump;
 }
 
 /** Updates the streaks, rolls monthly bumps and decays bumps in calm cities. */
@@ -55,17 +74,8 @@ export function runPriceWars(state: GameState): void {
       if ((streaks[city] ?? 0) < PRICE_WAR.streakWeeks) continue;
       if (!bank.branches.some((b) => b.cityId === city)) continue;
       if (!rng.chance(PRICE_WAR.chance)) continue;
-      const before = bank.priceWar[city] ?? 0;
-      const after = Math.min(PRICE_WAR.cap, before + PRICE_WAR.bump);
-      const bump = after - before;
+      const bump = cutRivalPlans(bank, city, PRICE_WAR.bump);
       if (bump <= 0) continue;
-      bank.priceWar[city] = after;
-      // The sheet moves now; the target (rivalTargetPrice) carries the bump from here on.
-      for (const spec of Object.values(PRODUCTS)) {
-        const price = bank.prices[spec.id];
-        if (spec.kind !== 'plan' || spec.category !== 'deposits' || price === undefined) continue;
-        bank.prices[spec.id] = clamp(price * (1 - bump), spec.min, spec.max);
-      }
       pushEvent(
         state,
         'PRICE_WAR',

@@ -225,6 +225,31 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
         priority: p.leads ? P.company : P.companyRoutine,
         tokens: { bank, name: str(p.name), score: num(p.quality).toFixed(1) },
       });
+    case 'MODEL_LAUNCHED':
+      return business({
+        key: p.leads
+          ? num(p.rivalsCut) > 0
+            ? 'MODEL_LAUNCHED_WAR'
+            : 'MODEL_LAUNCHED_LEADS'
+          : 'MODEL_LAUNCHED',
+        subject: str(p.modelId),
+        icon: 'spark',
+        priority: p.leads ? P.companyLaunch : P.company,
+        tokens: {
+          bank,
+          name: str(p.name),
+          score: num(p.quality).toFixed(1),
+          rivals: String(num(p.rivalsCut)),
+        },
+      });
+    case 'WEIGHTS_OPENED':
+      return business({
+        key: 'WEIGHTS_OPENED',
+        subject: str(p.modelId),
+        icon: 'spark',
+        priority: P.company,
+        tokens: { bank, name: str(p.name) },
+      });
     case 'RESEARCHER_HIRED':
       return business({
         key: p.from ? 'RESEARCHER_POACHED_FROM' : 'RESEARCHER_HIRED',

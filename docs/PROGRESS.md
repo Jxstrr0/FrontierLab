@@ -3,13 +3,36 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** post-launch content and streamlining pass (v0.1.54, save schema 33), from the owner's review of 2026-10-30: batches 1 (incidents and the founder's desk) and 2 (streamlining) are in; batches 3–5 (model launches, public-sector tenders, goals) follow. The Kelbo.Website hub card still needs its own session in that repo.
+**Current stage:** post-launch content and streamlining pass (v0.1.55, save schema 34), from the owner's review of 2026-10-30: batches 1 (incidents and the founder's desk), 2 (streamlining) and 3 (model launches) are in; batches 4–5 (public-sector tenders, goals) follow. The Kelbo.Website hub card still needs its own session in that repo.
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `193f6e9e3607b5` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `03534e62e5380b` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-30 — Review batch 3: model launches, open weights and launch campaigns (v0.1.55)
+
+Finishing a training run used to end with a model waiting in a list for you to tap "Use". That's the biggest moment an AI lab has, and it had no fanfare. Now it does. Old saves load and are upgraded (save schema 33 → 34).
+
+**Launching a model.** The first time you switch on a model you trained (the button now says **Launch**), it launches:
+- The Inference runs the story, on the front page if the model is the best on the market.
+- Awareness goes up at every sales office.
+- Customers accept higher prices for a while: extra price headroom that fades to nothing over a quarter. A bigger jump over your old model means a bigger boost, up to 12%.
+- If your model beats every rival's, the rivals answer by cutting their plan prices by 5% in the cities where you sell. Those cuts fade over about ten weeks.
+
+The Products floor's AI model card shows the boost ("Launch buzz") while it lasts.
+
+**Open weights.** Any model you trained can be released for anyone to run, once (Manage models → Open weights, with a confirm step). Developers love it: awareness rises everywhere and API sign-ups are 30% higher for half a year. The catch: while your AI model is within 1.5 quality points of the open one, API customers won't pay as much over market (up to 12% less headroom). Train past it and the cost goes away. Plans aren't affected.
+
+**Agencies sell launch campaigns.** Agency packages were one-off awareness boosts, the same job brand campaigns at HQ already do. Now agencies sell only in the 8 weeks after a launch, and each package also keeps the launch buzz at full strength while it runs. The agency panel says whether a launch is open for booking.
+
+**How often.** In a 10-year steady game the lab launches about twice a year from year 3, with 2–5% extra headroom each time; from year 4 its models lead the board, so most launches make the rivals cut prices.
+
+**Checked:** lint, 1,174 tests (new `modelLaunch.test.ts`), type-check and build pass; steady, aggressive and stress on seed 42 pass every target. At 390×844 in Chromium, Manage models (Launch, Open weights and its confirm card), the Products card and an agency during a launch window render with no console errors. The determinism snapshot moved to `03534e62e5380b` (intended: launches change prices and awareness in the scripted run).
+
+**Next:** batch 4 (public-sector tenders).
+
 
 ### 2026-10-30 — Review batch 2: fewer places doing the same job (v0.1.54)
 
