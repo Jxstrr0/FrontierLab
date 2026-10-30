@@ -1,20 +1,15 @@
 // Data vendor panel body (SCREENS §13): this bureau's packaged models in a
-// carousel (name, rosette, data licence per customer a year, "Use as AI model", the
-// current AI model marked) and My model, a custom mix the vendor builds
-// and hosts (no Products floor needed; hosted quality and pricing). Buying
-// or commissioning needs you to be in the bureau's city.
-import { useState } from 'preact/hooks';
-import { MODEL_NAME_MAX } from '../../config/balance';
+// carousel (name, rosette, data licence per customer a year, "Use as AI model",
+// the current AI model marked). Buying needs you to be in the bureau's city.
+// Custom mixes are built on the HQ Products floor (Manage models) only; the
+// vendor's own mixer went on 2026-10-30 (owner's review, B2).
 import { BUREAU_PACKAGES, type BureauPackageSpec } from '../../data/bureaus';
 import * as cmd from '../../sim/commands';
 import type { Site } from '../../sim/state';
-import { modelQuality, mixRadar, previewModel } from '../../sim/underwriting';
+import { modelQuality, mixRadar } from '../../sim/underwriting';
 import { Badge, Card, Carousel, Row, SectionTitle } from '../components';
-import { MixEditor } from '../hq/products/MixEditor';
-import { fromPercents, toPercents, type PercentMix } from '../hq/products/mixMath';
 import { ModelRosette } from '../hq/products/ModelRosette';
-import { NameField } from '../hq/products/NameField';
-import { INPUT_IDS, radarText } from '../hq/products/productSelectors';
+import { radarText } from '../hq/products/productSelectors';
 import { act, toast, useGame } from '../store';
 import '../hq/products/products.css';
 import { exactMoney } from '../format/format';
@@ -24,17 +19,6 @@ export function BureauBody(p: { site: Site }) {
   const bureau = p.site.refId;
   const here = s.world.currentCityId === p.site.cityId;
   const packages = Object.values(BUREAU_PACKAGES).filter((x) => x.bureau === bureau);
-  const [name, setName] = useState(`${bureau} custom`);
-  const [mix, setMix] = useState<PercentMix>(() =>
-    toPercents(packages[0]?.mix ?? { bureau: 1 }, INPUT_IDS),
-  );
-  const problem = previewModel(s, fromPercents(mix), 'hosted').problem;
-
-  const commission = () => {
-    const r = act(cmd.commissionBureauModel, { bureau, name, mix: fromPercents(mix) });
-    if (r.ok) toast(`${name.trim()} commissioned. Switching over the next two weeks.`, 'good');
-  };
-
   return (
     <div class="stack">
       {!here && (
@@ -52,22 +36,9 @@ export function BureauBody(p: { site: Site }) {
       ) : (
         packages.map((pkg) => <PackageCard pkg={pkg} here={here} />)
       )}
-
-      <SectionTitle>My model</SectionTitle>
-      <p class="muted small">
-        Pick the data and {bureau} builds and hosts the model for you. No Products floor needed;
-        hosted models score a little lower and cost a little more than ones your own team builds.
+      <p class="muted small hq-note">
+        Want your own mix of training data? Build it on the Products floor at HQ (Manage models).
       </p>
-      <NameField label="Model name" value={name} max={MODEL_NAME_MAX} onInput={setName} />
-      <MixEditor value={mix} onChange={setMix} source="hosted" />
-      <button
-        type="button"
-        class="btn btn-primary btn-block"
-        disabled={!here || !!problem || !name.trim()}
-        onClick={commission}
-      >
-        Commission and use
-      </button>
     </div>
   );
 }

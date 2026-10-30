@@ -56,6 +56,8 @@ export interface DevTemplate {
   base?: string;
   mods: TemplateMods;
   digital?: DigitalEffect;
+  /** Not offered on the New product form any more; kept so old saves' products still work. */
+  retired?: boolean;
 }
 
 export const DEV_TEMPLATES: Record<string, DevTemplate> = {
@@ -66,16 +68,21 @@ export const DEV_TEMPLATES: Record<string, DevTemplate> = {
     base: 'plus',
     mods: { affinity: { STU: 0.15 }, defaultFee: 10 },
   },
+  // Retired 2026-10-30 (owner's review, B6): the Researcher, Family and Carbon-Neutral
+  // plans were bank-era segment variants of Plus; the last duplicated the Green
+  // Compute Pledge campaign. Old saves keep the products they developed.
   golden_years: {
     id: 'golden_years',
     // Keeps its bank-era id; the RET segment is now Researchers.
     name: 'Researcher Plan',
+    retired: true,
     base: 'plus',
     mods: { affinity: { RET: 0.15 }, defaultFee: 12 },
   },
   family_plan: {
     id: 'family_plan',
     name: 'Family Plan',
+    retired: true,
     base: 'plus',
     // Priced per seat; a family signs up four at once.
     mods: { affinity: { FAM: 0.15 }, ticketMult: 4, defaultFee: 12 },
@@ -89,6 +96,7 @@ export const DEV_TEMPLATES: Record<string, DevTemplate> = {
   carbon_neutral: {
     id: 'carbon_neutral',
     name: 'Carbon-Neutral Plan',
+    retired: true,
     base: 'plus',
     mods: { reputation: 0.05, affinity: { YP: 0.05 } },
   },
@@ -218,6 +226,9 @@ export const DEV_TEMPLATES: Record<string, DevTemplate> = {
   },
 };
 
-export const DEV_TEMPLATE_IDS = Object.keys(DEV_TEMPLATES);
+/** Templates on offer (retired ones stay in DEV_TEMPLATES for old saves). */
+export const DEV_TEMPLATE_IDS = Object.keys(DEV_TEMPLATES).filter(
+  (id) => !DEV_TEMPLATES[id]!.retired,
+);
 
 export const isDigital = (t: DevTemplate) => t.digital !== undefined;

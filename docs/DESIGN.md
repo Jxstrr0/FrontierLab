@@ -255,7 +255,6 @@ Shown to the player in one place, the Company summary:
 
 #### 5.8.1 Finance
 - Company statements (income, balance sheet, cash flow; Week/Quarter/Year): Revenue → Compute → Gross profit, then running costs. A revenue and net income chart, and a credit summary (plus liquidity for old bank-era saves).
-- **Launch posture** (code `riskAppetite`): a 1–5 dial from Very cautious to Very bold. A bolder posture wins and keeps more Deal Desk contracts but adds to the model's safety exposure, and at Bold or Very bold capability over-claims are likelier. The Chief Safety Officer and the CFO can steer it.
 - Understaffed:
   - statements are delayed
   - an investor-relations discount hits your share price
@@ -267,7 +266,7 @@ Shown to the player in one place, the Company summary:
 - Understaffed: hiring slows and morale drifts down.
 
 #### 5.8.3 Products
-- **The AI model:** a radar (Reasoning, Speed, Breadth, Safety, Efficiency) and a data licence per customer a year. Manage Models mixes training datasets bought from data vendors.
+- **The AI model:** a radar (Reasoning, Speed, Breadth, Safety, Efficiency) and a data licence per customer a year. Manage Models mixes training datasets bought from data vendors. Data vendors on the map sell packaged models (the founder-phase model); a custom mix is built here and nowhere else (2026-10-30).
   - Quality (the radar mean) gives price headroom, lifts every office's Products rating and adds to Deal Desk odds.
   - Efficiency cuts the compute behind every customer. Speed lifts Service. Safety counts with data-sensitive businesses and lowers safety risk.
 - **The frontier.** Every rival lab has a named model, and some ship a new generation each quarter. The best rival model is the frontier; as it rises, the bar your model is judged against rises with it. A leaderboard ranks every lab's model.
@@ -298,6 +297,7 @@ Brand awareness by city, brand campaigns (TV, billboards, podcasts, creators, ar
 
 #### 5.8.7 Safety & Alignment (new floor)
 - Shows the safety ratio and tier, the audit odds, model performance and losses.
+- **Launch posture** (code `riskAppetite`; here since 2026-10-30, on Finance before): a 1–5 dial from Very cautious to Very bold. A bolder posture wins and keeps more Deal Desk contracts but adds to the model's safety exposure, and at Bold or Very bold capability over-claims are likelier. The Chief Safety Officer and the CFO can steer it.
 - Its staffing is the strength half of the safety ratio, and its requirement grows with ARR.
 - Understaffed: a lower safety ratio, more failed audits and fines.
 
@@ -767,3 +767,7 @@ Add one dated line per decision. Never delete entries; supersede them.
 - 2026-10-29 (launch re-check): **The title cover prints its chunks off-screen, then paints once.** Repainting the whole 4-megapixel strip every frame while the chunks came in cost 4–5 s of main-thread blocking on a slow phone and took Lighthouse performance to 67. The cover now prepares chunks against a 1 × 1 scratch canvas without the map's prefetch ring and paints the strip once at the end; it looks the same and shows sooner.
 - 2026-10-30 (owner's review, A1): **Incidents follow the lab, not the bank.** A 10-year steady run saw no case at all in years 1–2, then 22–26 price-war popups a year by year 8, while the seven AI-native cases fired six times in a decade: they rolled company-wide at a flat 0.1–0.2% a week and the bank-era office cases rolled once per office, so only the latter grew with the lab. Company cases now scale with customers (`INCIDENT_SIZE`), the break-in and heatwave are retired from the roll, the API key leak and deepfake cases roll at half their odds, and a month's price cuts raise one Price war case a quarter naming every rival and city, answered everywhere at once.
 - 2026-10-30 (owner's review, A2): **The founder's desk.** Eight once-a-game company cases for the first three years (CONTENT §22b) so the founder phase has choices beyond prices and campaigns: a viral demo, a feature request, an angel's cheque (5% at a 30% discount to the private valuation), a press interview, a poached office manager, a cloud outage, a hackathon and course credits. The desk rests six weeks between cases and closes at week 156.
+- 2026-10-30 (owner's review, B2): **One place to mix a model.** The data vendor's "My model" mixer and HQ's Manage models were the same sliders in two places. Vendors now sell packaged models only; custom mixes are built on the Products floor. A hosted custom model in an old save keeps working.
+- 2026-10-30 (owner's review, B4): **A shorter menu.** Portfolio lives under Personal wealth, Milestones and Frontier projects under Company (a Goals section); the menu drops from eleven entries to eight.
+- 2026-10-30 (owner's review, B5): **Launch posture sits with the safety ratio.** The dial trades deal odds against safety exposure, so it moves from the Finance floor to the Safety & Alignment floor, under the regulator card.
+- 2026-10-30 (owner's review, B6): **Three development templates retired.** Researcher Plan, Family Plan and Carbon-Neutral Plan were bank-era segment variants of Plus (the last duplicating the Green Compute Pledge campaign). They leave the New product form; products already developed from them keep working.

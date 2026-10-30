@@ -336,3 +336,9 @@
 .safety-notice span {
   color: inherit;
 }
+
+/* Goals: the two goal screens that used to sit in the menu (2026-10-30). */
+.co-goals {
+  display: grid;
+  gap: 8px;
+}
