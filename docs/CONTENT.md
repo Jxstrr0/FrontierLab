@@ -1014,6 +1014,21 @@ Fill these per panel and state.
 - **Marketing agency:** "Let's put your name on every billboard in town."
 - **Vacation home:** "A place to get away from it all — bought with your own money."
 
+## 26b. Annual report headlines
+
+Each kind has two versions; the year picks one (SIMULATION §22a). Placeholders: {bank}, {founder}, {year}, {pct} (ARR growth), {decade} (years of play). Text lives in `src/data/annualReport.ts`.
+
+| Kind | Headlines | Standfirsts |
+|---|---|---|
+| first | {bank} closes its first year · Year one in the books for {bank} | From a rented desk to a working lab: the first twelve months in figures. · {founder} looks back on the lab's first year of business. |
+| topRich | {founder} tops the rich list · Number one: {founder} takes the top spot | The {bank} founder is now the wealthiest person on our list. · A lab fortune passes every other name on the rich list. |
+| firstProfit | {bank} turns a profit for the year · In the black: {bank} posts a yearly profit | After years of spending to grow, the lab earned more than it spent. · Investors who backed the early losses get the year they waited for. |
+| doubled | {bank} grows {pct} in {year} · A breakout year: {bank} up {pct} | Recurring revenue more than doubled as customers piled in. · Few labs have grown this fast. The question now is whether it lasts. |
+| safety | Regulators shadow {bank} through {year} · A year under the regulator's eye for {bank} | Growth came with a safety record the watchdog is not happy with. · The lab ends {year} on a restricted footing and must rebuild trust. |
+| hardYear | A hard year for {bank} · {bank} goes backwards in {year} | Recurring revenue shrank in {year}. {founder} promises a reset. · Customers left faster than they arrived. The board wants answers. |
+| grew | {bank} grows {pct} in {year} · Steady going: {bank} up {pct} | Another year of steady progress for the lab. · {founder} keeps the lab on course through {year}. |
+| decade | {bank}: the decade in review · {decade} years on: the {bank} story | {decade} years of the lab, from the first desk to today. · Looking back on {decade} years of growth, setbacks and big bets. |
+
 ## 26. Name pools
 
 - **First names:** Avery, Malik, Sofia, Kenji, Amara, Liam, Priya, Mateo, Chloé, Tariq, Hannah, Diego, Mei, Oluwaseun, Freya, Arjun, Isabel, Noah, Zainab, Lucas, Yuki, Elena, Kwame, Grace, Rafael, Aisha, Oscar, Leila, Dmitri, Nora, Santiago, Ingrid, Hamza, Camille, Ethan, Sakura, Omar, Bianca, Theo, Imani.

@@ -4,6 +4,7 @@
 // Frontier Lab's chain starts at schema 1 (stage C0, DESIGN decision A6).
 // Vault Street's 37 steps were dropped: its saves live in a separate store
 // and its export codes are turned away, so none can reach this chain.
+import { rescaleFortunes } from '../richList';
 import { CPO_TRAINING, CTO_COMPUTE, EXEC_DELEGATION } from '../../config/balance';
 import { foldRivalCity } from '../rivalOffices';
 import { startRunoff } from '../partnerships';
@@ -245,6 +246,17 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
   34: (s) => {
     const state = s as unknown as GameState;
     if (state.dealDesk) state.dealDesk.tenders ??= {};
+    return s;
+  },
+  // Schema 36 (owner's review A5: rich list rescale and the annual report): the
+  // fortunes move to the new RICH_LIST.fortune range by place (the richest
+  // takes the top of the range, spaced log-evenly down), scaled by the economy's
+  // growth so far; the annual reports start empty.
+  35: (s) => {
+    const state = s as unknown as GameState;
+    if (state.history) state.history.yearly ??= [];
+    const list = state.personal?.empire?.richList;
+    if (list?.fortunes?.length) rescaleFortunes(list);
     return s;
   },
 };

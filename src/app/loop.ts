@@ -44,6 +44,10 @@ let casesWaiting = false;
 let boardWaiting = false;
 /** Quarter label of the last board reminder, so each quarter prompts once. */
 let remindedQuarter: string | undefined;
+/** Annual reports already on file when shown, so each year end opens its report once. */
+let shownYears = 0;
+/** The year's annual report is waiting for the results modal to close. */
+let annualWaiting = false;
 
 export function startLoop(): void {
   stopLoop();
@@ -54,6 +58,8 @@ export function startLoop(): void {
   casesWaiting = false;
   boardWaiting = false;
   remindedQuarter = undefined;
+  shownYears = peekGame()?.history.yearly.length ?? 0;
+  annualWaiting = false;
   timer = setInterval(frame, FRAME_MS);
 }
 
@@ -115,8 +121,12 @@ function pageHidden(): boolean {
 export function elapse(dt: number): void {
   const s = peekGame();
   if (!s) return;
-  // Hand over from the weekly results to the incident modal, never stacking
-  // them, and only once the player is back on the map.
+  // Hand over from the weekly results to the annual report, then the incident
+  // modal, never stacking them, and only once the player is back on the map.
+  if (annualWaiting && !clockHeld()) {
+    annualWaiting = false;
+    if (!s.flags.gameOver) modal.value = { type: 'annual' };
+  }
   if (casesWaiting && !clockHeld()) {
     casesWaiting = false;
     if (s.incidents.active.length > 0 && !s.flags.gameOver) modal.value = { type: 'incident' };
@@ -161,6 +171,7 @@ function afterWeek(s: GameState): void {
   const due = resultsDue(s.settings.weeklyResults, s.meta.startDate, s.clock.day);
   if (due === 'weekly') modal.value = { type: 'weekly', week: s.clock.week - 1 };
   else if (due) modal.value = { type: 'weekly', week: s.clock.week - 1, period: due };
+  promptAnnual(s);
   promptIncidents(s);
   promptBoard(s, quarter);
 }
@@ -195,6 +206,15 @@ function promptBoard(s: GameState, quarterStart: boolean): void {
   remindedQuarter = label;
   if (modal.value || casesWaiting) boardWaiting = true;
   else modal.value = { type: 'boardMeeting', reminder: true };
+}
+
+/** A year end filed a new annual report (SCREENS §21b): open it, after the results. */
+function promptAnnual(s: GameState): void {
+  const n = s.history.yearly.length;
+  if (n <= shownYears) return;
+  shownYears = n;
+  if (modal.value) annualWaiting = true;
+  else modal.value = { type: 'annual' };
 }
 
 /** SIMULATION §2 auto-pause: new open cases open the incident modal (after any other modal). */

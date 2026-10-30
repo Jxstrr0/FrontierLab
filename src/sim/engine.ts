@@ -33,6 +33,7 @@ import { insiderQuarter, recordNetWorth, runPersonalAssets } from './personalAss
 import { runAuctions } from './auctions';
 import { runFranchises } from './franchise';
 import { richListYear } from './richList';
+import { recordYear } from './annualReport';
 import { checkFailure } from './failure';
 import { updateAppRating } from './company';
 import { pushEvent, trimEvents } from './events';
@@ -214,6 +215,7 @@ function runBranch(state: GameState, branch: Branch, deals: DealIndex): void {
 function yearEnd(state: GameState): void {
   conventionsYear(state); // next year's conventions calendar
   richListYear(state); // rich list ranking (§22)
+  recordYear(state); // the annual report (§22a)
   for (const c of Object.values(state.world.countries)) {
     // Fee products re-price yearly with the economy (§4.6; was inflation alone).
     if (c) c.feeIndex *= 1 + nominalWeeklyGrowth(c) * WEEKS_PER_YEAR;

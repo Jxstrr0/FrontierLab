@@ -58,7 +58,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState } from './personalTypes';
 
-export const SCHEMA_VERSION = 35;
+export const SCHEMA_VERSION = 36;
 
 export interface GameState {
   schemaVersion: number;
@@ -141,7 +141,8 @@ export interface GameState {
   /** Accumulates P&L lines and cash movements since the last weekly close. */
   ledger: Ledger;
   events: { log: GameEvent[]; scheduled: ScheduledEvent[] };
-  history: { weekly: WeeklySnapshot[]; quarterly: QuarterReport[] };
+  /** `yearly`: one annual report per calendar year closed (owner's review A5); absent before schema 36. */
+  history: { weekly: WeeklySnapshot[]; quarterly: QuarterReport[]; yearly: YearReport[] };
   milestones: Record<string, Week>;
   /**
    * `tutorialStep` (Stage 10): undefined = never offered, 0 = offer prompt,
@@ -1160,6 +1161,33 @@ export interface WeeklySnapshot {
   tier: Tier;
   /** Mobile app rating at the week's close (IT floor trend). Missing in older saves. */
   appRating?: Stars;
+}
+
+/**
+ * The annual report (owner's review A5, SIMULATION §22a): the lab's year in
+ * figures, recorded at each year end after the rich list ranks you.
+ */
+export interface YearReport {
+  /** Calendar year just closed. */
+  year: number;
+  /** Year of play, 1 for the first. */
+  n: number;
+  /** Last week included in this year. */
+  endWeek: Week;
+  revenue: Money;
+  netIncome: Money;
+  arr: Money;
+  offices: number;
+  customers: number;
+  /** Company valuation (§19.6) at the close. */
+  value: Money;
+  /** The founder's net worth (§22) at the close. */
+  worth: Money;
+  /** Rich list place at the close; absent when off the list. */
+  rank?: number;
+  /** House model quality (radar mean, 1–10). */
+  quality: number;
+  tier: Tier;
 }
 
 export interface QuarterReport {

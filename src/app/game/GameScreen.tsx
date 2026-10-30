@@ -40,6 +40,7 @@ import { SitePanel } from '../sites/SitePanel';
 import { modal, panel, sheet } from '../store';
 import { StorefrontPanel } from '../storefront/StorefrontPanel';
 import { GameOverModal } from '../weekly/GameOverModal';
+import { AnnualReport } from '../weekly/AnnualReport';
 import { WeeklyResults } from '../weekly/WeeklyResults';
 import { CentralBankPanel } from '../centralbank/CentralBankPanel';
 import { IncidentModal } from '../incidents/IncidentModal';
@@ -192,5 +193,6 @@ function ModalHost() {
   if (m.type === 'weekly') return <WeeklyResults week={m.week} period={m.period} />;
   if (m.type === 'incident') return FEATURES.competition ? <IncidentModal /> : null;
   if (m.type === 'boardMeeting') return FEATURES.capitalMarkets ? <BoardMeetingModal /> : null;
+  if (m.type === 'annual') return <AnnualReport year={m.year} />;
   return <GameOverModal />;
 }
