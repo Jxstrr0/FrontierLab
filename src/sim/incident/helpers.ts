@@ -1,7 +1,7 @@
 // Shared pieces for incident rules: the rule interface, fraudShield, rating hits
 // with their timed modifiers, morale bumps, the press-angle roll and the
 // scope's display name.
-import { FRAUD_SHIELD, INCIDENT_SCALE, INCIDENTS } from '../../config/balance';
+import { FRAUD_SHIELD, INCIDENT_SCALE, INCIDENT_SIZE, INCIDENTS } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { EQUIPMENT } from '../../data/equipment';
 import type { RatingCategory } from '../../data/types';
@@ -39,6 +39,24 @@ export interface IncidentRule {
 /** Flat company-incident costs × max(1, ARR ÷ refArr)^exp: a bigger lab pays more (post-C8). */
 export function incidentScale(state: GameState): number {
   return dpow(Math.max(1, companyArr(state) / INCIDENT_SCALE.refArr), INCIDENT_SCALE.exp);
+}
+
+/** Customers across every open sales office. */
+export function totalCustomers(state: GameState): number {
+  return Object.values(state.branches).reduce(
+    (s, b) => s + (b.status === 'open' ? b.customers : 0),
+    0,
+  );
+}
+
+/**
+ * Company-wide cases grow with the lab (INCIDENT_SIZE, 2026-10-30):
+ * clamp((customers ÷ ref)^exp, min, max), so a 5,000-customer founder rolls at
+ * about 0.7× and a lab with hundreds of thousands at the cap.
+ */
+export function labSizeMult(state: GameState): number {
+  const { refCustomers, exp, min, max } = INCIDENT_SIZE;
+  return clamp(dpow(Math.max(1, totalCustomers(state)) / refCustomers, exp), min, max);
 }
 
 /** 0–10: IT coverage′, the AI model's Safety and the ATM (decision log). */

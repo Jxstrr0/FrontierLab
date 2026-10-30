@@ -1412,6 +1412,10 @@ export const PRICE_WAR = {
   bump: 0.05,
   cap: 0.2,
   decay: 0.005,
+  /** One Price war case per rival per quarter (2026-10-30), naming every city it cut in. */
+  caseWeeks: 13,
+  /** Cities named in the case text before "and N more". */
+  namedCities: 3,
 } as const;
 
 // ─── CORPORATE LENDING: INVESTMENT BANK DEBT (§19.9) ──────────────────────────────────────────
@@ -1471,6 +1475,27 @@ export const INCIDENTS = {
   ratingMax: 5,
   /** Morale stays on its 0–100 scale. */
   moraleMax: 100,
+  /** Cooldown for a case that fires once a game (the founder's desk). */
+  onceWeeks: 1_000_000,
+} as const;
+/**
+ * Company-wide cases grow with the lab (2026-10-30): chance × clamp((customers ÷
+ * refCustomers)^exp, min, max), so a founder meets them in year 1 and a 30-city
+ * lab sees a few a year, not one a decade.
+ */
+export const INCIDENT_SIZE = { refCustomers: 10_000, exp: 0.5, min: 0.6, max: 4 } as const;
+/**
+ * The founder's desk (CONTENT §22b, 2026-10-30): small early cases with a real
+ * choice. Each fires once a game, only in the first untilWeek weeks, at least
+ * gapWeeks apart, with baseP a week each.
+ */
+export const FOUNDER_DESK = {
+  untilWeek: 156,
+  gapWeeks: 6,
+  baseP: 0.012,
+  /** The angel's cheque: this share of the lab at this discount to the private valuation. */
+  angelPct: 0.05,
+  angelDiscount: 0.3,
 } as const;
 /**
  * fraudShield, 0–10 (decision log): itWeight × IT coverage′ + modelWeight × the

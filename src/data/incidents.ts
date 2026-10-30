@@ -5,7 +5,9 @@
 // are formatted as money and percentages. Per-incident numbers are in
 // incidentParams.ts; the engine is src/sim/incidents.ts.
 export { INCIDENT_PARAMS } from './incidentParams';
+import { PRICE_WAR } from '../config/balance';
 import { AI_SPECS } from './incidentsAi';
+import { FOUNDER_SPECS } from './incidentsFounder';
 
 export interface IncidentOptionSpec {
   id: string;
@@ -55,11 +57,14 @@ export interface IncidentSpec {
 const OK: IncidentOptionSpec[] = [{ id: 'ok', label: 'OK', effect: 'Noted.' }];
 
 const BANK_ERA_SPECS: Record<string, IncidentSpec> = {
+  // Retired from the weekly roll (2026-10-30): a break-in and a heatwave are
+  // bank-branch troubles, not an AI lab's. Kept so old saves with an open case
+  // still resolve, and for the debug tools.
   ROBBERY: {
     id: 'ROBBERY',
     title: 'Server-room break-in',
     scope: 'branch',
-    trigger: 'rolled',
+    trigger: 'triggered',
     baseP: 0.0015,
     text: 'Thieves broke into the server room at {branch} this morning and got away with {loss} of hardware. Insurance covers {insured}, leaving {net} for us to absorb. The team is shaken.',
     money: ['loss', 'net', 'leave'],
@@ -86,7 +91,7 @@ const BANK_ERA_SPECS: Record<string, IncidentSpec> = {
     title: 'API key leak',
     scope: 'branch',
     trigger: 'rolled',
-    baseP: 0.002,
+    baseP: 0.001,
     text: 'API keys issued at {branch} leaked online, and strangers ran up about {refund} on customers’ accounts before we spotted it.',
     money: ['refund'],
     options: [
@@ -237,7 +242,7 @@ const BANK_ERA_SPECS: Record<string, IncidentSpec> = {
     id: 'BRANCH_FLOOD',
     title: 'Heatwave',
     scope: 'branch',
-    trigger: 'rolled',
+    trigger: 'triggered',
     baseP: 0.0005,
     text: 'A heatwave knocked out the cooling at {branch} and the servers shut down. We can’t open until it’s repaired.',
     options: [
@@ -363,18 +368,21 @@ const BANK_ERA_SPECS: Record<string, IncidentSpec> = {
     ],
     worst: 'bank',
   },
+  // One case a quarter (2026-10-30) naming every rival that cut and every city;
+  // Match it answers in all of them. Older saves may hold a per-city case.
   PRICE_WAR: {
     id: 'PRICE_WAR',
     title: 'Price war',
-    scope: 'city',
+    scope: 'company',
     trigger: 'triggered',
-    text: '{bank} just cut its plan prices by {bump} in {city} to win subscribers back from us.',
+    cooldownWeeks: PRICE_WAR.caseWeeks,
+    text: '{bank} cut plan prices by {bump} in {cities} this month to win subscribers back from us.',
     pct: ['bump'],
     options: [
       {
         id: 'match',
         label: 'Match it',
-        effect: 'Plans −10% at every sales office in {city} for 26 weeks.',
+        effect: 'Plans −10% at our sales offices in {cities} for 26 weeks.',
         penaltyWeeks: 1,
       },
       {
@@ -460,4 +468,8 @@ const BANK_ERA_SPECS: Record<string, IncidentSpec> = {
 };
 
 /** Every incident: the bank-era cases plus the AI-native ones (incidentsAi.ts). */
-export const INCIDENT_SPECS: Record<string, IncidentSpec> = { ...BANK_ERA_SPECS, ...AI_SPECS };
+export const INCIDENT_SPECS: Record<string, IncidentSpec> = {
+  ...BANK_ERA_SPECS,
+  ...AI_SPECS,
+  ...FOUNDER_SPECS,
+};
