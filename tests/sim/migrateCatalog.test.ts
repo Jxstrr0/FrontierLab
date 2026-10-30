@@ -128,12 +128,12 @@ describe('migration 5 → 6 (C3a catalog)', () => {
   it('switches a deposit partnership to a plan package, settling its balance', () => {
     const { s, branchId } = bankSave();
     const site = Object.values(s.world.sites).find(
-      (x) => x.cityId === 'cal' && x.kind === 'employer',
+      (x) => x.cityId === 'cal' && x.kind === 'university',
     )!;
     // Sign a deal today, then dress it as a schema-5 deposit package funded into reserves.
     s.company.paidInCapital += 5_000_000;
     s.company.cash += 5_000_000;
-    const r = cmd.signPartnership(s, site.id, branchId, 'team', 'payroll');
+    const r = cmd.signPartnership(s, site.id, branchId, 'team', 'student');
     if (!r.ok) throw new Error(r.reason);
     const old = s.partnerships[r.partnershipId]!;
     old.productId = 'savings';
@@ -141,7 +141,7 @@ describe('migration 5 → 6 (C3a catalog)', () => {
     s.treasury.reserves += 400_000;
     const m = migrated(s);
     const p = m.partnerships[r.partnershipId]!;
-    expect(p.productId).toBe('team');
+    expect(p.productId).toBe('campus_plan');
     expect(p.balance).toBe(0);
     expect(identityGap(m)).toBeLessThan(1);
   });

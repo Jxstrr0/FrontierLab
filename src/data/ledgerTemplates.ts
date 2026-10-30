@@ -410,7 +410,7 @@ const BANK_TEMPLATES = {
     },
     {
       h: '{bank} wins {employer} {kind}',
-      b: 'Staff at {employer} will be offered plans through {branch}. The lab paid {fee} to sign.',
+      b: 'People at {employer} will be offered plans through {branch}. The lab paid {fee} to sign.',
     },
   ],
   PARTNERSHIP_RENEWED: [

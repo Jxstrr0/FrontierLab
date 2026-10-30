@@ -10,11 +10,12 @@ import {
   yearlyOdds,
 } from '../../src/app/hq/itView';
 import { partnershipCards } from '../../src/app/hq/treasury/partnershipCardsView';
-import { APP_RATING, WEEKS_PER_YEAR } from '../../src/config/balance';
+import { APP_RATING, PARTNER_CONTRACT_WEEKS, WEEKS_PER_YEAR } from '../../src/config/balance';
 import * as cmd from '../../src/sim/commands';
 import { advanceWeeks } from '../../src/sim/engine';
 import { newGame } from '../../src/sim/newGame';
-import type { WeeklySnapshot } from '../../src/sim/state';
+import { headcount } from '../../src/sim/partnerships';
+import type { Partnership, WeeklySnapshot } from '../../src/sim/state';
 import { openScriptedBranch } from '../helpers/scenario';
 
 function partnerGame() {
@@ -37,30 +38,44 @@ describe('partnership cards', () => {
 
   it('lists active deals with the people, term and panel route, runoffs last', () => {
     const { s, branchId, employer, university } = partnerGame();
-    const pay = cmd.signPartnership(s, employer.id, branchId, 'plus');
     const stu = cmd.signPartnership(s, university.id, branchId, 'plus', 'student');
-    if (!pay.ok) throw new Error(pay.reason);
     if (!stu.ok) throw new Error(stu.reason);
-    s.partnerships[pay.partnershipId]!.balance = 1_000;
-    const student = s.partnerships[stu.partnershipId]!;
-    student.status = 'runoff';
-    student.runoffWeeksLeft = 1;
-    student.balance = 9_000;
+    s.partnerships[stu.partnershipId]!.balance = 1_000;
+    // A staff-plan deal from a save older than schema 32, running off at an employer.
+    const old: Partnership = {
+      id: 'pship_old',
+      siteId: employer.id,
+      kind: 'payroll',
+      hostBranchId: branchId,
+      productId: 'team',
+      startWeek: 0,
+      termWeeks: PARTNER_CONTRACT_WEEKS,
+      fee: 0,
+      unamortized: 0,
+      balance: 9_000,
+      accounts: 40,
+      health: 50,
+      lowHealthWeeks: 0,
+      status: 'runoff',
+      runoffWeeksLeft: 1,
+    };
+    s.partnerships[old.id] = old;
 
     const cards = partnershipCards(s);
-    expect(cards.map((c) => c.id)).toEqual([pay.partnershipId, stu.partnershipId]);
+    expect(cards.map((c) => c.id)).toEqual([stu.partnershipId, old.id]);
     const [a, b] = cards as [(typeof cards)[0], (typeof cards)[0]];
-    expect(a.name).toBe(employer.employer!.name);
-    expect(a.kindLabel).toBe('Staff plans');
-    expect(a.people).toBe(employer.employer!.employees);
-    expect(a.peopleLabel).toBe('Employees');
+    expect(a.name).toBe(university.employer!.name);
+    expect(a.kindLabel).toBe('Student plans');
+    expect(a.people).toBe(headcount(university, 'student'));
+    expect(a.peopleLabel).toBe('Students');
     expect(a.termText).toMatch(/^Year 1 of \d+$/);
-    expect(a.route).toEqual({ type: 'employer', siteId: employer.id });
+    expect(a.route).toEqual({ type: 'university', siteId: university.id });
     expect(b.active).toBe(false);
-    expect(b.kindLabel).toBe('Student plans');
-    expect(b.peopleLabel).toBe('Students');
+    expect(b.kindLabel).toBe('Staff plans');
+    expect(b.people).toBe(employer.employer!.employees);
+    expect(b.peopleLabel).toBe('Employees');
     expect(b.termText).toBe('Running off · 1 week left');
-    expect(b.route).toEqual({ type: 'university', siteId: university.id });
+    expect(b.route).toEqual({ type: 'employer', siteId: employer.id });
   });
 });
 

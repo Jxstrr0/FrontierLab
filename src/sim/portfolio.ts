@@ -5,7 +5,6 @@
 // the mark rule for ventures and buildings: revaluations run inside
 // `withAssetMarks`, which posts the change to P&L in the same step (a
 // company-owned sports club's value too, Stage 9).
-import { fxValue } from './fx';
 import { postPnl } from './ledger';
 import { holdingsValue, securityPrice } from './securities';
 import type { GameState, Property, Startup } from './state';
@@ -74,25 +73,21 @@ export interface PortfolioBreakdown {
   ventures: number;
   realEstate: number;
   ventureDebt: number;
-  /** Currency positions at today's rates (§19.10). */
-  currencies: number;
   total: number;
 }
 
-/** The Investment floor donut (SCREENS §10): Stocks, Ventures, Real estate, Venture debt, Currencies. */
+/** The Investment floor donut (SCREENS §10): Stocks, Ventures, Real estate, Venture debt. */
 export function portfolioBreakdown(state: GameState, account: Account): PortfolioBreakdown {
   const stocks = holdingsValue(state, account);
   const ventures = venturesValue(state, account);
   const realEstate = realEstateValue(state, account);
   const ventureDebt = ventureDebtValue(state, account);
-  const currencies = fxValue(state, account);
   return {
     stocks,
     ventures,
     realEstate,
     ventureDebt,
-    currencies,
-    total: stocks + ventures + realEstate + ventureDebt + currencies,
+    total: stocks + ventures + realEstate + ventureDebt,
   };
 }
 

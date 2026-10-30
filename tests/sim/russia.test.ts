@@ -53,10 +53,9 @@ describe('Russia', () => {
     expect(identityGap(s)).toBeLessThan(1);
   });
 
-  it("draws Russia's cycle and currency from their own streams", () => {
+  it("draws Russia's cycle from its own stream", () => {
     const a = newGame({ seed: 42, cityId: 'cal' });
     advanceWeeks(a, 26);
     expect(a.rng['macro:RU']).toBeDefined();
-    expect(a.rng['fx:RU']).toBeDefined();
   });
 });

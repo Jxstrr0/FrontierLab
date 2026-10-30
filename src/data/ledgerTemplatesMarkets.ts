@@ -74,26 +74,6 @@ export const MARKETS_TEMPLATES = {
       b: 'A buyback of {shares} shares at {price} leaves fewer shares to share the profits.',
     },
   ],
-  FX_UP: [
-    {
-      h: 'The {currency} climbs {pct}',
-      b: 'Currency traders bid the {currency} up {pct} against the {home} this week.',
-    },
-    {
-      h: 'A strong week for the {currency}',
-      b: 'The {currency} gained {pct} on the {home} as investors warmed to its economy.',
-    },
-  ],
-  FX_DOWN: [
-    {
-      h: 'The {currency} slips {pct}',
-      b: 'The {currency} lost {pct} against the {home} as traders turned cautious.',
-    },
-    {
-      h: 'Sellers hit the {currency}',
-      b: 'A {pct} fall against the {home} made it a rough week for the {currency}.',
-    },
-  ],
   SHARE_PRICE_UP: [
     {
       h: '{bank} shares jump {pct}',

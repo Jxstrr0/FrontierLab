@@ -5,6 +5,8 @@
 // the full statements on the HQ Finance floor once you have one.
 import { useState } from 'preact/hooks';
 import { ATTENTION, FEATURES, LIQ_MIN, LIQ_REPAY_BUFFER, RUNWAY } from '../../config/balance';
+import { FRONTIER_PROJECT_LIST } from '../../data/frontierProjects';
+import { MILESTONES } from '../../data/milestones';
 import { companyArr } from '../../sim/arr';
 import { balanceSheet } from '../../sim/balanceSheet';
 import { cashCoverWeeks, weeklyCosts } from '../../sim/cashCover';
@@ -188,6 +190,28 @@ export function CompanyPanel() {
         <button type="button" class="btn btn-secondary btn-block" onClick={() => setLearn(true)}>
           How this works
         </button>
+
+        <div>
+          <SectionTitle>Goals</SectionTitle>
+          <div class="co-goals">
+            <button
+              type="button"
+              class="btn btn-secondary btn-block"
+              data-tutorial="company-milestones"
+              onClick={() => openPanel({ type: 'milestones' })}
+            >
+              Milestones · {Object.keys(s.milestones).length} of {MILESTONES.length}
+            </button>
+            <button
+              type="button"
+              class="btn btn-secondary btn-block"
+              data-tutorial="company-projects"
+              onClick={() => openPanel({ type: 'projects' })}
+            >
+              Frontier projects · {s.projects.done.length} of {FRONTIER_PROJECT_LIST.length}
+            </button>
+          </div>
+        </div>
 
         <div>
           <SectionTitle>Statements</SectionTitle>
