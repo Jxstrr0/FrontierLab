@@ -38,6 +38,9 @@ export function runPriceWars(state: GameState): void {
   const monthly = state.clock.week % PRICE_WAR.everyWeeks === 0;
   const rng = stream(state, 'rivalsAi');
   const banks = Object.values(state.rivals).sort((a, b) => (a.id < b.id ? -1 : 1));
+  /** This month's cuts: one Price war case names every rival and city (2026-10-30). */
+  const cutCities = new Set<string>();
+  const cutters: string[] = [];
   for (const bank of banks) {
     if (bank.status !== 'active') continue;
     // Fade bumps in cities where your streak has ended.
@@ -76,7 +79,19 @@ export function runPriceWars(state: GameState): void {
         4,
         city,
       );
-      raiseIncident(state, 'PRICE_WAR', 'city', city, { rivalId: bank.id, bank: bank.name, bump });
+      cutCities.add(city);
+      if (!cutters.includes(bank.name)) cutters.push(bank.name);
     }
+  }
+  if (cutCities.size > 0) {
+    const others = cutters.length - 1;
+    raiseIncident(state, 'PRICE_WAR', 'company', 'company', {
+      bank:
+        others > 0
+          ? `${cutters[0]} and ${others} other ${others === 1 ? 'lab' : 'labs'}`
+          : cutters[0]!,
+      bump: PRICE_WAR.bump,
+      cityIds: [...cutCities].join(','),
+    });
   }
 }

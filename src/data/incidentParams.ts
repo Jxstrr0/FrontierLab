@@ -170,4 +170,28 @@ export const INCIDENT_PARAMS = {
     /** Otherwise the lab is in outage (§13.0 churn, contract losses) for this many weeks. */
     outageWeeks: 1,
   },
+
+  // ─── The founder's desk (2026-10-30; catalog in incidentsFounder.ts) ────────
+  /** Flat costs here grow with the lab like the AI cases (INCIDENT_SCALE), so they stay small for a founder. */
+  VIRAL_DEMO: { pushCost: 25_000, pushAwareness: 0.15, enjoyAwareness: 0.06 },
+  FEATURE_REQUEST: {
+    buildCost: 40_000,
+    buildProducts: 0.15,
+    buildWeeks: 26,
+    promiseProducts: 0.05,
+    promiseWeeks: 8,
+  },
+  PRESS_INTERVIEW: { awareness: 0.08, gaffeChance: 0.25, gaffeOverall: -0.1, gaffeWeeks: 4 },
+  /** The counter-offer raises the manager's salary by this share. */
+  MANAGER_POACHED: { raiseShare: 0.2 },
+  /** Burst capacity for the week costs demand × spot × burstPremium; riding it out is an outage. */
+  CLOUD_OUTAGE: { burstPremium: 0.6, minBurst: 5_000, outageWeeks: 1 },
+  HACKATHON: {
+    sponsorCost: 15_000,
+    product: 'api',
+    takeup: 1.25,
+    takeupWeeks: 12,
+    awareness: 0.05,
+  },
+  CAMPUS_CREDITS: { creditsCost: 10_000, product: 'plus', takeup: 1.15, takeupWeeks: 12 },
 } as const;

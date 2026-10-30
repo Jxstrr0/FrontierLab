@@ -12,7 +12,7 @@ export const AI_SPECS: Record<string, IncidentSpec> = {
     title: 'Jailbreak goes viral',
     scope: 'company',
     trigger: 'rolled',
-    baseP: 0.002,
+    baseP: 0.008,
     text: 'A prompt that talks our model into saying things it never should is going round online, with screenshots. Every hour it stays up, more people try it.',
     texts: [
       'Someone found a few sentences that switch off the model’s manners, and the thread showing it is everywhere this morning. Customers are asking what we are doing about it.',
@@ -45,7 +45,7 @@ export const AI_SPECS: Record<string, IncidentSpec> = {
     title: 'Hallucination lawsuit',
     scope: 'company',
     trigger: 'rolled',
-    baseP: 0.001,
+    baseP: 0.005,
     text: 'A customer acted on a confident, wrong answer from our model and lost money. Their lawyers want {settle}.',
     texts: [
       'Our model invented a regulation, a customer built a product on it, and now their lawyers are asking for {settle} in damages.',
@@ -72,7 +72,7 @@ export const AI_SPECS: Record<string, IncidentSpec> = {
     title: 'Training-data copyright suit',
     scope: 'company',
     trigger: 'rolled',
-    baseP: 0.0015,
+    baseP: 0.004,
     text: 'A publisher says {models} of our trained model generations learned from its archive without a licence, and has filed suit.',
     texts: [
       'A group of writers has traced their work in our training data. They are suing over all {models} generations we have trained.',
@@ -104,7 +104,7 @@ export const AI_SPECS: Record<string, IncidentSpec> = {
     title: 'Model weights leak',
     scope: 'company',
     trigger: 'rolled',
-    baseP: 0.001,
+    baseP: 0.003,
     text: 'A copy of our model’s weights has turned up on a file-sharing site. Whoever took it had a key that should have been rotated months ago.',
     texts: [
       'Security found our latest checkpoint being passed around a hobbyist forum. The keys that signed it out are still live.',
@@ -130,7 +130,7 @@ export const AI_SPECS: Record<string, IncidentSpec> = {
     title: 'Deepfake misuse',
     scope: 'branch',
     trigger: 'rolled',
-    baseP: 0.002,
+    baseP: 0.001,
     text: 'A local paper has traced a fake video of a {city} councillor to our Creative Suite, and {branch} is getting the calls.',
     texts: [
       'Someone used the Creative Suite to put words in a {city} newsreader’s mouth, and the clip names us. {branch} has reporters outside.',

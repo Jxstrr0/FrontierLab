@@ -10,6 +10,7 @@ import { CAPITAL_TEMPLATES } from './ledgerTemplatesCapital';
 import { INVESTMENTS_TEMPLATES } from './ledgerTemplatesInvestments';
 import { EMPIRE_TEMPLATES } from './ledgerTemplatesEmpire';
 import { DESK_TEMPLATES } from './ledgerTemplatesDesk';
+import { FOUNDER_TEMPLATES } from './ledgerTemplatesFounder';
 import { INCIDENT_TEMPLATES } from './ledgerTemplatesIncidents';
 import { CALENDAR_TEMPLATES } from './ledgerTemplatesCalendar';
 import { GLOBE_TEMPLATES } from './ledgerTemplatesGlobe';
@@ -601,6 +602,7 @@ export const LEDGER_TEMPLATES = {
   ...CALENDAR_TEMPLATES,
   ...DESK_TEMPLATES,
   ...INCIDENT_TEMPLATES,
+  ...FOUNDER_TEMPLATES,
 };
 
 export type TemplateKey = keyof typeof LEDGER_TEMPLATES;
