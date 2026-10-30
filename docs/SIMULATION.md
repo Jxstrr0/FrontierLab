@@ -73,6 +73,7 @@ How the economy works, step by step. Every CAPS name is a key in `src/config/bal
     - sports season results
     - `feeIndex` steps up by the year's nominal growth; rival prices re-price; price lists are reviewed (§4.6)
     - cities grow; rivals' year (learning, charters, technology, §18)
+    - the annual report is filed after the rich list ranks you (§22a)
 22. Incidents (§23).
 23. Net-worth history and milestones.
 24. News (§24).
@@ -1088,7 +1089,23 @@ Eight more cities (CONTENT §2, marked *late*) are closed to AI labs at the star
   - **Counterfeits:** authenticity is hidden. Fake odds by house: 4% / 8% / 6%.
   - **Appraise:** fee 1% of purchase price, takes 1 week, reveals the truth. A fake is worth $0 and can't be consigned.
   - **Consigning** a genuine item: hammer price = value × lognormal(1, 0.15), minus a 10% seller fee.
-- **Rich list:** a generated list of 50 fixed fortunes drawn log-uniform between $150M and $2B (`RICH_LIST.fortune`), each growing with the home country's nominal index (§4.6; `richList.nominalRef` remembers the level at the last ranking) times its own real growth of −2% to +5% a year (`RICH_LIST.growth`). Yearly rank event. A founder typically enters the list in years 8–12 and needs a long, strong game to top it.
+- **Rich list:** a generated list of 50 fixed fortunes drawn log-uniform between $500M and $30B (`RICH_LIST.fortune`; owner's review A5, 2026-10-30), each growing with the home country's nominal index (§4.6; `richList.nominalRef` remembers the level at the last ranking) times its own real growth of −1% to +4% a year (`RICH_LIST.growth`). Yearly rank event. On seed 42 the steady founder enters at about #47 in year 3, is about #26 in year 5 and reaches the top ten in year 8, while the top fortune grows from about $23B to $44B; topping it takes a long, strong game.
+
+### 22a. The annual report
+
+At each year end, after the rich list ranks you, `recordYear` (`sim/annualReport.ts`) files a `YearReport` in `history.yearly`: the calendar year, the year of play `n`, the last week, revenue and net income summed from that year's four quarterly reports, and at the close ARR, open sales offices, their customers, the company valuation (§19.6), your net worth and rich list rank, the house model's quality (radar mean) and the safety tier.
+
+The front page (SCREENS §21b) picks its headline from the year, most newsworthy first (`annualKind`):
+1. `decade`: every `ANNUAL_REPORT.decadeYears` (10) years of play.
+2. `first`: the first report.
+3. `topRich`: rank 1, not held the year before.
+4. `firstProfit`: net income above zero after a year at or below it.
+5. `safety`: the close is at a `safetyTiers` tier (Restricted or Critical).
+6. `doubled`: ARR growth of at least `doubled` (100%).
+7. `hardYear`: ARR growth below `hardYear` (0%).
+8. `grew`: otherwise.
+
+Each kind has two texts (CONTENT §26b); the year's parity picks one, so a report reads the same when reopened. No randomness is used.
 
 ## 23. Incidents
 
@@ -1228,5 +1245,6 @@ The main groups, with the defaults shown above. Names marked (legacy) belong to 
 - **CORPORATE DEBT:** `CORPORATE_LENDING` (`refreshWeeks` 4, `offersPerLender` [2, 3], `maxEquityShare` 0.4, `lineEquityShare` 0.6, `lineSpread` 0.04; §19.9)
 - **INVESTMENTS:** `VENTURES` (`acquireMarkPremium` 1.25), `VENTURE_DEBT`, `VENTURE_MARGIN`, `VENTURE_GEN`, `VENTURE_IPO`, `VENTURE_NEWS`, `CONVENTIONS`, `REAL_ESTATE`, `LOBBYING`
 - **NEWS:** `NEWS_*` (articles, priorities, world desk, company desk, commodities, archive, calendar, column, elections, polls, policy), `RANKING_SIZE`, `RANKING_MIN_ASSETS`, sports `SPORTS_*`
+- **ANNUAL_REPORT** (§22a): `doubled: 1`, `hardYear: 0`, `decadeYears: 10`, `safetyTiers: ['restricted', 'critical']`, `milestonesShown: 3`.
 - **PERSONAL:** `PERSONAL_TAX = 0`, `TRAVEL_KM_PER_WEEK = 24_140`, `FLIGHT_FARE = 80_000` (× destination costIndex), `EARTH_RADIUS_KM = 6_371`, `JET = { upkeepRate: 0.08, depreciation: 0.06, resaleHaircut: 0.1 }`, `HOMES_CFG`, `CARS_CFG`, `COLLECTIBLES_CFG`, `AUCTIONS`, `FRANCHISE`, `RICH_LIST`, `INSIDER`
 - **FEATURES:** flags per stage (ROADMAP)

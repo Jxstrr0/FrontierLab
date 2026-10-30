@@ -130,6 +130,10 @@ const BAR = { slot: 64, h: 110, top: 30 } as const;
 export function BarChart(p: {
   data: { label: string; revenue: number; income: number }[];
   format?: (v: number) => string;
+  /** Accessible name; defaults to the weekly results chart's. */
+  label?: string;
+  /** What one bar covers, for the tap hint ("week" by default). */
+  unit?: string;
 }) {
   const [picked, setPicked] = useState<number | null>(null);
   const fmt = p.format ?? ((v: number) => String(Math.round(v)));
@@ -145,7 +149,7 @@ export function BarChart(p: {
       <svg
         viewBox={`0 0 ${w} ${BAR.top + BAR.h + 4}`}
         role="img"
-        aria-label="Weekly revenue and income"
+        aria-label={p.label ?? 'Weekly revenue and income'}
       >
         <line x1="0" x2={w} y1={zero} y2={zero} class="barchart-axis" />
         {p.data.map((d, i) => {
@@ -211,7 +215,7 @@ export function BarChart(p: {
         <span class="lg-rev">Revenue</span>
         <span class="lg-inc">Income</span>
         {p.data.some((d) => d.income < 0) && <span class="lg-loss">Loss</span>}
-        <span class="barchart-hint">Tap a week for values</span>
+        <span class="barchart-hint">Tap a {p.unit ?? 'week'} for values</span>
       </div>
     </div>
   );

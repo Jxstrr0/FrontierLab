@@ -3,13 +3,30 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** post-launch content and streamlining pass (v0.1.56, save schema 35), from the owner's review of 2026-10-30: batches 1 (incidents and the founder's desk), 2 (streamlining), 3 (model launches) and 4 (public tenders) are in; batch 5 (rich list and the annual report) follows. The Kelbo.Website hub card still needs its own session in that repo.
+**Current stage:** post-launch content and streamlining pass (v0.1.57, save schema 36), from the owner's review of 2026-10-30: all five batches are in (incidents and the founder's desk, streamlining, model launches, public tenders, and the rich list with the annual report). The Kelbo.Website hub card still needs its own session in that repo.
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `164f69c2e37d23` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `01f3204c67bc2e` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-30 — Review batch 5: rich list rescale and the annual report (v0.1.57)
+
+Two things from the review: the rich list was too easy, and a year ending had no payoff. Old saves load and are upgraded (save schema 35 → 36).
+
+**The rich list.** The 50 fortunes used to sit between $150M and $2B. A lab worth billions passed all of them, so a steady game put you at #1 in year 5. They now start between $500M and $30B, so the richest name is worth about $23B. Each fortune still grows with the economy, plus up to 4% a year of its own. In a 10-year steady game on seed 42 you join the list around year 3, sit about 26th in year 5 and reach the top ten around year 8. By then the top fortune is about $44B, so first place takes a long, strong game. In an old save, every fortune moves onto the new range in the same order.
+
+**The annual report.** On the first day of each new year, after the results, a special front page of The Weekly Inference opens. It shows:
+- a headline picked from your year: first year, topping the rich list, a first profit, a year under the regulator, doubling, shrinking, or steady growth;
+- a short story with your recurring revenue, offices, valuation, the milestones you reached and your rich list place;
+- a table of the year's figures beside last year's.
+
+Every tenth year it becomes **the decade in review**: bars of revenue and net income for each of the ten years, and the same table as "then and now". Old reports stay in the menu's Ledger archive, above the weekly issues. Headlines follow fixed rules, so a report reads the same each time you open it.
+
+**Checked:** lint, 1,188 tests (new `annualReport.test.ts`), type-check and build pass. Steady, aggressive and stress on seed 42 pass every target. At 390×844 in Chromium, the report opened by itself after the 2027 results with no console errors. A faked ten-year history showed the decade edition and the archive list. Two fixes came from that check: the archive rows now have an icon, so the text isn't squeezed, and the decade bars use short year labels ('27, '28) so they don't run together. The determinism snapshot moved to `01f3204c67bc2e`. That is intended: the rich list draws from a new range.
+
+**Next:** the owner's review is done. The Kelbo.Website hub card still needs its own session in that repo.
 
 ### 2026-10-30 — Review batch 4: public-sector tenders (v0.1.56)
 

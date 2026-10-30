@@ -1,10 +1,13 @@
 // The Weekly Ledger archive (menu → The Ledger, SCREENS §0.3, SIMULATION §24):
 // the last 52 issues newest first, each with its date and lead headline; tap
-// one to read it with the same tabs as the weekly results.
+// one to read it with the same tabs as the weekly results. Above them, the
+// annual reports (SCREENS §21b), newest first, each reopening its front page.
 import { DAYS_PER_WEEK } from '../../config/balance';
 import { Panel } from '../components';
 import { gameDate } from '../format/format';
-import { closePanel, openPanel, useGame } from '../store';
+import { annualText } from '../../sim/annualReport';
+import type { GameState } from '../../sim/state';
+import { closePanel, modal, openPanel, useGame } from '../store';
 import { articlesFor, LedgerCard, Masthead } from '../weekly/LedgerCard';
 import { LedgerGlyph } from '../weekly/ledgerIcons';
 import '../weekly/weekly.css';
@@ -54,6 +57,7 @@ export function LedgerArchivePanel(p: { week?: number }) {
             date={dateOf(newest[0]!.week)}
             edition={`${issues.length} ${issues.length === 1 ? 'issue' : 'issues'} on file`}
           />
+          <AnnualReports s={s} />
           <ol class="ledger-archive" aria-label="Back issues">
             {newest.map((issue) => {
               const top = articlesFor(issue, 'top');
@@ -81,6 +85,35 @@ export function LedgerArchivePanel(p: { week?: number }) {
         </div>
       )}
     </Panel>
+  );
+}
+
+/** The annual reports on file, newest first; tap one to reopen it. */
+function AnnualReports(p: { s: GameState }) {
+  const reports = p.s.history.yearly;
+  if (reports.length === 0) return null;
+  const names = { bank: p.s.meta.bankName, founder: p.s.meta.founderName };
+  return (
+    <ol class="ledger-archive" aria-label="Annual reports">
+      {reports
+        .map((r, i) => ({ r, text: annualText(r, reports[i - 1], names) }))
+        .reverse()
+        .map(({ r, text }) => (
+          <li key={r.year}>
+            <button
+              type="button"
+              class="archive-row"
+              onClick={() => (modal.value = { type: 'annual', year: r.year })}
+            >
+              <LedgerGlyph icon="chart" size={30} />
+              <span class="archive-text">
+                <span class="archive-date">Annual report {r.year}</span>
+                <span class="archive-headline">{text.headline}</span>
+              </span>
+            </button>
+          </li>
+        ))}
+    </ol>
   );
 }
 

@@ -69,6 +69,8 @@ export type ModalRoute =
   | { type: 'incident' }
   /** `reminder`: opened by the quarterly auto-pause, showing a prompt first (SIMULATION §2). */
   | { type: 'boardMeeting'; reminder?: boolean }
+  /** The annual report (SCREENS §21b); `year` absent = the latest. */
+  | { type: 'annual'; year?: number }
   | { type: 'gameover' };
 
 export interface Toast {
