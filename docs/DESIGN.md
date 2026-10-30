@@ -31,7 +31,7 @@ You found an AI lab with a fresh seed round: $1,500,000, all of it yours to spen
   - **Safety ratio** with AI regulator tiers, a quarterly safety audit and a mandated pause (§5.6)
   - **The AI model and training runs**, judged against a rising frontier set by rival labs (§5.8.3)
   - **Deal Desk:** enterprise contracts with named businesses on the map, using the startup pentagon (§5.4.3)
-  - **Data-centre and power deals** at energy sites, and staff plan partnerships with employers, in place of plantations (§5.8.4)
+  - **Data-centre and power deals** at energy sites in place of plantations (§5.8.4); an employer is one deal, its anchor account on the Deal Desk
   - **Central banks** per country and a **business cycle** that move customer budgets, business failures and stock prices (§5.7)
   - **Compute credits** alongside equity investing (§5.12)
   - **Insider-trading** risk on your personal trades (§5.16)
@@ -57,7 +57,7 @@ How each of the original game's systems appears in Frontier Lab. The code-name c
 | Roasters selling packaged blends and roasting your custom blend | Data vendors selling dataset packages | `bureau`, layer `creditBureaus` | Map layer |
 | Develop new product | Product development, plus training runs for new model generations | `development`, `training` | Same terms and star-odds table |
 | Coffee bean inventory: lots, harvest year, price/lb, quantity, radar | Compute: GPU reservations (provider, term, price per GPU-week, size, radar) | `gpuLots` | Compute floor |
-| Plantations: hectares, yield curve, "year X of Y", replant | Data-centre and power deals at energy sites; staff plan partnerships with employers | `powerDeals`, `partnerships` | Same curve, health and renewal |
+| Plantations: hectares, yield curve, "year X of Y", replant | Data-centre and power deals at energy sites; student partnerships at universities | `powerDeals`, `partnerships` | Same curve, health and renewal |
 | Ten marketing campaigns with levels and weekly costs | Ten office campaigns with levels and weekly costs | | See CONTENT §8 |
 | HQ floors: Finance, HR, Product, Supply, Marketing, IT, Executive, Investment, Add Floor | Finance, HR, Products, Compute, Marketing, Platform & Security, Safety & Alignment, Executive, Investment, Add Floor | `treasury` = Compute, `it` = Platform & Security, `risk` = Safety & Alignment | Safety is new |
 | Understaffing warnings from floor advisors | Same, plus coverage % per floor | | |
@@ -255,7 +255,6 @@ Shown to the player in one place, the Company summary:
 
 #### 5.8.1 Finance
 - Company statements (income, balance sheet, cash flow; Week/Quarter/Year): Revenue → Compute → Gross profit, then running costs. A revenue and net income chart, and a credit summary (plus liquidity for old bank-era saves).
-- **Launch posture** (code `riskAppetite`): a 1–5 dial from Very cautious to Very bold. A bolder posture wins and keeps more Deal Desk contracts but adds to the model's safety exposure, and at Bold or Very bold capability over-claims are likelier. The Chief Safety Officer and the CFO can steer it.
 - Understaffed:
   - statements are delayed
   - an investor-relations discount hits your share price
@@ -267,7 +266,7 @@ Shown to the player in one place, the Company summary:
 - Understaffed: hiring slows and morale drifts down.
 
 #### 5.8.3 Products
-- **The AI model:** a radar (Reasoning, Speed, Breadth, Safety, Efficiency) and a data licence per customer a year. Manage Models mixes training datasets bought from data vendors.
+- **The AI model:** a radar (Reasoning, Speed, Breadth, Safety, Efficiency) and a data licence per customer a year. Manage Models mixes training datasets bought from data vendors. Data vendors on the map sell packaged models (the founder-phase model); a custom mix is built here and nowhere else (2026-10-30).
   - Quality (the radar mean) gives price headroom, lifts every office's Products rating and adds to Deal Desk odds.
   - Efficiency cuts the compute behind every customer. Speed lifts Service. Safety counts with data-sensitive businesses and lowers safety risk.
 - **The frontier.** Every rival lab has a named model, and some ship a new generation each quarter. The best rival model is the frontier; as it rises, the bar your model is judged against rises with it. A leaderboard ranks every lab's model.
@@ -284,7 +283,7 @@ The Compute floor (code `treasury`).
 - **GPU market:** 6-month, 1-year and 3-year reservations from fictional GPU clouds at a discount on spot. Offers refresh every two weeks; a fuller Compute team brings more and cheaper offers.
 - **Partnerships:**
   - **Data-centre and power deals** at regional energy sites: contracted GPUs at a fixed price (take-or-pay) plus cheaper power for your data centers in that country. "Year 3 of 7", relationship health, renew or let lapse.
-  - **Staff plan partnerships** with employers: their staff join a plan (Team by default), adding ARR along the same curve.
+  - **Employers are one deal:** an employer's business is its anchor account, won and renewed on the Deal Desk like any business. The bank-era staff plan partnership beside it was retired on 2026-10-30 (owner's review, B1); universities keep the student partnership.
 - Bank-era liquidity, funding and central bank cards show only for old saves that still carry deposits or wholesale funding.
 
 #### 5.8.5 Marketing
@@ -298,6 +297,7 @@ Brand awareness by city, brand campaigns (TV, billboards, podcasts, creators, ar
 
 #### 5.8.7 Safety & Alignment (new floor)
 - Shows the safety ratio and tier, the audit odds, model performance and losses.
+- **Launch posture** (code `riskAppetite`; here since 2026-10-30, on Finance before): a 1–5 dial from Very cautious to Very bold. A bolder posture wins and keeps more Deal Desk contracts but adds to the model's safety exposure, and at Bold or Very bold capability over-claims are likelier. The Chief Safety Officer and the CFO can steer it.
 - Its staffing is the strength half of the safety ratio, and its requirement grows with ARR.
 - Understaffed: a lower safety ratio, more failed audits and fines.
 
@@ -364,12 +364,6 @@ Investment banks on the map, with tabs Market / Equity / Debt / M&A:
 - **Startup screen:** description, founded, CEO, pre-money valuation, benchmark pentagon, quarterly financials, the current round with two offer lots (invest as Company or Private), funding history, top shareholders.
 - **Lifecycle.** Startups grow, raise up or down rounds, IPO, get acquired, or fail.
 - **AI-lab twist:** offer **compute credits** (code `ventureDebt`) instead of buying shares.
-
-### 5.12a Currencies (FX)
-- **A country bet.** Every country's currency is an investment: buy it when you think that country will do well against your home country, sell when you think it will slip. It's deliberately simple, a "country up or down" position, not real currency trading.
-- **What moves it:** the country's growth and interest rate against your home country's, its business cycle (recessions weaken a currency), plus noise. The Hong Kong currency is pegged to the US one.
-- **Where:** a Currencies view at any investment bank (beside the stock market), for the company or personally. Positions appear in the Investment floor portfolio and on the balance sheet.
-- Your operations are still booked in one currency; FX here is only an investment.
 
 ### 5.13 Governance
 - **Quarterly board meeting.** Set the dividend per share and your CEO compensation, then the board votes. Your ownership, company performance and how reasonable the proposal is decide the result.
@@ -442,7 +436,7 @@ Investment banks on the map, with tabs Market / Equity / Debt / M&A:
 - Everything is skippable, Part 2 can be switched off in Settings, and hints stay available in the advisor bar.
 
 ## 6. Out of scope for v1
-- FX conversion between currencies (one display currency; currencies exist only as an investment, §5.12a)
+- FX of any kind: one display currency, no conversion and no currency investments (the Currencies bet was cut 2026-10-30, §7)
 - Multiplayer
 - Derivatives and crypto
 - Real-world street maps
@@ -542,7 +536,7 @@ Add one dated line per decision. Never delete entries; supersede them.
 - 2026-10-24: M&A closing keeps the books balanced by treating the target's cash as D + E − L (less corporate debt you owed it, which is settled, and its lease deposits, which move to you); if that is negative its loans are written down to fair value. Your company's existing stake counts toward the price at market; personal shares are bought out at the offer price. Acquired fit-outs aren't booked as fixed assets. Converted branches get a build by the seller's strategy, full staff with morale −10, a generated manager with every delegation on, every product they can serve, and books split by a mature mix. The rebrand cost is spread over the 8 conversion weeks. A regulator block doesn't start the 4-week retry wait; an accepted deal you can no longer afford lapses. A distressed network's ask is rolled once at failure (P/B 0.4–0.7, floored at $1 a share); while you have an offer pending it isn't split. Converting branches keep the old bank's ink on the map with a progress ring and a "Converting" label.
 - 2026-10-24: The steady balance strategy takes a 25% private placement when its capital ratio is under 13% and cash is short, and launches a 25%-float IPO as soon as eligible; it lists in years 5–6 on seeds 42, 7 and 99.
 - 2026-10-24 (owner): One global enterprise. You can travel to any city at any time and buy any asset there; everything you own in every city runs at once. Supersedes the weekly travel cap: flights inside the 24,140 km weekly allowance are free, flights past it cost a flat one-way fare from personal cash (the original's behaviour), and jet flights are always free.
-- 2026-10-24 (owner): Currencies become an investment category (DESIGN §5.12a, SIMULATION §19.10): a simplified "country up or down" position per foreign currency, traded at investment banks as the company or personally, built with Stage 7. Operations stay in one currency.
+- 2026-10-24 (owner): Currencies become an investment category: a simplified "country up or down" position per foreign currency, traded at investment banks as the company or personally, built with Stage 7. Operations stay in one currency. (Cut 2026-10-30, below.)
 - 2026-10-24 (owner): The New Game options step offers a starting currency ($, C$, £, €, ¥), as the original does. It sets the display symbol only (defaulting to the saved preference); books stay in one currency.
 - 2026-10-24: Stage 7 buildings. Every city has property buildings (4/6/8/10 by size); a convention centre stands in L/XL cities and every host city; each country's lobbying firm has an office in its cities (Switzerland borrows Rue Royale Affairs, Japan Harbourline Policy Group). Calgary gains the Foothills Founders Fair (week 28) so every start city has a convention before travel arrives.
 - 2026-10-24: Stage 7 books. New P&L lines: venture debt interest (interest income), rental income and property gains (fee & other income; property gains are non-cash) and property costs and lobbying (opex). Venture marks use investment gains and venture debt write-offs loan losses. Risk weights: ventures 2.5, venture debt 1.5, buildings 1.0, currencies 1.0. Company investing in startups, venture debt and buildings is refused at the Restricted and Critical tiers, like acquisitions.
@@ -767,3 +761,9 @@ Add one dated line per decision. Never delete entries; supersede them.
 - 2026-10-29 (launch re-check): **The title cover prints its chunks off-screen, then paints once.** Repainting the whole 4-megapixel strip every frame while the chunks came in cost 4–5 s of main-thread blocking on a slow phone and took Lighthouse performance to 67. The cover now prepares chunks against a 1 × 1 scratch canvas without the map's prefetch ring and paints the strip once at the end; it looks the same and shows sooner.
 - 2026-10-30 (owner's review, A1): **Incidents follow the lab, not the bank.** A 10-year steady run saw no case at all in years 1–2, then 22–26 price-war popups a year by year 8, while the seven AI-native cases fired six times in a decade: they rolled company-wide at a flat 0.1–0.2% a week and the bank-era office cases rolled once per office, so only the latter grew with the lab. Company cases now scale with customers (`INCIDENT_SIZE`), the break-in and heatwave are retired from the roll, the API key leak and deepfake cases roll at half their odds, and a month's price cuts raise one Price war case a quarter naming every rival and city, answered everywhere at once.
 - 2026-10-30 (owner's review, A2): **The founder's desk.** Eight once-a-game company cases for the first three years (CONTENT §22b) so the founder phase has choices beyond prices and campaigns: a viral demo, a feature request, an angel's cheque (5% at a 30% discount to the private valuation), a press interview, a poached office manager, a cloud outage, a hackathon and course credits. The desk rests six weeks between cases and closes at week 156.
+- 2026-10-30 (owner's review, B2): **One place to mix a model.** The data vendor's "My model" mixer and HQ's Manage models were the same sliders in two places. Vendors now sell packaged models only; custom mixes are built on the Products floor. A hosted custom model in an old save keeps working.
+- 2026-10-30 (owner's review, B4): **A shorter menu.** Portfolio lives under Personal wealth, Milestones and Frontier projects under Company (a Goals section); the menu drops from eleven entries to eight.
+- 2026-10-30 (owner's review, B5): **Launch posture sits with the safety ratio.** The dial trades deal odds against safety exposure, so it moves from the Finance floor to the Safety & Alignment floor, under the regulator card.
+- 2026-10-30 (owner's review, B6): **Three development templates retired.** Researcher Plan, Family Plan and Carbon-Neutral Plan were bank-era segment variants of Plus (the last duplicating the Green Compute Pledge campaign). They leave the New product form; products already developed from them keep working.
+- 2026-10-30 (owner's review, B7): **Currencies cut.** The country-bet investment added its own Market section, portfolio slice and balance-sheet line for little play; it is removed, and old saves sell their positions at the last value into the owner's cash (schema 32).
+- 2026-10-30 (owner's review, B1): **One deal per employer.** An employer offered both a staff plan partnership and an anchor-account contract on the Deal Desk: two deals with the same company, priced and grown in different ways. The staff plan partnership is retired; the anchor account is the employer's deal, and universities keep the student partnership. Old saves run off any active staff plan deal over 12 weeks as if released (schema 33).

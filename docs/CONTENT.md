@@ -20,7 +20,7 @@ Starting values are fictional. Meeting weeks are weeks of the year.
 | AU | Australia | Reserve Bank of Australia | 3.60% | 3.00% | 2.5% | 30% | 7, 13, 20, 27, 33, 40, 46, 50 | |
 | SG | Singapore | Monetary Authority of Singapore | 3.00% | 2.50% | 2.0% | 17% | 4, 17, 30, 43 | |
 | HK | Hong Kong | Hong Kong Monetary Authority | — | — | — | 16.5% | follows US | `peggedTo: US`, spread +0.25% |
-| RU | Russia | Bank of Russia | 6.00% | 5.00% | 2.0% | 25% | 6, 12, 17, 24, 30, 38, 43, 51 | Moscow, St Petersburg. A high-rate economy. `ownStream`: its cycle and currency use their own RNG streams (`macro:RU`, `fx:RU`), so adding it left existing worlds unchanged |
+| RU | Russia | Bank of Russia | 6.00% | 5.00% | 2.0% | 25% | 6, 12, 17, 24, 30, 38, 43, 51 | Moscow, St Petersburg. A high-rate economy. `ownStream`: its cycle uses its own RNG stream (`macro:RU`), so adding it left existing worlds unchanged |
 
 ## 2. Cities (v1)
 
@@ -164,15 +164,15 @@ Plans and Enterprise contracts start switched on in a new sales office; the API 
 
 ## 6. Product development templates
 
-Prices in the tier column are the default price × 0.85 / 1 / 1.25 for Low / Medium / Premium (`DEV_TIER.feeMult`); Premium also adds +0.05 Products rating where offered. A template that sets its own default price scales the market reference with it.
+Prices in the tier column are the default price × 0.85 / 1 / 1.25 for Low / Medium / Premium (`DEV_TIER.feeMult`); Premium also adds +0.05 Products rating where offered. A template that sets its own default price scales the market reference with it. Templates marked retired stay in `DEV_TEMPLATES` so old saves' products work but are left off the New product form (`DEV_TEMPLATE_IDS`).
 
 | id | Name | Base | Effect |
 |---|---|---|---|
 | student_plus | Student Plus | plus | STU affinity +0.15; default $10 |
-| golden_years | Researcher Plan | plus | RET (Researchers) affinity +0.15; default $12 |
-| family_plan | Family Plan | plus | FAM affinity +0.15; 4 seats per sign-up; default $12 per seat |
+| golden_years | Researcher Plan (retired 2026-10-30) | plus | RET (Researchers) affinity +0.15; default $12 |
+| family_plan | Family Plan (retired 2026-10-30) | plus | FAM affinity +0.15; 4 seats per sign-up; default $12 per seat |
 | plus_annual | Plus Annual | plus | churn ×0.5; take-up ×0.85 |
-| carbon_neutral | Carbon-Neutral Plan | plus | reputation +0.05; YP +0.05 |
+| carbon_neutral | Carbon-Neutral Plan (retired 2026-10-30) | plus | reputation +0.05; YP +0.05 |
 | max_plan | Max | pro | default $200; Products +0.1 where offered; YP/BIZ +0.05 |
 | enterprise | Enterprise | team | BIZ +0.2; ticket ×5; churn ×0.6; default $45; take-up ×0.2 |
 | realtime_api | Realtime API | api | default $6; take-up ×1.1; YP/BIZ +0.05 |
@@ -454,14 +454,14 @@ Rival model families (one per lab, numbered by generation, starting at 2; 52 nam
 
 Researchers take names and portraits from the shared person generator (the same lists as managers and executives), so every one is fictional. The CPO leads research: their Expertise lifts training odds and their **Routine training runs** delegation trains for you (the Chief Scientist seat's job until 2026-10-27, when the seat folded into the CPO). A rival bidding for one of yours raises **Researcher poached**: "{rival} is trying to hire away our researcher {name}." It offers *Counter-offer* (their salary +25%) or *Let them go* (they join the rival lab, and its next models get better).
 
-## 14. Employers (staff plan partnerships)
+## 14. Employers
 
-Employers sit on the Businesses layer (layer id `employers`). Each is also an anchor account for the Deal Desk (§21b). The partnership kind keeps its bank-era id `payroll`.
+Employers sit on the Businesses layer (layer id `employers`). Each is an anchor account for the Deal Desk (§21b), its one deal: the staff plan partnership (kind id `payroll`) was retired on 2026-10-30 and survives only on a deal running off from an older save. Employees and income mult size the anchor's AI budget.
 
 | Type | Employees | Income mult | Notes |
 |---|---|---|---|
 | Hospital | 2,000 | 1.10 | |
-| University | 3,500 staff | 1.00 | also offers the student partnership |
+| University | 3,500 staff | 1.00 | offers the student partnership |
 | Auto Plant | 2,500 | 1.00 | |
 | Tech Campus | 1,800 | 1.60 | |
 | City Hall | 5,000 | 1.05 | one per city |
@@ -472,9 +472,8 @@ Employers sit on the Businesses layer (layer id `employers`). Each is also an an
 | Iron Ore Mine | 3,000 | 1.70 | Pilbara |
 | Shale Field Services | 2,500 | 1.50 | Midland |
 
-- **Signing fee:** employees × $160 × income mult × city.incomeIndex.
-- **Contract:** 364 weeks ("Year X of 7").
-- **ARR per participating employee:** $300 (`ARR_PER_EMPLOYEE`; about a Team seat). Student deals: $80 per participating student. The package is a plan (Team for staff, Campus Plan for students by default). The employer panel shows the current "Plans partner".
+- **Rival-held anchors:** when a city is seeded, each employer's anchor account sits with one of the city's rivals 60% of the time (`EMPLOYER_PARTNER_CHANCE`).
+- **Student partnership (universities):** 364 weeks ("Year X of 7"), $80 ARR per participating student, Campus Plan by default (SIMULATION §13.7).
 - **Generation:** 2–4 employers per city.
 - **Energy sites:** the regional sites (the mine, camp and field rows) sign data-centre and power deals instead: fee employees × $500 × the price list, 1.5 contracted GPUs per employee at full participation, $20 per GPU-week fixed at signing, and 25% off power for your data centers in the country (`POWER_DEAL`, SIMULATION §13.7a).
 
@@ -658,21 +657,6 @@ Startups generated during a game (conventions and the Investment floor pipeline,
 | Asia Compute Forum | Singapore | 45 |
 
 Announced in the paper 4 weeks before. Active for 4 weeks (was 2 and 1 until 2026-10-26, so monthly results never miss one). Calgary's fair is our addition so every start city has a conference before travel arrives. The code calls conferences `conventions`.
-
-### 19a. Currencies (SIMULATION §19.10)
-
-| Country | Code | Name | Weekly vol | Notes |
-|---|---|---|---|---|
-| CA | CAD | Canadian dollar | 0.6% | |
-| US | USD | US dollar | 0.5% | |
-| UK | GBP | Pound sterling | 0.7% | |
-| EA | EUR | Euro | 0.6% | |
-| CH | CHF | Swiss franc | 0.5% | |
-| JP | JPY | Japanese yen | 0.8% | |
-| AU | AUD | Australian dollar | 0.9% | |
-| SG | SGD | Singapore dollar | 0.4% | |
-| HK | HKD | Hong Kong dollar | 0.5% | pegged to USD |
-| RU | RUB | Russian ruble | 1.2% | the most volatile |
 
 ### 19b. Milestones (`src/data/milestones.ts`, DESIGN §5.18)
 

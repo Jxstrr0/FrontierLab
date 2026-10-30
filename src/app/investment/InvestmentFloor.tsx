@@ -1,5 +1,5 @@
 // The HQ Investment floor (SCREENS §10): portfolio value with weekly change,
-// a donut (Stocks, Ventures, Real estate, Venture debt, Currencies) for the
+// a donut (Stocks, Ventures, Real estate, Venture debt) for the
 // company or your private account, List portfolio, and the Ventures carousel
 // of startups that are raising (the pipeline refreshes every 4 weeks).
 import { useState } from 'preact/hooks';

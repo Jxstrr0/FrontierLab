@@ -121,9 +121,6 @@ export function mergeRivals(
   for (const branch of target.branches) giveRivalOffice(state, buyer, branch);
   for (const c of target.cities) if (!buyer.cities.includes(c)) buyer.cities.push(c);
   moveCorporateDebt(state, target, buyer);
-  for (const site of Object.values(state.world.sites)) {
-    if (site.employer?.partnerRivalId === target.id) site.employer.partnerRivalId = buyer.id;
-  }
   const n = target.branches.length;
   target.branches = [];
   target.status = 'merged';

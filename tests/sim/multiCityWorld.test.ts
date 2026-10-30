@@ -101,13 +101,13 @@ describe('rivals in cities generated later', () => {
 });
 
 describe('regional employers', () => {
-  it('sign power deals rather than payroll partnerships (C8a)', () => {
+  it('sign power deals rather than partnerships (C8a)', () => {
     const s = game();
     const host = openScriptedBranch(s, 'midtown');
     advanceWeeks(s, 2);
     fly(s, 'fmm');
     const camp = siteOf(s, 'employer', 'fmm');
-    expect(cmd.signBlocker(s, camp.id, host, 'team')).toMatch(/power deals/);
+    expect(cmd.signBlocker(s, camp.id, host, 'team', 'student')).toMatch(/power deals/);
     expect(cmd.signPowerDeal(s, camp.id).ok).toBe(true);
     // Each energy site signs its own deal, in any country.
     fly(s, 'mid');

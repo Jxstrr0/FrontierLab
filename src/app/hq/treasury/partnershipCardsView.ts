@@ -1,8 +1,9 @@
-// Read-only view for the Treasury floor's partnership cards (SCREENS §10
-// Treasury, §14 Yours): one entry per payroll or student partnership, active
-// or running off, with who it is with, how many people it covers, where it is
-// in its contract, its plan mini-book and health, and the panel a tap
-// opens. Formulas come from src/sim/partnerships.ts.
+// Read-only view for the Compute floor's student partnership cards (SCREENS
+// §10 Treasury, §15 Yours): one entry per partnership, active or running off
+// (a retired staff-plan deal from an old save can still be running off), with
+// who it is with, how many people it covers, where it is in its contract, its
+// plan mini-book and health, and the panel a tap opens. Formulas come from
+// src/sim/partnerships.ts.
 import { headcount, yearOfTerm } from '../../../sim/partnerships';
 import type { GameState, Partnership } from '../../../sim/state';
 import type { PanelRoute } from '../../store';
@@ -11,7 +12,7 @@ export interface PartnershipCardView {
   id: string;
   /** Employer or university name. */
   name: string;
-  /** "Staff plans" or "Student plans". */
+  /** "Student plans" ("Staff plans" for a retired deal running off). */
   kindLabel: string;
   /** Headcount the deal covers, with its noun ("employees" or "students"). */
   people: number;
@@ -41,9 +42,9 @@ function cardView(state: GameState, p: Partnership): PartnershipCardView {
   return {
     id: p.id,
     name: site ? (site.employer?.name ?? site.refId) : 'A former partner',
-    kindLabel: p.kind === 'student' ? 'Student plans' : 'Staff plans',
+    kindLabel: p.kind === 'payroll' ? 'Staff plans' : 'Student plans',
     people: site ? headcount(site, p.kind) : 0,
-    peopleLabel: p.kind === 'student' ? 'Students' : 'Employees',
+    peopleLabel: p.kind === 'payroll' ? 'Employees' : 'Students',
     termText: active
       ? `Year ${year} of ${of}`
       : `Running off · ${left} ${left === 1 ? 'week' : 'weeks'} left`,

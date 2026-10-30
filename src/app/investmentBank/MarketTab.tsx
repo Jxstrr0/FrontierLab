@@ -1,14 +1,12 @@
 // Investment bank Market tab (SCREENS §12): the Ledger Composite, a sector
 // switch (Banking lists listed rival banks and, once you are public, your
-// own), Currencies (CurrenciesList.tsx, §19.10) and a vertical list of company
-// cards, phone-first. Trade opens the Trade sheet.
+// own) and a vertical list of company cards, phone-first. Trade opens the Trade sheet.
 import { useState } from 'preact/hooks';
 import { MARKET_INDEX_NAME, SECTORS, type SectorId } from '../../data/stocks';
 import { indexWeeklyMove } from '../../sim/marketStocks';
 import { Card, Segmented } from '../components';
 import { signedPct } from '../format/format';
 import { useGame } from '../store';
-import { CurrenciesList } from './CurrenciesList';
 import { sectorSecurities } from './marketView';
 import { Sparkline } from './Sparkline';
 import { StockCard } from './StockCard';
@@ -18,9 +16,9 @@ import './investmentBank.css';
 export function MarketTab(_p: { bankId: string }) {
   const s = useGame();
   const sym = s.settings.currency;
-  const [sector, setSector] = useState<SectorId | 'fx'>('technology');
+  const [sector, setSector] = useState<SectorId>('technology');
   const [trading, setTrading] = useState<{ id: string; name: string } | null>(null);
-  const list = sector === 'fx' ? [] : sectorSecurities(s, sector);
+  const list = sectorSecurities(s, sector);
   const move = indexWeeklyMove(s);
   return (
     <>
@@ -37,17 +35,12 @@ export function MarketTab(_p: { bankId: string }) {
       <div class="ib-sectors">
         <Segmented
           label="Sector"
-          options={[
-            ...SECTORS.map((x) => ({ value: x.id as SectorId | 'fx', label: x.label })),
-            { value: 'fx', label: 'Currencies' },
-          ]}
+          options={SECTORS.map((x) => ({ value: x.id as SectorId, label: x.label }))}
           value={sector}
           onChange={setSector}
         />
       </div>
-      {sector === 'fx' ? (
-        <CurrenciesList />
-      ) : list.length === 0 ? (
+      {list.length === 0 ? (
         <Card>
           <p class="muted small">
             {sector === 'banking'

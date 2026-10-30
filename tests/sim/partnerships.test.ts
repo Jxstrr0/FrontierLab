@@ -1,9 +1,9 @@
-// Payroll and student partnerships (SIMULATION §13.7): fee formula, the
-// participation curve, ARR converging, termination and runoff, renewal,
-// amortization, the balance identity and a save round-trip.
+// Student partnerships (SIMULATION §13.7): fee formula, the participation
+// curve, ARR converging, termination and runoff, renewal, amortization, the
+// balance identity and a save round-trip. Staff-plan (payroll) deals with
+// employers are refused: an employer's one deal is its anchor account (B1).
 import { describe, expect, it } from 'vitest';
 import {
-  ARR_PER_EMPLOYEE,
   MANAGER_SKILL,
   PARTICIPATION,
   PARTNER_CONTRACT_WEEKS,
@@ -18,7 +18,13 @@ import { advanceWeeks } from '../../src/sim/engine';
 import { hiresPerWeek, staffMods } from '../../src/sim/hq';
 import { refreshManagerPool } from '../../src/sim/people';
 import { newGame } from '../../src/sim/newGame';
-import { balanceTarget, participation, renewalFee, signingFee } from '../../src/sim/partnerships';
+import {
+  balanceTarget,
+  headcount,
+  participation,
+  renewalFee,
+  signingFee,
+} from '../../src/sim/partnerships';
 import { exportCode, importCode } from '../../src/sim/save/serialize';
 import type { GameState, Site } from '../../src/sim/state';
 import { openScriptedBranch } from '../helpers/scenario';
@@ -41,20 +47,16 @@ const identity = (s: GameState) => {
   return Math.abs(bs.equity - bs.expectedEquity);
 };
 
-function sign(s: GameState, site: Site, branchId: string, kind: 'payroll' | 'student' = 'payroll') {
-  const r = cmd.signPartnership(s, site.id, branchId, 'team', kind);
+function sign(s: GameState, site: Site, branchId: string) {
+  const r = cmd.signPartnership(s, site.id, branchId, 'team', 'student');
   if (!r.ok) throw new Error(r.reason);
   return s.partnerships[r.partnershipId]!;
 }
 
 describe('partnership formulas', () => {
-  it('prices the signing fee per CONTENT §14', () => {
-    const { s, employer, university } = setup();
-    const e = employer.employer!;
-    expect(signingFee(s, employer, 'payroll')).toBeCloseTo(
-      e.employees * 160 * e.incomeMult * CITIES.cal!.incomeIndex,
-      6,
-    );
+  it('prices the signing fee per SIMULATION §13.7', () => {
+    const { s, university } = setup();
+    expect(headcount(university, 'student')).toBe(STUDENT_PARTNERSHIP.students.M);
     expect(signingFee(s, university, 'student')).toBeCloseTo(
       STUDENT_PARTNERSHIP.students.M * STUDENT_PARTNERSHIP.feePerStudent * CITIES.cal!.incomeIndex,
       6,
@@ -76,65 +78,86 @@ describe('partnership formulas', () => {
   });
 
   it('scales the balance target with health', () => {
-    const { employer } = setup();
-    const e = employer.employer!;
-    const at = (h: number) => balanceTarget(employer, 'payroll', 0.8, h);
+    const { university } = setup();
+    const at = (h: number) => balanceTarget(university, 'student', 0.8, h);
     expect(at(100)).toBeCloseTo(
-      e.employees * 0.8 * ARR_PER_EMPLOYEE * e.incomeMult * CITIES.cal!.incomeIndex * 1.1,
+      STUDENT_PARTNERSHIP.students.M *
+        0.8 *
+        STUDENT_PARTNERSHIP.arrPerStudent *
+        CITIES.cal!.incomeIndex *
+        1.1,
       4,
     );
     expect(at(0)).toBeCloseTo(at(100) * (0.5 / 1.1), 4);
   });
 });
 
-describe('payroll partnerships', () => {
-  it('signs: cash becomes an intangible, the rival loses the payroll, books balance', () => {
+describe('staff-plan deals are retired', () => {
+  it('refuses a payroll partnership anywhere, pointing at the Deal Desk', () => {
+    const { s, branchId, employer, university } = setup();
+    for (const site of [employer, university]) {
+      const r = cmd.signPartnership(s, site.id, branchId, 'team', 'payroll');
+      expect(r.ok).toBe(false);
+      if (!r.ok) expect(r.reason).toMatch(/Deal Desk/);
+    }
+    expect(Object.keys(s.partnerships)).toHaveLength(0);
+  });
+
+  it('only lets universities sign a student partnership', () => {
     const { s, branchId, employer } = setup();
-    employer.employer!.partnerRivalId = Object.keys(s.rivals)[0];
+    const r = cmd.signPartnership(s, employer.id, branchId, 'team', 'student');
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(r.reason).toMatch(/universities/);
+  });
+});
+
+describe('student partnerships', () => {
+  it('signs: cash becomes an intangible and the books balance', () => {
+    const { s, branchId, university } = setup();
     const cash = s.company.cash;
     const before = identity(s);
-    const p = sign(s, employer, branchId);
+    const p = sign(s, university, branchId);
+    expect(p.kind).toBe('student');
     expect(s.company.cash).toBeCloseTo(cash - p.fee, 6);
     expect(intangibleAssets(s)).toBeCloseTo(p.fee, 6);
-    expect(employer.employer!.partnerRivalId).toBeUndefined();
     expect(identity(s)).toBeLessThan(Math.max(1, before + 1));
     expect(s.events.log.some((e) => e.type === 'PARTNERSHIP_SIGNED')).toBe(true);
-    const again = cmd.signPartnership(s, employer.id, branchId, 'team');
+    const again = cmd.signPartnership(s, university.id, branchId, 'team', 'student');
     expect(again.ok).toBe(false);
   });
 
   it('refuses without a branch in the city or enough cash', () => {
-    const { s, branchId, employer } = setup();
-    expect(cmd.signPartnership(s, employer.id, 'nope', 'team').ok).toBe(false);
+    const { s, branchId, university } = setup();
+    expect(cmd.signPartnership(s, university.id, 'nope', 'team', 'student').ok).toBe(false);
     // The package must be a paid plan: not the API, not the free tier.
-    expect(cmd.signPartnership(s, employer.id, branchId, 'api').ok).toBe(false);
-    expect(cmd.signPartnership(s, employer.id, branchId, 'free_tier').ok).toBe(false);
+    expect(cmd.signPartnership(s, university.id, branchId, 'api', 'student').ok).toBe(false);
+    expect(cmd.signPartnership(s, university.id, branchId, 'free_tier', 'student').ok).toBe(false);
     s.company.cash = 10;
-    const r = cmd.signPartnership(s, employer.id, branchId, 'team');
+    const r = cmd.signPartnership(s, university.id, branchId, 'team', 'student');
     expect(r.ok).toBe(false);
   });
 
   it('grows ARR toward target and bills it as plan fees, keeping the identity', () => {
-    const { s, branchId, employer } = setup();
-    const p = sign(s, employer, branchId);
+    const { s, branchId, university } = setup();
+    const p = sign(s, university, branchId);
     for (let w = 0; w < 60; w++) {
       advanceWeeks(s, 1);
       expect(identity(s)).toBeLessThan(1);
     }
     const t = s.clock.week - p.startWeek;
-    const target = balanceTarget(employer, 'payroll', participation(t, p.termWeeks), p.health);
+    const target = balanceTarget(university, 'student', participation(t, p.termWeeks), p.health);
     expect(p.balance).toBeGreaterThan(0.8 * target);
     expect(p.balance).toBeLessThan(1.05 * target);
-    expect(p.accounts).toBeGreaterThan(0.5 * employer.employer!.employees * 0.65);
+    expect(p.accounts).toBeGreaterThan(0.5 * headcount(university, 'student') * 0.65);
     const snap = s.history.weekly.at(-1)!;
-    // The staff plans bill a week of their ARR on top of the office's own plans.
+    // The student plans bill a week of their ARR on top of the office's own plans.
     expect(snap.pnl.accountFees).toBeGreaterThan(p.balance / 52);
     expect(snap.pnl.amortization).toBeGreaterThan(0);
   });
 
   it('terminates after 8 weeks of low health and runs off over 12 weeks', () => {
-    const { s, branchId, employer } = setup();
-    const p = sign(s, employer, branchId);
+    const { s, branchId, university } = setup();
+    const p = sign(s, university, branchId);
     advanceWeeks(s, 30);
     const peak = p.balance;
     expect(peak).toBeGreaterThan(0);
@@ -160,8 +183,8 @@ describe('payroll partnerships', () => {
   });
 
   it('renews in the last year at fee × (1.5 − health/100) and amortizes every fee', () => {
-    const { s, branchId, employer } = setup();
-    const p = sign(s, employer, branchId);
+    const { s, branchId, university } = setup();
+    const p = sign(s, university, branchId);
     const fee0 = p.fee;
     let amortized = 0;
     const tally = () => (amortized += s.history.weekly.at(-1)!.pnl.amortization);
@@ -176,8 +199,8 @@ describe('payroll partnerships', () => {
       advanceWeeks(s, 1);
       tally();
     }
-    const quote = renewalFee(s, employer, p);
-    expect(quote).toBeCloseTo(signingFee(s, employer, 'payroll') * (1.5 - p.health / 100), 6);
+    const quote = renewalFee(s, university, p);
+    expect(quote).toBeCloseTo(signingFee(s, university, 'student') * (1.5 - p.health / 100), 6);
     const r = cmd.renewPartnership(s, p.id);
     expect(r.ok).toBe(true);
     expect(p.termWeeks).toBe(2 * PARTNER_CONTRACT_WEEKS);
@@ -195,17 +218,18 @@ describe('payroll partnerships', () => {
   });
 
   it('releases on request and runs off when the host office closes', () => {
-    const { s, branchId, employer, university } = setup();
+    const { s, branchId, university } = setup();
     // C2a: one office per city, so the other office is in Saskatoon and can't host Calgary sites.
     expect(cmd.travelTo(s, 'sas').ok).toBe(true);
     openScriptedBranch(s);
     advanceWeeks(s, 2);
-    const p = sign(s, employer, branchId);
-    const q = sign(s, university, branchId, 'student');
+    const q = sign(s, university, branchId);
     advanceWeeks(s, 10);
     expect(cmd.releasePartnership(s, q.id).ok).toBe(true);
     expect(q.status).toBe('runoff');
     expect(cmd.releasePartnership(s, q.id).ok).toBe(false);
+    // A released deal frees the university for a new one.
+    const p = sign(s, university, branchId);
     expect(cmd.closeBranch(s, branchId).ok).toBe(true);
     advanceWeeks(s, 1);
     expect(p.status).toBe('runoff');
@@ -214,8 +238,8 @@ describe('payroll partnerships', () => {
   });
 
   it('round-trips a save with an active partnership', () => {
-    const { s, branchId, employer } = setup();
-    sign(s, employer, branchId);
+    const { s, branchId, university } = setup();
+    sign(s, university, branchId);
     advanceWeeks(s, 5);
     const back = importCode(exportCode(s));
     expect(back).toEqual(s);

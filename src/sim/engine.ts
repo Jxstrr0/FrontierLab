@@ -21,7 +21,6 @@ import { runDataCenters } from './dataCenters';
 import { runExecutives } from './executives';
 import { governanceQuarter, runGovernance } from './governance';
 import { marketsQuarter, runMarkets } from './market';
-import { runFx } from './fx';
 import { runMergers } from './mergers';
 import { conventionsYear, runConventions } from './conventions';
 import { runLobbying } from './lobbying';
@@ -145,7 +144,6 @@ export function weeklyTick(state: GameState): void {
   runAuctions(state); // 11 (auction houses, §22)
   runFranchises(state); // 11 (sports clubs, SCREENS §20)
   runMarkets(state); // 12
-  runFx(state); // 12 (currencies, §19.10)
 
   if (isQuarterStart(state.meta.startDate, state.clock.day)) {
     quarterEnd(state); // 13

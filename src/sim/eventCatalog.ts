@@ -194,6 +194,7 @@ export interface EventPayloads {
     partnershipId: Id;
     siteId: Id;
     employer: string;
+    /** Only student deals are signed now; `payroll` is kept for old saves' logs. */
     kind: 'payroll' | 'student';
     branchName: string;
     fee: Money;
@@ -306,9 +307,6 @@ export interface EventPayloads {
     weeks: number;
     n: number;
   };
-
-  /** A currency moved ≥ FX.newsMove against your home currency this week (fx.ts, §19.10). */
-  FX_MOVE: { country: string; currency: string; home: string; pct: number };
 
   // ─── Travel (Stage 8, travel.ts) ──────────────────────────────────────────
   /** You flew. `mode`: inside the weekly allowance, a paid fare, or your jet. */

@@ -11,7 +11,6 @@ import { RUNWAY_LABEL, RUNWAY_TONE, RunwayMeter } from '../company/RunwayMeter';
 import { Statements } from '../company/Statements';
 import { delta, money, pct, runwayText, shortDate } from '../format/format';
 import { useGame } from '../store';
-import { RiskAppetite } from './finance/RiskAppetite';
 
 const CHART_WEEKS = 5;
 
@@ -87,9 +86,6 @@ export function FinanceFloor() {
           <Row label="Target" value={pct(s.treasury.liqTarget, 1)} tone="dim" />
         </Card>
       )}
-
-      <SectionTitle>Launch posture</SectionTitle>
-      <RiskAppetite />
 
       <SectionTitle>Statements</SectionTitle>
       <Statements state={s} delayWeeks={delay} />

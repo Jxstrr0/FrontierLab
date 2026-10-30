@@ -1,4 +1,4 @@
-// Stage 5 state types (schema v6): payroll and student partnerships, corporate
+// Stage 5 state types (schema v6): student partnerships, corporate
 // debt from rival banks, incidents with their timed effects, The Weekly Ledger's
 // issues and the price-war tracker. Re-exported from state.ts; kept here so
 // state.ts stays readable. See docs/DATA_MODEL.md §6 and §8.
@@ -10,7 +10,10 @@ export interface Partnership {
   id: Id;
   /** Employer or university site. */
   siteId: Id;
-  /** Payroll accounts for an employer's staff, or student accounts at a university. */
+  /**
+   * Student seats at a university. `payroll` (an employer's staff plans) was
+   * retired at schema 32; it survives only on a deal running off from an old save.
+   */
   kind: 'payroll' | 'student';
   hostBranchId: Id;
   /** The deposit product offered as the package. */
@@ -260,7 +263,7 @@ export interface EmployerInfo {
   name: string;
   employees: number;
   incomeMult: number;
-  /** Rival bank holding the payroll today, if any. */
+  /** Rival that holds this employer's anchor account when the city is seeded (C5a). */
   partnerRivalId?: Id;
 }
 

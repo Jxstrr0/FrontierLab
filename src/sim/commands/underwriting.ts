@@ -1,5 +1,5 @@
 // Underwriting model commands (SIMULATION §16.7, DATA_MODEL §11): buy a bureau
-// package, commission a bureau-hosted custom mix, save a Products-floor custom
+// package, save a Products-floor custom
 // model, and switch the house model (a two-week blend).
 import { MODEL_NAME_MAX, MODEL_SWITCH_WEEKS } from '../../config/balance';
 import { BUREAU_PACKAGES, bureausIn } from '../../data/bureaus';
@@ -80,31 +80,6 @@ function buildModel(
   };
   if (bureau) model.hostedBy = bureau;
   return model;
-}
-
-/**
- * Commissions a custom mix hosted by a bureau in the current city (no Products
- * floor needed; quality 0.95, cost × 1.15) and makes it the house model.
- */
-export function commissionBureauModel(
-  state: GameState,
-  input: { bureau: string; name: string; mix: Record<string, number> },
-): CommandResult<{ modelId: string }> {
-  if (!bureausIn(state.world.currentCityId).includes(input.bureau))
-    return fail(`${input.bureau} has no office in this city.`);
-  const problem = checkName(input.name) ?? mixProblem(state, input.mix);
-  if (problem) return fail(problem);
-  const id = newId(state, 'model');
-  state.underwriting.models[id] = buildModel(
-    state,
-    id,
-    input.name,
-    input.mix,
-    'hosted',
-    input.bureau,
-  );
-  const r = activateModel(state, id);
-  return r.ok ? ok({ modelId: id }) : r;
 }
 
 /**

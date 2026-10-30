@@ -1,16 +1,17 @@
-// Payroll and student partnerships (SIMULATION §13.7) and the university
-// graduate program (DESIGN §5.8.10). Pure formulas (fees, participation curve,
+// Student partnerships at universities (SIMULATION §13.7) and the university
+// graduate program (DESIGN §5.8.10). Pure formulas (fee, participation curve,
 // ARR target, health) plus the weekly step: each partnership's plan mini-book
 // (seats and their ARR, stage C3a) moves toward its target, earns its ARR / 52
 // in plan fees, amortizes its fee, and ends by termination or lapse with a
 // 12-week runoff. Signing, renewing and releasing live in commands/partnerships.ts.
+// Staff-plan (`payroll`) partnerships with employers were retired on 2026-10-30
+// (owner's review, B1): an employer is one deal, its anchor account on the Deal
+// Desk. A save from before schema 32 may still hold one running off.
 import {
   COMP_CLAMP,
-  ARR_PER_EMPLOYEE,
   GRAD_PROGRAM,
   PARTICIPATION,
   PARTNER_BALANCE_STEP,
-  PARTNER_FEE_PER_EMPLOYEE,
   PARTNER_HEALTH,
   PARTNER_PERKS,
   PARTNER_RENEWAL,
@@ -34,33 +35,33 @@ export type PartnershipKind = Partnership['kind'];
 
 // ─── Formulas ─────────────────────────────────────────────────────────────────
 
-/** People the deal covers: the employer's staff, or the university's students by city size. */
+/**
+ * People the deal covers: the university's students by city size. A retired
+ * staff-plan deal running off from an old save still counts the employer's staff.
+ */
 export function headcount(site: Site, kind: PartnershipKind): number {
-  if (kind === 'student') {
-    const size = CITIES[site.cityId]?.size ?? 'M';
-    return STUDENT_PARTNERSHIP.students[size];
-  }
-  return site.employer?.employees ?? 0;
+  if (kind === 'payroll') return site.employer?.employees ?? 0;
+  const size = CITIES[site.cityId]?.size ?? 'M';
+  return STUDENT_PARTNERSHIP.students[size];
 }
 
-/** City incomeIndex × the employer's income multiplier (students: city only). */
-export function incomeFactor(site: Site, kind: PartnershipKind): number {
-  const city = CITIES[site.cityId]?.incomeIndex ?? 1;
-  return kind === 'student' ? city : city * (site.employer?.incomeMult ?? 1);
+/** The city's incomeIndex. */
+export function incomeFactor(site: Site): number {
+  return CITIES[site.cityId]?.incomeIndex ?? 1;
 }
 
 /**
- * CONTENT §14: employees × $160 × income mult × city incomeIndex (students:
- * per-student fee), at today's price list in the site's country (§4.6).
+ * SIMULATION §13.7: students × $30 × city incomeIndex, at today's price list
+ * in the site's country (§4.6).
  */
 export function signingFee(state: GameState, site: Site, kind: PartnershipKind): number {
-  const perHead = kind === 'student' ? STUDENT_PARTNERSHIP.feePerStudent : PARTNER_FEE_PER_EMPLOYEE;
-  return headcount(site, kind) * perHead * incomeFactor(site, kind) * listLevel(state, site.cityId);
+  return (
+    headcount(site, kind) *
+    STUDENT_PARTNERSHIP.feePerStudent *
+    incomeFactor(site) *
+    listLevel(state, site.cityId)
+  );
 }
-
-/** ARR per participating person at income factor 1. */
-const arrPerHead = (kind: PartnershipKind) =>
-  kind === 'student' ? STUDENT_PARTNERSHIP.arrPerStudent : ARR_PER_EMPLOYEE;
 
 const logistic = (x: number) => 1 / (1 + dexp(-x));
 
@@ -85,7 +86,7 @@ export function participation(t: number, L: number): number {
   return P.peak + ((P.end - P.peak) * (t - declineFrom)) / (L - declineFrom);
 }
 
-/** §13.7: people × participation × ARR per head × income × (0.5 + 0.6 × health/100). */
+/** §13.7: students × participation × ARR per student × incomeIndex × (0.5 + 0.6 × health/100). */
 export function balanceTarget(
   site: Site,
   kind: PartnershipKind,
@@ -96,8 +97,8 @@ export function balanceTarget(
   return (
     headcount(site, kind) *
     part *
-    arrPerHead(kind) *
-    incomeFactor(site, kind) *
+    STUDENT_PARTNERSHIP.arrPerStudent *
+    incomeFactor(site) *
     (H.balanceBase + (H.balanceSlope * health) / 100)
   );
 }

@@ -88,18 +88,8 @@ describe('custom models', () => {
       modelId: 'northscore_inclusion',
     });
     expect(s.underwriting.switching).toEqual({ fromId: 'clearline_basic', weeksLeft: 2 });
-    expect(cmd.commissionBureauModel(s, { bureau: 'TrueMark', name: 'T', mix: MIX }).ok).toBe(
-      false,
-    );
-    expect(
-      cmd.commissionBureauModel(s, { bureau: 'Northscore', name: 'N', mix: { bureau: 0.4 } }).ok,
-    ).toBe(false);
-    const r = cmd.commissionBureauModel(s, { bureau: 'Northscore', name: 'My mix', mix: MIX });
-    if (!r.ok) throw new Error(r.reason);
-    const m = s.underwriting.models[r.modelId]!;
-    expect(m.hostedBy).toBe('Northscore');
-    expect(m.costPerCustomer).toBeCloseTo(18 * 1.15, 12);
-    expect(s.underwriting.activeModelId).toBe(r.modelId);
+    // Vendors sell packaged models only (2026-10-30); custom mixes are built at HQ.
+    expect('commissionBureauModel' in cmd).toBe(false);
   });
 });
 

@@ -75,9 +75,6 @@ export function closeAcquisition(
   }
   const branchIds = converted.filter((id) => state.branches[id]);
 
-  for (const site of Object.values(state.world.sites)) {
-    if (site.employer?.partnerRivalId === bank.id) delete site.employer.partnerRivalId;
-  }
   const n = bank.branches.length;
   bank.branches = [];
   bank.status = 'acquired';

@@ -29,7 +29,7 @@ Every building panel uses the same five parts, mirroring the original's structur
 - **Cases chip:** while incidents wait for a decision, an "N cases" chip sits under the date pill and reopens the incident modal.
 
 ### 0.3 Menu sheet
-Company · HQ · Sales offices · Personal wealth · Portfolio · The Inference (archive) · Milestones · Settings · Save game · Exit to title.
+Company · HQ · Sales offices · Personal wealth · The Inference (archive) · Settings · Save game · Exit to title. (Portfolio moved under Personal wealth and Milestones and Frontier projects under Company on 2026-10-30, owner's review B4.)
 
 ### 0.4 Formatting
 - **Money:**
@@ -270,6 +270,8 @@ No tabs: one overview page.
 - **Finance:**
   - **Results:** total revenue and net income with weekly change, and the bar chart
   - **Runway and liquidity:** runway (SIMULATION §15, what lenders price on): months or "Not burning cash", the runway tier badge, a four-band meter (Critical under 6 months, Tight 6–12, Comfortable 12–24, Strong 24+) and a Net burn row; the liquidity ratio and target rows show only when there is a liquidity ratio (bank-era saves with deposits)
+  - (The Launch posture dial moved to the Safety & Alignment floor on 2026-10-30.)
+- **Safety & Alignment** also carries, under the regulator card:
   - **Launch posture** (code `riskAppetite`, SIMULATION §16.8): Segmented (1–5, "Launch posture, 1 very cautious to 5 very bold"), with the level's name (Very cautious, Cautious, Balanced, Bold, Very bold), a hint such as "Deal odds +6 pts, safety exposure +16%, and over-claims are likelier." ("Standard deal odds and safety risk." at Balanced) and a line naming who else steers it: the Chief Safety Officer ("tunes this to the safety tier every 4 weeks"; Launch posture switch)
   - **Statements:** Income / Balance sheet / Cash flow, each Week | Quarter | Year
   - "Delayed" placeholders when short-staffed
@@ -311,7 +313,7 @@ No tabs: one overview page.
   - Board meeting card: explanation, last meeting date, Hold meeting (enabled once per quarter)
   - Senior executives grid: seven seats (CEO, COO, CFO, CPO, CMO, CTO, Chief Safety Officer; on a phone the last cell spans both columns) with portrait, name and title; empty seats show Hire, which opens a sheet of the seat's candidates with a paid "New candidates · $fee" button at the bottom (as for office managers)
 - **Investment:**
-  - portfolio value with weekly change, a donut (Stocks, Ventures, Real estate, Compute credits, Currencies) and List portfolio
+  - portfolio value with weekly change, a donut (Stocks, Ventures, Real estate, Compute credits) and List portfolio
   - Ventures carousel (vignette, name, sector, short description, founded, Details)
 - **Add floor sheet:** department choices with descriptions, desks and fit-out cost.
 
@@ -373,8 +375,7 @@ No tabs: one overview page.
 
 **Market:**
 - the Inference Composite index card (value, weekly change, sparkline)
-- sector Segmented: AI labs, Technology, Energy, Auto, Retail, Real estate, Currencies
-- **Currencies** (SIMULATION §19.10): one card per foreign currency with flag-free country medallion, name, index vs home with weekly change and sparkline, a one-line "why it's moving" (growth, rates, cycle), your position (company / personal) and Buy / Sell with an amount stepper and Company | Private toggle
+- sector Segmented: AI labs, Technology, Energy, Auto, Retail, Real estate
 - company card carousel:
   - monogram, name, ticker and exchange
   - sparkline and price
@@ -425,24 +426,15 @@ No tabs: one overview page.
 - Header ("{Vendor} data vendor") and advisor.
 - Packaged models carousel: name, tier, rosette, licence per customer a year, "Use as AI model".
 - The current AI model is marked.
-- My model: commission a custom mix (sliders per training dataset, live rosette and cost), hosted by the vendor.
+- A note that custom mixes are built on the HQ Products floor (Manage models). The vendor's own "My model" mixer, the same sliders in a second place, went on 2026-10-30 (owner's review, B2); a hosted custom model from an older save keeps working.
 
 ## 14. Employer (partnerships)
 
 - **Header:** employer name with its type.
 - **Advisor** and **hero** vignette.
-- **Stats:** Employees, Average income, Plans partner (a rival or none), then the **Anchor account** card (§14b).
-- **Staff plan deal** ("Yours" once signed): the **Staff plans** deal card:
-  - signing fee and contract length
-  - Peak ARR and an Expected ARR curve chart
-  - package selector (a plan the host offers; Team by default)
-  - host sales office selector
-  - Sign partnership
+- **Stats:** Employees, Average income, then the **Anchor account** card (§14b): the employer's one deal, bid for on the sales office's Deal Desk.
 - An energy site shows the power deal instead (§5b).
-- **Yours** ("Staff plans · yours"):
-  - health bar, "Year X of 7", ARR, package price and accounts
-  - curve with a "you are here" marker
-  - Renew (shows the fee) / Release
+- The staff plan deal card went on 2026-10-30 (owner's review, B1). A staff plan deal from an older save shows under **Yours** while it runs off.
 
 ## 14b. Business
 
@@ -467,8 +459,7 @@ Opened by tapping a business pin on the map (the **Businesses** layer, which als
   - campaigns: "Ease the AI safety rules for 4 quarters", "Fast-track a merger review", "Stall the AI safety bill" (only while one is pending; there is no price-cap law to delay)
   - sections: In force, Under way (weeks left), Past campaigns
 - **University:**
-  - stats: Staff, Students, Plans partner
-  - Staff plans: the employer deal (§14)
+  - stats: Staff, Students
   - Student partnership: the same deal card as **Student plans**, with Campus Plan by default
   - Graduate program: yearly cost ($120k × wageIndex); adds +10 to candidate skill and +1 hire a week
 
@@ -558,6 +549,7 @@ Opened by tapping a business pin on the map (the **Businesses** layer, which als
 - **Real estate:** cards with ROI, value and gain.
 - **Other assets:** homes, cars, collectibles, jet, franchise.
 - **Rich list:** rank chip ("#38 on the Rich List").
+- **Portfolio** button at the bottom (every holding, the lab's and yours; §29).
 
 ## 24. Company summary (menu → Company)
 
@@ -573,7 +565,8 @@ Opened by tapping a business pin on the map (the **Businesses** layer, which als
 - share price or private valuation, with the 52-week range, market cap, your stake and top shareholders
 - a Personal line: personal cash plus holdings
 - one-line explanations ("Grow recurring revenue; watch the compute bill") with a "Learn more" sheet: Revenue recurs, compute bills · Compute: own it or rent it · Safety limits growth · Treasury reserves · Cash cover
-- statements: the income statement runs Plans, API, Apps & services, Enterprise contracts, Other income → Revenue → Compute → Gross profit → Operating expenses → Interest expense (when any) → Bad debts → Depreciation → Pre-tax → Tax → Net income. The balance sheet lines are in SIMULATION §14.4; treasury reserves, loans, stocks, ventures, compute credits, real estate, currencies, partnership fees, goodwill, deposits, wholesale funding, corporate debt and dividends payable show only when non-zero.
+- statements: the income statement runs Plans, API, Apps & services, Enterprise contracts, Other income → Revenue → Compute → Gross profit → Operating expenses → Interest expense (when any) → Bad debts → Depreciation → Pre-tax → Tax → Net income. The balance sheet lines are in SIMULATION §14.4; treasury reserves, loans, stocks, ventures, compute credits, real estate, partnership fees, goodwill, deposits, wholesale funding, corporate debt and dividends payable show only when non-zero.
+- **Goals:** two buttons, Milestones (n of 32) and Frontier projects (n of 6), which open §28 and §28a
 - links to the full statements (Finance floor, or a simplified view without an HQ)
 
 ## 25. Sales offices list
@@ -639,21 +632,21 @@ After Part 1 is finished or skipped, with Settings → Guides on (the default):
 - **First-look tips** show once, the first time you open each HQ floor, each map place (rival sales office and HQ, central bank, data vendor, agency, employer, business, data center, university, investment bank and its M&A tab, startup, property, conference, lobbying firm, airport, vacation home, car dealer, auction house, sports club), Personal wealth, the Inference, a sales office's Finance tab, a board meeting and an incident. They end on "Got it" or when you move on. Popup tips dock at the top, clear of the choices. A finished guide marks the tips it already covered (Safety & Alignment → that floor's tip, executives → the Executive suite's, training → the Products floor's, travel → the airport's, wealth → Personal wealth's).
 - **Settings:** a Guides switch, and "Show the guides again" to see every guide and tip once more.
 
-## 28. Milestones (menu → Milestones)
+## 28. Milestones (Company → Goals)
 
 - Subtitle: "n of 32 reached" (the count is `MILESTONES.length`; 32 since the AI milestones of 2026-10-27, CONTENT §19b).
 - One row per milestone (data/milestones.ts) in order: a filled brass diamond ◆ when reached with "Reached {date}", an outline ◇ with the goal otherwise.
 - Read-only. Reaching one toasts "Milestone reached: …"; the big ones also make a Ledger story.
 
-## 28a. Frontier projects (menu → Frontier projects)
+## 28a. Frontier projects (Company → Goals)
 
 - **Under way** card (when one runs): name, a progress bar with the percent done, weeks left, weekly payment, spent so far, "Stalled: not enough cash" when stalled, and a Cancel button that asks to confirm ("what was spent is gone").
 - One card per project (SIMULATION §16.14, CONTENT §7d): name, blurb, reward line, today's price, length and minimum ARR. A Start button when it can start, otherwise the reason (finished, needs another first, ARR too low, another under way, not enough cash).
 - The house model card shows "/ {ceiling}" and its rosettes scale to the raised ceiling.
 
-## 29. Portfolio (menu → Portfolio)
+## 29. Portfolio (Personal wealth → Portfolio)
 
-The same view as the HQ Investment floor's portfolio, reachable from anywhere:
+The same view as the HQ Investment floor's portfolio, reachable from Personal wealth:
 - Company / Private toggle
-- portfolio value with weekly change and the donut (Stocks, Ventures, Real estate, Venture debt, Currencies)
+- portfolio value with weekly change and the donut (Stocks, Ventures, Real estate, Venture debt)
 - the holdings list; empty states point to investment banks, the Investment floor and conventions

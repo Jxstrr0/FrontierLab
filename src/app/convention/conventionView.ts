@@ -57,7 +57,7 @@ export function conventionAdvisor(v: ConventionView): string {
   return 'The halls are empty until next year.';
 }
 
-/** An employer in the city to court for a payroll partnership (first by name). */
+/** An employer in the city to court for its anchor account (first by name). */
 export function employerLead(s: GameState, cityId: string): Site | undefined {
   return Object.values(s.world.sites)
     .filter((x) => x.kind === 'employer' && x.cityId === cityId && x.employer)

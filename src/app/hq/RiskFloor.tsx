@@ -1,7 +1,9 @@
 // Safety & Alignment floor content (SCREENS §10, DESIGN §5.8.7, SIMULATION
 // §15): regulator status (safety ratio, tier badge and meter, strength vs
 // exposure, pause or strict watch, the next safety audit's fail chance, last
-// audit, failures).
+// audit, failures), then the launch posture dial (SIMULATION §16.8), which
+// trades deal odds against safety exposure and so lives beside the ratio it
+// moves (moved here from the Finance floor on 2026-10-30).
 import { REGULATOR_REVIEW } from '../../config/balance';
 import { safetySnapshot, tierLift } from '../../sim/safety';
 import { SafetyNotice } from '../company/SafetyNotice';
@@ -11,6 +13,7 @@ import { dayOfWeek } from '../branch/selectors';
 import { CapitalMeter, TIER_LABEL, TIER_TONE } from '../company/CapitalMeter';
 import { gameDate, money, pct, safetyRatioText } from '../format/format';
 import { useGame } from '../store';
+import { RiskAppetite } from './finance/RiskAppetite';
 import { nextReviewWeek } from './risk/riskView';
 import './risk/risk.css';
 
@@ -22,6 +25,8 @@ export function RiskFloor() {
     <div class="stack rk-floor">
       <SectionTitle>Regulator and safety</SectionTitle>
       <RegulatorCard />
+      <SectionTitle>Launch posture</SectionTitle>
+      <RiskAppetite />
     </div>
   );
 }
