@@ -14,8 +14,8 @@ export interface CountrySpec {
   peggedTo?: CountryId;
   pegSpread?: Rate;
   /**
-   * Draws its business cycle and currency from its own RNG streams
-   * (`macro:{id}`, `fx:{id}`) instead of the shared ones, so adding the
+   * Draws its business cycle from its own RNG stream (`macro:{id}`)
+   * instead of the shared one, so adding the
    * country after launch left every existing seed's world unchanged.
    */
   ownStream?: boolean;

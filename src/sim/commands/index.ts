@@ -22,7 +22,6 @@ export * from './mergers';
 export * from './ventures';
 export * from './realEstate';
 export * from './lobbying';
-export * from './fx';
 export * from './travel';
 export * from './personal';
 export * from './auctions';

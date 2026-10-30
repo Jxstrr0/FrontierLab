@@ -15,7 +15,6 @@ export interface NetWorth {
   stocks: number;
   ventures: number;
   ventureDebt: number;
-  currencies: number;
   /** Buildings you own personally (§21). */
   realEstate: number;
   homes: number;
@@ -36,7 +35,6 @@ export function netWorth(state: GameState): NetWorth {
     stocks: p.stocks,
     ventures: p.ventures,
     ventureDebt: p.ventureDebt,
-    currencies: p.currencies,
     realEstate: p.realEstate,
     homes: sum(e?.homes),
     cars: sum(e?.cars),

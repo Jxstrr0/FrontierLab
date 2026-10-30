@@ -1,7 +1,7 @@
 // Polish pass, batch 2 (v0.1.50): balance fixes from the playtest read —
 // researchers in pay reviews, counter-offers that a review can't undo, token
 // grants, one grant per country from lobbying, startup sales off the mark,
-// currencies that no longer all drift to their ceiling, distressed rivals'
+// distressed rivals'
 // share prices, developed products that don't dominate their base, the
 // Compute floor's staffing, office layoffs with severance, and candidates whose
 // money switches start off.
@@ -9,20 +9,16 @@ import { describe, expect, it } from 'vitest';
 import {
   DEPT_REQUIREMENTS,
   EXECUTIVES,
-  FX,
-  FX_START_INDEX,
   PAY_REVIEW,
   SEVERANCE_WEEKS,
   HOURS_PER_WEEK,
 } from '../../src/config/balance';
-import { CURRENCIES } from '../../src/data/currencies';
 import { EXEC_SEATS } from '../../src/data/executives';
 import { PRODUCTS } from '../../src/data/products';
 import { updateStaff } from '../../src/sim/branch/staff';
 import * as cmd from '../../src/sim/commands';
 import { generateExecutive } from '../../src/sim/execCandidates';
 import { resignChance } from '../../src/sim/execSeats';
-import { runFx } from '../../src/sim/fx';
 import { requiredStaff } from '../../src/sim/hq';
 import { priceRivalShares } from '../../src/sim/marketRivals';
 import { newGame } from '../../src/sim/newGame';
@@ -95,20 +91,6 @@ describe('lobbying grants', () => {
     });
     expect(cmd.lobbyBlock(s, firm, 'computeSubsidy')).toMatch(/already won/);
     expect(cmd.lobbyBlock(s, firm, 'fastTrack')).toBeUndefined();
-  });
-});
-
-describe('currencies', () => {
-  it('drift against each other, not all up into the ceiling', () => {
-    const s = newGame({ seed: 7, cityId: 'cal', bankName: 'FX Lab' });
-    for (let w = 0; w < 520; w++) runFx(s);
-    const free = Object.entries(s.fx.level).filter(
-      ([c]) => !CURRENCIES[c as keyof typeof CURRENCIES].peggedTo,
-    );
-    const logMean = free.reduce((sum, [, v]) => sum + Math.log(v!), 0) / free.length;
-    expect(Math.exp(logMean)).toBeGreaterThan(FX_START_INDEX * 0.7);
-    expect(Math.exp(logMean)).toBeLessThan(FX_START_INDEX * 1.4);
-    expect(free.every(([, v]) => v! >= FX.max * FX_START_INDEX)).toBe(false);
   });
 });
 

@@ -20,7 +20,7 @@ Starting values are fictional. Meeting weeks are weeks of the year.
 | AU | Australia | Reserve Bank of Australia | 3.60% | 3.00% | 2.5% | 30% | 7, 13, 20, 27, 33, 40, 46, 50 | |
 | SG | Singapore | Monetary Authority of Singapore | 3.00% | 2.50% | 2.0% | 17% | 4, 17, 30, 43 | |
 | HK | Hong Kong | Hong Kong Monetary Authority | — | — | — | 16.5% | follows US | `peggedTo: US`, spread +0.25% |
-| RU | Russia | Bank of Russia | 6.00% | 5.00% | 2.0% | 25% | 6, 12, 17, 24, 30, 38, 43, 51 | Moscow, St Petersburg. A high-rate economy. `ownStream`: its cycle and currency use their own RNG streams (`macro:RU`, `fx:RU`), so adding it left existing worlds unchanged |
+| RU | Russia | Bank of Russia | 6.00% | 5.00% | 2.0% | 25% | 6, 12, 17, 24, 30, 38, 43, 51 | Moscow, St Petersburg. A high-rate economy. `ownStream`: its cycle uses its own RNG stream (`macro:RU`), so adding it left existing worlds unchanged |
 
 ## 2. Cities (v1)
 
@@ -658,21 +658,6 @@ Startups generated during a game (conventions and the Investment floor pipeline,
 | Asia Compute Forum | Singapore | 45 |
 
 Announced in the paper 4 weeks before. Active for 4 weeks (was 2 and 1 until 2026-10-26, so monthly results never miss one). Calgary's fair is our addition so every start city has a conference before travel arrives. The code calls conferences `conventions`.
-
-### 19a. Currencies (SIMULATION §19.10)
-
-| Country | Code | Name | Weekly vol | Notes |
-|---|---|---|---|---|
-| CA | CAD | Canadian dollar | 0.6% | |
-| US | USD | US dollar | 0.5% | |
-| UK | GBP | Pound sterling | 0.7% | |
-| EA | EUR | Euro | 0.6% | |
-| CH | CHF | Swiss franc | 0.5% | |
-| JP | JPY | Japanese yen | 0.8% | |
-| AU | AUD | Australian dollar | 0.9% | |
-| SG | SGD | Singapore dollar | 0.4% | |
-| HK | HKD | Hong Kong dollar | 0.5% | pegged to USD |
-| RU | RUB | Russian ruble | 1.2% | the most volatile |
 
 ### 19b. Milestones (`src/data/milestones.ts`, DESIGN §5.18)
 

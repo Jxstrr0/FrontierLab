@@ -47,7 +47,6 @@ import type {
 } from './marketsTypes';
 import type {
   ConventionsState,
-  FxState,
   LobbyingState,
   RealEstateState,
   VenturesState,
@@ -58,7 +57,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState } from './personalTypes';
 
-export const SCHEMA_VERSION = 31;
+export const SCHEMA_VERSION = 32;
 
 export interface GameState {
   schemaVersion: number;
@@ -133,7 +132,6 @@ export interface GameState {
   /** Lobbying campaigns and their effects (DESIGN §5.8.10). */
   lobbying: LobbyingState;
   /** Currency strength levels and positions (SIMULATION §19.10). */
-  fx: FxState;
   /** Auction houses' sales by house id (Stage 9, SIMULATION §22). */
   auctions: Record<Id, AuctionHouseState>;
   /** Every sports club by club id, yours or not (SCREENS §20). */

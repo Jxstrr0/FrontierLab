@@ -124,7 +124,7 @@ export function OtherAssets() {
   const items = collectibleRows(s);
   const jet = jetName(s);
   const clubs = Object.values(s.clubs ?? {}).filter((c) => c.owner === 'personal');
-  const privateInv = nw.ventures + nw.ventureDebt + nw.currencies;
+  const privateInv = nw.ventures + nw.ventureDebt;
   const empty = cars.length + items.length + clubs.length === 0 && !jet && privateInv === 0;
   return (
     <div class="stack">
@@ -168,7 +168,7 @@ export function OtherAssets() {
             <Row label={FRANCHISES[c.clubId]?.name ?? c.clubId} value={money(c.value, sym)} />
           ))}
           {privateInv > 0 && (
-            <Row label="Ventures, compute credits and currencies" value={money(privateInv, sym)} />
+            <Row label="Ventures and compute credits" value={money(privateInv, sym)} />
           )}
         </Card>
       )}

@@ -20,7 +20,6 @@ import { safetySnapshot } from './safety';
 import { fullCoverage } from './hq';
 import { emptyLedger } from './ledger';
 import { initCountries } from './macro';
-import { emptyFx } from './fx';
 import {
   emptyConventions,
   emptyLobbying,
@@ -234,7 +233,6 @@ export function newGame(opts: NewGameOptions): GameState {
     conventions: emptyConventions(),
     realEstate: emptyRealEstate(),
     lobbying: emptyLobbying(),
-    fx: emptyFx(),
     auctions: {},
     clubs: {},
     ledger: emptyLedger(),

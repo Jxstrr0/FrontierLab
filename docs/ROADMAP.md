@@ -154,7 +154,7 @@ Eleven stages. Each one ends playable and deployed. A stage usually takes severa
 - Real estate: buy, rent and sell, as company or personal
 - REO from mortgage defaults
 - Lobbying firms
-- Currencies (FX) as an investment category: per-country index, positions as company or personal (SIMULATION §19.10)
+- ~~Currencies (FX) as an investment category: per-country index, positions as company or personal~~ removed 2026-10-30 (owner's review, B7)
 
 **Accept:**
 - Portfolio values tie out to the balance sheet and RWA.

@@ -1,5 +1,5 @@
 // List portfolio (SCREENS §10): every holding of the chosen account, grouped
-// as Stocks, Ventures, Real estate, Venture debt and Currencies, with value and
+// as Stocks, Ventures, Real estate and Venture debt, with value and
 // gain against cost. Ventures and venture debt open the startup panel; the
 // building rows open the property panel.
 import type { Account } from '../../sim/portfolio';

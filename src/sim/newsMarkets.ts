@@ -142,16 +142,6 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
           cost: m(p.cost),
         },
       });
-    case 'FX_MOVE': {
-      const pct = num(p.pct);
-      return markets({
-        key: pct >= 0 ? 'FX_UP' : 'FX_DOWN',
-        subject: `fx:${str(p.country)}`,
-        icon: 'coin',
-        priority: P.market,
-        tokens: { currency: str(p.currency), home: str(p.home), pct: newsAbsPct(pct) },
-      });
-    }
     case 'SHARE_PRICE_MOVE': {
       const pct = num(p.pct);
       return markets({

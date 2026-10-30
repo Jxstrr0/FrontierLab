@@ -58,7 +58,7 @@ How the economy works, step by step. Every CAPS name is a key in `src/config/bal
 16. Close the week: P&L, cash flow, balance sheet, tax and the weekly snapshot (§14).
 17. The safety ratio and regulator tier (`evaluateSafety`), then the pause and failure checks (§15). Runway (§15) is not stored: it is worked out from cash and the weekly closes whenever it is read.
 18. Personal: cash and salary, travel (reset the km allowance, jet upkeep), personal assets, auctions, sports franchises (§22).
-19. Markets: listed prices, your valuation, portfolios (§19), then currencies (§19.10).
+19. Markets: listed prices, your valuation, portfolios (§19).
 20. **Quarter start** (the first weekly tick after Mar 31, Jun 30, Sep 30, Dec 31):
     - earnings for every listed company, rivals and you
     - the safety audit (§15)
@@ -508,7 +508,7 @@ Shown in the top bar. Moves only with cash items:
 - capex, lease and office deposits
 - corporate debt draws, repayments and interest; interest on any legacy wholesale lots
 - taxes, dividends, share issuance proceeds
-- purchases and sales of assets (stocks, ventures, real estate, currencies)
+- purchases and sales of assets (stocks, ventures, real estate)
 - partnership and power-deal fees, fines, incident costs
 
 ### 14.2 Weekly company P&L
@@ -532,13 +532,13 @@ The statement reads like a software company's (`src/app/company/statementData.ts
 
 ### 14.3 Cash flow
 - **Operations:** net income + non-cash items (bad debts, D&A, grant expense, investment gains) ± change in taxes payable.
-- **Investing:** capex; real estate, stock, venture and currency purchases and sales; partnership and power-deal fees.
+- **Investing:** capex; real estate, stock and venture purchases and sales; partnership and power-deal fees.
 - **Financing:** share issuance, dividends paid, corporate debt draws and repayments.
 - **Net cash flow** = change in corporate cash. This must reconcile; test it.
 
 ### 14.4 Balance sheet
 `src/sim/balanceSheet.ts`. Lines marked * show only when non-zero.
-- **Assets:** cash; treasury reserves*; loans* (legacy); stocks*; ventures*; compute credits* (venture debt); real estate*; currencies*; sales offices and equipment (fixed assets at book value, data centers and HQ fit-outs included); lease deposits; partnership fees* (unamortized partnership and power-deal fees, the intangibles); goodwill*.
+- **Assets:** cash; treasury reserves*; loans* (legacy); stocks*; ventures*; compute credits* (venture debt); real estate*; sales offices and equipment (fixed assets at book value, data centers and HQ fit-outs included); lease deposits; partnership fees* (unamortized partnership and power-deal fees, the intangibles); goodwill*.
 - **Liabilities:** deposits* (legacy); wholesale funding* (legacy); corporate debt* (venture debt and credit lines from investment banks, or rival labs in old saves, §19.9); dividends payable*; taxes payable.
 - **Equity** = assets − liabilities: paid-in capital plus retained earnings.
 - **Why it balances:** corporate cash moves only with cash items, each matched by a P&L line or another balance-sheet line; non-cash items (depreciation, write-offs, marks) move an asset and equity together.
@@ -961,20 +961,6 @@ Investment banks lend to you on their Debt tab (`src/sim/corporateDebt.ts`, `COR
 - These are corporate debt and flow through corporate cash.
 - **Old saves:** loans and lines taken from rival labs keep accruing and can be repaid from any Debt tab ("Your debt"), but a rival line can't be drawn. Offers still held from rival labs are replaced on the next tick.
 
-### 19.10 Currencies (FX)
-A deliberately simple "country up or down" investment (DESIGN §5.12a). Your books stay in one currency.
-- **State:** a strength level per country, `L[c]`, starting at 100. A currency's rate against your home currency is `fx[c] = L[c] / L[home] × 100`, so your home currency always reads 100 and can't be bought.
-- **Weekly move** (tick step 19, after listed prices), per country:
-  - `d_c = FX.growthW × gdp_c/100/52 + FX.rateW × policy_c/52 + FX.phase[phase_c]`, and `d̄` the mean of `d_c` over the floating (unpegged) currencies.
-  - `r_c = d_c − d̄ + normal(0, vol_c × FX.volMult)`: only the differences matter, so subtracting the world average keeps levels from all rising together into the FX.max ceiling (polish pass, v0.1.50).
-  - `L[c] *= 1 + r_c`, clamped to [FX.min, FX.max] × 100.
-  - So `fx[c]` still moves by about `r_c − r_home`: growth and rate differentials plus the cycle gap and noise.
-  - HK is pegged to the US: `L[HK] = L[US] × (1 + normal(0, FX.pegVol))`.
-  - Currency volatilities are in `src/data/currencies.ts`.
-- **Positions:** buy an amount of a currency as the company or personally: `units = amount / fx[c]`; value = `units × fx[c]`. Buying and selling pay FX.spread on the amount (to `commissions` for the company). No carry is paid; the rate differential is already in the drift.
-- **Books:** company positions are investments at value, marked through `investmentGains` like stocks.
-- **News:** a currency moving more than FX.newsMove (2%) in a week makes the Markets page.
-
 ## 20. Ventures
 
 - **20.1 Startup state:**
@@ -1180,7 +1166,7 @@ Sweep results (seeds 1–20, 10 years): turtle 20/20 clean (was 8), aggressive 1
 
 **Note (polish pass, 2026-10-28):** a playtest read found that a delegated office manager measured an office's reach by its own storefront, not the city it serves (C2a), so from about week 20 every delegated office ran no marketing at all; the strategies, which delegate marketing, were tuned that way. Fixed, the managers of grown offices ran every campaign, because a campaign cost the same for a Flagship as for a Starter, from the bank-era table (about $3.5k a week for all of them against $100k+ of weekly revenue). Weekly campaign costs now scale with the office's size multiplier, the one that also sets its reach (Starter 1×, Standard 2.5×, Large 5×, Flagship 9×), and `CAMPAIGN_COST_SCALE` (4). A Starter in a new city still runs one or two campaigns; a grown office runs the few that pay back. Offices that market earn a little more in year 2, so the week-104 income ceiling rose from $140k to $150k. The 20-seed steady median sits inside every band; steady, aggressive and turtle on seed 42 pass every check.
 
-**Note (polish pass, batch 2, 2026-10-28):** balance fixes from the same read. Researchers are now in pay reviews (raised, never cut), and a review can't undo a counter-offer for a year. A token equity grant no longer halves resignations. Lobbying grants pay once per country and move with the price list. Startups sell for at least 1.25× their last mark. Currencies drift against the world average, so they no longer all climb to the ceiling. A distressed listed rival trades toward its asking price. Enterprise and Dedicated Capacity sign fewer prospects, and Embeddings serve at a fifth of the batch compute cost. The Compute floor needs a person per 2,000 GPUs of demand (eased to 15,000 at the launch re-check, below). Office layoffs pay 4 weeks' severance. New executive candidates start with Share sales and the two personal-money switches off. All 20-seed steady medians and seed-42 steady, aggressive and turtle checks still pass with no target changes.
+**Note (polish pass, batch 2, 2026-10-28):** balance fixes from the same read. Researchers are now in pay reviews (raised, never cut), and a review can't undo a counter-offer for a year. A token equity grant no longer halves resignations. Lobbying grants pay once per country and move with the price list. Startups sell for at least 1.25× their last mark. A distressed listed rival trades toward its asking price. Enterprise and Dedicated Capacity sign fewer prospects, and Embeddings serve at a fifth of the batch compute cost. The Compute floor needs a person per 2,000 GPUs of demand (eased to 15,000 at the launch re-check, below). Office layoffs pay 4 weeks' severance. New executive candidates start with Share sales and the two personal-money switches off. All 20-seed steady medians and seed-42 steady, aggressive and turtle checks still pass with no target changes.
 
 **Note (launch re-check, 2026-10-29):** at a person per 2,000 GPUs the Compute floor reached about 155 staff by year 10 and, with only two main offices allowed, took the desks the Safety floor needed, so steady under the forced recession reached Critical on seed 42. It is now a person per 15,000 GPUs (about 20 staff at year 10). The HQ script also leases the roomiest building it can afford when it outgrows its first one, instead of the cheapest. Sweeps (seeds 1–20, 10 years): stress 18/20 (seed 1 steady reaches Critical, seed 16 aggressive dips to −$47k), aggressive 17/20 (seeds 5 and 6 trail steady at year 3, seed 16 dips below $0), turtle 20/20, and the steady median passes every first-office band, the same picture as the C8d sweep.
 
@@ -1219,7 +1205,7 @@ The main groups, with the defaults shown above. Names marked (legacy) belong to 
 - **PEOPLE:** `EXECUTIVES` (`grantMinValue` 0.25: unvested grants must be worth a quarter of salary to cut resignations), `EXEC_PAY`, `EXEC_DELEGATION`, `GUIDANCE`, `PAY_REVIEW` (`counterHoldWeeks` 52), `GOVERNANCE`, `BOARD_VOTE`
 - **MARKETS:** `COE`, `VALUATION`, `PRIVATE_VALUATION = 0.8`, `PLACEMENT`, `IPO` (`minArr` 100M), `PUBLIC_PRICE`, `SECONDARY`, `SECONDARY_DISCOUNT = 0.03`, `BUYBACK`, `STOCK_MARKET`, `COMMISSION = 0.001`, `MERGERS`, `SHARE_DEALS`, `REBRAND_COST`, `INCIDENT_PRICE_SEVERITY`, `LATE_FILING`
 - **CORPORATE DEBT:** `CORPORATE_LENDING` (`refreshWeeks` 4, `offersPerLender` [2, 3], `maxEquityShare` 0.4, `lineEquityShare` 0.6, `lineSpread` 0.04; §19.9)
-- **INVESTMENTS:** `VENTURES` (`acquireMarkPremium` 1.25), `VENTURE_DEBT`, `VENTURE_MARGIN`, `VENTURE_GEN`, `VENTURE_IPO`, `VENTURE_NEWS`, `CONVENTIONS`, `REAL_ESTATE`, `LOBBYING`, `FX`, `FX_START_INDEX = 100`
+- **INVESTMENTS:** `VENTURES` (`acquireMarkPremium` 1.25), `VENTURE_DEBT`, `VENTURE_MARGIN`, `VENTURE_GEN`, `VENTURE_IPO`, `VENTURE_NEWS`, `CONVENTIONS`, `REAL_ESTATE`, `LOBBYING`
 - **NEWS:** `NEWS_*` (articles, priorities, world desk, company desk, commodities, archive, calendar, column, elections, polls, policy), `RANKING_SIZE`, `RANKING_MIN_ASSETS`, sports `SPORTS_*`
 - **PERSONAL:** `PERSONAL_TAX = 0`, `TRAVEL_KM_PER_WEEK = 24_140`, `FLIGHT_FARE = 80_000` (× destination costIndex), `EARTH_RADIUS_KM = 6_371`, `JET = { upkeepRate: 0.08, depreciation: 0.06, resaleHaircut: 0.1 }`, `HOMES_CFG`, `CARS_CFG`, `COLLECTIBLES_CFG`, `AUCTIONS`, `FRANCHISE`, `RICH_LIST`, `INSIDER`
 - **FEATURES:** flags per stage (ROADMAP)

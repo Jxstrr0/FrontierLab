@@ -2733,32 +2733,6 @@ export const LOBBYING = {
   bufferReliefWeeks: 52,
 } as const;
 
-// ─── CURRENCIES (SIMULATION §19.10) ───────────────────────────────────────────
-export const FX = {
-  /** Weight on annual GDP growth (percent) and on the policy rate in the weekly drift. */
-  growthW: 1.0,
-  rateW: 0.5,
-  /** Weekly drift by business cycle phase: recessions weaken a currency. */
-  phase: { expansion: 0.0003, slowdown: 0, recession: -0.0012, recovery: 0.0004 } as Record<
-    Phase,
-    number
-  >,
-  /** Scales each currency's own weekly volatility (src/data/currencies.ts). */
-  volMult: 1,
-  /** A pegged currency's weekly wobble around its anchor. */
-  pegVol: 0.0004,
-  /** The strength index stays within [min, max] × its start of 100. */
-  min: 0.5,
-  max: 2,
-  /** Spread paid on every buy and sell, as a share of the amount. */
-  spread: 0.0025,
-  /** Weekly closes kept per currency. */
-  historyWeeks: 260,
-  /** A weekly move this large (vs your home currency) makes the Markets page. */
-  newsMove: 0.02,
-} as const;
-export const FX_START_INDEX = 100;
-
 // ─── MILESTONES (DESIGN §5.18) ────────────────────────────────────────────────
 export const MILESTONE_GOALS = {
   /** Flagship sales offices for 'Five Flagships' (C2a). */

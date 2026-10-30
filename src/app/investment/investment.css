@@ -12,9 +12,6 @@
 .inv-slice-ventureDebt {
   --slice: var(--donut-coral);
 }
-.inv-slice-currencies {
-  --slice: var(--donut-blue);
-}
 
 /* List portfolio sheet */
 .inv-group + .inv-group {

@@ -378,7 +378,7 @@ export const PLACE_TIPS: Record<string, TipText> = {
   },
   investmentBank: {
     title: 'Investment bank',
-    line: 'Trade shares and currencies here, raise capital by selling shares, borrow venture debt or draw a credit line on the Debt tab, and buy rival labs on the M&A tab.',
+    line: 'Trade shares here, raise capital by selling shares, borrow venture debt or draw a credit line on the Debt tab, and buy rival labs on the M&A tab.',
   },
   startup: {
     title: 'Startup',

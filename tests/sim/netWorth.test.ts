@@ -89,7 +89,6 @@ describe('Net worth ties out', () => {
         nw.stocks +
         nw.ventures +
         nw.ventureDebt +
-        nw.currencies +
         nw.realEstate +
         nw.homes +
         nw.cars +
