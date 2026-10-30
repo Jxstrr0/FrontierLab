@@ -2,10 +2,11 @@
 // plan and usage book, the lab's headline growth number. Plan books hold seats
 // × price × billing periods; usage books hold a year of usage at today's price;
 // partnership mini-books hold their seats' ARR; enterprise contracts add their
-// yearly value (C5b).
+// yearly value (C5b), and so do public tenders won (§11.7).
 import { isRecurring } from '../data/products';
 import { productSpec } from './products';
 import { officeContractArr } from './contracts';
+import { officeTenderArr } from './tenders';
 import type { Branch, GameState } from './state';
 
 /** ARR of one office's plan and usage books and its enterprise contracts. */
@@ -15,7 +16,7 @@ export function branchArr(state: GameState, branch: Branch): number {
     const spec = productSpec(state, pid);
     if (spec && isRecurring(spec)) total += book.balance;
   }
-  return total + officeContractArr(state, branch.id);
+  return total + officeContractArr(state, branch.id) + officeTenderArr(state, branch.id);
 }
 
 /** ARR across every open or converting office plus partnership plans. */

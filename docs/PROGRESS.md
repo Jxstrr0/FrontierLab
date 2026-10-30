@@ -3,13 +3,31 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** post-launch content and streamlining pass (v0.1.55, save schema 34), from the owner's review of 2026-10-30: batches 1 (incidents and the founder's desk), 2 (streamlining) and 3 (model launches) are in; batches 4–5 (public-sector tenders, goals) follow. The Kelbo.Website hub card still needs its own session in that repo.
+**Current stage:** post-launch content and streamlining pass (v0.1.56, save schema 35), from the owner's review of 2026-10-30: batches 1 (incidents and the founder's desk), 2 (streamlining), 3 (model launches) and 4 (public tenders) are in; batch 5 (rich list and the annual report) follows. The Kelbo.Website hub card still needs its own session in that repo.
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `03534e62e5380b` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `164f69c2e37d23` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-30 — Review batch 4: public-sector tenders (v0.1.56)
+
+Safety mattered for the regulator but rarely paid off directly. Now it wins business. Old saves load and are upgraded (save schema 34 → 35).
+
+**What a tender is.** A few times a year, a city where you have a sales office posts a public tender: its Transit Commission, Health Authority, Courts Service and so on (eight kinds, all generic city services). Tenders are big and long. They are worth about $0.3M–$4M a year at the start of a game, growing with the city's economy, for three to five years. That is several times a large business's contract.
+
+**How you win one.** Tenders appear on the sales office's Deal Desk tab, above the proposal requests, and the tab lights up. You seal a bid (a discount off the budget) and can change or withdraw it. The award is made six weeks after the tender opens. The win chance leans mostly on your AI model's **Safety** score, then on a Strong safety rating and the model's overall quality, then on your discount. If you delegate the Deal Desk, your manager seals a bid for you at the close.
+
+**The catch.** Public bodies only invite labs the regulator rates **Adequate or better**. At Watch you can't win new ones, but you keep the ones you hold. If the regulator **restricts** the lab, every public contract is cancelled at once and the paper runs the story.
+
+**How often.** In a 10-year steady game on seed 42, about 46 tenders open. The lab wins 30 and holds about $60M a year of them by year 8. Then it loses 15 at once when it is restricted in year 10.
+
+**Also fixed.** SIMULATION §11.5 said 30% of contract revenue runs on compute. The game uses 25%, so the doc now says 25%.
+
+**Checked:** lint, 1,183 tests (new `tenders.test.ts`), type-check and build pass. Steady, aggressive and stress on seed 42 pass every target. At 390×844 in Chromium, the Deal Desk tab shows an open tender and a held one with no console errors, and sealing a bid updates the card at once. That last part needed a fix: the card keeps its own discount, so the signals library skipped redrawing it when only the tender changed. The card now subscribes to game updates itself. The determinism snapshot moved to `164f69c2e37d23`. That is intended: tenders add contracts in the scripted run.
+
+**Next:** batch 5 (rich list rescale and the year-end annual report).
 
 ### 2026-10-30 — Review batch 3: model launches, open weights and launch campaigns (v0.1.55)
 

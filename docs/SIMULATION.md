@@ -392,10 +392,20 @@ Clamped to 5–95%. `stars` is your office's overall rating; the rival is the in
 A delegated manager (Delegation → Deal Desk, key `loans`) or the Chief Safety Officer's Deal Desk policy bids for the office within its **discount limit** (`branch.discountLimit`, default 10%): the smallest discount that reaches `delegateTarget` (60%), else the limit if that reaches `delegateFloor` (30%), else it declines. Renewal offers are set the week the renewal appears.
 
 ### 11.5 Revenue and costs
-Each week an office earns `contractValue / 52` for every contract it holds (P&L line `loanDesk`, shown as Enterprise contracts), spends `computeShare` (30%) of it × `inferenceMult` on compute (base spot dollars, so it joins the GPU demand of §13.0) and `serviceShare` (10%) on servicing. Contract values count in ARR (§10.7). Contracts of $250k a year or more make the news when won from a rival or lost.
+Each week an office earns `contractValue / 52` for every contract it holds (P&L line `loanDesk`, shown as Enterprise contracts), spends `computeShare` (25%) of it × `inferenceMult` on compute (base spot dollars, so it joins the GPU demand of §13.0) and `serviceShare` (10%) on servicing. Contract values count in ARR (§10.7). Contracts of $250k a year or more make the news when won from a rival or lost.
 
 ### 11.6 Migration 12 → 13
 Saves from before the Deal Desk: business loans still current are repaid into treasury reserves at their balance (equity unchanged) and the applications lapse. Offices get `discountLimit`. Business budgets and rival contract values are rescaled to the size bases above (6k / 25k / 90k / 360k).
+
+### 11.7 Public tenders
+Big, long contracts from a city's public bodies (owner's review A4). Constants are `TENDER`; code is `src/sim/tenders.ts`, content `PUBLIC_BODIES` (CONTENT §21c).
+- **Who is invited:** only a lab whose safety tier (§15) is Strong or Adequate (`TENDER.tiers`), from week `firstWeek` (26), and not during a mandated pause.
+- **Opening** (quarter start, tick step 13, `tendersQuarter`): each open sales office with Enterprise contracts on, in id order, in a city with no tender open or held, posts one at `quarterlyChance` (25%). The body is drawn from `PUBLIC_BODIES`; its yearly budget = `U(budget) (600k–1.8M) × body.budgetMult × citySize[S 0.7, M 1, L 1.3, XL 1.6] × nominal index`, to $10k; the term is `U{termYears}` (3–5) years. Bids close `bidWeeks` (6) later. Event `TENDER_OPENED`. RNG stream `tenders`.
+- **Bid:** a sealed discount `d` off the budget (same steps and cap as §11.1), changeable or withdrawn until bids close. A delegated desk (§11.4) with no bid at the close seals the smallest discount within the limit that reaches `delegateTarget`, else the limit if that reaches `delegateFloor`.
+- **Win chance** (0 below Adequate; else clamped 5–90%) = `winBase (0.3) + safetySlope (0.06) × (Safety axis − 5) + qualitySlope (0.03) × (quality − bar) + tierEdge (Strong 0.1, Adequate 0) + discountSlope (1.0) × d`. Safety counts twice: on its own and in the quality mean. Worked example: Safety 8, quality 0.5 over the bar, Adequate, a 10% discount → `0.3 + 0.18 + 0.015 + 0 + 0.1 = 59.5%`.
+- **Award** (weekly, `runTenders`, before the offices run): at `closeWeek` a bid wins at the win chance: the tender turns `active` at value `budget × (1 − d)` to $100 until `week + term` (`TENDER_WON`). A losing bid, or one set aside because the tier is below Adequate at the close, is `TENDER_LOST` (with the best rival in the city as the winner). With no bid the tender just closes.
+- **Held contracts:** each week the office earns `value / 52` with the same compute and servicing shares as §11.5; the value counts in ARR. The contract ends at its term (`TENDER_ENDED`). It is cancelled at once when the tier falls to Restricted or Critical (`cancelTiers`, reason `tier`; Watch only stops new awards) or its office closes (reason `office`): `TENDER_CANCELLED`.
+- **Pace:** a 10-year steady run on seed 42 sees about 46 tenders, wins 30 and holds about $60M a year of them by year 8, then loses 15 at once when the lab is restricted in year 10.
 
 ## 12. Sales office P&L
 
@@ -1204,7 +1214,7 @@ The main groups, with the defaults shown above. Names marked (legacy) belong to 
 - **RATINGS:** `RATING_EMA`, `PRODUCTS_RATING`, `SERVICE_RATING`, `BRANCH_RATING_WEIGHTS`, `NO_ATM_QUALITY`, `UPKEEP_PENALTY`, `OVERALL_WEIGHTS`, `REVIEW_RATE`
 - **DEMAND:** `PROSPECT_RATE`, `CATCHMENT_MULT`, `SATURATION_EXP`, `SHARE_EXP`, `CITY_MARKET`, `CITY_SATURATION_EXP`, `CITY_BRANCH_GUIDE`, `OFFICE_SIZES`, `OFFICE_TRAFFIC_MULT`, `TAKEUP_CAP`, `STARS_TAKEUP`, `PRODUCTS_PER_CUSTOMER`, `OVERALL_CHURN`, `INTEREST_PERIODS`; (legacy) `RIVAL_RADIUS`, `DISTANCE_FALLOFF`, `MORTGAGE_SPECIAL`, `APPROVAL_INCLUSION`, `INTERCHANGE`
 - **COMPUTE:** `COMPUTE`, `GPU_MARKET`, `SPOT`, `OUTAGE`, `DATA_CENTER`, `POWER_DEAL`
-- **DEALS:** `BUSINESS`, `DEAL`, `SECTOR_DISTRICT_WEIGHT`
+- **DEALS:** `BUSINESS`, `DEAL`, `TENDER`, `SECTOR_DISTRICT_WEIGHT`
 - **SALES OFFICE:** `EQUIP_MAINT`, `FITOUT_UPKEEP`, `BRANCH_OVERHEAD`, `ATM_FEE`, `CLOSE_RECOVERY = 0.30`, `CLOSE_RENT_WEEKS`, `LEASE_DEPOSIT_WEEKS`, `BRANCH_PNL_WEEKS`, `FITOUT_LIFE_WEEKS`, `EQUIPMENT_LIFE_WEEKS`
 - **TREASURY (legacy except reserves):** `RESERVE_RATE_SPREAD`, `LIQ_MIN`, `LIQ_TARGET_DEFAULT`, `OVERNIGHT_SPREAD`, `OVERNIGHT_LIMIT`, `WINDOW_SPREAD`, `WINDOW_STIGMA`, `RATING_SPREADS`, `TREASURY_PENALTY`, `FUNDING_REFRESH_WEEKS = 2`, `FUNDING_OFFERS`, `FUNDING_SIZE`, `FUNDING_RATE_NOISE = 0.0008`
 - **PARTNERSHIPS:** `PARTNER_CONTRACT_WEEKS`, `PARTICIPATION`, `PARTNER_HEALTH`, `PARTNER_PERKS`, `PARTNER_RUNOFF_WEEKS`, `PARTNER_RENEWAL`, `STUDENT_PARTNERSHIP`, `GRAD_PROGRAM`

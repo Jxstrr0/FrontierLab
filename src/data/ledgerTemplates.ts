@@ -363,6 +363,26 @@ const BANK_TEMPLATES = {
       b: 'With a {score} benchmark score at the top of the board, {bank} has rivals scrambling: {rivals} labs answered with cheaper plans.',
     },
   ],
+  TENDER_WON: [
+    {
+      h: '{bank} wins the {body} tender',
+      b: 'The {city} body picked {bank} for a {years}-year contract worth {amount} a year. Officials pointed to the lab’s safety record.',
+    },
+    {
+      h: '{body} signs {bank} for {years} years',
+      b: 'A {amount}-a-year public contract goes to {bank}. Rival bidders were told the safety review decided it.',
+    },
+  ],
+  TENDER_CANCELLED: [
+    {
+      h: '{body} drops {bank}',
+      b: 'With the regulator restricting the lab, the public body has cancelled a contract worth {amount} a year.',
+    },
+    {
+      h: 'Public contract pulled from {bank}',
+      b: '{body} says it cannot keep a lab the regulator has restricted. The {amount}-a-year deal ends today.',
+    },
+  ],
   WEIGHTS_OPENED: [
     {
       h: '{bank} releases {name} as open weights',

@@ -843,6 +843,21 @@ Customer businesses on spare storefronts (`src/data/dealSectors.ts`). Pentagon o
 
 Sizes (`BUSINESS.sizes` in balance.ts): small, mid and large weigh 0.55 / 0.33 / 0.12 with base budgets of $6k / $25k / $90k a year; anchors start at $360k scaled by headcount (per 2,500 staff) and pay. About half the businesses (70% of anchors) start on a rival lab's contract. Big contracts ($250k a year or more) make the paper when won from a rival or lost.
 
+## 21c. Public bodies
+
+Bodies that post public tenders (`src/data/publicBodies.ts`, SIMULATION §11.7). Each is named after its city: "Calgary Transit Commission".
+
+| Body | For | Budget mult |
+|---|---|---|
+| Transit Commission | route planning and rider help | 1.0 |
+| Health Authority | clinical notes and triage | 1.4 |
+| Courts Service | case records and transcripts | 0.9 |
+| School Board | tutoring and marking help | 1.1 |
+| Water Board | leak detection and billing | 0.7 |
+| Permits Office | applications and inspections | 0.8 |
+| Emergency Services | dispatch and call handling | 1.2 |
+| Revenue Office | tax queries and audits | 1.3 |
+
 ## 22. Incidents
 Implemented in `src/data/incidents.ts` (texts and options) and `src/data/incidentParams.ts` (numbers). The case ids are bank-era; the title column is what the player sees.
 
