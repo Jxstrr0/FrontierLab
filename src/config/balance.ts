@@ -206,8 +206,8 @@ export const START_AWARENESS = 0.2;
 export const GRAND_OPENING_BONUS = 0.15;
 export const GRAND_OPENING_WEEKS = 6;
 export const AWARENESS_DECAY = 0.03;
-export const BRAND_DECAY = 0.02;
-export const BRAND_PASSIVE_PER_BRANCH = 0.002;
+/** Word of mouth: an open office's weekly awareness gain before campaigns (× (1 − a)). */
+export const OFFICE_PASSIVE_AWARENESS = 0.003;
 /**
  * Office campaigns' weekly costs (CONTENT §8) × this × the office's size
  * multiplier (OFFICE_SIZES mult, which also sets its reach), × city costIndex
@@ -223,10 +223,11 @@ export const RATES_BASE = 3.0;
 export const RATE_COMP_STEP = 0.005;
 export const COMP_CLAMP = 2;
 export const BALANCE_WEIGHT_FLOOR = 0.1;
+/** §8 (audit batch D): product coins move with the model, perPoint coins per radar point past the bar. */
+export const MODEL_COINS = { perPoint: 0.15 } as const;
 export const PRODUCTS_RATING = {
   app: 0.3,
   appBase: 3,
-  model: 0.1,
   modelBase: 5,
   breadthGood: 0.3,
   breadthBad: -0.5,

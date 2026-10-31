@@ -78,7 +78,7 @@ export interface CountryState {
   capitalBufferAdj: Rate;            // politics/lobbying modifiers (pp)
 }
 export interface CityState {
-  id: Id; generated: boolean; brandAwareness: Pct; marketRef: Record<string /*productId*/, number>;
+  id: Id; generated: boolean; marketRef: Record<string /*productId*/, number>;
   layout?: 1 | 2;   // map layout version: 1 = the original shared grid (cities generated before schema 11), 2 = per-city looks (ART_DIRECTION §2.1); missing = 1
   grownLots?: number; // storefronts added since generation (city growth, CONTENT §3; v35)
   licensed?: boolean; // a new region's market-entry licence is paid (SIMULATION §20a; schema 28)
@@ -345,6 +345,8 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 `src/sim/state.ts` is the source of truth; this section records how it differs from the guide above. Later stages add the rest with a schema bump and a migration.
 
 **Frontier Lab renumbering (stage C0, 2026-10-26):** the state below is Vault Street's final shape (its schema v38), renumbered as Frontier Lab schema 1. Vault Street's 37 migration steps were dropped, so the schema numbers and migrations mentioned in the entries below are history only.
+
+**Frontier Lab schema 39 (audit batch D, one awareness):** `CityState.brandAwareness` is gone; the city's sales office `awareness` is its only awareness. Migration 38 → 39 (`src/sim/save/migrateOneAwareness.ts`) sets each non-closed office's `a = 1 − (1 − a)(1 − b)` (the old effective awareness, so demand doesn't jump) and deletes `brandAwareness`. Product coins from the model need no state: `coinsOf` (`src/sim/productCoins.ts`) works them out each week.
 
 **Frontier Lab schema 38 (cleanup, the bank's weight removed):** `GameState.treasury` (reserves, `liqTarget`, `autoFunding`, `freeze`, funding `lots` and `offers`, `overnight`, `window`, `windowStigmaWeeks`) and the `Treasury`, `FundingLot` and `FundingOffer` types are gone, with `company.liquidityRatio`, `risk.losses` (the loss records) and the `funding` RNG stream. `CountryState` loses `prevFtpShort`, `prevFtpLong`, `cardAnchor` and `startPolicy`; `RivalBank` loses `priceLags` (rival prices drift straight to target). The P&L lines `reserveInterest`, `bondCoupon`, `depositInterest`, `wholesaleInterest`, `wealthFees`, `originationFees` and `realizedGains` and the office row line `losses` are gone; `WeeklySnapshot` loses `netRevenue` and `totals.deposits`/`loans`/`liquid`. Write-only fields go too: `meta.saveName`, `world.travel.totalKm`/`faresPaid`, `Lot.homeownerShare`, `Book.last.defaulted`/`defaultedLoans`, `stock.ipoPrice`, `market.shock`, `richList.lastRankWeek`, `MergerOffer.madeWeek` and `QuarterReport.roe`. Migration 37 → 38 (`src/sim/save/migrateBankWeight.ts`, the owner's rule "fold into cash"): `cash += reserves − (overnight + window + Σ lot amounts)`, then drops `treasury`, so assets and liabilities fall by the same amount and equity is unchanged; the old P&L lines fold, in the open ledger and every weekly record, into `ventureDebtInterest` (reserve interest, bond coupons), `corporateInterest` (deposit and wholesale interest), `dividendIncome` (wealth and origination fees) and `investmentGains` (realized gains), and every other field above is deleted. Older migrations reach the treasury through `legacyTreasury()` (`src/sim/save/legacyTreasury.ts`). Commands `setTreasuryPolicy`, `borrowOffer`, `repayLot`, `topUpLendingFund`, `borrowWindow` and `repayWindow` are gone; events `WINDOW_USE` and `FUNDING_MATURED` are no longer raised.
 

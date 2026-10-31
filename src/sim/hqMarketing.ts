@@ -1,14 +1,15 @@
 // HQ marketing (SIMULATION §7, §16.10; CONTENT §11): brand campaigns that run
-// weekly per city or country and raise city brand awareness b, agency packages
+// weekly per city or country and raise each covered city's awareness (held by
+// its sales office, awareness.ts), agency packages
 // that spread a one-off boost over their length, and the Prestige package's
 // Branch-rating bonus. Runs in tick step 8 (corporate items).
+import { raiseCityAwareness } from './awareness';
 import { BRAND_CAMPAIGNS, type BrandCampaignSpec } from '../data/brandCampaigns';
 import { CITIES } from '../data/cities';
 import { SEGMENTS, type SegmentId } from '../data/types';
 import { pushEvent } from './events';
 import { campaignMult } from './hq';
 import { spend } from './ledger';
-import { clamp } from './math';
 import { listPrice } from './nominal';
 import type { BrandCampaign, GameState } from './state';
 
@@ -146,12 +147,9 @@ export function runBrandMarketing(state: GameState): void {
   }
   spend(state, 'marketing', brandCampaignsWeeklyCost(state));
 
-  // §7: b += gain × (1 − b), the same saturating shape as branch awareness.
-  for (const [cityId, gain] of Object.entries(brandGainByCity(state))) {
-    const city = state.world.cities[cityId];
-    if (!city || gain <= 0) continue;
-    city.brandAwareness = clamp(city.brandAwareness + gain * (1 - city.brandAwareness), 0, 1);
-  }
+  // §7: the city's one awareness number (its office's) rises by gain × (1 − a).
+  for (const [cityId, gain] of Object.entries(brandGainByCity(state)))
+    raiseCityAwareness(state, cityId, gain);
 
   for (const p of m.packages) p.weeksLeft -= 1;
   m.packages = m.packages.filter((p) => p.weeksLeft > 0);

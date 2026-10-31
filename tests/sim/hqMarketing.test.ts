@@ -16,6 +16,7 @@ import {
 } from '../../src/sim/hqMarketing';
 import { balanceSheet } from '../../src/sim/balanceSheet';
 import { bankWithFloors } from '../helpers/scenario';
+import { cityAwareness, officeIn } from '../../src/sim/awareness';
 
 /** B3: agencies sell launch campaigns only just after a model launch; open that window. */
 function openLaunchWindow(s: GameState): void {
@@ -53,7 +54,7 @@ describe('brand campaigns', () => {
     });
   });
 
-  it('raises b with the (1 − b) shape and costs its weekly price', () => {
+  it('raises the city’s awareness with the (1 − a) shape and costs its weekly price', () => {
     const s = bankWithFloors(['marketing']);
     const r = cmd.startBrandCampaign(s, {
       campaignId: 'billboards',
@@ -61,13 +62,13 @@ describe('brand campaigns', () => {
       targetId: 'cal',
     });
     expect(r.ok).toBe(true);
-    const city = s.world.cities.cal!;
-    const b0 = city.brandAwareness;
+    const city = officeIn(s, 'cal')!;
+    const b0 = city.awareness;
     const marketing0 = s.ledger.pnl.marketing;
     const cash0 = s.company.cash;
     runBrandMarketing(s);
     // Full coverage (no requirements yet): campaignMult = 1.
-    expect(city.brandAwareness).toBeCloseTo(b0 + 0.012 * (1 - b0), 10);
+    expect(city.awareness).toBeCloseTo(b0 + 0.012 * (1 - b0), 10);
     expect(s.ledger.pnl.marketing - marketing0).toBe(8_000);
     expect(s.company.cash).toBe(cash0 - 8_000);
   });
@@ -75,22 +76,24 @@ describe('brand campaigns', () => {
   it('country scope covers every simulated city in the country', () => {
     const s = bankWithFloors(['marketing']);
     cmd.startBrandCampaign(s, { campaignId: 'tv', scope: 'country', targetId: 'CA' });
-    const b0 = s.world.cities.cal!.brandAwareness;
+    const b0 = cityAwareness(s, 'cal');
     const before = s.ledger.pnl.marketing;
     runBrandMarketing(s);
-    expect(s.world.cities.cal!.brandAwareness).toBeCloseTo(b0 + 0.012 * (1 - b0), 10);
+    expect(cityAwareness(s, 'cal')).toBeCloseTo(b0 + 0.012 * (1 - b0), 10);
     expect(s.ledger.pnl.marketing - before).toBe(BRAND_CAMPAIGNS.tv!.costPerWeek.country);
   });
 
   it('beats no campaign over ten weeks and keeps the balance identity', () => {
     const control = bankWithFloors(['marketing']);
     const s = bankWithFloors(['marketing']);
+    // The office manager's own campaigns chase the same awareness number; hand them back so
+    // the comparison isolates the brand campaign.
+    for (const g of [control, s])
+      for (const b of Object.values(g.branches)) cmd.setDelegation(g, b.id, 'marketing', false);
     const r = cmd.startBrandCampaign(s, { campaignId: 'tv', scope: 'city', targetId: 'cal' });
     advanceWeeks(control, 10);
     advanceWeeks(s, 10);
-    expect(s.world.cities.cal!.brandAwareness).toBeGreaterThan(
-      control.world.cities.cal!.brandAwareness + 0.1,
-    );
+    expect(cityAwareness(s, 'cal')).toBeGreaterThan(cityAwareness(control, 'cal') + 0.05);
     const bs = balanceSheet(s);
     expect(Math.abs(bs.equity - bs.expectedEquity)).toBeLessThan(1);
     expect(cmd.stopBrandCampaign(s, r.ok ? r.id : '')).toEqual({ ok: true });
@@ -132,8 +135,8 @@ describe('agency packages', () => {
 
   it('charges once and spreads the boost evenly over its weeks', () => {
     const s = bankWithFloors([], { cityId: 'tor' });
-    const city = s.world.cities.tor!;
-    city.brandAwareness = 0;
+    const city = officeIn(s, 'tor')!;
+    city.awareness = 0;
     openLaunchWindow(s);
     const cash0 = s.company.cash;
     const r = cmd.buyAgencyPackage(s, {
@@ -150,10 +153,10 @@ describe('agency packages', () => {
       runBrandMarketing(s);
       expected += (0.25 / 8) * (1 - expected);
     }
-    expect(city.brandAwareness).toBeCloseTo(expected, 12);
+    expect(city.awareness).toBeCloseTo(expected, 12);
     expect(s.marketing.packages).toHaveLength(0);
     runBrandMarketing(s);
-    expect(city.brandAwareness).toBeCloseTo(expected, 12);
+    expect(city.awareness).toBeCloseTo(expected, 12);
   });
 
   it('Prestige lifts the Branch rating in its city for 26 weeks', () => {

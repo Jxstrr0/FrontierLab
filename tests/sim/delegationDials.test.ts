@@ -68,7 +68,7 @@ describe('routines read the dials', () => {
     const s = execGame(['marketing']);
     const b = openFirst(s);
     withRevenue(s, 10_000_000);
-    s.world.cities[b.cityId]!.brandAwareness = 0.6;
+    b.awareness = 0.6;
     cmoBrand(s);
     expect(s.marketing.campaigns).toHaveLength(0);
     cmd.setBrandTarget(s, 0.7);
@@ -112,7 +112,7 @@ describe('estimates', () => {
     const s = execGame(['marketing']);
     const b = openFirst(s);
     withRevenue(s, 10_000_000);
-    s.world.cities[b.cityId]!.brandAwareness = 0.5;
+    b.awareness = 0.5;
     const before = JSON.stringify(s);
     const low = brandEstimate(s, 0.4);
     const high = brandEstimate(s, 0.7);

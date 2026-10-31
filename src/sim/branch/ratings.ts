@@ -17,7 +17,6 @@ import {
   REVIEW_RATE,
   SERVICE_RATING,
   UPKEEP_PENALTY,
-  MODEL_EFFECTS,
 } from '../../config/balance';
 import { BUILD_SLOTS, EQUIPMENT } from '../../data/equipment';
 import { REVIEW_LINES } from '../../data/reviews';
@@ -27,7 +26,8 @@ import { clamp, ema } from '../math';
 import { marketRef } from '../rates';
 import { stream } from '../rng';
 import type { Branch, GameState } from '../state';
-import { activeModel, modelQuality, qualityBar, RADAR } from '../underwriting';
+import { activeModel, RADAR } from '../underwriting';
+import { coinsOf, modelCoinLift } from '../productCoins';
 import type { CampaignEffects } from './marketing';
 import { branchPrice, competitiveness, isOffered } from './pricing';
 import { managerOf } from './staff';
@@ -42,7 +42,6 @@ import {
   baseId,
   developedEntries,
   productSpec,
-  starsOf,
 } from '../products';
 
 /** Σ over segments of mix_s × affinity[s][p] at this branch's lot. */
@@ -85,12 +84,13 @@ export function productsTarget(state: GameState, branch: Branch, fx: CampaignEff
   let bump = 0;
   // Breadth counts each base product once, covered if it or a variant is offered.
   const covered = new Set<string>();
+  const lift = modelCoinLift(state);
   for (const spec of allProducts(state)) {
     if (!isOffered(branch, spec.id)) continue;
     const aff = lotAffinity(state, branch, spec.id);
     covered.add(baseId(spec));
     affSum += aff;
-    starSum += aff * starsOf(state, spec);
+    starSum += aff * coinsOf(state, spec, lift);
     bump += spec.productsBump ?? 0;
   }
   let totalAff = 0;
@@ -112,10 +112,6 @@ export function productsTarget(state: GameState, branch: Branch, fx: CampaignEff
     mean +
       breadth +
       PRODUCTS_RATING.app * (state.company.appRating - PRODUCTS_RATING.appBase) +
-      PRODUCTS_RATING.model *
-        (modelQuality(activeModel(state)) -
-          PRODUCTS_RATING.modelBase -
-          (qualityBar(state) - MODEL_EFFECTS.qualityRef)) +
       fx.bumps.products +
       bump,
     1,
