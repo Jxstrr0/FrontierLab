@@ -3,14 +3,17 @@
 // Ledger (as composed by the sim, src/sim/news.ts); a monthly or quarterly
 // roll-up also lists the lead story of each earlier issue in the period. When
 // the Finance team is short the figures read "Delayed" (SIMULATION §14.6); the
-// Ledger still runs. Closing resumes the game.
+// Ledger still runs. Closing resumes the game. Under Continue, a row sets how
+// often these results open (the same setting as in Settings).
 import { dateOf, quarterOf } from '../../sim/calendar';
 import { statementDelayWeeks } from '../../sim/hq';
 import type { LedgerIssue } from '../../sim/competitionTypes';
 import type { GameState, WeeklySnapshot } from '../../sim/state';
-import { Card, Medallion, Modal, Row, SectionTitle } from '../components';
+import { WEEKLY_RESULTS_MODES } from '../../data/settingsOptions';
+import { setSettings } from '../../sim/commands';
+import { Card, Medallion, Modal, Row, SectionTitle, Segmented } from '../components';
 import { delta, gameDate, money, moneyFull, monthYear, shortDate } from '../format/format';
-import { modal, useGame } from '../store';
+import { act, modal, useGame } from '../store';
 import { articlesFor, LedgerCard } from './LedgerCard';
 import {
   periodIssues,
@@ -33,6 +36,12 @@ const TITLE: Record<ResultsPeriod, string> = {
   weekly: 'Weekly results',
   monthly: 'Monthly results',
   quarterly: 'Quarterly results',
+};
+const FREQ_LABEL: Record<GameState['settings']['weeklyResults'], string> = {
+  weekly: 'Weekly',
+  monthly: 'Monthly',
+  quarterly: 'Quarterly',
+  off: 'Off',
 };
 const NOUN: Record<ResultsPeriod, string> = {
   weekly: 'week',
@@ -70,14 +79,25 @@ export function WeeklyResults(p: { week: number; period?: ResultsPeriod }) {
         />
       }
       footer={
-        <button
-          type="button"
-          class="btn btn-primary btn-block"
-          onClick={close}
-          data-tutorial="weekly-continue"
-        >
-          Continue
-        </button>
+        <>
+          <button
+            type="button"
+            class="btn btn-primary btn-block"
+            onClick={close}
+            data-tutorial="weekly-continue"
+          >
+            Continue
+          </button>
+          <div class="weekly-freq">
+            <span class="muted small">Show results</span>
+            <Segmented
+              label="Show results"
+              value={s.settings.weeklyResults}
+              options={WEEKLY_RESULTS_MODES.map((m) => ({ value: m, label: FREQ_LABEL[m] }))}
+              onChange={(weeklyResults) => act(setSettings, { weeklyResults })}
+            />
+          </div>
+        </>
       }
     >
       <div class="stack">

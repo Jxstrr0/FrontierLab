@@ -1,5 +1,5 @@
-// Board meeting modal (SCREENS §10.2). Opened from the Executive floor, or by
-// the quarterly reminder (which asks first). Dividends: the current dividend
+// Board meeting modal (SCREENS §10.2). Opened from the Executive floor, or from
+// the HUD's Board chip at a quarter start. Dividends: the current dividend
 // and its yield, a per-share stepper with yield and payout ratio, and the
 // regulator's cap note. CEO compensation: current pay and a stepper. Take votes
 // runs the meeting; each item's For / Against tally animates in turn (instant
@@ -16,8 +16,6 @@ import './executive.css';
 
 export function BoardMeetingModal() {
   const s = useGame();
-  const route = modal.value;
-  const [asking, setAsking] = useState(route?.type === 'boardMeeting' && !!route.reminder);
   const view = meetingView(s);
   const [dps, setDps] = useState(view.proposal);
   const [salary, setSalary] = useState(s.governance.ceoSalary);
@@ -34,27 +32,6 @@ export function BoardMeetingModal() {
     />
   );
   const b = boardCard(s);
-
-  if (asking) {
-    return (
-      <Modal title="Board meeting" icon={icon} onClose={close}>
-        <div class="stack">
-          <p>
-            A new quarter has begun and the board is ready to meet for {b.quarter}. Set this
-            quarter’s dividend and your pay, then put them to a vote.
-          </p>
-          <div class="btn-row">
-            <button type="button" class="btn btn-secondary" onClick={close}>
-              Later
-            </button>
-            <button type="button" class="btn btn-primary" onClick={() => setAsking(false)}>
-              Hold meeting
-            </button>
-          </div>
-        </div>
-      </Modal>
-    );
-  }
 
   if (meeting) {
     return (

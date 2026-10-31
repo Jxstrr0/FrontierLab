@@ -8,7 +8,7 @@ Screen-by-screen layout. Design at 390×844 portrait first. Visual styling is in
 
 ### 0.1 Panel anatomy
 Every building panel uses the same five parts, mirroring the original's structure:
-1. **Header:** icon medallion, title, subtitle (address or type), close ✕.
+1. **Header:** a ‹ Back button when this panel was opened from another one (it returns there; moving between tabs or HQ floors doesn't stack, and closing ends the trail), icon medallion, title, subtitle (address or type), close ✕.
 2. **Advisor bar:** an oval engraved portrait and a one-line speech. Tap to cycle contextual hints. Lines are in CONTENT.
 3. **Hero vignette:** a procedural engraving of the building, about 16:9. Small corner buttons where needed (e.g. "details").
 4. **Content:** scrolls.
@@ -19,14 +19,16 @@ Every building panel uses the same five parts, mirroring the original's structur
 ### 0.2 HUD (over the map)
 - **Top-left:** your lab's medallion + corporate cash. Tap → Company summary (§24).
 - **Top-right:** date pill and speed control.
-  - Tap cycles 1× → 2× → 4×. Long-press or the ❚❚ button pauses.
-  - While paused, the pill hides the speed and dims. It also reads paused while a panel, sheet or popup is open, since the clock runs only on the map.
+  - Tap cycles 1× → 2× → 4×. Long-press or the ❚❚ button pauses. Play resumes at the speed you were playing at before the pause (the default speed only at the start).
+  - While paused, the pill hides the speed and dims. It also reads paused while a panel, sheet or popup is open, since the clock runs only on the map. When the game paused itself, a small line under the pill says why ("Cash is below zero", "Skipped to the end of the month").
   - **Next week** button (▶|): plays out the rest of the week instantly, runs the weekly tick (weekly results, autosave, auto-pause checks) and leaves the game paused. This allows week-by-week play.
+- **Status chips** under the date pill, right-aligned and wrapping: **In the red n/4** (oxblood, while corporate cash is below zero; tap → Company), **Board** (from a quarter start while the board is ready to meet; tap → the board meeting), the **Cases** chip, and **Skip** (⏩): runs at `SKIP_DAYS_PER_SECOND` (40 days a second) to the end of the month, skipping the weekly results and showing that month's results instead (none if results are Off); it stops early, paused, for any popup or a bad-news notice. Tap it again (it reads Stop) to stop.
 - **Bottom-left:** Layers button.
 - **Bottom-center:** city pill with an engraved flag. Tap → Travel sheet (the nearest airport's departures, plus "Fly now" if you own a jet).
 - **Bottom-right:** Menu.
 - **Badges:** pins show a small oxblood dot for an unresolved incident, a brass dot for new proposal requests on the Deal Desk.
 - **Cases chip:** while incidents wait for a decision, an "N cases" chip sits under the date pill and reopens the incident modal.
+- **Notices:** the week's news toasts wait while a popup is open and queue (three on screen at once) rather than pushing each other off.
 
 ### 0.3 Menu sheet
 Company · HQ · Sales offices · Personal wealth · The Inference (archive) · Settings · Save game · Exit to title. (Portfolio moved under Personal wealth and Milestones and Frontier projects under Company on 2026-10-30, owner's review B4.)
@@ -70,7 +72,7 @@ Company · HQ · Sales offices · Personal wealth · The Inference (archive) · 
 - **Footer**, one line: "A Longlight Interactive game · v{version}" and a **Check for updates** button: it asks the site for a newer version and reloads into it, or says you have the latest (handy in the home-screen app, which iOS often resumes rather than reloading).
 - **Wide screens (≥ 900 px) and landscape:** two columns, the panel on the left at `min(60vw, 760px)` and full height, the words, menu and footer in a centred column on the right (max 360 px). Landscape phones under 500 px tall stack instead, with the panel at 45% of the height.
 
-**New Game wizard** (5 steps, with Back and Next):
+**New Game wizard** (5 steps, with Back and Next). Step 1 opens with a **Quick start** button (a ready-made lab in Calgary). From step 2, once the step is complete, "Skip to confirm with the default city and options" jumps to step 5:
 1. **Your lab:**
    - "Lab name" (max 24 characters)
    - monogram (2 letters, auto-filled from the name)
@@ -261,7 +263,7 @@ No tabs: one overview page.
 - **Office sheet** (from the header button): address, floors in use, weekly rent, which department sits on each floor; a **Tab order** card listing the floors you have in the order their tabs run along the bottom bar, each with ▲ ▼ arrows (44 px) to move it past its neighbour, and **Reset order** once any has moved (the order is saved with the game; departments you add later slot in where the usual order puts them); then **Release floor · {department}** (the floor you're on; "Close HR floor" on HR) and **Release office**, each with its confirm.
 - **Bottom icon bar** (only departments you have): an icon over a short label for each floor, scrolling sideways when they don't fit. Finance (ledger) · HR (people) · Products (card) · Compute (server) · Marketing (megaphone) · Platform (screen; dept `it`) · Safety (shield; dept `risk`) · Executive (briefcase) · Investment (rising chart) · Add floor (plus). The Platform & Security floor's tab reads Platform and the Safety & Alignment floor's reads Safety, to fit the bar.
 
-**Every department floor shows:**
+**Every department floor shows** (the department's own cards come first, so its actions sit near the top, and the team controls follow; on a floor with nobody hired yet the team comes first):
 - **hero:** engraved isometric office interior whose desk count reflects staffing, furnished per department (ART_DIRECTION §3)
 - **advisor:** a coverage-aware line ("We're short on finance staff — statements are running late.")
 - **Employees:** stepper (`18 / 24`) with an Open positions chip
@@ -354,7 +356,7 @@ No tabs: one overview page.
 - **Dividends:** current dividend per share and yield, new per-share stepper, payout ratio, and the regulator cap note when the tier restricts it.
 - **CEO compensation:** current, plus a new stepper.
 - **Take votes:** an animated tally (For / Against %) per item, then the outcome. If approved, the declared dividend schedules its payment in 3 weeks.
-- **Quarterly reminder:** the same modal opens once per quarter with Later / Hold meeting when the board hasn't met (after weekly results and incidents).
+- **Quarterly reminder:** at each quarter start, when the board hasn't met, a notice says it is ready and the HUD shows a **Board** chip for the quarter that opens this modal (it no longer pops up by itself).
 
 ## 11. Startup detail
 
@@ -504,7 +506,7 @@ Opened by tapping a business pin on the map (the **Businesses** layer, which als
 - **Stats:** flown this week and remaining mileage (weekly allowance).
 - **Departures board:** split-flap styled rows (airport code tiles, destination, country, distance in km or mi), nearest first, with a region filter (All / Americas / Europe / Asia-Pac). The new regions (SIMULATION §20a) are left off the board and the flight map until they open at week 260. Rows mark "New" for places you haven't visited, "regional site", and whether you have a sales office there. Tap a row to fly: the plane follows a dotted great-circle arc across a world map (tap to skip; a still frame with reduced motion), then the destination map loads and a toast welcomes you. Rows beyond the remaining mileage stay tappable and show the one-way fare ("$104K ticket"); a confirm shows what personal cash pays and what the lab pays as a travel expense. Travel is never blocked.
 - **Private jet card:** without a jet, both models (price, range, Buy with confirm). With one: value, weekly upkeep, Fly now (the board in jet mode: rows within range read "Jet") and Sell (shows resale, confirm).
-- **City pill** (bottom centre of the map, SCREENS §0.2): tap for the Travel sheet — where you are, this week's mileage, Go to the airport, and Fly now with a jet.
+- **City pill** (bottom centre of the map, SCREENS §0.2): tap for the Travel sheet — where you are, this week's mileage, the departures board itself (all regions; tap a row to fly, a fare asks first; with a jet, the board quotes your plane), then Go to the airport and Fly now with a jet.
 
 ## 19. Vacation home · Car dealer · Auction house
 
@@ -536,11 +538,14 @@ Opened by tapping a business pin on the map (the **Businesses** layer, which als
   - two-column article grid (icon vignette, headline, 1–2 sentence body)
 - **Earlier this month / quarter** (roll-ups only): a card listing each earlier issue's date and lead headline; the archive in the menu has the full issues.
 - When Finance is short-staffed, the figures read "Delayed".
+- Under **Continue**, a "Show results" row (Weekly / Monthly / Quarterly / Off) changes the results setting on the spot.
+- After the first year, a game still on Weekly switches to Monthly once, with a notice saying so.
+- A quarter's results are skipped at a year end that opens the annual report, which covers the same weeks.
 - Close resumes the game.
 
 ### 21b. Annual report (modal)
 
-Opens on the first tick of a new year, after the results modal closes (before any incident or board reminder). Reopened from the Ledger archive, whose list starts with the annual reports, newest first ("Annual report 2031" and its headline).
+Opens on the first tick of a new year, after the results modal closes (before any incident), unless Settings → "Open the annual report" is off. Reopened from the Ledger archive, whose list starts with the annual reports, newest first ("Annual report 2031" and its headline).
 - **Header:** your lab's medallion, "Annual report {year}" ("The decade in review" every tenth year), ✕.
 - **Front page:** the Weekly Inference masthead with "Annual edition · year N" (or "Decade edition") and the date, then a headline and standfirst (SIMULATION §22a, CONTENT §26b).
 - **Story:** ARR, sales offices and valuation at the close; the milestones reached this year (up to three named, then "and N more"); your net worth and rich list place.
@@ -568,18 +573,17 @@ Opens on the first tick of a new year, after the results modal closes (before an
 
 ## 24. Company summary (menu → Company)
 
-- **Where to look** at the top: the three things that most need you, worst first (Urgent / Watch / Note), each a tap to the right screen: a mandated pause or revoked licence, the safety tier, corporate cash below zero or under `ATTENTION.cashCoverWeeks` of running costs, open cases, a funding freeze or liquidity under the minimum (legacy saves only), expiring proposal requests, sales offices losing money for 4 weeks, ratings under 2.5, understaffing, loan losses over the Chief Safety Officer's ceiling (legacy), morale under 50, sales offices without a manager, empty executive seats, switched-off delegations, low awareness. "All clear" when nothing qualifies. Ranking in `src/sim/attention.ts`, thresholds in `ATTENTION`.
-- safety ratio (SIMULATION §15) with the regulator's tier badge, a meter with the tier lines, and a breakdown line (Safety cover, model exposure)
+- **Where to look** at the top: the three things that most need you (with "Show N more" for the rest), worst first (Urgent / Watch / Note), each a tap to the right screen: a mandated pause or revoked licence, the safety tier, corporate cash below zero or under `ATTENTION.cashCoverWeeks` of running costs, open cases, a funding freeze or liquidity under the minimum (legacy saves only), expiring proposal requests, sales offices losing money for 4 weeks, ratings under 2.5, understaffing, loan losses over the Chief Safety Officer's ceiling (legacy), morale under 50, sales offices without a manager, empty executive seats, switched-off delegations, low awareness. "All clear" when nothing qualifies. Ranking in `src/sim/attention.ts`, thresholds in `ATTENTION`.
+- **Cash** card: corporate cash with the runway tier badge, **Runway** (months, or "Not burning cash") with the runway meter and a line on what it gates, then running costs a week
+- safety ratio (SIMULATION §15) with the regulator's tier badge and a meter with the tier lines; "Details on the Safety floor" once you have one (the breakdown lives there)
 - a notice during a mandated pause or a revoked licence (what is blocked and until when) or strict watch (until when, tier lines 10 points higher, audits twice as likely)
 - at Watch, Restricted or Critical, a "How to fix this" checklist under the meter (`src/data/capitalFixes.ts`): hire safety staff on the Safety & Alignment floor, pay them better, seat a Chief Safety Officer, train or switch to a safer model, grow the Safety team before shipping a model far ahead of the frontier; at Critical, a line on the mandated pause and the licence
-- **Cash** card: corporate cash with the runway tier badge, **Runway** (months, or "Not burning cash") with the runway meter and a line on what it gates, then running costs a week and **cash cover** (weeks of running costs; red under `ATTENTION.cashCoverWeeks`)
-- a liquidity section (Target, Overnight borrowing), only while an older save still holds deposits or overnight borrowing
 - **Compute** card (SIMULATION §13.0): spot price per GPU-week with the chip phase badge (Chip glut green, Normal market, Chip shortage red), a line chart of the price index over the last 104 weeks, GPUs your customers used last week, GPUs running in your data centers, the share they covered, and what the rest costs at spot a week, with a one-line note
   - a red **Waitlist** or **Outage** badge under the phase badge; "Bought at spot" reads "N of M max" against the spot limit; red "Emergency burst" and "Not served (waitlist)" rows when non-zero; "Spot and burst bill" a week; "Pool cost vs spot" (green under 100%) once the pool has paid anything. The Company explainer "Compute: own it or rent it" covers the internal charge and the limit.
-- **Totals:** Assets, ARR, Treasury reserves (only when above $0, which only bank-era saves have), Equity
+- **Totals:** Assets, ARR, Equity
 - share price or private valuation, with the 52-week range, market cap, your stake and top shareholders
 - a Personal line: personal cash plus holdings
-- one-line explanations ("Grow recurring revenue; watch the compute bill") with a "Learn more" sheet: Revenue recurs, compute bills · Compute: own it or rent it · Safety limits growth · Treasury reserves · Cash cover
+- one-line explanations ("Grow recurring revenue; watch the compute bill") with a "Learn more" sheet: Revenue recurs, compute bills · Compute: own it or rent it · Safety limits growth · Runway
 - statements: the income statement runs Plans, API, Apps & services, Enterprise contracts, Other income → Revenue → Compute → Gross profit → Operating expenses → Interest expense (when any) → Bad debts → Depreciation → Pre-tax → Tax → Net income. The balance sheet lines are in SIMULATION §14.4; treasury reserves, loans, stocks, ventures, compute credits, real estate, partnership fees, goodwill, deposits, wholesale funding, corporate debt and dividends payable show only when non-zero.
 - **Goals:** two buttons, Milestones (n of 32) and Frontier projects (n of 6), which open §28 and §28a
 - links to the full statements (Finance floor, or a simplified view without an HQ)
@@ -596,11 +600,12 @@ Opens on the first tick of a new year, after the results modal closes (before an
   - currency symbol ($, C$, £, €, ¥) and distance units (km/mi)
   - results frequency (every week / every month / every quarter / off)
   - default speed
-  - auto-pause on incidents and on expiring proposal requests
+  - auto-pause on incidents (info-only notices such as Dividend due never pause; they show as a message and close themselves) and on expiring proposal requests
+  - "Open the annual report" at each year end (on by default; off, it waits in the Ledger archive)
   - sound, reduced motion, text size (100 / 115 / 130%)
   - edit founder avatar
   - **Tutorial:** Replay tutorial, the Guides switch and "Show the guides again" (§27)
-  - **Developer:** a "Developer tools" switch, saved on this device only (not in the game save). When on, in a game, a button adds `DEV_PAYMENT` ($10,000,000) to corporate cash as paid-in capital (`devPayment` command; no shares issued, the books still balance). Two more switches sit under it, in a game only, and are stored in the game save (`flags.devStaff`, `flags.devNoBankruptcy`, optional, no schema change):
+  - **Developer:** shown only with `?debug` in the address, or while already switched on. A "Developer tools" switch, saved on this device only (not in the game save). When on, in a game, a button adds `DEV_PAYMENT` ($10,000,000) to corporate cash as paid-in capital (`devPayment` command; no shares issued, the books still balance). Two more switches sit under it, in a game only, and are stored in the game save (`flags.devStaff`, `flags.devNoBankruptcy`, optional, no schema change):
     - **Top staff** (`setDevStaff`): holds every sales office's staff and every HQ team's skill and morale at `DEV_STAFF` (95) or better, now and after every weekly update, so a high-staff game can be tested. Off, they drift back to where pay and management put them.
     - **Free top rerolls** (`setDevRerolls`): manager and executive "New candidates" cost nothing (the button reads "Free"), and every rerolled candidate's skills land in `DEV_REROLL` (95–99, the normal roll squeezed into that range so candidates still differ), with the asking salary to match. Lists already on offer and the free monthly refresh are unchanged. Before your first manager hire the guide keeps the first place on the list.
     - **No bankruptcy** (`setDevNoBankruptcy`): weeks in the red never end the game. Cash still goes negative and the warnings still show.

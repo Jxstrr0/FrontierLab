@@ -11,6 +11,7 @@ import { useDialog } from './dialog';
 import { Icon } from './Icon';
 import { PanelTabs, type Tab } from './PanelTabs';
 import { Portrait } from './Portrait';
+import { backPanel, panelHistory } from '../store';
 
 export type { Tab };
 
@@ -42,6 +43,11 @@ export function Panel<T extends string>(p: {
   return (
     <section class="panel" role="dialog" aria-label={p.title} tabIndex={-1} ref={ref}>
       <header class="panel-header">
+        {panelHistory.value.length > 0 && (
+          <button type="button" class="icon-btn panel-back" aria-label="Back" onClick={backPanel}>
+            <Icon name="chevronLeft" size={20} />
+          </button>
+        )}
         {p.icon && <span class="panel-icon">{p.icon}</span>}
         <div class="panel-titles">
           <h2 class="panel-title">{p.title}</h2>

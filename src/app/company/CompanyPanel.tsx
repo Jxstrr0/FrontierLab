@@ -1,23 +1,22 @@
-// Company summary (SCREENS §24): "Where to look", safety ratio and tier,
-// corporate cash with its runway meter and cash cover, liquidity, the main
+// Company summary (SCREENS §24): "Where to look", corporate cash with its
+// runway meter and running costs, safety ratio and tier, compute, the main
 // totals, your share price or private valuation with the cap table and your
 // personal line (ShareSummary.tsx), and simplified statements, with a link to
 // the full statements on the HQ Finance floor once you have one.
 import { useState } from 'preact/hooks';
-import { ATTENTION, FEATURES, LIQ_MIN, LIQ_REPAY_BUFFER, RUNWAY } from '../../config/balance';
+import { FEATURES, RUNWAY } from '../../config/balance';
 import { FRONTIER_PROJECT_LIST } from '../../data/frontierProjects';
 import { MILESTONES } from '../../data/milestones';
 import { companyArr } from '../../sim/arr';
 import { balanceSheet } from '../../sim/balanceSheet';
-import { cashCoverWeeks, weeklyCosts } from '../../sim/cashCover';
+import { weeklyCosts } from '../../sim/cashCover';
 import { runwaySnapshot } from '../../sim/runway';
 import { safetySnapshot, tierLift } from '../../sim/safety';
 import { Badge, Card, Medallion, Panel, Row, SectionTitle, Sheet } from '../components';
-import { money, pct, runwayText, safetyRatioText } from '../format/format';
+import { money, runwayText, safetyRatioText } from '../format/format';
 import { RealEstateCard } from '../realEstate/RealEstateCard';
 import { closePanel, openPanel, useGame } from '../store';
 import { CapitalFixes } from './CapitalFixes';
-import { LIQUIDITY_STATUS, liquidityGauge } from '../hq/treasury/treasuryView';
 import { ComputeCard } from './ComputeCard';
 import { RUNWAY_LABEL, RUNWAY_TONE, RunwayMeter } from './RunwayMeter';
 import { CapitalMeter, TIER_LABEL, TIER_TONE } from './CapitalMeter';
@@ -38,25 +37,13 @@ const EXPLAINERS: { title: string; body: string }[] = [
   },
   {
     title: 'Safety limits growth',
-    body: 'The regulator compares your Safety & Alignment floor with the risk your model carries. That safety ratio sets your tier, and the tier decides how freely you can sign new customers. Lenders price on a separate credit ratio.',
+    body: 'The regulator compares your Safety & Alignment floor with the risk your model carries. That safety ratio sets your tier, and the tier decides how freely you can sign new customers.',
   },
   {
-    title: 'Treasury reserves',
-    body: 'Cash set aside from the operating account.',
-  },
-  {
-    title: 'Cash cover',
-    body: 'Corporate cash pays the wages, rent and salaries. Cash cover is how many weeks of those running costs it would last. A new sales office loses money for its first couple of months, so build with cover to spare.',
+    title: 'Runway',
+    body: 'Corporate cash pays the wages, rent, salaries and the compute bill. Runway is how many months it lasts at the last few weeks’ net loss; lenders price your debt on it. A new sales office loses money for its first couple of months, so build with runway to spare.',
   },
 ];
-
-/** 0.4 → "Under 1 week", 7.6 → "7 weeks", 52+ → "A year or more". */
-export function coverText(weeks: number): string {
-  if (weeks < 1) return 'Under 1 week';
-  if (weeks >= 52) return 'A year or more';
-  const n = Math.floor(weeks);
-  return `${n} week${n === 1 ? '' : 's'}`;
-}
 
 export function CompanyPanel() {
   const s = useGame();
@@ -65,12 +52,7 @@ export function CompanyPanel() {
   const runway = runwaySnapshot(s);
   const safe = safetySnapshot(s);
   const bs = balanceSheet(s);
-  const liq = s.company.liquidityRatio;
-  const gauge = liquidityGauge(liq, LIQ_MIN, s.treasury.liqTarget, LIQ_REPAY_BUFFER);
-  const liqStatus = LIQUIDITY_STATUS[gauge.status];
   const costs = weeklyCosts(s);
-  const cover = cashCoverWeeks(s);
-  const coverTone = cover === null ? 'dim' : cover < ATTENTION.cashCoverWeeks ? 'bad' : 'good';
 
   return (
     <Panel
@@ -89,24 +71,6 @@ export function CompanyPanel() {
     >
       <div class="stack co-stack">
         <WhereToLook s={s} />
-        <Card>
-          <div class="cap-head" data-tutorial="capital-meter">
-            <div>
-              <div class="muted small">Safety ratio</div>
-              <div class="hero-number">{safetyRatioText(safe.ratio)}</div>
-            </div>
-            <Badge tone={TIER_TONE[safe.tier]}>{TIER_LABEL[safe.tier]}</Badge>
-          </div>
-          <SafetyNotice s={s} />
-          <CapitalMeter ratio={safe.ratio} tier={safe.tier} kind="safety" lift={tierLift(s)} />
-          <p class="muted small cap-note">
-            Safety cover {safetyRatioText(safe.strength)}, exposure ×{safe.exposure.toFixed(2)}. The
-            regulator compares your Safety &amp; Alignment floor with the risk your model carries;
-            the tier decides how many new customers it lets in.
-          </p>
-          <CapitalFixes tier={safe.tier} listing={s.stock.status} />
-        </Card>
-
         <Card>
           <div class="cap-head">
             <div>
@@ -129,45 +93,29 @@ export function CompanyPanel() {
             value={costs > 0 ? `${money(costs, sym)} / week` : 'Measuring'}
             tone="dim"
           />
-          <Row
-            label="Cash cover"
-            value={cover === null ? '—' : coverText(cover)}
-            tone={coverTone}
-            strong
-          />
-          <p class="muted small cap-note">
-            How long cash would pay the wages, rent and salaries at the last few weeks' pace. A new
-            sales office loses money for its first couple of months, so keep about{' '}
-            {ATTENTION.cashCoverWeeks} weeks in hand before you build.
-          </p>
         </Card>
 
-        {/* C3b: liquidity only matters while an older save still holds deposits or borrowing. */}
-        {(liq !== null || s.treasury.overnight > 0) && (
-          <Card>
-            <div class="cap-head">
-              <div>
-                <div class="muted small">Liquidity ratio</div>
-                <div class="hero-number">{liq === null ? '—' : pct(Math.max(0, liq), 1)}</div>
-              </div>
-              <Badge tone={liqStatus.tone}>{liqStatus.label}</Badge>
+        <Card>
+          <div class="cap-head" data-tutorial="capital-meter">
+            <div>
+              <div class="muted small">Safety ratio</div>
+              <div class="hero-number">{safetyRatioText(safe.ratio)}</div>
             </div>
-            <Row label="Target" value={pct(s.treasury.liqTarget, 1)} tone="dim" />
-            {s.treasury.overnight > 0 && (
-              <Row
-                label="Overnight borrowing"
-                value={money(s.treasury.overnight, sym)}
-                tone="dim"
-              />
-            )}
-            <p class="muted small cap-note">
-              Reserves as a share of deposits: the cash you can reach in a hurry.{' '}
-              {s.treasury.autoFunding
-                ? 'Auto-funding holds the target by borrowing overnight, so it looks after itself.'
-                : 'Auto-funding is off, so nothing tops it up when it slips.'}
-            </p>
-          </Card>
-        )}
+            <Badge tone={TIER_TONE[safe.tier]}>{TIER_LABEL[safe.tier]}</Badge>
+          </div>
+          <SafetyNotice s={s} />
+          <CapitalMeter ratio={safe.ratio} tier={safe.tier} kind="safety" lift={tierLift(s)} />
+          <CapitalFixes tier={safe.tier} listing={s.stock.status} />
+          {FEATURES.hq && s.departments.risk && (
+            <button
+              type="button"
+              class="btn btn-secondary btn-block"
+              onClick={() => openPanel({ type: 'hq', dept: 'risk' })}
+            >
+              Details on the Safety floor
+            </button>
+          )}
+        </Card>
 
         <ComputeCard />
 
@@ -176,9 +124,6 @@ export function CompanyPanel() {
           <Card>
             <Row label="Assets" value={money(bs.assets, sym)} />
             <Row label="ARR" value={money(companyArr(s), sym)} />
-            {s.treasury.reserves > 0 && (
-              <Row label="Treasury reserves" value={money(s.treasury.reserves, sym)} />
-            )}
             <Row label="Equity" value={money(bs.equity, sym)} strong />
           </Card>
         </div>
