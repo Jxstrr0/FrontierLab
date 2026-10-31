@@ -25,7 +25,6 @@ describe('governance news', () => {
       revenue: 3_000_000,
       netIncome: 1_000_000,
       eps: 0,
-      roe: 0,
     }));
     s.company.tier = 'strong';
     hire(s, 'cfo');

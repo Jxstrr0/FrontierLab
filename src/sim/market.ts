@@ -20,7 +20,7 @@ import {
 import { stream } from './rng';
 import { withMarks } from './securities';
 import type { GameState } from './state';
-import { homeCountry } from './treasury';
+import { homeCountry } from './homeCountry';
 
 /** Market capitalisation of every index member: listed companies and trading listed rivals. */
 export function indexCaps(state: GameState): Map<string, number> {
@@ -66,7 +66,6 @@ export function runMarkets(state: GameState): void {
   withMarks(state, () => {
     const before = indexCaps(state);
     const shock = drawMarketShock(rng, phase);
-    state.market.shock = shock;
     moveCompanies(state, rng, phase, shock);
     priceRivalShares(state, rng, phase, shock);
     chainIndex(state, before, true);

@@ -4,7 +4,6 @@
 import {
   DEPT_SALARY_RANGE,
   DEPT_SALARY_STEP,
-  FEATURES,
   FLOOR_FITOUT,
   FLOOR_FITOUT_LIFE_WEEKS,
   MAIN_OFFICES_MAX,
@@ -38,12 +37,11 @@ export function floorFitout(state: GameState, cityId: string): number {
 }
 
 /**
- * Whether a department's floor can be added: the core departments always, the
- * Executive suite and Investment floor with their FEATURES flags.
+ * Whether a department's floor can be added: the core departments, the
+ * Executive suite and the Investment floor.
  */
 export function deptAvailable(id: DeptId): boolean {
-  if (id === 'executive') return FEATURES.capitalMarkets;
-  if (id === 'investment') return FEATURES.investments;
+  if (id === 'executive' || id === 'investment') return true;
   return (HQ_DEPTS as readonly string[]).includes(id);
 }
 

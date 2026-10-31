@@ -3,7 +3,7 @@
 // be added, and what releasing a floor or a whole office would do (staff let go
 // with severance, fit-out written off, deposit back). Nothing here mutates
 // GameState; the release previews mirror src/sim/commands/hq.ts.
-import { FEATURES, SEVERANCE_WEEKS, WEEKS_PER_YEAR, type FeatureId } from '../../config/balance';
+import { SEVERANCE_WEEKS, WEEKS_PER_YEAR } from '../../config/balance';
 import { DEPARTMENTS, DEPT_ORDER } from '../../data/departments';
 import { assetBookValue } from '../../sim/balanceSheet';
 import { deptAvailable } from '../../sim/commands';
@@ -37,10 +37,9 @@ export function floorDesks(office: Pick<Office, 'desksPerFloor'>, dept: DeptId):
   return DEPARTMENTS[dept].fixedDesks ?? office.desksPerFloor;
 }
 
-/** Departments whose floors can be fitted out in this build (HQ on, and each floor's stage on). */
-export function addableDepts(features: Record<FeatureId, boolean> = FEATURES): DeptId[] {
-  if (!features.hq) return [];
-  return DEPT_ORDER.filter((d) => deptAvailable(d) && features[DEPARTMENTS[d].feature]);
+/** Departments whose floors can be fitted out in this build. */
+export function addableDepts(): DeptId[] {
+  return DEPT_ORDER.filter((d) => deptAvailable(d));
 }
 
 export function usedFloors(office: Office): number {

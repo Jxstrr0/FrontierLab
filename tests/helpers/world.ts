@@ -17,8 +17,6 @@ export interface WorldBank {
 export function worldBank(seed = 42): WorldBank {
   const s = newGame({ seed, cityId: 'cal', bankName: 'Globe Bank' });
   addCapital(s, 20_000_000);
-  // C3b: the Loan Desk lends only what treasury reserves hold.
-  cmd.topUpLendingFund(s, 12_000_000);
   const cal = openScriptedBranch(s, 'midtown');
   fly(s, 'nyc');
   const nyc = openScriptedBranch(s, 'midtown');

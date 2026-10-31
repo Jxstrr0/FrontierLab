@@ -30,7 +30,7 @@ export type Pentagon = [number, number, number, number, number]; // 1–10; axis
 ```ts
 export interface GameState {
   schemaVersion: number;              // bump on any shape change + add migration
-  meta: { saveName: string; bankName: string; monogram: string; brandInk: string;
+  meta: { bankName: string; monogram: string; brandInk: string;
           founderName: string; founderAvatar: AvatarSpec; seed: number; startDate: string; createdWith: string };
   clock: { day: number; week: Week; speed: 0|1|2|4; pausedReason?: string };
   rng: Record<string, number[]>;      // sfc32 state per stream name
@@ -43,7 +43,6 @@ export interface GameState {
   people: People;
   products: ProductsState;
   underwriting: UnderwritingState;
-  treasury: Treasury;
   partnerships: Record<Id, Partnership>;
   corporateDebt: CorporateDebt;       // venture debt and credit lines (SIMULATION §19.9), below
   dealDesk: { rfps: Record<Id, Rfp> };      // C5b (schema 13); was loanDesk { applications, loans }
@@ -70,7 +69,7 @@ export interface World {
   countries: Record<CountryId, CountryState>;
   cities: Record<Id, CityState>;
   lots: Record<Id, Lot>;              // all cities; generated lazily on first visit (seeded)
-  travel: { kmThisWeek: number; totalKm: number; flights: number; faresPaid: Money };   // Stage 8; flights are instant
+  travel: { kmThisWeek: number; flights: number };   // Stage 8; flights are instant
 }
 export interface CountryState {
   id: CountryId; phase: Phase; weeksInPhase: number;
@@ -90,7 +89,7 @@ export interface Lot {
   special?: 'centralBank'|'rivalHq'|'investmentBank'|'creditBureau'|'agency'|'lobby'|'convention'
           |'university'|'employer'|'autoDealer'|'auctionHouse'|'stadium'|'airport'|'vacationHome';
   specialRef?: Id;                    // e.g. rival id, employer id
-  footTraffic: number; mix: SegmentMix; incomeIndex: number; homeownerShare: Pct;
+  footTraffic: number; mix: SegmentMix; incomeIndex: number;
   weeklyRent?: Money; deposit?: Money; sqm?: number; askingPrice?: Money; floors?: number;
   occupant?: { type: 'player'|'rival'; id: Id };
   buildingSeed: number;               // drives procedural art
@@ -105,7 +104,7 @@ export interface Company {
   sharePrice: Money; sentiment: number; privateRounds: number; lastRoundWeek?: Week;
   taxPayable: Money; taxLossCarry: Money; dividendsPayable: Money;
   goodwill: Money; intangibles: Money; fixedAssets: FixedAsset[];
-  tier: Tier; tierWeeks: number; liquidityRatio: number;
+  tier: Tier; tierWeeks: number;
   appRating: Stars; riskAppetite: 1|2|3|4|5; /* the launch posture, SIMULATION §16.8 */ applyRatesToAll: boolean; companyPrices: Record<string, number>;
 }
 export interface FixedAsset { id: Id; kind: 'fitout'|'equipment'|'officeFitout'; cost: Money; lifeWeeks: number; ageWeeks: number; ownerId: Id }
@@ -131,13 +130,13 @@ export interface Branch {
 }
 export interface Book {
   accounts: number; balance: Money; bookRate: Rate; pd: Rate; lgd: Pct;
-  last: { newAccounts: number; newVolume: Money; deltaAccounts: number; churned: number; defaulted: Money };
+  last: { newAccounts: number; newVolume: Money; deltaAccounts: number; churned: number };
 }
 export interface BranchPnl {
   week: Week; revenue: Money; income: Money;
   // C3b (schema 7): AI revenue lines and the compute bill; funding transfers dropped.
   lines: Record<'plans'|'api'|'apps'|'loanDesk'|'otherIncome'|'compute'
-              |'losses'|'staff'|'manager'|'rent'|'marketing'|'equipment'|'servicing'|'overhead', Money>;
+              |'staff'|'manager'|'rent'|'marketing'|'equipment'|'servicing'|'overhead', Money>;
 }
 export interface ReviewCard { week: Week; category: 'rates'|'products'|'service'|'branch'; stars: number; text: string; portraitSeed: number }
 ```
@@ -181,18 +180,10 @@ export interface UnderwritingState {
 }
 ```
 
-## 6. Treasury, partnerships, Loan Desk
+## 6. Partnerships, corporate debt, Deal Desk
 
 ```ts
-export interface Treasury {
-  reserves: Money; // 0 in new games (C8f); only bank-era saves with funding still hold any
-  liqTarget: Pct; autoFunding: boolean; freeze: boolean;
-  lots: FundingLot[]; offers: FundingOffer[]; offersRefreshWeek: Week;
-  overnight: Money; window: Money; windowStigmaWeeks: number;
-}
-export interface FundingLot { id: Id; type: string; counterparty: string; amount: Money; rate: Rate; startWeek: Week; maturityWeek: Week; radar: Pentagon }
-export interface FundingOffer extends Omit<FundingLot, 'startWeek'|'maturityWeek'> { termWeeks: number; expiresWeek: Week }
-
+// The bank treasury (reserves, funding lots and offers, overnight and window borrowing) went in schema 38.
 export interface Partnership {
   id: Id; employerId: Id; cityId: Id; hostBranchId: Id; packageProductId: string;
   startWeek: Week; lengthWeeks: number; fee: Money; health: Score; lowHealthWeeks: number;
@@ -226,7 +217,7 @@ export interface RivalBank {
   cash: Money; costs: Money /* last week's running costs; runway = cash ÷ costs */; negativeQuarters: number;
   equity: Money;                                 // cash + offices at replacement value (synced weekly, schema 23)
   listed: boolean; ticker?: string; shares: number; price: Money; execs: { title: string; name: string }[];
-  status: 'active'|'distressed'|'seized'|'acquired'|'merged'; priceLags: Record<string, { target: number; weeksLeft: number }>;
+  status: 'active'|'distressed'|'seized'|'acquired'|'merged';
   home?: CountryId[]; charteredWeek?: Week;      // labs founded during play (v37)
   mergedInto?: Id;                               // set with status 'merged' (v37)
   campaigns?: Record<Id /*city*/, { boost: number; weeksLeft: number }>;   // rival ads (v37)
@@ -284,10 +275,10 @@ export interface Incident { id: Id; type: string; scope: Id; createdWeek: Week; 
 export interface LedgerIssue { week: Week; date: string; articles: { tab: string; icon: string; headline: string; body: string; priority: number }[] }
 export interface WeeklySnapshot {
   week: Week; revenue: Money; netIncome: Money; cashFlow: { ops: Money; investing: Money; financing: Money; net: Money };
-  totals: { assets: Money; arr?: Money; deposits: Money; loans: Money; equity: Money };  // arr from schema 6; rwa dropped at schema 24
+  totals: { assets: Money; arr?: Money; equity: Money; taxPayable: Money };  // arr from schema 6; rwa dropped at schema 24; deposits, loans and liquid at 38
   pnl: Record<string, Money>; delayed: boolean;
 }
-export interface QuarterReport { year: number; q: 1|2|3|4; revenue: Money; netIncome: Money; eps: number; roe: number }
+export interface QuarterReport { year: number; q: 1|2|3|4; revenue: Money; netIncome: Money; eps: number }
 export interface Settings {
   currency: '$'|'C$'|'£'|'€'|'¥'; units: 'km'|'mi'; weeklyResults: 'weekly'|'monthly'|'quarterly'|'off';
   defaultSpeed: 1|2|4; autoPauseIncidents: boolean; autoPauseApplications: boolean;
@@ -338,7 +329,7 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 | Offices and departments | `leaseOffice`, `addFloor`, `releaseFloor`, `setDeptTarget`, `setDeptSalary`, `setBenefit` |
 | Finance floor | `setRiskAppetite` (the launch posture, 1–5) |
 | Products floor | `startDevelopment`, `cancelDevelopment`, `deleteProduct`, `buyBureauModel`, `commissionBureauModel`, `saveCustomModel`, `activateModel` |
-| Treasury | `setTreasuryPolicy`, `borrowOffer`, `repayLot`, `topUpLendingFund`, `borrowWindow`, `repayWindow` |
+| Compute floor | `rentGpus`, `setAutoSpotBuy`; data centers: `buildDataCenter`, `upgradeDataCenter`, `renameDataCenter`, `closeDataCenter` |
 | Partnerships and partners | `signPartnership` (student; payroll refused since schema 33), `renewPartnership`, `releasePartnership`, `startGradProgram`, `endGradProgram` |
 | Marketing and lobbying | `startBrandCampaign`, `buyAgencyPackage`, `startLobbying` (was `lobby`) |
 | Corporate borrowing (investment bank Debt tab) | `acceptCorporateLoan`, `repayCorporateLoan`, `drawCredit(lenderSiteId, amount)`, `repayCredit(lenderId, amount)` (repaying works for any lender, old rival lines included) |
@@ -354,6 +345,8 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
 `src/sim/state.ts` is the source of truth; this section records how it differs from the guide above. Later stages add the rest with a schema bump and a migration.
 
 **Frontier Lab renumbering (stage C0, 2026-10-26):** the state below is Vault Street's final shape (its schema v38), renumbered as Frontier Lab schema 1. Vault Street's 37 migration steps were dropped, so the schema numbers and migrations mentioned in the entries below are history only.
+
+**Frontier Lab schema 38 (cleanup, the bank's weight removed):** `GameState.treasury` (reserves, `liqTarget`, `autoFunding`, `freeze`, funding `lots` and `offers`, `overnight`, `window`, `windowStigmaWeeks`) and the `Treasury`, `FundingLot` and `FundingOffer` types are gone, with `company.liquidityRatio`, `risk.losses` (the loss records) and the `funding` RNG stream. `CountryState` loses `prevFtpShort`, `prevFtpLong`, `cardAnchor` and `startPolicy`; `RivalBank` loses `priceLags` (rival prices drift straight to target). The P&L lines `reserveInterest`, `bondCoupon`, `depositInterest`, `wholesaleInterest`, `wealthFees`, `originationFees` and `realizedGains` and the office row line `losses` are gone; `WeeklySnapshot` loses `netRevenue` and `totals.deposits`/`loans`/`liquid`. Write-only fields go too: `meta.saveName`, `world.travel.totalKm`/`faresPaid`, `Lot.homeownerShare`, `Book.last.defaulted`/`defaultedLoans`, `stock.ipoPrice`, `market.shock`, `richList.lastRankWeek`, `MergerOffer.madeWeek` and `QuarterReport.roe`. Migration 37 → 38 (`src/sim/save/migrateBankWeight.ts`, the owner's rule "fold into cash"): `cash += reserves − (overnight + window + Σ lot amounts)`, then drops `treasury`, so assets and liabilities fall by the same amount and equity is unchanged; the old P&L lines fold, in the open ledger and every weekly record, into `ventureDebtInterest` (reserve interest, bond coupons), `corporateInterest` (deposit and wholesale interest), `dividendIncome` (wealth and origination fees) and `investmentGains` (realized gains), and every other field above is deleted. Older migrations reach the treasury through `legacyTreasury()` (`src/sim/save/legacyTreasury.ts`). Commands `setTreasuryPolicy`, `borrowOffer`, `repayLot`, `topUpLendingFund`, `borrowWindow` and `repayWindow` are gone; events `WINDOW_USE` and `FUNDING_MATURED` are no longer raised.
 
 **Frontier Lab schema 4 (stage C2c, data centers):** `dataCenters: Record<Id, DataCenter>` (`id`, `cityId`, `lotId?` or `siteId?`, `name`, `status` fitout/open, `weeksLeft`, `builtWeek`, `openedWeek?`, `build { hall, power, cooling }` part ids, `lease { weeklyRent, deposit }`). A data center on a storefront sets that lot's occupant to `{ type: 'player', id: <data center id> }`, so code that reads a player occupant checks `dataCenters` before `branches`. Its parts are fixed assets owned by its id. Migration 3 → 4 adds an empty table. Events `DATA_CENTER_STARTED { dataCenterId, name, city, site, weeks }`, `DATA_CENTER_OPENED { …, gpus, refit }`, `DATA_CENTER_UPGRADED { …, slot, part }`, `DATA_CENTER_CLOSED`. Commands `buildDataCenter`, `upgradeDataCenter`, `renameDataCenter`, `closeDataCenter`.
 
@@ -477,11 +470,11 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
   - The drawable city (streets, water, parks, landmarks, building heights) is not saved: `src/art/citygen.ts` regenerates it from the save seed, the city and its lots.
   - `Branch.desk` (`DeskWeek`: `week`, `arrived` (v12), `approved`, `refused`, `declined`, `expired`): this week's Loan Desk outcomes, reset when the week turns (schema v3; migration 2 → 3 adds an empty tally).
   - `company.negativeCashWeeks`, `company.lowCapitalWeeks`: counters for the game-over checks (schema v2).
-  - `company.retainedEarnings`, `company.leaseDeposits` (an asset). `company.liquidityRatio` is `null` while there are no deposits.
-  - `CountryState`: `hpiHistory`, `prevFtpShort`/`prevFtpLong` (to detect moves), `cardAnchor`, `startPolicy`, `feeIndex`, `marketReturn`, `nominal` (v33), `listIndex` (v35), `forceRecessionAtWeek`.
+  - `company.retainedEarnings`, `company.leaseDeposits` (an asset).
+  - `CountryState`: `hpiHistory`, `feeIndex`, `marketReturn`, `nominal` (v33), `listIndex` (v35), `forceRecessionAtWeek`.
   - `Lot.address`; `Branch.builtDay`, `Branch.last` (prospects, captured, served, share); `ReviewCard` unchanged.
   - `LoanApplication.estPd` (the noisy estimate behind the risk band); `BusinessLoan.payment`.
-  - `QuarterReport.endWeek`; `WeeklySnapshot.netRevenue`, `capitalRatio`, `tier`, `totals.liquid`, `totals.taxPayable`.
+  - `QuarterReport.endWeek`; `WeeklySnapshot.capitalRatio`, `tier`, `totals.taxPayable`.
   - `people.managerCandidates` and `candidatesRefreshWeek` are keyed by city.
 - **Changed:** rival rate sheets live on `RivalBank.prices` (one sheet per bank), not per branch. `RivalBranch` carries `cityId` and `overall`.
 - **Commands:** `leaseStorefront` is folded into `buildBranch`, which leases and builds in one step (DESIGN §7). Stage 1 also has `renameBranch`, `fireManager`, `setManagerSalary`, `setRiskAppetite`, `decideApplication` and `declineApplication`.

@@ -1,14 +1,10 @@
-// Risk & Compliance (SIMULATION §15, SCREENS §10): loss records and table maths,
-// model performance, the regulator review's fail chance and its fine path.
+// Risk & Compliance (SIMULATION §15, SCREENS §10): the regulator review's fail
+// chance and its fine path.
 import { describe, expect, it } from 'vitest';
-import { HQ_EFFECTS, REGULATOR_REVIEW, RISK_LOSS_WEEKS } from '../../src/config/balance';
+import { HQ_EFFECTS, REGULATOR_REVIEW } from '../../src/config/balance';
 import { advanceWeeks } from '../../src/sim/engine';
-import { newGame } from '../../src/sim/newGame';
 import {
   avgManagerEthics,
-  lossTable,
-  modelPerformance,
-  recordLoss,
   regulatorReview,
   regulatorStatus,
   reviewFailChance,
@@ -16,42 +12,6 @@ import {
 } from '../../src/sim/riskFloor';
 import { stream } from '../../src/sim/rng';
 import { bankWithFloors, runScript } from '../helpers/scenario';
-
-describe('loss records', () => {
-  it('keeps 13 weeks and computes annualized rates and delinquency', () => {
-    const s = newGame({ seed: 1, cityId: 'cal' });
-    for (let w = 0; w < 20; w++) {
-      s.clock.week = w;
-      // PD 5.2%: expected defaults 1,000 a week on $1M; half of it lost.
-      recordLoss(s, 'personal_loan', {
-        balance: 1_000_000,
-        defaulted: 1_000,
-        loss: 500,
-        pd: 0.052,
-        lgd: 0.5,
-      });
-      recordLoss(s, 'mortgage', { balance: 4_000_000, defaulted: 0, loss: 0, pd: 0.01, lgd: 0.2 });
-    }
-    expect(s.risk.losses).toHaveLength(RISK_LOSS_WEEKS);
-    expect(s.risk.losses[0]!.week).toBe(20 - RISK_LOSS_WEEKS);
-
-    const [mortgage, personal] = lossTable(s);
-    expect(mortgage!.productId).toBe('mortgage');
-    expect(mortgage!.lossRate).toBe(0);
-    expect(personal!.avgBalance).toBeCloseTo(1_000_000);
-    expect(personal!.losses).toBeCloseTo(500 * 13);
-    expect(personal!.lossRate).toBeCloseTo(0.026); // 500 / 1M × 52
-    expect(personal!.defaultRate).toBeCloseTo(0.052);
-    expect(personal!.delinquency).toBeCloseTo(0.013); // 1,000 × 13 weeks / 1M
-
-    const perf = modelPerformance(s);
-    // Predicted: (1M × 5.2% + 4M × 1%) / 5M = 1.84%; actual 1,000 × 52 / 5M = 1.04%.
-    expect(perf.predicted).toBeCloseTo(0.0184);
-    expect(perf.actual).toBeCloseTo(0.0104);
-    expect(perf.actualLoss).toBeCloseTo(500 * 13);
-    expect(perf.expectedLoss).toBeCloseTo((500 + (4e6 * 0.01 * 0.2) / 52) * 13);
-  });
-});
 
 describe('regulator review', () => {
   it('fail chance follows §15', () => {

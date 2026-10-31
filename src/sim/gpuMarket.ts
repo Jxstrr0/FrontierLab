@@ -1,21 +1,33 @@
 // The GPU market on the Compute floor (stage C4b, SIMULATION §13.0): GPU cloud
 // providers offer reservations of rented GPUs at a fixed weekly price, a
 // discount on today's spot price for locking in a term. Offers refresh every
-// GPU_MARKET.refreshWeeks while you have the floor, counted like funding
-// offers. Rented GPUs join your own data centers in covering office demand,
+// GPU_MARKET.refreshWeeks while you have the floor, more with better floor
+// coverage and an expert CFO. Rented GPUs join your own data centers in covering office demand,
 // and every active lot is billed to the compute line each week.
 import { GPU_MARKET, SPOT } from '../config/balance';
 import { GPU_LOT_TYPES, GPU_PROVIDERS, type GpuLotSpec } from '../data/gpuLots';
 import { spotPrice } from './compute';
-import { hasTreasuryFloor, offerCount } from './fundingMarket';
 import { newId } from './ids';
 import { noise, roundToStep } from './math';
 import { stream } from './rng';
 import type { GameState, GpuOffer } from './state';
 
+/** The GPU market needs a Compute floor (department id 'treasury'), whatever its staffing. */
+export function hasTreasuryFloor(state: GameState): boolean {
+  return state.departments.treasury !== undefined;
+}
+
 /** Compute floor coverage k′ (1 while requirements don't apply). */
 function floorCoverage(state: GameState): number {
   return state.hq.coverage.treasury?.kPrime ?? 1;
+}
+
+/** §13.0: base + floor(perCoverage × coverage′) + (CFO expertise ≥ cfoExpertise ? cfoBonus : 0). */
+export function offerCount(state: GameState): number {
+  const o = GPU_MARKET.offers;
+  const cfo = state.executives.seats.cfo;
+  const cfoBonus = cfo && cfo.expertise >= o.cfoExpertise ? o.cfoBonus : 0;
+  return o.base + Math.floor(o.perCoverage * Math.min(1, floorCoverage(state))) + cfoBonus;
 }
 
 /** §13.0: the price per GPU-week a type would carry today, before noise. */

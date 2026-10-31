@@ -1,66 +1,7 @@
-// Pure view helpers for the Treasury floor (SCREENS §10, SIMULATION §13): the
-// liquidity gauge's positions and status, friendly term text, and a "nice"
-// step for amount sliders. No state access, so they are easy to test.
+// Pure view helpers for the Compute floor and credit lines (SCREENS §10):
+// friendly term text and a "nice" step for amount sliders. No state access,
+// so they are easy to test.
 import { WEEKS_PER_YEAR } from '../../../config/balance';
-
-/** The gauge runs from 0 to this liquidity ratio (the top of the target range plus room). */
-export const GAUGE_MAX = 0.5;
-
-export type LiquidityStatus = 'none' | 'below' | 'low' | 'ok' | 'high';
-
-export interface LiquidityGauge {
-  status: LiquidityStatus;
-  /** Marker, minimum and target positions along the bar, 0–1. */
-  marker: number;
-  min: number;
-  target: number;
-  /** True when the ratio is beyond the end of the bar. */
-  offScale: boolean;
-}
-
-const frac = (x: number) => Math.max(0, Math.min(1, x / GAUGE_MAX));
-
-/**
- * Where the liquidity ratio sits against the 10% minimum and the player's
- * target (SIMULATION §13.3, §13.5). `buffer` is how far above target Treasury
- * starts repaying wholesale funding (LIQ_REPAY_BUFFER); beyond it the cash is idle.
- */
-export function liquidityGauge(
-  lr: number | null,
-  min: number,
-  target: number,
-  buffer: number,
-): LiquidityGauge {
-  const status: LiquidityStatus =
-    lr === null
-      ? 'none'
-      : lr < min
-        ? 'below'
-        : lr < target
-          ? 'low'
-          : lr <= target + buffer
-            ? 'ok'
-            : 'high';
-  return {
-    status,
-    marker: lr === null ? 1 : frac(lr),
-    min: frac(min),
-    target: frac(target),
-    offScale: lr === null || lr > GAUGE_MAX,
-  };
-}
-
-/** Status label and tone for the gauge badge. */
-export const LIQUIDITY_STATUS: Record<
-  LiquidityStatus,
-  { label: string; tone: 'good' | 'warn' | 'bad' | 'info' }
-> = {
-  none: { label: 'Nothing to measure', tone: 'info' },
-  below: { label: 'Below minimum', tone: 'bad' },
-  low: { label: 'Under target', tone: 'warn' },
-  ok: { label: 'On target', tone: 'good' },
-  high: { label: 'Above target', tone: 'info' },
-};
 
 /** 26 → "26 weeks", 52 → "1 year", 260 → "5 years", 78 → "78 weeks". */
 export function termText(weeks: number): string {

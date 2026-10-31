@@ -3,13 +3,32 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** audit fixes (v0.1.59, save schema 37). After the owner's review batches, an audit of clunky spots, content gaps and over-complexity; the owner asked for all of it. Batches A (pacing, popups and navigation) and B (content top-ups) are in; the bank-leftover cleanup with the treasury removal, and the awareness and quality merges follow. The Kelbo.Website hub card still needs its own session in that repo.
+**Current stage:** audit fixes (v0.1.60, save schema 38). After the owner's review batches, an audit of clunky spots, content gaps and over-complexity; the owner asked for all of it. Batches A (pacing, popups and navigation), B (content top-ups) and C (bank-leftover cleanup) are in; the awareness and quality merges follow. The Kelbo.Website hub card still needs its own session in that repo.
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `09a419ef2772cf` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `165b497d024061` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-31 — Audit batch C: bank-leftover cleanup (v0.1.60)
+
+The game still carried a hidden bank treasury from Vault Street that no new game could use. It's gone, along with other dead weight: about 2,100 lines lighter. Old saves load and are upgraded (save schema 37 → 38).
+
+**The treasury is gone.** Reserves, overnight loans from the central bank, the emergency window, a wholesale funding market and a liquidity ratio: none of it worked without bank deposits, which the lab doesn't have. Corporate cash is now the lab's only pot of money. If an old save still had treasury money, it is folded into cash as you chose: reserves are added and anything still owed is paid off, so the company's value doesn't change. The Compute floor is untouched (inside the code it shares the old "treasury" name).
+
+**Other dead weight removed.**
+- Bank rate machinery (deposit betas, delayed rate changes, rival price lags) that ran every week for a price nothing used.
+- Loss tracking on the Safety floor that nothing filled in.
+- Accounting lines that were always zero. Old saves move their numbers into the matching live lines. "Bad debts" is now "Write-offs".
+- On/off switches for game stages that were always on (about 20 files simpler).
+- Unused tuning numbers, saved fields nothing read, and three files that only re-exported other files.
+
+**New:** a data center can be renamed from its panel, using the same form as a sales office.
+
+**What moves:** from year 3 the numbers differ very slightly. The old rival price-lag code used up random draws, so later rival dice rolls fall differently. Steady, aggressive and stress on seed 42 still pass every target.
+
+**Checked:** lint, 1,195 tests (new `migrateBankWeight.test.ts` loads a schema-37 save with treasury money, checks the fold keeps the books balanced, plays four weeks and round-trips the save), type-check and build pass. In Chromium at 390×844 the main panels open with no console errors. The determinism snapshot moved to `165b497d024061`. That is intended: the save shape changed and the rival draws shifted.
 
 ### 2026-10-31 — Audit batch B: content top-ups (v0.1.59)
 

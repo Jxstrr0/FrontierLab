@@ -1,13 +1,13 @@
 // Pin data for the map (SCREENS §2, ART_DIRECTION §2): one entry per storefront
 // lot (your sales offices and data centers, rivals and open locations) in the
-// current city and, with the HQ stage (FEATURES.hq), per office building and
+// current city and per office building and
 // site (sitePins.ts), filtered by the Layers settings, plus the central bank
 // and airport landmarks, each with its roof anchor in world px and its
 // accessible label. An acquired office still converting wears the old lab's
 // ink with a progress ring. Types live in pinTypes.ts; what the renderer draws
 // on each lot in mapOccupants.ts. Read-only views of GameState.
 import type { CityMap } from '../../art/citygen';
-import { FEATURES, MERGERS, type FeatureId } from '../../config/balance';
+import { MERGERS } from '../../config/balance';
 import { LEASE_ONLY_KEY, layerOn } from '../../data/mapLayers';
 import type { Business, GameState, Lot, OfficeListing } from '../../sim/state';
 import { vendorCaption, vendorName } from '../business/businessView';
@@ -16,7 +16,7 @@ import { stadiumPins } from '../franchise/stadiumPin';
 import { airportPin, centralBankPin } from './landmarkPins';
 import { rivalShortName } from './markers';
 import { pinAnchor, type PinKind, type PinSpec } from './pinTypes';
-import { siteEnabled, siteLayer, sitePin, stage7Info } from './sitePins';
+import { siteLayer, sitePin, stage7Info } from './sitePins';
 
 export type { PinKind, PinSpec } from './pinTypes';
 
@@ -164,12 +164,7 @@ function officePin(s: GameState, map: CityMap, o: OfficeListing): PinSpec {
 }
 
 /** Pins for the city on screen, after the Layers settings, in stacking order. */
-export function buildPins(
-  s: GameState,
-  map: CityMap,
-  lots: Lot[],
-  features: Record<FeatureId, boolean> = FEATURES,
-): PinSpec[] {
+export function buildPins(s: GameState, map: CityMap, lots: Lot[]): PinSpec[] {
   const layers = s.settings.layers;
   const pins: PinSpec[] = [];
   const offices = layerOn(layers, 'branches');
@@ -188,40 +183,35 @@ export function buildPins(
       pins.push(lotPin(s, map, lot, pending));
     }
   }
-  if (features.competition && layerOn(layers, 'employers')) {
+  if (layerOn(layers, 'employers')) {
     for (const lot of lots) {
       const b = lot.occupant?.type === 'business' ? s.businesses[lot.occupant.id] : undefined;
       if (b && lot.cityId === map.cityId) pins.push(businessPin(s, map, lot, b));
     }
   }
-  if (features.hq) {
-    if (layerOn(layers, 'offices')) {
-      for (const o of Object.values(s.world.officeListings))
-        if (o.cityId === map.cityId) pins.push(officePin(s, map, o));
-    }
-    for (const site of Object.values(s.world.sites)) {
-      if (site.cityId !== map.cityId) continue;
-      if (!siteEnabled(site.kind, features)) continue;
-      // A seized, acquired or merged rival's head office leaves the map; a distressed one stays, faded.
-      const status = site.kind === 'rivalHq' ? s.rivals[site.refId]?.status : undefined;
-      if (status === 'seized' || status === 'acquired' || status === 'merged') continue;
-      if (!layerOn(layers, siteLayer(site))) continue;
-      const info = stage7Info(s, site);
-      if (info && !info.visible) continue;
-      pins.push(sitePin(s, map, site, info));
-    }
+  if (layerOn(layers, 'offices')) {
+    for (const o of Object.values(s.world.officeListings))
+      if (o.cityId === map.cityId) pins.push(officePin(s, map, o));
   }
-  if (features.competition && layerOn(layers, 'banks')) {
+  for (const site of Object.values(s.world.sites)) {
+    if (site.cityId !== map.cityId) continue;
+    // A seized, acquired or merged rival's head office leaves the map; a distressed one stays, faded.
+    const status = site.kind === 'rivalHq' ? s.rivals[site.refId]?.status : undefined;
+    if (status === 'seized' || status === 'acquired' || status === 'merged') continue;
+    if (!layerOn(layers, siteLayer(site))) continue;
+    const info = stage7Info(s, site);
+    if (info && !info.visible) continue;
+    pins.push(sitePin(s, map, site, info));
+  }
+  if (layerOn(layers, 'banks')) {
     const cb = centralBankPin(map);
     if (cb) pins.push(cb);
   }
   // Stage 9: club stadiums (Sports Teams layer).
-  if (features.personalEmpire && layerOn(layers, 'sportsTeams')) pins.push(...stadiumPins(s, map));
+  if (layerOn(layers, 'sportsTeams')) pins.push(...stadiumPins(s, map));
   // Stage 8: the airport is always on the map (SCREENS §18), whatever the Layers say.
-  if (features.multiCity) {
-    const ap = airportPin(map);
-    if (ap) pins.push(ap);
-  }
+  const ap = airportPin(map);
+  if (ap) pins.push(ap);
   return pins.sort(
     (a, b) => KIND_ORDER[a.kind] - KIND_ORDER[b.kind] || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0),
   );

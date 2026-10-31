@@ -3,13 +3,13 @@
 import { companyArr } from './arr';
 import { SAFETY, WEEKLY_HISTORY } from '../config/balance';
 import { COUNTRIES } from '../data/countries';
-import { balanceSheet, totalDeposits, loanTotals } from './balanceSheet';
+import { balanceSheet } from './balanceSheet';
 import { isFirstDayOfQuarter, previousQuarter } from './calendar';
 import { trailingRevenue } from './riskFloor';
 import { safetySnapshot } from './safety';
 import { emptyLedger, postCash, postPnl, spend, summarize } from './ledger';
 import type { GameState, WeeklySnapshot } from './state';
-import { homeCountry } from './treasury';
+import { homeCountry } from './homeCountry';
 
 /** Straight-line depreciation of every fixed asset (tick step 8). */
 export function depreciate(state: GameState): void {
@@ -45,7 +45,6 @@ export function closeWeek(state: GameState): WeeklySnapshot {
     week: state.clock.week,
     revenue: sum.revenue,
     netIncome: sum.netIncome,
-    netRevenue: sum.netRevenue,
     cashFlow: {
       ops: cash.ops,
       investing: cash.investing,
@@ -55,10 +54,7 @@ export function closeWeek(state: GameState): WeeklySnapshot {
     totals: {
       assets: bs.assets,
       arr: companyArr(state),
-      deposits: totalDeposits(state),
-      loans: loanTotals(state).total,
       equity: bs.equity,
-      liquid: bs.reserves,
       taxPayable: bs.taxPayable,
     },
     pnl: { ...state.ledger.pnl },
@@ -85,7 +81,6 @@ export function quarterEnd(state: GameState): void {
   const { year, q } = previousQuarter(state.meta.startDate, state.clock.day);
   const revenue = weeks.reduce((s, w) => s + w.revenue, 0);
   const netIncome = weeks.reduce((s, w) => s + w.netIncome, 0);
-  const equity = weeks.at(-1)?.totals.equity ?? 0;
   state.history.quarterly.push({
     endWeek,
     year,
@@ -93,7 +88,6 @@ export function quarterEnd(state: GameState): void {
     revenue,
     netIncome,
     eps: netIncome / state.company.sharesOutstanding,
-    roe: equity > 0 ? (netIncome * 4) / equity : 0,
   });
 
   const c = state.company;

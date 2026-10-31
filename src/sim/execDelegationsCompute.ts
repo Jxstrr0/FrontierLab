@@ -9,7 +9,7 @@ import { CTO_COMPUTE, GPU_MARKET } from '../config/balance';
 import { rentGpus } from './commands/compute';
 import { capacityGpus, spotPrice } from './compute';
 import { usableGpus } from './dataCenters';
-import { hasTreasuryFloor } from './fundingMarket';
+import { hasTreasuryFloor } from './gpuMarket';
 import type { ChipPhase, GameState, GpuOffer } from './state';
 
 /** GPUs outside spot, counting data centers still in fit-out. */

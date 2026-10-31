@@ -1,4 +1,4 @@
-/* Treasury floor styles (SCREENS §10, ART_DIRECTION §1 and §5). */
+/* Compute floor styles (SCREENS §10, ART_DIRECTION §1 and §5): GPU lot and offer cards, partnership cards and the amount slider. */
 .tr-floor .card + .card,
 .tr-floor .stack > .card + .card {
   margin-top: 0;
@@ -8,20 +8,12 @@
   flex-direction: column;
   gap: var(--space-2);
 }
-.tr-card-title {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: var(--text-16);
-}
 .tr-under {
   margin: 0;
   text-align: center;
 }
-.tr-rows {
-  margin-top: var(--space-2);
-}
 
-/* ─── Funding freeze banner ────────────────────────────────────────────── */
+/* ─── Compute alarm banner ───────────────────────────────────────────── */
 .tr-banner {
   padding: var(--space-3) var(--space-4);
   border: 1px solid var(--oxblood);
@@ -32,91 +24,7 @@
   line-height: var(--line-body);
 }
 
-/* ─── Liquidity gauge ──────────────────────────────────────────────────── */
-.tr-gauge-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: var(--space-2);
-}
-.tr-gauge {
-  position: relative;
-  height: 14px;
-  margin-top: var(--space-2);
-  border: 1px solid var(--hairline);
-  border-radius: var(--radius-pill);
-  background: var(--vault-deep);
-  overflow: visible;
-}
-.tr-gauge-danger {
-  position: absolute;
-  inset: 0 auto 0 0;
-  border-radius: var(--radius-pill) 0 0 var(--radius-pill);
-  background: repeating-linear-gradient(135deg, rgb(158 61 61 / 35%) 0 2px, transparent 2px 5px);
-}
-.tr-gauge-fill {
-  position: absolute;
-  inset: 2px auto 2px 0;
-  border-radius: var(--radius-pill);
-  background: var(--brass);
-}
-.tr-gauge-below {
-  background: var(--oxblood);
-}
-.tr-gauge-ok {
-  background: var(--jade);
-}
-.tr-gauge-none {
-  background: var(--ivory-dim);
-  opacity: 0.4;
-}
-.tr-gauge-tick {
-  position: absolute;
-  top: -5px;
-  bottom: -5px;
-  width: 2px;
-  margin-left: -1px;
-  background: var(--oxblood);
-}
-.tr-gauge-tick.is-target {
-  background: var(--brass-light);
-}
-.tr-gauge-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-1) var(--space-3);
-  margin-top: var(--space-2);
-  color: var(--ivory-dim);
-}
-.tr-gauge-legend span::before {
-  content: '';
-  display: inline-block;
-  width: 2px;
-  height: 12px;
-  margin-right: 6px;
-  vertical-align: -2px;
-}
-.tr-legend-min::before {
-  background: var(--oxblood);
-}
-.tr-legend-target {
-  color: var(--brass-light);
-}
-.tr-legend-target::before {
-  background: var(--brass-light);
-}
-.tr-gauge-legend .muted::before {
-  display: none;
-}
-
-/* ─── Policy ───────────────────────────────────────────────────────────── */
-.tr-policy {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-/* ─── Funding lot and offer cards ──────────────────────────────────────── */
+/* ─── GPU lot and offer cards ────────────────────────────────────────── */
 .tr-fund-head {
   display: flex;
   justify-content: space-between;
@@ -244,13 +152,4 @@
 }
 .amount-slider.is-disabled {
   opacity: 0.5;
-}
-
-/* ─── Central bank facility ────────────────────────────────────────────── */
-.tr-facility {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  padding-top: var(--space-3);
-  border-top: 1px solid var(--hairline);
 }

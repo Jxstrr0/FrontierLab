@@ -12,7 +12,7 @@ import { postCash } from './ledger';
 import { stream } from './rng';
 import { issueShares } from './shares';
 import type { GameState, Shareholder } from './state';
-import { homeCountry } from './treasury';
+import { homeCountry } from './homeCountry';
 
 /** The holder that stands for every outside shareholder once you are listed. */
 export const PUBLIC_HOLDER: Omit<Shareholder, 'shares'> = {
@@ -104,7 +104,6 @@ export function listPendingIpo(state: GameState): boolean {
   stock.ticker = makeTicker(state);
   stock.exchange = homeExchange(state);
   stock.listedWeek = state.clock.week;
-  stock.ipoPrice = ipo.price;
   stock.price = open;
   stock.sentiment = 1;
   stock.history = [open];

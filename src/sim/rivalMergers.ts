@@ -126,7 +126,6 @@ export function mergeRivals(
   target.status = 'merged';
   target.mergedInto = buyer.id;
   target.priceWar = {};
-  target.priceLags = {};
   delete target.campaigns;
   refreshRivalFinances(state, buyer);
   refreshRivalFinances(state, target);

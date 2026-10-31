@@ -15,7 +15,7 @@ import { clamp, roundToStep } from './math';
 import { stream } from './rng';
 import { runwaySnapshot } from './runway';
 import type { CorporateDebt, GameState, Site } from './state';
-import { homeCountry } from './treasury';
+import { homeCountry } from './homeCountry';
 
 export function emptyCorporateDebt(): CorporateDebt {
   return { loans: {}, lines: {}, offers: [], offersRefreshWeek: -1 };

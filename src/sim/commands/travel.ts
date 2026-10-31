@@ -34,9 +34,7 @@ export function travelTo(
   if (q.mode === 'fare') {
     state.personal.cash -= q.personalPays;
     if (q.bankPays > 0) spend(state, 'travel', q.bankPays);
-    t.faresPaid += q.fare;
   }
-  t.totalKm += q.km;
   t.flights += 1;
   const firstVisit = !isGenerated(state, cityId);
   generateCity(state, cityId, { firstListings: true });

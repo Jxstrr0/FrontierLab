@@ -1,15 +1,15 @@
 // Finance floor content (SCREENS §10, DESIGN §5.8.1): total revenue and net
 // income with the weekly change, a 5-week bar chart, the company statements
-// (Income / Balance sheet / Cash flow × Week / Quarter / Year), the credit
-// ratio meter, the liquidity ratio and the risk appetite dial. Weeks a short-staffed team hasn't
-// closed (statementDelayWeeks) show as "Delayed" instead of numbers.
+// (Income / Balance sheet / Cash flow × Week / Quarter / Year) and the runway
+// meter. Weeks a short-staffed team hasn't closed (statementDelayWeeks) show
+// as "Delayed" instead of numbers.
 import { runwaySnapshot } from '../../sim/runway';
 import { statementDelayWeeks } from '../../sim/hq';
 import { Badge, BarChart, Card, Row, SectionTitle } from '../components';
 import { dayOfWeek } from '../branch/selectors';
 import { RUNWAY_LABEL, RUNWAY_TONE, RunwayMeter } from '../company/RunwayMeter';
 import { Statements } from '../company/Statements';
-import { delta, money, pct, runwayText, shortDate } from '../format/format';
+import { delta, money, runwayText, shortDate } from '../format/format';
 import { useGame } from '../store';
 
 const CHART_WEEKS = 5;
@@ -28,7 +28,6 @@ export function FinanceFloor() {
     income: w.netIncome,
   }));
   const runway = runwaySnapshot(s);
-  const liq = s.company.liquidityRatio;
 
   return (
     <div class="stack">
@@ -80,12 +79,6 @@ export function FinanceFloor() {
           ARR; the regulator looks at the safety ratio on the Safety floor instead.
         </p>
       </Card>
-      {liq !== null && (
-        <Card>
-          <Row label="Liquidity ratio" value={pct(liq, 1)} strong />
-          <Row label="Target" value={pct(s.treasury.liqTarget, 1)} tone="dim" />
-        </Card>
-      )}
 
       <SectionTitle>Statements</SectionTitle>
       <Statements state={s} delayWeeks={delay} />

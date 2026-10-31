@@ -3,7 +3,7 @@
 // transfer market; for yours the weekly finances and kit sponsorship, which
 // raises your bank's brand awareness across the club's country (SIMULATION §7).
 // Stream: `franchise`.
-import { FRANCHISE } from '../config/balance';
+import { FRANCHISE, WEEKS_PER_YEAR } from '../config/balance';
 import { CITIES } from '../data/cities';
 import { FRANCHISES, SPORT_DRAWS, type FranchiseSpec } from '../data/franchises';
 import { pushEvent } from './events';
@@ -28,7 +28,6 @@ import { stream, type Rng } from './rng';
 import type { ClubState, GameState } from './state';
 
 const F = FRANCHISE;
-const WEEKS_PER_YEAR = 52;
 const MOOD_MID = 50;
 
 /** Every club with its outside owner and squad (newGame and migration 9 → 10). */

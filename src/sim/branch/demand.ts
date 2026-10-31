@@ -108,11 +108,9 @@ export function shareOf(state: GameState, branch: Branch): number {
 export function approvalOf(state: GameState, spec: ProductSpec): number {
   if (!needsApproval(spec)) return 1;
   const model = activeModel(state);
-  const fundingGate = state.treasury.freeze ? 0 : 1;
   return (
     (spec.baseApproval ?? 0) *
-    (APPROVAL_INCLUSION.base + APPROVAL_INCLUSION.slope * model.radar[RADAR.breadth]) *
-    fundingGate
+    (APPROVAL_INCLUSION.base + APPROVAL_INCLUSION.slope * model.radar[RADAR.breadth])
   );
 }
 

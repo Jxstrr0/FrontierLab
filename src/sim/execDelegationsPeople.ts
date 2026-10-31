@@ -31,11 +31,8 @@ import {
   staffMods,
 } from './hq';
 import { brandCampaignCost, brandCampaignsWeeklyCost, hasMarketingFloor } from './hqMarketing';
-import { companyLossRate } from './riskFloor';
 import type { GameState } from './state';
 import { weeklyRevenue } from './execDelegationsFinance';
-
-export { companyLossRate };
 
 // ─── COO ──────────────────────────────────────────────────────────────────────
 

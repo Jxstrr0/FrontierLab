@@ -1,7 +1,7 @@
 // The Weekly Ledger's templates for governance stories (Stage 6, CONTENT §23):
 // dividends declared, board votes that went against the founder, and
-// executive hires, departures and firings. Merged into LEDGER_TEMPLATES via
-// ledgerTemplatesCapital.ts. Tokens in {braces} come from src/sim/newsGovernance.ts.
+// executive hires, departures and firings. Merged into LEDGER_TEMPLATES in
+// ledgerTemplates.ts. Tokens in {braces} come from src/sim/newsGovernance.ts.
 import type { LedgerTemplate } from './ledgerTemplates';
 
 export const GOVERNANCE_TEMPLATES = {

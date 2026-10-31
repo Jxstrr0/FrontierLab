@@ -1,11 +1,9 @@
 // Creates a fresh GameState (SIMULATION §26 START constants): the start city
 // (worldGen.ts; other cities are made on first visit), every country's macro,
-// the chosen corporate cash ($750k by default) and $2M of charter capital held
-// in treasury reserves.
+// and the chosen seed money as corporate cash.
 import {
   COMPETITORS,
   DEFAULT_LAUNCH_POSTURE,
-  LIQ_TARGET_DEFAULT,
   START_APP_RATING,
   START_CASH,
   START_CASH_OPTIONS,
@@ -120,7 +118,6 @@ export function newGame(opts: NewGameOptions): GameState {
   const state: GameState = {
     schemaVersion: SCHEMA_VERSION,
     meta: {
-      saveName: bankName,
       bankName,
       monogram: opts.monogram ?? 'FL',
       brandInk: opts.brandInk ?? '#2C4A7A',
@@ -150,7 +147,7 @@ export function newGame(opts: NewGameOptions): GameState {
       lots: {},
       officeListings: {},
       sites: {},
-      travel: { kmThisWeek: 0, totalKm: 0, flights: 0, faresPaid: 0 },
+      travel: { kmThisWeek: 0, flights: 0 },
     },
     company: {
       cash: startCash,
@@ -167,7 +164,6 @@ export function newGame(opts: NewGameOptions): GameState {
       negativeCashWeeks: 0,
       lowCapitalWeeks: 0,
       safetyRatio: 1,
-      liquidityRatio: null,
       appRating: START_APP_RATING,
       riskAppetite: DEFAULT_LAUNCH_POSTURE,
       applyRatesToAll: false,
@@ -192,23 +188,11 @@ export function newGame(opts: NewGameOptions): GameState {
     training: { generation: 0, frontierBase: 0 },
     talent: { researchers: {} },
     projects: { done: [] },
-    treasury: {
-      reserves: 0,
-      liqTarget: LIQ_TARGET_DEFAULT,
-      autoFunding: true,
-      freeze: false,
-      overnight: 0,
-      window: 0,
-      windowStigmaWeeks: 0,
-      lots: [],
-      offers: [],
-      offersRefreshWeek: -1,
-    },
     dealDesk: { rfps: {}, tenders: {} },
     rivals: {},
     businesses: {},
     marketing: { campaigns: [], packages: [], cityBonus: {} },
-    risk: { losses: [], reviews: [] },
+    risk: { reviews: [] },
     partnerships: {},
     powerDeals: {},
     corporateDebt: emptyCorporateDebt(),
