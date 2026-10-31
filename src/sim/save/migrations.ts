@@ -259,6 +259,13 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
     if (list?.fortunes?.length) rescaleFortunes(list);
     return s;
   },
+  // Schema 37 (audit smoothing batch): a setting for opening the annual report
+  // at each year end, on as before.
+  36: (s) => {
+    const state = s as unknown as GameState;
+    if (state.settings) state.settings.annualReport ??= true;
+    return s;
+  },
 };
 
 /** Upgrades a raw save to the current schema, or throws if it can't. */

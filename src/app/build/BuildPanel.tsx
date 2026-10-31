@@ -5,7 +5,7 @@ import { BUILD_SLOTS, EQUIPMENT, type BuildSlot, type BuildSpec } from '../../da
 import * as cmd from '../../sim/commands';
 import { districtName } from '../city/lotInfo';
 import { Card, CoinRating, Panel, Row, SectionTitle } from '../components';
-import { moneyFull } from '../format/format';
+import { coverText, moneyFull } from '../format/format';
 import { act, closePanel, openPanel, toast, useGame } from '../store';
 import { defaultBuild, SLOT_LABEL } from './builds';
 import { PartPicker } from './PartPicker';
@@ -16,7 +16,6 @@ import { CITIES } from '../../data/cities';
 import { ATTENTION } from '../../config/balance';
 import { cashCoverWeeks } from '../../sim/cashCover';
 import { listLevel, listPrice } from '../../sim/nominal';
-import { coverText } from '../company/CompanyPanel';
 
 export function BuildPanel(p: { lotId: string }) {
   const s = useGame();

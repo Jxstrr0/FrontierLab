@@ -33,7 +33,8 @@ export type FeatureId = keyof typeof FEATURES;
 
 // ─── TIME (SIMULATION §2, §26) ────────────────────────────────────────────────
 export const DAY_MS = 1000;
-export const SPEEDS = [0, 1, 2, 4] as const;
+/** Skip ahead (HUD ⏭): game days per real second while it runs to the next thing that needs you. */
+export const SKIP_DAYS_PER_SECOND = 40;
 export const DAYS_PER_WEEK = 7;
 export const WEEKS_PER_YEAR = 52;
 export const START_DATE = '2027-01-04';

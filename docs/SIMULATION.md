@@ -81,7 +81,7 @@ How the economy works, step by step. Every CAPS name is a key in `src/config/bal
 
 **Central bank meetings:** each country meets on the fixed week-of-year list in CONTENT (Countries table). A meeting in a given week is processed inside step 1.
 
-**Auto-pause** when any of these needs a decision: an unresolved incident, the results modal (every week, or the tick that closes a month's or quarter's last week, per the setting; a week belongs to the month its last day falls in, and the report rolls up every week of the period that just ended), the board meeting reminder (once per quarter), or Deal Desk proposal requests expiring this week (optional setting). The clock also holds, without changing the speed setting, while any panel or sheet is open: days pass only on the map.
+**Auto-pause** when any of these needs a decision: an unresolved incident (info-only incidents, with nothing to decide, close themselves and show as a notice instead), the results modal (every week, or the tick that closes a month's or quarter's last week, per the setting; a week belongs to the month its last day falls in, and the report rolls up every week of the period that just ended), the first week corporate cash is below zero, or Deal Desk proposal requests expiring this week (optional setting). The quarter's board meeting no longer pauses: the HUD shows a Board chip. **Skip ahead** runs at `SKIP_DAYS_PER_SECOND` until the month ends (showing that month's results) or something above needs you, then pauses. After any pause, play resumes at the speed you were playing at. The clock also holds, without changing the speed setting, while any panel or sheet is open: days pass only on the map.
 
 ## 3. RNG and determinism
 

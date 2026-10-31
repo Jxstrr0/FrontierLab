@@ -168,6 +168,14 @@ export function runwayText(months: number | null): string {
   return `${m} month${m === 1 ? '' : 's'}`;
 }
 
+/** Weeks of running costs cash would cover: 0.4 → "Under 1 week", 7.6 → "7 weeks", 52+ → "A year or more". */
+export function coverText(weeks: number): string {
+  if (weeks < 1) return 'Under 1 week';
+  if (weeks >= 52) return 'A year or more';
+  const n = Math.floor(weeks);
+  return `${n} week${n === 1 ? '' : 's'}`;
+}
+
 /** A safety ratio as a whole percent: 0.963 → "96%". */
 export function safetyRatioText(ratio: number): string {
   return `${Math.round(ratio * 100)}%`;

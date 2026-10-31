@@ -169,3 +169,42 @@ button.hud-chip {
 .menu-item:last-child {
   border-bottom: 0;
 }
+
+/* Why the game paused (loop.ts pause reasons), under the date pill. */
+.hud-reason {
+  pointer-events: none;
+  max-width: 220px;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-card);
+  background: var(--vault-deep);
+  color: var(--ivory-dim);
+  font-size: var(--text-12);
+  text-align: right;
+}
+/* Status chips under the date pill: in the red, Board, cases, Skip ahead. */
+.hud-status {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  pointer-events: none;
+}
+.hud-skip {
+  padding: 0 var(--space-3);
+  color: var(--brass-light);
+  font-weight: 600;
+}
+.hud-skip.is-on {
+  background: var(--brass);
+  color: var(--vault-deep);
+}
+.hud-board,
+.hud-red {
+  padding: 0 var(--space-3);
+  font-size: var(--text-14);
+  font-weight: 600;
+}
+.hud-red {
+  background: var(--oxblood);
+  color: var(--ivory);
+}
