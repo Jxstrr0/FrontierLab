@@ -7,8 +7,8 @@
 import { useState } from 'preact/hooks';
 import { CITIES } from '../../data/cities';
 import { JETS } from '../../data/jets';
-import { kmRemaining, flightQuote } from '../../sim/travel';
-import { Card, Confirm, Panel, Row, Segmented, SectionTitle } from '../components';
+import { kmRemaining } from '../../sim/travel';
+import { Card, Panel, Row, Segmented, SectionTitle } from '../components';
 import { money } from '../format/format';
 import { closePanel, openPanel, useGame } from '../store';
 import { AirportArt } from './AirportArt';
@@ -22,6 +22,7 @@ import {
   type DepartureRow,
   type RegionId,
 } from './departures';
+import { FareConfirm } from './FareConfirm';
 import { startFlight } from './flight';
 import './airport.css';
 
@@ -56,9 +57,6 @@ export function AirportPanel(p: { jet?: boolean }) {
           : 'Flights within your weekly mileage are free. Past it, a one-way ticket comes from your personal cash.',
         'Opening sales offices and buying buildings means being in that city. Your sales offices run everywhere at once.',
       ];
-
-  // Re-quote at confirm time so the sheet shows today's split.
-  const q = asking ? flightQuote(s, asking.id, jetMode) : undefined;
 
   return (
     <Panel
@@ -102,33 +100,7 @@ export function AirportPanel(p: { jet?: boolean }) {
         {!jetMode && <JetCard onFlyNow={() => openPanel({ type: 'airport', jet: true })} />}
       </div>
 
-      {asking && q && (
-        <Confirm
-          title={`Fly to ${asking.name}?`}
-          body={
-            <div class="ap-fare">
-              <p>
-                This week's free mileage won't reach {asking.name}, so it's a one-way ticket of{' '}
-                {money(q.fare, sym)}.
-              </p>
-              <Row label="From your personal cash" value={money(q.personalPays, sym)} />
-              {q.bankPays > 0 && (
-                <Row
-                  label="The lab pays (travel expense)"
-                  value={money(q.bankPays, sym)}
-                  tone="bad"
-                />
-              )}
-            </div>
-          }
-          confirmLabel="Buy ticket"
-          onCancel={() => setAsking(null)}
-          onConfirm={() => {
-            setAsking(null);
-            startFlight(asking.id, jetMode);
-          }}
-        />
-      )}
+      {asking && <FareConfirm row={asking} jet={jetMode} onClose={() => setAsking(null)} />}
     </Panel>
   );
 }

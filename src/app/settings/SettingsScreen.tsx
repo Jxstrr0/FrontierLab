@@ -32,6 +32,10 @@ import { TutorialSetting } from './TutorialSetting';
 import './settings.css';
 import './standalone.css';
 
+/** The developer tools only show with `?debug` in the address, or once already switched on. */
+const DEBUG_URL =
+  typeof location !== 'undefined' && new URLSearchParams(location.search).has('debug');
+
 const WEEKLY_LABEL: Record<Settings['weeklyResults'], string> = {
   weekly: 'Weekly',
   monthly: 'Monthly',
@@ -121,10 +125,16 @@ export function SettingsScreen(p: { inGame?: boolean }) {
             onChange={(autoPauseApplications) => change({ autoPauseApplications })}
           />
           <Toggle
-            label="Pause for incidents and board meetings"
-            hint="Stops time when something goes wrong, and reminds you of each quarter's board meeting."
+            label="Pause for incidents"
+            hint="Stops time when something goes wrong that needs a decision. Notices that need no decision show as a message instead."
             checked={s.autoPauseIncidents}
             onChange={(autoPauseIncidents) => change({ autoPauseIncidents })}
+          />
+          <Toggle
+            label="Open the annual report"
+            hint="Shows the year's report at each year end. Off, it waits in The Ledger's archive."
+            checked={s.annualReport}
+            onChange={(annualReport) => change({ annualReport })}
           />
           <Toggle
             label="Sound"
@@ -162,16 +172,18 @@ export function SettingsScreen(p: { inGame?: boolean }) {
             </p>
           )}
 
-          <SectionTitle>Developer</SectionTitle>
-          <Toggle
-            label="Developer tools"
-            hint="Testing shortcuts. Saved on this device only."
-            checked={devTools}
-            onChange={(on) => {
-              saveDevTools(on);
-              setDevTools(on);
-            }}
-          />
+          {(DEBUG_URL || devTools) && <SectionTitle>Developer</SectionTitle>}
+          {(DEBUG_URL || devTools) && (
+            <Toggle
+              label="Developer tools"
+              hint="Testing shortcuts. Saved on this device only."
+              checked={devTools}
+              onChange={(on) => {
+                saveDevTools(on);
+                setDevTools(on);
+              }}
+            />
+          )}
           {devTools &&
             (game ? (
               <>

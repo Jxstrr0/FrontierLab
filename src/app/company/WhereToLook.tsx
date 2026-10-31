@@ -1,6 +1,7 @@
 // "Where to look" (SCREENS §24): the top few things that need you, worst first,
-// each a tap away. Reads the pure ranking in src/sim/attention.ts; the
-// Company screen shows it above the capital meter.
+// each a tap away, and "Show N more" opens the rest. Reads the pure ranking in
+// src/sim/attention.ts; it heads the Company screen.
+import { useState } from 'preact/hooks';
 import { ATTENTION } from '../../config/balance';
 import { attentionItems, type AttentionRoute } from '../../sim/attention';
 import type { GameState } from '../../sim/state';
@@ -30,8 +31,9 @@ function go(route: AttentionRoute): void {
 }
 
 export function WhereToLook(p: { s: GameState }) {
+  const [all, setAll] = useState(false);
   const items = attentionItems(p.s);
-  const shown = items.slice(0, ATTENTION.shown);
+  const shown = all ? items : items.slice(0, ATTENTION.shown);
   const more = items.length - shown.length;
   return (
     <div>
@@ -72,9 +74,13 @@ export function WhereToLook(p: { s: GameState }) {
           </ul>
         )}
         {more > 0 && (
-          <p class="muted small attn-more">
-            {more} more {more === 1 ? 'item' : 'items'} further down the list.
-          </p>
+          <button
+            type="button"
+            class="btn btn-secondary btn-block attn-more"
+            onClick={() => setAll(true)}
+          >
+            Show {more} more
+          </button>
         )}
       </Card>
     </div>

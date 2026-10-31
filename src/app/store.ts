@@ -67,8 +67,7 @@ export type ModalRoute =
   /** `period`: a monthly or quarterly roll-up of the weeks ending at `week` (SCREENS §21); absent for one week. */
   | { type: 'weekly'; week: number; period?: 'monthly' | 'quarterly' }
   | { type: 'incident' }
-  /** `reminder`: opened by the quarterly auto-pause, showing a prompt first (SIMULATION §2). */
-  | { type: 'boardMeeting'; reminder?: boolean }
+  | { type: 'boardMeeting' }
   /** The annual report (SCREENS §21b); `year` absent = the latest. */
   | { type: 'annual'; year?: number }
   | { type: 'gameover' };
@@ -93,6 +92,7 @@ let current: GameState | null = null;
 
 export function setGame(state: GameState | null): void {
   current = state;
+  held.length = 0;
   panel.value = null;
   modal.value = null;
   sheet.value = null;
@@ -116,20 +116,55 @@ export function bump(): void {
 }
 
 let toastId = 0;
+/** Toasts on screen at once; notices beyond this wait their turn (see notice()). */
+const MAX_TOASTS = 3;
+/** Week-end notices queued behind a popup or a full toast stack. */
+const NOTICE_QUEUE_MAX = 12;
+const held: { text: string; tone: Toast['tone']; ms: number }[] = [];
+
+function show(text: string, tone: Toast['tone'], ms: number, action?: Toast['action']): void {
+  // Amounts the simulation wrote in dollars follow the currency setting.
+  const sym = current?.settings.currency ?? '$';
+  const t: Toast = { id: ++toastId, text: localizeMoney(text, sym), tone, action };
+  toasts.value = [...toasts.value, t].slice(-MAX_TOASTS);
+  setTimeout(() => {
+    toasts.value = toasts.value.filter((x) => x.id !== t.id);
+    pumpNotices();
+  }, ms);
+}
+
+/** Immediate feedback for something the player just did (a failed command, a purchase). */
 export function toast(
   text: string,
   tone: Toast['tone'] = 'info',
   ms = 3200,
   action?: Toast['action'],
 ): void {
-  // Amounts the simulation wrote in dollars follow the currency setting.
-  const sym = current?.settings.currency ?? '$';
-  const t: Toast = { id: ++toastId, text: localizeMoney(text, sym), tone, action };
-  toasts.value = [...toasts.value, t].slice(-3);
-  setTimeout(() => {
-    toasts.value = toasts.value.filter((x) => x.id !== t.id);
-  }, ms);
+  show(text, tone, ms, action);
 }
+
+/**
+ * A notice from the week's events (loop.ts): it waits while a popup is open, so
+ * it isn't hidden behind the weekly results, and queues rather than pushing
+ * older notices off when several land at once.
+ */
+export function notice(text: string, tone: Toast['tone'] = 'info', ms = 4200): void {
+  held.push({ text, tone, ms });
+  if (held.length > NOTICE_QUEUE_MAX) held.splice(0, held.length - NOTICE_QUEUE_MAX);
+  pumpNotices();
+}
+
+function pumpNotices(): void {
+  if (modal.value) return;
+  while (held.length > 0 && toasts.value.length < MAX_TOASTS) {
+    const n = held.shift()!;
+    show(n.text, n.tone, n.ms);
+  }
+}
+
+modal.subscribe((v) => {
+  if (!v) pumpNotices();
+});
 
 /**
  * Runs a sim command against the current game, re-renders, and toasts the
@@ -156,11 +191,40 @@ export function clockHeld(): boolean {
   return panel.value !== null || sheet.value !== null || modal.value !== null;
 }
 
+/**
+ * Panels opened from inside another panel stack up, so the header can offer a
+ * Back button (SCREENS §0.1) instead of dumping you on the map. Moving within one
+ * kind of screen (a tab, an HQ floor) replaces the top rather than stacking.
+ */
+export const panelHistory = signal<PanelRoute[]>([]);
+const MAX_PANEL_HISTORY = 8;
+
+/** Moving within one kind of screen (a tab, an HQ floor, another office) replaces rather than stacks. */
+function sameScreen(a: PanelRoute, b: PanelRoute): boolean {
+  return a.type === b.type;
+}
+
 export function openPanel(route: PanelRoute): void {
   sheet.value = null;
+  const from = panel.value;
+  if (from && !sameScreen(from, route))
+    panelHistory.value = [...panelHistory.value, from].slice(-MAX_PANEL_HISTORY);
   panel.value = route;
 }
 
 export function closePanel(): void {
   panel.value = null;
 }
+
+/** Back to the panel this one was opened from (Panel header). */
+export function backPanel(): void {
+  const prev = panelHistory.value.at(-1);
+  if (!prev) return closePanel();
+  panelHistory.value = panelHistory.value.slice(0, -1);
+  panel.value = prev;
+}
+
+// Whatever closes the panel (Close, a flight, a new game) ends the trail.
+panel.subscribe((v) => {
+  if (v === null && panelHistory.value.length > 0) panelHistory.value = [];
+});

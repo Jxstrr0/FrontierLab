@@ -1,15 +1,19 @@
-// HUD over the map (SCREENS §0.2): bank medallion and cash (→ Company), the
-// date pill with speed control and a next-week step, the Layers button (with the map), the city
-// pill (Stage 8: tap for the Travel sheet) and the Menu button.
+// HUD over the map (SCREENS §0.2): lab medallion and cash (→ Company), the
+// date pill with speed control and a next-week step, why the game paused, a row
+// of status chips (Skip ahead, the quarter's Board meeting, open cases, weeks in
+// the red), the Layers button, the city pill (tap for the Travel sheet) and the
+// Menu button.
 import { FEATURES } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { PlaneIcon } from '../airport/AirportMedallion';
 import { Icon, Medallion } from '../components';
 import { gameDate, money } from '../format/format';
-import { pause, setSpeed, stepWeek } from '../loop';
+import { boardChipQuarter, pause, resume, setSpeed, skipAhead, skipping, stepWeek } from '../loop';
+import { boardDue, quarterLabel } from '../../sim/governance';
+import { FAILURE } from '../../config/balance';
 import { CasesChip } from '../incidents/CasesChip';
 import { LayerIcon } from '../map/LayerIcon';
-import { clockHeld, openPanel, sheet, useGame } from '../store';
+import { clockHeld, modal, openPanel, sheet, useGame } from '../store';
 
 const NEXT_SPEED = { 0: 1, 1: 2, 2: 4, 4: 1 } as const;
 
@@ -48,17 +52,19 @@ export function Hud() {
               type="button"
               class="hud-date"
               aria-label={paused ? 'Resume' : 'Change speed'}
-              onClick={() => setSpeed(paused ? s.settings.defaultSpeed : NEXT_SPEED[s.clock.speed])}
+              onClick={() => (paused ? resume() : setSpeed(NEXT_SPEED[s.clock.speed]))}
             >
               <span>{gameDate(s.meta.startDate, s.clock.day)}</span>
-              {!held && <span class="hud-speed">{s.clock.speed}×</span>}
+              {!held && (
+                <span class="hud-speed">{skipping.value ? 'Skip' : `${s.clock.speed}×`}</span>
+              )}
             </button>
             <button
               type="button"
               class="hud-pause"
               data-tutorial="play"
               aria-label={paused ? 'Play' : 'Pause'}
-              onClick={() => (paused ? setSpeed(s.settings.defaultSpeed) : pause())}
+              onClick={() => (paused ? resume() : pause())}
             >
               <Icon
                 name={held ? 'play' : 'pause'}
@@ -76,7 +82,46 @@ export function Hud() {
               <NextWeekIcon />
             </button>
           </div>
-          {FEATURES.competition && <CasesChip />}
+          {paused && s.clock.pausedReason && !clockHeld() && (
+            <div class="hud-reason">{s.clock.pausedReason}</div>
+          )}
+          <div class="hud-status">
+            {s.company.cash < 0 && !s.flags.gameOver && (
+              <button
+                type="button"
+                class="hud-chip hud-red"
+                aria-label="Cash below zero. Open Company"
+                onClick={() => openPanel({ type: 'company' })}
+              >
+                In the red {Math.min(s.company.negativeCashWeeks, FAILURE.insolvencyWeeks)}/
+                {FAILURE.insolvencyWeeks}
+              </button>
+            )}
+            {FEATURES.capitalMarkets &&
+              boardChipQuarter.value === quarterLabel(s) &&
+              boardDue(s) && (
+                <button
+                  type="button"
+                  class="hud-chip hud-board"
+                  aria-label="The board is ready to meet. Hold the meeting"
+                  onClick={() => (modal.value = { type: 'boardMeeting' })}
+                >
+                  Board
+                </button>
+              )}
+            {FEATURES.competition && <CasesChip />}
+            {!s.flags.gameOver && (
+              <button
+                type="button"
+                class={`hud-chip hud-skip${skipping.value ? ' is-on' : ''}`}
+                aria-label={skipping.value ? 'Stop skipping' : 'Skip ahead to the end of the month'}
+                onClick={skipAhead}
+              >
+                <SkipIcon />
+                <span>{skipping.value ? 'Stop' : 'Skip'}</span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
       <div class="hud-bottom">
@@ -116,6 +161,16 @@ export function Hud() {
         </button>
       </div>
     </>
+  );
+}
+
+/** Double-arrow-to-bar glyph for Skip ahead, in SVG so iOS doesn't swap it for an emoji. */
+function SkipIcon() {
+  return (
+    <svg width="20" height="18" viewBox="0 0 20 18" aria-hidden="true">
+      <path d="M2 3.5 L8.5 9 L2 14.5 Z M8.5 3.5 L15 9 L8.5 14.5 Z" fill="currentColor" />
+      <rect x="15.5" y="3.5" width="2.5" height="11" fill="currentColor" />
+    </svg>
   );
 }
 

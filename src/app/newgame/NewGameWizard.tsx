@@ -1,5 +1,7 @@
 // New Game wizard (SCREENS §1): five steps with Back and Next and a step
-// indicator. Nothing touches the simulation until "Open the doors" on step 5.
+// indicator. Quick start heads step 1; from the Founder step on, "Skip to
+// confirm" takes the default city and options. Nothing touches the simulation
+// until "Open the doors" on step 5.
 import type { ComponentType } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { screen } from '../store';
@@ -103,10 +105,19 @@ export function NewGameWizard() {
 
       <div class="wizard-body" ref={body}>
         <div class="wizard-column">
-          <spec.View draft={draft} patch={patch} />
           {step === 0 && (
-            <button type="button" class="link-btn" onClick={quickStart}>
-              Quick start with a ready-made lab in Calgary
+            <button
+              type="button"
+              class="btn btn-secondary btn-block wizard-quick"
+              onClick={quickStart}
+            >
+              Quick start: a ready-made lab in Calgary
+            </button>
+          )}
+          <spec.View draft={draft} patch={patch} />
+          {step >= 1 && !last && blocker === null && (
+            <button type="button" class="link-btn" onClick={() => setStep(STEPS.length - 1)}>
+              Skip to confirm with the default city and options
             </button>
           )}
         </div>
