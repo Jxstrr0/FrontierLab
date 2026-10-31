@@ -102,11 +102,42 @@ export const NAMED_EMPLOYERS: Record<string, [string, string][]> = {
   sas: [['potashMine', 'Prairie Potash Co.']],
 };
 
-/** Name patterns per type; {city} is replaced by the city name. */
+/**
+ * Name patterns per type; {city} is replaced by the city name. Most patterns
+ * carry the city (2026-10-31) so the same plant or campus doesn't stand in
+ * every city on the map.
+ */
 export const EMPLOYER_NAMES: Record<string, string[]> = {
-  hospital: ['{city} General Hospital', "St. Brendan's Hospital", '{city} Health Centre'],
-  autoPlant: ['Kestrel Motors Assembly', 'Halberd Auto Works', 'Corvane Motor Plant'],
-  techCampus: ['Lattice Labs Campus', 'Northstar Software Park', 'Quillon Systems Campus'],
+  hospital: [
+    '{city} General Hospital',
+    '{city} Health Centre',
+    '{city} Royal Infirmary',
+    '{city} Children’s Hospital',
+    '{city} Memorial Hospital',
+    "St. Brendan's Hospital",
+    'Mercy Vale Hospital',
+    'Harbourlight Medical Centre',
+  ],
+  autoPlant: [
+    'Kestrel Motors {city} Assembly',
+    'Halberd Auto Works',
+    'Corvane Motor Plant',
+    '{city} Motor Works',
+    'Vantor Electric {city} Plant',
+    'Ridgeline Trucks Assembly',
+    'Solenne Automotive {city}',
+    'Tallis Battery Works',
+  ],
+  techCampus: [
+    'Lattice Labs Campus',
+    'Northstar Software Park',
+    'Quillon Systems Campus',
+    '{city} Science Park',
+    'Brightwire {city} Campus',
+    'Orrery Cloud Campus',
+    '{city} Digital Quarter',
+    'Pellucid Devices Campus',
+  ],
   cityHall: ['{city} City Hall'],
   port: ['Port of {city} Authority'],
   potashMine: ['Prairie Potash Co.'],

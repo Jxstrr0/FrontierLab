@@ -1,8 +1,11 @@
 // Per-incident numbers (CONTENT §22): probabilities' multipliers, rolled ranges,
 // option costs, effect sizes and durations. The catalog is incidents.ts.
 
+import { VETERAN_PARAMS } from './incidentParamsVeteran';
+
 /** Per-incident numbers (CONTENT §22). Probabilities are weekly. */
 export const INCIDENT_PARAMS = {
+  ...VETERAN_PARAMS,
   ROBBERY: {
     securityRef: 6,
     securityDiv: 3,

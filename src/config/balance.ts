@@ -1195,8 +1195,9 @@ export const RIVAL_PLACEMENT = {
 export const START_APP_RATING = 3.75;
 /** visitRate = SERVICE_VISIT_RATE × (base − slope × appRating) (§6.4). */
 export const VISIT_APP = { base: 1.2, slope: 0.1 } as const;
-/** Chance a new review card quotes an active campaign instead of a category. */
-export const REVIEW_CAMPAIGN_CHANCE = 0.5;
+/** Share of new review cards that quote an active campaign instead of a category
+ *  line (lowered from 0.5 on 2026-10-31 so campaign cards stop crowding the feed). */
+export const REVIEW_CAMPAIGN_CHANCE = 0.3;
 export const INTEREST_PERIODS = { monthsPerYear: 12 } as const;
 /** Loan Desk sector pick: weight for sectors that fit the lot's district versus others. */
 export const SECTOR_DISTRICT_WEIGHT = { match: 4, other: 1 } as const;
@@ -1563,6 +1564,15 @@ export const FOUNDER_DESK = {
   /** The angel's cheque: this share of the lab at this discount to the private valuation. */
   angelPct: 0.05,
   angelDiscount: 0.3,
+} as const;
+/**
+ * The veteran's desk (CONTENT §22c, 2026-10-31): once-a-game company cases from
+ * year 3 (fromWeek) on, one at a time with gapWeeks of rest between them.
+ */
+export const VETERAN_DESK = {
+  fromWeek: 156,
+  gapWeeks: 12,
+  baseP: 0.006,
 } as const;
 /**
  * fraudShield, 0–10 (decision log): itWeight × IT coverage′ + modelWeight × the
@@ -1959,6 +1969,8 @@ export const CARS_CFG = {
   classicGain: 0.03,
   upkeepRate: 0.02,
   resaleHaircut: 0.1,
+  /** A car bought or sold at this price or more makes The Weekly Ledger (2026-10-31). */
+  newsMin: 1_000_000,
 } as const;
 /**
  * Collectibles (SIMULATION §22): every piece not found to be fake drifts
@@ -2091,6 +2103,8 @@ export const RICH_LIST = {
  * tier with the regulator one (ahead of both); every `decadeYears` (10) years
  * of play it opens on the decade in review.
  */
+/** Board meeting remark (data/boardLines.ts): vote share for a warm room, and how near half is split. */
+export const BOARD_ROOM = { unanimous: 0.85, closeBand: 0.06 } as const;
 export const ANNUAL_REPORT = {
   doubled: 1,
   hardYear: 0,
@@ -2099,6 +2113,10 @@ export const ANNUAL_REPORT = {
   safetyTiers: ['restricted', 'critical'] as readonly string[],
   /** At most this many milestones named in the year's story. */
   milestonesShown: 3,
+  /** Acquisitions in one year that make it an acquisition spree (2026-10-31). */
+  spreeDeals: 3,
+  /** Net income at least this many times the best earlier year is a record-profit year. */
+  recordMargin: 1.5,
 } as const;
 /** Insider trading (§22): trades in your own shares within 2 weeks of a quarter-end. */
 export const INSIDER = {
@@ -2838,6 +2856,14 @@ export const MILESTONE_GOALS = {
   // ─ AI milestones (2026-10-27) ─
   /** Trained model generation for 'Fifth generation'. */
   modelGeneration: 5,
+  // ─ Late-game milestones (2026-10-31) ─
+  /** Generations for 'Eighth generation' and 'Twelfth generation'. */
+  lateGenerations: [8, 12] as readonly [number, number],
+  /** Public contracts held at once for 'Trusted by the state'. */
+  tendersHeld: 5,
+  /** Weeks of play for 'A decade in' and 'Twenty years'. */
+  decadeWeeks: 520,
+  twoDecadesWeeks: 1040,
   /** Weeks in a row at the Strong safety tier for 'Two years of Strong safety'. */
   strongTierWeeks: 104,
   /** Weeks in a row with every GPU-week of demand served from owned GPUs (a quarter). */

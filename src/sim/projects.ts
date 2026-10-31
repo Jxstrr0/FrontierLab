@@ -95,14 +95,21 @@ export function nextStartableProject(state: GameState): FrontierProject | undefi
 
 /** Starts `spec` at today's price (callers check projectBlock and the cash first). */
 export function beginProject(state: GameState, spec: FrontierProject): void {
+  const cost = projectPrice(state, spec.id);
   state.projects.active = {
     id: spec.id,
     startWeek: state.clock.week,
-    cost: projectPrice(state, spec.id),
+    cost,
     weeks: spec.weeks,
     weeksDone: 0,
     spent: 0,
   };
+  pushEvent(
+    state,
+    'PROJECT_STARTED',
+    { bank: state.meta.bankName, projectId: spec.id, name: spec.name, cost, weeks: spec.weeks },
+    2,
+  );
 }
 
 /** Tick step 7: pay this week's share, roll an overrun at a quarter start, finish at the last week. */
@@ -130,7 +137,8 @@ export function runProjects(state: GameState): void {
   }
   const pay = projectWeekly(active);
   if (state.company.cash < pay) {
-    if (!active.stalled) pushEvent(state, 'PROJECT_STALLED', { bank, name: spec.name }, 2);
+    if (!active.stalled)
+      pushEvent(state, 'PROJECT_STALLED', { bank, projectId: spec.id, name: spec.name }, 2);
     active.stalled = true;
     return;
   }

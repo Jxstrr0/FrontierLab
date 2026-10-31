@@ -19,6 +19,7 @@ import { bankRunCondition, endBankRun, startBankRun } from './incident/capitalEv
 import { COMPANY_RULES } from './incident/companyRules';
 import { COMPUTE_RULES } from './incident/computeRules';
 import { FOUNDER_RULES } from './incident/founderRules';
+import { VETERAN_RULES } from './incident/veteranRules';
 import { expireEffects } from './incident/effects';
 import { scopeName, type IncidentRule } from './incident/helpers';
 import { compactMoney, fillTemplate } from './incident/text';
@@ -29,6 +30,7 @@ const RULES: Record<string, IncidentRule> = {
   ...AI_RULES,
   ...COMPUTE_RULES,
   ...FOUNDER_RULES,
+  ...VETERAN_RULES,
 };
 
 /** The feature flag each later ROADMAP stage switches on. */

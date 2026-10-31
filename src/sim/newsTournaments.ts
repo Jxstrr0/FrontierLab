@@ -5,7 +5,7 @@
 // script in the news desk and prints each story in its week. Flavour only.
 import { NEWS_CALENDAR as K, NEWS_PRIORITY as P } from '../config/balance';
 import { COUNTRIES } from '../data/countries';
-import { FIRST_NAMES, LAST_NAMES } from '../data/names';
+import { SPORT_FIRST_NAMES, SPORT_LAST_NAMES } from '../data/namesSport';
 import { FIXTURES, GAMES_SPORTS, NATIONS } from '../data/worldCalendar';
 import type { CountryId } from '../data/types';
 import { grouped } from './newsFormat';
@@ -14,7 +14,7 @@ import type { ScheduledStory } from './state';
 
 const COUNTRY_ORDER = Object.keys(COUNTRIES) as CountryId[];
 const team = (id: CountryId) => NATIONS[id].team;
-const person = (rng: Rng) => `${rng.pick(FIRST_NAMES)} ${rng.pick(LAST_NAMES)}`;
+const person = (rng: Rng) => `${rng.pick(SPORT_FIRST_NAMES)} ${rng.pick(SPORT_LAST_NAMES)}`;
 
 type Script = Omit<ScheduledStory, 'week'> & { offset: number };
 

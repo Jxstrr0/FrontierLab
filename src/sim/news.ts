@@ -26,6 +26,7 @@ import { lobbyingStories } from './newsLobbying';
 import { auctionStories } from './newsAuctions';
 import { franchiseStories } from './newsFranchise';
 import { personalStories } from './newsPersonal';
+import { projectStories } from './newsProjects';
 import { realEstateStories } from './newsRealEstate';
 import { venturesStories } from './newsVentures';
 import { fillTemplate } from './newsFormat';
@@ -114,6 +115,7 @@ export function composeNews(state: GameState): void {
     ...realEstateStories(ctx),
     ...lobbyingStories(ctx),
     ...personalStories(ctx),
+    ...projectStories(ctx),
     ...auctionStories(ctx),
     ...franchiseStories(ctx),
     ...politicsStories(ctx),
