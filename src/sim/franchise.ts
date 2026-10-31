@@ -3,6 +3,7 @@
 // transfer market; for yours the weekly finances and kit sponsorship, which
 // raises your bank's brand awareness across the club's country (SIMULATION §7).
 // Stream: `franchise`.
+import { raiseCityAwareness } from './awareness';
 import { FRANCHISE, WEEKS_PER_YEAR } from '../config/balance';
 import { CITIES } from '../data/cities';
 import { FRANCHISES, SPORT_DRAWS, type FranchiseSpec } from '../data/franchises';
@@ -178,7 +179,7 @@ function endSeason(state: GameState, rng: Rng, spec: FranchiseSpec, club: ClubSt
   );
 }
 
-/** §7: your bank on the shirt adds kitAwareness × (1 − b) to every generated city of the club's country. */
+/** §7: your lab on the shirt adds kitAwareness × (1 − a) to every city of the club's country where you have an office. */
 function kitAwareness(state: GameState): void {
   for (const club of yourClubs(state)) {
     if (club.kit.sponsor !== 'bank') continue;
@@ -186,8 +187,7 @@ function kitAwareness(state: GameState): void {
     if (!country) continue;
     for (const city of Object.values(state.world.cities)) {
       if (!city.generated || CITIES[city.id]?.country !== country) continue;
-      const b = city.brandAwareness;
-      city.brandAwareness = clamp(b + F.kitAwareness * (1 - b), 0, 1);
+      raiseCityAwareness(state, city.id, F.kitAwareness);
     }
   }
 }

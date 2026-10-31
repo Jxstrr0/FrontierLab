@@ -28,11 +28,12 @@ import { effectiveAwareness, type CampaignEffects } from './marketing';
 import { branchPrice, isOffered, priceFactor } from './pricing';
 import { capacity, visitRate } from './staff';
 import { waitlisted } from '../compute';
+import { coinsOf, modelCoinLift } from '../productCoins';
 import { difficultyOf } from '../difficulty';
 import { dpow } from '../detmath';
 import { brandSegmentMults } from '../hqMarketing';
 import { isClosed, isPulled, takeupMult } from '../incident/effects';
-import { affinityOf, allProducts, baseId, starsOf } from '../products';
+import { affinityOf, allProducts, baseId } from '../products';
 import { cityRoom } from './cityMarket';
 import { officeTraffic } from './officeSize';
 import { rivalOverall } from '../rivalMarketing';
@@ -124,7 +125,7 @@ export function runDemand(state: GameState, branch: Branch, fx: CampaignEffects)
   const traffic = officeTraffic(state, branch);
   const population = traffic * CATCHMENT_MULT;
   const penetration = clamp(branch.customers / population, 0, 1);
-  const e = effectiveAwareness(state, branch);
+  const e = effectiveAwareness(branch);
   const prospects =
     traffic *
     PROSPECT_RATE *
@@ -162,6 +163,7 @@ export function runDemand(state: GameState, branch: Branch, fx: CampaignEffects)
   const usageHeadroom = priceHeadroom(state, 'usage');
   // §15 (C7a): the regulator's tier gates every new sign-up; a pause stops them.
   const regulator = salesGate(state);
+  const lift = modelCoinLift(state);
   for (const spec of allProducts(state)) {
     if (spec.kind === 'sbl' || spec.kind === 'fx' || !isOffered(branch, spec.id)) continue;
     // §23: a product pulled from sale after an incident (DEEPFAKE) signs nobody up.
@@ -170,7 +172,7 @@ export function runDemand(state: GameState, branch: Branch, fx: CampaignEffects)
     const m =
       marketRef(state, branch.cityId, spec.id) *
       (spec.kind === 'plan' ? headroom : spec.kind === 'usage' ? usageHeadroom : 1);
-    const stars = starsOf(state, spec);
+    const stars = coinsOf(state, spec, lift);
     const affinity = affinityOf(spec);
     const approval = approvalOf(state, spec);
     const gate = waitlist && (spec.kind === 'plan' || spec.kind === 'usage') ? 0 : 1;

@@ -98,10 +98,10 @@ describe('CMO brand', () => {
     const s = execGame(['marketing']);
     const b = openFirst(s);
     withRevenue(s, 10_000_000);
-    s.world.cities[b.cityId]!.brandAwareness = 0.1;
+    b.awareness = 0.1;
     cmoBrand(s);
     expect(s.marketing.campaigns.filter((c) => c.targetId === b.cityId)).toHaveLength(1);
-    s.world.cities[b.cityId]!.brandAwareness = 0.9;
+    b.awareness = 0.9;
     cmoBrand(s);
     expect(s.marketing.campaigns).toHaveLength(0);
   });

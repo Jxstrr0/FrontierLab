@@ -10,7 +10,7 @@ import { runDelegation } from './branch/delegation';
 import { runDemand } from './branch/demand';
 import { dealIndex, runDealDesk, type DealIndex } from './branch/dealDesk';
 import { earnTenders, runTenders, tendersQuarter } from './tenders';
-import { campaignEffects, updateAwareness, updateBrandAwareness } from './branch/marketing';
+import { campaignEffects, updateAwareness } from './branch/marketing';
 import { addReviews, updateRatings } from './branch/ratings';
 import { updateStaff } from './branch/staff';
 import { emptyWeek } from './branch/week';
@@ -113,7 +113,6 @@ export function weeklyTick(state: GameState): void {
   tallyCompute(state); // 4 (the compute pool, C4a)
   settleCompute(state); // 4 (pay the pool; spot trail, crunch and outages, C4c)
   retireGpuLots(state); // 4 (rented GPU lots, C4b)
-  updateBrandAwareness(state);
   runPartnerships(state); // 5
   refreshGpuOffers(state); // 6 (the GPU market, C4b)
   runHq(state); // 7

@@ -8,7 +8,7 @@ import { useState } from 'preact/hooks';
 import type { ProductSpec } from '../../../data/products';
 import type { CountryId } from '../../../data/types';
 import * as cmd from '../../../sim/commands';
-import { starsOf } from '../../../sim/products';
+import { coinsOf } from '../../../sim/productCoins';
 import { marketRef } from '../../../sim/rates';
 import { Card, CoinRating, Confirm, Row, Stepper, Toggle } from '../../components';
 import { editPrice, parsePrice, priceText, productWords, rangeText } from '../../branch/selectors';
@@ -43,7 +43,7 @@ export function CompanyProductCard(p: { spec: ProductSpec; country: CountryId })
         <div class="br-product-title">
           <div class="br-product-name">{spec.name}</div>
           {subtitle && <div class="muted small pf-subtitle">{subtitle}</div>}
-          <CoinRating value={starsOf(s, spec)} size={14} />
+          <CoinRating value={coinsOf(s, spec)} size={14} />
         </div>
         <div class="br-product-toggle">
           <Toggle

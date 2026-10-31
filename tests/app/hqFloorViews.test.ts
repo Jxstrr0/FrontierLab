@@ -1,6 +1,7 @@
 // View helpers behind the Compute, Marketing and Risk floors (Stage 4 UI):
 // term text and slider steps, campaign targets and
 // awareness rows and the next regulator review.
+import { openScriptedBranch } from '../helpers/scenario';
 import { describe, expect, it } from 'vitest';
 import {
   awarenessRows,
@@ -64,6 +65,8 @@ describe('marketing view', () => {
     const listing = Object.values(s.world.officeListings).find((l) => l.cityId === 'cal')!;
     const lease = cmd.leaseOffice(s, listing.id, ['marketing']);
     if (!lease.ok) throw new Error(lease.reason);
+    // Awareness lives in the city's sales office (one awareness number per city).
+    openScriptedBranch(s, 'midtown');
     expect(awarenessRows(s)[0]!.rise).toBe(0);
     const r = cmd.startBrandCampaign(s, { campaignId: 'tv', scope: 'city', targetId: 'cal' });
     if (!r.ok) throw new Error(r.reason);

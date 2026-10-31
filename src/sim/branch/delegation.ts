@@ -130,7 +130,6 @@ function delegateMarketing(state: GameState, branch: Branch): void {
   // Contribution per customer per week: revenue less compute.
   const perCustomer = Math.max(0, (last.revenue - last.lines.compute) / customers);
   const mult = marketingMult(state, branch);
-  const b = state.world.cities[branch.cityId]?.brandAwareness ?? 0;
   // As runDemand: the office's reach is its city traffic (C2a), not its own storefront's.
   const traffic = officeTraffic(state, branch);
   const pen = clamp(branch.customers / Math.max(1e-9, traffic * CATCHMENT_MULT), 0, 1);
@@ -139,7 +138,6 @@ function delegateMarketing(state: GameState, branch: Branch): void {
     PROSPECT_RATE *
     difficultyOf(state).demandMult *
     (1 - AWARENESS_FLOOR) *
-    (1 - b) *
     Math.sqrt(loanDemand(country)) *
     dpow(1 - pen, SATURATION_EXP) *
     cityRoom(state, branch.cityId);

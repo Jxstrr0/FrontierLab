@@ -308,7 +308,7 @@ No tabs: one overview page.
   - **Rented GPUs:** totals card (GPUs rented, weekly bill), then lot cards with provider, reservation type, price per GPU-week, GPUs, end date, weeks left and a rosette (Cost, Term, Reliability, Flexibility, Latency). No early cancel.
   - **GPU market:** offer cards with provider, type, price per GPU-week, "Up to" GPUs, term, price vs spot and rosette, a GPU slider (step 50+) with Max, **Rent N GPUs**, the weekly bill under it, and when the next offers arrive
   - **Partnerships:** cards with employer, people, ARR, seats and a health bar. Tap to open the partnership view (§14).
-- **Marketing:** brand awareness by city (bars), brand campaign cards (scope: city or country; level; cost), active agency packages.
+- **Marketing:** awareness by city (bars, one per sales office: the same number the office's Marketing tab shows), brand campaign cards (scope: city or country; level; cost), active agency packages.
 - **Platform & Security** (dept id `it`): Mobile app (rating coins with a 26-week trend), Security (posture summary), Digital projects (developments of type Digital).
 - **Safety & Alignment** (dept id `risk`):
   - **Regulator and safety:** safety ratio with tier badge and the safety meter, Safety cover, Model exposure, Next safety audit, Chance it fails, Last safety audit, Failed audits, and a notice during a mandated pause, a revoked licence or strict watch
@@ -517,7 +517,7 @@ Opened by tapping a business pin on the map (the **Businesses** layer, which als
 - **For sale:** club name and sport, league, last-season finish, owner, valuation, Company | Private toggle, Offer purchase.
 - **Owned** — tabs Club · Kit · Squad · Transfers · Finance:
   - **Club:** position, record, fan mood, stadium.
-  - **Kit:** colour pickers and shirt sponsor. Choosing your lab boosts brand awareness in that country.
+  - **Kit:** colour pickers and shirt sponsor. Choosing your lab boosts awareness at your offices in that country.
   - **Squad:** star players (name, position, rating, salary) and payroll totals (stars, others, total).
   - **Transfers:** window status, available players, sign / release.
   - **Finance:** revenues (tickets, broadcasting, merchandise, sponsorship), expenses (payroll, operations), net income.

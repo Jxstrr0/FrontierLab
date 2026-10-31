@@ -4,6 +4,7 @@
 // screen to open. Pure: reads state, mutates nothing. Thresholds in
 // ATTENTION (balance.ts); the safety tiers and the CRO's loss target are the
 // ones the rest of the sim already uses.
+import { cityAwareness } from './awareness';
 import { ATTENTION, GRAND_OPENING_WEEKS, SPOT } from '../config/balance';
 import { CITIES } from '../data/cities';
 import { EXEC_SEAT_ORDER, EXEC_SEATS } from '../data/executives';
@@ -277,7 +278,7 @@ export function attentionItems(state: GameState): AttentionItem[] {
 
   // Low awareness in a city with branches.
   const quiet = [...new Set(open.map((b) => b.cityId))]
-    .filter((c) => (state.world.cities[c]?.brandAwareness ?? 0) < ATTENTION.lowAwareness)
+    .filter((c) => cityAwareness(state, c) < ATTENTION.lowAwareness)
     .sort();
   if (quiet.length > 0) {
     items.push({
@@ -285,7 +286,7 @@ export function attentionItems(state: GameState): AttentionItem[] {
       tone: 'info',
       weight: 15,
       title: `Few people know you in ${quiet.length === 1 ? (CITIES[quiet[0]!]?.name ?? quiet[0]) : `${quiet.length} cities`}`,
-      detail: 'Brand awareness under 20%. Campaigns bring prospects through the door.',
+      detail: 'Awareness under 20%. Campaigns bring prospects through the door.',
       route: { kind: 'hq', dept: state.departments.marketing ? 'marketing' : undefined },
     });
   }

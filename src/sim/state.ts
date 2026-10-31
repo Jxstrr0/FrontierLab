@@ -58,7 +58,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState } from './personalTypes';
 
-export const SCHEMA_VERSION = 38;
+export const SCHEMA_VERSION = 39;
 
 export interface GameState {
   schemaVersion: number;
@@ -350,8 +350,6 @@ export interface CityState {
    * original shared grid (cities from saves before v11), 2 its own geography.
    */
   layout: LayoutVersion;
-  /** City brand awareness b (SIMULATION §7). */
-  brandAwareness: Pct;
   /** Market reference price m(p, city) per product (§5). */
   marketRef: Record<string, number>;
   /** Storefronts added since the city was generated (city growth, CONTENT §3). */

@@ -3,6 +3,7 @@
 // company right now, for the tagline under each dial. Pure estimates that
 // change nothing; the weekly routines in execDelegationsPeople.ts and
 // payReviews.ts do the actual work with the same rules.
+import { cityAwareness } from './awareness';
 import {
   AWARENESS_FLOOR,
   EXEC_DELEGATION as X,
@@ -102,8 +103,7 @@ export interface BrandEstimate {
 }
 
 /** The new-customer factor from awareness (SIMULATION §9.1), for a branch at a and a city at b. */
-const flow = (a: number, b: number) =>
-  AWARENESS_FLOOR + (1 - AWARENESS_FLOOR) * (1 - (1 - a) * (1 - b));
+const flow = (a: number) => AWARENESS_FLOOR + (1 - AWARENESS_FLOOR) * a;
 
 /** Campaigns the CMO would run to hold every branch city near `target`, by the routine's own rule. */
 export function brandEstimate(state: GameState, target: number): BrandEstimate {
@@ -120,7 +120,7 @@ export function brandEstimate(state: GameState, target: number): BrandEstimate {
   let capped = false;
   const held: Record<string, number> = {};
   for (const cityId of cities) {
-    const b = state.world.cities[cityId]?.brandAwareness ?? 0;
+    const b = cityAwareness(state, cityId);
     held[cityId] = b;
     const running = state.marketing.campaigns.filter(
       (c) => c.scope === 'city' && c.targetId === cityId,
@@ -148,9 +148,8 @@ export function brandEstimate(state: GameState, target: number): BrandEstimate {
   let nowFlow = 0;
   let thenFlow = 0;
   for (const br of open) {
-    const b = state.world.cities[br.cityId]?.brandAwareness ?? 0;
-    nowFlow += flow(br.awareness, b);
-    thenFlow += flow(br.awareness, held[br.cityId] ?? b);
+    nowFlow += flow(br.awareness);
+    thenFlow += flow(held[br.cityId] ?? br.awareness);
   }
   return {
     target,

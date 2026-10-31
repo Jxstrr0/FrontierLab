@@ -96,12 +96,12 @@ describe('sales office guidance', () => {
     hire(s, 'cmo');
     const b = managed(s);
     onCadence(s);
-    s.world.cities[b.cityId]!.brandAwareness = 0.1;
+    b.awareness = 0.1;
     runBranchGuidance(s);
     runBranchGuidance(s);
     expect(s.company.guidance.marketing).toBe(2);
     expect(guidanceMarketingMult(s)).toBeCloseTo(1 + 2 * GUIDANCE.marketingStep);
-    s.world.cities[b.cityId]!.brandAwareness = 0.9;
+    b.awareness = 0.9;
     for (let i = 0; i < 6; i++) runBranchGuidance(s);
     expect(s.company.guidance.marketing).toBe(GUIDANCE.min);
   });

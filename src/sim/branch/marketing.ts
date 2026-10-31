@@ -1,9 +1,8 @@
 // Branch awareness, city brand awareness and campaign effects (SIMULATION §7).
 import {
   AWARENESS_DECAY,
-  BRAND_DECAY,
   CAMPAIGN_COST_SCALE,
-  BRAND_PASSIVE_PER_BRANCH,
+  OFFICE_PASSIVE_AWARENESS,
   GRAND_OPENING_BONUS,
   GRAND_OPENING_WEEKS,
   MANAGER_MARKETING,
@@ -94,7 +93,7 @@ export function marketingMult(state: GameState, branch: Branch): number {
 /** Weekly branch awareness: a = a × (1 − decay) + Σ gain × (1 − a) × mktMult. */
 export function updateAwareness(state: GameState, branch: Branch, fx: CampaignEffects): void {
   const a = branch.awareness;
-  const gain = fx.awareness * (1 - a) * marketingMult(state, branch);
+  const gain = (fx.awareness * marketingMult(state, branch) + OFFICE_PASSIVE_AWARENESS) * (1 - a);
   branch.awareness = clamp(a * (1 - AWARENESS_DECAY) + gain, 0, 1);
   if (branch.grandOpeningWeeksLeft > 0) branch.grandOpeningWeeksLeft -= 1;
   // Sign-up churn cohort: held while the campaign runs, then decays linearly.
@@ -115,25 +114,8 @@ export function signupChurnMult(branch: Branch): number {
   return 1 + (s.mult - 1) * (s.weeksLeft / s.weeksTotal);
 }
 
-/** Effective awareness e = 1 − (1 − a)(1 − b), with the grand-opening bonus on a. */
-export function effectiveAwareness(state: GameState, branch: Branch): number {
+/** Effective awareness: the office's awareness with the grand-opening bonus (§7). */
+export function effectiveAwareness(branch: Branch): number {
   const bonus = (GRAND_OPENING_BONUS * branch.grandOpeningWeeksLeft) / GRAND_OPENING_WEEKS;
-  const a = clamp(branch.awareness + bonus, 0, 1);
-  const b = state.world.cities[branch.cityId]?.brandAwareness ?? 0;
-  return 1 - (1 - a) * (1 - b);
-}
-
-/** City brand awareness b: decays, with a passive gain per branch in the city. */
-export function updateBrandAwareness(state: GameState): void {
-  for (const city of Object.values(state.world.cities)) {
-    const n = Object.values(state.branches).filter(
-      (b) => b.cityId === city.id && b.status === 'open',
-    ).length;
-    const b = city.brandAwareness;
-    city.brandAwareness = clamp(
-      b * (1 - BRAND_DECAY) + BRAND_PASSIVE_PER_BRANCH * n * (1 - b),
-      0,
-      1,
-    );
-  }
+  return clamp(branch.awareness + bonus, 0, 1);
 }
