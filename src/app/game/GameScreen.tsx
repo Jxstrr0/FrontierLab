@@ -1,5 +1,4 @@
-// The in-game screen: the city view (the Stage 3 map, or the Stage 2 list when
-// FEATURES.cityMap is off), the HUD, and the overlay layers for panels,
+// The in-game screen: the city map, the HUD, and the overlay layers for panels,
 // modals, the menu and layers sheets, and toasts.
 import { AuctionHousePanel } from '../auction/AuctionHousePanel';
 import { FranchisePanel } from '../franchise/FranchisePanel';
@@ -19,12 +18,10 @@ import { LobbyingFirmPanel } from '../lobbying/LobbyingFirmPanel';
 import { PropertyPanel } from '../realEstate/PropertyPanel';
 import { StartupPanel } from '../startup/StartupPanel';
 import { useEffect } from 'preact/hooks';
-import { FEATURES } from '../../config/balance';
 import { BranchPanel } from '../branch/BranchPanel';
 import { BuildPanel } from '../build/BuildPanel';
 import { BuildDataCenterPanel } from '../dataCenter/BuildDataCenterPanel';
 import { DataCenterPanel } from '../dataCenter/DataCenterPanel';
-import { CityList } from '../city/CityList';
 import { BranchesPanel } from '../company/BranchesPanel';
 import { CompanyPanel } from '../company/CompanyPanel';
 import { HqPanel } from '../hq/HqPanel';
@@ -71,23 +68,17 @@ export function GameScreen() {
   }, []);
   return (
     <div class="game">
-      {FEATURES.cityMap ? (
-        <main class="game-map">
-          <MapView />
-        </main>
-      ) : (
-        <main class="game-view">
-          <CityList />
-        </main>
-      )}
+      <main class="game-map">
+        <MapView />
+      </main>
       <Hud />
       <PanelHost />
       {sheet.value === 'menu' && <MenuSheet />}
       {sheet.value === 'layers' && <LayersSheet />}
-      {FEATURES.multiCity && sheet.value === 'travel' && <TravelSheet />}
+      {sheet.value === 'travel' && <TravelSheet />}
       <ModalHost />
       <TutorialOverlay />
-      {FEATURES.multiCity && <FlightOverlay />}
+      <FlightOverlay />
       <ToastHost />
     </div>
   );
@@ -107,65 +98,49 @@ function PanelHost() {
       return <DataCenterPanel key={p.dataCenterId} dataCenterId={p.dataCenterId} />;
     case 'branch':
       return <BranchPanel key={p.branchId} branchId={p.branchId} tab={p.tab ?? 'service'} />;
-    // Stage 4 (FEATURES.hq): offices, HQ and the bureau and agency sites.
     case 'office':
-      return FEATURES.hq ? <OfficePanel key={p.listingId} listingId={p.listingId} /> : null;
+      return <OfficePanel key={p.listingId} listingId={p.listingId} />;
     case 'hq':
-      return FEATURES.hq ? <HqPanel officeId={p.officeId} dept={p.dept} /> : null;
+      return <HqPanel officeId={p.officeId} dept={p.dept} />;
     case 'bureau':
     case 'agency':
-      return FEATURES.hq ? <SitePanel key={p.siteId} siteId={p.siteId} kind={p.type} /> : null;
-    // Stage 5 (FEATURES.competition): rivals, the central bank, employers, the Ledger archive.
+      return <SitePanel key={p.siteId} siteId={p.siteId} kind={p.type} />;
     case 'rivalBranch':
-      return FEATURES.competition ? <RivalBranchPanel key={p.lotId} lotId={p.lotId} /> : null;
+      return <RivalBranchPanel key={p.lotId} lotId={p.lotId} />;
     case 'rivalHq':
-      return FEATURES.competition ? <RivalHqPanel key={p.siteId} siteId={p.siteId} /> : null;
+      return <RivalHqPanel key={p.siteId} siteId={p.siteId} />;
     case 'centralBank':
-      return FEATURES.competition ? <CentralBankPanel countryId={p.countryId} /> : null;
+      return <CentralBankPanel countryId={p.countryId} />;
     case 'employer':
-      return FEATURES.competition ? <EmployerPanel key={p.siteId} siteId={p.siteId} /> : null;
+      return <EmployerPanel key={p.siteId} siteId={p.siteId} />;
     case 'business':
-      return FEATURES.competition ? (
-        <BusinessPanel key={p.businessId} businessId={p.businessId} />
-      ) : null;
+      return <BusinessPanel key={p.businessId} businessId={p.businessId} />;
     case 'university':
-      return FEATURES.competition ? <UniversityPanel key={p.siteId} siteId={p.siteId} /> : null;
+      return <UniversityPanel key={p.siteId} siteId={p.siteId} />;
     case 'ledger':
-      return FEATURES.competition ? <LedgerArchivePanel week={p.week} /> : null;
-    // Stage 6 (FEATURES.capitalMarkets): investment banks.
+      return <LedgerArchivePanel week={p.week} />;
     case 'investmentBank':
-      return FEATURES.capitalMarkets ? (
-        <InvestmentBankPanel key={p.siteId} siteId={p.siteId} tab={p.tab ?? 'market'} />
-      ) : null;
-    // Stage 7 (FEATURES.investments): startups, buildings, conventions, lobbyists.
+      return <InvestmentBankPanel key={p.siteId} siteId={p.siteId} tab={p.tab ?? 'market'} />;
     case 'startup':
-      return FEATURES.investments ? (
-        <StartupPanel key={p.startupId} startupId={p.startupId} />
-      ) : null;
+      return <StartupPanel key={p.startupId} startupId={p.startupId} />;
     case 'property':
-      return FEATURES.investments ? <PropertyPanel key={p.siteId} siteId={p.siteId} /> : null;
+      return <PropertyPanel key={p.siteId} siteId={p.siteId} />;
     case 'convention':
-      return FEATURES.investments ? <ConventionPanel key={p.siteId} siteId={p.siteId} /> : null;
+      return <ConventionPanel key={p.siteId} siteId={p.siteId} />;
     case 'lobbyingFirm':
-      return FEATURES.investments ? <LobbyingFirmPanel key={p.siteId} siteId={p.siteId} /> : null;
-    // Stage 8 (FEATURES.multiCity): airports and travel.
-    // Stage 9 (FEATURES.personalEmpire): the founder's empire.
+      return <LobbyingFirmPanel key={p.siteId} siteId={p.siteId} />;
     case 'wealth':
-      return FEATURES.personalEmpire ? <WealthPanel /> : null;
+      return <WealthPanel />;
     case 'vacationHome':
-      return FEATURES.personalEmpire ? (
-        <VacationHomePanel key={p.siteId} siteId={p.siteId} />
-      ) : null;
+      return <VacationHomePanel key={p.siteId} siteId={p.siteId} />;
     case 'carDealer':
-      return FEATURES.personalEmpire ? <CarDealerPanel key={p.siteId} siteId={p.siteId} /> : null;
+      return <CarDealerPanel key={p.siteId} siteId={p.siteId} />;
     case 'auctionHouse':
-      return FEATURES.personalEmpire ? (
-        <AuctionHousePanel key={p.siteId} siteId={p.siteId} tab={p.tab} />
-      ) : null;
+      return <AuctionHousePanel key={p.siteId} siteId={p.siteId} tab={p.tab} />;
     case 'franchise':
-      return FEATURES.personalEmpire ? <FranchisePanel key={p.clubId} clubId={p.clubId} /> : null;
+      return <FranchisePanel key={p.clubId} clubId={p.clubId} />;
     case 'airport':
-      return FEATURES.multiCity ? <AirportPanel key={p.jet ? 'jet' : 'ap'} jet={p.jet} /> : null;
+      return <AirportPanel key={p.jet ? 'jet' : 'ap'} jet={p.jet} />;
     case 'company':
       return <CompanyPanel />;
     case 'branches':
@@ -177,7 +152,7 @@ function PanelHost() {
     case 'saves':
       return <SavesScreen inGame />;
     case 'portfolio':
-      return FEATURES.investments ? <PortfolioPanel /> : null;
+      return <PortfolioPanel />;
     case 'milestones':
       return <MilestonesPanel />;
     case 'projects':
@@ -191,8 +166,8 @@ function ModalHost() {
   const m = modal.value;
   if (!m) return null;
   if (m.type === 'weekly') return <WeeklyResults week={m.week} period={m.period} />;
-  if (m.type === 'incident') return FEATURES.competition ? <IncidentModal /> : null;
-  if (m.type === 'boardMeeting') return FEATURES.capitalMarkets ? <BoardMeetingModal /> : null;
+  if (m.type === 'incident') return <IncidentModal />;
+  if (m.type === 'boardMeeting') return <BoardMeetingModal />;
   if (m.type === 'annual') return <AnnualReport year={m.year} />;
   return <GameOverModal />;
 }

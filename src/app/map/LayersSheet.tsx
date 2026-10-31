@@ -3,7 +3,7 @@
 // build, each showing the actual pins it toggles (markers.ts), plus the
 // Branches layer's "Available only" filter and a way into the accessible list
 // view. Every change goes through the setSettings command so it saves with the game.
-import { availableLayers, LEASE_ONLY_KEY, layerOn, type MapLayerId } from '../../data/mapLayers';
+import { LEASE_ONLY_KEY, layerOn, MAP_LAYERS, type MapLayerId } from '../../data/mapLayers';
 import * as cmd from '../../sim/commands';
 import { Sheet, Toggle } from '../components';
 import { act, openPanel, sheet, useGame } from '../store';
@@ -18,7 +18,7 @@ const SAMPLE_RIVAL_INK = 'var(--ledger-ink)';
 export function LayersSheet() {
   const s = useGame();
   const layers = s.settings.layers;
-  const list = availableLayers();
+  const list = MAP_LAYERS;
   const allOn = list.every((l) => layerOn(layers, l.id));
   const set = (patch: Record<string, boolean>) =>
     act(cmd.setSettings, { layers: { ...layers, ...patch } });

@@ -15,6 +15,7 @@ import {
 import * as cmd from '../../src/sim/commands';
 import { businessesIn } from '../../src/sim/businesses';
 import { newGame } from '../../src/sim/newGame';
+import { legacyTreasury } from '../../src/sim/save/legacyTreasury';
 import { migrations } from '../../src/sim/save/migrations';
 import type { GameState } from '../../src/sim/state';
 import {
@@ -258,10 +259,10 @@ describe('save migration 12 → 13', () => {
         Math.round((b.budget * BUSINESS.oldBudgets[b.size]) / BUSINESS.sizes[b.size].budget / 100) *
         100;
     }
-    const reserves = s.treasury.reserves;
+    const reserves = legacyTreasury(s).reserves;
     migrations[12]!(raw as never);
 
-    expect(s.treasury.reserves).toBe(reserves + 340_000);
+    expect(legacyTreasury(s).reserves).toBe(reserves + 340_000);
     expect(raw.loanDesk).toBeUndefined();
     expect(s.dealDesk).toEqual({ rfps: {} });
     expect(branch.desk).toEqual({ week: 3, arrived: 5, won: 4, lost: 2, declined: 1, expired: 0 });

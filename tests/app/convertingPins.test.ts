@@ -5,12 +5,10 @@ import { describe, expect, it } from 'vitest';
 import { occupantsOf } from '../../src/app/map/mapOccupants';
 import { buildPins, pinsKey } from '../../src/app/map/pins';
 import { generateCityMap } from '../../src/art/citygen';
-import { FEATURES, MERGERS } from '../../src/config/balance';
+import { MERGERS } from '../../src/config/balance';
 import { CITIES } from '../../src/data/cities';
 import { newGame } from '../../src/sim/newGame';
 import { openScriptedBranch } from '../helpers/scenario';
-
-const NO_HQ = { ...FEATURES, hq: false, competition: false };
 
 describe('converting branch pins', () => {
   it('shows the old brand, progress and weeks left, and changes key as it counts down', () => {
@@ -26,7 +24,7 @@ describe('converting branch pins', () => {
       monogram: 'OB',
       weeksLeft: 3,
     };
-    const pins = buildPins(s, map, lots, NO_HQ);
+    const pins = buildPins(s, map, lots);
     const mine = pins.find((p) => p.branchId === branchId)!;
     expect(mine.kind).toBe('mine');
     expect(mine.ink).toBe('#123456');
@@ -34,7 +32,7 @@ describe('converting branch pins', () => {
     expect(mine.label).toContain('converting from Old Bank, 3 weeks left');
     const total = MERGERS.conversionWeeks;
     expect(mine.converting?.progress).toBeCloseTo((total - 3) / total, 10);
-    expect(occupantsOf(s, lots, NO_HQ)[branch.lotId]).toEqual({
+    expect(occupantsOf(s, lots)[branch.lotId]).toEqual({
       type: 'player',
       ink: '#123456',
       fitout: true,
@@ -42,9 +40,9 @@ describe('converting branch pins', () => {
 
     const before = pinsKey(pins);
     branch.converting.weeksLeft = 2;
-    expect(pinsKey(buildPins(s, map, lots, NO_HQ))).not.toBe(before);
+    expect(pinsKey(buildPins(s, map, lots))).not.toBe(before);
     delete branch.converting;
-    const done = buildPins(s, map, lots, NO_HQ).find((p) => p.branchId === branchId)!;
+    const done = buildPins(s, map, lots).find((p) => p.branchId === branchId)!;
     expect(done.ink).toBe(s.meta.brandInk);
     expect(done.converting).toBeUndefined();
   });

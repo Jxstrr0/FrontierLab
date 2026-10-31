@@ -16,7 +16,7 @@ import {
 import { advanceWeeks } from '../../src/sim/engine';
 import { newGame } from '../../src/sim/newGame';
 import type { GameState } from '../../src/sim/state';
-import { homeCountry } from '../../src/sim/treasury';
+import { homeCountry } from '../../src/sim/homeCountry';
 import { freeLot } from '../helpers/scenario';
 
 function setup(): GameState {

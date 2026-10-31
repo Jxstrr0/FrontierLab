@@ -3,7 +3,7 @@
 // (CreditLineCard.tsx), and every loan and line you owe with early repayment.
 // Corporate cash, never deposits. A bank lends to labs with a sales office in
 // its city. Loans taken from rival labs in older saves show here to repay.
-import { CORPORATE_LENDING } from '../../config/balance';
+import { CORPORATE_LENDING, WEEKS_PER_YEAR } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { INVESTMENT_BANKS } from '../../data/investmentBanks';
 import * as cmd from '../../sim/commands';
@@ -14,8 +14,6 @@ import { money, pct } from '../format/format';
 import { act, toast, useGame } from '../store';
 import { CreditLineCard } from './CreditLineCard';
 import './debt.css';
-
-const WEEKS_PER_YEAR = 52;
 
 /** "2 years", "18 months" style maturity for a term in weeks. */
 function maturity(weeks: number): string {

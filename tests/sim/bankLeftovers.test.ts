@@ -6,6 +6,7 @@ import { LAUNCH_POSTURE, MILESTONE_GOALS, START_CASH } from '../../src/config/ba
 import { safetyExposure, postureDealEdge } from '../../src/sim/safety';
 import { checkMilestones } from '../../src/sim/milestones';
 import { newGame } from '../../src/sim/newGame';
+import { legacyTreasury } from '../../src/sim/save/legacyTreasury';
 import { migrations } from '../../src/sim/save/migrations';
 import * as arr from '../../src/sim/arr';
 
@@ -13,25 +14,26 @@ describe('seed money', () => {
   it('is all spendable: no locked reserve', () => {
     const s = newGame({ seed: 42, cityId: 'cal' });
     expect(s.company.cash).toBe(START_CASH);
-    expect(s.treasury.reserves).toBe(0);
+    expect('treasury' in s).toBe(false);
     expect(s.company.paidInCapital).toBe(START_CASH);
   });
 
   it('migration 18 → 19 moves an old save’s reserves into cash', () => {
     const s = newGame({ seed: 42, cityId: 'cal' });
-    s.treasury.reserves = 2_000_000;
+    legacyTreasury(s).reserves = 2_000_000;
     const cash = s.company.cash;
     migrations[18]!(s as never);
     expect(s.company.cash).toBe(cash + 2_000_000);
-    expect(s.treasury.reserves).toBe(0);
+    expect(legacyTreasury(s).reserves).toBe(0);
   });
 
   it('leaves reserves alone while bank-era borrowing remains', () => {
     const s = newGame({ seed: 42, cityId: 'cal' });
-    s.treasury.reserves = 2_000_000;
-    s.treasury.overnight = 500_000;
+    const t = legacyTreasury(s);
+    t.reserves = 2_000_000;
+    t.overnight = 500_000;
     migrations[18]!(s as never);
-    expect(s.treasury.reserves).toBe(2_000_000);
+    expect(t.reserves).toBe(2_000_000);
   });
 });
 

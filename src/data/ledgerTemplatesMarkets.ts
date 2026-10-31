@@ -2,7 +2,7 @@
 // your placements, IPO and secondary offerings, big moves in your share price,
 // and listed companies' notable results. The weekly market wrap reuses
 // MARKET_UP / MARKET_DOWN from ledgerTemplatesWorld.ts. Merged into
-// LEDGER_TEMPLATES via ledgerTemplatesCapital.ts.
+// LEDGER_TEMPLATES in ledgerTemplates.ts.
 import type { LedgerTemplate } from './ledgerTemplates';
 
 export const MARKETS_TEMPLATES = {

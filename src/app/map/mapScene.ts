@@ -7,13 +7,11 @@ import { tileCenter } from '../../art/iso';
 import { createMapRenderer } from '../../art/isoRenderer';
 import { createLifeLayer, type LifeLayer } from '../../art/lifeLayer';
 import type { MapRenderer } from '../../art/mapRenderer';
-import { FEATURES } from '../../config/balance';
 import { BRANCH_ZOOM, OVERVIEW_ZOOM } from '../../config/mapView';
 import type { CitySpec } from '../../data/cities';
 import type { GameState, Lot } from '../../sim/state';
 import type { ViewCamera } from './camera';
 import { landmarkCentre } from './landmarkPins';
-import { siteEnabled } from './sitePins';
 
 /** Fallback for the map paper if the --paper token can't be read (ART_DIRECTION §1.1). */
 const PAPER_FALLBACK = '#DFE7E7';
@@ -39,14 +37,12 @@ export function paperColour(): string {
   return v || PAPER_FALLBACK;
 }
 
-/** The city's layout version, plus office buildings and sites (Stage 4, behind FEATURES.hq). */
+/** The city's layout version, plus office buildings and sites. */
 export function mapPlaces(s: GameState, cityId: string): MapPlaces {
-  const layout = s.world.cities[cityId]?.layout;
-  if (!FEATURES.hq) return { layout };
   return {
-    layout,
+    layout: s.world.cities[cityId]?.layout,
     offices: Object.values(s.world.officeListings).filter((o) => o.cityId === cityId),
-    sites: Object.values(s.world.sites).filter((x) => x.cityId === cityId && siteEnabled(x.kind)),
+    sites: Object.values(s.world.sites).filter((x) => x.cityId === cityId),
   };
 }
 

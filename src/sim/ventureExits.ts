@@ -11,7 +11,7 @@ import { postCash } from './ledger';
 import { withAssetMarks, type Account } from './portfolio';
 import type { Rng } from './rng';
 import type { GameState, ListedCompany, Startup } from './state';
-import { homeCountry } from './treasury';
+import { homeCountry } from './homeCountry';
 import { repayDebtInFull, writeOffDebt } from './ventureDebt';
 import { cancelRound, heldByYou } from './ventureRounds';
 import { sectorOf } from './ventureModel';

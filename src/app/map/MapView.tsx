@@ -6,8 +6,6 @@ import { useEffect, useRef, useState } from 'preact/hooks';
 import { CITIES } from '../../data/cities';
 import type { LandmarkId } from '../../config/map';
 import { BRANCH_ZOOM, CLUSTER_EXPAND_ZOOM } from '../../config/mapView';
-import { FEATURES } from '../../config/balance';
-import { RivalSheet } from '../city/RivalSheet';
 import { cityLots } from '../city/lotInfo';
 import { openPanel, useGame } from '../store';
 import { initialCamera, mapPlaces, rememberCamera, sceneFor } from './mapScene';
@@ -54,7 +52,6 @@ export function MapView() {
   const pinHost = useRef<HTMLDivElement>(null);
   const ctrl = useRef<MapController | null>(null);
   const keys = useRef({ scene: '', build: '', pins: STALE, occupants: STALE, mood: STALE });
-  const [rivalLotId, setRivalLotId] = useState<string | null>(null);
   const [fontsReady, setFontsReady] = useState(fontsLoaded);
   // Read through a ref so the controller always sees the latest settings.
   const reduced = useRef(false);
@@ -76,10 +73,8 @@ export function MapView() {
         if (pin.dataCenterId) openPanel({ type: 'dataCenter', dataCenterId: pin.dataCenterId });
         else if (pin.kind === 'mine' && pin.branchId)
           openPanel({ type: 'branch', branchId: pin.branchId });
-        else if (pin.kind === 'rival') {
-          if (FEATURES.competition) openPanel({ type: 'rivalBranch', lotId: pin.id });
-          else setRivalLotId(pin.id);
-        } else if (pin.kind === 'rivalHq') openPanel({ type: 'rivalHq', siteId: pin.id });
+        else if (pin.kind === 'rival') openPanel({ type: 'rivalBranch', lotId: pin.id });
+        else if (pin.kind === 'rivalHq') openPanel({ type: 'rivalHq', siteId: pin.id });
         else if (pin.kind === 'centralBank' && pin.countryId)
           openPanel({ type: 'centralBank', countryId: pin.countryId });
         else if (pin.kind === 'employer' || pin.kind === 'energySite')
@@ -165,7 +160,6 @@ export function MapView() {
         <canvas class="map-canvas map-life" ref={lifeCanvas} aria-hidden="true" />
         <div class="pin-layer" ref={pinHost} role="group" aria-label="Places on the map" />
       </div>
-      {rivalLotId && <RivalSheet s={s} lotId={rivalLotId} onClose={() => setRivalLotId(null)} />}
     </>
   );
 }

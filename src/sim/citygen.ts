@@ -100,7 +100,6 @@ export function rollLot(
     footTraffic,
     mix: { ...spec.mix },
     incomeIndex: spec.income * city.incomeIndex * rng.range(...LOT_INCOME_NOISE),
-    homeownerShare: spec.homeowners,
     weeklyRent,
     deposit: weeklyRent * LEASE_DEPOSIT_WEEKS,
     buildingSeed: rng.int(0, CITYGEN.maxSeed),

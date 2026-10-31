@@ -4,13 +4,13 @@
 // screen to open. Pure: reads state, mutates nothing. Thresholds in
 // ATTENTION (balance.ts); the safety tiers and the CRO's loss target are the
 // ones the rest of the sim already uses.
-import { ATTENTION, EXEC_DELEGATION, GRAND_OPENING_WEEKS, LIQ_MIN, SPOT } from '../config/balance';
+import { ATTENTION, GRAND_OPENING_WEEKS, SPOT } from '../config/balance';
 import { CITIES } from '../data/cities';
 import { EXEC_SEAT_ORDER, EXEC_SEATS } from '../data/executives';
 import type { DeptId } from '../data/types';
 import { staffNeeded } from './branch/staff';
 import { cashCoverWeeks } from './cashCover';
-import { averageMorale, companyLossRate } from './execDelegationsPeople';
+import { averageMorale } from './execDelegationsPeople';
 import { hasExecFloor } from './execSeats';
 import type { Branch, GameState } from './state';
 import { pauseBlock } from './safety';
@@ -144,44 +144,6 @@ export function attentionItems(state: GameState): AttentionItem[] {
     });
   }
 
-  // Liquidity: a freeze, under the minimum, or under target with nothing topping it up.
-  const liq = state.company.liquidityRatio;
-  const t = state.treasury;
-  const liqRoute = {
-    kind: 'hq',
-    dept: state.departments.treasury ? 'treasury' : undefined,
-  } as const;
-  if (t.freeze) {
-    items.push({
-      id: 'liquidity',
-      tone: 'bad',
-      weight: 85,
-      title: 'Spending frozen',
-      detail:
-        'Liquid assets are under the minimum and auto-funding is off, so new spending is on hold.',
-      route: liqRoute,
-    });
-  } else if (liq !== null && liq < LIQ_MIN) {
-    items.push({
-      id: 'liquidity',
-      tone: 'warn',
-      weight: 70,
-      title: 'Liquidity under the minimum',
-      detail: 'Drawing on the emergency credit line to cover it, which costs reputation.',
-      route: liqRoute,
-    });
-  } else if (liq !== null && !t.autoFunding && liq < t.liqTarget - ATTENTION.liqBand) {
-    items.push({
-      id: 'liquidity',
-      tone: 'warn',
-      weight: 60,
-      title: 'Liquidity under target',
-      detail:
-        'Auto-funding is off, so nothing tops it up: borrow on the Compute floor or turn auto-funding on.',
-      route: liqRoute,
-    });
-  }
-
   // New RFPs about to expire (C5b).
   const expiring = Object.values(state.dealDesk.rfps).filter(
     (a) => a.kind === 'new' && a.dueWeek <= state.clock.week + 1,
@@ -251,19 +213,6 @@ export function attentionItems(state: GameState): AttentionItem[] {
       detail:
         'Queues grow and the service rating slips. A manager with Staffing delegated fixes this.',
       route: short.length === 1 ? { kind: 'branch', branchId: short[0]!.id } : { kind: 'branches' },
-    });
-  }
-
-  // Loss rate above the CRO's ceiling.
-  const loss = companyLossRate(state);
-  if (loss > EXEC_DELEGATION.croMaxLoss) {
-    items.push({
-      id: 'lossRate',
-      tone: 'warn',
-      weight: 48,
-      title: `Bad debts at ${(loss * 100).toFixed(1)}% a year`,
-      detail: 'Above the 1.2% ceiling. Turn launch posture down or license a better data package.',
-      route: { kind: 'hq', dept: state.departments.risk ? 'risk' : undefined },
     });
   }
 
