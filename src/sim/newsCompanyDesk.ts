@@ -7,7 +7,7 @@
 // model already made and never move a price themselves.
 import { NEWS_COMPANY_DESK, NEWS_PRIORITY as P, WEEKS_PER_YEAR } from '../config/balance';
 import { CITIES } from '../data/cities';
-import { FIRST_NAMES, LAST_NAMES } from '../data/names';
+import { PUBLIC_FIRST_NAMES, PUBLIC_LAST_NAMES } from '../data/namesPublic';
 import { LAUNCH_PRODUCTS, MOVER_REASONS } from '../data/newsWorldBeats';
 import { STOCKS } from '../data/stocks';
 import { grouped, newsAbsPct, newsExact } from './newsFormat';
@@ -73,7 +73,7 @@ export function corporateStory(ctx: NewsContext, rng: Rng): Story | undefined {
     group: 'corporate',
     tokens: {
       company: c.name,
-      name: `${rng.pick(FIRST_NAMES)} ${rng.pick(LAST_NAMES)}`,
+      name: `${rng.pick(PUBLIC_FIRST_NAMES)} ${rng.pick(PUBLIC_LAST_NAMES)}`,
       product: rng.pick(LAUNCH_PRODUCTS[c.sector]),
       city: cities.length > 0 ? rng.pick(cities).name : 'its home city',
       n: grouped(rng.int(NEWS_COMPANY_DESK.siteJobs[0], NEWS_COMPANY_DESK.siteJobs[1])),

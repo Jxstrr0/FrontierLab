@@ -7,11 +7,11 @@ import { CITYGEN, REAL_ESTATE } from '../config/balance';
 import { CITIES } from '../data/cities';
 import { conventionIn } from '../data/conventions';
 import { lobbyFirmFor } from '../data/lobbying';
-import { STREET_KINDS, STREET_NAMES } from '../data/names';
 import type { DistrictId } from '../data/types';
 import { geometryFor, placeNear } from './cityPlacement';
 import { stream } from './rng';
 import type { GameState, Site, SiteKind } from './state';
+import { streetAddress } from './streets';
 
 /** Districts a property building can stand in. */
 const PROPERTY_DISTRICTS: DistrictId[] = [
@@ -49,7 +49,7 @@ export function generateInvestmentSites(state: GameState, cityId: string): void 
       refId,
       tile,
       district: d,
-      address: `${rng.int(1, CITYGEN.maxStreetNumber)} ${rng.pick(STREET_NAMES)} ${rng.pick(STREET_KINDS)}`,
+      address: streetAddress(rng, cityId),
       buildingSeed: rng.int(0, CITYGEN.maxSeed),
     };
     state.world.sites[site.id] = site;

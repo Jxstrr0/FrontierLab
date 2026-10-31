@@ -7,7 +7,7 @@
 import { NEWS_CALENDAR as K, NEWS_PRIORITY as P } from '../config/balance';
 import { CITIES } from '../data/cities';
 import type { TemplateKey } from '../data/ledgerTemplates';
-import { FIRST_NAMES, LAST_NAMES } from '../data/names';
+import { PUBLIC_FIRST_NAMES, PUBLIC_LAST_NAMES } from '../data/namesPublic';
 import { FILMS, FIXTURES, NATIONS, PRIZE_FIELDS } from '../data/worldCalendar';
 import { dateOf, weekOfYear } from './calendar';
 import { grouped, newsMoney } from './newsFormat';
@@ -24,7 +24,7 @@ import type { Rng } from './rng';
 import type { NewsDesk, ScheduledStory } from './state';
 
 const HOST_CITIES = Object.values(CITIES);
-const person = (rng: Rng) => `${rng.pick(FIRST_NAMES)} ${rng.pick(LAST_NAMES)}`;
+const person = (rng: Rng) => `${rng.pick(PUBLIC_FIRST_NAMES)} ${rng.pick(PUBLIC_LAST_NAMES)}`;
 
 /** Does a fixture that runs every `every` years (year % every === offset) fall this year? */
 const inYear = (year: number, f: { every: number; offset: number }) => year % f.every === f.offset;

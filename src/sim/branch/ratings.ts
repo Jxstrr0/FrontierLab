@@ -21,7 +21,8 @@ import {
   MODEL_EFFECTS,
 } from '../../config/balance';
 import { BUILD_SLOTS, EQUIPMENT } from '../../data/equipment';
-import { CAMPAIGN_REVIEW_LINES, REVIEW_LINES } from '../../data/reviews';
+import { REVIEW_LINES } from '../../data/reviews';
+import { CAMPAIGN_REVIEW_LINES, campaignToneLines } from '../../data/reviewsCampaigns';
 import { SEGMENTS, type RatingCategory } from '../../data/types';
 import { clamp, ema } from '../math';
 import { marketRef } from '../rates';
@@ -217,16 +218,22 @@ export function addReviews(
   const picks: RatingCategory[] = [sorted[0]!, sorted[sorted.length - 1]!];
   const count = rng.int(1, 2);
   for (let i = 0; i < count; i++) {
-    const campaignId = fx.activeIds.find((id) => CAMPAIGN_REVIEW_LINES[id]);
-    const useCampaign = campaignId !== undefined && rng.chance(REVIEW_CAMPAIGN_CHANCE);
-    const category = useCampaign
+    // Any running campaign with lines can be quoted, not just the first one.
+    const quotable = fx.activeIds.filter((id) => CAMPAIGN_REVIEW_LINES[id]);
+    const useCampaign = quotable.length > 0 && rng.chance(REVIEW_CAMPAIGN_CHANCE);
+    const campaignId = useCampaign ? rng.pick(quotable) : undefined;
+    const category = campaignId
       ? CAMPAIGN_REVIEW_LINES[campaignId]!.category
       : picks[i % picks.length]!;
     const stars = Math.round(
       clamp(branch.ratings[category] + rng.normal(0, REVIEW_CARD_SIGMA), 1, 5),
     );
-    const pool = stars >= 3 ? REVIEW_LINES[category].pos : REVIEW_LINES[category].neg;
-    const text = useCampaign ? CAMPAIGN_REVIEW_LINES[campaignId]!.text : rng.pick(pool);
+    const pool = campaignId
+      ? campaignToneLines(CAMPAIGN_REVIEW_LINES[campaignId]!, stars)
+      : stars >= 3
+        ? REVIEW_LINES[category].pos
+        : REVIEW_LINES[category].neg;
+    const text = rng.pick(pool);
     branch.reviewCards.push({
       week: state.clock.week,
       category,

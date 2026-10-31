@@ -1,5 +1,5 @@
-// Landmark towers (src/sim/landmarkTowers.ts, SIMULATION §16.1): London and
-// Moscow each list one giant Financial District office, big enough for every
+// Landmark towers (src/sim/landmarkTowers.ts, SIMULATION §16.1): London, Moscow
+// and ten more big cities each list one giant Financial District office, big enough for every
 // department; other cities don't; save migration 24 → 25 adds it to old saves.
 import { describe, expect, it } from 'vitest';
 import { LANDMARK_TOWERS } from '../../src/data/landmarkTowers';

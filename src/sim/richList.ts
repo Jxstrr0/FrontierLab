@@ -5,7 +5,7 @@
 // among them (no rank below the last place) and a RICH_LIST event reaches The
 // Weekly Ledger. Stream: `richList`.
 import { RICH_LIST } from '../config/balance';
-import { FIRST_NAMES, LAST_NAMES } from '../data/names';
+import { PUBLIC_FIRST_NAMES, PUBLIC_LAST_NAMES } from '../data/namesPublic';
 import { RICH_SOURCES } from '../data/richList';
 import { dexp, dlog } from './detmath';
 import { pushEvent } from './events';
@@ -29,7 +29,7 @@ export function seedRichList(state: GameState): void {
   for (let i = 0; i < RICH_LIST.size; i++) {
     let name = '';
     for (let t = 0; t < NAME_TRIES && (name === '' || used.has(name)); t++)
-      name = `${rng.pick(FIRST_NAMES)} ${rng.pick(LAST_NAMES)}`;
+      name = `${rng.pick(PUBLIC_FIRST_NAMES)} ${rng.pick(PUBLIC_LAST_NAMES)}`;
     used.add(name);
     // Log-uniform: as many fortunes between $0.5B and $3B as between $5B and $30B.
     const worth = round(dexp(rng.range(dlog(lo), dlog(hi))));

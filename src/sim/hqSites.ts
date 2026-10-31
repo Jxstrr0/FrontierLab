@@ -11,12 +11,12 @@ import {
 import { agenciesIn } from '../data/brandCampaigns';
 import { bureausIn } from '../data/bureaus';
 import { CITIES } from '../data/cities';
-import { STREET_KINDS, STREET_NAMES } from '../data/names';
 import type { DistrictId } from '../data/types';
 import { geometryFor, placeNear } from './cityPlacement';
 import { listPrice } from './nominal';
 import { stream, type Rng } from './rng';
 import type { GameState, OfficeListing, Site, SiteKind } from './state';
+import { streetAddress } from './streets';
 
 /** Weekly rent of a whole office building (§16.1), at today's price list (§4.6). */
 export function officeRent(state: GameState, floors: number, cityId: string): number {
@@ -52,7 +52,7 @@ export function generateSites(state: GameState, cityId: string): void {
         cityId,
         tile,
         district,
-        address: address(rng),
+        address: address(rng, cityId),
         floors,
         desksPerFloor,
         area: floors * desksPerFloor * OFFICE_LISTINGS.areaPerDesk,
@@ -82,7 +82,7 @@ export function generateSites(state: GameState, cityId: string): void {
       refId,
       tile,
       district,
-      address: address(rng),
+      address: address(rng, cityId),
       buildingSeed: rng.int(0, CITYGEN.maxSeed),
     };
     state.world.sites[site.id] = site;
@@ -109,6 +109,6 @@ export function listingsByDistrict(total: number): [DistrictId, number][] {
   return counts.map((c) => [c.district, c.count]);
 }
 
-function address(rng: Rng): string {
-  return `${rng.int(1, CITYGEN.maxStreetNumber)} ${rng.pick(STREET_NAMES)} ${rng.pick(STREET_KINDS)}`;
+function address(rng: Rng, cityId: string): string {
+  return streetAddress(rng, cityId);
 }

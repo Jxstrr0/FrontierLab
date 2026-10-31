@@ -16,7 +16,6 @@ import {
 import type { LayoutVersion } from '../config/cityGeo';
 import { CITIES, type CitySpec } from '../data/cities';
 import { DISTRICT_SPECS } from '../data/districts';
-import { STREET_KINDS, STREET_NAMES } from '../data/names';
 import type { DistrictId } from '../data/types';
 import type { CityGeometry } from './cityGeo';
 import { geometryFor, placeNear } from './cityPlacement';
@@ -24,6 +23,7 @@ import { listLevel } from './nominal';
 import { stream, type Rng } from './rng';
 import type { GameState, Lot } from './state';
 import { dhypot, dpow } from './detmath';
+import { streetAddress } from './streets';
 
 /**
  * How many storefronts a city gets: layout 1 keeps the original count; later
@@ -96,7 +96,7 @@ export function rollLot(
     tile: { x, y },
     district,
     kind: 'storefront',
-    address: `${rng.int(1, CITYGEN.maxStreetNumber)} ${rng.pick(STREET_NAMES)} ${rng.pick(STREET_KINDS)}`,
+    address: streetAddress(rng, city.id),
     footTraffic,
     mix: { ...spec.mix },
     incomeIndex: spec.income * city.incomeIndex * rng.range(...LOT_INCOME_NOISE),
