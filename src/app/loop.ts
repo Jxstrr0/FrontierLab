@@ -1,15 +1,27 @@
 // The real-time game loop (DESIGN §5.1). At 1× one game day passes per second
 // (DAY_MS); 2× and 4× scale that. After each weekly tick it autosaves, shows the
-// weekly results when settings ask for it, and pauses for game over, expiring
-// proposal requests and new incidents (the incident modal opens once the weekly
-// results are closed), and once a quarter for the board meeting reminder when
-// there is an Executive floor (after any other modal). Hidden tabs hold time,
+// results when settings ask for it, and pauses for game over, expiring proposal
+// requests, the first week in the red and new incidents (the incident modal
+// opens once the results are closed). Hidden tabs hold time,
 // and so does any open panel, sheet or modal: the clock runs only on the map,
 // and real time that passes while it is held is dropped, not banked, so closing
 // the weekly results never spends the seconds they were open. stepWeek() runs
 // the rest of the current week at once and leaves the game paused, for
-// week-by-week play.
-import { CAPITAL_BUFFER_PP, DAY_MS, DAYS_PER_WEEK, FEATURES, SAFETY } from '../config/balance';
+// week-by-week play. skipAhead() runs flat out (SKIP_DAYS_PER_SECOND) until
+// something needs you: a popup, a bad notice, cash below zero, or the end of
+// the month, which shows that month's results; then it pauses. Resuming after
+// any pause returns to the speed you were playing at. Info-only incidents
+// (nothing to decide) become notices instead of popups, and the quarter's
+// board meeting is a HUD chip rather than a popup.
+import { signal } from '@preact/signals';
+import {
+  CAPITAL_BUFFER_PP,
+  DAY_MS,
+  DAYS_PER_WEEK,
+  FEATURES,
+  SAFETY,
+  SKIP_DAYS_PER_SECOND,
+} from '../config/balance';
 import { CITIES } from '../data/cities';
 import { INCIDENT_SPECS } from '../data/incidents';
 import { isQuarterStart } from '../sim/calendar';
@@ -22,7 +34,8 @@ import { saveToSlot } from './saves';
 import { play } from './sound/sound';
 import { autosave } from './saves/autosave';
 import { reportSaveError } from './saves/saveError';
-import { bump, clockHeld, modal, peekGame, toast } from './store';
+import { resolveIncident, setSettings } from '../sim/commands';
+import { bump, clockHeld, modal, notice, peekGame } from './store';
 import { periodKey } from './weekly/resultsPeriod';
 import { MNA_BAD_EVENTS, MNA_EVENT_TEXT } from './investmentBank/mnaToasts';
 import { VENTURE_BAD_EVENTS, VENTURE_EVENT_TEXT } from './startup/ventureToasts';
@@ -40,10 +53,13 @@ let lastSeen: GameEvent | undefined;
 let promptedCases = new Set<string>();
 /** New cases are waiting for the current modal (weekly results) to close. */
 let casesWaiting = false;
-/** The board meeting reminder is waiting for the other modals to close. */
-let boardWaiting = false;
-/** Quarter label of the last board reminder, so each quarter prompts once. */
-let remindedQuarter: string | undefined;
+/** Quarter label of the last board reminder: the HUD shows the Board chip for it while a meeting is due. */
+export const boardChipQuarter = signal<string | undefined>(undefined);
+/** The speed to resume at after a pause (the one you were playing at). */
+let resumeSpeed: 1 | 2 | 4 | undefined;
+/** Skip ahead is running; it stops at the month key below or anything that needs you. */
+export const skipping = signal(false);
+let skipMonth = '';
 /** Annual reports already on file when shown, so each year end opens its report once. */
 let shownYears = 0;
 /** The year's annual report is waiting for the results modal to close. */
@@ -56,8 +72,9 @@ export function startLoop(): void {
   lastSeen = peekGame()?.events.log.at(-1);
   promptedCases = new Set(peekGame()?.incidents.active.map((i) => i.id) ?? []);
   casesWaiting = false;
-  boardWaiting = false;
-  remindedQuarter = undefined;
+  boardChipQuarter.value = undefined;
+  resumeSpeed = undefined;
+  skipping.value = false;
   shownYears = peekGame()?.history.yearly.length ?? 0;
   annualWaiting = false;
   timer = setInterval(frame, FRAME_MS);
@@ -72,17 +89,48 @@ export function setSpeed(speed: GameState['clock']['speed']): void {
   const s = peekGame();
   if (!s || s.flags.gameOver) return;
   s.clock.speed = speed;
-  if (speed > 0) delete s.clock.pausedReason;
+  if (speed > 0) {
+    delete s.clock.pausedReason;
+    resumeSpeed = speed as 1 | 2 | 4;
+  }
+  skipping.value = false;
   acc = 0;
   bump();
+}
+
+/** Play again at the speed you were playing at before the pause (or the default speed). */
+export function resume(): void {
+  const s = peekGame();
+  if (!s) return;
+  setSpeed(resumeSpeed ?? s.settings.defaultSpeed);
 }
 
 export function pause(reason?: string): void {
   const s = peekGame();
   if (!s) return;
+  if (s.clock.speed > 0) resumeSpeed = s.clock.speed as 1 | 2 | 4;
   s.clock.speed = 0;
+  skipping.value = false;
   if (reason) s.clock.pausedReason = reason;
   bump();
+}
+
+/** HUD ⏭: run flat out to the end of the month, or sooner if something needs you. */
+export function skipAhead(): void {
+  const s = peekGame();
+  if (!s || s.flags.gameOver || clockHeld()) return;
+  if (skipping.value) return pause();
+  if (s.clock.speed === 0) s.clock.speed = resumeSpeed ?? s.settings.defaultSpeed;
+  delete s.clock.pausedReason;
+  skipMonth = periodKey('monthly', s.meta.startDate, s.clock.week);
+  skipping.value = true;
+  acc = 0;
+  bump();
+}
+
+/** Ends a skip ahead and leaves the game paused, saying why. */
+function stopSkip(reason?: string): void {
+  if (skipping.value) pause(reason);
 }
 
 /** Plays out the days left in this week instantly, then pauses (week-by-week play). */
@@ -131,15 +179,12 @@ export function elapse(dt: number): void {
     casesWaiting = false;
     if (s.incidents.active.length > 0 && !s.flags.gameOver) modal.value = { type: 'incident' };
   }
-  if (boardWaiting && !clockHeld() && !casesWaiting) {
-    boardWaiting = false;
-    if (boardDue(s)) modal.value = { type: 'boardMeeting', reminder: true };
-  }
   if (s.clock.speed === 0 || clockHeld() || pageHidden()) {
     acc = 0;
     return;
   }
-  acc += Math.min(dt, MAX_FRAME_MS) * s.clock.speed;
+  const rate = skipping.value ? (SKIP_DAYS_PER_SECOND * DAY_MS) / 1000 : s.clock.speed;
+  acc += Math.min(dt, MAX_FRAME_MS) * rate;
   let changed = false;
   while (acc >= DAY_MS && s.clock.speed > 0 && !clockHeld()) {
     acc -= DAY_MS;
@@ -150,13 +195,16 @@ export function elapse(dt: number): void {
   }
   // A modal opened (or afterWeek paused the game) mid-frame: drop what was banked.
   if (clockHeld() || !(s.clock.speed > 0)) acc = 0;
+  // Skip ahead stops for any popup, and the game waits paused once it closes.
+  if (skipping.value && clockHeld()) stopSkip();
   if (changed) bump();
 }
 
 function afterWeek(s: GameState): void {
-  announceEvents(s);
+  const bad = announceEvents(s);
   if (s.flags.gameOver) {
     s.clock.speed = 0;
+    skipping.value = false;
     void saveToSlot('auto', s);
     modal.value = { type: 'gameover' };
     return;
@@ -165,15 +213,49 @@ function afterWeek(s: GameState): void {
 
   if (s.settings.autoPauseApplications && expiringRfps(s) > 0) {
     pause('Proposal requests expire this week');
-    toast('Proposal requests expire this week.', 'info');
+    notice('Proposal requests expire this week.', 'info');
+  }
+  // The first week in the red pauses once: four weeks there with no credit is game over.
+  if (s.company.negativeCashWeeks === 1) {
+    pause('Cash is below zero');
+    notice('Cash is below zero. Four weeks in the red with no credit ends the game.', 'bad', 6000);
+  }
+  const newYear = s.history.yearly.length > shownYears;
+  if (newYear && shownYears === 0 && s.settings.weeklyResults === 'weekly') {
+    // After the first year, results come monthly so the week-by-week sheet stops interrupting.
+    setSettings(s, { weeklyResults: 'monthly' });
+    notice('Results now come once a month. Change it in Settings or at the foot of the results.');
   }
   const quarter = isQuarterStart(s.meta.startDate, s.clock.day);
-  const due = resultsDue(s.settings.weeklyResults, s.meta.startDate, s.clock.day);
-  if (due === 'weekly') modal.value = { type: 'weekly', week: s.clock.week - 1 };
-  else if (due) modal.value = { type: 'weekly', week: s.clock.week - 1, period: due };
+  showResults(s, newYear);
   promptAnnual(s);
   promptIncidents(s);
   promptBoard(s, quarter);
+  if (skipping.value) {
+    if (bad) stopSkip('Something needs your attention');
+    else if (periodKey('monthly', s.meta.startDate, s.clock.week) !== skipMonth)
+      stopSkip('Skipped to the end of the month');
+  }
+}
+
+/**
+ * Opens the results the settings ask for. While skipping ahead the weekly sheet
+ * is skipped and the month's results show when the month ends; a quarter's
+ * results are skipped at a year end that opens the annual report, which covers
+ * the same weeks.
+ */
+function showResults(s: GameState, newYear: boolean): void {
+  const freq = s.settings.weeklyResults;
+  if (skipping.value) {
+    if (freq === 'off') return;
+    const monthEnd = periodKey('monthly', s.meta.startDate, s.clock.week) !== skipMonth;
+    if (monthEnd) modal.value = { type: 'weekly', week: s.clock.week - 1, period: 'monthly' };
+    return;
+  }
+  const due = resultsDue(freq, s.meta.startDate, s.clock.day);
+  if (due === 'quarterly' && newYear && s.settings.annualReport) return;
+  if (due === 'weekly') modal.value = { type: 'weekly', week: s.clock.week - 1 };
+  else if (due) modal.value = { type: 'weekly', week: s.clock.week - 1, period: due };
 }
 
 /**
@@ -196,16 +278,15 @@ export function resultsDue(
 }
 
 /**
- * SIMULATION §2 auto-pause: at each quarter start, with an Executive floor and no
- * meeting held yet, the board meeting reminder opens once (after other modals).
+ * SIMULATION §2: at each quarter start, with an Executive floor and no meeting
+ * held yet, the HUD shows a Board chip for the quarter and a notice says so.
  */
 function promptBoard(s: GameState, quarterStart: boolean): void {
-  if (!FEATURES.capitalMarkets || !quarterStart || !s.settings.autoPauseIncidents) return;
+  if (!FEATURES.capitalMarkets || !quarterStart) return;
   const label = quarterLabel(s);
-  if (remindedQuarter === label || !boardDue(s)) return;
-  remindedQuarter = label;
-  if (modal.value || casesWaiting) boardWaiting = true;
-  else modal.value = { type: 'boardMeeting', reminder: true };
+  if (boardChipQuarter.value === label || !boardDue(s)) return;
+  boardChipQuarter.value = label;
+  notice(`The board is ready to meet for ${label}. Tap Board when you want to hold it.`);
 }
 
 /** A year end filed a new annual report (SCREENS §21b): open it, after the results. */
@@ -213,12 +294,21 @@ function promptAnnual(s: GameState): void {
   const n = s.history.yearly.length;
   if (n <= shownYears) return;
   shownYears = n;
+  if (!s.settings.annualReport) return;
   if (modal.value) annualWaiting = true;
   else modal.value = { type: 'annual' };
 }
 
 /** SIMULATION §2 auto-pause: new open cases open the incident modal (after any other modal). */
 function promptIncidents(s: GameState): void {
+  // Notices with nothing to decide close themselves and show as a message.
+  for (const i of [...s.incidents.active]) {
+    const spec = INCIDENT_SPECS[i.type];
+    if (!spec?.info || promptedCases.has(i.id)) continue;
+    const text = String(i.data.text ?? '');
+    if (resolveIncident(s, i.id, i.options[0]?.id ?? 'ok').ok)
+      notice(`${spec.title}: ${text}`, 'info', 7000);
+  }
   const fresh = s.incidents.active.filter((i) => !promptedCases.has(i.id));
   for (const i of fresh) promptedCases.add(i.id);
   if (fresh.length === 0 || !s.settings.autoPauseIncidents) return;
@@ -320,7 +410,9 @@ const BAD_EVENTS = new Set([
   ...AUCTION_BAD_EVENTS,
 ]);
 
-function announceEvents(s: GameState): void {
+/** Toasts the week's new events; returns true when any of them was bad news. */
+function announceEvents(s: GameState): boolean {
+  let bad = false;
   const log = s.events.log;
   // The log drops old weeks every tick, so track the last event announced by
   // identity rather than by index (trimming keeps the same objects).
@@ -332,7 +424,11 @@ function announceEvents(s: GameState): void {
     if (HOME_ONLY.has(e.type) && e.payload.country !== home) continue;
     if (e.type === 'APPRAISAL_DONE' && e.payload.genuine === false) play('stamp');
     const text = EVENT_TEXT[e.type]?.(e.payload);
-    if (text) toast(text, BAD_EVENTS.has(e.type) ? 'bad' : 'info');
+    if (!text) continue;
+    const isBad = BAD_EVENTS.has(e.type);
+    bad ||= isBad;
+    notice(text, isBad ? 'bad' : 'info');
   }
   lastSeen = log.at(-1) ?? lastSeen;
+  return bad;
 }

@@ -294,3 +294,8 @@
   flex: none;
   padding: 0 var(--space-4);
 }
+
+/* Quick start at the head of step 1 (SCREENS §1). */
+.wizard-quick {
+  margin-bottom: var(--space-4);
+}

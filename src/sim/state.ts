@@ -58,7 +58,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState } from './personalTypes';
 
-export const SCHEMA_VERSION = 36;
+export const SCHEMA_VERSION = 37;
 
 export interface GameState {
   schemaVersion: number;
@@ -213,6 +213,8 @@ export interface Settings {
   hqTabOrder: DeptId[];
   /** Part 2 of the tutorial: guides for new mechanics and first-look tips (schema v24). */
   guides: boolean;
+  /** Open the annual report at each year end (schema v37); off, it waits in Menu → Company. */
+  annualReport: boolean;
 }
 
 export interface AvatarSpec {

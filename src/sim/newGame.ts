@@ -84,6 +84,7 @@ export const DEFAULT_SETTINGS: Settings = {
   layers: {},
   hqTabOrder: [],
   guides: true,
+  annualReport: true,
 };
 
 const DEFAULT_AVATAR: AvatarSpec = {

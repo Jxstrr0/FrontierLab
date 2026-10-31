@@ -2,9 +2,10 @@
 // Office button (floors, rent and the release actions in a sheet) and an
 // office switcher when you lease more than one, the floor's lead as advisor,
 // the engraved office interior, and a bottom icon bar with each department you
-// have (in the order you arrange in the Office sheet) plus "Add floor". Every floor opens with the shared team
-// controls and coverage (the Executive suite hires on the floor itself), then
-// that department's own content. Without an office, it explains how to lease
+// have (in the order you arrange in the Office sheet) plus "Add floor". Each
+// floor shows that department's own content first, so its actions are near the
+// top, then the shared team controls and coverage (the Executive suite hires on
+// the floor itself); a floor with nobody hired yet puts the team first. Without an office, it explains how to lease
 // one.
 import { useState } from 'preact/hooks';
 import { CITIES } from '../../data/cities';
@@ -107,7 +108,7 @@ export function HqPanel(p: { officeId?: string; dept?: DeptId }) {
         {dept ? (
           <>
             {/* The Executive suite's desks are you and six executives, hired on the floor itself. */}
-            {dept !== 'executive' && <DeptStaffing dept={dept} />}
+            {dept !== 'executive' && !s.departments[dept]?.target && <DeptStaffing dept={dept} />}
             {dept === 'finance' && <FinanceFloor />}
             {dept === 'hr' && <HrFloor />}
             {dept === 'it' && <ItFloor />}
@@ -117,6 +118,7 @@ export function HqPanel(p: { officeId?: string; dept?: DeptId }) {
             {dept === 'risk' && <RiskFloor />}
             {dept === 'executive' && <ExecutiveFloor />}
             {dept === 'investment' && <InvestmentFloor />}
+            {dept !== 'executive' && !!s.departments[dept]?.target && <DeptStaffing dept={dept} />}
           </>
         ) : (
           <Card>

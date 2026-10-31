@@ -3,13 +3,44 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** post-launch content and streamlining pass (v0.1.57, save schema 36), from the owner's review of 2026-10-30: all five batches are in (incidents and the founder's desk, streamlining, model launches, public tenders, and the rich list with the annual report). The Kelbo.Website hub card still needs its own session in that repo.
+**Current stage:** audit fixes (v0.1.58, save schema 37). After the owner's review batches, an audit of clunky spots, content gaps and over-complexity; the owner asked for all of it. Batch A (pacing, popups and navigation) is in; content top-ups, the bank-leftover cleanup with the treasury removal, and the awareness and quality merges follow. The Kelbo.Website hub card still needs its own session in that repo.
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `01f3204c67bc2e` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `0e367379653a3a` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-31 — Audit batch A: pacing, popups and navigation (v0.1.58)
+
+An audit found the game interrupts you too often and hides a few things you need. This batch is all about feel. Old saves load and are upgraded (save schema 36 → 37, one new setting).
+
+**Fewer interruptions.**
+- **Results come monthly after the first year.** At 4× the weekly results sheet popped up every 1.75 seconds. A game still on Weekly switches to Monthly once, at the first year end, and a notice says so. The results sheet now has a "Show results" row under Continue, so you can change it right there.
+- **Notices with nothing to decide don't stop the game.** Dividend due, Letter from the regulator and Big customer failure now show as a message and close themselves.
+- **The board meeting is a chip, not a popup.** At each quarter start a notice says the board is ready, and a **Board** chip under the date opens the meeting when you want it.
+- **No double report at year end.** Quarterly results are skipped when the annual report opens, since it covers the same weeks. A new setting, "Open the annual report", lets you turn the yearly popup off (old reports stay in the Ledger archive).
+
+**Smoother time.**
+- **Resume remembers your speed.** Every auto-pause used to drop you back to 1×; play now resumes at the speed you were on.
+- **Skip ahead.** A new **Skip** chip runs the game very fast (40 days a second) to the end of the month, then shows the month's results and pauses. It stops early, paused, for any popup or bad news.
+- **You can see why it paused.** A small line under the date says why ("Cash is below zero", "Skipped to the end of the month").
+- **Notices wait their turn.** The week's news messages used to fire behind the results sheet and only three fit. They now wait until the popup closes and queue up.
+- **Going into the red pauses once**, and an **In the red 2/4** chip counts the weeks to insolvency (tap it for Company).
+
+**Fewer taps.**
+- **Back button in panels.** A panel opened from another (Company → Milestones, Sales offices → an office) has a ‹ Back button.
+- **Travel in one tap.** The city pill's Travel sheet now shows the departures board itself, so flying somewhere is pick a city and go.
+- **HQ floors put their actions first.** Each floor's own cards (buy GPUs, prices, training) now come before the team controls, unless nobody is hired yet.
+- **New game:** Quick start is a button at the top of step 1, and from step 2 you can skip straight to the confirm step with the default city and options.
+
+**Tidied.**
+- The Company screen leads with cash and runway. The bank-era Liquidity card, the Treasury reserves line and the duplicate Cash cover line are gone, and the safety card links to the Safety floor for the details. "Where to look" has a "Show N more" button instead of a dead-end line.
+- Developer tools only appear in Settings with `?debug` in the address, or if you already switched them on.
+
+**Checked:** lint, 1,193 tests (new `loopSmoothing.test.ts` and `panelBack.test.ts`), type-check and build pass. At 390×844 in Chromium: the HUD with the pause reason, In the red and Skip chips, the Travel sheet's board, the results frequency row and the Back button all look right, with no console errors. The determinism snapshot moved to `0e367379653a3a`. That is intended: the save carries the new setting.
+
+**Next:** batch B (content top-ups), then the cleanup and the treasury removal, then the awareness and quality merges.
 
 ### 2026-10-30 — Review batch 5: rich list rescale and the annual report (v0.1.57)
 
