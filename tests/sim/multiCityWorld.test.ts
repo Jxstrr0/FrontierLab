@@ -4,6 +4,7 @@
 // regional employers hosted elsewhere in the country, conventions in cities
 // not yet visited, HQ campaigns and price lists for other countries, lobbying
 // and agency rules, news and names.
+import { cityAwareness } from '../../src/sim/awareness';
 import { describe, expect, it } from 'vitest';
 import { AGENCIES } from '../../src/data/brandCampaigns';
 import { CITIES } from '../../src/data/cities';
@@ -155,6 +156,8 @@ describe('HQ for several countries', () => {
   it('runs brand campaigns in another city from anywhere, only where you have been', () => {
     const s = bankWithFloors(['marketing']);
     fly(s, 'nyc');
+    // Awareness lives in a city's sales office, so the campaign needs one there to show.
+    openScriptedBranch(s);
     fly(s, 'lon');
     const order = { campaignId: 'billboards', scope: 'city', targetId: 'nyc' } as const;
     expect(cmd.startBrandCampaign(s, order).ok).toBe(true);
@@ -168,9 +171,9 @@ describe('HQ for several countries', () => {
     expect(
       cmd.startBrandCampaign(s, { campaignId: 'tv', scope: 'country', targetId: 'US' }).ok,
     ).toBe(true);
-    const before = s.world.cities.nyc!.brandAwareness;
+    const before = cityAwareness(s, 'nyc');
     advanceWeeks(s, 1);
-    expect(s.world.cities.nyc!.brandAwareness).toBeGreaterThan(before);
+    expect(cityAwareness(s, 'nyc')).toBeGreaterThan(before);
   });
 
   it('sells agency packages only in the agency’s city', () => {

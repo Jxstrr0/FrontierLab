@@ -49,7 +49,7 @@ How the economy works, step by step. Every CAPS name is a key in `src/config/bal
 7. Contracts: mid-term business failures and outage walk-outs (`runContracts`, §11.3).
 8. Power deals (§13.7a).
 9. Compute: tally demand, settle the pool, retire expired GPU lots (§13.0).
-10. City brand awareness (§7).
+10. (City brand awareness folded into office awareness, §7.)
 11. Partnerships (§13.7).
 12. GPU offer refresh (§13.0).
 13. HQ: floors, coverage and benefits (§16), then product developments (§16.6), the training run (§16.12), the AI model (§16.7) and the app rating (§16.9).
@@ -213,10 +213,10 @@ The build slots keep their bank ids: `teller` = sales desks, `vault` = machine r
 ## 7. Awareness and marketing
 
 - **Office awareness `a`.** A new office starts at 0.20, with a grand-opening bonus of +0.15 that decays linearly over 6 weeks.
-  - Weekly: `a = a × (1 − AWARENESS_DECAY (0.03)) + Σ gain_c × (1 − a) × mktMult`.
+  - Weekly: `a = a × (1 − AWARENESS_DECAY (0.03)) + (Σ gain_c × mktMult + OFFICE_PASSIVE_AWARENESS (0.003)) × (1 − a)`.
+  - **One awareness per city (audit batch D).** The sales office's `a` is the city's only awareness number (`src/sim/awareness.ts`). HQ brand campaigns, agency launch campaigns and kit sponsorship add their gain to it as `a += gain × (1 − a)`; a lobbying exposé takes from it. A city with no open office has awareness 0, and HQ campaigns there land nowhere until an office opens.
   - `mktMult = (0.8 + 0.4 × managerMarketing/100) × marketingFloorMult`, where `marketingFloorMult` is 1.0 below founder-mode thresholds and otherwise `0.5 + 0.5 × marketingCoverage'`.
-- **City brand awareness `b`** (HQ brand campaigns, kit sponsorship, your offices in the city): decays at BRAND_DECAY (0.02) with the same gain shape. Each office in a city adds a passive gain of 0.002.
-- **Effective awareness:** `e = 1 − (1 − a)(1 − b)`.
+- **Effective awareness:** `e = a + grand-opening bonus` (clamped to 1). Before schema 39 a separate city brand awareness `b` combined as `1 − (1 − a)(1 − b)`; the migration folds it in with that formula.
 - **Campaign cost:** a weekly campaign costs its CONTENT amount × `CAMPAIGN_COST_SCALE` (4) × the office's size mult × city costIndex × today's price list (`campaignCostIndex`), so it grows with the reach it buys. Per-sign-up and per-customer costs follow the price list only. A delegated manager values a campaign with the office's own reach (`officeTraffic`) at that cost.
 - **Campaign effects** (CONTENT Campaigns):
   - awareness gain per week
@@ -236,8 +236,9 @@ Targets are computed each week. Displayed ratings follow them with `ema(rating, 
   - Enterprise contracts' rate (the one rate product): `(m − price)/0.005`.
   - Weight each product by `w_p = balanceShare_p + 0.1`.
   - `Rates* = clamp(3.0 + Σ w_p c_p / Σ w_p + bumps, 1, 5)`.
+- **Product coins come from the model (audit batch D).** A product's coins are `coins_p = clamp(stars_p + MODEL_COINS.perPoint (0.15) × (modelQuality − 5 − bar rise), 1, 5)`, where `stars_p` is its base coins (CONTENT §4, or a developed product's roll) and bar rise = `qualityBar − 5.8` (§16.12). So a better model lifts every product's coins, and the coins shown on product cards are the ones demand and ratings use (`src/sim/productCoins.ts`).
 - **Products (the Model rating):**
-  - `Products* = clamp(Σ aff_p × stars_p / Σ aff_p + breadth + 0.30 × (appRating − 3) + 0.10 × (modelQuality − 5 − bar rise) + bumps, 1, 5)` (bar rise, §16.7).
+  - `Products* = clamp(Σ aff_p × coins_p / Σ aff_p + breadth + 0.30 × (appRating − 3) + bumps, 1, 5)`. (The model's old separate +0.10 × gap term is now inside `coins_p`.)
   - `modelQuality` = mean of the AI model's five radar values (1–10).
   - `aff_p` = Σ over segments of `mix_s × affinity[s][p]` at this lot, counting only offered products.
   - `breadth` = +0.3 if offered products cover ≥ 80% of the lot's total affinity mass, −0.5 if they cover < 40%, otherwise 0.
@@ -659,7 +660,7 @@ The AI regulator watches a **safety ratio**. Lenders, the CFO and the deal limit
   - **Data licences:** each office pays `customers × costPerCustomer × (1 + 0.3 × Products shortfall) / 52` a week (P&L line `underwriting`).
   - **Inference cost:** every compute cost behind plans, usage and contracts × `inferenceMult = 1 − 0.05 × (Efficiency − 7)` (0.85–1.35 over the radar).
   - **Price headroom:** plan and usage demand and churn compare your price with `market × (1 + 0.04 × (quality − qualityBar))`.
-  - **Model rating:** `+ 0.1 × (quality − 5 − bar rise)` on the Products rating (§8), where bar rise = `qualityBar − 5.8` (§16.12).
+  - **Product coins:** every product's coins move `MODEL_COINS.perPoint (0.15) × (quality − 5 − bar rise)` (§8), which feeds the Products rating and sign-up take-up, where bar rise = `qualityBar − 5.8` (§16.12).
   - **Contracts:** win and keep chances (§11.2) `+ 0.05 × (quality − qualityBar) + 0.03 × (Safety − 5) × (Data sensitivity − 5) / 5`.
   - **Speed** lifts the Service rating (§8) and **Safety** lowers fraud and abuse incident odds (`FRAUD_SHIELD`) and the safety ratio's exposure (§15).
   - The starting package (Clearline Web Base, radar 6, 8, 4, 4, 7) sits at the reference points.
@@ -781,7 +782,7 @@ A trained model's first switch-on (`activateModel`, by you, the CPO or a strateg
 
 **Sales office guidance** (`src/sim/branchGuidance.ts`): the C-suite steers the managers you delegate to, so managers still decide with their own skills but aim where HQ points them. `company.guidance` holds whole steps in `GUIDANCE.min..max` (−1..+3), moved one step every `GUIDANCE.everyWeeks` (4):
 - **Staffing (COO):** +1 while open delegated-staffing offices average staff morale below `GUIDANCE.moraleLow` (65), −1 above `moraleHigh` (82). Effect: delegated wages × `(1 + 0.02 × staffing)` and staff target × `(1 + 0.05 × staffing)`, on top of the manager's People skill.
-- **Marketing (CMO):** +1 while average brand awareness across the cities of open delegated-marketing offices is below the dialled `brandTarget − GUIDANCE.brandBand` (40% at the default target), −1 above `brandTarget + brandBand` (60%). Effect: the awareness value a delegated manager weighs each campaign against (§17.1) × `(1 + 0.2 × marketing)`.
+- **Marketing (CMO):** +1 while average awareness across open delegated-marketing offices is below the dialled `brandTarget − GUIDANCE.brandBand` (40% at the default target), −1 above `brandTarget + brandBand` (60%). Effect: the awareness value a delegated manager weighs each campaign against (§17.1) × `(1 + 0.2 × marketing)`.
 - **Products (CPO):** +1 while open delegated-products offices average a Products rating below `productsLow` (3★), −1 at `productsHigh` (4★) or better. Effect: delegated fee prices × `(1 − 0.03 × products)` (also the CPO's own company pricing) and the lineup's affinity bar (`DELEGATE.minAffinity`) × `(1 − 0.25 × products)`, so more products go on.
 - With no delegated office to read, a part holds its step. A part whose switch is off or whose seat is empty returns to 0 that week.
 
@@ -1042,7 +1043,7 @@ Eight more cities (CONTENT §2, marked *late*) are closed to AI labs at the star
     - **Stall the AI safety bill** (`stallBuffer`; $1.2M, 50%, 15%): only while an AI safety buffer bill is pending there. A win makes it fail its vote.
     - **Grant campaigns** (`computeSubsidy`, `dcPermits`, `fairUse`, `rdCredit`, `chipRelief`; fees, odds and grants in CONTENT §16): a win pays the lab a one-off grant, booked as a refund on the lobbying line (`spend('lobbying', -grant)`), so the year's lobbying cost nets down. The grant moves with the price list like the fee (`grant × fee paid ÷ base fee`), and each grant can be won once per country (`lobbyBlock`). No other effect.
   - The fee is paid at the start (`lobbying`, opex); the outcome arrives in 4–8 weeks (a stall no later than the vote). One pending campaign per type; a fast-track can't be bought while one is unused.
-  - Exposure is rolled win or lose: a fine of 50% of the fee and −0.03 brand awareness in your cities in that country, plus a Ledger exposé.
+  - Exposure is rolled win or lose: a fine of 50% of the fee and −0.03 awareness at your offices in that country, plus a Ledger exposé.
 
 ## 22. Personal
 
@@ -1214,8 +1215,8 @@ The main groups, with the defaults shown above. Names marked (legacy) belong to 
 - **MACRO:** `MACRO_TRANSITIONS`, `MACRO_TARGETS`, `MACRO_EMA`, `MACRO_SIGMA`, `MACRO_MIN_PHASE_WEEKS`, `POLICY_*` (rule weights, steps, `POLICY_FLOOR`, `POLICY_CAP`), `CREDIT_CYCLE`, `LOAN_DEMAND`, `NOMINAL_INDEX`, `EQUITY_MARKET_DRIFT`, `MARKET_SHOCK_SIGMA`
 - **PRICES:** `RIVAL_PRICE_DRIFT`, `FEE_COMP_MIN`, `FEE_COMP_SCALE`, `FEE_STEP_MIN`, `FEE_PF_SCALE`, `PRICE_FACTOR_CLAMP`; (legacy) `PF_RATE_STEP`
 - **STAFF:** `BASE_TELLER_WAGE`, `HOURS_PER_WEEK`, `MANAGER_BASE_SALARY`, `QUIT_BASE`, `HIRE_BASE`, `SERVICE_VISIT_RATE`, `MORALE`, `SKILL`, `CANDIDATE_REROLL`, `MANAGER_PAY`
-- **MARKETING:** `START_AWARENESS`, `GRAND_OPENING_BONUS`, `AWARENESS_DECAY`, `BRAND_DECAY`, `BRAND_PASSIVE_PER_BRANCH`, `CAMPAIGN_COST_SCALE` (4, office campaigns' weekly costs, × the office size mult)
-- **RATINGS:** `RATING_EMA`, `PRODUCTS_RATING`, `SERVICE_RATING`, `BRANCH_RATING_WEIGHTS`, `NO_ATM_QUALITY`, `UPKEEP_PENALTY`, `OVERALL_WEIGHTS`, `REVIEW_RATE`
+- **MARKETING:** `START_AWARENESS`, `GRAND_OPENING_BONUS`, `AWARENESS_DECAY`, `OFFICE_PASSIVE_AWARENESS`, `CAMPAIGN_COST_SCALE` (4, office campaigns' weekly costs, × the office size mult)
+- **RATINGS:** `RATING_EMA`, `PRODUCTS_RATING`, `MODEL_COINS`, `SERVICE_RATING`, `BRANCH_RATING_WEIGHTS`, `NO_ATM_QUALITY`, `UPKEEP_PENALTY`, `OVERALL_WEIGHTS`, `REVIEW_RATE`
 - **DEMAND:** `PROSPECT_RATE`, `CATCHMENT_MULT`, `SATURATION_EXP`, `SHARE_EXP`, `CITY_MARKET`, `CITY_SATURATION_EXP`, `CITY_BRANCH_GUIDE`, `OFFICE_SIZES`, `OFFICE_TRAFFIC_MULT`, `TAKEUP_CAP`, `STARS_TAKEUP`, `PRODUCTS_PER_CUSTOMER`, `OVERALL_CHURN`, `INTEREST_PERIODS`; (legacy) `RIVAL_RADIUS`, `DISTANCE_FALLOFF`, `APPROVAL_INCLUSION`, `INTERCHANGE`
 - **COMPUTE:** `COMPUTE`, `GPU_MARKET`, `SPOT`, `OUTAGE`, `DATA_CENTER`, `POWER_DEAL`
 - **DEALS:** `BUSINESS`, `DEAL`, `TENDER`, `SECTOR_DISTRICT_WEIGHT`

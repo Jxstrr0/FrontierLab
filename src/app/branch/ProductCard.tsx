@@ -12,6 +12,7 @@ import {
 } from '../../sim/branch/pricing';
 import * as cmd from '../../sim/commands';
 import { marketRef } from '../../sim/rates';
+import { coinsOf } from '../../sim/productCoins';
 import type { Branch } from '../../sim/state';
 import { Card, CoinRating, RingGauge, Row, Stepper, Toggle } from '../components';
 import { SpotArt } from '../components/SpotArt';
@@ -25,7 +26,7 @@ export function ProductCard(p: { branch: Branch; spec: ProductSpec; onDealDesk: 
   const s = useGame();
   const { branch, spec } = p;
   const sym = s.settings.currency;
-  const stars = s.products.catalog[spec.id]?.stars ?? spec.startStars;
+  const stars = coinsOf(s, spec);
   const offered = isOffered(branch, spec.id);
   const price = branchPrice(s, branch, spec.id);
   const setPrice = basePrice(s, branch, spec.id);

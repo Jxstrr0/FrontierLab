@@ -41,7 +41,6 @@ export function generateCity(
     id: cityId,
     generated: true,
     layout: opts.layout ?? LATEST_LAYOUT,
-    brandAwareness: 0,
     marketRef: {},
   };
   if (city.regional) {

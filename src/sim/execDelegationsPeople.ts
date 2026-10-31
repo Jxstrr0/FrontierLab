@@ -11,6 +11,7 @@
 //                    tier is weak, up while Strong, no higher than the posture
 //                    ceiling you dial (executives.postureCeiling)
 // The CRO's Loan Desk policy runs inside the Loan Desk (branch/loanDesk.ts).
+import { cityAwareness } from './awareness';
 import { DEPT_DEFAULT_EFF, EXEC_DELEGATION as X, WEEKS_PER_YEAR } from '../config/balance';
 import { BENEFITS } from '../data/benefits';
 import { BRAND_CAMPAIGNS } from '../data/brandCampaigns';
@@ -172,7 +173,7 @@ export function cmoBrand(state: GameState): void {
     .filter((c) => c.scopes.includes('city') && !c.needsFranchise)
     .sort((a, b) => brandCampaignCost(state, a, 'city') - brandCampaignCost(state, b, 'city'));
   for (const cityId of cities) {
-    const b = state.world.cities[cityId]?.brandAwareness ?? 0;
+    const b = cityAwareness(state, cityId);
     const running = state.marketing.campaigns.filter(
       (c) => c.scope === 'city' && c.targetId === cityId,
     );

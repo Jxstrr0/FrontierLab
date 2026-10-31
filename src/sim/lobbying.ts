@@ -7,6 +7,7 @@
 // review" relaxes the next deal's city share limit (acquisitionPlan.ts) and
 // "Stall the capital buffer bill" makes the pending bill fail (newsPolitics.ts).
 // Draws come from the `lobbying` stream.
+import { lowerCityAwareness } from './awareness';
 import { LOBBYING } from '../config/balance';
 import { CITIES } from '../data/cities';
 import { LOBBY_CAMPAIGNS, LOBBY_FIRMS, type LobbyCampaignSpec } from '../data/lobbying';
@@ -14,7 +15,6 @@ import { CAPITAL_BUFFER_POLICY } from '../data/newsWorld';
 import type { CountryId } from '../data/types';
 import { pushEvent } from './events';
 import { spend } from './ledger';
-import { clamp } from './math';
 import { listPrice } from './nominal';
 import { stream } from './rng';
 import type { GameState, LobbyCampaign } from './state';
@@ -101,7 +101,7 @@ function expose(
   spend(state, 'fines', fine);
   for (const city of Object.values(state.world.cities)) {
     if (CITIES[city.id]?.country !== c.country) continue;
-    city.brandAwareness = clamp(city.brandAwareness - LOBBYING.exposeAwareness, 0, 1);
+    lowerCityAwareness(state, city.id, LOBBYING.exposeAwareness);
   }
   pushEvent(state, 'LOBBY_EXPOSED', { ...payload, bank: state.meta.bankName, fine }, 9, c.id);
 }

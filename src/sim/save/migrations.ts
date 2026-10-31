@@ -26,6 +26,7 @@ import { migrateSeedMoney } from './migrateSeedMoney';
 import { migrateSeats } from './migrateSeats';
 import { migrateAvatars } from './migrateAvatars';
 import { migrateCurrencies } from './migrateCurrencies';
+import { migrateOneAwareness } from './migrateOneAwareness';
 import { migrateBankWeight } from './migrateBankWeight';
 import { generatePersonalSites } from '../personalSites';
 import { generateLandmarkTower } from '../landmarkTowers';
@@ -271,6 +272,11 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
   // (reserves in, anything it still owed paid off) and the bank-only fields go.
   37: (s) => {
     migrateBankWeight(s as unknown as GameState);
+    return s;
+  },
+  // Schema 39 (audit batch D): one awareness number per city, held by its office.
+  38: (s) => {
+    migrateOneAwareness(s as unknown as GameState);
     return s;
   },
 };

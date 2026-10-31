@@ -73,21 +73,22 @@ export function pointsText(gain: number): string {
 export interface AwarenessRow {
   cityId: string;
   name: string;
-  /** Brand awareness b, 0–1. */
+  /** The city's awareness (its sales office's), 0–1. */
   awareness: number;
-  /** This week's expected rise after saturation: gain × (1 − b) (SIMULATION §7). */
+  /** This week's expected rise after saturation: gain × (1 − a) (SIMULATION §7). */
   rise: number;
 }
 
-/** Brand awareness for every simulated city, highest first. */
+/** Awareness in every city where you have a sales office, highest first. */
 export function awarenessRows(state: GameState): AwarenessRow[] {
   const gains = brandGainByCity(state);
-  return Object.values(state.world.cities)
-    .map((c) => ({
-      cityId: c.id,
-      name: CITIES[c.id]?.name ?? c.id,
-      awareness: c.brandAwareness,
-      rise: (gains[c.id] ?? 0) * (1 - c.brandAwareness),
+  return Object.values(state.branches)
+    .filter((b) => b.status !== 'closed')
+    .map((b) => ({
+      cityId: b.cityId,
+      name: CITIES[b.cityId]?.name ?? b.cityId,
+      awareness: b.awareness,
+      rise: (gains[b.cityId] ?? 0) * (1 - b.awareness),
     }))
     .sort((a, b) => b.awareness - a.awareness || a.name.localeCompare(b.name));
 }
