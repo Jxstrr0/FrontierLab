@@ -11,7 +11,7 @@ import {
   isOffered,
 } from '../../sim/branch/pricing';
 import * as cmd from '../../sim/commands';
-import { countryOfCity, ftpFor, marketRef } from '../../sim/rates';
+import { marketRef } from '../../sim/rates';
 import type { Branch } from '../../sim/state';
 import { Card, CoinRating, RingGauge, Row, Stepper, Toggle } from '../components';
 import { SpotArt } from '../components/SpotArt';
@@ -30,10 +30,8 @@ export function ProductCard(p: { branch: Branch; spec: ProductSpec; onDealDesk: 
   const price = branchPrice(s, branch, spec.id);
   const setPrice = basePrice(s, branch, spec.id);
   const boost = incidentBoost(s, branch, spec.id);
-  const ftp = ftpFor(spec, countryOfCity(s, branch.cityId));
   const m = marketRef(s, branch.cityId, spec.id);
-  const book = branch.books[spec.id];
-  const unit = unitView(spec, price, ftp, book, sym);
+  const unit = unitView(spec, price, sym);
   const delegated = branch.delegation.products;
   const atHq = followsHq(s, branch);
   const fmt = (v: number) => priceText(spec, v, sym);

@@ -1,4 +1,4 @@
-// One branch's flows for the current weekly tick, gathered by the books, Loan
+// One branch's flows for the current weekly tick, gathered by the books, Deal
 // Desk and costs, then turned into the branch P&L and company postings.
 
 export interface BranchWeek {
@@ -7,7 +7,6 @@ export interface BranchWeek {
   cardFees: number;
   atmFees: number;
   serviceFees: number;
-  losses: number;
   staff: number;
   manager: number;
   rent: number;
@@ -27,7 +26,6 @@ export function emptyWeek(): BranchWeek {
     cardFees: 0,
     atmFees: 0,
     serviceFees: 0,
-    losses: 0,
     staff: 0,
     manager: 0,
     rent: 0,

@@ -3,7 +3,6 @@
 // fines, incidents, partnerships, launches). The weekly close's stories are
 // in newsWeek.ts.
 import { NEWS_PRIORITY as P } from '../config/balance';
-import { COUNTRIES } from '../data/countries';
 import { LEDGER_TEMPLATES, type TemplateKey } from '../data/ledgerTemplates';
 import { DEAL } from '../config/balance';
 import { DEAL_SECTOR_BY_ID } from '../data/dealSectors';
@@ -193,14 +192,6 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
         tokens: { bank, title: spec.title.toLowerCase(), line: spec.line.replace('{bank}', bank) },
       });
     }
-    case 'WINDOW_USE':
-      return banking({
-        key: 'WINDOW_USE',
-        subject: 'you',
-        icon: 'alert',
-        priority: P.companyAlarm,
-        tokens: { bank, amount: m(p.amount), cb: COUNTRIES[ctx.home].centralBank },
-      });
     case 'REGULATOR_AUDIT':
       return banking({
         key: 'REGULATOR_AUDIT',

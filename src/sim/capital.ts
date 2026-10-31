@@ -3,7 +3,7 @@
 // (runway.ts); the regulator's tier comes from the safety ratio (safety.ts),
 // whose lines the policy buffer below still raises.
 import type { GameState } from './state';
-import { homeCountry } from './treasury';
+import { homeCountry } from './homeCountry';
 
 /**
  * Policy buffer in force in your home country, in points: a passed buffer

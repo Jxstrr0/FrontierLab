@@ -126,7 +126,7 @@ export function allowanceText(s: GameState): { flown: string; remaining: string 
   };
 }
 
-/** The arrival toast: "Welcome to London · first visit · Ticket C$124K (the bank paid C$84.0K)". */
+/** The arrival toast: "Welcome to London · first visit · Ticket C$124K (the lab paid C$84.0K)". */
 export function arrivalText(
   cityName: string,
   landed: { mode: FlightQuote['mode']; fare: number; bankPays: number; firstVisit: boolean },

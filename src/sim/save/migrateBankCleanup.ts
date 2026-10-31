@@ -6,6 +6,7 @@
 // covered bond offers are withdrawn. Both sums are tiny or zero in C2-era saves,
 // so there is no news note (DESIGN decision log, C3c).
 import type { GameState } from '../state';
+import { legacyTreasury, type LegacyTreasury } from './legacyTreasury';
 
 type OldTreasury = {
   bondsMarket?: number;
@@ -21,7 +22,7 @@ export function migrateBankCleanup(state: GameState): void {
   delete raw.reo;
   state.company.cash += reoValue;
 
-  const t = state.treasury as unknown as OldTreasury & GameState['treasury'];
+  const t = legacyTreasury(state) as OldTreasury & LegacyTreasury;
   const market = t.bondsMarket ?? 0;
   const book = t.bondsBook ?? 0;
   t.reserves += market;

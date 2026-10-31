@@ -32,10 +32,6 @@ export function defaultPrice(spec: ProductSpec, c: CountryState): number {
     case 'ftpLong':
       price = Math.max(rule.floor ?? -Infinity, ftpLong(c) + rule.spread);
       break;
-    case 'card':
-      // Card APRs are fixed and follow FTP only in large moves (cardAnchor).
-      price = rule.value + (c.cardAnchor - c.startPolicy);
-      break;
     case 'fixed':
       // $ fees re-price yearly with inflation; % fees don't.
       price = spec.priceType === 'pctFee' ? rule.value : rule.value * c.feeIndex;

@@ -69,7 +69,7 @@ export interface CityMap {
   landmarks: LandmarkSite[];
 }
 
-/** Non-storefront buildings to place on the map (Stage 4); omitted while FEATURES.hq is off. */
+/** Non-storefront buildings to place on the map (Stage 4). */
 export interface MapPlaces {
   offices?: Pick<OfficeListing, 'id' | 'tile' | 'district' | 'floors' | 'buildingSeed'>[];
   sites?: Pick<Site, 'id' | 'kind' | 'tile' | 'district' | 'buildingSeed' | 'property'>[];

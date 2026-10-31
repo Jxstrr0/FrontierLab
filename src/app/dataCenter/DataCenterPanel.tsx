@@ -1,6 +1,6 @@
 // Data center panel (SCREENS §5b): the engraved hall outside and in (C8c),
 // status, the compute pool (C4a), the three parts with an Upgrade button each,
-// weekly costs, which cities get faster service, and Close.
+// weekly costs, which cities get faster service, Rename and Close.
 import { useState } from 'preact/hooks';
 import { DATA_CENTER } from '../../config/balance';
 import { CITIES } from '../../data/cities';
@@ -13,6 +13,7 @@ import { act, closePanel, toast, useGame } from '../store';
 import { ComputeCard } from '../company/ComputeCard';
 import { DataCenterHero } from './DataCenterHero';
 import { DcPartSheet } from './DcPartSheet';
+import { DcRenameSheet } from './DcRenameSheet';
 import { partFact } from './dcView';
 import '../build/build.css';
 import './dataCenter.css';
@@ -21,6 +22,7 @@ export function DataCenterPanel(p: { dataCenterId: string }) {
   const s = useGame();
   const [picking, setPicking] = useState<DcSlot | null>(null);
   const [closing, setClosing] = useState(false);
+  const [renaming, setRenaming] = useState(false);
   const dc = s.dataCenters[p.dataCenterId];
   if (!dc) {
     return (
@@ -117,6 +119,13 @@ export function DataCenterPanel(p: { dataCenterId: string }) {
             />
           </Card>
 
+          <button
+            type="button"
+            class="btn btn-secondary btn-block"
+            onClick={() => setRenaming(true)}
+          >
+            Rename data center
+          </button>
           <button type="button" class="btn btn-danger btn-block" onClick={() => setClosing(true)}>
             Close data center
           </button>
@@ -144,6 +153,7 @@ export function DataCenterPanel(p: { dataCenterId: string }) {
           onClose={() => setPicking(null)}
         />
       )}
+      {renaming && <DcRenameSheet dc={dc} onClose={() => setRenaming(false)} />}
       {closing && (
         <Confirm
           title={`Close ${dc.name}?`}

@@ -24,7 +24,7 @@ import {
   type BuildSlot,
   type BuildSpec,
 } from '../../data/equipment';
-import { isDeposit, isLoan } from '../../data/products';
+import { isLoan } from '../../data/products';
 import { allProducts, productSpec } from '../products';
 import { assetBookValue } from '../balanceSheet';
 import { tileDistance } from '../citygen';
@@ -450,8 +450,6 @@ export function closeBranch(
     const spec = productSpec(state, pid);
     if (!spec) continue;
     const share = isLoan(spec) ? 1 : quote.retention;
-    // Deposits that leave the bank are paid out of treasury reserves.
-    if (isDeposit(spec)) state.treasury.reserves -= from.balance * (1 - share);
     if (target) mergeBook((target.books[pid] ??= emptyBook()), from, share);
   }
   if (target) {

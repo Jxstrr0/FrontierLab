@@ -8,7 +8,7 @@ import { pushEvent } from '../events';
 import { postCash } from '../ledger';
 import type { Account } from '../portfolio';
 import type { GameState, Startup } from '../state';
-import { homeCountry } from '../treasury';
+import { homeCountry } from '../homeCountry';
 import { accessBlock } from '../ventureAccess';
 import { lendVentureDebt } from '../ventureDebt';
 import { isPrivate } from '../ventureGen';

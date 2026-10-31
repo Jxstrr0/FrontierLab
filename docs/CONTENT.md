@@ -402,9 +402,9 @@ Benefit effects scale linearly up to the stated amount, then flatten (capped at 
 | Northwind & Pike | Street Team | 2 wk | 45,000 | +0.10 (one city) |
 | Studio Halcyon | Prestige Campaign | 12 wk | 420,000 | +0.30, plus Office +0.1 in that city for 26 weeks |
 
-## 12. Funding types (old saves only)
+## 12. Funding types (removed)
 
-The bank's wholesale funding market is gone from new games. `src/data/fundingTypes.ts` keeps Overnight Interbank, Term Interbank and the Central Bank Window so an old save that still carries deposits or funding lots can run them off; their cards show on the Compute floor only for such a save. The GPU reservations of §12b replaced them.
+The bank's wholesale funding types (Overnight Interbank, Term Interbank, the Central Bank Window) and `src/data/fundingTypes.ts` were removed in schema 38; an old save's funding lots fold into corporate cash (SIMULATION §13.1). The GPU reservations of §12b replaced them.
 
 ## 12b. GPU reservations (Compute floor; `src/data/gpuLots.ts`)
 

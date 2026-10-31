@@ -51,15 +51,14 @@ How the economy works, step by step. Every CAPS name is a key in `src/config/bal
 9. Compute: tally demand, settle the pool, retire expired GPU lots (§13.0).
 10. City brand awareness (§7).
 11. Partnerships (§13.7).
-12. Treasury: reserve interest and any legacy funding (§13).
-13. Offer refreshes: funding offers (§13.6), then GPU offers (§13.0).
-14. HQ: floors, coverage and benefits (§16), then product developments (§16.6), the training run (§16.12), the AI model (§16.7) and the app rating (§16.9).
-15. Corporate items: brand marketing, corporate debt, executives, the talent market, HR manager hiring, manager poaching, governance, M&A, real estate, ventures, conventions, lobbying, depreciation, then the new regions opening (§14, §16–§21, §20a).
-16. Close the week: P&L, cash flow, balance sheet, tax and the weekly snapshot (§14).
-17. The safety ratio and regulator tier (`evaluateSafety`), then the pause and failure checks (§15). Runway (§15) is not stored: it is worked out from cash and the weekly closes whenever it is read.
-18. Personal: cash and salary, travel (reset the km allowance, jet upkeep), personal assets, auctions, sports franchises (§22).
-19. Markets: listed prices, your valuation, portfolios (§19).
-20. **Quarter start** (the first weekly tick after Mar 31, Jun 30, Sep 30, Dec 31):
+12. GPU offer refresh (§13.0).
+13. HQ: floors, coverage and benefits (§16), then product developments (§16.6), the training run (§16.12), the AI model (§16.7) and the app rating (§16.9).
+14. Corporate items: brand marketing, corporate debt, executives, the talent market, HR manager hiring, manager poaching, governance, M&A, real estate, ventures, conventions, lobbying, depreciation, then the new regions opening (§14, §16–§21, §20a).
+15. Close the week: P&L, cash flow, balance sheet, tax and the weekly snapshot (§14).
+16. The safety ratio and regulator tier (`evaluateSafety`), then the pause and failure checks (§15). Runway (§15) is not stored: it is worked out from cash and the weekly closes whenever it is read.
+17. Personal: cash and salary, travel (reset the km allowance, jet upkeep), personal assets, auctions, sports franchises (§22).
+18. Markets: listed prices, your valuation, portfolios (§19).
+19. **Quarter start** (the first weekly tick after Mar 31, Jun 30, Sep 30, Dec 31):
     - earnings for every listed company, rivals and you
     - the safety audit (§15)
     - rivals' quarter (failures, mergers, §18)
@@ -67,17 +66,17 @@ How the economy works, step by step. Every CAPS name is a key in `src/config/bal
     - the renewal season for business contracts (§11.3)
     - markets, governance (dividends declared and paid 3 weeks later; the board meeting unlocks), ventures report and raise (§20), the insider-trading check (§22)
     - the quarter's report sums the weeks whose last day falls in it, so when this tick lands on the quarter's first day the week just closed still counts for the old quarter
-21. **Year start** (first tick of a new year):
+20. **Year start** (first tick of a new year):
     - the Fastest Growing ranking and the Rich List
     - next year's conventions calendar
     - sports season results
     - `feeIndex` steps up by the year's nominal growth; rival prices re-price; price lists are reviewed (§4.6)
     - cities grow; rivals' year (learning, charters, technology, §18)
     - the annual report is filed after the rich list ranks you (§22a)
-22. Incidents (§23).
-23. Net-worth history and milestones.
-24. News (§24).
-25. Housekeeping: manager candidate pools refresh, old events are trimmed. The UI then shows the weekly results and autosaves.
+21. Incidents (§23).
+22. Net-worth history and milestones.
+23. News (§24).
+24. Housekeeping: manager candidate pools refresh, old events are trimmed. The UI then shows the weekly results and autosaves.
 
 **Central bank meetings:** each country meets on the fixed week-of-year list in CONTENT (Countries table). A meeting in a given week is processed inside step 1.
 
@@ -166,7 +165,7 @@ The §25 checkpoints are in start-of-game money: `npm run balance` deflates them
 - **Default prices:** each product has a default price rule (CONTENT Products). A fixed-dollar fee (a plan's monthly price, an app's price) is `value × feeIndex`; a per-unit or percent price is the value itself. Rivals and new offices start from it.
 - **Market reference `m(p, city)`:** the average current price of product p across the rival offices in the city, weighted by each office's size multiplier (§18.4). If no rival offers p, use the default rule. Your own offices are excluded, so you can't move the market reference yourself (`updateMarketRefs`).
 - **Rival prices:** `base × (1 + strategy fee stance − price-war cut)` (§18.6), drifting toward that target at RIVAL_PRICE_DRIFT (2%) of the gap a week. Fee prices re-price yearly with `feeIndex` (§4.6).
-- **Bank-era rate machinery (still computed, nearly idle):** FTP is still worked out each week (`FTP_short = policyRate`, `FTP_long = policyRate + termPremium`), along with the deposit beta (DEPOSIT_BETA_UP 0.45, DEPOSIT_BETA_DOWN 0.75) and loan pass-through. They only touch rate-priced products, and the only one left is Enterprise contracts (`sbl`, default `FTP_short + 4.5%`), whose list rate nothing reads: the Deal Desk prices by discount off a business's budget (§11.1).
+- **Rate-priced products:** the only one left is Enterprise contracts (`sbl`, default rule `ftpShort + 4.5%`, where `ftpShort = policyRate` and `ftpLong = policyRate + termPremium`, `src/sim/rates.ts`). Its list rate drives nothing in play: the Deal Desk prices by discount off a business's budget (§11.1). The bank's deposit betas, loan pass-through and the weekly prev-FTP lags were removed in schema 38.
 
 ## 6. Sales office staff, capacity, managers
 
@@ -380,7 +379,7 @@ Clamped to 5–95%. `stars` is your office's overall rating; the rival is the in
 
 ### 11.3 Settlement
 - **New RFP:** a bid is drawn at once. A win signs the contract: the vendor is your office, `renewalWeek` is the `U{termQuarters}`-th quarter start, `underwriting.loansBooked` + 1 (it feeds the AI model's Customer Feedback data), event `CONTRACT_WON`.
-- **Renewal season** (tick step 20, a quarter start; `renewalSeason`): every contract due is settled in id order.
+- **Renewal season** (tick step 19, a quarter start; `renewalSeason`): every contract due is settled in id order.
   - Yours: no open office → lost. Otherwise keep with the keep chance at the offer; kept contracts reprice to `budget × (1 − offer)` for a new `U{termQuarters}`; lost ones go to the best rival in the city (or no vendor) with `CONTRACT_LOST` (reason `renewal`).
   - A rival's: a merged rival hands it to its buyer; a rival gone from the city drops it. With your offer, you win it at the win chance (event `CONTRACT_WON` with `from`); otherwise the rival rolls over for `termQuarters[0]`.
   - Then each business without a vendor or an open RFP, in a city with rival offices, signs with one at `rivalSignQuarterly` (12%), the rival picked by office size + 1.
@@ -396,12 +395,12 @@ A delegated manager (Delegation → Deal Desk, key `loans`) or the Chief Safety 
 Each week an office earns `contractValue / 52` for every contract it holds (P&L line `loanDesk`, shown as Enterprise contracts), spends `computeShare` (25%) of it × `inferenceMult` on compute (base spot dollars, so it joins the GPU demand of §13.0) and `serviceShare` (10%) on servicing. Contract values count in ARR (§10.7). Contracts of $250k a year or more make the news when won from a rival or lost.
 
 ### 11.6 Migration 12 → 13
-Saves from before the Deal Desk: business loans still current are repaid into treasury reserves at their balance (equity unchanged) and the applications lapse. Offices get `discountLimit`. Business budgets and rival contract values are rescaled to the size bases above (6k / 25k / 90k / 360k).
+Saves from before the Deal Desk: business loans still current are repaid into treasury reserves at their balance (equity unchanged; schema 38 later folds reserves into cash, §13.1) and the applications lapse. Offices get `discountLimit`. Business budgets and rival contract values are rescaled to the size bases above (6k / 25k / 90k / 360k).
 
 ### 11.7 Public tenders
 Big, long contracts from a city's public bodies (owner's review A4). Constants are `TENDER`; code is `src/sim/tenders.ts`, content `PUBLIC_BODIES` (CONTENT §21c).
 - **Who is invited:** only a lab whose safety tier (§15) is Strong or Adequate (`TENDER.tiers`), from week `firstWeek` (26), and not during a mandated pause.
-- **Opening** (quarter start, tick step 13, `tendersQuarter`): each open sales office with Enterprise contracts on, in id order, in a city with no tender open or held, posts one at `quarterlyChance` (25%). The body is drawn from `PUBLIC_BODIES`; its yearly budget = `U(budget) (600k–1.8M) × body.budgetMult × citySize[S 0.7, M 1, L 1.3, XL 1.6] × nominal index`, to $10k; the term is `U{termYears}` (3–5) years. Bids close `bidWeeks` (6) later. Event `TENDER_OPENED`. RNG stream `tenders`.
+- **Opening** (quarter start, tick step 19, `tendersQuarter`): each open sales office with Enterprise contracts on, in id order, in a city with no tender open or held, posts one at `quarterlyChance` (25%). The body is drawn from `PUBLIC_BODIES`; its yearly budget = `U(budget) (600k–1.8M) × body.budgetMult × citySize[S 0.7, M 1, L 1.3, XL 1.6] × nominal index`, to $10k; the term is `U{termYears}` (3–5) years. Bids close `bidWeeks` (6) later. Event `TENDER_OPENED`. RNG stream `tenders`.
 - **Bid:** a sealed discount `d` off the budget (same steps and cap as §11.1), changeable or withdrawn until bids close. A delegated desk (§11.4) with no bid at the close seals the smallest discount within the limit that reaches `delegateTarget`, else the limit if that reaches `delegateFloor`.
 - **Win chance** (0 below Adequate; else clamped 5–90%) = `winBase (0.3) + safetySlope (0.06) × (Safety axis − 5) + qualitySlope (0.03) × (quality − bar) + tierEdge (Strong 0.1, Adequate 0) + discountSlope (1.0) × d`. Safety counts twice: on its own and in the quality mean. Worked example: Safety 8, quality 0.5 over the bar, Adequate, a 10% discount → `0.3 + 0.18 + 0.015 + 0 + 0.1 = 59.5%`.
 - **Award** (weekly, `runTenders`, before the offices run): at `closeWeek` a bid wins at the win chance: the tender turns `active` at value `budget × (1 − d)` to $100 until `week + term` (`TENDER_WON`). A losing bid, or one set aside because the tier is below Adequate at the close, is `TENDER_LOST` (with the best rival in the city as the winner). With no bid the tender just closes.
@@ -416,7 +415,6 @@ Revenue goes straight to corporate cash. Code: `src/sim/branch/branchPnl.ts`.
   - **Other income** is demo kiosk fees: `atm.productivity × sizeMult × ATM_FEE.usage (0.25) × ATM_FEE.fee ($2.50)` a week.
 - **Office expenses:**
   - **Compute:** the office's compute at base prices (plan seats, API usage and contracts, §10.7, §11.5) × the internal compute price (§13.0). Stored as `gpus = compute ÷ COMPUTE.spotPerGpuWeek` too. Posted to the company `compute` line.
-  - **Loan losses:** always $0 now; the row stays in the list.
   - staff wages (`staff × wage × 40`)
   - manager salary / 52
   - rent
@@ -428,12 +426,12 @@ Revenue goes straight to corporate cash. Code: `src/sim/branch/branchPnl.ts`.
 - Depreciation is a company-level item, not part of office income.
 - **Statement line groups:**
   - Revenues: Plans, API, Apps & services, Enterprise contracts, Other income
-  - Expenses: Compute, Loan losses, Staff, Manager, Rent, Marketing, Equipment & upkeep, Support & data licences, Overhead
+  - Expenses: Compute, Staff, Manager, Rent, Marketing, Equipment & upkeep, Support & data licences, Overhead
 
 ### 12.1 Worked example
 Retired: the bank-era branch example no longer applies. §25's office checkpoints are the calibration now.
 
-## 13. Compute and treasury
+## 13. Compute
 
 ### 13.0 Compute pool and the chip cycle (`src/sim/compute.ts`)
 - **Compute price index** `I`, one for the world (chips are a global market), starting at 1 in the `normal` phase. Like the macro phases (§4), a chip cycle moves between `glut` (target 0.8), `normal` (1.0) and `shortage` (1.3). After at least `COMPUTE.minPhaseWeeks` (13) in a phase: normal → shortage or glut at 1.2% a week each; shortage or glut → normal at 3%. Weekly: `I = clamp(ema(I, target, 0.08) + normal(0, 0.012), 0.5, 2)`, on the `compute` RNG stream. The last 104 weeks are kept for the chart.
@@ -445,30 +443,13 @@ Retired: the bank-era branch example no longer applies. §25's office checkpoint
 - **Allocation:** the gap = max(0, demand − owned − rented). With auto spot-buy on (the default), `spot = min(gap, spotLimit)`, then `burst = min(gap − spot, 0.25 × spotLimit)` at `SPOT.burstPremium` (1.6×) spot; the rest is unserved. With it off, the whole gap is unserved. Any burst week marks you for `SPOT.stigmaWeeks` (4): GPU offers cost `stigmaMarkup` (8%) more.
 - **Capacity crunch:** unserved > `SPOT.crunchFrom` (2%) of demand puts new plan and API sign-ups on a waitlist (take-up × 0). **Outage:** after `OUTAGE.afterWeeks` (3) crunch weeks in a row, churn × `OUTAGE.churnMult` (1.8) while the crunch lasts and `OUTAGE.weeks` (2) after. Events: COMPUTE_BURST, COMPUTE_CRUNCH, COMPUTE_CRUNCH_ENDED, COMPUTE_OUTAGE.
 - **Settle (tick step 9):** with this week's demand, the pool pays `(spot + 1.6 × burst) × spotPrice` plus every active lot's `gpus × price`, and books `poolCost − Σ office charges` on the company compute line (negative when your GPUs save money). Data-center costs stay on their own lines; power-deal GPUs are billed by the deal (§13.7a). Then the trail, stigma, crunch and outage counters update, and expired lots retire.
-- **GPU market (`src/sim/gpuMarket.ts`):** with a Compute floor (dept id `treasury`), offers refresh every `GPU_MARKET.refreshWeeks` (2) at tick step 13: 2 + floor(3 × coverage′) offers, +1 with a CFO of expertise ≥ 70, on the `gpuMarket` RNG stream. Each picks a reservation type from CONTENT §12b by weight. Size = U(type range) × max(1, demandGpus / `GPU_MARKET.sizeScale` 2,000), rounded to `sizeStep` (50). Price per GPU-week = `spot × (1 − discount) × (1 + 0.1 × (1 − coverage′)) × (1 + 0.08 while burst stigma lasts) × U(0.96, 1.04)`, fixed for the term.
+- **GPU market (`src/sim/gpuMarket.ts`):** with a Compute floor (dept id `treasury`), offers refresh every `GPU_MARKET.refreshWeeks` (2) at tick step 12: `GPU_MARKET.offers` gives 2 + floor(3 × coverage′) offers, +1 with a CFO of expertise ≥ 70, on the `gpuMarket` RNG stream. Each picks a reservation type from CONTENT §12b by weight. Size = U(type range) × max(1, demandGpus / `GPU_MARKET.sizeScale` 2,000), rounded to `sizeStep` (50). Price per GPU-week = `spot × (1 − discount) × (1 + 0.1 × (1 − coverage′)) × (1 + 0.08 while burst stigma lasts) × U(0.96, 1.04)`, fixed for the term.
 - **GPU lots:** `rentGpus` takes 50 GPUs or more from an offer (the rest stays on offer while ≥ 50). A lot rented in week w runs weeks w … w + term − 1: every lot is billed `gpus × price` in the pool settle, then lots whose last week this was retire. No early cancel; rented GPUs are billed whether or not demand uses them.
 - **Worked example (lots):** at a 1.0 index with a fully staffed floor, a 1-year lot is offered near $32.80/GPU-week (40 × 0.82). Renting 1,000 GPUs costs $32,800 a week for 52 weeks. If a shortage pushes the index to 1.3, the same GPUs at spot would cost $52,000 a week.
 - **Worked example (charge):** an office whose seats and API cost $80,000 a week at base prices uses 2,000 GPU-weeks. At a 1.2 shortage index it is charged $96,000 either way. With one `hall_row` data center (2,000 GPUs, grid power) covering it, the pool pays $0 for those GPUs and books −$96,000 on the compute line, so the company's compute bill is the hall's power and lease; without one, the pool buys 2,000 GPUs at spot (if the spot limit allows) for $96,000 and books $0.
 
-### 13.1 Treasury reserves
-- **Reserves `R`:** start at $0. The whole seed round (`START_CASH`) is corporate cash, and paid-in capital equals it. Reserves hold money only in bank-era saves that still carry deposits, wholesale lots or central bank borrowing; a save with none of those had its reserves moved into cash by migration 18 → 19 (DATA_MODEL). Reserves count in equity and can't be transferred out.
-- **Corporate cash** is separate (§14) and is what the lab spends.
-
-### 13.2 Weekly flows into reserves
-- Reserves earn interest (§13.4). `addToLendingFund` / `topUpLendingFund` can still move cash into reserves, but no screen offers it. There is no reverse transfer.
-- Retired: deposit flows, loan principal and recoveries no longer exist.
-
-### 13.3 Liquidity ratio
-Retired in play: `LR = reserves / totalDeposits` is null with no deposits. LIQ_MIN (0.10) and the `liqTarget` setting (default 0.15) only matter for an old save that still holds deposits; the Finance floor shows the liquidity row only when there is a ratio.
-
-### 13.4 Reserve interest
-Reserves earn the deposit-facility rate, RESERVE_RATE_SPREAD (0.50%) below policy: `R × max(0, policy − 0.005) / 52` cash in.
-
-### 13.5 Shortfall handling
-Retired in play. `runTreasury` still runs the bank's overnight and central bank window borrowing, but it measures the shortfall against deposits, which are $0, so it never borrows. A funding freeze can't happen.
-
-### 13.6 Funding market
-Legacy. With a Compute floor, funding offers (Term Interbank, CONTENT §12) still refresh every 2 weeks (`FUNDING_REFRESH_WEEKS`), and any wholesale lot an old save holds still pays weekly interest from corporate cash and repays at maturity. The Compute floor shows the funding cards only for a save that still has deposits, lots or overnight borrowing (`hasLegacyFunding`). The rating spread (`RATING_SPREADS`, by runway tier, §15: Strong −0.10pp, Comfortable 0, Tight +0.35pp, Critical +1.00pp) and TREASURY_PENALTY (0.5pp × the Compute floor's shortfall) still price them.
+### 13.1 Corporate cash only
+The lab keeps one pot of money, corporate cash (§14). The bank's treasury stack (reserves, the liquidity ratio, overnight and central bank window borrowing, window stigma and the wholesale funding market with its rating spreads) was removed in schema 38. Migration 37 → 38 folds an old save's treasury into cash: `cash += reserves − (overnight + window + Σ wholesale lots)`, so equity is unchanged (DATA_MODEL). The Compute floor (dept id `treasury`) keeps only the GPU market (§13.0) and the partnership cards.
 
 ### 13.7 Student partnerships (universities)
 - **Signing:**
@@ -517,7 +498,7 @@ Shown in the top bar. Moves only with cash items:
 - revenue (plans, API, apps, contracts, kiosk fees), interest received
 - wages, rents, campaigns, compute, power, data licences
 - capex, lease and office deposits
-- corporate debt draws, repayments and interest; interest on any legacy wholesale lots
+- corporate debt draws, repayments and interest
 - taxes, dividends, share issuance proceeds
 - purchases and sales of assets (stocks, ventures, real estate)
 - partnership and power-deal fees, fines, incident costs
@@ -527,30 +508,30 @@ The statement reads like a software company's (`src/app/company/statementData.ts
 
 | Line | Contents |
 |---|---|
-| Plans, API, Apps & services, Enterprise contracts, Other income | office revenue (§12), plus partnership ARR in Plans; other income also holds reserve and venture-debt interest, rents, dividends received and realized gains |
+| Plans, API, Apps & services, Enterprise contracts, Other income | office revenue (§12), plus partnership ARR in Plans; other income also holds venture-debt interest, rents, dividends received and investment gains |
 | **Revenue** | the sum |
 | Compute | office compute charges, the pool's settle (§13.0), power-deal bills |
 | **Gross profit** | revenue − compute |
 | Operating expenses | office staff, managers, rents (offices and HQ), HQ salaries, executive pay (including grant expense), marketing (office and brand), equipment and upkeep, power, overheads, support, data licences, benefits, development and training spend, lobbying, travel, fines, incident costs |
-| Interest expense | corporate debt and legacy funding; shown only when there is any |
-| Bad debts | non-cash: compute-credit (venture debt) write-offs (§20.5) |
+| Interest expense | corporate debt (§19.9); shown only when there is any |
+| Write-offs | non-cash: compute-credit (venture debt) write-offs (§20.5) |
 | Depreciation & amortization | non-cash: office fit-outs over 10 years, equipment over 5 years, HQ fit-outs over 10 years, partnership and power-deal fees over the contract; goodwill is not amortized |
 | Pre-tax income | |
 | Tax | country rate on positive pre-tax income, with loss carry-forward; accrued weekly, paid quarterly |
 | **Net income** | |
 
-"Weekly revenue" in the weekly results is the Revenue line. Internally the ledger still sums lines into bank-style groups (`netRevenue` = interest income + fee & other income).
+"Weekly revenue" in the weekly results is the Revenue line. Internally the ledger groups lines as interest income (`loanInterest` for Enterprise contracts, `ventureDebtInterest`), interest expense (`corporateInterest`), fee & other income and operating expenses. Schema 38 removed the bank's dead lines and folded old saves' history into these: reserve interest and bond coupons into venture-debt interest, deposit and wholesale interest into corporate interest, wealth and origination fees into dividend income, realized gains into investment gains.
 
 ### 14.3 Cash flow
-- **Operations:** net income + non-cash items (bad debts, D&A, grant expense, investment gains) ± change in taxes payable.
+- **Operations:** net income + non-cash items (write-offs, D&A, grant expense, investment gains) ± change in taxes payable.
 - **Investing:** capex; real estate, stock and venture purchases and sales; partnership and power-deal fees.
 - **Financing:** share issuance, dividends paid, corporate debt draws and repayments.
 - **Net cash flow** = change in corporate cash. This must reconcile; test it.
 
 ### 14.4 Balance sheet
 `src/sim/balanceSheet.ts`. Lines marked * show only when non-zero.
-- **Assets:** cash; treasury reserves*; loans* (legacy); stocks*; ventures*; compute credits* (venture debt); real estate*; sales offices and equipment (fixed assets at book value, data centers and HQ fit-outs included); lease deposits; partnership fees* (unamortized partnership and power-deal fees, the intangibles); goodwill*.
-- **Liabilities:** deposits* (legacy); wholesale funding* (legacy); corporate debt* (venture debt and credit lines from investment banks, or rival labs in old saves, §19.9); dividends payable*; taxes payable.
+- **Assets:** cash; stocks*; ventures*; compute credits* (venture debt); real estate*; sales offices and equipment (fixed assets at book value, data centers and HQ fit-outs included); lease deposits; partnership fees* (unamortized partnership and power-deal fees, the intangibles); goodwill*.
+- **Liabilities:** corporate debt* (venture debt and credit lines from investment banks, or rival labs in old saves, §19.9); dividends payable*; taxes payable.
 - **Equity** = assets − liabilities: paid-in capital plus retained earnings.
 - **Why it balances:** corporate cash moves only with cash items, each matched by a P&L line or another balance-sheet line; non-cash items (depreciation, write-offs, marks) move an asset and equity together.
 
@@ -602,7 +583,7 @@ The AI regulator watches a **safety ratio**. Lenders, the CFO and the deal limit
 - `months = max(0, cash) ÷ burn ÷ (52/12)`. With no burn (profitable, or no closes yet) there is no runway figure and the lab counts as Strong.
 - Tiers (`RUNWAY.tiers`): **Strong** 24 months or more, or not burning cash; **Comfortable** 12–24; **Tight** 6–12; **Critical** under 6, or cash below zero.
 - What reads it:
-  - lenders' spreads: the rating spread on legacy funding (§13.6) by tier, and venture debt (§19.9) by runway and ARR;
+  - lenders' spreads: venture debt (§19.9) by runway and ARR;
   - the CFO's Capital and Share sales routines (§17.2);
   - the gates: buybacks (§19.6a), acquisitions (§19.8) and the CFO's Buying (§21.1) and Investing (§17.2, §20.4) must leave at least `RUNWAY.gateMonths` (12) months of runway after the spend, so they never push the lab into Tight;
   - the IPO's recession exception (§19.4).
@@ -638,7 +619,7 @@ The AI regulator watches a **safety ratio**. Lenders, the CFO and the deal limit
 - `k' = 1 − ramp × (1 − min(k, 1))`. This is the coverage every effect reads.
 - **Shortfall curve:** `effect(k') = k'^0.7`. Above 1.0, bonuses are capped at +5%.
 - Per-department effects are in CONTENT (Floors).
-- **Gating:** some features need the floor to exist, regardless of coverage: the GPU market and legacy funding market (Compute), product development, custom models and training runs (Products), digital projects (Platform & Security), ventures (Investment), executives (Executive), brand campaigns (Marketing).
+- **Gating:** some features need the floor to exist, regardless of coverage: the GPU market (Compute), product development, custom models and training runs (Products), digital projects (Platform & Security), ventures (Investment), executives (Executive), brand campaigns (Marketing).
 
 ### 16.5 Benefits
 - Each benefit has a control value and a cost formula (CONTENT Benefits).
@@ -738,7 +719,7 @@ The Finance floor's 1–5 dial (code `company.riskAppetite`, set by `setRiskAppe
   - A new game seeds 16, each at a random active rival with chance 0.6, otherwise on the market.
   - **Hiring** (`hireResearcher`, Products floor required, team of up to 8): a free researcher at the higher of their salary and the market salary. From a rival: that × 1.3, plus a signing bonus of 13 weeks of it (P&L `hqStaff`). Cash must cover the bonus and a week's pay.
   - **Letting go** (`releaseResearcher`): back on the market, no cost.
-  - Your researchers' salaries are paid weekly into `hqStaff` (tick step 15).
+  - Your researchers' salaries are paid weekly into `hqStaff` (tick step 14).
 - **Each quarter start** (tick step 20, before rival model releases):
   - Researchers at a rival that closed or merged go back on the market.
   - For each of yours, a random active rival bids with chance `0.12 × (market salary ÷ salary)²` (capped at 1), raising **RESEARCHER_POACHED**: *Counter-offer* (salary +25%) or *Let them go* (they join that rival).
@@ -792,7 +773,7 @@ A trained model's first switch-on (`activateModel`, by you, the CPO or a strateg
 | Exec | Domain | Delegations |
 |---|---|---|
 | COO | HR, all sales offices | **Expansion:** opens sales offices for you in the cities you mark for growth, or grows a busy one a size (one move at most every 4 weeks, in the growth city with the most room, at the busiest free storefront, in your usual fit-out, keeping the **cash reserve** you dial in cash: `executives.expansionReserveWeeks`, one of `EXEC_DELEGATION.expansionReserves` 8 / 13 / 26 weeks of costs, default 8). **Company troubles:** settles company and city incidents the way a delegated manager would (§17.1), valuing effects in weeks of company revenue with error shrinking with Expertise; cases marked `yours` (the outage rumour, the mandated pause, poached executives) always come to you. **Sales office operations:** auto-hires managers for new offices and turns on default delegation. **HR benefits:** keeps average morale at or over the **morale target** you dial (`executives.moraleTarget`, one of `EXEC_DELEGATION.moraleTargets` 70 / 80 / 90, default 70) at least cost, within `benefitsBudgetShare` (8%) of payroll. **HR division:** auto-staffs every floor to 100% coverage. **Pay reviews:** on the **cadence** you dial (`executives.payReviewCadence`: quarterly = every 13 weeks, annual = every 52, `PAY_REVIEW.cadences`, default quarterly) sets every executive to `execMarketSalary × (1 + payPremium)`, every manager to their market pay (§6.5) × `(1 + payPremium)`, every researcher to `researcherMarketSalary × (1 + payPremium)` in `RESEARCHERS.salaryStep` but never below their pay (`reviewedResearcherSalary`; a contract you agreed stays), and every HQ department floor with a staff market (not the Executive floor) to `deptMarketSalary × (1 + payPremium)` (`reviewedDeptSalary`, inside `DEPT_SALARY_RANGE` 0.5–3× market in `DEPT_SALARY_STEP`), rounded to the salary steps and inside the allowed ranges. An executive you countered for (`EXEC_POACHED`, `counterWeek`) isn't cut for `PAY_REVIEW.counterHoldWeeks` (52) after the counter (`reviewedPayFor`). It also runs at once when switched on and whenever you change the premium (`setPayPremium`, −10% to +30% in 5% steps, default +5%). **Sales office guidance (staffing):** see below. |
-| CFO | Finance, owned buildings (the lab's and yours) | Halves statement delays. **Capital:** at Tight or Critical runway (§15), sells the company's stocks for cash. **Share sales** (its own switch, so the owner can keep their stake undiluted): under `RUNWAY.cfoRaiseBelowMonths` (12) months of runway, or with cash below zero, sells new shares through the cheapest investment bank (private placement while private, within the round limits; secondary once listed), sized to reach `RUNWAY.cfoTargetMonths` (18) at the current burn, in steps of `cfoRaiseStep` (1%) of the lab. Never launches the IPO. **Investing: the lab's money** and **Investing: your money:** every `EXEC_DELEGATION.investEveryWeeks` (4) weeks, on weeks ≡ `investPhase` (2), each switch for its account (rival labs' shares are never touched): (1) sells every listed-company stock whose price is ≤ `investTrimAt` (75%) of its average cost, and doesn't buy it back for `investCooldownWeeks` (52); (2) buys one stock, the listed company with the largest gap `capShare × (held + budget) − heldValue` (capShare = its market cap ÷ all listed companies'), so holdings build toward a market-cap weighting; buys under `investMinTrade` ($10K) are skipped; (3) backs one startup from the Investment floor pipeline: the highest pentagon average ≥ `investMinScore` (6) among those raising that the account doesn't already hold, taking one offer lot (§20.4); none without an Investment floor. Lab: never at a restricted or critical tier; stocks ≤ `investStockCap` (5%) and startup stakes ≤ `investVentureCap` (3%) of total assets; one stock buy ≤ `investStockLot` (1%) of total assets; each buy leaves at least `RUNWAY.gateMonths` (12) months of runway (it spends at most `cash − 12 × 52/12 × burn`, all of it with no burn); `expansionReserveWeeks` (8) of costs stay in cash. You: keeps `buyReserveYears` (1) of CEO salary; one purchase spends at most `investSpareShare` (25%) of the personal cash above that. **Dividends:** proposes a dividend at board meetings. Under a **Buildings** heading: **Rents: the lab's buildings** and **Rents: your own buildings** (two switches, so your private buildings can stay yours to price): every `EXEC_DELEGATION.rentEveryWeeks` (4) weeks, and at once when a switch goes on, each covered building's rent is set to hold that owner's **occupancy dial** (80 / 85 / 90 / 95 / 100%, default 100, one dial under each switch; `rentForOccupancy`, §21.2). At 100% that is `bestRent`: the highest rent that still fills it, counting the CFO's pricing power, rounded down to the $5 step and kept inside the 50–160% range. Changing a dial reprices at once. **Buying: the lab's buildings** and **Buying: your own buildings:** every `EXEC_DELEGATION.buyEveryWeeks` (4) weeks each buys at most one listed building, in any city, at its asking price (always accepted, no travel needed): the listing with the best net yield, a year of `propertyWeek(…).net` at the rent the CFO would set and the occupancy it settles at ÷ asking, among those the budget allows. Lab: never at a restricted or critical tier; its buildings' value stays ≤ `buyAssetCap` (5%) of total assets; at least `RUNWAY.gateMonths` (12) months of runway remain after the purchase (§15); `expansionReserveWeeks` (8) of weekly costs stay in cash. You: keeps `buyReserveYears` (1) of CEO salary, and a building may cost at most `buySpareShare` (50%) of the personal cash above that. Tenants of a covered building accept rent up to `marketRent × (1 + 0.10 × expertise/100)` with no loss of occupancy. The lab pays the CFO either way. The old **Funding** switch (auto-funding and funding offers, §13.3) went in schema 22: legacy funding lots simply run off. |
+| CFO | Finance, owned buildings (the lab's and yours) | Halves statement delays. **Capital:** at Tight or Critical runway (§15), sells the company's stocks for cash. **Share sales** (its own switch, so the owner can keep their stake undiluted): under `RUNWAY.cfoRaiseBelowMonths` (12) months of runway, or with cash below zero, sells new shares through the cheapest investment bank (private placement while private, within the round limits; secondary once listed), sized to reach `RUNWAY.cfoTargetMonths` (18) at the current burn, in steps of `cfoRaiseStep` (1%) of the lab. Never launches the IPO. **Investing: the lab's money** and **Investing: your money:** every `EXEC_DELEGATION.investEveryWeeks` (4) weeks, on weeks ≡ `investPhase` (2), each switch for its account (rival labs' shares are never touched): (1) sells every listed-company stock whose price is ≤ `investTrimAt` (75%) of its average cost, and doesn't buy it back for `investCooldownWeeks` (52); (2) buys one stock, the listed company with the largest gap `capShare × (held + budget) − heldValue` (capShare = its market cap ÷ all listed companies'), so holdings build toward a market-cap weighting; buys under `investMinTrade` ($10K) are skipped; (3) backs one startup from the Investment floor pipeline: the highest pentagon average ≥ `investMinScore` (6) among those raising that the account doesn't already hold, taking one offer lot (§20.4); none without an Investment floor. Lab: never at a restricted or critical tier; stocks ≤ `investStockCap` (5%) and startup stakes ≤ `investVentureCap` (3%) of total assets; one stock buy ≤ `investStockLot` (1%) of total assets; each buy leaves at least `RUNWAY.gateMonths` (12) months of runway (it spends at most `cash − 12 × 52/12 × burn`, all of it with no burn); `expansionReserveWeeks` (8) of costs stay in cash. You: keeps `buyReserveYears` (1) of CEO salary; one purchase spends at most `investSpareShare` (25%) of the personal cash above that. **Dividends:** proposes a dividend at board meetings. Under a **Buildings** heading: **Rents: the lab's buildings** and **Rents: your own buildings** (two switches, so your private buildings can stay yours to price): every `EXEC_DELEGATION.rentEveryWeeks` (4) weeks, and at once when a switch goes on, each covered building's rent is set to hold that owner's **occupancy dial** (80 / 85 / 90 / 95 / 100%, default 100, one dial under each switch; `rentForOccupancy`, §21.2). At 100% that is `bestRent`: the highest rent that still fills it, counting the CFO's pricing power, rounded down to the $5 step and kept inside the 50–160% range. Changing a dial reprices at once. **Buying: the lab's buildings** and **Buying: your own buildings:** every `EXEC_DELEGATION.buyEveryWeeks` (4) weeks each buys at most one listed building, in any city, at its asking price (always accepted, no travel needed): the listing with the best net yield, a year of `propertyWeek(…).net` at the rent the CFO would set and the occupancy it settles at ÷ asking, among those the budget allows. Lab: never at a restricted or critical tier; its buildings' value stays ≤ `buyAssetCap` (5%) of total assets; at least `RUNWAY.gateMonths` (12) months of runway remain after the purchase (§15); `expansionReserveWeeks` (8) of weekly costs stay in cash. You: keeps `buyReserveYears` (1) of CEO salary, and a building may cost at most `buySpareShare` (50%) of the personal cash above that. Tenants of a covered building accept rent up to `marketRent × (1 + 0.10 × expertise/100)` with no loss of occupancy. The lab pays the CFO either way. The old **Funding** switch (auto-funding and funding offers) went in schema 22, and the funding market itself in schema 38 (§13.1). |
 | CPO | Products | **Pricing:** keeps the company lineup priced like a delegated manager (§17.1) when Apply-to-all is on. **Developments:** starts one when none is running, within a budget cap of 1% of revenue, taking the next undeveloped product in the **product focus** you dial first (`executives.devFocus`: Plans, API, Apps or Any, default Any; once the focus category is exhausted it continues with the rest). **Models:** switches to the data package or trained model with the best quality per dollar (§16.7, §16.13); the CPO travels for you, so packages from a data vendor in any city with an open sales office count, not only the city you are in (`reachableBureaus`). **Routine training runs** (§16.13). **Research talent:** every `EXEC_DELEGATION.talentEveryWeeks` (4) weeks hires the best researcher on the open market (most stars, then the cheapest) while researcher pay after the hire stays within `talentBudgetShare` (3%) of annual revenue (trailing weekly revenue × 52) and `expansionReserveWeeks` (8) of costs stay in cash after a week of their salary; the team cap (`RESEARCHERS.maxTeam`) holds. It never bids for a rival's researcher (the poaching premium and signing bonus stay your call) and never answers `RESEARCHER_POACHED`, which is marked `yours`. **Sales office guidance (lineup):** see below. |
 | CTO | Platform & Security, Compute | App rating bonus (§16.9); runs digital projects. **Compute** (`execDelegationsCompute.ts`): each week, with a Compute floor, reserves GPU lots from the floor's market (§13.0) until `plannedCapacity` (data-center and power-deal GPUs, data centers in fit-out at their usable GPUs, rented lots) covers the **cover target** you dial (`executives.computeCover`, one of `CTO_COMPUTE.coverTargets` 60 / 75 / 90%, default 75%) of last week's `demandGpus`. It acts only when the gap is at least `CTO_COMPUTE.slack` (5%) of demand, takes only offers priced under spot, in whole `GPU_MARKET.sizeStep` lots, and orders offers by the chip phase: longest term first in a glut, shortest first in a shortage, cheapest per GPU-week in a normal market (ties by price, then id). Auto spot-buy is untouched and covers the rest. An empty seat applies the vacancy penalty. |
 | Chief Safety Officer | Safety & Alignment | **Launch posture** switch (id `appetite`): every `croEveryWeeks` (4) weeks, steps it down one level while the safety tier is Watch, Restricted or Critical, and up one while it is Strong, never above the **posture ceiling** you dial (`executives.postureCeiling`, one of `EXEC_DELEGATION.croCeilings` 3 Balanced / 4 Bold / 5 Very bold, default `croMaxAppetite` 4). Stepping down has no floor. **Deal Desk policy** (§11.4). |
@@ -927,7 +908,7 @@ A trained model's first switch-on (`activateModel`, by you, the CPO or a strateg
 
 ### 19.6 Secondary offering
 - New shares n, entered as a % of outstanding.
-- Price per share = current × 0.97 (`SECONDARY_DISCOUNT`).
+- Price per share = current × (1 − `SECONDARY.discount` 0.03).
 - Gross proceeds = n × price. Underwriting fee = the investment bank's fee %, default 4.55%. Capital raised = gross − fee.
 - Price impact: −2% to −5%, scaled by size up to the 25% cap per offering.
 
@@ -1225,26 +1206,25 @@ The main groups, with the defaults shown above. Names marked (legacy) belong to 
     | Expert | 0.85 | +0.4 | +0.20pp |
   - **Competitors:** a city takes the first n rivals in strategy order. Its starting rival office total (CONTENT §15) scales by n ÷ the city's usual count, with at least one each.
 - **MACRO:** `MACRO_TRANSITIONS`, `MACRO_TARGETS`, `MACRO_EMA`, `MACRO_SIGMA`, `MACRO_MIN_PHASE_WEEKS`, `POLICY_*` (rule weights, steps, `POLICY_FLOOR`, `POLICY_CAP`), `CREDIT_CYCLE`, `LOAN_DEMAND`, `NOMINAL_INDEX`, `EQUITY_MARKET_DRIFT`, `MARKET_SHOCK_SIGMA`
-- **PRICES:** `RIVAL_PRICE_DRIFT`, `FEE_COMP_MIN`, `FEE_COMP_SCALE`, `FEE_STEP_MIN`, `FEE_PF_SCALE`, `PRICE_FACTOR_CLAMP`; (legacy) `DEPOSIT_BETA_UP`, `DEPOSIT_BETA_DOWN`, `LOAN_PASS_THROUGH`, `CARD_REPRICE_GAP`, `PF_RATE_STEP`
+- **PRICES:** `RIVAL_PRICE_DRIFT`, `FEE_COMP_MIN`, `FEE_COMP_SCALE`, `FEE_STEP_MIN`, `FEE_PF_SCALE`, `PRICE_FACTOR_CLAMP`; (legacy) `PF_RATE_STEP`
 - **STAFF:** `BASE_TELLER_WAGE`, `HOURS_PER_WEEK`, `MANAGER_BASE_SALARY`, `QUIT_BASE`, `HIRE_BASE`, `SERVICE_VISIT_RATE`, `MORALE`, `SKILL`, `CANDIDATE_REROLL`, `MANAGER_PAY`
 - **MARKETING:** `START_AWARENESS`, `GRAND_OPENING_BONUS`, `AWARENESS_DECAY`, `BRAND_DECAY`, `BRAND_PASSIVE_PER_BRANCH`, `CAMPAIGN_COST_SCALE` (4, office campaigns' weekly costs, × the office size mult)
 - **RATINGS:** `RATING_EMA`, `PRODUCTS_RATING`, `SERVICE_RATING`, `BRANCH_RATING_WEIGHTS`, `NO_ATM_QUALITY`, `UPKEEP_PENALTY`, `OVERALL_WEIGHTS`, `REVIEW_RATE`
-- **DEMAND:** `PROSPECT_RATE`, `CATCHMENT_MULT`, `SATURATION_EXP`, `SHARE_EXP`, `CITY_MARKET`, `CITY_SATURATION_EXP`, `CITY_BRANCH_GUIDE`, `OFFICE_SIZES`, `OFFICE_TRAFFIC_MULT`, `TAKEUP_CAP`, `STARS_TAKEUP`, `PRODUCTS_PER_CUSTOMER`, `OVERALL_CHURN`, `INTEREST_PERIODS`; (legacy) `RIVAL_RADIUS`, `DISTANCE_FALLOFF`, `MORTGAGE_SPECIAL`, `APPROVAL_INCLUSION`, `INTERCHANGE`
+- **DEMAND:** `PROSPECT_RATE`, `CATCHMENT_MULT`, `SATURATION_EXP`, `SHARE_EXP`, `CITY_MARKET`, `CITY_SATURATION_EXP`, `CITY_BRANCH_GUIDE`, `OFFICE_SIZES`, `OFFICE_TRAFFIC_MULT`, `TAKEUP_CAP`, `STARS_TAKEUP`, `PRODUCTS_PER_CUSTOMER`, `OVERALL_CHURN`, `INTEREST_PERIODS`; (legacy) `RIVAL_RADIUS`, `DISTANCE_FALLOFF`, `APPROVAL_INCLUSION`, `INTERCHANGE`
 - **COMPUTE:** `COMPUTE`, `GPU_MARKET`, `SPOT`, `OUTAGE`, `DATA_CENTER`, `POWER_DEAL`
 - **DEALS:** `BUSINESS`, `DEAL`, `TENDER`, `SECTOR_DISTRICT_WEIGHT`
 - **SALES OFFICE:** `EQUIP_MAINT`, `FITOUT_UPKEEP`, `BRANCH_OVERHEAD`, `ATM_FEE`, `CLOSE_RECOVERY = 0.30`, `CLOSE_RENT_WEEKS`, `LEASE_DEPOSIT_WEEKS`, `BRANCH_PNL_WEEKS`, `FITOUT_LIFE_WEEKS`, `EQUIPMENT_LIFE_WEEKS`
-- **TREASURY (legacy except reserves):** `RESERVE_RATE_SPREAD`, `LIQ_MIN`, `LIQ_TARGET_DEFAULT`, `OVERNIGHT_SPREAD`, `OVERNIGHT_LIMIT`, `WINDOW_SPREAD`, `WINDOW_STIGMA`, `RATING_SPREADS`, `TREASURY_PENALTY`, `FUNDING_REFRESH_WEEKS = 2`, `FUNDING_OFFERS`, `FUNDING_SIZE`, `FUNDING_RATE_NOISE = 0.0008`
 - **PARTNERSHIPS:** `PARTNER_CONTRACT_WEEKS`, `PARTICIPATION`, `PARTNER_HEALTH`, `PARTNER_PERKS`, `PARTNER_RUNOFF_WEEKS`, `PARTNER_RENEWAL`, `STUDENT_PARTNERSHIP`, `GRAD_PROGRAM`
-- **SAFETY AND CREDIT:** `SAFETY`, `SAFETY_TIER_THRESHOLDS`, `CAPITAL_GATE`, `MANDATED_PAUSE`, `LICENCE`, `REGULATOR_REVIEW` (fail base 0.02, ethics base 1.6, fine 0.05–0.3% of trailing revenue), `FAILURE`, `CAPITAL_BUFFER_PP`, `CAPITAL_BUFFER_WEEKS`, `BANK_RUN` (`creditShare` 0.02 for service credits); runway: `RUNWAY` (tiers, `gateMonths`, the CFO's `cfoRaiseBelowMonths` and `cfoTargetMonths`); `LAUNCH_POSTURE`, `DEFAULT_LAUNCH_POSTURE`, `RISK_LOSS_WEEKS`, `DELINQUENCY`
+- **SAFETY AND CREDIT:** `SAFETY`, `SAFETY_TIER_THRESHOLDS`, `CAPITAL_GATE`, `MANDATED_PAUSE`, `LICENCE`, `REGULATOR_REVIEW` (fail base 0.02, ethics base 1.6, fine 0.05–0.3% of trailing revenue), `FAILURE`, `CAPITAL_BUFFER_PP`, `CAPITAL_BUFFER_WEEKS`, `BANK_RUN` (`creditShare` 0.02 for service credits); runway: `RUNWAY` (tiers, `gateMonths`, the CFO's `cfoRaiseBelowMonths` and `cfoTargetMonths`); `LAUNCH_POSTURE`, `DEFAULT_LAUNCH_POSTURE`
 - **INCIDENTS:** `INCIDENTS` (`onceWeeks` for once-a-game cases), `INCIDENT_SCALE`, `INCIDENT_SIZE` (company cases grow with customers), `FOUNDER_DESK` (untilWeek 156, gapWeeks 6, baseP 0.012, angelPct 0.05, angelDiscount 0.3), `INCIDENT_PRICE_SEVERITY`, `FRAUD_SHIELD`; per-case numbers in `src/data/incidentParams.ts`
 - **RIVALS:** `RIVAL_EXPANSION`, `RIVAL_LEARNING`, `RIVAL_CHARTER`, `RIVAL_MERGERS`, `RIVAL_MARKETING`, `RIVAL_TECH`, `RIVAL_CLOSURE`, `RIVAL_FAILURE`, `RIVAL_RAISE`, `RIVAL_RUNWAY_TIERS`, `RIVAL_PAYOUT`, `PRICE_WAR` (`caseWeeks` 13, `namedCities` 3); the rival books: `RIVAL_BOOKS` (matureCustomers, ema, usagePerCustomer, cycle, computeShare, officeCost, trainingShare, cashTargetWeeks, startRunwayWeeks, strategy multipliers), `RIVAL_QUALITY_REF`, `RIVAL_RAMP_WEEKS`, `RIVAL_COMPETITION`
 - **HQ:** `OFFICE_LISTINGS`, `OFFICE_RENT_PER_FLOOR`, `OFFICE_DEPOSIT_WEEKS`, `FLOOR_FITOUT`, `MAIN_OFFICES_MAX`, `DESKS_PER_FLOOR_OPTIONS = [24, 32]` (the Executive suite's 7 desks come from `src/data/departments.ts`), `FOUNDER_MODE_ASSETS = 250_000_000`, `FOUNDER_RAMP`, `DEPT_REQUIREMENTS`, `HQ_COVERAGE`, `HQ_EFFECTS`, `APP_RATING`
 - **PRODUCTS AND MODELS:** `DEV_TERMS`, `DEV_*` (score, budget, `DEV_SIGMA`, `DEV_TIER`), `MODEL_QUALITY`, `BUREAU_HOSTED`, `INTERNAL_HISTORY`, `MODEL_EFFECTS`, `MODEL_DELEGATE`, `MODEL_SWITCH_WEEKS`, `MODEL_LAUNCH`, `OPEN_WEIGHTS`, `TRAINING`, `RIVAL_MODEL`, `CPO_TRAINING`, `RESEARCHERS`, `DELEGATE`
 - **PEOPLE:** `EXECUTIVES` (`grantMinValue` 0.25: unvested grants must be worth a quarter of salary to cut resignations), `EXEC_PAY`, `EXEC_DELEGATION`, `GUIDANCE`, `PAY_REVIEW` (`counterHoldWeeks` 52), `GOVERNANCE`, `BOARD_VOTE`
-- **MARKETS:** `COE`, `VALUATION`, `PRIVATE_VALUATION = 0.8`, `PLACEMENT`, `IPO` (`minArr` 100M), `PUBLIC_PRICE`, `SECONDARY`, `SECONDARY_DISCOUNT = 0.03`, `BUYBACK`, `STOCK_MARKET`, `COMMISSION = 0.001`, `MERGERS`, `SHARE_DEALS`, `REBRAND_COST`, `INCIDENT_PRICE_SEVERITY`, `LATE_FILING`
+- **MARKETS:** `COE`, `VALUATION`, `PRIVATE_VALUATION = 0.8`, `PLACEMENT`, `IPO` (`minArr` 100M), `PUBLIC_PRICE`, `SECONDARY`, `BUYBACK`, `STOCK_MARKET`, `COMMISSION = 0.001`, `MERGERS`, `SHARE_DEALS`, `REBRAND_COST`, `INCIDENT_PRICE_SEVERITY`, `LATE_FILING`
 - **CORPORATE DEBT:** `CORPORATE_LENDING` (`refreshWeeks` 4, `offersPerLender` [2, 3], `maxEquityShare` 0.4, `lineEquityShare` 0.6, `lineSpread` 0.04; §19.9)
 - **INVESTMENTS:** `VENTURES` (`acquireMarkPremium` 1.25), `VENTURE_DEBT`, `VENTURE_MARGIN`, `VENTURE_GEN`, `VENTURE_IPO`, `VENTURE_NEWS`, `CONVENTIONS`, `REAL_ESTATE`, `LOBBYING`
 - **NEWS:** `NEWS_*` (articles, priorities, world desk, company desk, commodities, archive, calendar, column, elections, polls, policy), `RANKING_SIZE`, `RANKING_MIN_ASSETS`, sports `SPORTS_*`
 - **ANNUAL_REPORT** (§22a): `doubled: 1`, `hardYear: 0`, `decadeYears: 10`, `safetyTiers: ['restricted', 'critical']`, `milestonesShown: 3`.
 - **PERSONAL:** `PERSONAL_TAX = 0`, `TRAVEL_KM_PER_WEEK = 24_140`, `FLIGHT_FARE = 80_000` (× destination costIndex), `EARTH_RADIUS_KM = 6_371`, `JET = { upkeepRate: 0.08, depreciation: 0.06, resaleHaircut: 0.1 }`, `HOMES_CFG`, `CARS_CFG`, `COLLECTIBLES_CFG`, `AUCTIONS`, `FRANCHISE`, `RICH_LIST`, `INSIDER`
-- **FEATURES:** flags per stage (ROADMAP)
+- **FEATURES:** an empty record today; a flag goes here only while a system is partly built (ROADMAP)

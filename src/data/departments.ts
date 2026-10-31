@@ -1,7 +1,6 @@
 // HQ departments (docs/CONTENT.md §9): names, descriptions, desks and market
 // salaries. Requirement formulas live in balance.ts (DEPT_REQUIREMENTS); the
 // effects of a shortfall are wired in src/sim/hq.ts and the systems they touch.
-import type { FeatureId } from '../config/balance';
 import type { DeptId, HqDeptId } from './types';
 
 export interface DepartmentSpec {
@@ -13,8 +12,6 @@ export interface DepartmentSpec {
   marketSalary: number;
   /** Fixed desks for special floors; otherwise the building's desks per floor. */
   fixedDesks?: number;
-  /** The stage that makes this floor available. */
-  feature: FeatureId;
 }
 
 export const DEPARTMENTS: Record<DeptId, DepartmentSpec> = {
@@ -23,49 +20,42 @@ export const DEPARTMENTS: Record<DeptId, DepartmentSpec> = {
     name: 'Finance',
     description: 'Company statements on time, credit and cash reporting.',
     marketSalary: 82_000,
-    feature: 'hq',
   },
   hr: {
     id: 'hr',
     name: 'HR',
     description: 'Hiring speed and morale for every sales office and floor; staff benefits.',
     marketSalary: 68_000,
-    feature: 'hq',
   },
   products: {
     id: 'products',
     name: 'Products',
     description: 'The AI model and its training data, the company lineup and product development.',
     marketSalary: 90_000,
-    feature: 'hq',
   },
   treasury: {
     id: 'treasury',
     name: 'Compute',
     description: 'The compute pool, GPU reservations from cloud providers and partnerships.',
     marketSalary: 95_000,
-    feature: 'hq',
   },
   marketing: {
     id: 'marketing',
     name: 'Marketing',
     description: 'Brand campaigns by city or country; boosts every campaign you run.',
     marketSalary: 72_000,
-    feature: 'hq',
   },
   it: {
     id: 'it',
     name: 'Platform & Security',
     description: 'Your app rating, platform projects and security.',
     marketSalary: 98_000,
-    feature: 'hq',
   },
   risk: {
     id: 'risk',
     name: 'Safety & Alignment',
     description: 'Safety reviews with the regulator, loss tracking and sharper risk estimates.',
     marketSalary: 88_000,
-    feature: 'hq',
   },
   executive: {
     id: 'executive',
@@ -73,7 +63,6 @@ export const DEPARTMENTS: Record<DeptId, DepartmentSpec> = {
     description: 'Senior executives and the quarterly board meeting.',
     marketSalary: 0,
     fixedDesks: 7,
-    feature: 'capitalMarkets',
   },
   investment: {
     id: 'investment',
@@ -81,7 +70,6 @@ export const DEPARTMENTS: Record<DeptId, DepartmentSpec> = {
     description: 'Stocks, ventures and venture debt.',
     marketSalary: 120_000,
     fixedDesks: 32,
-    feature: 'investments',
   },
 };
 

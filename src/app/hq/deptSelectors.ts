@@ -99,9 +99,6 @@ export function deptAdvisor(s: GameState, dept: DeptId): string[] {
   const d = s.departments[dept];
   const name = DEPARTMENTS[dept].name;
   const lines: string[] = [];
-  if (dept === 'treasury' && s.treasury.freeze) {
-    lines.push('Cash freeze: new spending is stopped until liquidity recovers.');
-  }
   // C4c: a compute outage or crunch outranks the staffing line.
   const computeAlarm =
     dept === 'treasury' && (s.compute.outageWeeksLeft > 0 || s.compute.crunchWeeks > 0);
@@ -119,7 +116,7 @@ export function deptAdvisor(s: GameState, dept: DeptId): string[] {
         : `This floor is empty. Raise Employees to start hiring.`,
     );
   }
-  if (isHqDept(dept) && !(dept === 'treasury' && (s.treasury.freeze || computeAlarm))) {
+  if (isHqDept(dept) && !(dept === 'treasury' && computeAlarm)) {
     const cov = coverageView(s, dept);
     const [ok, short] = LINES[dept];
     if (cov.status === 'short') lines.push(short);

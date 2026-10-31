@@ -8,17 +8,10 @@ const total = (pnl: Record<PnlLine, number>, lines: readonly PnlLine[]) =>
 
 export const PNL_LINES: readonly PnlLine[] = [
   'loanInterest',
-  'reserveInterest',
-  'bondCoupon',
-  'depositInterest',
-  'wholesaleInterest',
   'accountFees',
   'cardFees',
-  'wealthFees',
   'serviceFees',
   'atmFees',
-  'originationFees',
-  'realizedGains',
   'branchStaff',
   'managers',
   'rent',
@@ -55,21 +48,14 @@ export const PNL_LINES: readonly PnlLine[] = [
   'tax',
 ];
 
-export const INTEREST_INCOME: readonly PnlLine[] = [
-  'loanInterest',
-  'reserveInterest',
-  'bondCoupon',
-  'ventureDebtInterest',
-];
-export const INTEREST_EXPENSE: readonly PnlLine[] = ['depositInterest', 'wholesaleInterest'];
+export const INTEREST_INCOME: readonly PnlLine[] = ['loanInterest', 'ventureDebtInterest'];
+/** Interest on venture debt and drawn credit lines (§19.9). */
+export const INTEREST_EXPENSE: readonly PnlLine[] = ['corporateInterest'];
 export const FEE_INCOME: readonly PnlLine[] = [
   'accountFees',
   'cardFees',
-  'wealthFees',
   'serviceFees',
   'atmFees',
-  'originationFees',
-  'realizedGains',
   'dividendIncome',
   'investmentGains',
   'acquisitionGain',
@@ -92,7 +78,6 @@ export const OPEX: readonly PnlLine[] = [
   'development',
   'fines',
   'incidents',
-  'corporateInterest',
   'amortization',
   'execPay',
   'grantExpense',
@@ -108,7 +93,6 @@ export const NON_CASH: readonly PnlLine[] = [
   'loanLosses',
   'depreciation',
   'amortization',
-  'realizedGains',
   'grantExpense',
   'investmentGains',
   'acquisitionGain',
@@ -147,7 +131,6 @@ export function spend(state: GameState, line: PnlLine, amount: number): void {
 export interface IncomeSummary {
   interestIncome: number;
   interestExpense: number;
-  netInterestIncome: number;
   feeIncome: number;
   opex: number;
   /** Compute bill (part of opex; C3b): plan seats and API usage. */
@@ -160,7 +143,6 @@ export interface IncomeSummary {
   tax: number;
   netIncome: number;
   revenue: number;
-  netRevenue: number;
 }
 
 export function summarize(pnl: Record<PnlLine, number>): IncomeSummary {
@@ -173,7 +155,6 @@ export function summarize(pnl: Record<PnlLine, number>): IncomeSummary {
   return {
     interestIncome,
     interestExpense,
-    netInterestIncome: interestIncome - interestExpense,
     feeIncome,
     opex,
     compute: pnl.compute,
@@ -184,6 +165,5 @@ export function summarize(pnl: Record<PnlLine, number>): IncomeSummary {
     tax: pnl.tax,
     netIncome: preTax - pnl.tax,
     revenue: interestIncome + feeIncome,
-    netRevenue: interestIncome - interestExpense + feeIncome,
   };
 }

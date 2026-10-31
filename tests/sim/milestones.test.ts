@@ -55,8 +55,8 @@ describe('late-game milestones', () => {
     const s = newGame({ seed: 3, cityId: 'cal' });
     const deal = {} as (typeof s.mergers.deals)[number];
     s.mergers.deals = Array.from({ length: 10 }, () => deal);
-    // Treasury reserves are an asset with no liability, so they lift book value (the valuation floor).
-    s.treasury.reserves += 100e9;
+    // Extra cash with no liability lifts book value (the valuation floor).
+    s.company.cash += 100e9;
     s.personal.cash += 10e9;
     checkMilestones(s);
     expect(companyValuation(s)).toBeGreaterThanOrEqual(100e9);
@@ -67,7 +67,7 @@ describe('late-game milestones', () => {
     expect(s.milestones.worth_10b).toBe(s.clock.week);
     expect(s.milestones.twenty_cities).toBeUndefined();
     expect(s.milestones.ten_countries).toBeUndefined();
-    s.treasury.reserves += 900e9;
+    s.company.cash += 900e9;
     checkMilestones(s);
     expect(s.milestones.assets_1t).toBe(s.clock.week);
   });

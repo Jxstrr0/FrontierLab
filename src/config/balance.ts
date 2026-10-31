@@ -5,31 +5,12 @@
 import type { Difficulty, Phase, RunwayTier, Tier } from '../data/types';
 
 /**
- * Feature flags, one per ROADMAP stage. A stage's systems stay switched off on
- * `main` until they are fully wired, so the live site is always shippable.
+ * Feature flags for systems that are only partly built (CLAUDE.md: never leave
+ * a stage half-wired on main). Every stage so far is finished, so there are
+ * none; add one here, check it where the system is wired, and remove the flag
+ * and its checks once the system is complete.
  */
-export const FEATURES = {
-  /** Stage 1: headless simulation core. */
-  simulation: true,
-  /** Stage 2: playable founder loop in plain UI (enables New Game / Continue). */
-  playableLoop: true,
-  /** Stage 3: engraved isometric city map. */
-  cityMap: true,
-  /** Stage 4: HQ offices, departments and operations depth. */
-  hq: true,
-  /** Stage 5: rival AI, macro for every country, The Weekly Ledger, incidents. */
-  competition: true,
-  /** Stage 6: governance, executives and capital markets. */
-  capitalMarkets: true,
-  /** Stage 7: ventures, conventions and real estate. */
-  investments: true,
-  /** Stage 8: every city, airports and travel. */
-  multiCity: true,
-  /** Stage 9: personal wealth, homes, cars, auctions, franchise. */
-  personalEmpire: true,
-} as const;
-
-export type FeatureId = keyof typeof FEATURES;
+export const FEATURES: Readonly<Record<string, boolean>> = {};
 
 // ─── TIME (SIMULATION §2, §26) ────────────────────────────────────────────────
 export const DAY_MS = 1000;
@@ -170,14 +151,8 @@ export const EQUITY_MARKET_DRIFT: Record<Phase, number> = {
 export const MARKET_SHOCK_SIGMA = 0.018;
 
 // ─── RATES (§5) ───────────────────────────────────────────────────────────────
-export const DEPOSIT_BETA_UP = 0.45;
-export const DEPOSIT_BETA_DOWN = 0.75;
-export const DEPOSIT_LAG_WEEKS: [number, number] = [4, 8];
-export const LOAN_PASS_THROUGH = 0.9;
-export const LOAN_LAG_WEEKS = 2;
+/** Rival prices close this share of the gap to their strategy target each week. */
 export const RIVAL_PRICE_DRIFT = 0.02;
-/** Cards re-price only when FTP has moved this far since the last change. */
-export const CARD_REPRICE_GAP = 0.01;
 
 // ─── STAFF (§6) ───────────────────────────────────────────────────────────────
 export const BASE_TELLER_WAGE = 24.0;
@@ -374,8 +349,8 @@ export const COMPUTE = {
 } as const;
 /**
  * The GPU market on the Compute floor (stage C4b, SIMULATION §13.0): offers
- * refresh every refreshWeeks while you have the floor, counted like funding
- * offers (FUNDING_OFFERS). Price = spot × index × (1 − type discount) ×
+ * refresh every refreshWeeks while you have the floor; offers sets how many.
+ * Price = spot × index × (1 − type discount) ×
  * (1 + understaffedMarkup × (1 − coverage′)) × noise(±priceNoise). Size =
  * the type's GPU range × max(1, demand / sizeScale), rounded to sizeStep.
  */
@@ -385,6 +360,8 @@ export const GPU_MARKET = {
   sizeStep: 50,
   priceNoise: 0.04,
   understaffedMarkup: 0.1,
+  /** Offer count = base + floor(perCoverage × coverage′) + (CFO expertise ≥ cfoExpertise ? cfoBonus : 0). */
+  offers: { base: 2, perCoverage: 3, cfoBonus: 1, cfoExpertise: 70 },
 } as const;
 /**
  * Spot compute limits (stage C4c, SIMULATION §13.0). Clouds sell you spot GPUs
@@ -444,13 +421,6 @@ export const BUSINESS = {
 } as const;
 export const TAKEUP_CAP = 0.95;
 export const STARS_TAKEUP = { base: 0.6, slope: 0.2 } as const;
-export const MORTGAGE_SPECIAL = {
-  homeownerRef: 0.6,
-  base: 0.6,
-  perOffice: 0.2,
-  min: 0.6,
-  max: 1.2,
-} as const;
 export const APPROVAL_INCLUSION = { base: 0.85, slope: 0.03 } as const;
 /** Price factors move one sensitivity unit per this rate gap (§9.7; tuned from 0.005). */
 export const PF_RATE_STEP = 0.01;
@@ -563,43 +533,6 @@ export const BRANCH_PNL_WEEKS = 52;
 export const FITOUT_LIFE_WEEKS = 520;
 export const EQUIPMENT_LIFE_WEEKS = 260;
 
-// ─── TREASURY (§13) ───────────────────────────────────────────────────────────
-export const LIQ_MIN = 0.1;
-/** Reserves earn the policy rate minus this spread (the central bank's deposit facility, §13.4). */
-export const RESERVE_RATE_SPREAD = 0.005;
-export const LIQ_TARGET_DEFAULT = 0.15;
-export const LIQ_TARGET_RANGE: [number, number] = [0.1, 0.4];
-export const LIQ_REPAY_BUFFER = 0.05;
-export const FREEZE_RELEASE = 0.02;
-export const OVERNIGHT_SPREAD = 0.002;
-export const OVERNIGHT_LIMIT = 0.1;
-export const WINDOW_SPREAD = 0.01;
-export const WINDOW_STIGMA = { weeks: 4, rating: 0.05, newsChance: 0.2 } as const;
-export const TREASURY_PENALTY = 0.005;
-/** Funding spread by runway tier (§13.6, §15). */
-export const RATING_SPREADS: Record<RunwayTier, number> = {
-  strong: -0.001,
-  comfortable: 0,
-  tight: 0.0035,
-  critical: 0.01,
-};
-/** Overnight limit multiplier by tier (assumption, DESIGN §7). */
-export const OVERNIGHT_LIMIT_MULT: Record<Tier, number> = {
-  strong: 1,
-  adequate: 1,
-  watch: 0.75,
-  restricted: 0.5,
-  critical: 0.25,
-};
-/** Funding market (§13.6): offers regenerate every 2 weeks while you have a Treasury floor. */
-export const FUNDING_REFRESH_WEEKS = 2;
-/** Offer count = base + floor(perCoverage × treasuryCoverage′) + (CFO expertise ≥ cfoExpertise ? cfoBonus : 0). */
-export const FUNDING_OFFERS = { base: 2, perCoverage: 3, cfoBonus: 1, cfoExpertise: 70 } as const;
-/** Offer size = typeSize × max(1, deposits / sizeScale) × (1 ± sizeNoise), rounded to amountStep. */
-export const FUNDING_SIZE = { scale: 100_000_000, noise: 0.25, amountStep: 100_000 } as const;
-/** Offer rate noise: normal(0, FUNDING_RATE_NOISE). */
-export const FUNDING_RATE_NOISE = 0.0008;
-
 // ─── RUNWAY (§15) ─────────────────────────────────────────────────────────────
 /**
  * Runway (SIMULATION §15): months of corporate cash at the average net burn
@@ -693,14 +626,6 @@ export const REGULATOR_REVIEW = {
   defaultEthics: 50,
   fineRange: [0.0005, 0.003] as [number, number],
 } as const;
-/** Risk floor loss records kept, in weeks (SCREENS §10: annualized 13-week loss rates). */
-export const RISK_LOSS_WEEKS = 13;
-/**
- * Delinquency proxy (assumption, DESIGN §7): the average weekly defaults of the
- * last `recentWeeks`, times the `pipelineWeeks` a loan spends in arrears before
- * default, as a share of the current balance.
- */
-export const DELINQUENCY = { recentWeeks: 4, pipelineWeeks: 13 } as const;
 /**
  * Game over (DESIGN §5.18): corporate cash below zero for 4 weeks with no
  * credit left to cover it. (The regulator's takeover went in stage C7a: a
@@ -745,7 +670,6 @@ export const FLOOR_FITOUT = 120_000;
 export const MAIN_OFFICES_MAX = 2;
 export const FLOOR_FITOUT_LIFE_WEEKS = 520;
 export const DESKS_PER_FLOOR_OPTIONS = [24, 32] as const;
-export const INVESTMENT_FLOOR_DESKS = 32;
 /** Releasing a floor or office lets staff above the remaining desks go with this severance. */
 export const SEVERANCE_WEEKS = 4;
 /**
@@ -2200,8 +2124,7 @@ export const EXEC_PAY = {
  * revenueWeeks average). CMO: holds brand awareness near brandTarget (±
  * brandSlack) within brandBudgetShare of revenue. CRO (Chief Safety Officer):
  * every croEveryWeeks weeks, steps the launch posture down while the safety
- * tier is Watch or worse and up while it is Strong, up to croMaxAppetite;
- * croMaxLoss is the loss ceiling the attention list warns at.
+ * tier is Watch or worse and up while it is Strong, up to croMaxAppetite.
  */
 export const EXEC_DELEGATION = {
   cooDelegation: { staffing: true, products: true, marketing: true, troubles: true, loans: true },
@@ -2233,7 +2156,6 @@ export const EXEC_DELEGATION = {
   brandSlack: 0.05,
   brandBudgetShare: 0.03,
   croEveryWeeks: 4,
-  croMaxLoss: 0.012,
   /**
    * CSO Launch posture: the posture the CSO may step up to while the safety
    * tier is Strong (the posture ceiling dial on their profile), default and stops
@@ -2387,14 +2309,13 @@ export const MANAGER_PAY = {
  * ranks what most needs you. A branch counts as losing money after lossWeeks
  * weekly closes in the red once it is past its grand opening; a rating under
  * lowRating, average morale under lowMorale, city awareness under lowAwareness
- * (with a branch there) and liquidity more than liqBand under target are flagged.
+ * (with a branch there) are flagged.
  */
 export const ATTENTION = {
   lossWeeks: 4,
   lowRating: 2.5,
   lowMorale: 50,
   lowAwareness: 0.2,
-  liqBand: 0.03,
   /** Cash under this many weeks of running costs is flagged (and warned about on the build sheet). */
   cashCoverWeeks: 8,
   /** How many items the Company screen shows. */
@@ -2484,7 +2405,6 @@ export const SECONDARY = {
   impact: [0.02, 0.05] as [number, number],
   maxPct: 0.25,
 } as const;
-export const SECONDARY_DISCOUNT = SECONDARY.discount;
 /**
  * Share buybacks (§19.6a): a listed bank buys its own shares back from the
  * public at the market price plus a small premium, pays a broker's fee, and

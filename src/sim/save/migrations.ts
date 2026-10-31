@@ -26,6 +26,7 @@ import { migrateSeedMoney } from './migrateSeedMoney';
 import { migrateSeats } from './migrateSeats';
 import { migrateAvatars } from './migrateAvatars';
 import { migrateCurrencies } from './migrateCurrencies';
+import { migrateBankWeight } from './migrateBankWeight';
 import { generatePersonalSites } from '../personalSites';
 import { generateLandmarkTower } from '../landmarkTowers';
 
@@ -264,6 +265,12 @@ export const migrations: Record<number, (s: RawSave) => RawSave> = {
   36: (s) => {
     const state = s as unknown as GameState;
     if (state.settings) state.settings.annualReport ??= true;
+    return s;
+  },
+  // Schema 38 (cleanup batch): the bank treasury folds into corporate cash
+  // (reserves in, anything it still owed paid off) and the bank-only fields go.
+  37: (s) => {
+    migrateBankWeight(s as unknown as GameState);
     return s;
   },
 };

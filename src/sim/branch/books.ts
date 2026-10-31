@@ -30,7 +30,7 @@ export function emptyBook(): Book {
     bookRate: 0,
     pd: 0,
     lgd: 0,
-    last: { newAccounts: 0, newVolume: 0, deltaAccounts: 0, churned: 0, defaulted: 0 },
+    last: { newAccounts: 0, newVolume: 0, deltaAccounts: 0, churned: 0 },
   };
 }
 
@@ -59,7 +59,6 @@ export function runBooks(
       newVolume: orig.newVolume,
       deltaAccounts: 0,
       churned: 0,
-      defaulted: 0,
     };
     runRecurring(ctx, spec, book, orig);
     book.last.deltaAccounts = book.accounts - before;

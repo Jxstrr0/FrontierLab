@@ -9,6 +9,7 @@ import { emptyBook } from '../branch/books';
 import { roundToStep } from '../math';
 import { countryOfCity, defaultPrice } from '../rates';
 import type { Branch, GameState } from '../state';
+import { legacyTreasury } from './legacyTreasury';
 
 /** The bank's base products and how their balances sit on the balance sheet. */
 const OLD_DEPOSITS = new Set(['chequing', 'savings', 'gic1y', 'student', 'business_acct']);
@@ -31,8 +32,8 @@ function convertOffice(state: GameState, b: Branch, old: Map<string, string>): v
   for (const [pid, base] of old) {
     const book = b.books[pid];
     if (book) {
-      if (OLD_DEPOSITS.has(base)) state.treasury.reserves -= book.balance;
-      else if (OLD_LOANS.has(base)) state.treasury.reserves += book.balance;
+      if (OLD_DEPOSITS.has(base)) legacyTreasury(state).reserves -= book.balance;
+      else if (OLD_LOANS.has(base)) legacyTreasury(state).reserves += book.balance;
     }
     delete b.books[pid];
     delete b.offered[pid];
@@ -55,19 +56,19 @@ export function migrateCatalog(state: GameState): void {
   for (const b of Object.values(state.branches ?? {})) convertOffice(state, b, old);
 
   // Paying out more deposits than reserves held comes out of corporate cash.
-  if (state.treasury.reserves < 0) {
-    state.company.cash += state.treasury.reserves;
-    state.treasury.reserves = 0;
+  if (legacyTreasury(state).reserves < 0) {
+    state.company.cash += legacyTreasury(state).reserves;
+    legacyTreasury(state).reserves = 0;
   }
 
   for (const p of Object.values(state.partnerships ?? {})) {
-    state.treasury.reserves -= p.balance;
+    legacyTreasury(state).reserves -= p.balance;
     p.balance = 0;
     p.productId = p.kind === 'student' ? 'campus_plan' : 'team';
   }
-  if (state.treasury.reserves < 0) {
-    state.company.cash += state.treasury.reserves;
-    state.treasury.reserves = 0;
+  if (legacyTreasury(state).reserves < 0) {
+    state.company.cash += legacyTreasury(state).reserves;
+    legacyTreasury(state).reserves = 0;
   }
 
   const catalog = state.products.catalog;
@@ -88,7 +89,7 @@ export function migrateCatalog(state: GameState): void {
   for (const r of Object.values(state.rivals ?? {})) {
     for (const id of old.keys()) {
       delete r.prices[id];
-      delete r.priceLags[id];
+      delete (r as { priceLags?: Record<string, unknown> }).priceLags?.[id];
     }
     // Price-war bumps were savings-rate points; they are plan price cuts now.
     r.priceWar = {};

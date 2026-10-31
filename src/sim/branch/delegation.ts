@@ -127,9 +127,8 @@ function delegateMarketing(state: GameState, branch: Branch): void {
   // As campaignEffects: a weekly campaign's amount × campaignCostIndex.
   const costIndex = campaignCostIndex(state, branch);
   const customers = Math.max(branch.customers, 1);
-  // Contribution per customer per week: revenue less compute and loan losses.
-  const l = last.lines;
-  const perCustomer = Math.max(0, (last.revenue - l.compute - l.losses) / customers);
+  // Contribution per customer per week: revenue less compute.
+  const perCustomer = Math.max(0, (last.revenue - last.lines.compute) / customers);
   const mult = marketingMult(state, branch);
   const b = state.world.cities[branch.cityId]?.brandAwareness ?? 0;
   // As runDemand: the office's reach is its city traffic (C2a), not its own storefront's.

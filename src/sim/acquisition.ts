@@ -79,7 +79,6 @@ export function closeAcquisition(
   bank.branches = [];
   bank.status = 'acquired';
   bank.priceWar = {};
-  bank.priceLags = {};
   delete bank.distressedUntil;
   delete bank.distressedAsk;
 

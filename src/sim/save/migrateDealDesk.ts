@@ -5,6 +5,7 @@
 // budgets (and rival contracts) move to the C5b size bases.
 import { BUSINESS, DEAL } from '../../config/balance';
 import type { GameState } from '../state';
+import { legacyTreasury } from './legacyTreasury';
 
 interface OldDesk {
   week?: number;
@@ -20,7 +21,7 @@ export function migrateDealDesk(state: GameState): void {
     loanDesk?: { loans?: Record<string, { balance?: number; status?: string }> };
   };
   for (const loan of Object.values(raw.loanDesk?.loans ?? {}))
-    if (loan.status === 'current') state.treasury.reserves += loan.balance ?? 0;
+    if (loan.status === 'current') legacyTreasury(state).reserves += loan.balance ?? 0;
   delete raw.loanDesk;
   // Tenders arrive with migration 34 → 35.
   state.dealDesk = { rfps: {} } as unknown as GameState['dealDesk'];

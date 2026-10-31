@@ -217,7 +217,7 @@ Five tabs. Coffee Inc has four; the Deal Desk is the AI-lab addition.
 Shown to the player in one place, the Company summary:
 - **Revenue is cash.** Plans, API usage, apps and contracts are recurring revenue. The headline number is **ARR** (annual recurring revenue); each week a lab earns about ARR ÷ 52.
 - **Corporate cash** (top bar) pays for offices, data centers, compute, salaries, acquisitions and dividends.
-- **Seed money.** The whole seed round is corporate cash from day one; nothing is locked away. Treasury reserves (`treasury.reserves`) start at $0 and matter only to old bank-era saves.
+- **Seed money.** The whole seed round is corporate cash from day one; nothing is locked away. Corporate cash is the lab's only pot of money: the bank's treasury reserves went in schema 38, folded into cash.
 - **Compute.** Every plan seat, API token and contract needs GPUs, counted in GPU-weeks.
   - Your own GPUs (data centers and power deals) serve demand first, then rented GPU lots, then the spot market.
   - The spot price follows a global **chip cycle** (glut, normal, shortage).
@@ -255,7 +255,7 @@ Shown to the player in one place, the Company summary:
 - **Founder mode:** with three or fewer office units nothing is required (a Starter office is one unit, a Flagship four). Requirements phase in fully by eight units, or at once when total assets reach $250M.
 
 #### 5.8.1 Finance
-- Company statements (income, balance sheet, cash flow; Week/Quarter/Year): Revenue → Compute → Gross profit, then running costs. A revenue and net income chart, and a credit summary (plus liquidity for old bank-era saves).
+- Company statements (income, balance sheet, cash flow; Week/Quarter/Year): Revenue → Compute → Gross profit, then running costs. A revenue and net income chart, and the runway card.
 - Understaffed:
   - statements are delayed
   - an investor-relations discount hits your share price
@@ -287,7 +287,6 @@ The Compute floor (code `treasury`).
 - **Partnerships:**
   - **Data-centre and power deals** at regional energy sites: contracted GPUs at a fixed price (take-or-pay) plus cheaper power for your data centers in that country. "Year 3 of 7", relationship health, renew or let lapse.
   - **Employers are one deal:** an employer's business is its anchor account, won and renewed on the Deal Desk like any business. The bank-era staff plan partnership beside it was retired on 2026-10-30 (owner's review, B1); universities keep the student partnership.
-- Bank-era liquidity, funding and central bank cards show only for old saves that still carry deposits or wholesale funding.
 
 #### 5.8.5 Marketing
 Brand awareness by city, brand campaigns (TV, billboards, podcasts, creators, arena naming rights) and agency packages.

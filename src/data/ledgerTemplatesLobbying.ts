@@ -1,6 +1,6 @@
 // The Weekly Ledger's templates for lobbying stories (Stage 7, CONTENT §23):
 // exposés of your campaigns and briefs on their outcomes. Merged into
-// LEDGER_TEMPLATES via ledgerTemplatesInvestments.ts.
+// LEDGER_TEMPLATES in ledgerTemplates.ts.
 import type { LedgerTemplate } from './ledgerTemplates';
 
 export const LOBBYING_TEMPLATES = {
