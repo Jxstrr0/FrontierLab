@@ -5,10 +5,10 @@
 import { CITYGEN } from '../config/balance';
 import { CITIES } from '../data/cities';
 import { investmentBanksIn } from '../data/investmentBanks';
-import { STREET_KINDS, STREET_NAMES } from '../data/names';
 import { geometryFor, placeNear } from './cityPlacement';
 import { stream } from './rng';
 import type { GameState, Site } from './state';
+import { streetAddress } from './streets';
 
 /** Adds the city's investment bank offices. Safe to call once per city. */
 export function generateCapitalMarketSites(state: GameState, cityId: string): void {
@@ -33,7 +33,7 @@ export function generateCapitalMarketSites(state: GameState, cityId: string): vo
       refId: bankId,
       tile,
       district: 'financial',
-      address: `${rng.int(1, CITYGEN.maxStreetNumber)} ${rng.pick(STREET_NAMES)} ${rng.pick(STREET_KINDS)}`,
+      address: streetAddress(rng, cityId),
       buildingSeed: rng.int(0, CITYGEN.maxSeed),
     };
     state.world.sites[id] = site;

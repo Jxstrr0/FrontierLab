@@ -3,11 +3,14 @@
 // Each one is recorded once with the week it was reached.
 import { MILESTONE_GOALS, MILESTONE_HQ_DEPTS, RESEARCHERS } from '../config/balance';
 import { CITIES } from '../data/cities';
+import { FRONTIER_PROJECT_LIST } from '../data/frontierProjects';
+import { LANDMARK_TOWERS } from '../data/landmarkTowers';
 import { MILESTONES } from '../data/milestones';
 import { companyArr } from './arr';
 import { MAX_OFFICE_SIZE } from './branch/officeSize';
 import { pushEvent } from './events';
 import { yourClubs } from './franchise';
+import { towerListingId } from './landmarkTowers';
 import { deptDesks } from './hq';
 import { netWorth } from './netWorth';
 import { bestRivalModel } from './rivalModels';
@@ -22,6 +25,10 @@ const flagships = (s: GameState) =>
 const cityCount = (s: GameState) => new Set(openBranches(s).map((b) => b.cityId)).size;
 const countryCount = (s: GameState) =>
   new Set(openBranches(s).map((b) => CITIES[b.cityId]?.country)).size;
+
+const heldTenders = (s: GameState) =>
+  Object.values(s.dealDesk.tenders).filter((t) => t.status === 'active').length;
+const TOWER_IDS = new Set(Object.keys(LANDMARK_TOWERS).map(towerListingId));
 
 const REACHED: Record<string, (s: GameState) => boolean> = {
   first_branch: (s) => openBranches(s).length > 0,
@@ -72,6 +79,17 @@ const REACHED: Record<string, (s: GameState) => boolean> = {
     Object.values(s.businesses).some(
       (b) => b.vendor?.type === 'player' && (b.contractValue ?? 0) >= MILESTONE_GOALS.bigContract,
     ),
+  // Late-game milestones (2026-10-31). Tenders end and leave no record, so these
+  // count the public contracts held right now.
+  first_tender: (s) => heldTenders(s) >= 1,
+  five_tenders: (s) => heldTenders(s) >= MILESTONE_GOALS.tendersHeld,
+  first_frontier_project: (s) => s.projects.done.length > 0,
+  all_frontier_projects: (s) => FRONTIER_PROJECT_LIST.every((p) => s.projects.done.includes(p.id)),
+  landmark_tower: (s) => Object.values(s.offices).some((o) => TOWER_IDS.has(o.listingId)),
+  model_gen_8: (s) => s.training.generation >= MILESTONE_GOALS.lateGenerations[0],
+  model_gen_12: (s) => s.training.generation >= MILESTONE_GOALS.lateGenerations[1],
+  ten_years: (s) => s.clock.week >= MILESTONE_GOALS.decadeWeeks,
+  twenty_years: (s) => s.clock.week >= MILESTONE_GOALS.twoDecadesWeeks,
 };
 
 /** Records newly reached milestones. `quiet` skips the events (catching up an old save). */

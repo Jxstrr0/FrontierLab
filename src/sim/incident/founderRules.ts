@@ -19,7 +19,7 @@ import { incidentScale, maybeNews, num, ratingHit, type IncidentRule } from './h
 const P = INCIDENT_PARAMS;
 const DESK_KEY = 'FOUNDER_DESK:company';
 
-const openBranches = (state: GameState): Branch[] =>
+export const openBranches = (state: GameState): Branch[] =>
   Object.values(state.branches)
     .filter((b) => b.status === 'open')
     .sort((a, b) => (a.id < b.id ? -1 : 1));
@@ -42,7 +42,7 @@ const restDesk = (state: GameState): void => {
 };
 
 /** Awareness at every open sales office moves by `delta` (0–1 scale). */
-function bumpAwareness(state: GameState, delta: number, cityId?: string): void {
+export function bumpAwareness(state: GameState, delta: number, cityId?: string): void {
   for (const b of openBranches(state)) {
     if (cityId && b.cityId !== cityId) continue;
     b.awareness = clamp(b.awareness + delta, 0, 1);

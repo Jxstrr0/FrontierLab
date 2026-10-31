@@ -9,7 +9,7 @@
 import { NEWS_PRIORITY as P, NEWS_WORLD } from '../config/balance';
 import { CITIES } from '../data/cities';
 import { COUNTRIES } from '../data/countries';
-import { FIRST_NAMES, LAST_NAMES } from '../data/names';
+import { PUBLIC_FIRST_NAMES, PUBLIC_LAST_NAMES } from '../data/namesPublic';
 import type { CountryId } from '../data/types';
 import {
   SOUTHERN,
@@ -117,7 +117,7 @@ function beatStory(ctx: NewsContext, beat: WorldBeat, c: CountryState, rng: Rng)
       other: countryName(rng.pick(others)),
       n: grouped(n),
       money: newsMoney(money, ctx.sym),
-      name: `${rng.pick(FIRST_NAMES)} ${rng.pick(LAST_NAMES)}`,
+      name: `${rng.pick(PUBLIC_FIRST_NAMES)} ${rng.pick(PUBLIC_LAST_NAMES)}`,
       job: rng.pick(WORLD_JOBS),
       title: beat.pool ? rng.pick(TITLE_POOLS[beat.pool]) : '',
       gdp: newsPct(c.gdp),

@@ -1,7 +1,8 @@
 // Frontier projects (post-C8, CONTENT §7d): the late game's big builds, each
 // a multi-year commitment paid weekly with a lasting reward. Breakthroughs
 // raise the model's ceiling one step at a time (in order); the others add a
-// giant compute campus, a safety institute or a global edge network. Costs
+// giant compute campus, a safety institute or a global edge network; four late
+// projects build on those. Costs
 // are in start-of-game money (the price list scales them). Fictional names only.
 
 export type ProjectReward =
@@ -91,6 +92,52 @@ const list: FrontierProject[] = [
     weeks: 78,
     minArr: 750_000_000,
     reward: { kind: 'service', lift: 0.15 },
+  },
+  // The late projects (2026-10-31): each needs an earlier one finished and a
+  // much bigger lab, so the list keeps giving after year ten.
+  {
+    id: 'apex',
+    name: 'Project Apex',
+    blurb: 'Past Zenith: a training run so large it needs its own treaty.',
+    rewardText: 'Raises the model ceiling to 14.',
+    cost: 12_000_000_000,
+    weeks: 130,
+    minArr: 6_000_000_000,
+    requires: 'zenith',
+    reward: { kind: 'ceiling', lift: 1 },
+  },
+  {
+    id: 'array',
+    name: 'Terawatt Array',
+    blurb: 'A second campus, five times the first, strung along a new power line.',
+    rewardText: 'Adds 400,000 GPUs to your compute, at energy-site power prices.',
+    cost: 5_000_000_000,
+    weeks: 130,
+    minArr: 3_000_000_000,
+    requires: 'campus',
+    reward: { kind: 'gpus', gpus: 400_000 },
+  },
+  {
+    id: 'relay',
+    name: 'Stratos Relay',
+    blurb: 'High-altitude relays that put fast inference over every city you serve.',
+    rewardText: 'Adds another +0.15 Service stars to every sales office.',
+    cost: 3_000_000_000,
+    weeks: 104,
+    minArr: 2_000_000_000,
+    requires: 'edge',
+    reward: { kind: 'service', lift: 0.15 },
+  },
+  {
+    id: 'fellowship',
+    name: 'Long Table Fellowship',
+    blurb: 'A worldwide school that trains every engineer who touches a customer.',
+    rewardText: 'Adds +0.1 Service stars to every sales office.',
+    cost: 1_500_000_000,
+    weeks: 78,
+    minArr: 1_500_000_000,
+    requires: 'institute',
+    reward: { kind: 'service', lift: 0.1 },
   },
 ];
 

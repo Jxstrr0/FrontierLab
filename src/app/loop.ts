@@ -23,6 +23,7 @@ import {
   SKIP_DAYS_PER_SECOND,
 } from '../config/balance';
 import { CITIES } from '../data/cities';
+import { BOARD_LINES, boardLine } from '../data/boardLines';
 import { INCIDENT_SPECS } from '../data/incidents';
 import { isQuarterStart } from '../sim/calendar';
 import { advanceDay } from '../sim/engine';
@@ -286,7 +287,11 @@ function promptBoard(s: GameState, quarterStart: boolean): void {
   const label = quarterLabel(s);
   if (boardChipQuarter.value === label || !boardDue(s)) return;
   boardChipQuarter.value = label;
-  notice(`The board is ready to meet for ${label}. Tap Board when you want to hold it.`);
+  notice(
+    `${boardLine(BOARD_LINES.reminder, s.clock.week, { quarter: label })} Tap Board when you're ready.`,
+    'info',
+    6000,
+  );
 }
 
 /** A year end filed a new annual report (SCREENS §21b): open it, after the results. */

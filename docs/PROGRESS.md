@@ -3,13 +3,37 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** audit fixes (v0.1.58, save schema 37). After the owner's review batches, an audit of clunky spots, content gaps and over-complexity; the owner asked for all of it. Batch A (pacing, popups and navigation) is in; content top-ups, the bank-leftover cleanup with the treasury removal, and the awareness and quality merges follow. The Kelbo.Website hub card still needs its own session in that repo.
+**Current stage:** audit fixes (v0.1.59, save schema 37). After the owner's review batches, an audit of clunky spots, content gaps and over-complexity; the owner asked for all of it. Batches A (pacing, popups and navigation) and B (content top-ups) are in; the bank-leftover cleanup with the treasury removal, and the awareness and quality merges follow. The Kelbo.Website hub card still needs its own session in that repo.
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `0e367379653a3a` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `09a419ef2772cf` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-31 — Audit batch B: content top-ups (v0.1.59)
+
+The audit found places where the game repeats itself or runs out of things to say, especially late on. No save change: old saves load as they are.
+
+**Less repetition.**
+- **Reviews:** each marketing campaign now has seven review lines (good, neutral and bad, matched to the card's stars), and only about a third of cards mention a campaign.
+- **Incidents:** every original case has two or three texts; the six most common (viral complaint, walkout, audit, price war, capital review, dividend due) have three.
+- **News:** the 13 most frequent stories now have four or more versions.
+- **Names:** the main name pool is five times bigger (100 first names × 100 surnames), and world-news figures and sports players have their own pools, so the same surname stops turning up everywhere.
+- **Streets:** each country has its own street names (Paris, Frankfurt and London get their own); the bank-era "Ledger" and "Mint" are gone. Nothing on the map moves.
+- **Employers** have mostly city-flavoured names, and **auctions** no longer offer pieces you already own. Two bank-themed collectibles became computing-era ones, and four more were added.
+- **The board meeting talks:** the quarter's reminder, the vote's outcome and a remark on how the room split each have several versions.
+- **The annual report** has five new kinds of year (IPO year, a frontier project finished, top of the leaderboard, an acquisition spree, a record profit), and every kind has three or four pages that no longer just alternate.
+
+**More late game.**
+- **Four new frontier projects**, each building on an earlier one: Project Apex (model ceiling to 14), Terawatt Array (+400,000 GPUs), Stratos Relay and Long Table Fellowship (better service everywhere).
+- **Nine new milestones** (41 in all): first and five public contracts held, first and all frontier projects, a landmark tower, model generations 8 and 12, ten and twenty years.
+- **News for things that had none:** starting a project, each project finishing (its own story), a project stalling, losing or ending a tender, the special dividend, buying or selling a jet, a car of $1M or more, or a home.
+- **The veteran's desk:** six one-off cases from year 3 (a hearing summons, an open letter, a sentience claim, a documentary, a reunion, a safety-audit request), each with two texts and two newspaper stories.
+- **Ten more landmark towers** in big cities (New York, Chicago, San Francisco, Toronto, Paris, Frankfurt, Tokyo, Hong Kong, Singapore, Sydney). A city an old save has already visited keeps none.
+- **New first-look tips** for frontier projects, milestones, the portfolio, the Deal Desk and tenders, price wars and the annual report.
+
+**Checked:** lint, 1,211 tests (new `milestonesLate.test.ts` and `veteranDesk.test.ts`), type-check and build pass. Steady on seed 42 is inside every target. The determinism snapshot moved to `09a419ef2772cf`. That is intended: names, streets, incident and news versions and review picks all draw differently.
 
 ### 2026-10-31 — Audit batch A: pacing, popups and navigation (v0.1.58)
 

@@ -33,7 +33,7 @@ describe('late-game milestones', () => {
     const s = newGame({ seed: 3, cityId: 'cal' });
     checkMilestones(s);
     expect(new Set(MILESTONES.map((m) => m.id)).size).toBe(MILESTONES.length);
-    expect(MILESTONES.length).toBe(32);
+    expect(MILESTONES.length).toBe(41);
     expect(Object.keys(s.milestones)).toEqual([]);
   });
 
