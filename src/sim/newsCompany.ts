@@ -231,13 +231,12 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
         priority: P.company,
         tokens: { names: str(p.names), count: String(num(p.count)) },
       });
-    case 'PROJECT_DONE':
     case 'PROJECT_OVERRUN':
       return business({
         key: e.type,
         subject: str(p.name),
         icon: 'spark',
-        priority: e.type === 'PROJECT_DONE' ? P.company : P.companyRoutine,
+        priority: P.companyRoutine,
         tokens: { bank, name: str(p.name), weeks: String(num(p.weeks)) },
       });
     case 'MODEL_TRAINED':

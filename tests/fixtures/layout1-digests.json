@@ -5,11 +5,11 @@
       "map": "198bc24f1650d2"
     },
     "cal": {
-      "places": "002caf6ad35f4d",
+      "places": "086ce12a44edf8",
       "map": "127c4cf36690b7"
     },
     "van": {
-      "places": "15cf817a296dfb",
+      "places": "06dba4f0f95d0d",
       "map": "14dd49547887a0"
     },
     "tor": {
@@ -17,7 +17,7 @@
       "map": "04256fb49e563e"
     },
     "mtl": {
-      "places": "1367edc9b4c8ac",
+      "places": "0fb2d74135f7d9",
       "map": "0f0a775dc7cbc9"
     },
     "nyc": {
@@ -25,27 +25,27 @@
       "map": "084d23294f5c52"
     },
     "chi": {
-      "places": "114fe5cccb6718",
+      "places": "1a8349c5a246e0",
       "map": "0fdbf52102454c"
     },
     "sfo": {
-      "places": "1fcac6e2c62333",
+      "places": "149623dbb99870",
       "map": "1f8b2244a38b2b"
     },
     "sea": {
-      "places": "113ed6699a000b",
+      "places": "1fd58e09593165",
       "map": "0f60f8fcd54ed8"
     },
     "lon": {
-      "places": "0d621b4167e476",
+      "places": "0b59f691583161",
       "map": "1687e444a3f042"
     },
     "par": {
-      "places": "0e9eb6d333a30a",
+      "places": "1b12ff3083ba35",
       "map": "1232edd97ed08c"
     },
     "fra": {
-      "places": "09a8736533cb72",
+      "places": "0b651b52b26a70",
       "map": "023f2b01de9f2b"
     },
     "ams": {
@@ -57,7 +57,7 @@
       "map": "040b3274f937cb"
     },
     "tyo": {
-      "places": "0b21876f417495",
+      "places": "0ef0f444b0204e",
       "map": "1e03c8cd9804f4"
     },
     "syd": {
@@ -65,11 +65,11 @@
       "map": "1b4fc656811ebd"
     },
     "sin": {
-      "places": "132623025d3227",
+      "places": "1670ff7930e827",
       "map": "0450334e4bdca2"
     },
     "hkg": {
-      "places": "18d004257fed55",
+      "places": "02404aed24b73e",
       "map": "13d2cdbcad43c1"
     },
     "fmm": {

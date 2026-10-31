@@ -4,7 +4,7 @@
 // `franchise` stream.
 import { FRANCHISE } from '../config/balance';
 import { OWNER_NAME_SHAPES, SPORT_POSITIONS, type FranchiseSpec } from '../data/franchises';
-import { FIRST_NAMES, LAST_NAMES } from '../data/names';
+import { SPORT_FIRST_NAMES, SPORT_LAST_NAMES } from '../data/namesSport';
 import { baseStarSalary, salaryWeight } from './franchiseMath';
 import { newId } from './ids';
 import type { Rng } from './rng';
@@ -16,8 +16,8 @@ const F = FRANCHISE;
 export function ownerName(rng: Rng): string {
   return rng
     .pick(OWNER_NAME_SHAPES)
-    .replace('{first}', rng.pick(FIRST_NAMES))
-    .replace('{last}', rng.pick(LAST_NAMES));
+    .replace('{first}', rng.pick(SPORT_FIRST_NAMES))
+    .replace('{last}', rng.pick(SPORT_LAST_NAMES));
 }
 
 /** One player of this sport rated in [lo, hi], paid by rating for a club worth `value`. */
@@ -31,7 +31,7 @@ export function makePlayer(
   const rating = rng.int(lo, hi);
   return {
     id: newId(state, 'pl'),
-    name: `${rng.pick(FIRST_NAMES)} ${rng.pick(LAST_NAMES)}`,
+    name: `${rng.pick(SPORT_FIRST_NAMES)} ${rng.pick(SPORT_LAST_NAMES)}`,
     position: rng.pick(SPORT_POSITIONS[spec.sport]),
     rating,
     salary: Math.round(baseStarSalary(value) * salaryWeight(rating)),

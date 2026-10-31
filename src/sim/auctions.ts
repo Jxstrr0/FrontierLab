@@ -65,14 +65,20 @@ export function runAuctions(state: GameState): void {
   if (isYearStart(state.meta.startDate, state.clock.day)) driftValues(state);
 }
 
-/** Draws the next sale's lots (no item twice in one sale) and previews them. */
+/**
+ * Draws the next sale's lots and previews them: no item twice in one sale, and
+ * never a one-of-a-kind piece you already own (2026-10-31).
+ */
 export function listLots(state: GameState, h: AuctionHouseState): void {
   const spec = AUCTION_HOUSES[h.houseId];
   if (!spec) return;
   const rng = stream(state, 'auctions');
   const [lo, hi] = AUCTIONS.lots;
   const n = rng.int(lo, hi);
-  const taken = new Set(h.lots.map((l) => l.itemId));
+  const taken = new Set([
+    ...h.lots.map((l) => l.itemId),
+    ...state.personal.empire.collectibles.map((c) => c.itemId),
+  ]);
   const pool = Object.keys(COLLECTIBLES).filter((id) => !taken.has(id));
   const noise = AUCTIONS.estimateNoise;
   for (let i = 0; i < n && pool.length > 0; i++) {

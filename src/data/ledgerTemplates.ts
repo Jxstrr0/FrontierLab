@@ -11,6 +11,9 @@ import { INVESTMENTS_TEMPLATES } from './ledgerTemplatesInvestments';
 import { EMPIRE_TEMPLATES } from './ledgerTemplatesEmpire';
 import { DESK_TEMPLATES } from './ledgerTemplatesDesk';
 import { FOUNDER_TEMPLATES } from './ledgerTemplatesFounder';
+import { VETERAN_TEMPLATES } from './ledgerTemplatesVeteran';
+import { PROJECT_TEMPLATES } from './ledgerTemplatesProjects';
+import { withExtras } from './ledgerTemplatesExtra';
 import { INCIDENT_TEMPLATES } from './ledgerTemplatesIncidents';
 import { CALENDAR_TEMPLATES } from './ledgerTemplatesCalendar';
 import { GLOBE_TEMPLATES } from './ledgerTemplatesGlobe';
@@ -291,16 +294,6 @@ const BANK_TEMPLATES = {
     {
       h: 'Regulators wave the labs in',
       b: '{count} more cities have opened their doors to AI labs: {names}. Entry comes with a one-off licence.',
-    },
-  ],
-  PROJECT_DONE: [
-    {
-      h: '{bank} completes {name}',
-      b: 'Years of spending pay off as the lab’s biggest project yet comes in. Rivals are taking notes.',
-    },
-    {
-      h: '{name} is finished',
-      b: '{bank} calls it the most ambitious thing the lab has built. Analysts are already asking what comes next.',
     },
   ],
   PROJECT_OVERRUN: [
@@ -650,7 +643,7 @@ const BANK_TEMPLATES = {
   ],
 } satisfies Record<string, LedgerTemplate[]>;
 
-export const LEDGER_TEMPLATES = {
+export const LEDGER_TEMPLATES = withExtras({
   ...BANK_TEMPLATES,
   ...RIVAL_TEMPLATES,
   ...WORLD_TEMPLATES,
@@ -663,6 +656,8 @@ export const LEDGER_TEMPLATES = {
   ...DESK_TEMPLATES,
   ...INCIDENT_TEMPLATES,
   ...FOUNDER_TEMPLATES,
-};
+  ...VETERAN_TEMPLATES,
+  ...PROJECT_TEMPLATES,
+});
 
 export type TemplateKey = keyof typeof LEDGER_TEMPLATES;

@@ -613,7 +613,7 @@ The AI regulator watches a **safety ratio**. Lenders, the CFO and the deal limit
 
 ### 16.1 Offices
 - **Listings:** OFFICE_LISTINGS.countBySize per city (S 2, M 2, L 3, XL 4), split across the financial, downtown and midtown districts by largest remainder; floors 3–10, desks per floor 24 or 32 (set per building).
-- **Landmark towers:** London and Moscow each also list one landmark tower in the Financial District (`LANDMARK_TOWERS` in `src/data/landmarkTowers.ts`): London's Kestrel Tower has 20 floors and Moscow's Polaris Tower 18, all with 32 desks. It rents like any listing (per floor, the whole building), so one tower holds every department with room for second floors, with no need for a second main office. It is placed after every other site from its own `tower:{cityId}` stream, so no other lot or site moves.
+- **Landmark towers:** London, Moscow and ten more big cities (CONTENT §16) each also list one landmark tower in the Financial District (`LANDMARK_TOWERS` in `src/data/landmarkTowers.ts`): London's Kestrel Tower has 20 floors and Moscow's Polaris Tower 18, all with 32 desks. It rents like any listing (per floor, the whole building), so one tower holds every department with room for second floors, with no need for a second main office. It is placed after every other site from its own `tower:{cityId}` stream, so no other lot or site moves.
 - **Rent:** weekly rent = `floors × OFFICE_RENT_PER_FLOOR ($1,100) × city.rentIndex`. Deposit = 8 × weekly rent.
 - **Floors:** each floor slot holds one department. Fit-out = FLOOR_FITOUT ($120,000) × city.costIndex, a fixed asset.
 - **Desks per floor:** set by the building, 24 or 32. Investment floors always have 32. The Executive suite always has 7 desks (`fixedDesks` in `src/data/departments.ts`): you and your six executives, not hired staff.
@@ -1099,19 +1099,25 @@ The front page (SCREENS §21b) picks its headline from the year, most newsworthy
 1. `decade`: every `ANNUAL_REPORT.decadeYears` (10) years of play.
 2. `first`: the first report.
 3. `topRich`: rank 1, not held the year before.
-4. `firstProfit`: net income above zero after a year at or below it.
-5. `safety`: the close is at a `safetyTiers` tier (Restricted or Critical).
-6. `doubled`: ARR growth of at least `doubled` (100%).
-7. `hardYear`: ARR growth below `hardYear` (0%).
-8. `grew`: otherwise.
+4. `ipo`: the lab listed in the year (the `ipo` milestone's week).
+5. `frontier`: the first or the last frontier project finished in the year (their milestones' weeks).
+6. `leader`: the lab first topped the benchmark leaderboard in the year.
+7. `firstProfit`: net income above zero after a year at or below it.
+8. `safety`: the close is at a `safetyTiers` tier (Restricted or Critical).
+9. `doubled`: ARR growth of at least `doubled` (100%).
+10. `spree`: at least `spreeDeals` (3) acquisitions closed in the year.
+11. `record`: net income at least `recordMargin` (1.5) × the best earlier year's, which was positive.
+12. `hardYear`: ARR growth below `hardYear` (0%).
+13. `grew`: otherwise.
 
-Each kind has two texts (CONTENT §26b); the year's parity picks one, so a report reads the same when reopened. No randomness is used.
+Kinds 4–6, 10 and 11 read the year's facts from the state (`yearFacts`: milestone weeks, deal weeks and earlier reports), so nothing new is stored and old reports gain them too. Each kind has three or four texts (CONTENT §26b); a hash of the year and the kind picks one, so a report reads the same when reopened without the versions simply alternating. No randomness is used.
 
 ## 23. Incidents
 
 - Each incident type has a weekly base probability, a scope (sales office, city, company or personal), conditions, multipliers, a cooldown (default 8 weeks per scope) and 2–3 options with costs and effects.
 - **Size (2026-10-30, `INCIDENT_SIZE`):** company-wide rolled cases (jailbreak, hallucination suit, copyright suit, weights leak, data breach, abuse ring) multiply their chance by `labSizeMult = clamp((customers ÷ refCustomers 10,000)^exp 0.5, min 0.6, max 4)`, customers summed over open offices. Office cases roll once per office, so they already grow with the lab; the two bank-branch ones (break-in, heatwave) are retired from the roll (`trigger: 'triggered'`, kept for old saves and the debug tools), and the API key leak and deepfake cases roll at half their old odds. A 10-year steady run (seed 42) now sees 2–5 cases a year in years 1–4 and 6–10 a year by year 10, where before it saw none in years 1–2 and 30+ price-war popups a year late on.
 - **The founder's desk (2026-10-30, `FOUNDER_DESK`, CONTENT §22b):** eight company cases for the early game. `founderDeskOpen` is true before `untilWeek` (156) with an open office, no founder case pending and the desk's rest (`gapWeeks` 6, the `FOUNDER_DESK:company` cooldown set when a case is raised) over; each case then rolls at `baseP` (0.012) a week under its own condition and fires once a game (`cooldownWeeks: INCIDENTS.onceWeeks`). Effects reuse the catalog's primitives: awareness bumps on open offices, `rating` and `takeup` effects, the angel's cheque books new shares through `bookRaise` at the private valuation × (1 − `angelDiscount`), a poached manager's counter raises their salary by `raiseShare` within `MANAGER_SALARY_RANGE`, and riding out the cloud outage sets `compute.outageWeeksLeft`.
+- **The veteran's desk (2026-10-31, `VETERAN_DESK`, CONTENT §22c):** six once-a-game company cases for a lab three years or older. `veteranDeskOpen` is true from `fromWeek` (156) with an open office, no veteran case pending and the desk's rest (`gapWeeks` 12, the `VETERAN_DESK:company` cooldown) over; each case then rolls at `baseP` (0.006) a week. Effects reuse the founder's desk primitives (awareness, morale, `rating`, `riskCoverage` and `takeup` effects).
 - Full list in CONTENT (Incidents). Lab-wide cases that matter here: Outage rumour (§13.8), Mandated pause and Safety audit (§15), Price war (§18.6), Capability over-claim (`MIS_SELLING`, more likely at a Bold or Very bold launch posture, §16.8).
 - **Office incidents:** auto-resolved when "Office troubles" is delegated (§17.1), with a toast. Otherwise they queue and pause the game.
 - Unresolved incidents choose the worst option after 4 weeks.
@@ -1236,7 +1242,7 @@ The main groups, with the defaults shown above. Names marked (legacy) belong to 
 - **TREASURY (legacy except reserves):** `RESERVE_RATE_SPREAD`, `LIQ_MIN`, `LIQ_TARGET_DEFAULT`, `OVERNIGHT_SPREAD`, `OVERNIGHT_LIMIT`, `WINDOW_SPREAD`, `WINDOW_STIGMA`, `RATING_SPREADS`, `TREASURY_PENALTY`, `FUNDING_REFRESH_WEEKS = 2`, `FUNDING_OFFERS`, `FUNDING_SIZE`, `FUNDING_RATE_NOISE = 0.0008`
 - **PARTNERSHIPS:** `PARTNER_CONTRACT_WEEKS`, `PARTICIPATION`, `PARTNER_HEALTH`, `PARTNER_PERKS`, `PARTNER_RUNOFF_WEEKS`, `PARTNER_RENEWAL`, `STUDENT_PARTNERSHIP`, `GRAD_PROGRAM`
 - **SAFETY AND CREDIT:** `SAFETY`, `SAFETY_TIER_THRESHOLDS`, `CAPITAL_GATE`, `MANDATED_PAUSE`, `LICENCE`, `REGULATOR_REVIEW` (fail base 0.02, ethics base 1.6, fine 0.05–0.3% of trailing revenue), `FAILURE`, `CAPITAL_BUFFER_PP`, `CAPITAL_BUFFER_WEEKS`, `BANK_RUN` (`creditShare` 0.02 for service credits); runway: `RUNWAY` (tiers, `gateMonths`, the CFO's `cfoRaiseBelowMonths` and `cfoTargetMonths`); `LAUNCH_POSTURE`, `DEFAULT_LAUNCH_POSTURE`, `RISK_LOSS_WEEKS`, `DELINQUENCY`
-- **INCIDENTS:** `INCIDENTS` (`onceWeeks` for once-a-game cases), `INCIDENT_SCALE`, `INCIDENT_SIZE` (company cases grow with customers), `FOUNDER_DESK` (untilWeek 156, gapWeeks 6, baseP 0.012, angelPct 0.05, angelDiscount 0.3), `INCIDENT_PRICE_SEVERITY`, `FRAUD_SHIELD`; per-case numbers in `src/data/incidentParams.ts`
+- **INCIDENTS:** `INCIDENTS` (`onceWeeks` for once-a-game cases), `INCIDENT_SCALE`, `INCIDENT_SIZE` (company cases grow with customers), `FOUNDER_DESK` (untilWeek 156, gapWeeks 6, baseP 0.012, angelPct 0.05, angelDiscount 0.3), `VETERAN_DESK` (fromWeek 156, gapWeeks 12, baseP 0.006), `INCIDENT_PRICE_SEVERITY`, `FRAUD_SHIELD`; per-case numbers in `src/data/incidentParams.ts`
 - **RIVALS:** `RIVAL_EXPANSION`, `RIVAL_LEARNING`, `RIVAL_CHARTER`, `RIVAL_MERGERS`, `RIVAL_MARKETING`, `RIVAL_TECH`, `RIVAL_CLOSURE`, `RIVAL_FAILURE`, `RIVAL_RAISE`, `RIVAL_RUNWAY_TIERS`, `RIVAL_PAYOUT`, `PRICE_WAR` (`caseWeeks` 13, `namedCities` 3); the rival books: `RIVAL_BOOKS` (matureCustomers, ema, usagePerCustomer, cycle, computeShare, officeCost, trainingShare, cashTargetWeeks, startRunwayWeeks, strategy multipliers), `RIVAL_QUALITY_REF`, `RIVAL_RAMP_WEEKS`, `RIVAL_COMPETITION`
 - **HQ:** `OFFICE_LISTINGS`, `OFFICE_RENT_PER_FLOOR`, `OFFICE_DEPOSIT_WEEKS`, `FLOOR_FITOUT`, `MAIN_OFFICES_MAX`, `DESKS_PER_FLOOR_OPTIONS = [24, 32]` (the Executive suite's 7 desks come from `src/data/departments.ts`), `FOUNDER_MODE_ASSETS = 250_000_000`, `FOUNDER_RAMP`, `DEPT_REQUIREMENTS`, `HQ_COVERAGE`, `HQ_EFFECTS`, `APP_RATING`
 - **PRODUCTS AND MODELS:** `DEV_TERMS`, `DEV_*` (score, budget, `DEV_SIGMA`, `DEV_TIER`), `MODEL_QUALITY`, `BUREAU_HOSTED`, `INTERNAL_HISTORY`, `MODEL_EFFECTS`, `MODEL_DELEGATE`, `MODEL_SWITCH_WEEKS`, `MODEL_LAUNCH`, `OPEN_WEIGHTS`, `TRAINING`, `RIVAL_MODEL`, `CPO_TRAINING`, `RESEARCHERS`, `DELEGATE`
@@ -1245,6 +1251,6 @@ The main groups, with the defaults shown above. Names marked (legacy) belong to 
 - **CORPORATE DEBT:** `CORPORATE_LENDING` (`refreshWeeks` 4, `offersPerLender` [2, 3], `maxEquityShare` 0.4, `lineEquityShare` 0.6, `lineSpread` 0.04; §19.9)
 - **INVESTMENTS:** `VENTURES` (`acquireMarkPremium` 1.25), `VENTURE_DEBT`, `VENTURE_MARGIN`, `VENTURE_GEN`, `VENTURE_IPO`, `VENTURE_NEWS`, `CONVENTIONS`, `REAL_ESTATE`, `LOBBYING`
 - **NEWS:** `NEWS_*` (articles, priorities, world desk, company desk, commodities, archive, calendar, column, elections, polls, policy), `RANKING_SIZE`, `RANKING_MIN_ASSETS`, sports `SPORTS_*`
-- **ANNUAL_REPORT** (§22a): `doubled: 1`, `hardYear: 0`, `decadeYears: 10`, `safetyTiers: ['restricted', 'critical']`, `milestonesShown: 3`.
+- **ANNUAL_REPORT** (§22a): `doubled: 1`, `hardYear: 0`, `decadeYears: 10`, `safetyTiers: ['restricted', 'critical']`, `milestonesShown: 3`, `spreeDeals: 3`, `recordMargin: 1.5`.
 - **PERSONAL:** `PERSONAL_TAX = 0`, `TRAVEL_KM_PER_WEEK = 24_140`, `FLIGHT_FARE = 80_000` (× destination costIndex), `EARTH_RADIUS_KM = 6_371`, `JET = { upkeepRate: 0.08, depreciation: 0.06, resaleHaircut: 0.1 }`, `HOMES_CFG`, `CARS_CFG`, `COLLECTIBLES_CFG`, `AUCTIONS`, `FRANCHISE`, `RICH_LIST`, `INSIDER`
 - **FEATURES:** flags per stage (ROADMAP)

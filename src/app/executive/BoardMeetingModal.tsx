@@ -5,6 +5,7 @@
 // runs the meeting; each item's For / Against tally animates in turn (instant
 // with reduced motion), then the outcome and Close.
 import { useState } from 'preact/hooks';
+import { BOARD_LINES, boardLine } from '../../data/boardLines';
 import * as cmd from '../../sim/commands';
 import type { BoardMeeting } from '../../sim/state';
 import { Medallion, Modal, Row, SectionTitle, Stepper } from '../components';
@@ -39,10 +40,7 @@ export function BoardMeetingModal() {
     return (
       <Modal title="Board meeting" icon={icon} onClose={close}>
         <div class="stack">
-          <p>
-            A new quarter has begun and the board is ready to meet for {b.quarter}. Set this
-            quarter’s dividend and your pay, then put them to a vote.
-          </p>
+          <p>{boardLine(BOARD_LINES.reminder, s.clock.week, { quarter: b.quarter })}</p>
           <div class="btn-row">
             <button type="button" class="btn btn-secondary" onClick={close}>
               Later

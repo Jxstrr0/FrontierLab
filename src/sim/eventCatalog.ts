@@ -65,7 +65,9 @@ export interface EventPayloads {
   /** Frontier projects (projects.ts, §16.14): finished, overrun by `weeks`, or stalled for cash. */
   PROJECT_DONE: { bank: string; projectId: string; name: string };
   PROJECT_OVERRUN: { bank: string; name: string; weeks: number };
-  PROJECT_STALLED: { bank: string; name: string };
+  PROJECT_STALLED: { bank: string; projectId?: string; name: string };
+  /** A frontier project began (projects.ts beginProject); `cost` at today's price. */
+  PROJECT_STARTED: { bank: string; projectId: string; name: string; cost: Money; weeks: number };
   /** The new regions opened to flights (regions.ts, §20a). */
   REGIONS_OPENED: { count: number; names: string };
   /** A training run finished: a new model generation (training.ts, C6b). */

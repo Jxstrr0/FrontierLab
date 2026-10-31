@@ -8,6 +8,7 @@ export { INCIDENT_PARAMS } from './incidentParams';
 import { PRICE_WAR } from '../config/balance';
 import { AI_SPECS } from './incidentsAi';
 import { FOUNDER_SPECS } from './incidentsFounder';
+import { VETERAN_SPECS } from './incidentsVeteran';
 
 export interface IncidentOptionSpec {
   id: string;
@@ -67,6 +68,9 @@ const BANK_ERA_SPECS: Record<string, IncidentSpec> = {
     trigger: 'triggered',
     baseP: 0.0015,
     text: 'Thieves broke into the server room at {branch} this morning and got away with {loss} of hardware. Insurance covers {insured}, leaving {net} for us to absorb. The team is shaken.',
+    texts: [
+      'Someone walked out of {branch} overnight with {loss} of GPUs under their coat. Insurance pays {insured}; the other {net} is ours. Nobody slept well.',
+    ],
     money: ['loss', 'net', 'leave'],
     pct: ['insured'],
     options: [
@@ -93,6 +97,9 @@ const BANK_ERA_SPECS: Record<string, IncidentSpec> = {
     trigger: 'rolled',
     baseP: 0.001,
     text: 'API keys issued at {branch} leaked online, and strangers ran up about {refund} on customers’ accounts before we spotted it.',
+    texts: [
+      'A batch of {branch} API keys turned up on a public code site. Before we noticed, strangers had burned about {refund} of customers’ credit.',
+    ],
     money: ['refund'],
     options: [
       { id: 'refund', label: 'Refund customers', effect: 'Pay back every customer.' },
@@ -118,6 +125,10 @@ const BANK_ERA_SPECS: Record<string, IncidentSpec> = {
     trigger: 'rolled',
     baseP: 0.002,
     text: 'Our systems were breached overnight. Records for about {affected} customers may have been copied.',
+    texts: [
+      'A security researcher emailed at dawn: our customer database was open to the internet. About {affected} customers’ records may be out there.',
+      'Intruders got into a support system overnight. Details for about {affected} customers may have left the building.',
+    ],
     options: [
       {
         id: 'notify',
@@ -147,6 +158,9 @@ const BANK_ERA_SPECS: Record<string, IncidentSpec> = {
     trigger: 'rolled',
     baseP: 0.001,
     text: 'Staff at {branch} promised customers things our model can’t do. Complaints are piling up; putting it right costs about {comp}.',
+    texts: [
+      'A sales lead at {branch} told customers the model could do their accounts unsupervised. It cannot. Making it right costs about {comp}.',
+    ],
     money: ['comp', 'fine'],
     options: [
       {
@@ -171,6 +185,10 @@ const BANK_ERA_SPECS: Record<string, IncidentSpec> = {
     scope: 'company',
     trigger: 'triggered',
     text: 'The regulator’s quarterly safety review found gaps in our controls. They propose a fine of {fine}.',
+    texts: [
+      'The safety inspectors spent a week in our offices and left with a list. Their letter proposes a fine of {fine}.',
+      'The quarterly review is back. The regulator calls our controls “aspirational” and proposes a fine of {fine}.',
+    ],
     money: ['fine', 'appealFine', 'consultants'],
     options: [
       { id: 'pay', label: 'Pay the fine', effect: 'Settled.', line: 'fines' },
@@ -195,7 +213,12 @@ const BANK_ERA_SPECS: Record<string, IncidentSpec> = {
     scope: 'branch',
     trigger: 'rolled',
     baseP: 0.01,
-    text: 'A video of a customer stuck in the queue at {branch} is going round online, and people are piling on.',
+    text: 'A video of a customer left on hold for an hour by {branch} support is going round online, and people are piling on.',
+    texts: [
+      'A clip of a customer waiting forever for help at {branch} is going round online, and people are piling on.',
+      'A customer filmed our {branch} demo crashing three times in a row. The video has more views than our launch.',
+      'A furious thread about a support ticket at {branch} is trending. Everyone has a story to add.',
+    ],
     options: [
       { id: 'apology', label: 'Apologise and fix it', effect: 'Service rating +0.2 for 8 weeks.' },
       {
@@ -215,6 +238,7 @@ const BANK_ERA_SPECS: Record<string, IncidentSpec> = {
     yours: true,
     stage: 6,
     text: '{rival} is trying to hire our {title}, {name}.',
+    texts: ['Word reaches us that {rival} has made {name}, our {title}, a very large offer.'],
     options: [
       { id: 'counter', label: 'Counter-offer', effect: 'Salary +25%. Loyalty +10.' },
       { id: 'release', label: 'Let them go', effect: 'The seat falls vacant.' },
@@ -228,6 +252,7 @@ const BANK_ERA_SPECS: Record<string, IncidentSpec> = {
     trigger: 'triggered',
     yours: true,
     text: '{rival} is trying to hire away our researcher {name}.',
+    texts: ['{rival} has been taking {name} to long lunches. An offer is on the table.'],
     options: [
       { id: 'counter', label: 'Counter-offer', effect: 'Their salary +25%.' },
       {
@@ -245,6 +270,9 @@ const BANK_ERA_SPECS: Record<string, IncidentSpec> = {
     trigger: 'triggered',
     baseP: 0.0005,
     text: 'A heatwave knocked out the cooling at {branch} and the servers shut down. We can’t open until it’s repaired.',
+    texts: [
+      'The cooling failed at {branch} in the heat and the racks shut themselves down. We stay closed until it is fixed.',
+    ],
     options: [
       { id: 'fast', label: 'Fast repair', effect: 'Closed for 1 week.', penaltyWeeks: 1 },
       { id: 'slow', label: 'Slow repair', effect: 'Closed for 4 weeks.', penaltyWeeks: 4 },
@@ -258,6 +286,9 @@ const BANK_ERA_SPECS: Record<string, IncidentSpec> = {
     trigger: 'triggered',
     yours: true,
     text: 'Rumours that we are about to go dark are spreading, and customers are cancelling their plans before it happens.',
+    texts: [
+      'A post claiming we are weeks from shutting down has gone viral. Customers are cancelling plans to get out first.',
+    ],
     money: ['credits'],
     pct: ['odds'],
     options: [
@@ -286,6 +317,9 @@ const BANK_ERA_SPECS: Record<string, IncidentSpec> = {
     trigger: 'rolled',
     baseP: 0.0015,
     text: 'An abuse ring is signing up for the API with stolen card numbers. Losses so far: about {loss}.',
+    texts: [
+      'Fraudsters are opening API accounts with stolen cards and reselling the access. We are down about {loss} so far.',
+    ],
     money: ['loss'],
     options: [
       { id: 'absorb', label: 'Absorb the losses', effect: 'We eat the fraud.' },
@@ -310,6 +344,10 @@ const BANK_ERA_SPECS: Record<string, IncidentSpec> = {
     trigger: 'rolled',
     baseP: 0.03,
     text: 'The team at {branch} has walked out over pay and conditions.',
+    texts: [
+      'The {branch} team downed tools at nine this morning. They want better pay and fewer weekend launches.',
+      'Nobody showed up at {branch} today. The team is out on the pavement with signs about pay.',
+    ],
     options: [
       { id: 'raise', label: 'Raise wages 10%', effect: 'Hourly wage {wage}.' },
       { id: 'bonus', label: 'Pay a bonus', effect: '$1,000 per person. Morale +20.' },
@@ -330,6 +368,10 @@ const BANK_ERA_SPECS: Record<string, IncidentSpec> = {
     info: true,
     stage: 6,
     text: 'A quarterly dividend of {amount} is due in three weeks. Keep enough cash on hand.',
+    texts: [
+      'Shareholders expect {amount} in three weeks. Make sure the cash is there.',
+      'The quarterly dividend, {amount}, goes out in three weeks. Finance asks you not to spend it first.',
+    ],
     money: ['amount'],
     options: OK,
     worst: 'ok',
@@ -343,6 +385,10 @@ const BANK_ERA_SPECS: Record<string, IncidentSpec> = {
     hideCosts: true,
     cooldownWeeks: 0,
     text: 'The year is closed, and the board sees {surplus} of cash beyond what the lab needs. It wants a plan for {amount} of it.',
+    texts: [
+      'Year-end figures are in. The board counts {surplus} of spare cash and wants to know what happens to {amount} of it.',
+      'The board has read the accounts: {surplus} more cash than the lab needs. They want a plan for {amount} before the next meeting.',
+    ],
     money: ['surplus', 'amount'],
     options: [
       {
@@ -377,6 +423,10 @@ const BANK_ERA_SPECS: Record<string, IncidentSpec> = {
     trigger: 'triggered',
     cooldownWeeks: PRICE_WAR.caseWeeks,
     text: '{bank} cut plan prices by {bump} in {cities} this month to win subscribers back from us.',
+    texts: [
+      '{bank} slashed plan prices by {bump} in {cities}. Their ads name us.',
+      'Price cuts of {bump} from {bank} hit {cities} this month. Our sales teams are getting calls.',
+    ],
     pct: ['bump'],
     options: [
       {
@@ -401,6 +451,9 @@ const BANK_ERA_SPECS: Record<string, IncidentSpec> = {
     trigger: 'triggered',
     info: true,
     text: '{business} has gone under owing {amount} on its contract with {branch}. The loss is already on our books.',
+    texts: [
+      '{business} has collapsed, leaving {amount} unpaid on its {branch} contract. We have already written it off.',
+    ],
     money: ['amount'],
     options: OK,
     worst: 'ok',
@@ -412,6 +465,9 @@ const BANK_ERA_SPECS: Record<string, IncidentSpec> = {
     trigger: 'triggered',
     stage: 9,
     text: 'Securities regulators are asking about your personal trades in {company}. They suggest a settlement of {fine}.',
+    texts: [
+      'A letter from the securities regulator asks about your trades in {company}. Settling would cost {fine}.',
+    ],
     money: ['fine', 'doubled'],
     options: [
       {
@@ -435,6 +491,9 @@ const BANK_ERA_SPECS: Record<string, IncidentSpec> = {
     trigger: 'triggered',
     info: true,
     text: 'Our safety ratio has slipped into the Restricted band. Until it recovers we can’t open sales offices or pay dividends, and new sign-ups are halved. More, better-paid safety staff or a safer model will lift it.',
+    texts: [
+      'The regulator writes: our safety ratio is now Restricted. No new sales offices, no dividends and half the sign-ups until it climbs. Hire or pay more safety staff, or ship a safer model.',
+    ],
     options: OK,
     worst: 'ok',
   },
@@ -446,6 +505,9 @@ const BANK_ERA_SPECS: Record<string, IncidentSpec> = {
     yours: true,
     cooldownWeeks: 0,
     text: 'Our safety ratio has been under {floor} for {weeks} weeks. The regulator offers a {pauseWeeks}-week pause: no new customers, deals or training while its monitors work alongside our Safety team, for a fee of {amount}. Refusing means it revokes our licence.',
+    texts: [
+      '{weeks} weeks under {floor} and the regulator has run out of patience. It offers a {pauseWeeks}-week pause under its monitors for {amount}: no new customers, deals or training. Say no and the licence goes.',
+    ],
     money: ['amount'],
     pct: ['floor'],
     options: [
@@ -472,4 +534,5 @@ export const INCIDENT_SPECS: Record<string, IncidentSpec> = {
   ...BANK_ERA_SPECS,
   ...AI_SPECS,
   ...FOUNDER_SPECS,
+  ...VETERAN_SPECS,
 };

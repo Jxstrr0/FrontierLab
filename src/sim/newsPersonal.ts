@@ -1,7 +1,8 @@
 // The Weekly Ledger's Stage 9 personal stories (SIMULATION §24): your place on
-// the year-end rich list, insider-trading probes and their fines, and home
-// purchases of HOMES_CFG.newsMin or more.
-import { HOMES_CFG, NEWS_PRIORITY as P } from '../config/balance';
+// the year-end rich list, insider-trading probes and their fines, home
+// purchases and sales of HOMES_CFG.newsMin or more, every jet bought or sold,
+// and cars of CARS_CFG.newsMin or more.
+import { CARS_CFG, HOMES_CFG, NEWS_PRIORITY as P } from '../config/balance';
 import { newsMoney } from './newsFormat';
 import { num, str, type NewsContext, type Story } from './newsStory';
 import type { GameEvent } from './state';
@@ -61,14 +62,36 @@ function fromEvent(ctx: NewsContext, e: GameEvent): Story | undefined {
         },
       };
     case 'HOME_BOUGHT':
+    case 'HOME_SOLD':
       if (num(p.price) < HOMES_CFG.newsMin) return undefined;
       return {
-        key: 'HOME_BOUGHT',
+        key: e.type,
         subject: str(p.homeId),
         tab: 'business',
         icon: 'house',
         priority: P.companyRoutine,
         tokens: { ...base, home: str(p.name, 'a home'), price: newsMoney(num(p.price), ctx.sym) },
+      };
+    case 'JET_BOUGHT':
+    case 'JET_SOLD':
+      return {
+        key: e.type,
+        subject: `jet:${str(p.model)}`,
+        tab: 'business',
+        icon: 'plane',
+        priority: P.companyRoutine,
+        tokens: { ...base, model: str(p.model, 'jet'), price: newsMoney(num(p.price), ctx.sym) },
+      };
+    case 'CAR_BOUGHT':
+    case 'CAR_SOLD':
+      if (num(p.price) < CARS_CFG.newsMin) return undefined;
+      return {
+        key: e.type,
+        subject: str(p.carId),
+        tab: 'business',
+        icon: 'person',
+        priority: P.companyRoutine,
+        tokens: { ...base, car: str(p.name, 'car'), price: newsMoney(num(p.price), ctx.sym) },
       };
     default:
       return undefined;

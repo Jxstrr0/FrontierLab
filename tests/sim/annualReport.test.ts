@@ -5,7 +5,7 @@
 import { describe, expect, it } from 'vitest';
 import { ANNUAL_REPORT, RICH_LIST } from '../../src/config/balance';
 import { ANNUAL_TEXT } from '../../src/data/annualReport';
-import { annualKind, annualText, recordYear } from '../../src/sim/annualReport';
+import { annualKind, annualText, recordYear, yearFacts } from '../../src/sim/annualReport';
 import { advanceWeeks } from '../../src/sim/engine';
 import { newGame } from '../../src/sim/newGame';
 import { exportCode, importCode } from '../../src/sim/save/serialize';
@@ -65,13 +65,43 @@ describe('annual report', () => {
     expect(annualKind(report({ arr: 1.5e6 }), prev)).toBe('hardYear');
     expect(annualKind(report({ arr: 2.5e6 }), prev)).toBe('grew');
     expect(annualKind(report({ n: ANNUAL_REPORT.decadeYears }), prev)).toBe('decade');
+    // The later kinds (2026-10-31), read from the year's facts.
+    const quiet = { ipo: false, deals: 0, leader: false, record: false };
+    expect(annualKind(report({ arr: 2.5e6 }), prev, quiet)).toBe('grew');
+    expect(annualKind(report(), prev, { ...quiet, ipo: true })).toBe('ipo');
+    expect(annualKind(report(), prev, { ...quiet, project: 'Project Lodestar' })).toBe('frontier');
+    expect(annualKind(report(), prev, { ...quiet, leader: true })).toBe('leader');
+    expect(
+      annualKind(report({ arr: 2.5e6 }), prev, { ...quiet, deals: ANNUAL_REPORT.spreeDeals }),
+    ).toBe('spree');
+    expect(annualKind(report({ arr: 2.5e6 }), prev, { ...quiet, record: true })).toBe('record');
+  });
+
+  it('reads the year’s facts from milestone and deal weeks and past profits', () => {
+    const s = game();
+    const prev = report({ n: 1, year: 2027, endWeek: 51, netIncome: 1e5 });
+    const cur = report({ endWeek: 103, netIncome: 2e5 });
+    s.history.yearly.push(prev, cur);
+    s.milestones.ipo = 60;
+    s.milestones.leaderboard_top = 20;
+    s.milestones.first_frontier_project = 80;
+    s.projects.done = ['lodestar'];
+    const deal = { week: 70 } as (typeof s.mergers.deals)[number];
+    s.mergers.deals = [deal, deal, { ...deal, week: 10 }];
+    expect(yearFacts(s, cur, prev)).toEqual({
+      ipo: true,
+      deals: 2,
+      project: 'Project Lodestar',
+      leader: false,
+      record: true,
+    });
   });
 
   it('fills every placeholder in every version', () => {
     const names = { bank: 'Ledger Labs', founder: 'Ada Vale' };
     const prev = report({ n: 1, year: 2027, arr: 1e6 });
     for (const kind of Object.keys(ANNUAL_TEXT)) {
-      expect(ANNUAL_TEXT[kind as keyof typeof ANNUAL_TEXT]).toHaveLength(2);
+      expect(ANNUAL_TEXT[kind as keyof typeof ANNUAL_TEXT].length).toBeGreaterThanOrEqual(3);
     }
     for (const year of [2028, 2029]) {
       for (const cur of [
@@ -81,6 +111,23 @@ describe('annual report', () => {
         report({ year, tier: 'critical' }),
       ]) {
         const t = annualText(cur, prev, names);
+        expect(t.headline + t.standfirst).not.toMatch(/[{}]/);
+      }
+      const facts = {
+        ipo: false,
+        deals: 4,
+        project: 'Project Lodestar',
+        leader: false,
+        record: true,
+      };
+      for (const f of [
+        { ...facts, ipo: true },
+        facts,
+        { ...facts, project: undefined },
+        { ...facts, project: undefined, deals: 0 },
+        { ...facts, project: undefined, leader: true },
+      ]) {
+        const t = annualText(report({ year }), prev, names, f);
         expect(t.headline + t.standfirst).not.toMatch(/[{}]/);
       }
       const first = annualText(report({ year, n: 1 }), undefined, names);

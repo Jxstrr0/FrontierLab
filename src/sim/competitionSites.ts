@@ -13,11 +13,11 @@ import {
   NAMED_UNIVERSITIES,
   UNIVERSITY_PATTERNS,
 } from '../data/employers';
-import { STREET_KINDS, STREET_NAMES } from '../data/names';
 import type { DistrictId } from '../data/types';
 import { geometryFor, placeNear } from './cityPlacement';
 import { stream, type Rng } from './rng';
 import type { EmployerInfo, GameState, Site, SiteKind } from './state';
+import { streetAddress } from './streets';
 
 /** Adds the city's rival head offices, employers and university. Safe to call once per city. */
 export function generateCompetitionSites(state: GameState, cityId: string): void {
@@ -44,7 +44,7 @@ export function generateCompetitionSites(state: GameState, cityId: string): void
       refId,
       tile,
       district: d,
-      address: address(rng),
+      address: address(rng, cityId),
       buildingSeed: rng.int(0, CITYGEN.maxSeed),
     };
     if (employer) site.employer = employer;
@@ -98,6 +98,6 @@ export function generateCompetitionSites(state: GameState, cityId: string): void
   add('university', uniName, 'university', info('university', uniName));
 }
 
-function address(rng: Rng): string {
-  return `${rng.int(1, CITYGEN.maxStreetNumber)} ${rng.pick(STREET_NAMES)} ${rng.pick(STREET_KINDS)}`;
+function address(rng: Rng, cityId: string): string {
+  return streetAddress(rng, cityId);
 }
