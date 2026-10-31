@@ -26,6 +26,8 @@ export interface LessonObs {
   /** The floor shown in an open HQ panel. */
   hqDept?: DeptId;
   modalType: string | null;
+  /** A price-war case is among the open incidents (its own first-look tip). */
+  priceWarOpen?: boolean;
   sheetType: string | null;
   tutorialStep?: number;
   guidesOn: boolean;
@@ -210,11 +212,15 @@ export function tipFor(o: LessonObs): string | undefined {
   if (!guidesActive(o)) return undefined;
   const fresh = (id: string) => (o.lessonsDone.includes(id) ? undefined : id);
   if (o.modalType === 'boardMeeting') return fresh('modal-board');
-  if (o.modalType === 'incident') return fresh('modal-incident');
+  if (o.modalType === 'incident')
+    return fresh('modal-incident') ?? (o.priceWarOpen ? fresh('modal-price-war') : undefined);
+  if (o.modalType === 'annual') return fresh('modal-annual');
   if (o.modalType || o.sheetType || activeChapter(o)) return undefined;
   if (o.hqDept && FLOOR_TIPS[o.hqDept]) return fresh(`floor-${o.hqDept}`);
-  if (o.panelType === 'branch')
-    return o.panelTab === 'finance' ? fresh('branch-finance') : undefined;
+  if (o.panelType === 'branch') {
+    if (o.panelTab === 'finance') return fresh('branch-finance');
+    return o.panelTab === 'loandesk' ? fresh('branch-dealdesk') : undefined;
+  }
   const place = o.panelType && PLACE_TIPS[o.panelType] ? `place-${o.panelType}` : undefined;
   if (o.panelType === 'investmentBank') {
     return (place && fresh(place)) ?? (o.panelTab === 'mna' ? fresh('ib-mna') : undefined);

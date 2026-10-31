@@ -8,11 +8,11 @@ import { DEALER_NAMES } from '../data/cars';
 import { CITIES } from '../data/cities';
 import { auctionHouseIn } from '../data/collectibles';
 import { homesIn } from '../data/homes';
-import { STREET_KINDS, STREET_NAMES } from '../data/names';
 import type { DistrictId } from '../data/types';
 import { geometryFor, placeNear } from './cityPlacement';
 import { stream } from './rng';
 import type { GameState, Site, SiteKind } from './state';
+import { streetAddress } from './streets';
 
 /** Adds the city's car dealer, auction house and vacation homes. Safe to call once per city. */
 export function generatePersonalSites(state: GameState, cityId: string): void {
@@ -39,7 +39,7 @@ export function generatePersonalSites(state: GameState, cityId: string): void {
       refId,
       tile,
       district: d,
-      address: `${rng.int(1, CITYGEN.maxStreetNumber)} ${rng.pick(STREET_NAMES)} ${rng.pick(STREET_KINDS)}`,
+      address: streetAddress(rng, cityId),
       buildingSeed: rng.int(0, CITYGEN.maxSeed),
     };
     state.world.sites[id] = site;

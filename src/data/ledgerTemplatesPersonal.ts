@@ -1,6 +1,6 @@
 // The Weekly Ledger's templates for Stage 9 personal stories (CONTENT §23): the
-// rich list (entry and rank), insider-trading probes and fines, and big home
-// purchases. Merged into LEDGER_TEMPLATES via ledgerTemplatesEmpire.ts.
+// rich list (entry and rank), insider-trading probes and fines, big home
+// purchases and sales, and jets and costly cars bought or sold. Merged into LEDGER_TEMPLATES via ledgerTemplatesEmpire.ts.
 import type { LedgerTemplate } from './ledgerTemplates';
 
 export const PERSONAL_TEMPLATES = {
@@ -56,6 +56,56 @@ export const PERSONAL_TEMPLATES = {
     {
       h: '{home} sells for {price}',
       b: 'The buyer, property records show, is {bank} founder {founder}.',
+    },
+  ],
+  HOME_SOLD: [
+    {
+      h: '{bank} founder sells {home}',
+      b: '{founder} let the property go for a reported {price}.',
+    },
+    {
+      h: '{home} changes hands at {price}',
+      b: 'The seller is said to be {founder}, of {bank}.',
+    },
+  ],
+  JET_BOUGHT: [
+    {
+      h: '{founder} takes delivery of a {model}',
+      b: 'The {bank} founder’s new jet cost a reported {price}. Flight crews are being hired.',
+    },
+    {
+      h: '{bank} founder buys a private jet',
+      b: 'A {model}, at about {price}. Air-miles, it seems, are no longer a concern.',
+    },
+  ],
+  JET_SOLD: [
+    {
+      h: '{founder} sells the jet',
+      b: 'The {bank} founder’s {model} went for about {price}. Friends say they will fly commercial. Briefly.',
+    },
+    {
+      h: '{bank} founder parts with a {model}',
+      b: 'The aircraft fetched a reported {price}.',
+    },
+  ],
+  CAR_BOUGHT: [
+    {
+      h: '{founder} adds a {car} to the garage',
+      b: 'The {bank} founder paid a reported {price}. Neighbours have noticed.',
+    },
+    {
+      h: '{price} for a {car}',
+      b: 'The buyer at the dealership, staff confirm, was {bank} founder {founder}.',
+    },
+  ],
+  CAR_SOLD: [
+    {
+      h: '{founder} sells a {car}',
+      b: 'The {bank} founder let it go for about {price}. The garage has room again.',
+    },
+    {
+      h: '{bank} founder’s {car} finds a new home',
+      b: 'The car sold for a reported {price}.',
     },
   ],
 } satisfies Record<string, LedgerTemplate[]>;

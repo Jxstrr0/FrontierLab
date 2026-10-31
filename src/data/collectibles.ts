@@ -1,6 +1,8 @@
 // Collectibles and auction houses (docs/CONTENT.md §20 "Collectibles", §16
 // "Auction houses"). Estimates are the house's pre-sale figure; authenticity is
-// hidden until appraised (SIMULATION §22).
+// hidden until appraised (SIMULATION §22). Computing-era lots are in
+// collectiblesTech.ts. Ids are saved, so a replaced item keeps its id.
+import { TECH_COLLECTIBLES } from './collectiblesTech';
 export interface CollectibleSpec {
   id: string;
   name: string;
@@ -23,10 +25,10 @@ export const COLLECTIBLES: Record<string, CollectibleSpec> = {
   }),
   merchant: k({
     id: 'merchant',
-    name: 'Portrait of a Merchant Banker, oil, 1890s',
+    name: 'Portrait of an Inventor at a Difference Engine, oil, 1890s',
     estimate: 3_800_000,
     blurb:
-      'A sombre oil of a top-hatted financier at his ledger, attributed to a fashionable portraitist.',
+      'A sombre oil of a top-hatted inventor beside a calculating machine of brass and cogs, attributed to a fashionable portraitist.',
     category: 'art',
   }),
   sovereign: k({
@@ -61,10 +63,10 @@ export const COLLECTIBLES: Record<string, CollectibleSpec> = {
   }),
   plate: k({
     id: 'plate',
-    name: 'Original Banknote Engraving Plate, 1923',
+    name: 'Core-Memory Plane from an Early Mainframe, 1956',
     estimate: 950_000,
     blurb:
-      'The steel intaglio plate for a 1923 high-denomination note, cancelled with a single line.',
+      'A hand-woven grid of tiny ferrite rings that once held a whole kilobyte, framed under glass.',
     category: 'memorabilia',
   }),
   morrow: k({
@@ -305,6 +307,7 @@ export const COLLECTIBLES: Record<string, CollectibleSpec> = {
     blurb: 'Three hundred drops of cut crystal that lit a ballroom for ninety years.',
     category: 'antiques',
   }),
+  ...TECH_COLLECTIBLES,
 };
 
 export interface AuctionHouseSpec {
