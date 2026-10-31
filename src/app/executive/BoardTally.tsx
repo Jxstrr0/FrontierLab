@@ -2,6 +2,8 @@
 // filling one after the other, then the outcome lines and Close. With reduced
 // motion the final tallies show at once.
 import { useEffect, useState } from 'preact/hooks';
+import { BOARD_ROOM } from '../../config/balance';
+import { BOARD_LINES, boardLine } from '../../data/boardLines';
 import type { BoardMeeting, BoardVote } from '../../sim/state';
 import { exactMoney, moneyFull } from '../format/format';
 
@@ -47,13 +49,8 @@ export function BoardTally(p: {
         {done && (
           <ul class="exec-outcome">
             <li>{dividendLine(m, p.sym)}</li>
-            <li>
-              {!m.salary.passed
-                ? 'The board turned down your pay proposal. Your salary is unchanged.'
-                : m.salary.proposed === p.previousSalary
-                  ? `Your salary stays at ${moneyFull(m.salary.proposed, p.sym)} a year.`
-                  : `Your salary is now ${moneyFull(m.salary.proposed, p.sym)} a year.`}
-            </li>
+            <li>{salaryLine(m, p.previousSalary, p.sym)}</li>
+            {roomLine(m) && <li class="muted">{roomLine(m)}</li>}
           </ul>
         )}
       </div>
@@ -64,10 +61,31 @@ export function BoardTally(p: {
   );
 }
 
+// The wording comes from data/boardLines.ts, its version picked by the meeting's week.
 function dividendLine(m: BoardMeeting, sym: string): string {
-  if (!m.dividend.passed) return 'The board voted the dividend down. Nothing will be paid.';
-  if (m.dividend.proposed <= 0) return 'No dividend this quarter.';
-  return `Approved: ${exactMoney(m.dividend.proposed, sym)} a share, paid in three weeks.`;
+  const L = BOARD_LINES;
+  if (!m.dividend.passed) return boardLine(L.dividendRejected, m.week);
+  if (m.dividend.proposed <= 0) return boardLine(L.dividendNone, m.week);
+  return boardLine(L.dividendApproved, m.week, { amount: exactMoney(m.dividend.proposed, sym) });
+}
+
+function salaryLine(m: BoardMeeting, previous: number, sym: string): string {
+  const L = BOARD_LINES;
+  const salary = moneyFull(m.salary.proposed, sym);
+  if (!m.salary.passed) return boardLine(L.salaryRejected, m.week + 1);
+  if (m.salary.proposed === previous) return boardLine(L.salarySame, m.week + 1, { salary });
+  return boardLine(L.salaryChanged, m.week + 1, { salary });
+}
+
+/** A remark on how the room split, when it was warm, split or cold. */
+function roomLine(m: BoardMeeting): string | undefined {
+  const votes = [m.dividend, m.salary];
+  if (votes.some((v) => Math.abs(v.forShare - 0.5) <= BOARD_ROOM.closeBand))
+    return boardLine(BOARD_LINES.roomSplit, m.week + 2);
+  if (votes.every((v) => v.passed && v.forShare >= BOARD_ROOM.unanimous))
+    return boardLine(BOARD_LINES.roomWarm, m.week + 2);
+  if (votes.every((v) => !v.passed)) return boardLine(BOARD_LINES.roomCold, m.week + 2);
+  return undefined;
 }
 
 function Tally(p: { label: string; vote: BoardVote; progress: number }) {

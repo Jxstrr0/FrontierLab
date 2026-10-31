@@ -1,5 +1,5 @@
 // Review card templates (docs/CONTENT.md §24). Picked by category and sentiment,
-// with campaign-specific lines when that campaign is active.
+// Campaign-specific lines live in reviewsCampaigns.ts.
 import type { RatingCategory } from './types';
 
 export const REVIEW_LINES: Record<RatingCategory, { pos: string[]; neg: string[] }> = {
@@ -106,39 +106,5 @@ export const REVIEW_LINES: Record<RatingCategory, { pos: string[]; neg: string[]
       'Images come out with six fingers. Still. In this day and age.',
       'The context window fills up after three pages of a contract.',
     ],
-  },
-};
-
-export const CAMPAIGN_REVIEW_LINES: Record<string, { category: RatingCategory; text: string }> = {
-  lobby_coffee: {
-    category: 'branch',
-    text: 'Free espresso while they set up my account? Fine, you win.',
-  },
-  charging: {
-    category: 'branch',
-    text: 'Charged my laptop while I waited. Small thing, big difference.',
-  },
-  saturday: { category: 'service', text: 'Open Saturday mornings. Thank you!' },
-  signup_bonus: { category: 'rates', text: 'Came for the free credits. Might stay.' },
-  workshops: { category: 'service', text: 'The prompting workshop finally made it click for me.' },
-  paperless: {
-    category: 'branch',
-    text: 'Green compute pledge on the door, solar on the roof. I felt less guilty about the batch job.',
-  },
-  direct_mail: {
-    category: 'products',
-    text: 'Signed up after the research newsletter. The eval results were worth the read.',
-  },
-  sponsors: {
-    category: 'branch',
-    text: 'Saw their name on the school robotics team shirts. Nice to see a lab put money in.',
-  },
-  social: {
-    category: 'products',
-    text: 'Tried it because of a demo clip online. The agent really does file the expenses.',
-  },
-  search: {
-    category: 'rates',
-    text: 'Searched for a cheaper API and their ad was right. It was cheaper.',
   },
 };

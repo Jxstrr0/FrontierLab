@@ -297,6 +297,12 @@ The default (and cheapest) build is Row hall, Grid feed, Air handlers. Default n
 | Gigawatt Campus | $2B | 104 | $1B | — | 200,000 GPUs |
 | Safety Institute | $600M | 52 | $500M | — | Exposure −0.3, company incidents ×0.7 |
 | Global Edge Network | $1B | 78 | $750M | — | Service +0.15 in every office |
+| Project Apex | $12B | 130 | $6B | Zenith | Model ceiling +1 (to 14) |
+| Terawatt Array | $5B | 130 | $3B | Gigawatt Campus | 400,000 GPUs |
+| Stratos Relay | $3B | 104 | $2B | Global Edge Network | Service +0.15 in every office |
+| Long Table Fellowship | $1.5B | 78 | $1.5B | Safety Institute | Service +0.1 in every office |
+
+The last four (2026-10-31) keep the late game going. Starting a project prints a Ledger story (`PROJECT_STARTED`); each project has its own finished story (`PROJECT_DONE_{id}`, `src/data/ledgerTemplatesProjects.ts`), and a stall gets one too.
 
 ### 7a. House styles
 
@@ -569,7 +575,7 @@ New labs founded during a game (SIMULATION §18.7) take an invented name from `s
   - Sokolov & Lind (Moscow, St Petersburg): 9%
 - **Convention centre:** one per L and XL city, plus every city that hosts a convention (Saskatoon, Calgary). Venue names are in `src/data/conventions.ts`; other cities use "{City} Convention Centre".
 - **Property buildings:** 6 / 9 / 12 / 15 per S / M / L / XL city, in any district; towers (over 5,000 m²) only in the financial, downtown and waterfront districts, and the biggest only in L and XL cities (SIMULATION §21.5).
-- **Office listings:** 2 / 2 / 3 / 4 per S / M / L / XL city (SIMULATION §16.1), plus one landmark tower in London (Kestrel Tower, 1 Fenmarch Square, 20 floors) and Moscow (Polaris Tower, 1 Severny Prospect, 18 floors), in `src/data/landmarkTowers.ts`.
+- **Office listings:** 2 / 2 / 3 / 4 per S / M / L / XL city (SIMULATION §16.1), plus one landmark tower in London (Kestrel Tower, 1 Fenmarch Square, 20 floors), Moscow (Polaris Tower, 1 Severny Prospect, 18 floors) and, since 2026-10-31, New York, Chicago, San Francisco, Toronto, Paris, Frankfurt, Tokyo, Hong Kong, Singapore and Sydney (16–22 floors each), in `src/data/landmarkTowers.ts`. A city generated before its tower was added gets none (no migration).
 - **Airports** (code, name): SAS Saskatoon Regional · CAL Calgary International · VAN Vancouver International · TOR Toronto Pearson-style "Lakeshore International" · MTL Montréal-Mercier · NYC Liberty International · CHI O'Hare-style "Lakefront International" · SFO Bayview International · SEA Sound International · LON Thameshaven · PAR Charles-Lumière · FRA Rhein-Main · AMS Polder International · ZUR Kloten-Alpen · TYO Haneda-Bay · SYD Harbour Kingsford · SIN Changi-Garden · HKG Lantau Harbour · MOW Vnukovo Fields · LED Pulkovo-Neva. Regional sites: FMM Athabasca Field · PHE Port Hedland Strip · MAF Permian Regional. All fictional names; use the city name in UI where clearer.
 
 ## 17. Stock market (listed companies outside AI)
@@ -660,7 +666,7 @@ Announced in the paper 4 weeks before. Active for 4 weeks (was 2 and 1 until 202
 
 ### 19b. Milestones (`src/data/milestones.ts`, DESIGN §5.18)
 
-32 one-time goals, checked at the end of every weekly tick; thresholds in `MILESTONE_GOALS`. "News" marks those that make a Ledger story of their own. The three valuation goals keep their bank-era ids (`assets_*`) so saves keep them.
+41 one-time goals, checked at the end of every weekly tick; thresholds in `MILESTONE_GOALS`. "News" marks those that make a Ledger story of their own. The three valuation goals keep their bank-era ids (`assets_*`) so saves keep them.
 
 | id | Title | Reached when | News |
 |---|---|---|---|
@@ -696,6 +702,15 @@ Announced in the paper 4 weeks before. Active for 4 weeks (was 2 and 1 until 202
 | owned_compute_quarter | Compute independence | 13 weeks in a row with owned GPUs (data centers and power deals) ≥ demand, demand > 0 (`compute.ownedStreak`) | ✓ |
 | model_gen_5 | Fifth generation | `training.generation` ≥ 5 | ✓ |
 | safety_strong_2y | Two years of Strong safety | Strong tier held 104 weeks in a row (`company.tierWeeks` + 1 ≥ 104) | ✓ |
+| first_tender | First public contract | a public tender held (won and active) | |
+| five_tenders | Trusted by the state | 5 public contracts held at once (tenders leave no record when they end) | ✓ |
+| first_frontier_project | First frontier project | a frontier project finished | |
+| landmark_tower | A landmark address | an HQ office leased in a landmark tower | ✓ |
+| model_gen_8 | Eighth generation | `training.generation` ≥ 8 | ✓ |
+| ten_years | A decade in | week ≥ 520 | ✓ |
+| model_gen_12 | Twelfth generation | `training.generation` ≥ 12 | ✓ |
+| all_frontier_projects | Nothing left to build | every frontier project finished | ✓ |
+| twenty_years | Twenty years | week ≥ 1040 | ✓ |
 
 ## 20. Personal purchases
 
@@ -896,6 +911,21 @@ The seven AI-native cases (2026-10-27) live in `src/data/incidentsAi.ts` with tw
 
 The outage rumour's text: "Rumours that we are about to go dark are spreading, and customers are cancelling their plans before it happens."
 
+Every case in `src/data/incidents.ts` also has a `texts` list (2026-10-31): one or two alternatives to its main text, one picked when the case is raised; the frequent ones (viral complaint, staff walkout, safety audit, price war, board capital review, dividend due) have three versions in all.
+
+### 22c. The veteran's desk (`src/data/incidentsVeteran.ts`, 2026-10-31)
+
+Later-game cases, built like the founder's desk: company cases that fire **once a game**, from `VETERAN_DESK.fromWeek` (156, year 3) on, with an open sales office, no veteran case pending and at least `gapWeeks` (12) since the last; each rolls at `VETERAN_DESK.baseP` (0.6%) a week. Costs scale with the lab (`INCIDENT_SCALE`); numbers in `src/data/incidentParamsVeteran.ts`; rules in `src/sim/incident/veteranRules.ts`. Each has two case texts and two Ledger templates (`INCIDENT_{id}`, `src/data/ledgerTemplatesVeteran.ts`).
+
+| id | Title | Condition | Options (cost → effect) |
+|---|---|---|---|
+| HEARING_SUMMONS | Called to testify | — | Testify ($60k → awareness +0.05 everywhere; 20%: Overall −0.15 for 8 wk) · Written statement (Overall −0.2 for 12 wk) |
+| OPEN_LETTER | An open letter | — | Sign it (Safety coverage +0.1 for 26 wk, Products −0.1 for 12 wk) · Say nothing (Overall −0.1 for 12 wk) |
+| SENTIENCE_CLAIM | An engineer says it is alive | a trained model | Fund a study ($80k) · Put them on leave (morale −8 at every office) · Let them talk (awareness +0.06, Overall −0.1 for 8 wk) |
+| DOCUMENTARY | A documentary crew | — | Open the doors (awareness +0.1; 30%: Overall −0.15 for 12 wk) · Decline |
+| REUNION | The old crew | — | Throw a party ($30k → morale +10 at every office) · Send a card |
+| SAFETY_AUDIT_ASK | A big customer wants an audit | API usage on the books | Pay for the audit ($120k → API take-up ×1.15 for 26 wk) · Refuse (API take-up ×0.85 for 12 wk) |
+
 ### 22b. The founder's desk (`src/data/incidentsFounder.ts`, 2026-10-30)
 
 The small cases a young lab gets. Each is a company case that fires **once a game**, only in the first `FOUNDER_DESK.untilWeek` (156) weeks, while you have an open sales office, with no founder case pending and at least `gapWeeks` (6) since the last one; each rolls at `FOUNDER_DESK.baseP` (1.2%) a week, so a founder meets about five of the eight in year one and the rest by year three. Flat costs grow with the lab like the AI cases (`INCIDENT_SCALE`, ×1 for a founder). Rules in `src/sim/incident/founderRules.ts`; each has two case texts and two Ledger templates (`INCIDENT_{id}`, `src/data/ledgerTemplatesFounder.ts`). A COO trusted with Company troubles settles them like any company case.
@@ -945,7 +975,7 @@ Examples:
 
 ## 24. Review card templates
 
-Pick by category and sentiment. Use campaign-specific lines when the campaign is active. The full lists live in `src/data/reviews.ts`: ten lines per category and sentiment (80 in all) plus one line per sales-office campaign (examples below).
+Pick by category and sentiment. While a campaign runs, `REVIEW_CAMPAIGN_CHANCE` (30%) of new cards quote one of the running campaigns instead. The full lists live in `src/data/reviews.ts`: ten lines per category and sentiment (80 in all); campaign lines live in `src/data/reviewsCampaigns.ts`, three good, two neutral and two bad per campaign, picked to match the card's stars (4–5 good, 3 neutral, 1–2 bad). One good line per campaign is below.
 
 - **Price +**
   - "Pro costs less here than anywhere else I tried. Switched the whole team."
@@ -1016,7 +1046,7 @@ Fill these per panel and state.
 
 ## 26b. Annual report headlines
 
-Each kind has two versions; the year picks one (SIMULATION §22a). Placeholders: {bank}, {founder}, {year}, {pct} (ARR growth), {decade} (years of play). Text lives in `src/data/annualReport.ts`.
+Each kind has three or four versions; a hash of the year and the kind picks one, so they don't simply alternate (SIMULATION §22a). Placeholders: {bank}, {founder}, {year}, {pct} (ARR growth), {n}, {decade} (years of play), {deals}, {project}. Text lives in `src/data/annualReport.ts` and `annualReportMore.ts`; the first two versions of the original kinds are below. Priority: decade, first, topRich, then the year's facts read from the state (`yearFacts`): **ipo** (listed this year), **frontier** (first or last frontier project finished), **leader** (first time on top of the benchmark leaderboard), then firstProfit, safety, doubled, **spree** (`ANNUAL_REPORT.spreeDeals`, 3, acquisitions in the year), **record** (net income ≥ `recordMargin` 1.5 × the best earlier year), hardYear, grew.
 
 | Kind | Headlines | Standfirsts |
 |---|---|---|
@@ -1031,6 +1061,9 @@ Each kind has two versions; the year picks one (SIMULATION §22a). Placeholders:
 
 ## 26. Name pools
 
+The main pool is 100 × 100 (`src/data/names.ts`, 2026-10-31) and names staff, researchers, executives and rival CEOs; public figures in world news, the company desk and the rich list draw from `namesPublic.ts` (50 × 50), and club players, owners and tournament stars from `namesSport.ts` (50 × 50). No surname is shared between the three. The first forty of each main list:
+
 - **First names:** Avery, Malik, Sofia, Kenji, Amara, Liam, Priya, Mateo, Chloé, Tariq, Hannah, Diego, Mei, Oluwaseun, Freya, Arjun, Isabel, Noah, Zainab, Lucas, Yuki, Elena, Kwame, Grace, Rafael, Aisha, Oscar, Leila, Dmitri, Nora, Santiago, Ingrid, Hamza, Camille, Ethan, Sakura, Omar, Bianca, Theo, Imani.
 - **Last names:** Bennett, Okafor, Laurent, Tanaka, Haddad, Novak, Fraser, Mendes, Kowalski, Singh, Achebe, Moreau, Lindqvist, Park, Delgado, Whitfield, Nakamura, Osei, Brennan, Rossi, Chen, Abara, Duval, MacLeod, Petrov, Ahmed, Sorensen, Kaur, Ibarra, Gallagher, Hoffmann, Mensah, Calloway, Ferreira, Varga, Kimura, Nwosu, Ashford, Castillo, Holm.
+- **Street names:** per country, with Paris, Frankfurt and London their own sets (`src/data/streetNames.ts`); no bank words.
 - **Investor and fund names** (25): Hardwick Capital, Wren & Lowe, Saltmarsh Ventures, Northgate Partners, Lindenhall Fund, Bluewater Equity, Corbel Asset Management, Fenwick Family Office, Greyfell Growth, Tidewater Ventures, Ironbridge Capital, Marrow & Vale, Quill Street Partners, Halden Pension Trust, Oakmere Endowment, Stirling Ridge Capital, Pelican Point Ventures, Ashcombe Holdings, Lantern Hill Partners, Blackwater Growth Fund, Carrick Sovereign Fund, Foxglove Capital, Winterbourne Family Office, Keel & Compass Ventures, Rookery Asset Management.

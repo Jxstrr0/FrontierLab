@@ -402,7 +402,7 @@ export function closeQuote(state: GameState, branchId: string) {
   const depositRefund = branch.lease.deposit - forfeit;
   const blocker =
     !target && hasLoans(state, branch)
-      ? 'This is your only sales office, so its loans have nowhere to go.'
+      ? 'This is your only sales office, so its contracts have nowhere to go.'
       : null;
   return {
     targetId: target?.id,

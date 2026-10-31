@@ -6,7 +6,7 @@
 // table. Old reports reopen from the Ledger archive.
 import { ANNUAL_REPORT, DAYS_PER_WEEK } from '../../config/balance';
 import { MILESTONES } from '../../data/milestones';
-import { annualText, isDecade } from '../../sim/annualReport';
+import { annualText, isDecade, yearFacts } from '../../sim/annualReport';
 import type { YearReport } from '../../sim/state';
 import { TIER_LABEL } from '../company/CapitalMeter';
 import { BarChart, Medallion, Modal } from '../components';
@@ -75,7 +75,7 @@ export function AnnualReport(p: { year?: number }) {
   if (!cur) return null;
   const prev = i > 0 ? reports[i - 1] : undefined;
   const names = { bank: s.meta.bankName, founder: s.meta.founderName };
-  const text = annualText(cur, prev, names);
+  const text = annualText(cur, prev, names, yearFacts(s, cur, prev));
   const decade = isDecade(cur);
   const span = reports.slice(Math.max(0, i - ANNUAL_REPORT.decadeYears + 1), i + 1);
   const date = gameDate(s.meta.startDate, (cur.endWeek + 1) * DAYS_PER_WEEK);

@@ -5,7 +5,7 @@
 import { DAYS_PER_WEEK } from '../../config/balance';
 import { Panel } from '../components';
 import { gameDate } from '../format/format';
-import { annualText } from '../../sim/annualReport';
+import { annualText, yearFacts } from '../../sim/annualReport';
 import type { GameState } from '../../sim/state';
 import { closePanel, modal, openPanel, useGame } from '../store';
 import { articlesFor, LedgerCard, Masthead } from '../weekly/LedgerCard';
@@ -96,7 +96,10 @@ function AnnualReports(p: { s: GameState }) {
   return (
     <ol class="ledger-archive" aria-label="Annual reports">
       {reports
-        .map((r, i) => ({ r, text: annualText(r, reports[i - 1], names) }))
+        .map((r, i) => ({
+          r,
+          text: annualText(r, reports[i - 1], names, yearFacts(p.s, r, reports[i - 1])),
+        }))
         .reverse()
         .map(({ r, text }) => (
           <li key={r.year}>

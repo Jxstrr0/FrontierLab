@@ -71,6 +71,7 @@ export function observeLessons(
     panelTab: panel?.type === 'branch' || panel?.type === 'investmentBank' ? panel.tab : undefined,
     hqDept: shownFloor(s, panel),
     modalType: modal?.type ?? null,
+    priceWarOpen: s.incidents.active.some((i) => i.type === 'PRICE_WAR'),
     sheetType: sheet,
     tutorialStep: s.flags.tutorialStep,
     guidesOn: s.settings.guides,

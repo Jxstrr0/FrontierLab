@@ -370,7 +370,7 @@ export const PLACE_TIPS: Record<string, TipText> = {
   },
   dataCenter: {
     title: 'Data center',
-    line: 'Our own GPUs: they serve customers before anything bought at spot, and cost less. Cheap power at an energy site keeps the bill down.',
+    line: 'Our own GPUs: they serve customers before anything bought at spot, and cost less. Cheap power at an energy site keeps the bill down, and a power deal fixes the price for years.',
   },
   university: {
     title: 'University',
@@ -402,7 +402,7 @@ export const PLACE_TIPS: Record<string, TipText> = {
   },
   wealth: {
     title: 'Personal wealth',
-    line: 'Your own money, kept apart from the lab’s: salary, dividends and anything you buy. Trading your own lab’s shares just before earnings risks an investigation.',
+    line: 'Your own money, kept apart from the lab’s: salary, dividends and anything you buy. Each year end the rich list ranks you. Trading your own lab’s shares just before earnings risks an investigation.',
   },
   vacationHome: {
     title: 'Vacation home',
@@ -419,6 +419,18 @@ export const PLACE_TIPS: Record<string, TipText> = {
   franchise: {
     title: 'Sports club',
     line: 'Own a club with your own money. A strong kit sponsorship lifts the lab’s brand.',
+  },
+  projects: {
+    title: 'Frontier projects',
+    line: 'Multi-year builds paid every week. One runs at a time; a week we can’t pay stalls it. What they give lasts for good.',
+  },
+  milestones: {
+    title: 'Milestones',
+    line: 'Goals for the long game. Each one is marked the week we reach it, and the big ones make the paper.',
+  },
+  portfolio: {
+    title: 'Portfolio',
+    line: 'The lab’s holdings, or your own: shares, startup stakes and property, with what each is worth today. Tap a row to open it.',
   },
   ledger: {
     title: 'The Weekly Inference',
@@ -443,6 +455,18 @@ export const OTHER_TIPS = {
   'modal-incident': {
     title: 'Incidents',
     line: 'Something has gone wrong. Each choice has a cost and a consequence; pick one. An office manager can handle sales office troubles for you.',
+  },
+  'modal-price-war': {
+    title: 'Price war',
+    line: 'A rival cut prices to win customers back. Matching keeps them but thins our margin for half a year; holding keeps the margin and risks cancellations.',
+  },
+  'modal-annual': {
+    title: 'Annual report',
+    line: 'The year in figures, filed at every year end. Old reports stay in the Inference’s archive.',
+  },
+  'branch-dealdesk': {
+    title: 'Deal Desk',
+    line: 'Businesses ask for proposals here. Public tenders appear too: one sealed bid, a long contract, and our safety tier decides if we qualify.',
   },
 } satisfies Record<string, TipText>;
 
