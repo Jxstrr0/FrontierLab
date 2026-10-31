@@ -10,7 +10,7 @@ import { FUND_NAMES } from '../data/names';
 import { clamp } from './math';
 import { hashSeed, rngFromState } from './rng';
 import type { GameState } from './state';
-import { homeCountry } from './treasury';
+import { homeCountry } from './homeCountry';
 import { companyArr } from './arr';
 import { runwaySnapshot } from './runway';
 import { fundamentalPerShare, privateValuation } from './valuation';

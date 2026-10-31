@@ -5,7 +5,8 @@ import { describe, expect, it } from 'vitest';
 import { balanceSheet } from '../../src/sim/balanceSheet';
 import { advanceWeeks } from '../../src/sim/engine';
 import { newGame } from '../../src/sim/newGame';
-import { migrate } from '../../src/sim/save/migrations';
+import { legacyTreasury } from '../../src/sim/save/legacyTreasury';
+import { migrate, migrations } from '../../src/sim/save/migrations';
 import type { GameState } from '../../src/sim/state';
 import { identityGap } from '../helpers/mergers';
 import { openScriptedBranch } from '../helpers/scenario';
@@ -43,9 +44,10 @@ function oldSave(): { s: GameState; branchId: string } {
   strip(s.ledger.pnl);
   for (const w of s.history.weekly) strip(w.pnl);
   // Borrowing that once carried Loan Desk loans sits in reserves until repaid.
-  s.treasury.window = 400_000;
-  s.treasury.overnight = 100_000;
-  s.treasury.reserves += 500_000;
+  const t = legacyTreasury(s);
+  t.window = 400_000;
+  t.overnight = 100_000;
+  t.reserves += 500_000;
   return { s, branchId };
 }
 
@@ -53,7 +55,11 @@ describe('save migration 6 → 7 (C3b)', () => {
   it('moves office rows onto the AI lines and repays the borrowing at unchanged equity', () => {
     const { s, branchId } = oldSave();
     const raw = { ...(structuredClone(s) as object), schemaVersion: 6 } as never;
-    const reserves = s.treasury.reserves;
+    const step = structuredClone(s);
+    migrations[6]!(step as never);
+    const t = legacyTreasury(step);
+    expect(t.window + t.overnight).toBe(0);
+    expect(t.reserves).toBeCloseTo(legacyTreasury(s).reserves - 500_000);
     const m = migrate(raw) as unknown as GameState;
     const row = m.branches[branchId]!.pnl[0]!;
     expect(row.lines.plans).toBe(5_000);
@@ -65,8 +71,7 @@ describe('save migration 6 → 7 (C3b)', () => {
     expect(row.income).toBe(1_000);
     expect(m.ledger.pnl.compute).toBe(0);
     expect(m.history.weekly.every((w) => w.pnl.compute === 0)).toBe(true);
-    expect(m.treasury.window + m.treasury.overnight).toBe(0);
-    expect(m.treasury.reserves).toBeCloseTo(reserves - 500_000);
+    expect('treasury' in m).toBe(false);
     expect(balanceSheet(m).equity).toBeCloseTo(balanceSheet(s).equity, 4);
     expect(identityGap(m)).toBeLessThan(1);
     advanceWeeks(m, 8);

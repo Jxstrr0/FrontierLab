@@ -59,15 +59,6 @@ describe('commands', () => {
     expect(cmd.setPrice(s, r.branchId, 'plus', 500)).toEqual({ ok: true, price: 60 });
   });
 
-  it('moves corporate cash into treasury reserves one way only', () => {
-    const s = newGame({ seed: 42, cityId: 'cal' });
-    const reserves = s.treasury.reserves;
-    expect(cmd.topUpLendingFund(s, 50_000).ok).toBe(true);
-    expect(s.treasury.reserves).toBe(reserves + 50_000);
-    expect(s.company.cash).toBe(START_CASH - 50_000);
-    expect(cmd.topUpLendingFund(s, 10_000_000).ok).toBe(false);
-  });
-
   it('requires a manager before delegating', () => {
     const s = newGame({ seed: 42, cityId: 'cal' });
     const r = cmd.buildBranch(s, { lotId: freeLot(s).id, build: REFERENCE_BUILDS.basic });

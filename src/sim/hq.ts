@@ -10,7 +10,6 @@ import {
   DEPT_REQUIREMENTS,
   DEPT_SKILL,
   EXEC_DELEGATION,
-  FEATURES,
   FOUNDER_MODE_ASSETS,
   FOUNDER_RAMP,
   GRAD_PROGRAM,
@@ -23,7 +22,6 @@ import {
   REMOTE_FRIDAY_STAFF,
   SKILL,
   START_STAFF_MORALE,
-  TREASURY_PENALTY,
   WEEKS_PER_YEAR,
 } from '../config/balance';
 import { BENEFIT_RULES, BENEFITS } from '../data/benefits';
@@ -76,8 +74,6 @@ export function annualPayroll(state: GameState): number {
 
 /** Founder-mode ramp (§16.3): requirements phase in from 3 to 6 office units, or at $250M assets. */
 export function founderRamp(state: GameState): number {
-  // With the HQ system switched off (FEATURES.hq), no requirements apply.
-  if (!FEATURES.hq) return 0;
   const assets = state.history.weekly.at(-1)?.totals.assets ?? 0;
   if (assets >= FOUNDER_MODE_ASSETS) return 1;
   return clamp((officeUnits(state) - FOUNDER_RAMP.fromBranches) / FOUNDER_RAMP.overBranches, 0, 1);
@@ -210,11 +206,6 @@ export function riskPdMult(state: GameState): number {
 /** Branch and brand campaign effects × (0.5 + 0.5 k′) (CONTENT §9, Marketing). */
 export function campaignMult(state: GameState): number {
   return HQ_EFFECTS.campaignBase + (1 - HQ_EFFECTS.campaignBase) * cov(state, 'marketing');
-}
-
-/** Treasury penalty on funding spreads: (1 − k′) × 0.50% (§13.6). */
-export function treasuryPenalty(state: GameState): number {
-  return shortfall(state, 'treasury') * TREASURY_PENALTY;
 }
 
 /** Weeks of statements shown as Delayed (CONTENT §9, Finance); a seated CFO halves it (§17.2). */

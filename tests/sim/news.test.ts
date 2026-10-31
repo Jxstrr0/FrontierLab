@@ -17,7 +17,7 @@ import { pushEvent } from '../../src/sim/events';
 import { newGame } from '../../src/sim/newGame';
 import { newsMoney, newsRate } from '../../src/sim/newsFormat';
 import type { GameState, LedgerIssue } from '../../src/sim/state';
-import { homeCountry } from '../../src/sim/treasury';
+import { homeCountry } from '../../src/sim/homeCountry';
 import { openScriptedBranch, runScript } from '../helpers/scenario';
 
 /** `${key}:${subject}#${idx}` → [`${key}:${subject}`, idx]. */

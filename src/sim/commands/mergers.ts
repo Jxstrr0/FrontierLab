@@ -73,7 +73,6 @@ export function offerMerger(
     pricePerShare,
     total: quote.plan.cash + quote.plan.split.stockValue,
     premium: quote.premium,
-    madeWeek: state.clock.week,
     respondWeek: state.clock.week + 1,
     status: 'pending',
     distressed: bank.status === 'distressed',

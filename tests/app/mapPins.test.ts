@@ -4,10 +4,9 @@ import { occupantsOf } from '../../src/app/map/mapOccupants';
 import { buildPins } from '../../src/app/map/pins';
 import { generateCityMap } from '../../src/art/citygen';
 import { roofAnchor } from '../../src/art/iso';
-import { FEATURES } from '../../src/config/balance';
 import { CLUSTER_RADIUS_PX } from '../../src/config/mapView';
 import { CITIES } from '../../src/data/cities';
-import { availableLayers, LEASE_ONLY_KEY, MAP_LAYERS } from '../../src/data/mapLayers';
+import { LEASE_ONLY_KEY, MAP_LAYER_IDS, MAP_LAYERS } from '../../src/data/mapLayers';
 import * as cmd from '../../src/sim/commands';
 import { newGame } from '../../src/sim/newGame';
 import { openScriptedBranch } from '../helpers/scenario';
@@ -50,39 +49,9 @@ describe('pin clustering', () => {
   });
 });
 
-/** Feature sets with the HQ stage off and on, whatever the build's flags say. */
-const NO_HQ = {
-  ...FEATURES,
-  hq: false,
-  competition: false,
-  multiCity: false,
-  personalEmpire: false,
-};
-const WITH_HQ = {
-  ...FEATURES,
-  hq: true,
-  competition: false,
-  capitalMarkets: false,
-  investments: false,
-  multiCity: false,
-  personalEmpire: false,
-};
-const STAGE5 = {
-  ...FEATURES,
-  hq: true,
-  competition: true,
-  capitalMarkets: false,
-  investments: false,
-  multiCity: false,
-};
-const STAGE6 = {
-  ...FEATURES,
-  hq: true,
-  competition: true,
-  capitalMarkets: true,
-  investments: false,
-  multiCity: false,
-};
+/** Storefront pins only: your offices, rivals and open lots. */
+const storefronts = <T extends { kind: string }>(pins: T[]) =>
+  pins.filter((p) => p.kind === 'mine' || p.kind === 'rival' || p.kind === 'lot');
 
 describe('map pins', () => {
   function setup() {
@@ -95,7 +64,7 @@ describe('map pins', () => {
 
   it('has one pin per storefront, yours first, anchored on the roof', () => {
     const { s, branchId, lots, map } = setup();
-    const pins = buildPins(s, map, lots, NO_HQ);
+    const pins = storefronts(buildPins(s, map, lots));
     // Storefronts held by businesses (C5a) pin on the Businesses layer instead.
     const offices = lots.filter((l) => l.occupant?.type !== 'business');
     expect(offices.length).toBeLessThan(lots.length);
@@ -115,35 +84,35 @@ describe('map pins', () => {
   it("pins businesses on the Businesses layer in their vendor's colours (C5a)", () => {
     const { s, lots, map } = setup();
     const held = lots.filter((l) => l.occupant?.type === 'business');
-    const pins = buildPins(s, map, lots, STAGE5).filter((p) => p.kind === 'business');
+    const pins = buildPins(s, map, lots).filter((p) => p.kind === 'business');
     expect(pins).toHaveLength(held.length);
     const rivalHeld = pins.find((p) => s.businesses[p.businessId!]!.vendor?.type === 'rival')!;
     expect(rivalHeld.caption).toBeTruthy();
-    const occ = occupantsOf(s, lots, STAGE5);
+    const occ = occupantsOf(s, lots);
     const biz = s.businesses[rivalHeld.businessId!]!;
     expect(occ[rivalHeld.id]).toEqual({ type: 'business', ink: s.rivals[biz.vendor!.id]!.ink });
     // Won: your brand ink on the awning and your seal on the pin.
     biz.vendor = { type: 'player', id: 'player' };
-    expect(occupantsOf(s, lots, STAGE5)[rivalHeld.id]!.ink).toBe(s.meta.brandInk);
-    const mine = buildPins(s, map, lots, STAGE5).find((p) => p.id === rivalHeld.id)!;
+    expect(occupantsOf(s, lots)[rivalHeld.id]!.ink).toBe(s.meta.brandInk);
+    const mine = buildPins(s, map, lots).find((p) => p.id === rivalHeld.id)!;
     expect(mine.partner).toBe(true);
     cmd.setSettings(s, { layers: { employers: false } });
-    expect(buildPins(s, map, lots, STAGE5).some((p) => p.kind === 'business')).toBe(false);
+    expect(buildPins(s, map, lots).some((p) => p.kind === 'business')).toBe(false);
   });
 
   it('follows the layer settings', () => {
     const { s, lots, map } = setup();
     cmd.setSettings(s, { layers: { [LEASE_ONLY_KEY]: true } });
-    const leaseOnly = buildPins(s, map, lots, NO_HQ);
+    const leaseOnly = storefronts(buildPins(s, map, lots));
     expect(leaseOnly.length).toBeGreaterThan(0);
     expect(leaseOnly.every((p) => p.kind === 'lot')).toBe(true);
     cmd.setSettings(s, { layers: { branches: false } });
-    expect(buildPins(s, map, lots, NO_HQ)).toEqual([]);
+    expect(storefronts(buildPins(s, map, lots))).toEqual([]);
   });
 
   it('tells the renderer who occupies each lot, in their ink', () => {
     const { s, lots } = setup();
-    const occ = Object.values(occupantsOf(s, lots, NO_HQ));
+    const occ = Object.values(occupantsOf(s, lots));
     // A sales office still being fitted out has a crane over it.
     expect(occ.filter((o) => o.type === 'player')).toEqual([
       { type: 'player', ink: s.meta.brandInk, fitout: true },
@@ -163,12 +132,9 @@ describe('HQ pins (Stage 4)', () => {
     return { s, lots, offices, sites, map };
   }
 
-  it('adds offices for lease, credit bureaus and agencies only with the HQ stage', () => {
+  it('adds offices for lease, credit bureaus and agencies', () => {
     const { s, lots, offices, sites, map } = setup();
-    expect(
-      buildPins(s, map, lots, NO_HQ).every((p) => p.kind === 'rival' || p.kind === 'lot'),
-    ).toBe(true);
-    const pins = buildPins(s, map, lots, WITH_HQ);
+    const pins = buildPins(s, map, lots);
     const officePins = pins.filter((p) => p.kind === 'office');
     expect(officePins.map((p) => p.id).sort()).toEqual(offices.map((o) => o.id).sort());
     const o = offices.find((x) => x.id === officePins[0]!.id)!;
@@ -193,7 +159,7 @@ describe('HQ pins (Stage 4)', () => {
     const listing = offices[0]!;
     const r = cmd.leaseOffice(s, listing.id, ['finance']);
     expect(r.ok).toBe(true);
-    const pins = buildPins(s, map, lots, WITH_HQ);
+    const pins = buildPins(s, map, lots);
     const hq = pins.find((p) => p.id === listing.id)!;
     expect(hq.kind).toBe('hq');
     expect(hq.label).toBe(`Your HQ, ${listing.address}`);
@@ -201,28 +167,27 @@ describe('HQ pins (Stage 4)', () => {
     expect(hq.monogram).toBe(s.meta.monogram);
     expect(hq.officeId).toBe(r.ok ? r.officeId : undefined);
     expect(pins[0]!.kind).toBe('hq');
-    expect(occupantsOf(s, lots, WITH_HQ)[listing.id]).toEqual({
+    expect(occupantsOf(s, lots)[listing.id]).toEqual({
       type: 'player',
       ink: s.meta.brandInk,
     });
-    expect(occupantsOf(s, lots, NO_HQ)[listing.id]).toBeUndefined();
   });
 
   it('follows the Offices, Credit Bureaus and Marketing Agencies layers', () => {
     const { s, lots, map } = setup();
-    cmd.setSettings(s, { layers: { branches: false, offices: false } });
-    const kinds = new Set(buildPins(s, map, lots, WITH_HQ).map((p) => p.kind));
-    expect([...kinds].sort()).toEqual(['agency', 'bureau']);
+    // Every layer off but these two; the airport stays whatever the Layers say.
+    const off = Object.fromEntries(MAP_LAYER_IDS.map((l) => [l, false]));
+    cmd.setSettings(s, { layers: { ...off, creditBureaus: true, marketingAgencies: true } });
+    const kinds = new Set(buildPins(s, map, lots).map((p) => p.kind));
+    expect([...kinds].sort()).toEqual(['agency', 'airport', 'bureau']);
     // setSettings replaces the whole layers map.
-    cmd.setSettings(s, {
-      layers: { branches: false, offices: false, creditBureaus: false, marketingAgencies: false },
-    });
-    expect(buildPins(s, map, lots, WITH_HQ)).toEqual([]);
+    cmd.setSettings(s, { layers: off });
+    expect(buildPins(s, map, lots).map((p) => p.kind)).toEqual(['airport']);
   });
 
   it('clusters HQ pins with the rest', () => {
     const { s, lots, map } = setup();
-    const pins = buildPins(s, map, lots, WITH_HQ);
+    const pins = buildPins(s, map, lots);
     const ids = clusterPins(pins, clusterRadius(0.4)).flatMap((c) => c.members.map((m) => m.id));
     expect(ids.sort()).toEqual(pins.map((p) => p.id).sort());
   });
@@ -235,7 +200,7 @@ describe('Stage 5 pins', () => {
     const offices = Object.values(s.world.officeListings).filter((o) => o.cityId === 'cal');
     const sites = Object.values(s.world.sites).filter((x) => x.cityId === 'cal');
     const map = generateCityMap(CITIES.cal!, s.meta.seed, lots, { offices, sites });
-    const pins = buildPins(s, map, lots, STAGE5);
+    const pins = buildPins(s, map, lots);
     const hqs = pins.filter((p) => p.kind === 'rivalHq');
     expect(hqs.length).toBe(Object.values(s.rivals).length);
     expect(hqs[0]!.label).toMatch(/ head office, /);
@@ -245,7 +210,7 @@ describe('Stage 5 pins', () => {
     expect(cb.countryId).toBe('CA');
     expect(cb.label).toBe('Bank of Canada');
     cmd.setSettings(s, { layers: { banks: false, employers: false, universities: false } });
-    const kinds = new Set(buildPins(s, map, lots, STAGE5).map((p) => p.kind));
+    const kinds = new Set(buildPins(s, map, lots).map((p) => p.kind));
     for (const k of ['rivalHq', 'centralBank', 'employer', 'university'] as const)
       expect(kinds.has(k)).toBe(false);
   });
@@ -259,10 +224,10 @@ describe('Stage 5 pins', () => {
     const sites = Object.values(s.world.sites).filter((x) => x.cityId === 'cal');
     const map = generateCityMap(CITIES.cal!, s.meta.seed, lots, { sites });
     const university = sites.find((x) => x.kind === 'university')!;
-    const before = buildPins(s, map, lots, STAGE5).find((p) => p.id === university.id)!;
+    const before = buildPins(s, map, lots).find((p) => p.id === university.id)!;
     expect(before.partner).toBeUndefined();
     expect(cmd.signPartnership(s, university.id, branchId, 'plus', 'student').ok).toBe(true);
-    const after = buildPins(s, map, lots, STAGE5).find((p) => p.id === university.id)!;
+    const after = buildPins(s, map, lots).find((p) => p.id === university.id)!;
     expect(after.partner).toBe(true);
     expect(after.ink).toBe(s.meta.brandInk);
     expect(after.label).toMatch(/your partner/);
@@ -270,17 +235,9 @@ describe('Stage 5 pins', () => {
 });
 
 describe('map layers', () => {
-  it('lists the 16 layer types and only offers those whose stage is on', () => {
+  it('lists the 16 layer types once each', () => {
     expect(MAP_LAYERS).toHaveLength(16);
     expect(new Set(MAP_LAYERS.map((l) => l.id)).size).toBe(16);
-    for (const l of availableLayers()) expect(FEATURES[l.feature]).toBe(true);
-    const mapOnly = { ...FEATURES, cityMap: true, hq: false };
-    expect(availableLayers(mapOnly).map((l) => l.id)).toContain('branches');
-    const none = Object.fromEntries(Object.keys(FEATURES).map((k) => [k, false])) as Record<
-      keyof typeof FEATURES,
-      boolean
-    >;
-    expect(availableLayers(none)).toEqual([]);
   });
 });
 
@@ -291,9 +248,8 @@ describe('Stage 6 pins', () => {
     const offices = Object.values(s.world.officeListings).filter((o) => o.cityId === 'cal');
     const sites = Object.values(s.world.sites).filter((x) => x.cityId === 'cal');
     const map = generateCityMap(CITIES.cal!, s.meta.seed, lots, { offices, sites });
-    const ib = buildPins(s, map, lots, STAGE6).filter((p) => p.kind === 'investmentBank');
+    const ib = buildPins(s, map, lots).filter((p) => p.kind === 'investmentBank');
     expect(ib.map((p) => p.label.split(',')[0])).toEqual(['Ashgrove Capital']);
     expect(ib[0]!.icon).toBe('investmentBanks');
-    expect(buildPins(s, map, lots, STAGE5).some((p) => p.kind === 'investmentBank')).toBe(false);
   });
 });

@@ -13,13 +13,13 @@ import {
   WEEKS_PER_YEAR,
 } from '../../config/balance';
 import type { CampaignCost } from '../../data/campaigns';
-import { isDeposit, isLoan, isRecurring, type ProductSpec } from '../../data/products';
+import { isRecurring, type ProductSpec } from '../../data/products';
 import { branchArr } from '../../sim/arr';
 import { contractTotals, officeRfps } from './dealDeskSelectors';
 import { marketWage, staffNeeded } from '../../sim/branch/staff';
 import { managerMarketSalary, managerSalaryBounds } from '../../sim/payReviews';
 export { managerRerollFee } from '../../sim/candidateRerolls';
-import type { Book, Branch, BranchPnl, BranchPnlLine, GameState, Manager } from '../../sim/state';
+import type { Branch, BranchPnl, BranchPnlLine, GameState, Manager } from '../../sim/state';
 import {
   delta,
   exactMoney,
@@ -198,27 +198,20 @@ export function editPrice(spec: ProductSpec, v: number, sym = '$'): string {
 }
 
 export interface UnitView {
-  /** Share of each revenue dollar kept after funding, servicing and expected losses. */
+  /** Share of each revenue dollar kept after compute and servicing. */
   margin: number;
   caption: string;
-  /** "Funding cost (FTP)" or "Unit cost" row. */
+  /** "Compute cost", "Cost per seat" or "Unit cost" row. */
   costLabel: string;
   costText: string;
 }
 
 /**
- * Per-account economics behind the margin ring (SCREENS §5.2), using the
- * branch's average balance when it has accounts and the product ticket otherwise.
+ * Per-unit economics behind the margin ring (SCREENS §5.2): a unit of usage,
+ * a seat, or a year of an app's fee.
  */
-export function unitView(
-  spec: ProductSpec,
-  price: number,
-  ftp: number,
-  book: Book | undefined,
-  sym: string,
-): UnitView {
+export function unitView(spec: ProductSpec, price: number, sym: string): UnitView {
   const perYear = spec.servicing * WEEKS_PER_YEAR;
-  const avg = book && book.accounts > 0 ? book.balance / book.accounts : spec.ticket;
   const ratio = (keep: number, rev: number) => (rev > 0 ? keep / rev : 0);
   if (spec.kind === 'usage') {
     // Per unit of usage: the price less the compute behind it (C3a).
@@ -240,49 +233,6 @@ export function unitView(
       costText: `${exactMoney(perYear / MONTHS_PER_YEAR, sym)}/mo`,
     };
   }
-  if (spec.priceType === 'rate' && isDeposit(spec)) {
-    const spread = ftp - price;
-    return {
-      margin: ratio(spread, ftp),
-      caption: `Spread ${signed(spread)}`,
-      costLabel: 'Funding credit (FTP)',
-      costText: pct(ftp),
-    };
-  }
-  if (spec.priceType === 'rate' && isLoan(spec)) {
-    const spread = price - ftp;
-    const loss = (spec.basePd ?? 0) * (spec.lgd ?? 0);
-    return {
-      margin: ratio(spread - loss, price),
-      caption: `Spread ${signed(spread)}`,
-      costLabel: 'Funding cost (FTP)',
-      costText: pct(ftp),
-    };
-  }
-  if (isDeposit(spec)) {
-    // Fee accounts: the monthly fee plus the funding credit on balances above the pay rate.
-    const pay = spec.payRate ?? 0;
-    const rev = price * MONTHS_PER_YEAR + avg * ftp;
-    const keep = rev - avg * pay - perYear;
-    return {
-      margin: ratio(keep, rev),
-      caption: `Spread ${signed(ftp - pay)}`,
-      costLabel: 'Unit cost',
-      costText: `${exactMoney(perYear / MONTHS_PER_YEAR, sym)}/mo`,
-    };
-  }
-  if (spec.kind === 'wealth') {
-    const rev = avg * price;
-    return {
-      margin: ratio(rev - perYear, rev),
-      caption: `Fee ${pct(price)} of assets`,
-      costLabel: 'Unit cost',
-      costText: `${exactMoney(perYear / MONTHS_PER_YEAR, sym)}/mo`,
-    };
-  }
-  if (spec.kind === 'fx') {
-    return { margin: 1, caption: `Markup ${pct(price)}`, costLabel: 'Unit cost', costText: 'None' };
-  }
   const rev = spec.priceType === 'feeAnnual' ? price : price * MONTHS_PER_YEAR;
   return {
     margin: ratio(rev - perYear, rev),
@@ -290,10 +240,6 @@ export function unitView(
     costLabel: 'Unit cost',
     costText: `${exactMoney(perYear, sym)}/yr`,
   };
-}
-
-function signed(r: number): string {
-  return `${r >= 0 ? '+' : '−'}${pct(Math.abs(r))}`;
 }
 
 /** An office's ARR (plan and usage books), enterprise contract value and customers. */
@@ -335,7 +281,6 @@ export const REVENUE_LINES: [BranchPnlLine, string][] = [
 ];
 export const EXPENSE_LINES: [BranchPnlLine, string][] = [
   ['compute', 'Compute'],
-  ['losses', 'Bad debts'],
   ['staff', 'Staff'],
   ['manager', 'Manager'],
   ['rent', 'Rent'],

@@ -17,7 +17,6 @@ import {
   REVIEW_RATE,
   SERVICE_RATING,
   UPKEEP_PENALTY,
-  WINDOW_STIGMA,
   MODEL_EFFECTS,
 } from '../../config/balance';
 import { BUILD_SLOTS, EQUIPMENT } from '../../data/equipment';
@@ -189,13 +188,11 @@ export function updateRatings(state: GameState, branch: Branch, fx: CampaignEffe
   r.products = ema(r.products, target('products', productsTarget(state, branch, fx)), RATING_EMA);
   r.service = ema(r.service, target('service', serviceTarget(state, branch, fx)), RATING_EMA);
   r.branch = ema(r.branch, target('branch', branchTarget(state, branch, fx)), RATING_EMA);
-  const stigma = state.treasury.windowStigmaWeeks > 0 ? WINDOW_STIGMA.rating : 0;
   r.overall = clamp(
     OVERALL_WEIGHTS.rates * r.rates +
       OVERALL_WEIGHTS.products * r.products +
       OVERALL_WEIGHTS.service * r.service +
-      OVERALL_WEIGHTS.branch * r.branch -
-      stigma +
+      OVERALL_WEIGHTS.branch * r.branch +
       ratingMod(state, branch, 'overall'),
     1,
     5,

@@ -8,7 +8,7 @@ import { advanceWeeks } from '../src/sim/engine';
 import { newGame, type NewGameOptions } from '../src/sim/newGame';
 import type { Tier } from '../src/data/types';
 import type { GameState } from '../src/sim/state';
-import { homeCountry } from '../src/sim/treasury';
+import { homeCountry } from '../src/sim/homeCountry';
 import { STRATEGIES } from './strategies';
 import { forceRecession } from './strategies/stress';
 import type { Strategy } from './strategies/types';

@@ -11,7 +11,7 @@ import type { TemplateKey } from '../data/ledgerTemplates';
 import { COUNTRIES_WITH_THE } from '../data/newsWorld';
 import type { CountryId, DistrictId, Week } from '../data/types';
 import type { GameEvent, GameState, LedgerTab } from './state';
-import { homeCountry } from './treasury';
+import { homeCountry } from './homeCountry';
 
 /** Icon vignette ids, drawn by src/app/weekly/ledgerIcons.tsx. */
 export type LedgerIconId =

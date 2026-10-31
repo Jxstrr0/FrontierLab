@@ -10,7 +10,6 @@ import {
   releaseFloorPreview,
   releaseOfficePreview,
 } from '../../src/app/hq/officeSelectors';
-import { FEATURES } from '../../src/config/balance';
 import { BENEFITS } from '../../src/data/benefits';
 import * as cmd from '../../src/sim/commands';
 import { newGame } from '../../src/sim/newGame';
@@ -110,7 +109,6 @@ describe('benefit words', () => {
 
 describe('add floor choices', () => {
   it('offers no departments with the HQ stage off', () => {
-    expect(addableDepts({ ...FEATURES, hq: false })).toEqual([]);
-    expect(addableDepts({ ...FEATURES, hq: true })).toContain('finance');
+    expect(addableDepts()).toContain('finance');
   });
 });

@@ -14,7 +14,7 @@ import {
 import { CITIES } from '../../data/cities';
 import { EQUIPMENT, isFitout, BUILD_SLOTS } from '../../data/equipment';
 import { internalComputePrice } from '../compute';
-import { earn, postPnl, spend } from '../ledger';
+import { earn, spend } from '../ledger';
 import { listLevel } from '../nominal';
 import type { Branch, BranchPnl, GameState } from '../state';
 import type { CampaignEffects } from './marketing';
@@ -63,7 +63,6 @@ export function closeBranchWeek(state: GameState, branch: Branch, wk: BranchWeek
     loanDesk: wk.loanInterest,
     otherIncome,
     compute: wk.compute,
-    losses: wk.losses,
     staff: wk.staff,
     manager: wk.manager,
     rent: wk.rent,
@@ -75,7 +74,6 @@ export function closeBranchWeek(state: GameState, branch: Branch, wk: BranchWeek
   const revenue = lines.plans + lines.api + lines.apps + lines.loanDesk + otherIncome;
   const expenses =
     wk.compute +
-    wk.losses +
     wk.staff +
     wk.manager +
     wk.rent +
@@ -108,6 +106,5 @@ export function closeBranchWeek(state: GameState, branch: Branch, wk: BranchWeek
   spend(state, 'servicing', wk.servicing);
   spend(state, 'compute', wk.compute);
   spend(state, 'underwriting', wk.underwriting);
-  postPnl(state, 'loanLosses', wk.losses);
   return row;
 }

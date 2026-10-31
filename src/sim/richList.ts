@@ -12,7 +12,7 @@ import { pushEvent } from './events';
 import { netWorth } from './netWorth';
 import { stream } from './rng';
 import type { GameState, RichFortune } from './state';
-import { homeCountry } from './treasury';
+import { homeCountry } from './homeCountry';
 
 /** Most draws spent looking for an unused name before accepting a repeat. */
 const NAME_TRIES = 20;
@@ -76,7 +76,6 @@ export function richListYear(state: GameState): void {
   const worth = netWorth(state).total;
   const prev = list.rank;
   const rank = rankFor(list.fortunes, worth);
-  list.lastRankWeek = state.clock.week;
   if (rank === undefined) {
     delete list.rank;
     return;

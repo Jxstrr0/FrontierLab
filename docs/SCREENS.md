@@ -211,7 +211,7 @@ After the wizard, the map opens with the tutorial (§27).
 ### 5.5 Finance
 - **Headline figures:** office revenue (with weekly change in $ and %) and office income (with change).
 - **Chart:** paired bars for the last 5 weeks.
-- **Office income statement** (Week | Quarter | Year), with the line groups from SIMULATION §12 (Other income is demo kiosk fees; Bad debts is the expense row for unpaid contracts).
+- **Office income statement** (Week | Quarter | Year), with the line groups from SIMULATION §12 (Other income is demo kiosk fees).
 - **Balances box:** ARR (contracts included), Customers.
 - **Office size card:** the size (Starter, Standard, Large or Flagship), the cost to grow to the next one and its new weekly rent, and a **Grow office** button (confirm, showing fit-out, extra lease deposit, total and new rent; the reason shows under the button when it can't). At Flagship the card says it is the largest size.
 - **Footer:** Rename, Close sales office (confirm, showing what you get back; with one office per city, accounts go to the office in the nearest city).
@@ -220,7 +220,7 @@ After the wizard, the map opens with the tutorial (§27).
 
 - **Entry points:** a **Build data center** button under Build sales office on an available storefront (§3), with its own blocker line; an **Energy site** section on a regional employer's panel (§14) listing your data centers there with a **Build data center** button; your data center's pin on the map (your crest, noted "Data center" or "Fit-out"), its row on the city list, and a **Data centers** list under the Sales offices screen (§25).
 - **Build data center:** three part tiles (GPU hall, Power, Cooling) with price and what each does; tapping one opens a sheet listing that slot's options. A **Running it** card (GPUs running, power bill and rent a week, fit-out weeks), a note when the power feed can't run the whole hall, then a summary (parts, deposit, first week's rent, total, cash available) and **Build for $X**.
-- **Data center panel:** header with the name, place and city; the advisor says how long the fit-out has left, or that its GPUs serve customers before spot and which cities get faster service. The Compute card (§24) sits under the status card. Status card (Online or Fit-out with weeks left, GPUs in the hall, GPUs running (red when power caps it), PUE). Parts as tiles with **Upgrade** (a sheet that greys out parts no better than the fitted one or that you can't afford; the hall is locked during fit-out; "Best fitted" on the top part). Weekly costs (rent, power). **Close data center** with a confirmation showing equipment sold, deposit back and cash back.
+- **Data center panel:** header with the name, place and city; the advisor says how long the fit-out has left, or that its GPUs serve customers before spot and which cities get faster service. The Compute card (§24) sits under the status card. Status card (Online or Fit-out with weeks left, GPUs in the hall, GPUs running (red when power caps it), PUE). Parts as tiles with **Upgrade** (a sheet that greys out parts no better than the fitted one or that you can't afford; the hall is locked during fit-out; "Best fitted" on the top part). Weekly costs (rent, power). **Rename data center** (a sheet with one name field, Cancel and Save, like renaming a sales office; up to `BRANCH_NAME_MAX` characters) and **Close data center** with a confirmation showing equipment sold, deposit back and cash back.
 
 - **Power deal:** on an energy site's employer panel, above the Energy site section, in place of the plans deal (SIMULATION §13.7a). Before signing: what the deal brings (contracted GPUs in the pool, X% off power for your data centers in the country), signing fee, contract years, price per GPU-week, a take-or-pay note, the blocker line and **Sign · $X**. Once signed: health bar, "Year X of 7", contracted GPUs, weekly bill, price per GPU-week, a line on what moves health, **Renew · $X** (opens in the last year) and **Release** with a confirmation. The data center screens show the discounted power bill.
 
@@ -246,7 +246,6 @@ No tabs: one overview page.
 - **Indicators:** GDP growth last quarter and forecast, inflation, unemployment, house price index trend.
 - **Yield curve mini-chart:** overnight / 2y / 5y / 10y.
 - **Rate note:** in a country where you're licensed, "Your {n} sales offices in {country} sell into an economy this rate steers: customer budgets rise and fall with it."
-- **Standing lending facility:** only in the home country and only for a bank-era save that still carries funding (`hasLegacyFunding`): the facility card (rate, usage, Borrow / Repay with a stigma warning). Otherwise there is no card (SIMULATION §13.5).
 
 ## 9. Office for lease
 
@@ -275,7 +274,7 @@ No tabs: one overview page.
 **Floor-specific content:**
 - **Finance:**
   - **Results:** total revenue and net income with weekly change, and the bar chart
-  - **Runway and liquidity:** runway (SIMULATION §15, what lenders price on): months or "Not burning cash", the runway tier badge, a four-band meter (Critical under 6 months, Tight 6–12, Comfortable 12–24, Strong 24+) and a Net burn row; the liquidity ratio and target rows show only when there is a liquidity ratio (bank-era saves with deposits)
+  - **Runway:** runway (SIMULATION §15, what lenders price on): months or "Not burning cash", the runway tier badge, a four-band meter (Critical under 6 months, Tight 6–12, Comfortable 12–24, Strong 24+) and a Net burn row
   - (The Launch posture dial moved to the Safety & Alignment floor on 2026-10-30.)
 - **Safety & Alignment** also carries, under the regulator card:
   - **Launch posture** (code `riskAppetite`, SIMULATION §16.8): Segmented (1–5, "Launch posture, 1 very cautious to 5 very bold"), with the level's name (Very cautious, Cautious, Balanced, Bold, Very bold), a hint such as "Deal odds +6 pts, safety exposure +16%, and over-claims are likelier." ("Standard deal odds and safety risk." at Balanced) and a line naming who else steers it: the Chief Safety Officer ("tunes this to the safety tier every 4 weeks"; Launch posture switch)
@@ -308,13 +307,10 @@ No tabs: one overview page.
   - **Compute pool:** the Compute card (§24), with a "GPUs rented in lots" row when you have any, then the **Compute policy** card: spot limit this week, emergency burst on top, the "GPU offers +8%" stigma row while it lasts, a note on how the limit moves, and the **Auto spot-buy** toggle (hint: buys at spot then burst / runs on your own GPUs only, with a waitlist)
   - **Rented GPUs:** totals card (GPUs rented, weekly bill), then lot cards with provider, reservation type, price per GPU-week, GPUs, end date, weeks left and a rosette (Cost, Term, Reliability, Flexibility, Latency). No early cancel.
   - **GPU market:** offer cards with provider, type, price per GPU-week, "Up to" GPUs, term, price vs spot and rosette, a GPU slider (step 50+) with Max, **Rent N GPUs**, the weekly bill under it, and when the next offers arrive
-  - **Legacy funding** (only while a bank-era save still carries deposits, wholesale lots, overnight or window borrowing, `hasLegacyFunding`): Liquidity (gauge and policy), Funding inventory, Funding market, Central bank (the standing facility from §8).
   - **Partnerships:** cards with employer, people, ARR, seats and a health bar. Tap to open the partnership view (§14).
 - **Marketing:** brand awareness by city (bars), brand campaign cards (scope: city or country; level; cost), active agency packages.
 - **Platform & Security** (dept id `it`): Mobile app (rating coins with a 26-week trend), Security (posture summary), Digital projects (developments of type Digital).
 - **Safety & Alignment** (dept id `risk`):
-  - **Losses:** a loan delinquency card, shown only when a bank-era save still has loans to report
-  - **Model performance:** predicted vs actual losses
   - **Regulator and safety:** safety ratio with tier badge and the safety meter, Safety cover, Model exposure, Next safety audit, Chance it fails, Last safety audit, Failed audits, and a notice during a mandated pause, a revoked licence or strict watch
 - **Executive:**
   - Board meeting card: explanation, last meeting date, Hold meeting (enabled once per quarter)
@@ -584,7 +580,7 @@ Opens on the first tick of a new year, after the results modal closes (before an
 - share price or private valuation, with the 52-week range, market cap, your stake and top shareholders
 - a Personal line: personal cash plus holdings
 - one-line explanations ("Grow recurring revenue; watch the compute bill") with a "Learn more" sheet: Revenue recurs, compute bills · Compute: own it or rent it · Safety limits growth · Runway
-- statements: the income statement runs Plans, API, Apps & services, Enterprise contracts, Other income → Revenue → Compute → Gross profit → Operating expenses → Interest expense (when any) → Bad debts → Depreciation → Pre-tax → Tax → Net income. The balance sheet lines are in SIMULATION §14.4; treasury reserves, loans, stocks, ventures, compute credits, real estate, partnership fees, goodwill, deposits, wholesale funding, corporate debt and dividends payable show only when non-zero.
+- statements: the income statement runs Plans, API, Apps & services, Enterprise contracts, Other income → Revenue → Compute → Gross profit → Operating expenses → Interest expense (when any) → Write-offs → Depreciation → Pre-tax → Tax → Net income. The balance sheet lines are in SIMULATION §14.4; stocks, ventures, compute credits, real estate, partnership fees, goodwill, corporate debt and dividends payable show only when non-zero.
 - **Goals:** two buttons, Milestones (n of 32) and Frontier projects (n of 6), which open §28 and §28a
 - links to the full statements (Finance floor, or a simplified view without an HQ)
 

@@ -20,7 +20,6 @@ import {
 import { clusterLabel } from '../../src/app/map/pinElements';
 import { buildPins, type PinKind, type PinSpec } from '../../src/app/map/pins';
 import { generateCityMap } from '../../src/art/citygen';
-import { FEATURES } from '../../src/config/balance';
 import { CITIES } from '../../src/data/cities';
 import { RIVALS } from '../../src/data/rivals';
 import { newGame } from '../../src/sim/newGame';
@@ -149,7 +148,7 @@ describe('captions', () => {
     const lots = Object.values(s.world.lots).filter((l) => l.cityId === 'cal');
     const sites = Object.values(s.world.sites).filter((x) => x.cityId === 'cal');
     const map = generateCityMap(CITIES.cal!, s.meta.seed, lots, { sites });
-    const pins = buildPins(s, map, lots, { ...FEATURES, competition: true, hq: true });
+    const pins = buildPins(s, map, lots);
     const rival = pins.find((p) => p.kind === 'rival')!;
     expect(rival.caption).toBe(rivalShortName(rival.label.split(' sales office, ')[0]!));
     const hq = pins.find((p) => p.kind === 'rivalHq')!;

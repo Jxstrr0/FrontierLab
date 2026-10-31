@@ -37,7 +37,6 @@ describe('rival shares under your own offer', () => {
       pricePerShare: 1,
       total: 1,
       premium: 0.5,
-      madeWeek: 0,
       respondWeek: 1,
       status: 'pending',
       distressed: false,

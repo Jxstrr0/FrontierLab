@@ -6,7 +6,7 @@ import { dateOf, quarterOf } from '../../sim/calendar';
 import type { Account } from '../../sim/portfolio';
 import { startupShares } from '../../sim/portfolio';
 import type { GameState, Startup } from '../../sim/state';
-import { homeCountry } from '../../sim/treasury';
+import { homeCountry } from '../../sim/homeCountry';
 import { accessBlock } from '../../sim/ventureAccess';
 import { isPrivate } from '../../sim/ventureGen';
 import { maxVentureDebt } from '../../sim/ventureModel';

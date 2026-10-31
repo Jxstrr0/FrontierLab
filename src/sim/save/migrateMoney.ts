@@ -4,6 +4,7 @@
 // funding that once carried Loan Desk loans is repaid from reserves, then cash,
 // now that the desk only lends what reserves hold. Equity is unchanged.
 import type { GameState } from '../state';
+import { legacyTreasury } from './legacyTreasury';
 
 type OldRow = { revenue?: number; lines?: Record<string, number> };
 
@@ -44,7 +45,7 @@ export function migrateMoney(state: GameState): void {
       row.income = income;
     }
   }
-  const t = state.treasury;
+  const t = legacyTreasury(state);
   const owed = t.overnight + t.window;
   t.reserves -= owed;
   t.overnight = 0;

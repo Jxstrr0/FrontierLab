@@ -11,7 +11,7 @@ import { advanceDay } from '../../src/sim/engine';
 import { ventureDebtValue, venturesValue } from '../../src/sim/portfolio';
 import { rngFromState } from '../../src/sim/rng';
 import type { GameState, Startup } from '../../src/sim/state';
-import { homeCountry } from '../../src/sim/treasury';
+import { homeCountry } from '../../src/sim/homeCountry';
 import { acquireStartup, failStartup, ipoStartup } from '../../src/sim/ventureExits';
 import { openRound } from '../../src/sim/ventureRounds';
 import { refreshPipeline } from '../../src/sim/ventures';

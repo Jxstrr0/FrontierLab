@@ -3,7 +3,6 @@
 // of status chips (Skip ahead, the quarter's Board meeting, open cases, weeks in
 // the red), the Layers button, the city pill (tap for the Travel sheet) and the
 // Menu button.
-import { FEATURES } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { PlaneIcon } from '../airport/AirportMedallion';
 import { Icon, Medallion } from '../components';
@@ -97,19 +96,17 @@ export function Hud() {
                 {FAILURE.insolvencyWeeks}
               </button>
             )}
-            {FEATURES.capitalMarkets &&
-              boardChipQuarter.value === quarterLabel(s) &&
-              boardDue(s) && (
-                <button
-                  type="button"
-                  class="hud-chip hud-board"
-                  aria-label="The board is ready to meet. Hold the meeting"
-                  onClick={() => (modal.value = { type: 'boardMeeting' })}
-                >
-                  Board
-                </button>
-              )}
-            {FEATURES.competition && <CasesChip />}
+            {boardChipQuarter.value === quarterLabel(s) && boardDue(s) && (
+              <button
+                type="button"
+                class="hud-chip hud-board"
+                aria-label="The board is ready to meet. Hold the meeting"
+                onClick={() => (modal.value = { type: 'boardMeeting' })}
+              >
+                Board
+              </button>
+            )}
+            <CasesChip />
             {!s.flags.gameOver && (
               <button
                 type="button"
@@ -125,31 +122,25 @@ export function Hud() {
         </div>
       </div>
       <div class="hud-bottom">
-        {FEATURES.cityMap && (
-          <button
-            type="button"
-            class="hud-chip hud-layers"
-            aria-label="Map layers"
-            onClick={() => (sheet.value = 'layers')}
-          >
-            <LayerIcon id="branches" size={22} />
-            <span>Layers</span>
-          </button>
-        )}
-        {FEATURES.multiCity ? (
-          <button
-            type="button"
-            class="hud-chip hud-city is-tappable"
-            aria-label={`${city?.name ?? ''}. Travel`}
-            data-tutorial="hud-travel"
-            onClick={() => (sheet.value = 'travel')}
-          >
-            <PlaneIcon size={16} filled />
-            <span>{city?.name ?? ''}</span>
-          </button>
-        ) : (
-          <div class="hud-chip hud-city">{city?.name ?? ''}</div>
-        )}
+        <button
+          type="button"
+          class="hud-chip hud-layers"
+          aria-label="Map layers"
+          onClick={() => (sheet.value = 'layers')}
+        >
+          <LayerIcon id="branches" size={22} />
+          <span>Layers</span>
+        </button>
+        <button
+          type="button"
+          class="hud-chip hud-city is-tappable"
+          aria-label={`${city?.name ?? ''}. Travel`}
+          data-tutorial="hud-travel"
+          onClick={() => (sheet.value = 'travel')}
+        >
+          <PlaneIcon size={16} filled />
+          <span>{city?.name ?? ''}</span>
+        </button>
         <button
           type="button"
           class="hud-chip hud-menu"

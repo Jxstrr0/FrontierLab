@@ -5,7 +5,7 @@
 // through `raiseIncident`; the player answers through commands/incidents.ts.
 // Per-type rules live in src/sim/incident/ (bank-era branch and company rules,
 // the AI-native aiRules and computeRules), numbers in src/data/incidentParams.ts.
-import { BANK_RUN, EXEC_DELEGATION, FEATURES, INCIDENTS, type FeatureId } from '../config/balance';
+import { BANK_RUN, EXEC_DELEGATION, INCIDENTS } from '../config/balance';
 import { INCIDENT_SPECS, type IncidentSpec } from '../data/incidents';
 import { pushEvent } from './events';
 import { delegationOn } from './execSeats';
@@ -32,21 +32,6 @@ const RULES: Record<string, IncidentRule> = {
   ...FOUNDER_RULES,
   ...VETERAN_RULES,
 };
-
-/** The feature flag each later ROADMAP stage switches on. */
-const STAGE_FEATURE: Record<number, FeatureId> = {
-  6: 'capitalMarkets',
-  7: 'investments',
-  8: 'multiCity',
-  9: 'personalEmpire',
-};
-
-/** False for incidents whose systems arrive in a later stage (executives, dividends…). */
-export function stageReady(spec: IncidentSpec): boolean {
-  if (spec.stage === undefined) return true;
-  const flag = STAGE_FEATURE[spec.stage];
-  return flag !== undefined && FEATURES[flag];
-}
 
 /** True when a type has a rule (every CONTENT §22 incident does). */
 export const hasRule = (type: string): boolean => RULES[type] !== undefined;
@@ -79,7 +64,7 @@ export function raiseIncident(
 ): Incident | undefined {
   const spec = INCIDENT_SPECS[type];
   const rule = RULES[type];
-  if (!spec || !rule || !stageReady(spec) || onCooldown(state, type, scope)) return undefined;
+  if (!spec || !rule || onCooldown(state, type, scope)) return undefined;
   const week = state.clock.week;
   const sym = state.settings.currency;
   const d = { ...data };
@@ -248,7 +233,7 @@ function bestOption(state: GameState, inc: Incident, weekly: number, sd: number)
 
 /** Tick step 15: effects and cooldowns expire, deadlines pass, runs tick, new cases roll. */
 export function runIncidents(state: GameState): void {
-  if (!FEATURES.competition || state.flags.gameOver) return;
+  if (state.flags.gameOver) return;
   const week = state.clock.week;
   expireEffects(state);
   for (const [key, until] of Object.entries(state.incidents.cooldowns)) {
@@ -287,7 +272,7 @@ function rollIncidents(state: GameState): void {
   const branches = Object.values(state.branches).filter((b) => b.status === 'open');
   for (const spec of Object.values(INCIDENT_SPECS)) {
     const rule = RULES[spec.id];
-    if (spec.trigger !== 'rolled' || !rule?.chance || !stageReady(spec)) continue;
+    if (spec.trigger !== 'rolled' || !rule?.chance) continue;
     const scopes =
       spec.scope === 'branch'
         ? branches.map((b) => b.id)
