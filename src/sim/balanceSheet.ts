@@ -1,18 +1,13 @@
 // The company balance sheet (SIMULATION §14.4), computed from state on demand.
 // Equity is assets minus liabilities; `expectedEquity` rolls paid-in capital,
 // retained earnings and AOCI forward, and the two must agree (balance identity).
-import { isDeposit, isLoan } from '../data/products';
-import { totalWholesale } from './fundingLots';
 import { summarize } from './ledger';
 import { franchiseValue, realEstateValue, ventureDebtValue, venturesValue } from './portfolio';
 import { holdingsValue } from './securities';
-import { productSpec } from './products';
 import type { GameState } from './state';
 
 export interface BalanceSheet {
   cash: number;
-  reserves: number;
-  loans: number;
   fixedAssets: number;
   leaseDeposits: number;
   /** Unamortized partnership signing fees (deducted from CET1, §15). */
@@ -30,8 +25,6 @@ export interface BalanceSheet {
   /** Goodwill from acquisitions (§19.8, deducted from CET1). */
   goodwill: number;
   assets: number;
-  deposits: number;
-  wholesale: number;
   /** Venture debt and drawn credit lines from investment banks (§19.9). */
   corporateDebt: number;
   /** Dividends declared but not yet paid (§14.4). */
@@ -47,18 +40,6 @@ export function assetBookValue(a: { cost: number; lifeWeeks: number; ageWeeks: n
   return a.cost * Math.max(0, 1 - a.ageWeeks / a.lifeWeeks);
 }
 
-/** Branch deposit books (partnership mini-books hold ARR since C3a). */
-export function totalDeposits(state: GameState): number {
-  let total = 0;
-  for (const b of Object.values(state.branches)) {
-    for (const [pid, book] of Object.entries(b.books)) {
-      const spec = productSpec(state, pid);
-      if (spec && isDeposit(spec)) total += book.balance;
-    }
-  }
-  return total;
-}
-
 /** Unamortized partnership and power-deal signing fees. */
 export function intangibleAssets(state: GameState): number {
   let total = 0;
@@ -67,7 +48,7 @@ export function intangibleAssets(state: GameState): number {
   return total;
 }
 
-/** Corporate debt owed to rival banks: loan balances plus drawn lines. */
+/** Corporate debt owed to investment banks: loan balances plus drawn lines. */
 export function corporateDebtTotal(state: GameState): number {
   const d = state.corporateDebt;
   let total = 0;
@@ -76,26 +57,8 @@ export function corporateDebtTotal(state: GameState): number {
   return total;
 }
 
-/** Loan balances weighted by risk weight, and in total. */
-export function loanTotals(state: GameState): { total: number; rwa: number } {
-  let total = 0;
-  let rwa = 0;
-  for (const b of Object.values(state.branches)) {
-    for (const [pid, book] of Object.entries(b.books)) {
-      const spec = productSpec(state, pid);
-      // Enterprise contracts (kind 'sbl', C5b) are not loans.
-      if (!spec || !isLoan(spec) || spec.kind === 'sbl') continue;
-      total += book.balance;
-      rwa += book.balance * spec.riskWeight;
-    }
-  }
-  return { total, rwa };
-}
-
 export function balanceSheet(state: GameState): BalanceSheet {
   const c = state.company;
-  const t = state.treasury;
-  const loans = loanTotals(state).total;
   const fixedAssets = c.fixedAssets.reduce((sum, a) => sum + assetBookValue(a), 0);
   const intangibles = intangibleAssets(state);
   const investments = holdingsValue(state, 'company');
@@ -105,8 +68,6 @@ export function balanceSheet(state: GameState): BalanceSheet {
   const franchise = franchiseValue(state, 'company');
   const assets =
     c.cash +
-    t.reserves +
-    loans +
     fixedAssets +
     c.leaseDeposits +
     intangibles +
@@ -116,15 +77,11 @@ export function balanceSheet(state: GameState): BalanceSheet {
     realEstate +
     franchise +
     c.goodwill;
-  const deposits = totalDeposits(state);
-  const wholesale = totalWholesale(state);
   const corporateDebt = corporateDebtTotal(state);
   const dividendsPayable = state.governance.pendingDividend?.total ?? 0;
-  const liabilities = deposits + wholesale + corporateDebt + dividendsPayable + c.taxPayable;
+  const liabilities = corporateDebt + dividendsPayable + c.taxPayable;
   return {
     cash: c.cash,
-    reserves: t.reserves,
-    loans,
     fixedAssets,
     leaseDeposits: c.leaseDeposits,
     intangibles,
@@ -135,8 +92,6 @@ export function balanceSheet(state: GameState): BalanceSheet {
     franchise,
     goodwill: c.goodwill,
     assets,
-    deposits,
-    wholesale,
     corporateDebt,
     dividendsPayable,
     taxPayable: c.taxPayable,

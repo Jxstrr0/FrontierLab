@@ -28,7 +28,6 @@ function withIncome(s: GameState, quarterly: number) {
     revenue: quarterly * 3,
     netIncome: quarterly,
     eps: 0,
-    roe: 0,
   }));
 }
 

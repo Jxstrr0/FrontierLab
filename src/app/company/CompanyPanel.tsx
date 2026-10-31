@@ -4,7 +4,7 @@
 // personal line (ShareSummary.tsx), and simplified statements, with a link to
 // the full statements on the HQ Finance floor once you have one.
 import { useState } from 'preact/hooks';
-import { FEATURES, RUNWAY } from '../../config/balance';
+import { RUNWAY } from '../../config/balance';
 import { FRONTIER_PROJECT_LIST } from '../../data/frontierProjects';
 import { MILESTONES } from '../../data/milestones';
 import { companyArr } from '../../sim/arr';
@@ -106,7 +106,7 @@ export function CompanyPanel() {
           <SafetyNotice s={s} />
           <CapitalMeter ratio={safe.ratio} tier={safe.tier} kind="safety" lift={tierLift(s)} />
           <CapitalFixes tier={safe.tier} listing={s.stock.status} />
-          {FEATURES.hq && s.departments.risk && (
+          {s.departments.risk && (
             <button
               type="button"
               class="btn btn-secondary btn-block"
@@ -128,9 +128,9 @@ export function CompanyPanel() {
           </Card>
         </div>
 
-        {FEATURES.capitalMarkets && <ShareSummary s={s} />}
+        <ShareSummary s={s} />
 
-        {FEATURES.investments && <RealEstateCard />}
+        <RealEstateCard />
 
         <button type="button" class="btn btn-secondary btn-block" onClick={() => setLearn(true)}>
           How this works
@@ -160,17 +160,15 @@ export function CompanyPanel() {
 
         <div>
           <SectionTitle>Statements</SectionTitle>
-          {FEATURES.hq && (
-            <button
-              type="button"
-              class="btn btn-secondary btn-block co-hq-link"
-              onClick={() =>
-                openPanel(s.departments.finance ? { type: 'hq', dept: 'finance' } : { type: 'hq' })
-              }
-            >
-              {s.departments.finance ? 'Full statements on the Finance floor' : 'Open HQ'}
-            </button>
-          )}
+          <button
+            type="button"
+            class="btn btn-secondary btn-block co-hq-link"
+            onClick={() =>
+              openPanel(s.departments.finance ? { type: 'hq', dept: 'finance' } : { type: 'hq' })
+            }
+          >
+            {s.departments.finance ? 'Full statements on the Finance floor' : 'Open HQ'}
+          </button>
           <Statements state={s} />
         </div>
       </div>

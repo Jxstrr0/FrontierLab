@@ -25,8 +25,6 @@ function devDefaultRule(base: ProductSpec, m: TemplateMods, tier: DevTier): Defa
     case 'ftpShort':
     case 'ftpLong':
       return { ...rule, spread: rule.spread + rateAdd };
-    case 'card':
-      return { base: 'card', value: rule.value + rateAdd };
     case 'fixed':
       return { base: 'fixed', value: (m.defaultFee ?? rule.value) * DEV_TIER.feeMult[tier] };
   }

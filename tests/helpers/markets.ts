@@ -33,7 +33,6 @@ export function setQuarters(s: GameState, roe: number, n = 4): void {
     revenue: equity * 0.1,
     netIncome: (equity * roe) / 4,
     eps: 0,
-    roe,
   }));
 }
 

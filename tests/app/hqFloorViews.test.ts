@@ -1,5 +1,5 @@
-// View helpers behind the Treasury, Marketing and Risk floors (Stage 4 UI):
-// liquidity gauge maths, term text and slider steps, campaign targets and
+// View helpers behind the Compute, Marketing and Risk floors (Stage 4 UI):
+// term text and slider steps, campaign targets and
 // awareness rows and the next regulator review.
 import { describe, expect, it } from 'vitest';
 import {
@@ -11,45 +11,13 @@ import {
   targetName,
 } from '../../src/app/hq/marketing/marketingView';
 import { nextReviewWeek } from '../../src/app/hq/risk/riskView';
-import {
-  GAUGE_MAX,
-  gainTone,
-  liquidityGauge,
-  niceStep,
-  snapAmount,
-  termText,
-} from '../../src/app/hq/treasury/treasuryView';
-import { DAYS_PER_WEEK, LIQ_MIN, LIQ_REPAY_BUFFER } from '../../src/config/balance';
+import { gainTone, niceStep, snapAmount, termText } from '../../src/app/hq/treasury/treasuryView';
+import { DAYS_PER_WEEK } from '../../src/config/balance';
 import { isQuarterStart } from '../../src/sim/calendar';
 import * as cmd from '../../src/sim/commands';
 import { newGame } from '../../src/sim/newGame';
 
-describe('liquidity gauge', () => {
-  const g = (lr: number | null, target = 0.15) =>
-    liquidityGauge(lr, LIQ_MIN, target, LIQ_REPAY_BUFFER);
-
-  it('classifies the ratio against the minimum, target and repay buffer', () => {
-    expect(g(null).status).toBe('none');
-    expect(g(0.08).status).toBe('below');
-    expect(g(0.12).status).toBe('low');
-    expect(g(0.15).status).toBe('ok');
-    expect(g(0.2).status).toBe('ok');
-    expect(g(0.21).status).toBe('high');
-  });
-
-  it('places marker, minimum and target along the bar and pins off-scale ratios', () => {
-    const x = g(0.25, 0.2);
-    expect(x.marker).toBeCloseTo(0.25 / GAUGE_MAX);
-    expect(x.min).toBeCloseTo(LIQ_MIN / GAUGE_MAX);
-    expect(x.target).toBeCloseTo(0.2 / GAUGE_MAX);
-    expect(x.offScale).toBe(false);
-    const far = g(3);
-    expect(far.marker).toBe(1);
-    expect(far.offScale).toBe(true);
-  });
-});
-
-describe('treasury formatting', () => {
+describe('compute floor formatting', () => {
   it('writes terms in weeks or whole years', () => {
     expect(termText(1)).toBe('1 week');
     expect(termText(26)).toBe('26 weeks');

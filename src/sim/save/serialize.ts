@@ -15,7 +15,6 @@ const REQUIRED_KEYS: (keyof GameState)[] = [
   'world',
   'company',
   'branches',
-  'treasury',
   'ledger',
   'history',
 ];

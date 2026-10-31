@@ -58,7 +58,7 @@ export type * from './investmentsTypes';
 export type * from './personalTypes';
 import type { AuctionHouseState, ClubState } from './personalTypes';
 
-export const SCHEMA_VERSION = 37;
+export const SCHEMA_VERSION = 38;
 
 export interface GameState {
   schemaVersion: number;
@@ -89,7 +89,6 @@ export interface GameState {
   talent: TalentState;
   /** Frontier projects: the one under way and those finished (post-C8, schema 27). */
   projects: ProjectsState;
-  treasury: Treasury;
   /** Open RFPs on the Deal Desk (stage C5b; schema 13). Contracts live on the businesses. */
   /** Proposal requests, and public-sector tenders open or held (§11.7, schema 35). */
   dealDesk: { rfps: Record<Id, Rfp>; tenders: Record<Id, Tender> };
@@ -98,7 +97,7 @@ export interface GameState {
   businesses: Record<Id, Business>;
   /** HQ brand campaigns and agency packages (§16.10). */
   marketing: MarketingState;
-  /** Risk floor records: weekly losses by product and regulator reviews (§15, §16). */
+  /** Risk floor records: the regulator's quarterly reviews (§15, §16). */
   risk: RiskState;
   /** Payroll and student partnerships (Stage 5, SIMULATION §13.7). */
   partnerships: Record<Id, Partnership>;
@@ -168,7 +167,6 @@ export interface GameState {
 }
 
 export interface Meta {
-  saveName: string;
   bankName: string;
   monogram: string;
   brandInk: string;
@@ -247,17 +245,14 @@ export interface World {
   officeListings: Record<Id, OfficeListing>;
   /** Credit bureaus, marketing agencies and other non-bank buildings on the map. */
   sites: Record<Id, Site>;
-  /** Flying (Stage 8, DESIGN §5.17): the weekly allowance and lifetime totals. */
+  /** Flying (Stage 8, DESIGN §5.17): the weekly km allowance and the flight count. */
   travel: TravelState;
 }
 
 export interface TravelState {
   /** Free km flown since the last weekly tick (TRAVEL_KM_PER_WEEK allowance). */
   kmThisWeek: number;
-  totalKm: number;
   flights: number;
-  /** Fares paid, lifetime (personal and bank share together). */
-  faresPaid: Money;
 }
 
 export interface OfficeListing {
@@ -330,12 +325,6 @@ export interface CountryState {
   gdpHistory: number[];
   hpiHistory: number[];
   lastDecision?: { week: Week; change: Rate };
-  /** FTP rates seen at the previous weekly tick, to detect moves (§5, §13.4). */
-  prevFtpShort: Rate;
-  prevFtpLong: Rate;
-  /** FTP when card APRs last re-priced (§5). */
-  cardAnchor: Rate;
-  startPolicy: Rate;
   /** Fee products re-price yearly with the economy's nominal growth (§4.6): price = base × feeIndex. */
   feeIndex: number;
   /** Equity market return this week (feeds wealth AUM until markets arrive). */
@@ -381,7 +370,6 @@ export interface Lot {
   footTraffic: number;
   mix: SegmentMix;
   incomeIndex: number;
-  homeownerShare: Pct;
   weeklyRent: Money;
   deposit: Money;
   /** A business (stage C5a) holds its lot for good: it is not for lease. */
@@ -416,8 +404,6 @@ export interface Company {
   pause?: { reason: 'voluntary' | 'revoked'; untilWeek: Week };
   /** Strict watch after a revoked licence ends this week (C7a). */
   watchUntilWeek?: Week;
-  /** Liquid assets ÷ deposits; null while there are no deposits. */
-  liquidityRatio: number | null;
   appRating: Stars;
   riskAppetite: 1 | 2 | 3 | 4 | 5;
   applyRatesToAll: boolean;
@@ -570,9 +556,6 @@ export interface Book {
     newVolume: Money;
     deltaAccounts: number;
     churned: number;
-    defaulted: Money;
-    /** Loans that defaulted this week (business loans only; added in v12). */
-    defaultedLoans?: number;
   };
 }
 
@@ -584,7 +567,6 @@ export type BranchPnlLine =
   | 'loanDesk'
   | 'otherIncome'
   | 'compute'
-  | 'losses'
   | 'staff'
   | 'manager'
   | 'rent'
@@ -745,25 +727,6 @@ export interface MarketingState {
   cityBonus: Record<Id, { bonus: number; weeksLeft: number }>;
 }
 
-export interface LossWeek {
-  week: Week;
-  /** Exposure, defaults and losses by product id (sbl covers Loan Desk loans). */
-  byProduct: Record<string, LossLine>;
-  /** Expected loss from booked PDs this week, for model performance. */
-  expected: Money;
-}
-
-/** One product's week on the Risk floor. Balances are before this week's defaults. */
-export interface LossLine {
-  balance: Money;
-  /** Balance that defaulted this week. */
-  defaulted: Money;
-  /** Loss after recoveries. */
-  loss: Money;
-  /** Defaults the booked PDs predicted (balance × PD / 52, before the credit cycle). */
-  expectedDefaults: Money;
-}
-
 export interface RegulatorReview {
   week: Week;
   passed: boolean;
@@ -771,8 +734,6 @@ export interface RegulatorReview {
 }
 
 export interface RiskState {
-  /** Last 13 weeks of losses (§16, Risk floor). */
-  losses: LossWeek[];
   reviews: RegulatorReview[];
 }
 
@@ -944,47 +905,6 @@ export interface UnderwritingState {
   launch?: { modelId: Id; week: Week; headroom: number; awareness: number; holdUntil?: Week };
 }
 
-// ─── Treasury, Loan Desk ──────────────────────────────────────────────────────
-
-export interface Treasury {
-  /** The Loan Desk's lending fund (C3b); government bonds were removed in C3c. */
-  reserves: Money;
-  liqTarget: Pct;
-  autoFunding: boolean;
-  freeze: boolean;
-  overnight: Money;
-  window: Money;
-  windowStigmaWeeks: number;
-  /** Wholesale funding lots bought from the funding market (§13.6). */
-  lots: FundingLot[];
-  offers: FundingOffer[];
-  offersRefreshWeek: Week;
-}
-
-/** Radar order: Cost, Term, Stability, Flexibility, Discretion. */
-export interface FundingLot {
-  id: Id;
-  type: string;
-  counterparty: string;
-  amount: Money;
-  rate: Rate;
-  startWeek: Week;
-  maturityWeek: Week;
-  radar: Pentagon;
-}
-
-export interface FundingOffer {
-  id: Id;
-  type: string;
-  counterparty: string;
-  /** Maximum you can borrow. */
-  amount: Money;
-  rate: Rate;
-  termWeeks: number;
-  radar: Pentagon;
-  expiresWeek: Week;
-}
-
 // ─── Rivals, REO ──────────────────────────────────────────────────────────────
 
 export interface RivalBank {
@@ -997,8 +917,6 @@ export interface RivalBank {
   branches: RivalBranch[];
   /** One rate sheet per rival (all its branches share it). */
   prices: Record<string, number>;
-  /** Pending deposit-beta / loan pass-through moves (§5). */
-  priceLags: Record<string, { target: number; weeksLeft: number }>;
   appRating: Stars;
   /** 'merged' is bought by another rival (§18.8); 'acquired' is bought by you. */
   status: 'active' | 'distressed' | 'seized' | 'acquired' | 'merged';
@@ -1074,17 +992,10 @@ export interface RivalBranch {
 
 export type PnlLine =
   | 'loanInterest'
-  | 'reserveInterest'
-  | 'bondCoupon'
-  | 'depositInterest'
-  | 'wholesaleInterest'
   | 'accountFees'
   | 'cardFees'
-  | 'wealthFees'
   | 'serviceFees'
   | 'atmFees'
-  | 'originationFees'
-  | 'realizedGains'
   | 'branchStaff'
   | 'managers'
   | 'rent'
@@ -1145,16 +1056,13 @@ export interface WeeklySnapshot {
   week: Week;
   revenue: Money;
   netIncome: Money;
-  netRevenue: Money;
   cashFlow: { ops: Money; investing: Money; financing: Money; net: Money };
   totals: {
     assets: Money;
     /** Annual recurring revenue at the close (C3a); absent in weeks closed before schema 6. */
     arr?: Money;
-    deposits: Money;
-    loans: Money;
     equity: Money;
-    liquid: Money;
+    /** Taxes payable at the close (the cash-flow reconciliation reads it). */
     taxPayable: Money;
   };
   pnl: Record<PnlLine, Money>;
@@ -1200,5 +1108,4 @@ export interface QuarterReport {
   revenue: Money;
   netIncome: Money;
   eps: number;
-  roe: number;
 }

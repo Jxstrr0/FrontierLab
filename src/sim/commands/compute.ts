@@ -1,8 +1,7 @@
 // Compute commands (stage C4b, SIMULATION §13.0): renting GPUs from an offer
 // on the Compute floor's GPU market. A lot can't be cancelled early.
 import { GPU_MARKET } from '../../config/balance';
-import { hasTreasuryFloor } from '../fundingMarket';
-import { rentedGpus } from '../gpuMarket';
+import { hasTreasuryFloor, rentedGpus } from '../gpuMarket';
 import { newId } from '../ids';
 import type { GameState } from '../state';
 import { fail, ok, type CommandResult } from './result';

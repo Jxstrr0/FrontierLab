@@ -1,9 +1,7 @@
 // Central bank panel (SCREENS §8) for any country: the institution and city,
 // a line from the governor's office, the big policy rate with the last
 // decision and the next meeting (and how many of your branches price off it),
-// the economy's indicators, the yield curve and — for your home country only,
-// wherever you stand — the standing lending facility (the Treasury floor's
-// CentralBankFacility, with its stigma warning on first use).
+// the economy's indicators and the yield curve.
 import { DAYS_PER_WEEK } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { COUNTRIES } from '../../data/countries';
@@ -19,12 +17,8 @@ import {
 import { hpiYoY } from '../../sim/macro';
 import type { CountryState, GameState } from '../../sim/state';
 import { theCountryName } from '../../sim/newsStory';
-import { homeCountry } from '../../sim/treasury';
 import { Badge, Card, Panel, Row, SectionTitle } from '../components';
 import { gameDate, pct, signedPct } from '../format/format';
-import { CentralBankFacility } from '../hq/treasury/CentralBankFacility';
-import { hasLegacyFunding } from '../hq/treasury/legacyFunding';
-import '../hq/treasury/treasury.css';
 import { closePanel, useGame } from '../store';
 import { CentralBankArt } from './CentralBankArt';
 import { CentralBankMedallion } from './CentralBankMedallion';
@@ -76,7 +70,6 @@ export function CentralBankPanel(p: { countryId: CountryId }) {
       </Panel>
     );
   }
-  const home = homeCountry(s).id === p.countryId;
   const yours = Object.values(s.branches).filter(
     (b) => b.status !== 'closed' && CITIES[b.cityId]?.country === p.countryId,
   ).length;
@@ -165,9 +158,6 @@ export function CentralBankPanel(p: { countryId: CountryId }) {
             <YieldCurveChart curve={curve} />
           </Card>
         </div>
-
-        {/* C8f: the standing facility lends only to bank-era saves with funding to manage. */}
-        {home && hasLegacyFunding(s) && <CentralBankFacility />}
       </div>
     </Panel>
   );

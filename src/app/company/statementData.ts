@@ -54,7 +54,7 @@ export function incomeStatement(snaps: WeeklySnapshot[]): StatementLine[] {
     { label: 'Gross profit', value: x.grossProfit, kind: 'total' },
     { label: 'Operating expenses', value: -(x.opex - x.compute) },
     ...optional('Interest expense', -x.interestExpense),
-    { label: 'Bad debts', value: -x.loanLosses },
+    { label: 'Write-offs', value: -x.loanLosses },
     { label: 'Depreciation', value: -x.depreciation },
     { label: 'Pre-tax income', value: x.preTax, kind: 'total' },
     { label: 'Tax', value: -x.tax },
@@ -79,12 +79,8 @@ export function balanceSheetLines(s: GameState): StatementLine[] {
   // Lines that only appear once something is in them (later-stage assets and liabilities).
   const optional = (label: string, value: number): StatementLine[] =>
     Math.abs(value) >= 0.5 ? [{ label, value, kind: 'sub' }] : [];
-  // C3b: bank-only lines (reserves, deposits, wholesale funding) show only
-  // while they hold money. Bonds and foreclosed property went in C3c.
   return [
     { label: 'Cash', value: b.cash, kind: 'sub' },
-    ...optional('Treasury reserves', b.reserves),
-    ...optional('Loans', b.loans),
     ...optional('Stocks', b.investments),
     ...optional('Ventures', b.ventures),
     ...optional('Compute credits', b.ventureDebt),
@@ -94,8 +90,6 @@ export function balanceSheetLines(s: GameState): StatementLine[] {
     ...optional('Partnership fees', b.intangibles),
     ...optional('Goodwill', b.goodwill),
     { label: 'Total assets', value: b.assets, kind: 'total' },
-    ...optional('Deposits', b.deposits),
-    ...optional('Wholesale funding', b.wholesale),
     ...optional('Corporate debt', b.corporateDebt),
     ...optional('Dividends payable', b.dividendsPayable),
     { label: 'Taxes payable', value: b.taxPayable, kind: 'sub' },

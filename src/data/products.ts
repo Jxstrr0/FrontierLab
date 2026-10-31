@@ -34,11 +34,10 @@ export type ProductKind =
  */
 export type PriceType = 'rate' | 'feeMonthly' | 'feeAnnual' | 'perUnit' | 'pctFee';
 
-/** Default price rule (SIMULATION §5). `fixed` prices re-price with the fee index or card anchor. */
+/** Default price rule (SIMULATION §5). `fixed` prices re-price with the fee index. */
 export type DefaultRule =
   | { base: 'ftpShort' | 'ftpLong'; spread: number; floor?: number }
-  | { base: 'fixed'; value: number }
-  | { base: 'card'; value: number };
+  | { base: 'fixed'; value: number };
 
 export interface ProductSpec {
   id: string;

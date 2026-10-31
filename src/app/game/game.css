@@ -4,13 +4,6 @@
   position: relative;
   overflow: hidden;
 }
-.game-view {
-  height: 100%;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  padding: calc(var(--safe-top) + 72px) calc(var(--safe-right) + var(--space-4))
-    calc(var(--safe-bottom) + 88px) calc(var(--safe-left) + var(--space-4));
-}
 .hud-top,
 .hud-bottom {
   position: fixed;

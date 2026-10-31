@@ -143,7 +143,6 @@ export interface PersonalEmpire {
   richList: {
     fortunes: RichFortune[];
     rank?: number;
-    lastRankWeek?: Week;
     /** The home country's nominal index at the last year end (§22): fortunes grow with it. */
     nominalRef?: number;
   };

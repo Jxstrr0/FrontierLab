@@ -1,7 +1,6 @@
 // Builds the tutorial's views of the game (TutorialObs for Part 1, LessonObs
 // for Part 2) from the GameState and the open panel, modal and sheet. Pure:
 // reads only, so tests can call it on a newGame().
-import { FEATURES } from '../../config/balance';
 import { basePrice, isOffered } from '../../sim/branch/pricing';
 import { ipoChecklist } from '../../sim/equityOffers';
 import type { DeptId, GameState, Manager } from '../../sim/state';
@@ -77,16 +76,16 @@ export function observeLessons(
     guidesOn: s.settings.guides,
     lessonsDone: s.flags.lessonsDone,
     lesson: s.flags.lesson,
-    hqRamp: FEATURES.hq && open > 0 ? s.hq.ramp : 0,
+    hqRamp: open > 0 ? s.hq.ramp : 0,
     offices: Object.keys(s.offices).length,
     depts: Object.keys(s.departments) as DeptId[],
     execs: Object.values(s.executives.seats).filter(Boolean).length,
     tier: s.company.tier,
-    ipoReady: FEATURES.capitalMarkets && ipoChecklist(s).every((r) => r.ok),
+    ipoReady: ipoChecklist(s).every((r) => r.ok),
     listed: s.stock.status === 'public' || !!s.stock.ipo,
-    cityCovered: FEATURES.multiCity && cover.ours > 0 && cover.full,
+    cityCovered: cover.ours > 0 && cover.full,
     flights: s.world.travel.flights,
-    personalCash: FEATURES.personalEmpire ? s.personal.cash : 0,
+    personalCash: s.personal.cash,
     computeShort:
       s.compute.crunchWeeks > 0 || s.compute.outageWeeksLeft > 0 || s.compute.burstStigmaWeeks > 0,
     trainingStarted: !!s.training.run || s.training.generation > 0,
