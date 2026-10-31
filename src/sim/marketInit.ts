@@ -53,7 +53,6 @@ export function initMarket(): MarketState {
     companies,
     index: STOCK_MARKET.startIndex,
     indexHistory: [STOCK_MARKET.startIndex],
-    shock: 0,
     holdings: { company: {}, personal: {} },
   };
 }

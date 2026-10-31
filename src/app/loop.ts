@@ -18,7 +18,6 @@ import {
   CAPITAL_BUFFER_PP,
   DAY_MS,
   DAYS_PER_WEEK,
-  FEATURES,
   SAFETY,
   SKIP_DAYS_PER_SECOND,
 } from '../config/balance';
@@ -28,7 +27,7 @@ import { isQuarterStart } from '../sim/calendar';
 import { advanceDay } from '../sim/engine';
 import { boardDue, quarterLabel } from '../sim/governance';
 import type { GameEvent, GameState } from '../sim/state';
-import { homeCountry } from '../sim/treasury';
+import { homeCountry } from '../sim/homeCountry';
 import { CAPITAL_BUFFER_POLICY } from '../data/newsWorld';
 import { saveToSlot } from './saves';
 import { play } from './sound/sound';
@@ -282,7 +281,7 @@ export function resultsDue(
  * held yet, the HUD shows a Board chip for the quarter and a notice says so.
  */
 function promptBoard(s: GameState, quarterStart: boolean): void {
-  if (!FEATURES.capitalMarkets || !quarterStart) return;
+  if (!quarterStart) return;
   const label = quarterLabel(s);
   if (boardChipQuarter.value === label || !boardDue(s)) return;
   boardChipQuarter.value = label;
@@ -339,7 +338,6 @@ const EVENT_TEXT: Record<string, (p: Record<string, unknown>) => string> = {
     const verb = change > 0 ? 'raised' : change < 0 ? 'cut' : 'held';
     return `${String(p.cb)} ${verb} its policy rate${change ? ' to' : ' at'} ${(Number(p.rate) * 100).toFixed(2)}%.`;
   },
-  WINDOW_USE: () => 'Finance drew on the emergency credit line.',
   POLICY_PASSED: (p) =>
     p.policyId === CAPITAL_BUFFER_POLICY
       ? `Lawmakers passed an AI safety buffer: every safety tier line rises by ${Math.round(CAPITAL_BUFFER_PP * SAFETY.bufferPerPp * 100)} points for a year.`
@@ -395,7 +393,6 @@ const EVENT_TEXT: Record<string, (p: Record<string, unknown>) => string> = {
 /** Events about a country toast only when it is your home country (nine central banks meet). */
 const HOME_ONLY = new Set(['CB_DECISION', 'POLICY_PASSED']);
 const BAD_EVENTS = new Set([
-  'WINDOW_USE',
   'MANAGER_POACHED',
   'BANK_RUN',
   'COMPUTE_BURST',

@@ -177,8 +177,6 @@ export interface OwnStock {
   placements: Placement[];
   ipo?: PendingIpo;
   listedWeek?: Week;
-  /** Price the IPO was offered at, for the listing story. */
-  ipoPrice?: Money;
   /** Why the last pending IPO was withdrawn at listing (shown on the Equity tab). */
   ipoWithdrawn?: { week: Week; reason: string };
   /** Market step's event cursor: events of `week` already read (§19.5 shocks). */
@@ -232,8 +230,6 @@ export interface MarketState {
   /** Cap-weighted index of every listed company, 1000 at the start. */
   index: number;
   indexHistory: number[];
-  /** This week's shared market shock (§19.1). */
-  shock: number;
   holdings: { company: Record<Id, Holding>; personal: Record<Id, Holding> };
 }
 
@@ -254,7 +250,6 @@ export interface MergerOffer {
   pricePerShare: Money;
   total: Money;
   premium: number;
-  madeWeek: Week;
   /** The answer arrives at this week's tick. */
   respondWeek: Week;
   /** 'lapsed': accepted, but your cash or safety tier no longer allowed closing. */

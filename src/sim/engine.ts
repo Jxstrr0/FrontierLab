@@ -37,7 +37,6 @@ import { recordYear } from './annualReport';
 import { checkFailure } from './failure';
 import { updateAppRating } from './company';
 import { pushEvent, trimEvents } from './events';
-import { refreshFundingOffers } from './fundingMarket';
 import { runDevelopments } from './development';
 import { runHq } from './hq';
 import { runBrandMarketing } from './hqMarketing';
@@ -52,13 +51,12 @@ import { runPowerDeals } from './powerDeals';
 import { rivalsQuarter, rivalsYear, runRivals } from './rivalAi';
 import { refreshManagerPool } from './people';
 import { runManagerPoaching } from './payReviews';
-import { ftpLong, ftpShort, updateMarketRefs } from './rates';
+import { updateMarketRefs } from './rates';
 import { regulatorReview } from './riskFloor';
 import { repriceRivalFees, updateRivalPrices } from './rivalPrices';
 import type { Branch, GameState } from './state';
 import { closeWeek, depreciate, quarterEnd } from './statements';
 import { renewalSeason, runContracts } from './contracts';
-import { runTreasury } from './treasury';
 import { updateModels } from './underwriting';
 import { runTraining } from './training';
 import { runProjects } from './projects';
@@ -117,8 +115,6 @@ export function weeklyTick(state: GameState): void {
   retireGpuLots(state); // 4 (rented GPU lots, C4b)
   updateBrandAwareness(state);
   runPartnerships(state); // 5
-  runTreasury(state); // 6
-  refreshFundingOffers(state); // 6 (§13.6 market, after this week's flows)
   refreshGpuOffers(state); // 6 (the GPU market, C4b)
   runHq(state); // 7
   runDevelopments(state);
@@ -173,11 +169,6 @@ export function weeklyTick(state: GameState): void {
 
   for (const cityId of Object.keys(state.world.cities)) {
     if (!CITIES[cityId]?.regional) refreshManagerPool(state, cityId);
-  }
-  for (const c of Object.values(state.world.countries)) {
-    if (!c) continue;
-    c.prevFtpShort = ftpShort(c);
-    c.prevFtpLong = ftpLong(c);
   }
   trimEvents(state);
 }

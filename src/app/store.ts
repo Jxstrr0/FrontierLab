@@ -22,7 +22,7 @@ export type PanelRoute =
   | { type: 'hq'; officeId?: string; dept?: DeptId }
   | { type: 'bureau'; siteId: string }
   | { type: 'agency'; siteId: string }
-  // Stage 5 (FEATURES.competition)
+  // Stage 5
   | { type: 'rivalBranch'; lotId: string }
   | { type: 'rivalHq'; siteId: string }
   | { type: 'centralBank'; countryId: CountryId }
@@ -31,20 +31,20 @@ export type PanelRoute =
   | { type: 'business'; businessId: string }
   | { type: 'university'; siteId: string }
   | { type: 'ledger'; week?: number }
-  // Stage 6 (FEATURES.capitalMarkets)
+  // Stage 6
   | { type: 'investmentBank'; siteId: string; tab?: InvestmentBankTab }
-  // Stage 7 (FEATURES.investments)
+  // Stage 7
   | { type: 'startup'; startupId: string }
   | { type: 'property'; siteId: string }
   | { type: 'convention'; siteId: string }
   | { type: 'lobbyingFirm'; siteId: string }
-  // Stage 9 (FEATURES.personalEmpire)
+  // Stage 9
   | { type: 'wealth' }
   | { type: 'vacationHome'; siteId: string }
   | { type: 'carDealer'; siteId: string }
   | { type: 'auctionHouse'; siteId: string; tab?: 'buy' | 'sell' }
   | { type: 'franchise'; clubId: string }
-  // Stage 8 (FEATURES.multiCity): the airport's departures; `jet` = "Fly now" in your own plane.
+  // Stage 8: the airport's departures; `jet` = "Fly now" in your own plane.
   | { type: 'airport'; jet?: boolean }
   | { type: 'company' }
   | { type: 'branches' }

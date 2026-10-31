@@ -1,7 +1,7 @@
 // The Weekly Ledger's templates for ventures stories (Stage 7, CONTENT §23):
 // convention announcements, funding rounds, IPOs, acquisitions and failures,
 // with louder variants when your bank or you back the startup. Merged into
-// LEDGER_TEMPLATES via ledgerTemplatesInvestments.ts.
+// LEDGER_TEMPLATES in ledgerTemplates.ts.
 import type { LedgerTemplate } from './ledgerTemplates';
 
 export const VENTURES_TEMPLATES = {

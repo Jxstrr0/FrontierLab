@@ -8,7 +8,7 @@ import { portfolioBreakdown } from './portfolio';
 import { investmentStaff } from './ventureAccess';
 import { stream, type Rng } from './rng';
 import type { GameState, Startup } from './state';
-import { homeCountry } from './treasury';
+import { homeCountry } from './homeCountry';
 import { serviceVentureDebt } from './ventureDebt';
 import { acquireStartup, failStartup, ipoStartup, pruneStartups } from './ventureExits';
 import { generateStartup, isPrivate } from './ventureGen';

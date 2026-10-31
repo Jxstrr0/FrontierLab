@@ -9,6 +9,7 @@ import { emptyBook } from '../../src/sim/branch/books';
 import * as cmd from '../../src/sim/commands';
 import { advanceWeeks } from '../../src/sim/engine';
 import { newGame } from '../../src/sim/newGame';
+import { legacyTreasury } from '../../src/sim/save/legacyTreasury';
 import { migrate } from '../../src/sim/save/migrations';
 import { exportCode, importCode } from '../../src/sim/save/serialize';
 import { SCHEMA_VERSION, type Book, type GameState } from '../../src/sim/state';
@@ -35,7 +36,7 @@ function bankSave(): { s: GameState; branchId: string } {
   b.books.mortgage = oldBook(1_200_000, 4);
   b.books.personal_loan = oldBook(250_000, 20);
   b.books.wealth = oldBook(5_000_000, 30); // off the balance sheet
-  s.treasury.reserves += 2_000_000 + 500_000 + 300_000 - 1_200_000 - 250_000;
+  legacyTreasury(s).reserves += 2_000_000 + 500_000 + 300_000 - 1_200_000 - 250_000;
   for (const id of ['savings', 'chequing', 'mortgage', 'personal_loan', 'wealth', 'dev_old'])
     b.offered[id] = { on: true, price: 0.02 };
   s.products.catalog.savings = { id: 'savings', stars: 3, developed: false };
@@ -64,7 +65,9 @@ function bankSave(): { s: GameState; branchId: string } {
   (s.company.companyOffered ??= {}).savings = true;
   const rival = Object.values(s.rivals)[0]!;
   rival.prices.savings = 0.031;
-  rival.priceLags.savings = { target: 0.031, weeksLeft: 2 };
+  (rival as unknown as { priceLags: object }).priceLags = {
+    savings: { target: 0.031, weeksLeft: 2 },
+  };
   rival.priceWar.cal = 0.0015;
   s.incidents.effects.push({
     kind: 'savingsBoost' as never,
@@ -87,7 +90,7 @@ function migrated(s: GameState): GameState {
 describe('migration 5 → 6 (C3a catalog)', () => {
   it('settles the bank books without moving equity and opens the AI catalog', () => {
     const { s, branchId } = bankSave();
-    const reserves = s.treasury.reserves;
+    const reserves = legacyTreasury(s).reserves;
     const cash = s.company.cash;
     const before = s.branches[branchId]!;
     const customers = before.customers;
@@ -103,10 +106,10 @@ describe('migration 5 → 6 (C3a catalog)', () => {
       expect(m.company.companyPrices.CA?.[id], id).toBeUndefined();
       expect(m.company.companyOffered?.[id], id).toBeUndefined();
     }
-    // Deposits paid out and loans sold: reserves (and cash, for any shortfall) net the two.
+    // Deposits paid out and loans sold net out of reserves, which reach cash by schema 38.
     const settled = 2_000_000 + 500_000 + 300_000 - 1_200_000 - 250_000;
-    expect(m.treasury.reserves + m.company.cash).toBeCloseTo(reserves + cash - settled, 2);
-    expect(m.treasury.reserves).toBeGreaterThanOrEqual(0);
+    expect(m.company.cash).toBeCloseTo(reserves + cash - settled, 2);
+    expect('treasury' in m).toBe(false);
 
     for (const spec of Object.values(PRODUCTS)) {
       expect(b.books[spec.id], spec.id).toBeDefined();
@@ -120,7 +123,7 @@ describe('migration 5 → 6 (C3a catalog)', () => {
 
     const rival = Object.values(m.rivals)[0]!;
     expect(rival.prices.savings).toBeUndefined();
-    expect(rival.priceLags.savings).toBeUndefined();
+    expect('priceLags' in rival).toBe(false);
     expect(rival.priceWar).toEqual({});
     expect(m.incidents.effects.some((e) => (e.kind as string) === 'savingsBoost')).toBe(false);
   });
@@ -138,7 +141,7 @@ describe('migration 5 → 6 (C3a catalog)', () => {
     const old = s.partnerships[r.partnershipId]!;
     old.productId = 'savings';
     old.balance = 400_000;
-    s.treasury.reserves += 400_000;
+    legacyTreasury(s).reserves += 400_000;
     const m = migrated(s);
     const p = m.partnerships[r.partnershipId]!;
     expect(p.productId).toBe('campus_plan');

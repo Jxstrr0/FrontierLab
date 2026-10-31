@@ -47,7 +47,7 @@ Eleven stages. Each one ends playable and deployed. A stage usually takes severa
 - Staff and capacity (§6), awareness and campaigns (§7), ratings (§8), demand (§9)
 - Books: deposits, amortizing loans, revolving, wealth, services (§10)
 - Branch P&L (§12)
-- Treasury §13.1–13.5 (auto overnight only)
+- Treasury §13.1–13.5 (auto overnight only; the whole treasury stack was removed in schema 38)
 - Statements (§14) and capital and tiers (§15)
 - Commands: `leaseStorefront`, `buildBranch`, `setOffered`, `setPrice`, `setStaffTarget`, `setWage`, `setCampaignLevel`, `hireManager`, `setDelegation` (heuristics §17.1), `transferToTreasury`
 - Generated lots for one city without art: a list of lots with district values
@@ -105,10 +105,10 @@ Eleven stages. Each one ends playable and deployed. A stage usually takes severa
 - HR benefits
 - Products floor: house model, Manage Models, risk appetite, lineup and Apply-to-all, product development with the live odds table
 - Credit bureaus on the map
-- Treasury floor: policy, bonds with mark-to-market, funding market and inventory, central bank window
+- Treasury floor: policy, bonds with mark-to-market, funding market and inventory, central bank window (now the Compute floor; the funding parts were removed in schema 38)
 - Marketing floor: brand campaigns, agencies
 - IT floor: app rating
-- Risk floor: loss tables, regulator status, quarterly review
+- Risk floor: loss tables, regulator status, quarterly review (now the Safety & Alignment floor; loss tables removed in schema 38)
 
 **Accept:**
 - A steady 5-year run clearly needs an HQ, and understaffing visibly bites (delays, spreads, defaults).

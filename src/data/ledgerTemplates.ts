@@ -6,9 +6,15 @@
 // ledgerTemplatesWorld.ts, the World desk in ledgerTemplatesGlobe.ts and the
 // company desk, Money Column and elections in ledgerTemplatesDesk.ts; all are
 // merged into LEDGER_TEMPLATES.
-import { CAPITAL_TEMPLATES } from './ledgerTemplatesCapital';
-import { INVESTMENTS_TEMPLATES } from './ledgerTemplatesInvestments';
-import { EMPIRE_TEMPLATES } from './ledgerTemplatesEmpire';
+import { GOVERNANCE_TEMPLATES } from './ledgerTemplatesGovernance';
+import { MARKETS_TEMPLATES } from './ledgerTemplatesMarkets';
+import { MERGERS_TEMPLATES } from './ledgerTemplatesMergers';
+import { VENTURES_TEMPLATES } from './ledgerTemplatesVentures';
+import { REAL_ESTATE_TEMPLATES } from './ledgerTemplatesRealEstate';
+import { LOBBYING_TEMPLATES } from './ledgerTemplatesLobbying';
+import { PERSONAL_TEMPLATES } from './ledgerTemplatesPersonal';
+import { AUCTIONS_TEMPLATES } from './ledgerTemplatesAuctions';
+import { FRANCHISE_TEMPLATES } from './ledgerTemplatesFranchise';
 import { DESK_TEMPLATES } from './ledgerTemplatesDesk';
 import { FOUNDER_TEMPLATES } from './ledgerTemplatesFounder';
 import { INCIDENT_TEMPLATES } from './ledgerTemplatesIncidents';
@@ -654,9 +660,15 @@ export const LEDGER_TEMPLATES = {
   ...BANK_TEMPLATES,
   ...RIVAL_TEMPLATES,
   ...WORLD_TEMPLATES,
-  ...CAPITAL_TEMPLATES,
-  ...INVESTMENTS_TEMPLATES,
-  ...EMPIRE_TEMPLATES,
+  ...GOVERNANCE_TEMPLATES,
+  ...MARKETS_TEMPLATES,
+  ...MERGERS_TEMPLATES,
+  ...VENTURES_TEMPLATES,
+  ...REAL_ESTATE_TEMPLATES,
+  ...LOBBYING_TEMPLATES,
+  ...PERSONAL_TEMPLATES,
+  ...AUCTIONS_TEMPLATES,
+  ...FRANCHISE_TEMPLATES,
   ...GLOBE_TEMPLATES,
   ...GLOBE_MORE_TEMPLATES,
   ...CALENDAR_TEMPLATES,

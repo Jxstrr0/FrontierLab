@@ -167,7 +167,6 @@ export function installDebug(): void {
         revenue: income * 3,
         netIncome: income,
         eps: income / s.company.sharesOutstanding,
-        roe: 0.12,
       }));
       s.company.tier = 'strong';
       const r = cmd.launchIpo(s, bankId, 0.25);

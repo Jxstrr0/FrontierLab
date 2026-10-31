@@ -3,7 +3,6 @@
 // places, with their names, layers, partner and owned seals, and which site
 // kinds each stage switches on.
 import type { CityMap } from '../../art/citygen';
-import { FEATURES, type FeatureId } from '../../config/balance';
 import { AGENCIES } from '../../data/brandCampaigns';
 import { CITIES, isRegional } from '../../data/cities';
 import { AUCTION_HOUSES } from '../../data/collectibles';
@@ -125,18 +124,4 @@ export function sitePin(s: GameState, map: CityMap, site: Site, info?: SitePinIn
   if (owned) pin.owned = true;
   if (info?.tag) pin.tag = info.tag;
   return pin;
-}
-
-/** Whether a site kind's stage is switched on (bureaus and agencies come with the HQ stage). */
-export function siteEnabled(
-  kind: Site['kind'],
-  features: Record<FeatureId, boolean> = FEATURES,
-): boolean {
-  if (kind === 'bureau' || kind === 'agency') return features.hq;
-  if (kind === 'investmentBank') return features.capitalMarkets;
-  if (kind === 'property' || kind === 'conventionCenter' || kind === 'lobbyingFirm')
-    return features.investments;
-  if (kind === 'autoDealer' || kind === 'auctionHouse' || kind === 'vacationHome')
-    return features.personalEmpire;
-  return features.competition;
 }

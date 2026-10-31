@@ -2,14 +2,13 @@
 // strength and win chance, the finish position from win %, the season and
 // transfer-window calendar, salaries by rating, payroll, and a week's revenue
 // split. Pure functions of their inputs; franchise.ts applies them.
-import { FRANCHISE } from '../config/balance';
+import { FRANCHISE, WEEKS_PER_YEAR } from '../config/balance';
 import { FRANCHISES, SPORT_DRAWS } from '../data/franchises';
 import { dateOf, weekOfYear } from './calendar';
 import { clamp } from './math';
 import type { ClubState, GameState, Player } from './state';
 
 const F = FRANCHISE;
-const WEEKS_PER_YEAR = 52;
 
 /** Mean star rating over maxStars slots, an empty slot at the replacement rating. */
 export function squadStrength(stars: readonly Player[]): number {

@@ -56,8 +56,6 @@ export interface EventPayloads {
   };
   /** A public contract ran its full term. */
   TENDER_ENDED: { tenderId: Id; name: string; city: Id; value: Money };
-  WINDOW_USE: { amount: Money };
-  FUNDING_MATURED: { lotId: Id; type: string; counterparty: string; amount: Money };
   REGULATOR_AUDIT: { fine: Money };
   BRAND_CAMPAIGN_ENDED: { campaignId: string; reason: string };
   DIGITAL_PROJECT_DONE: { templateId: string; name: string };

@@ -210,7 +210,6 @@ export function newRivalBank(
     cities: [],
     branches: [],
     prices,
-    priceLags: {},
     appRating: STRATEGY_PROFILES[spec.strategy].app,
     status: 'active',
     cash: 0,
