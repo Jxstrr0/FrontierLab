@@ -3,6 +3,8 @@
 // intact, personal finances, value growth, season finishes, transfer windows,
 // and the acceptance test: kit sponsorship raises brand awareness in that
 // country, and only there.
+import { openScriptedBranch } from '../helpers/scenario';
+import { cityAwareness } from '../../src/sim/awareness';
 import { describe, expect, it } from 'vitest';
 import { FRANCHISE as F } from '../../src/config/balance';
 import { CITIES } from '../../src/data/cities';
@@ -188,6 +190,8 @@ describe('transfers', () => {
 describe('kit sponsorship', () => {
   const setup = (kit: boolean) => {
     const s = game();
+    // Awareness lives in a city's sales office: Calgary gets one, Toronto none.
+    openScriptedBranch(s, 'midtown');
     generateCity(s, 'tor');
     generateCity(s, 'nyc');
     s.personal.cash = 2e9;
@@ -200,19 +204,15 @@ describe('kit sponsorship', () => {
     return s;
   };
 
-  it('Kit sponsorship raises brand awareness in that country', () => {
+  it('Kit sponsorship raises awareness where you have an office in that country', () => {
     const on = setup(true);
     const off = setup(false);
-    for (const id of ['cal', 'tor']) {
-      expect(CITIES[id]!.country).toBe(CITIES.cal!.country);
-      const gain = on.world.cities[id]!.brandAwareness - off.world.cities[id]!.brandAwareness;
-      expect(gain, id).toBeGreaterThan(0.04);
-    }
+    expect(CITIES.tor!.country).toBe(CITIES.cal!.country);
+    expect(cityAwareness(on, 'cal') - cityAwareness(off, 'cal')).toBeGreaterThan(0.02);
+    // Toronto has no sales office, so there is no awareness to raise.
+    expect(cityAwareness(on, 'tor')).toBe(0);
     // Cities in other countries are unchanged.
-    expect(on.world.cities.nyc!.brandAwareness).toBeCloseTo(
-      off.world.cities.nyc!.brandAwareness,
-      12,
-    );
+    expect(cityAwareness(on, 'nyc')).toBeCloseTo(cityAwareness(off, 'nyc'), 12);
   });
 
   it('only for your own club, and kit colours from the palette', () => {

@@ -6,6 +6,7 @@
 // delegation is off (or whose seat is empty) returns to 0. Managers still do
 // the work with their own skills; guidance only shifts what they aim for. The
 // CFO and CSO's deposit and loan steps, which no product used, went in schema 22.
+import { cityAwareness } from './awareness';
 import { GUIDANCE } from '../config/balance';
 import { delegationOn } from './execSeats';
 import { clamp } from './math';
@@ -74,7 +75,7 @@ export function runBranchGuidance(state: GameState): void {
   }
   if (cmo) {
     const cities = [...new Set(delegated(state, 'marketing').map((b) => b.cityId))];
-    const aware = mean(cities.map((c) => state.world.cities[c]?.brandAwareness ?? 0));
+    const aware = mean(cities.map((c) => cityAwareness(state, c)));
     g.marketing = nudge(
       g.marketing,
       aware,

@@ -3,13 +3,25 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** audit fixes (v0.1.60, save schema 38). After the owner's review batches, an audit of clunky spots, content gaps and over-complexity; the owner asked for all of it. Batches A (pacing, popups and navigation), B (content top-ups) and C (bank-leftover cleanup) are in; the awareness and quality merges follow. The Kelbo.Website hub card still needs its own session in that repo.
+**Current stage:** audit fixes (v0.1.61, save schema 39). After the owner's review batches, an audit of clunky spots, content gaps and over-complexity; the owner asked for all of it. Batches A (pacing, popups and navigation), B (content top-ups), C (bank-leftover cleanup) and D (one awareness, coins from the model) are in. The Kelbo.Website hub card still needs its own session in that repo.
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
-**Determinism snapshot:** `165b497d024061` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
+**Determinism snapshot:** `19474cc0478135` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-10-31 — Audit batch D: one awareness, coins from the model (v0.1.61)
+
+Two places where the game kept two numbers for one idea now keep one. Old saves load and are upgraded (save schema 38 → 39).
+
+**One awareness per city.** Before, each sales office had its own awareness and each city had a separate "brand awareness", and the game blended them behind the scenes. Now there's one number per city, held by its sales office, as you chose ("Office + HQ only"). Office campaigns, HQ brand campaigns, agency launch campaigns and kit sponsorship all push that same number up, and the bar you see on HQ Marketing is the same one the office's Marketing tab shows. A city with no office has nothing to be aware of yet, so open an office before running HQ campaigns there. Each office also earns a little awareness each week just by being open. Old saves blend their two numbers into one with the same formula the game used, so nothing jumps.
+
+**Coins come from the model.** Before, a product's coins were fixed, and the model's radar score nudged the Products rating separately. Now the coins move with the model, as you chose ("Coins come from the radar"): every radar point above the market's bar adds 0.15 of a coin to every product, and falling behind rival labs takes coins away. The coins on product cards are the real ones that sign-ups and ratings use. Training a better model now shows up directly on every product.
+
+**Kept on purpose:** agency launch campaigns (your earlier call) stay; they now feed the same single awareness number.
+
+**Checked:** lint, all tests (new `migrateOneAwareness.test.ts` upgrades a schema-38 save and checks the blend; new `productCoins.test.ts` checks the 0.15-per-point lift and the 1–5 clamp), type-check and build pass. Steady, aggressive and stress on seed 42 pass every target. The determinism snapshot moved to `19474cc0478135`: intended, since awareness and coins are worked out differently.
 
 ### 2026-10-31 — Audit batch C: bank-leftover cleanup (v0.1.60)
 

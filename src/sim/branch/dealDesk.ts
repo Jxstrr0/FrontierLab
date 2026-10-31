@@ -298,7 +298,7 @@ export function runDealDesk(
   const here = index.byCity.get(branch.cityId) ?? [];
   // A mandated pause (C7a) stops new business; your own renewals carry on.
   const offered = dealsOffered(branch) && !isPaused(state);
-  const reach = AWARENESS_FLOOR + (1 - AWARENESS_FLOOR) * effectiveAwareness(state, branch);
+  const reach = AWARENESS_FLOOR + (1 - AWARENESS_FLOOR) * effectiveAwareness(branch);
   for (const b of here) {
     if (index.rfpByBusiness.has(b.id)) continue;
     if (b.vendor && b.renewalWeek !== undefined) {
