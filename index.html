@@ -29,6 +29,205 @@
     </script>
   </head>
   <body>
+    <!-- Loading screen (docs/SCREENS.md §1). Plain HTML and CSS so it paints on
+         the first frame, before the game's code has downloaded. src/main.tsx
+         fades it out once the title screen is up. Colours copy tokens.css
+         (which isn't loaded yet); the fonts are the bundled ones if the browser
+         already has them cached, else the system fallbacks. -->
+    <style>
+      #boot {
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 24px;
+        margin: 0;
+        padding: calc(24px + env(safe-area-inset-top)) calc(24px + env(safe-area-inset-right))
+          calc(24px + env(safe-area-inset-bottom)) calc(24px + env(safe-area-inset-left));
+        background: radial-gradient(circle at 50% 40%, #1c2943 0%, #131d33 55%, #0a1222 100%);
+        color: #ece8da;
+        font-family:
+          'Public Sans',
+          system-ui,
+          -apple-system,
+          'Segoe UI',
+          sans-serif;
+        text-align: center;
+        transition: opacity 320ms ease;
+      }
+      #boot.boot-done {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .boot-frame {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 14px;
+        width: min(100%, 320px);
+        padding: 28px 20px 24px;
+        border: 1px solid rgb(184 145 61 / 40%);
+        outline: 1px solid rgb(184 145 61 / 40%);
+        outline-offset: 4px;
+      }
+      .boot-rule {
+        width: 64px;
+        height: 1px;
+        background: #b8913d;
+      }
+      .boot-name {
+        margin: 0;
+        font-family: 'Bodoni Moda', 'Didot', 'Bodoni 72', Georgia, serif;
+        font-weight: 900;
+        font-size: 34px;
+        line-height: 1;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+      .boot-line {
+        margin: 0;
+        font-size: 14px;
+        color: #b3b5ae;
+      }
+      .boot-bar {
+        position: relative;
+        width: 100%;
+        height: 4px;
+        margin-top: 6px;
+        overflow: hidden;
+        background: #0a1222;
+        border: 1px solid rgb(184 145 61 / 40%);
+      }
+      .boot-bar span {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 40%;
+        background: linear-gradient(90deg, #b8913d, #d9be7a);
+        animation: boot-slide 1.4s ease-in-out infinite;
+      }
+      @keyframes boot-slide {
+        from {
+          transform: translateX(-100%);
+        }
+        to {
+          transform: translateX(250%);
+        }
+      }
+      .boot-credit {
+        margin: 0;
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: #b3b5ae;
+      }
+      .boot-error {
+        margin: 0;
+        font-size: 14px;
+        color: #e07a7a;
+      }
+      .boot-reload {
+        min-width: 44px;
+        min-height: 44px;
+        padding: 10px 24px;
+        border: 1px solid #b8913d;
+        border-radius: 999px;
+        background: #b8913d;
+        color: #0a1222;
+        font:
+          600 16px 'Public Sans',
+          system-ui,
+          -apple-system,
+          'Segoe UI',
+          sans-serif;
+        cursor: pointer;
+      }
+      .boot-reload:focus-visible {
+        outline: 2px solid #d9be7a;
+        outline-offset: 2px;
+      }
+      #boot [hidden] {
+        display: none;
+      }
+      @media (max-width: 350px) {
+        .boot-name {
+          font-size: 28px;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #boot {
+          transition: none;
+        }
+        /* A still, half-filled bar instead of the sliding one. */
+        .boot-bar span {
+          animation: none;
+          width: 50%;
+        }
+      }
+    </style>
+    <div id="boot" role="status" aria-live="polite">
+      <div class="boot-frame">
+        <div class="boot-rule"></div>
+        <h1 class="boot-name">Frontier Lab</h1>
+        <p class="boot-line" id="boot-line">Powering up the lab…</p>
+        <div class="boot-bar" id="boot-bar" aria-hidden="true"><span></span></div>
+        <p class="boot-error" id="boot-error" hidden></p>
+        <button class="boot-reload" id="boot-reload" type="button" hidden>Reload</button>
+        <div class="boot-rule"></div>
+      </div>
+      <p class="boot-credit">A Longlight Interactive game</p>
+    </div>
+    <script>
+      // If the game can't start (a file failed to download, or boot threw),
+      // swap the loading bar for a plain message and a Reload button instead of
+      // leaving a blank page. src/main.tsx calls __bootFail on a boot error.
+      (function () {
+        var boot = document.getElementById('boot');
+        function fail(msg) {
+          if (!boot.isConnected || boot.className.indexOf('boot-done') >= 0) return;
+          document.getElementById('boot-line').hidden = true;
+          document.getElementById('boot-bar').hidden = true;
+          var err = document.getElementById('boot-error');
+          err.textContent = msg || 'Frontier Lab could not start.';
+          err.hidden = false;
+          var btn = document.getElementById('boot-reload');
+          btn.hidden = false;
+          btn.onclick = function () {
+            location.reload();
+          };
+        }
+        window.__bootFail = fail;
+        // A <script> or stylesheet that fails to load fires a non-bubbling
+        // error event, so listen in the capture phase.
+        window.addEventListener(
+          'error',
+          function (e) {
+            var t = e.target;
+            if (t && (t.tagName === 'SCRIPT' || t.tagName === 'LINK')) {
+              fail('Frontier Lab could not download. Check your connection and reload.');
+            } else if (t === window) {
+              fail('Frontier Lab could not start.');
+            }
+          },
+          true,
+        );
+        // Still nothing after 20 seconds: offer a reload, keep waiting.
+        setTimeout(function () {
+          if (!boot.isConnected || boot.className.indexOf('boot-done') >= 0) return;
+          document.getElementById('boot-line').textContent = 'This is taking a while…';
+          var btn = document.getElementById('boot-reload');
+          btn.hidden = false;
+          btn.onclick = function () {
+            location.reload();
+          };
+        }, 20000);
+      })();
+    </script>
     <div id="app"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

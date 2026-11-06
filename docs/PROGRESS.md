@@ -3,13 +3,25 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** audit fixes (v0.1.62.0, save schema 39). After the owner's review batches, an audit of clunky spots, content gaps and over-complexity; the owner asked for all of it. Batches A (pacing, popups and navigation), B (content top-ups), C (bank-leftover cleanup) and D (one awareness, coins from the model) are in. The Kelbo.Website hub card still needs its own session in that repo.
+**Current stage:** audit fixes (v0.1.63.0, save schema 39). After the owner's review batches, an audit of clunky spots, content gaps and over-complexity; the owner asked for all of it. Batches A (pacing, popups and navigation), B (content top-ups), C (bank-leftover cleanup) and D (one awareness, coins from the model) are in. The Kelbo.Website hub card still needs its own session in that repo.
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
 **Determinism snapshot:** `19474cc0478135` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-11-06 — Loading screen (v0.1.63.0)
+
+Before, a phone showed a blank navy page until the game's code had downloaded and drawn the title screen. Now a loading screen is part of the page itself, so it shows on the very first frame.
+
+**What you see:** the FRONTIER LAB wordmark inside a double brass frame, "Powering up the lab…", a thin brass bar that slides back and forth, and "A Longlight Interactive game" underneath. With reduced motion turned on, the bar sits still. When the title screen is ready, the loading screen fades out in about a third of a second.
+
+**If something goes wrong:** if a file can't download (say the connection drops) or the game hits an error while starting, the bar is replaced by a short message and a **Reload** button instead of a blank page. If loading takes more than 20 seconds, a Reload button shows up too, while it keeps trying.
+
+**How:** the screen is plain HTML and CSS in `index.html` with a tiny inline script for the error case; `src/app/boot.ts` (called from `src/main.tsx`) fades it out after the title has painted. No network calls and no storage.
+
+**Checked:** lint, all tests, type-check and build pass. In Chromium at 390×844: with the game's script held back, the loading screen shows; once released, the title screen appears and the loading screen is gone; with the script blocked, the error line and Reload button show. No console errors on a normal load. No sim change, so the determinism snapshot is unchanged.
 
 ### 2026-11-06 — Four-number versions (v0.1.62.0)
 
