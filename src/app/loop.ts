@@ -33,6 +33,7 @@ import { CAPITAL_BUFFER_POLICY } from '../data/newsWorld';
 import { saveToSlot } from './saves';
 import { play } from './sound/sound';
 import { autosave } from './saves/autosave';
+import { remindToBackUpInGame } from './saves/backupReminder';
 import { reportSaveError } from './saves/saveError';
 import { resolveIncident, setSettings } from '../sim/commands';
 import { bump, clockHeld, modal, notice, peekGame } from './store';
@@ -210,6 +211,7 @@ function afterWeek(s: GameState): void {
     return;
   }
   autosave(s, reportSaveError);
+  remindToBackUpInGame(s.clock.day);
 
   if (s.settings.autoPauseApplications && expiringRfps(s) > 0) {
     pause('Proposal requests expire this week');

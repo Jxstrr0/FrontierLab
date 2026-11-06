@@ -610,6 +610,9 @@ Opens on the first tick of a new year, after the results modal closes (before an
   - autosave card
   - 3 slot cards (lab name, date, cash; Save here / Load / Delete)
   - Export save code (copy, share sheet) and Import save code (paste; validates the version)
+  - **Back up or move a save** (`src/app/saves/CodeTransfer.tsx`): a "Storage:" line from `navigator.storage.persisted()` ("protected on this device", or "this browser may clear saves if the phone runs low on space. Keep a backup file."; hidden where the browser can't say). **Save backup file** writes the same save code to `frontier-lab-backup-YYYY-MM-DD.txt` (local date): through the share sheet where files can be shared (iPhone "Save to Files", also in the Home Screen app), otherwise as a download. **Load backup file** reads a picked .txt (trimmed) and runs it through Import, so the same checks, errors and "Replace your current game?" step apply.
+  - Storage keep: the game asks the browser to keep its storage (`navigator.storage.persist()`, `keepSaves` in `slotData.ts`) at most once per page load, after the first save written that session or a backup or restore, and only if it isn't kept already. Every Longlight game shares one site, so a browser clearing space could take all their saves at once.
+  - **Backup reminder** (`saves/backupReminder.ts`, numbers in `src/config/backup.ts`): when a game is at least `BACKUP_REMINDER_MIN_DAY` (56) days in and this device has never backed up, or not for `BACKUP_REMINDER_AFTER_DAYS` (14) real days, a quiet note shows once per session: a banner under the title menu (Back up / Not now), or, in a game, a notice after the week's autosave that waits for any popup to close (Back up opens Save game). The last backup (a code copied or shared, or a file saved) is stored on the device in `frontierlab.lastBackup`, not in the save.
 
 ## 27. Tutorial
 

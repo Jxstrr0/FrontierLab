@@ -2,7 +2,8 @@
 // cover (an engraved map of your current city, or a different city each launch
 // for a new player), the wordmark and tagline, the main menu, and a footer with
 // the version and a "Check for updates" button (handy for the home-screen app
-// on iPhone). Two columns on wide screens.
+// on iPhone). Two columns on wide screens. A small, dismissible banner nudges a
+// player with real progress to save a backup file (saves/backupReminder.ts).
 import { useMemo, useState } from 'preact/hooks';
 import { CITIES, START_CITIES } from '../../data/cities';
 import { COVER_DOTS } from '../../config/cover';
@@ -11,6 +12,7 @@ import { screen, setGame, toast } from '../store';
 import { ToastHost } from '../components';
 import { openCredits } from '../credits/openCredits';
 import { checkForUpdate } from '../pwa/register';
+import { BACKUP_REMINDER_TEXT, takeBackupReminder } from '../saves/backupReminder';
 import { nextCoverIndex, pickCoverCity, type CoverChoice } from './coverCity';
 import { CoverSkyline } from './CoverSkyline';
 import './title.css';
@@ -28,6 +30,7 @@ function coverIndexThisLaunch(): number {
 export function TitleScreen() {
   const latest = latestSlot();
   const choice = useMemo(() => pickCoverCity(latest, coverIndexThisLaunch(), START_CITIES), []);
+  const [remind, setRemind] = useState(() => takeBackupReminder(latest?.day ?? null));
   const resume = async () => {
     if (!latest) return;
     try {
@@ -90,6 +93,24 @@ export function TitleScreen() {
             </button>
           </div>
         </nav>
+
+        {remind && (
+          <aside class="title-backup" aria-label="Backup reminder">
+            <p>{BACKUP_REMINDER_TEXT}</p>
+            <div class="btn-row">
+              <button
+                type="button"
+                class="btn btn-primary"
+                onClick={() => (screen.value = 'saves')}
+              >
+                Back up
+              </button>
+              <button type="button" class="btn btn-secondary" onClick={() => setRemind(false)}>
+                Not now
+              </button>
+            </div>
+          </aside>
+        )}
 
         <footer class="title-footer">
           <span>A Longlight Interactive game · v{__APP_VERSION__}</span>

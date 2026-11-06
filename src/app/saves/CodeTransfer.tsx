@@ -1,12 +1,15 @@
 // Save codes (SCREENS §26): export a game as a text code to copy or share, and
 // import one pasted from another device. The code carries the save's version, so
-// a code from a newer game is refused with a clear message.
-import { useRef, useState } from 'preact/hooks';
+// a code from a newer game is refused with a clear message. The same code can
+// go into a backup file and be loaded back from one (backupFile.ts). A line
+// says whether the browser has promised to keep this device's saves.
+import { useEffect, useRef, useState } from 'preact/hooks';
 import { exportCode, importCode } from '../../sim/save/serialize';
 import type { GameState } from '../../sim/state';
-import { loadFromSlot, slotMeta, type SlotId } from '../saves';
+import { keepSaves, loadFromSlot, markBackedUp, savesKept, slotMeta, type SlotId } from '../saves';
 import { peekGame, toast } from '../store';
 import { SectionTitle, Segmented } from '../components';
+import { readBackupFile, saveBackupFile } from './backupFile';
 
 type Source = 'current' | SlotId;
 
@@ -28,11 +31,38 @@ export function CodeTransfer(p: {
   const sources = SOURCE_ORDER.filter((s) => (s === 'current' ? p.inGame : slotMeta(s) !== null));
   return (
     <>
-      <SectionTitle>Move a save to another device</SectionTitle>
+      <SectionTitle>Back up or move a save</SectionTitle>
+      <StorageStatus />
       <Export sources={sources} />
       <Import inGame={p.inGame} onLoad={p.onLoad} />
     </>
   );
+}
+
+/** "Storage: protected on this device", or a nudge to keep a backup file. Hidden if the browser can't say. */
+function StorageStatus() {
+  const [kept, setKept] = useState<boolean | null>(null);
+  useEffect(() => {
+    let live = true;
+    void savesKept().then((k) => live && setKept(k));
+    return () => {
+      live = false;
+    };
+  }, []);
+  if (kept === null) return null;
+  return (
+    <p class="small muted storage-status">
+      {kept
+        ? 'Storage: protected on this device.'
+        : 'Storage: this browser may clear saves if the phone runs low on space. Keep a backup file.'}
+    </p>
+  );
+}
+
+/** Notes a finished backup: for the reminder, and to ask the browser to keep the saves. */
+function backedUp(): void {
+  markBackedUp();
+  keepSaves();
 }
 
 function Export(p: { sources: Source[] }) {
@@ -45,18 +75,36 @@ function Export(p: { sources: Source[] }) {
     return <p class="muted small">Nothing to export yet. Save a game first.</p>;
   }
 
-  const make = async () => {
+  /** The chosen save as a code, or null after telling the player why not. */
+  const codeFor = async (): Promise<string | null> => {
     try {
       const state = chosen === 'current' ? peekGame() : await loadFromSlot(chosen);
       if (!state) throw new Error('There is no game to export.');
-      setCode(exportCode(state));
+      return exportCode(state);
     } catch (e) {
       toast((e as Error).message, 'bad');
+      return null;
+    }
+  };
+  const make = async () => {
+    const c = await codeFor();
+    if (c) setCode(c);
+  };
+  const saveFile = async () => {
+    const c = await codeFor();
+    if (!c) return;
+    try {
+      if (!(await saveBackupFile(c))) return;
+      backedUp();
+      toast('Backup file saved.', 'good');
+    } catch {
+      toast('The backup file could not be saved. Copy the save code instead.', 'bad');
     }
   };
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(code);
+      backedUp();
       toast('Save code copied.', 'good');
     } catch {
       // Clipboard access can be blocked; leave the code selected to copy by hand.
@@ -65,9 +113,12 @@ function Export(p: { sources: Source[] }) {
     }
   };
   const share = () => {
-    navigator.share({ title: 'Frontier Lab save code', text: code }).catch(() => {
-      // Dismissing the share sheet rejects; nothing to report.
-    });
+    navigator
+      .share({ title: 'Frontier Lab save code', text: code })
+      .then(backedUp)
+      .catch(() => {
+        // Dismissing the share sheet rejects; nothing to report.
+      });
   };
 
   return (
@@ -87,6 +138,9 @@ function Export(p: { sources: Source[] }) {
         )}
         <button type="button" class="btn btn-secondary btn-block" onClick={make}>
           Create save code
+        </button>
+        <button type="button" class="btn btn-secondary btn-block" onClick={saveFile}>
+          Save backup file
         </button>
       </div>
       {code && (
@@ -120,13 +174,33 @@ function Export(p: { sources: Source[] }) {
 function Import(p: { inGame: boolean; onLoad: (state: GameState) => void }) {
   const [text, setText] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const picker = useRef<HTMLInputElement>(null);
 
-  const load = () => {
+  /** Checks the whole code first; only a good one reaches onLoad (and its confirm step). */
+  const load = (code = text) => {
     try {
-      p.onLoad(importCode(text));
+      const state = importCode(code);
+      keepSaves();
+      p.onLoad(state);
     } catch (e) {
       setError((e as Error).message);
     }
+  };
+  const loadFile = async (e: Event) => {
+    const input = e.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = ''; // so picking the same file again still fires
+    if (!file) return;
+    let code: string;
+    try {
+      code = await readBackupFile(file);
+    } catch {
+      setError('That file could not be read.');
+      return;
+    }
+    setText(code);
+    setError(null);
+    load(code);
   };
   const paste = async () => {
     try {
@@ -144,7 +218,7 @@ function Import(p: { inGame: boolean; onLoad: (state: GameState) => void }) {
         class="code-box"
         rows={4}
         value={text}
-        placeholder="Paste a save code here. It starts with VS."
+        placeholder="Paste a save code here. It starts with FL."
         aria-label="Save code to import"
         aria-invalid={error !== null}
         onInput={(e) => {
@@ -165,11 +239,27 @@ function Import(p: { inGame: boolean; onLoad: (state: GameState) => void }) {
           type="button"
           class="btn btn-primary btn-small"
           disabled={!text.trim()}
-          onClick={load}
+          onClick={() => load()}
         >
           Load code
         </button>
       </div>
+      <button
+        type="button"
+        class="btn btn-secondary btn-block"
+        onClick={() => picker.current?.click()}
+      >
+        Load backup file
+      </button>
+      <input
+        ref={picker}
+        type="file"
+        accept=".txt,text/plain"
+        hidden
+        aria-hidden="true"
+        tabIndex={-1}
+        onChange={(e) => void loadFile(e)}
+      />
     </div>
   );
 }
