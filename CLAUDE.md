@@ -127,6 +127,9 @@ Don't add other runtime dependencies without a clear reason. Log every addition,
 ## When something isn't specified
 Check REFERENCE_NOTES.md for how the original handles it, then pick the simplest option consistent with DESIGN's pillars. Implement it and add a one-line entry to DESIGN's decision log.
 
+## Versions
+The game version is `gameVersion` in `package.json`, four numbers: **Major.Minor.Patch.Build** (for example `0.1.62.0`), the same scheme as every Longlight game. Major = overhaul, Minor = feature batch, Patch = tweak or fix, Build = republish. Bump it with every release; `vite.config.ts` feeds it to the title screen, the update toast and new saves as `__APP_VERSION__`, and the build fails if it isn't four numbers. The `version` field above it must stay three-number semver (npm refuses four) and is not shown to players; leave it alone. The service worker's cache name is a content hash, not this number.
+
 ## Commits
 Author commits as `Claude <noreply@anthropic.com>` so GitHub shows them as Verified (the owner chose this on 2026-10-30; earlier commits are authored as Jxstrr0). At the start of a session, run `git config user.name "Claude"` and `git config user.email "noreply@anthropic.com"`, and keep the Co-Authored-By trailer for Claude in each message.
 
