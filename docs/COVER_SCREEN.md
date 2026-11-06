@@ -139,7 +139,7 @@ Don't run a live pannable map on the title screen. Instead:
 | `docs/ART_DIRECTION.md` | New §2.2 "The cover". |
 | `docs/DESIGN.md` | Decision log line: "Title screen shows a live engraving of your current city (Living skyline); rotates cities for new players." |
 | `docs/PROGRESS.md` | Session entry in plain language for the owner. |
-| `package.json` | Version bump: minor if it feels like a feature (0.11.0), otherwise a patch. Check what landed on `main` first. |
+| `package.json` | `gameVersion` bump (four numbers, Major.Minor.Patch.Build): Minor if it feels like a feature, otherwise Patch. Check what landed on `main` first. |
 
 ## 8. Tests
 

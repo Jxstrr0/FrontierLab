@@ -3,13 +3,23 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** audit fixes (v0.1.62, save schema 39). After the owner's review batches, an audit of clunky spots, content gaps and over-complexity; the owner asked for all of it. Batches A (pacing, popups and navigation), B (content top-ups), C (bank-leftover cleanup) and D (one awareness, coins from the model) are in. The Kelbo.Website hub card still needs its own session in that repo.
+**Current stage:** audit fixes (v0.1.62.0, save schema 39). After the owner's review batches, an audit of clunky spots, content gaps and over-complexity; the owner asked for all of it. Batches A (pacing, popups and navigation), B (content top-ups), C (bank-leftover cleanup) and D (one awareness, coins from the model) are in. The Kelbo.Website hub card still needs its own session in that repo.
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
 **Determinism snapshot:** `19474cc0478135` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-11-06 — Four-number versions (v0.1.62.0)
+
+Kelbo asked for every Longlight game to use the same version scheme: four numbers, Major.Minor.Patch.Build. Frontier Lab was on 0.1.62; it is now **0.1.62.0**, with no other change, so the game plays exactly the same.
+
+**How it works.** npm refuses four-number versions in `package.json`'s `version`, so that field stays `0.1.62` and is only for npm. The game's own number is a new field next to it, `gameVersion`. The build reads that into the title screen ("v0.1.62.0"), the "You have the latest version" toast and new saves, and refuses to build if it isn't four numbers. Nothing in the game parses the version (save upgrades use the save schema number, and the offline cache name is a hash of the files), so old saves are unaffected.
+
+**From now on:** bump `gameVersion` with each release (Minor for a feature batch, Patch for a fix or tweak, Build for a republish). CLAUDE.md ("Versions") and docs/DEPLOYMENT.md say so.
+
+**Checked:** lint, tests and build pass; the built JS carries "0.1.62.0". No sim change, so the determinism snapshot is unchanged.
 
 ### 2026-11-06 — Save safety: backup files, storage keep and a reminder (v0.1.62)
 
