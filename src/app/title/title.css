@@ -226,6 +226,23 @@
   font-size: var(--text-14);
 }
 
+/* Backup reminder: a quiet card under the menu, no animation. */
+.title-backup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--hairline);
+  border-left: 3px solid var(--brass);
+  border-radius: var(--radius-card);
+  background: var(--vault-deep);
+  font-size: var(--text-14);
+  color: var(--ivory);
+}
+.title-backup p {
+  margin: 0;
+}
+
 .title-footer {
   display: flex;
   align-items: center;

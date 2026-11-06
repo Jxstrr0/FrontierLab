@@ -1,5 +1,5 @@
 // Transient notices above the bottom bar (SCREENS §0.5 Toast).
-import { toasts } from '../store';
+import { dismissToast, toasts } from '../store';
 
 export function ToastHost() {
   return (
@@ -8,7 +8,14 @@ export function ToastHost() {
         <div key={t.id} class={`toast toast-${t.tone}`}>
           {t.text}
           {t.action && (
-            <button type="button" class="toast-action" onClick={t.action.run}>
+            <button
+              type="button"
+              class="toast-action"
+              onClick={() => {
+                dismissToast(t.id);
+                t.action!.run();
+              }}
+            >
               {t.action.label}
             </button>
           )}

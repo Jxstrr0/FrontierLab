@@ -120,7 +120,7 @@ let toastId = 0;
 const MAX_TOASTS = 3;
 /** Week-end notices queued behind a popup or a full toast stack. */
 const NOTICE_QUEUE_MAX = 12;
-const held: { text: string; tone: Toast['tone']; ms: number }[] = [];
+const held: { text: string; tone: Toast['tone']; ms: number; action?: Toast['action'] }[] = [];
 
 function show(text: string, tone: Toast['tone'], ms: number, action?: Toast['action']): void {
   // Amounts the simulation wrote in dollars follow the currency setting.
@@ -131,6 +131,12 @@ function show(text: string, tone: Toast['tone'], ms: number, action?: Toast['act
     toasts.value = toasts.value.filter((x) => x.id !== t.id);
     pumpNotices();
   }, ms);
+}
+
+/** Takes a toast off screen early (its button was tapped). */
+export function dismissToast(id: number): void {
+  toasts.value = toasts.value.filter((x) => x.id !== id);
+  pumpNotices();
 }
 
 /** Immediate feedback for something the player just did (a failed command, a purchase). */
@@ -148,8 +154,13 @@ export function toast(
  * it isn't hidden behind the weekly results, and queues rather than pushing
  * older notices off when several land at once.
  */
-export function notice(text: string, tone: Toast['tone'] = 'info', ms = 4200): void {
-  held.push({ text, tone, ms });
+export function notice(
+  text: string,
+  tone: Toast['tone'] = 'info',
+  ms = 4200,
+  action?: Toast['action'],
+): void {
+  held.push({ text, tone, ms, action });
   if (held.length > NOTICE_QUEUE_MAX) held.splice(0, held.length - NOTICE_QUEUE_MAX);
   pumpNotices();
 }
@@ -158,7 +169,7 @@ function pumpNotices(): void {
   if (modal.value) return;
   while (held.length > 0 && toasts.value.length < MAX_TOASTS) {
     const n = held.shift()!;
-    show(n.text, n.tone, n.ms);
+    show(n.text, n.tone, n.ms, n.action);
   }
 }
 

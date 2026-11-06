@@ -3,13 +3,27 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** audit fixes (v0.1.61, save schema 39). After the owner's review batches, an audit of clunky spots, content gaps and over-complexity; the owner asked for all of it. Batches A (pacing, popups and navigation), B (content top-ups), C (bank-leftover cleanup) and D (one awareness, coins from the model) are in. The Kelbo.Website hub card still needs its own session in that repo.
+**Current stage:** audit fixes (v0.1.62, save schema 39). After the owner's review batches, an audit of clunky spots, content gaps and over-complexity; the owner asked for all of it. Batches A (pacing, popups and navigation), B (content top-ups), C (bank-leftover cleanup) and D (one awareness, coins from the model) are in. The Kelbo.Website hub card still needs its own session in that repo.
 **Live URL:** https://jxstrr0.github.io/FrontierLab/
 **Determinism snapshot:** `19474cc0478135` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-11-06 — Save safety: backup files, storage keep and a reminder (v0.1.62)
+
+Kelbo asked for this in every Longlight game. All the games live on the same site, so they share one storage pot on a phone; if the phone runs low on space, the browser can clear it all at once. Save codes were already the backstop; this makes them easier to keep.
+
+**Backup files.** On the Save game / Load game screen, under "Back up or move a save": **Save backup file** puts the same save code into a small text file named `frontier-lab-backup-YYYY-MM-DD.txt`. On iPhone it opens the share sheet, where "Save to Files" keeps it (this works in the Home Screen app too); elsewhere it downloads. **Load backup file** picks that file and runs it through the normal Import, so the same checks, the same error for a broken code and the same "Replace your current game?" question apply.
+
+**Keeping the storage.** The game asks the browser to keep its storage once per visit, right after the first save of the session (or a backup or restore), and only if it isn't already kept. Chrome and Safari decide quietly; Firefox may ask. A line on the Saves screen says "Storage: protected on this device", or suggests keeping a backup file when it isn't.
+
+**Reminder.** If a game is 8 weeks in and this device has never backed up, or it's been 14 days, a quiet note shows once per session: a small banner under the title menu (Back up / Not now), or, in a game, a notice after the week's autosave that waits for any popup to close. The last backup time (code copied or shared, or file saved) is kept on the device in `frontierlab.lastBackup`, not in the save.
+
+**Also fixed:** the import box said codes start with "VS" (a Vault Street leftover); it now says "FL". A toast's button now closes the toast when tapped.
+
+**Checked:** lint, all tests (new `tests/app/backupFile.test.ts`; a few slow sim files only timed out on a busy machine and pass when re-run), type-check and build pass. In Chromium at 390×844: saved a backup file from the Saves screen, loaded it back through the file picker and the game restored; a broken file shows the import error; no console errors. No sim change, so the determinism snapshot is unchanged.
 
 ### 2026-10-31 — Audit batch D: one awareness, coins from the model (v0.1.61)
 
