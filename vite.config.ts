@@ -10,7 +10,18 @@ import { serviceWorkerPlugin } from './src/app/pwa/swPlugin.ts';
 
 const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')) as {
   version: string;
+  gameVersion: string;
 };
+
+// The game's version is `gameVersion` in package.json, four numbers:
+// Major.Minor.Patch.Build (the same scheme as every Longlight game). npm only
+// accepts three-number versions in `version`, so that field stays semver and
+// is not shown to players. Bump `gameVersion` with each release.
+if (!/^\d+\.\d+\.\d+\.\d+$/.test(pkg.gameVersion ?? '')) {
+  throw new Error(
+    `package.json "gameVersion" must be Major.Minor.Patch.Build, got "${pkg.gameVersion}"`,
+  );
+}
 
 export default defineConfig({
   base: './',
@@ -29,7 +40,7 @@ export default defineConfig({
     },
   },
   define: {
-    __APP_VERSION__: JSON.stringify(pkg.version),
+    __APP_VERSION__: JSON.stringify(pkg.gameVersion),
   },
   test: {
     include: ['tests/**/*.test.ts'],

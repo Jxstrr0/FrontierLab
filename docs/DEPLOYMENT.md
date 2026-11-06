@@ -85,3 +85,8 @@ jobs:
 ## Later
 - **Hub:** add a Frontier Lab card in the Longlight hub repo (`Jxstrr0/Kelbo.Website`) in a separate session.
 - **Custom domain (optional):** add a CNAME in Pages settings.
+
+## Version numbers
+
+- The game version is `gameVersion` in `package.json`: four numbers, Major.Minor.Patch.Build (for example `0.1.62.0`), the scheme every Longlight game uses. Bump it with each release, by hand (`npm version` only handles the three-number `version` field, which stays semver for npm and is never shown to players).
+- `vite.config.ts` reads it into `__APP_VERSION__` (title screen, the "latest version" toast, `meta.createdWith` in new saves) and stops the build if it isn't four numbers. Nothing parses it; the service worker's cache name comes from a hash of the built files.
