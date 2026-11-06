@@ -296,14 +296,15 @@ export interface AvatarSpec { head: number; hair: number; facial: number; glasse
 
 ## 10. Saves
 
-- **Slot data in IndexedDB** (`src/sim/save/slotData.ts`): database `frontierlab`, object store `saves`, keyed by slot id (`auto`, written each weekly tick, `1`, `2`, `3`); the value is the compressed game. Its quota is a share of the device's free space, not localStorage's ~5 MB per site (a big 10-year game is ~2.7 MB a slot). The app asks `navigator.storage.persist()` once so the browser keeps saves when space runs low. Where IndexedDB is missing or won't open, the data falls back to the localStorage key below. All slot reads and writes run in order through one queue.
+- **Slot data in IndexedDB** (`src/sim/save/slotData.ts`): database `frontierlab`, object store `saves`, keyed by slot id (`auto`, written each weekly tick, `1`, `2`, `3`); the value is the compressed game. Its quota is a share of the device's free space, not localStorage's ~5 MB per site (a big 10-year game is ~2.7 MB a slot). The app asks `navigator.storage.persist()` at most once per page load (after the first save written, or a backup or restore, and only if `persisted()` is false) so the browser keeps saves when space runs low. Where IndexedDB is missing or won't open, the data falls back to the localStorage key below. All slot reads and writes run in order through one queue.
 - **localStorage keys** (written by `src/sim/save/storage.ts` and `slotData.ts`; the names are fixed so existing saves keep loading; Frontier Lab uses its own `frontierlab.` prefix so it never shares slots with Vault Street on the same site):
   - `frontierlab.meta.{slot}`: the slot card (read at once by menus), written after its data, with a checksum of it
   - `frontierlab.save.{slot}`: the compressed game before v0.11.7, and the fallback. On first use it is copied into IndexedDB and removed; until then it is still read from here
   - `frontierlab.prefs` (settings also live inside each save; this key holds title-screen prefs)
   - `frontierlab.tutorialSeen`
+  - `frontierlab.lastBackup`: when this device last backed up (a code copied or shared, or a backup file saved), ms since 1970; drives the backup reminder
 - **Format:** `JSON.stringify(state)`, compressed with lz-string `compressToUTF16` (the same string in IndexedDB or localStorage, so the card's checksum carries across).
-- **Export code:** `"FL" + schemaVersion + ":" + compressToEncodedURIComponent(json)`. Vault Street codes (`"VS…"`) are turned away with a clear message. Offer copy-to-clipboard and `navigator.share` when available.
+- **Export code:** `"FL" + schemaVersion + ":" + compressToEncodedURIComponent(json)`. Vault Street codes (`"VS…"`) are turned away with a clear message. Offer copy-to-clipboard and `navigator.share` when available, and a backup file (`frontier-lab-backup-YYYY-MM-DD.txt`, the same code plus a newline) that Load backup file reads back through Import.
 - **Import:**
   1. Parse the prefix.
   2. Decompress.
