@@ -15,6 +15,8 @@ import type { GameState, Settings } from '../state';
 import { checksum, deserialize, serialize } from './serialize';
 import { localStore, withSlotStore } from './slotData';
 
+export { keepSaves, savesKept } from './slotData';
+
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const gameDate = (startDate: string, day: number) => {
   const d = dateOf(startDate, day);
@@ -238,6 +240,31 @@ export function saveDevTools(on: boolean): void {
   try {
     if (on) store()?.setItem(DEV_TOOLS_KEY, '1');
     else store()?.removeItem(DEV_TOOLS_KEY);
+  } catch {
+    // A convenience only; ignore storage failures.
+  }
+}
+
+const LAST_BACKUP_KEY = `${PREFIX}lastBackup`;
+
+/**
+ * When this browser last backed up a game (a save code copied or shared, or a
+ * backup file saved), in ms since 1970; null if never. Kept on this device
+ * only, not in the save, so loading another game doesn't reset it.
+ */
+export function loadLastBackup(): number | null {
+  try {
+    const n = Number(store()?.getItem(LAST_BACKUP_KEY));
+    return Number.isFinite(n) && n > 0 ? n : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Remembers that a backup was made just now. */
+export function markBackedUp(now = Date.now()): void {
+  try {
+    store()?.setItem(LAST_BACKUP_KEY, String(now));
   } catch {
     // A convenience only; ignore storage failures.
   }

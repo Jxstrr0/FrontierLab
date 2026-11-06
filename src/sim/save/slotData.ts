@@ -78,17 +78,46 @@ function openDb(): Promise<IDBDatabase | null> {
   });
 }
 
-/** Asks the browser not to clear the saves when space runs low (best effort). */
-function keepSaves(): void {
+let askedToKeep = false;
+
+/**
+ * Asks the browser not to clear the saves when space runs low (best effort).
+ * Every Longlight game shares one site, so one storage pot: if the phone runs
+ * low the browser may clear it all at once. Asked at most once per page load,
+ * and only once there is progress worth keeping (the first save written, or a
+ * backup or restore), because Firefox shows a prompt for it. Skipped when the
+ * storage is already kept. Never throws.
+ */
+export function keepSaves(): void {
+  if (askedToKeep) return;
+  askedToKeep = true;
   try {
-    void navigator.storage?.persist?.().catch(() => undefined);
+    const storage = navigator.storage;
+    if (!storage?.persist || !storage.persisted) return;
+    void storage
+      .persisted()
+      .then((kept) => (kept ? true : storage.persist()))
+      .catch(() => undefined);
   } catch {
     // Not supported here; the saves are kept on a best-effort basis.
   }
 }
 
+/**
+ * Whether the browser has promised to keep this site's storage: true or false,
+ * or null when this browser can't say (the Saves screen then hides the line).
+ */
+export async function savesKept(): Promise<boolean | null> {
+  try {
+    const storage = navigator.storage;
+    if (!storage?.persist || !storage.persisted) return null;
+    return await storage.persisted();
+  } catch {
+    return null;
+  }
+}
+
 function fromIndexedDb(db: IDBDatabase): SlotDataStore {
-  let askedToKeep = false;
   const legacy = (slot: string) => localStore()?.getItem(dataKey(slot)) ?? null;
   return {
     kind: 'indexeddb',
@@ -100,8 +129,7 @@ function fromIndexedDb(db: IDBDatabase): SlotDataStore {
       await inTransaction(db, 'readwrite', (s) => s.put(data, slot));
       // The copy in IndexedDB is committed; free the old localStorage space.
       localStore()?.removeItem(dataKey(slot));
-      if (!askedToKeep) keepSaves();
-      askedToKeep = true;
+      keepSaves();
     },
     async remove(slot) {
       await inTransaction(db, 'readwrite', (s) => s.delete(slot));
