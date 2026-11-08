@@ -23,7 +23,7 @@ When docs disagree, DESIGN wins for intent, SIMULATION for numbers and formulas,
 
 ## Non-negotiables
 1. **Faithful systems, original surface.** Mirror the original's system structure (DESIGN §3.1 mapping table). Never copy its names, writing, art, icons, logos, sounds or company names. Every name in CONTENT.md is original: use those or invent new ones.
-2. **Static site on GitHub Pages.** No backend, accounts, analytics, ads or runtime network calls. Bundle all assets, with fonts via @fontsource. It must work when served from a sub-path (`/FrontierLab/`).
+2. **Static site on GitHub Pages.** No backend, accounts, analytics, ads or runtime network calls. Bundle all assets, with fonts via @fontsource. It is served at the root of `https://frontierlab.longlight.games/` (the old `jxstrr0.github.io/FrontierLab/` address forwards there) and must keep working from any address, sub-paths included (relative base `./`).
 3. **Phone-first.** Build and check at 390×844 portrait first, then scale up.
    - Tap targets ≥ 44 px, no hover-only interactions.
    - Respect `env(safe-area-inset-*)`.
@@ -169,7 +169,7 @@ screen, and any link back to the studio site.
 
 - **Logo:** the horizon lockup, a half-set clay sun on a long horizon line
   with LONGLIGHT above INTERACTIVE. Use the official files from the studio
-  site's press kit (https://jxstrr0.github.io/Kelbo.Website/press.html; the
+  site's press kit (https://longlight.games/press.html; the
   files are `assets/press/longlight-logo-dark` and `longlight-logo-light`,
   SVG plus 2x PNG, in `Jxstrr0/Kelbo.Website`). Copy them into this repo;
   never hotlink, redraw or recolour them, or swap the letters for live text.
@@ -181,12 +181,12 @@ screen, and any link back to the studio site.
 - **Name:** always "Longlight Interactive" in full. Credit line:
   "© year Kelbo / Longlight Interactive" (the studio isn't a registered
   business yet). Never Kelbo's real name or initials.
-- **Studio site:** https://jxstrr0.github.io/Kelbo.Website/
+- **Studio site:** https://longlight.games/
 
 ## Studio catalogue
 
 `LONGLIGHT-STUDIO.md` (repo root) covers every Longlight game: looks, names
-already taken, storage and cache prefixes on the shared origin, a reuse map and
+already taken, storage and cache prefixes (kept from the shared-origin days), a reuse map and
 improvement ideas. Read it before pitching new ideas, names or looks, and
 before building a system another Longlight game may already have. This file
 wins where the two disagree. Don't edit the copy here: the master is

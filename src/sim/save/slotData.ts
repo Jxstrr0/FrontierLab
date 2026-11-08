@@ -82,8 +82,8 @@ let askedToKeep = false;
 
 /**
  * Asks the browser not to clear the saves when space runs low (best effort).
- * Every Longlight game shares one site, so one storage pot: if the phone runs
- * low the browser may clear it all at once. Asked at most once per page load,
+ * If the phone runs low on space the browser may clear the game's storage all
+ * at once. Asked at most once per page load,
  * and only once there is progress worth keeping (the first save written, or a
  * backup or restore), because Firefox shows a prompt for it. Skipped when the
  * storage is already kept. Never throws.

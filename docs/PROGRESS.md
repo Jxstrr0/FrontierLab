@@ -3,13 +3,21 @@
 Claude Code updates this at the end of every session. Newest entries go at the top.
 
 **Project:** Frontier Lab, an AI-lab tycoon forked from Vault Street (reference remote `upstream`, read-only).
-**Current stage:** audit fixes (v0.1.63.0, save schema 39). After the owner's review batches, an audit of clunky spots, content gaps and over-complexity; the owner asked for all of it. Batches A (pacing, popups and navigation), B (content top-ups), C (bank-leftover cleanup) and D (one awareness, coins from the model) are in. The Kelbo.Website hub card still needs its own session in that repo.
-**Live URL:** https://jxstrr0.github.io/FrontierLab/
+**Current stage:** audit fixes (v0.1.63.1, save schema 39). After the owner's review batches, an audit of clunky spots, content gaps and over-complexity; the owner asked for all of it. Batches A (pacing, popups and navigation), B (content top-ups), C (bank-leftover cleanup) and D (one awareness, coins from the model) are in. The Kelbo.Website hub card still needs its own session in that repo.
+**Live URL:** https://frontierlab.longlight.games/
 **Determinism snapshot:** `19474cc0478135` (seed 42, scripted commands, 260 weeks; `tests/sim/determinism.test.ts`)
 
 ---
 
 ## Session log
+
+### 2026-11-08 — New addresses (v0.1.63.1)
+
+Every Longlight game moved to its own web address this month. Frontier Lab now lives at **https://frontierlab.longlight.games/**, and the old `jxstrr0.github.io/FrontierLab/` address forwards there. The studio site is https://longlight.games/ (press kit: https://longlight.games/press.html).
+
+**What changed:** only words. CLAUDE.md, the README, docs/DEPLOYMENT.md and a comment in `src/sim/save/slotData.ts` give the new addresses and no longer say every game shares one site: the game has its own storage now. Saves made at the old address stay on that address (Kelbo accepted that). `LONGLIGHT-STUDIO.md` is recopied from the master. The game itself plays exactly the same; the version moves to 0.1.63.1 as a republish.
+
+**Checked:** lint, all tests and build pass. No sim change, so the determinism snapshot is unchanged.
 
 ### 2026-11-06 — Loading screen (v0.1.63.0)
 
