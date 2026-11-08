@@ -6,7 +6,7 @@ Raise a seed round, open your first sales office, price your plans and API, and 
 
 Plays on phones and desktops. Built with Vite, TypeScript and Preact; deployed with GitHub Pages.
 
-**Play:** https://jxstrr0.github.io/FrontierLab/
+**Play:** https://frontierlab.longlight.games/
 
 **On iPhone:** open the link in Safari, tap Share → Add to Home Screen, then launch it from the icon to play full screen. After the first visit it works offline, and new versions arrive on the next launch.
 
