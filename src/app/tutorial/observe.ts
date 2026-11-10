@@ -5,6 +5,7 @@ import { basePrice, isOffered } from '../../sim/branch/pricing';
 import { ipoChecklist } from '../../sim/equityOffers';
 import type { DeptId, GameState, Manager } from '../../sim/state';
 import { cityCoverage } from '../city/lotInfo';
+import { weeklyBurn } from '../../sim/runway';
 import { hqDepts } from '../hq/officeSelectors';
 import type { ModalRoute, PanelRoute } from '../store';
 import type { LessonObs } from './lessons';
@@ -89,6 +90,8 @@ export function observeLessons(
     computeShort:
       s.compute.crunchWeeks > 0 || s.compute.outageWeeksLeft > 0 || s.compute.burstStigmaWeeks > 0,
     trainingStarted: !!s.training.run || s.training.generation > 0,
+    raised: s.stock.placements.length > 0,
+    runwayWeeks: runwayWeeks(s),
   };
 }
 
@@ -101,4 +104,10 @@ function shownFloor(s: GameState, panel: PanelRoute | null): DeptId | undefined 
   const depts = hqDepts(s);
   const want = panel?.type === 'hq' ? panel.dept : undefined;
   return want && depts.includes(want) ? want : depts[0];
+}
+
+/** Weeks of corporate cash at the current burn (null when the lab isn't losing money). */
+function runwayWeeks(s: GameState): number | null {
+  const burn = weeklyBurn(s);
+  return burn > 0 ? Math.max(0, s.company.cash) / burn : null;
 }
