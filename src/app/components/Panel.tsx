@@ -195,6 +195,8 @@ export function Confirm(p: {
   body: ComponentChildren;
   confirmLabel: string;
   danger?: boolean;
+  /** Tutorial target for the confirm button, when a lesson points at it. */
+  tutorial?: string;
   onConfirm: () => void;
   onCancel: () => void;
 }) {
@@ -208,6 +210,7 @@ export function Confirm(p: {
         <button
           type="button"
           class={`btn ${p.danger ? 'btn-danger' : 'btn-primary'}`}
+          data-tutorial={p.tutorial}
           onClick={p.onConfirm}
         >
           {p.confirmLabel}
