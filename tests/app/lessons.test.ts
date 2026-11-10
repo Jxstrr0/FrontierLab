@@ -232,6 +232,31 @@ describe('guide steps', () => {
     expect(chapterObsolete('ipo', base({ listed: true }))).toBe(true);
   });
 
+  it('teaches raising money after Part 1, again when cash runs low, and stops once raised', () => {
+    const fresh = base({ raised: false });
+    expect(chapterToStart(fresh)).toBe('funding');
+    expect(chapterToStart({ ...fresh, lessonsDone: ['funding'] })).toBeUndefined();
+    const low = { ...fresh, runwayWeeks: GUIDES.runwayWeeks - 1 };
+    expect(chapterToStart({ ...low, lessonsDone: ['funding'] })).toBe('runway');
+    // Low cash first: the plain guide is then skipped.
+    expect(chapterToStart(low)).toBe('runway');
+    expect(chapterToStart({ ...fresh, lessonsDone: ['runway'] })).toBeUndefined();
+    expect(chapterDue('runway', { ...low, runwayWeeks: GUIDES.runwayWeeks + 1 })).toBe(false);
+    expect(chapterDue('funding', base({ raised: true }))).toBe(false);
+    expect(chapterObsolete('runway', { ...low, raised: true })).toBe(true);
+    // Raise money on the map, then the Equity tab, then leave or raise.
+    const ib = { ...fresh, panelType: 'investmentBank', panelTab: 'equity' };
+    expect(chapterStepDone(enterChapterStep('funding', 0, fresh), ib)).toBe(true);
+    const m = updateChapterMemo(enterChapterStep('funding', 1, ib), ib);
+    expect(chapterGuidance(m, ib).targets.map((t) => t.key)).toEqual(['placement-card']);
+    expect(chapterStepDone(m, ib)).toBe(false);
+    expect(chapterStepDone(m, fresh)).toBe(true);
+    expect(chapterStepDone(m, { ...ib, raised: true })).toBe(true);
+    // A new game has not raised and is burning cash.
+    const o = observeLessons(newGame({ seed: 42, cityId: 'cal' }), null, null, null);
+    expect(o.raised).toBe(false);
+  });
+
   it('ignores a stored guide that does not exist or has no such step', () => {
     expect(activeChapter(base({ lesson: { id: 'hq', step: 2 } }))).toEqual({ id: 'hq', step: 2 });
     expect(activeChapter(base({ lesson: { id: 'hq', step: 3 } }))).toBeUndefined();

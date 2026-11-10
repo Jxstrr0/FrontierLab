@@ -55,7 +55,7 @@ export function PlacementCard(p: { bankId: string }) {
     if (r.ok) toast(`${r.investor} invested ${money(r.raised, sym)}.`, 'good');
   };
   return (
-    <Card class="ib-card">
+    <Card class="ib-card" tutorial="placement-card">
       <h3 class="ib-card-name">Private placement</h3>
       <p class="muted small">
         Sell new shares to an investment fund at a {pctText(1 - PLACEMENT.discount)} discount to
