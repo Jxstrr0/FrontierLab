@@ -67,7 +67,7 @@ export const MARKERS: Record<MarkerId, MarkerStyle> = {
   investmentBanks: {
     icon: 'investmentBank',
     ink: 'var(--type-investment-bank)',
-    caption: 'Investment bank',
+    caption: 'Raise money',
     shape: 'medallion',
   },
   marketingAgencies: {

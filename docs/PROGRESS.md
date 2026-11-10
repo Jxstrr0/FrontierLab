@@ -11,6 +11,11 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-11-10 — Playtest quick wins (v0.1.63.2)
+- **Skip says how far it jumps.** Two first-time players tried the game; one tapped Skip and lost almost four weeks without warning. Tapping Skip now shows a short message: "Skipping to the end of February: about 3 weeks. Tap Stop to pause sooner."
+- **The bank pin says what it is for.** Neither player found how to raise money. Up close, the investment bank's pin on the map now reads "Raise money".
+- Checked: lint, tests and build. To test on a phone: tap Skip and read the message; zoom in on an investment bank pin.
+
 ### 2026-11-08 — New addresses (v0.1.63.1)
 
 Every Longlight game moved to its own web address this month. Frontier Lab now lives at **https://frontierlab.longlight.games/**, and the old `jxstrr0.github.io/FrontierLab/` address forwards there. The studio site is https://longlight.games/ (press kit: https://longlight.games/press.html).
