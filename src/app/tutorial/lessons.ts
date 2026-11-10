@@ -49,6 +49,10 @@ export interface LessonObs {
   computeShort: boolean;
   /** A training run is under way or has finished. */
   trainingStarted: boolean;
+  /** The lab has raised a private round (undefined in tests that don't care: no money guide). */
+  raised?: boolean;
+  /** Weeks of cash at the current burn; null with no burn. */
+  runwayWeeks?: number | null;
 }
 
 /** What a guide step remembers from when it began. */
@@ -80,6 +84,16 @@ export function chapterDue(id: ChapterId, o: LessonObs): boolean {
   switch (id) {
     case 'capital':
       return WEAK_TIERS.includes(o.tier);
+    case 'funding':
+      // Skipped when the low-cash guide already explained the same screen.
+      return o.raised === false && !o.listed && !o.lessonsDone.includes('runway');
+    case 'runway':
+      return (
+        o.raised === false &&
+        !o.listed &&
+        o.runwayWeeks != null &&
+        o.runwayWeeks < GUIDES.runwayWeeks
+      );
     case 'hq':
       return o.hqRamp > 0 && o.offices === 0;
     case 'safetyFloor':
@@ -141,6 +155,8 @@ function atScreen(m: ChapterMemo, o: LessonObs): boolean | undefined {
     case 'training:0':
       return o.hqDept === 'products';
     case 'ipo:1':
+    case 'funding:1':
+    case 'runway:1':
       return o.panelType === 'investmentBank' && o.panelTab === 'equity';
     case 'travel:1':
       return o.panelType === 'airport';
@@ -169,7 +185,12 @@ export function chapterStepDone(m: ChapterMemo, o: LessonObs): boolean {
     case 'training:0':
       return o.trainingStarted || (m.saw && !atScreen(m, o));
     case 'ipo:0':
+    case 'funding:0':
+    case 'runway:0':
       return o.panelType === 'investmentBank';
+    case 'funding:1':
+    case 'runway:1':
+      return !!o.raised || (m.saw && !atScreen(m, o));
     case 'travel:0':
       return o.panelType === 'airport' || o.flights > m.flights;
     case 'travel:1':
@@ -183,6 +204,7 @@ export function chapterStepDone(m: ChapterMemo, o: LessonObs): boolean {
 export function chapterObsolete(id: ChapterId, o: LessonObs): boolean {
   if (id === 'capital') return !WEAK_TIERS.includes(o.tier);
   if (id === 'ipo') return o.listed;
+  if (id === 'funding' || id === 'runway') return !!o.raised || o.listed;
   return false;
 }
 

@@ -36,6 +36,7 @@ export type LessonTarget =
   | 'pin-investmentBank'
   | 'tab-equity'
   | 'ipo-card'
+  | 'placement-card'
   | 'travel-airport';
 
 export interface LessonStepText {
@@ -57,7 +58,17 @@ export interface ChapterText {
 }
 
 export type ChapterId =
-  'capital' | 'hq' | 'safetyFloor' | 'compute' | 'exec' | 'training' | 'ipo' | 'travel' | 'wealth';
+  | 'capital'
+  | 'funding'
+  | 'runway'
+  | 'hq'
+  | 'safetyFloor'
+  | 'compute'
+  | 'exec'
+  | 'training'
+  | 'ipo'
+  | 'travel'
+  | 'wealth';
 
 const CLOSE_FIRST = 'Close this panel first.';
 const OPEN_MENU = 'Open the menu, top right.';
@@ -71,6 +82,27 @@ const TRAINING_HERE =
   'Training starts from the model we use now and lifts every measure, most of all the focus you pick. A longer run, a bigger budget and a skilled research team make a great result likelier. Start a run, or close HQ to wait.';
 const IPO_HERE =
   'An IPO sells part of the lab on the stock market for fresh money. Investors price us on ARR and how fast it grows. After it, the board votes on your pay and dividends. There’s no rush. Close this when you’ve had a look.';
+const RAISE_HERE =
+  'A private placement sells new shares to an investment fund for cash: the lab gets money, you keep a smaller stake. Rounds are few and spaced weeks apart, so raise before cash runs short, not after. Close this when you’ve had a look.';
+/** The two money guides share their steps; only the opening line differs. */
+const raiseSteps = (why: string): LessonStepText[] => [
+  {
+    idle: `${why} Find Raise money on the map: open Layers and switch on Investment Banks if you can’t see it.`,
+    lines: {
+      'pin-investmentBank': `${why} Tap Raise money on the map.`,
+      'panel-close': CLOSE_FIRST,
+    },
+  },
+  {
+    idle: 'Tap Raise money on the map.',
+    here: RAISE_HERE,
+    lines: {
+      'placement-card': RAISE_HERE,
+      'tab-equity': 'Open the Equity tab.',
+      'pin-investmentBank': 'Tap Raise money on the map.',
+    },
+  },
+];
 const SAFETY_FLOOR_HERE =
   'This is the regulator’s view of us: the safety ratio, our tier and the next safety audit. Raise the staff target as we grow; a model far ahead of the pack needs a bigger team. Close HQ when you’re ready.';
 
@@ -88,6 +120,18 @@ export const CHAPTERS: Record<ChapterId, ChapterText> = {
         },
       },
     ],
+  },
+  funding: {
+    title: 'Raising money',
+    steps: raiseSteps(
+      'Salaries, compute and rent burn cash every week, faster than a young lab earns it. When we need more, we sell a slice of the lab to investors.',
+    ),
+  },
+  runway: {
+    title: 'Cash is running low',
+    steps: raiseSteps(
+      'At this burn our cash runs out within a few months, and a lab with no cash is finished. Investors can top it up.',
+    ),
   },
   hq: {
     title: 'Headquarters',
@@ -273,6 +317,8 @@ export const CHAPTERS: Record<ChapterId, ChapterText> = {
 
 /** First-look tips a finished guide has already said, so they don't repeat it. */
 export const CHAPTER_COVERS: Partial<Record<ChapterId, readonly string[]>> = {
+  funding: ['place-investmentBank'],
+  runway: ['place-investmentBank'],
   safetyFloor: ['floor-risk'],
   exec: ['floor-executive'],
   training: ['floor-products'],
@@ -283,6 +329,8 @@ export const CHAPTER_COVERS: Partial<Record<ChapterId, readonly string[]>> = {
 /** Guides start in this order when more than one is due. */
 export const CHAPTER_ORDER: readonly ChapterId[] = [
   'capital',
+  'runway',
+  'funding',
   'hq',
   'safetyFloor',
   'compute',
