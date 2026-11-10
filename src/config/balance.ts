@@ -2812,4 +2812,6 @@ export const MILESTONE_HQ_DEPTS = [
  */
 export const GUIDES = {
   wealthCash: 250_000,
+  /** The "Cash is running low" guide starts below this many weeks of cash, if you've never raised. */
+  runwayWeeks: 12,
 } as const;
