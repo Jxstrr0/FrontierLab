@@ -11,6 +11,10 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-11-10 — Add floor asks first (v0.1.63.3)
+- **Done:** HQ → Add floor no longer spends in one tap. Add opens a confirm with the fit-out, the cash you'd have left, and a note that rent stays the same while salaries come once you hire. `Confirm` takes an optional `tutorial` target so the Safety & Alignment lesson still points at the right button.
+- **Next:** the first-minutes design round.
+
 ### 2026-11-10 — Playtest quick wins (v0.1.63.2)
 - **Skip says how far it jumps.** Two first-time players tried the game; one tapped Skip and lost almost four weeks without warning. Tapping Skip now shows a short message: "Skipping to the end of February: about 3 weeks. Tap Stop to pause sooner."
 - **The bank pin says what it is for.** Neither player found how to raise money. Up close, the investment bank's pin on the map now reads "Raise money".
