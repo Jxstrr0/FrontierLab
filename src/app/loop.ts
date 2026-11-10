@@ -24,7 +24,7 @@ import {
 import { CITIES } from '../data/cities';
 import { BOARD_LINES, boardLine } from '../data/boardLines';
 import { INCIDENT_SPECS } from '../data/incidents';
-import { isQuarterStart } from '../sim/calendar';
+import { dateOf, isQuarterStart } from '../sim/calendar';
 import { advanceDay } from '../sim/engine';
 import { boardDue, quarterLabel } from '../sim/governance';
 import type { GameEvent, GameState } from '../sim/state';
@@ -36,8 +36,8 @@ import { autosave } from './saves/autosave';
 import { remindToBackUpInGame } from './saves/backupReminder';
 import { reportSaveError } from './saves/saveError';
 import { resolveIncident, setSettings } from '../sim/commands';
-import { bump, clockHeld, modal, notice, peekGame } from './store';
-import { periodKey } from './weekly/resultsPeriod';
+import { bump, clockHeld, modal, notice, peekGame, toast } from './store';
+import { periodKey, snapshotEndDay } from './weekly/resultsPeriod';
 import { MNA_BAD_EVENTS, MNA_EVENT_TEXT } from './investmentBank/mnaToasts';
 import { VENTURE_BAD_EVENTS, VENTURE_EVENT_TEXT } from './startup/ventureToasts';
 import { AUCTION_BAD_EVENTS, AUCTION_EVENT_TEXT } from './auction/auctionToasts';
@@ -60,6 +60,8 @@ export const boardChipQuarter = signal<string | undefined>(undefined);
 let resumeSpeed: 1 | 2 | 4 | undefined;
 /** Skip ahead is running; it stops at the month key below or anything that needs you. */
 export const skipping = signal(false);
+/** A month never has more weeks than this; bounds the count in skipWeeks. */
+const MAX_SKIP_WEEKS = 6;
 let skipMonth = '';
 /** Annual reports already on file when shown, so each year end opens its report once. */
 let shownYears = 0;
@@ -116,6 +118,23 @@ export function pause(reason?: string): void {
   bump();
 }
 
+/** How many weeks a skip started in `week` has left in its month (at least 1). */
+export function skipWeeks(startDate: string, week: number, month: string): number {
+  let n = 1;
+  while (n < MAX_SKIP_WEEKS && periodKey('monthly', startDate, week + n) === month) n++;
+  return n;
+}
+
+/** What Skip says when tapped, so the jump is no surprise (playtest: it ran almost 4 weeks unannounced). */
+function skipText(startDate: string, week: number, month: string): string {
+  const n = skipWeeks(startDate, week, month);
+  const name = dateOf(startDate, snapshotEndDay(week)).toLocaleString('en-GB', {
+    month: 'long',
+    timeZone: 'UTC',
+  });
+  return `Skipping to the end of ${name}: about ${n} week${n === 1 ? '' : 's'}. Tap Stop to pause sooner.`;
+}
+
 /** HUD ⏭: run flat out to the end of the month, or sooner if something needs you. */
 export function skipAhead(): void {
   const s = peekGame();
@@ -125,6 +144,7 @@ export function skipAhead(): void {
   delete s.clock.pausedReason;
   skipMonth = periodKey('monthly', s.meta.startDate, s.clock.week);
   skipping.value = true;
+  toast(skipText(s.meta.startDate, s.clock.week, skipMonth));
   acc = 0;
   bump();
 }

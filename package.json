@@ -2,7 +2,7 @@
   "name": "frontier-lab",
   "private": true,
   "version": "0.1.62",
-  "gameVersion": "0.1.63.1",
+  "gameVersion": "0.1.63.2",
   "description": "An AI-lab tycoon for the browser, by Longlight Interactive.",
   "type": "module",
   "engines": {
