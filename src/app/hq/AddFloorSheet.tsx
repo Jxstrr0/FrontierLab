@@ -1,10 +1,13 @@
 // "+ Add floor" sheet (SCREENS §10): the departments you can fit out on this
 // office's next empty floor, each with its description, desks and fit-out
-// cost. Disabled, with the reason, when every floor is in use.
+// cost. Disabled, with the reason, when every floor is in use. Tapping Add
+// opens a confirm step with the fit-out and the cash left, so a big spend is
+// never one tap (playtest, November 2026).
+import { useState } from 'preact/hooks';
 import { DEPARTMENTS } from '../../data/departments';
 import * as cmd from '../../sim/commands';
 import type { DeptId, Office } from '../../sim/state';
-import { Sheet } from '../components';
+import { Confirm, Sheet } from '../components';
 import { money } from '../format/format';
 import { act, openPanel, useGame } from '../store';
 import { addableDepts, floorDesks, officeAddress, usedFloors } from './officeSelectors';
@@ -16,12 +19,32 @@ export function AddFloorSheet(p: { office: Office; onClose: () => void }) {
   const full = usedFloors(o) >= o.floors.length;
   const fitout = cmd.floorFitout(s, o.cityId);
   const short = s.company.cash < fitout;
+  const [pick, setPick] = useState<DeptId | null>(null);
   const add = (dept: DeptId) => {
     if (act(cmd.addFloor, o.id, dept).ok) {
       p.onClose();
       openPanel({ type: 'hq', officeId: o.id, dept });
     }
   };
+  if (pick) {
+    const spec = DEPARTMENTS[pick];
+    return (
+      <Confirm
+        title={`Add a ${spec.name} floor?`}
+        confirmLabel={`Add floor · ${money(fitout, sym)}`}
+        tutorial={pick === 'risk' ? 'add-floor-risk' : undefined}
+        onCancel={() => setPick(null)}
+        onConfirm={() => add(pick)}
+        body={
+          <ul class="hq-confirm-list">
+            <li>Fit-out today: {money(fitout, sym)}.</li>
+            <li>Cash after: {money(s.company.cash - fitout, sym)}.</li>
+            <li>Rent stays the same; the team's salaries are paid weekly once you hire.</li>
+          </ul>
+        }
+      />
+    );
+  }
   return (
     <Sheet title="Add a floor" onClose={p.onClose}>
       <p class="muted small hq-sheet-intro">
@@ -59,7 +82,7 @@ export function AddFloorSheet(p: { office: Office; onClose: () => void }) {
                 class="btn btn-secondary hq-add-btn"
                 disabled={full || short}
                 aria-label={`Add a ${spec.name} floor`}
-                onClick={() => add(d)}
+                onClick={() => setPick(d)}
                 data-tutorial={d === 'risk' ? 'add-floor-risk' : undefined}
               >
                 Add
