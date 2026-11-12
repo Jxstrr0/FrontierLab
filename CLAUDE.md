@@ -23,7 +23,7 @@ When docs disagree, DESIGN wins for intent, SIMULATION for numbers and formulas,
 
 ## Non-negotiables
 1. **Faithful systems, original surface.** Mirror the original's system structure (DESIGN §3.1 mapping table). Never copy its names, writing, art, icons, logos, sounds or company names. Every name in CONTENT.md is original: use those or invent new ones.
-2. **Static site on GitHub Pages.** No backend, accounts, analytics, ads or runtime network calls. Bundle all assets, with fonts via @fontsource. It is served at the root of `https://frontierlab.longlight.games/` (the old `jxstrr0.github.io/FrontierLab/` address forwards there) and must keep working from any address, sub-paths included (relative base `./`).
+2. **Static site on GitHub Pages.** No backend, accounts, ads or runtime network calls, and no analytics except one: the cookieless Cloudflare Web Analytics beacon at the end of `index.html`, which counts visits and load speed (owner's call, 2026-11-12). Bundle all assets, with fonts via @fontsource. It is served at the root of `https://frontierlab.longlight.games/` (the old `jxstrr0.github.io/FrontierLab/` address forwards there) and must keep working from any address, sub-paths included (relative base `./`).
 3. **Phone-first.** Build and check at 390×844 portrait first, then scale up.
    - Tap targets ≥ 44 px, no hover-only interactions.
    - Respect `env(safe-area-inset-*)`.

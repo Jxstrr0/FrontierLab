@@ -11,6 +11,10 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-11-12 — Visit counts (v0.1.64.1)
+- **Done:** the owner asked for Cloudflare Web Analytics on the six listed games. The cookieless beacon is the last script in `index.html`, and CLAUDE.md and the DESIGN decision log now allow this one beacon. The loading screen's download-failure check skips it, so an ad blocker can't show the error card.
+- **Checked:** lint, tests, build.
+
 ### 2026-11-12 — Repo housekeeping (no version change)
 - **Done:** from the studio security cycle. Nothing in the game changes, so `gameVersion` stays put. The Deploy workflow no longer keeps its GitHub login after checking out the code (`persist-credentials: false`), `.gitignore` now covers `.env` files, and `.github/dependabot.yml` asks for one grouped pull request a month for minor and patch updates (major versions are left to do by hand). No new dependencies.
 
