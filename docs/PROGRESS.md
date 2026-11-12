@@ -11,6 +11,9 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-11-12 — Repo housekeeping (no version change)
+- **Done:** from the studio security cycle. Nothing in the game changes, so `gameVersion` stays put. The Deploy workflow no longer keeps its GitHub login after checking out the code (`persist-credentials: false`), `.gitignore` now covers `.env` files, and `.github/dependabot.yml` asks for one grouped pull request a month for minor and patch updates (major versions are left to do by hand). No new dependencies.
+
 ### 2026-11-10 — Raising money guide (v0.1.64.0)
 
 Playtest: new players ran out of cash without knowing they could raise. Two new Part 2 guides (`funding`, `runway` in `src/data/lessons.ts`) walk to Raise money on the map, then ring the Private placement card on the Equity tab. "Raising money" starts right after the tutorial; "Cash is running low" starts when cash covers less than `GUIDES.runwayWeeks` (12) weeks of burn. Both need a lab that has never raised and isn't public, end once you raise, and the first is skipped if the low-cash one already ran. Tests in `tests/app/lessons.test.ts`.
