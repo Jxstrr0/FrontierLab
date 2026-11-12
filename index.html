@@ -208,6 +208,8 @@
           'error',
           function (e) {
             var t = e.target;
+            // The visit counter is optional: an ad blocker may stop it.
+            if (t && t.hasAttribute && t.hasAttribute('data-cf-beacon')) return;
             if (t && (t.tagName === 'SCRIPT' || t.tagName === 'LINK')) {
               fail('Frontier Lab could not download. Check your connection and reload.');
             } else if (t === window) {
@@ -230,5 +232,11 @@
     </script>
     <div id="app"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <!-- Cloudflare Web Analytics: cookieless visit counts for Longlight (no personal data). -->
+    <script
+      defer
+      src="https://static.cloudflareinsights.com/beacon.min.js"
+      data-cf-beacon='{"token": "480ba43c83ca40a2a9634f464298e98e"}'
+    ></script>
   </body>
 </html>
