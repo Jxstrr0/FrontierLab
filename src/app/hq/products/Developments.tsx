@@ -11,6 +11,7 @@ import { Card, Confirm, Row } from '../../components';
 import { money } from '../../format/format';
 import { act, useGame } from '../../store';
 import { NewProductSheet } from './NewProductSheet';
+import { ProjectProgress } from './ProjectProgress';
 import { devSubtitle } from './productSelectors';
 import { TemplateIcon } from './TemplateIcon';
 
@@ -57,22 +58,7 @@ export function DevCard(p: { dev: Development }) {
           </span>
         </div>
       </div>
-      <div
-        class="pf-progress"
-        role="progressbar"
-        aria-label={`${d.name} progress`}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuenow={Math.round(share * 100)}
-      >
-        <span class="pf-progress-fill" style={{ width: `${share * 100}%` }} />
-      </div>
-      <div class="pf-dev-meta small">
-        <span>{Math.round(share * 100)}% done</span>
-        <span class={paused ? 'tone-bad' : ''}>
-          {paused ? 'Paused: no Products floor' : `${left} ${left === 1 ? 'week' : 'weeks'} left`}
-        </span>
-      </div>
+      <ProjectProgress label={`${d.name} progress`} share={share} left={left} paused={paused} />
       <Row label="Weekly budget" value={money(d.weeklyBudget, sym)} />
       <Row label="Spent so far" value={money(d.spent, sym)} tone="dim" />
       <button

@@ -11,6 +11,14 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-11-14 — Code tidy (v0.1.64.2)
+- **Done:** the owner asked for the cleanup a read-only audit suggested. Nothing in the game looks or plays differently, apart from Digital projects now saying "1 week left" (not "1 weeks") and showing a paused build in red like the other progress bars.
+  - Deleted `src/sim/eventCatalog.ts` (494 lines that nothing imported) and the 13 unused exports the audit found, including the bank-era `riskPdMult` and its `HQ_EFFECTS.riskPd` number.
+  - Removed `cityBranchGuide` and `rivalBvps`, which only tests used; their tests now check the same things directly.
+  - Shared pieces for copied layouts: `RenameSheet` (sales office and data center), `OfferCard` (club, property and vacation home offers), `LabMedallion` (twelve copies), `fitRoom` in `isoKit.tsx` (three room pictures) and `ProjectProgress` (developments, training runs, digital projects).
+  - Kept the sound and save test hooks (they cost almost nothing and the tests need them).
+- **Checked:** lint, tests (determinism snapshot unchanged), build.
+
 ### 2026-11-12 — Visit counts (v0.1.64.1)
 - **Done:** the owner asked for Cloudflare Web Analytics on the six listed games. The cookieless beacon is the last script in `index.html`, and CLAUDE.md and the DESIGN decision log now allow this one beacon. The loading screen's download-failure check skips it, so an ad blocker can't show the error card.
 - **Checked:** lint, tests, build.

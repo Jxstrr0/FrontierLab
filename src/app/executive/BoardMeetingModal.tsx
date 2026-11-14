@@ -7,7 +7,7 @@
 import { useState } from 'preact/hooks';
 import * as cmd from '../../sim/commands';
 import type { BoardMeeting } from '../../sim/state';
-import { Medallion, Modal, Row, SectionTitle, Stepper } from '../components';
+import { LabMedallion, Modal, Row, SectionTitle, Stepper } from '../components';
 import { exactMoney, moneyFull, moneyStepper, pct } from '../format/format';
 import { act, modal, useGame } from '../store';
 import { BoardTally } from './BoardTally';
@@ -23,14 +23,7 @@ export function BoardMeetingModal() {
   const [before, setBefore] = useState(s.governance.ceoSalary);
   const close = () => (modal.value = null);
   const sym = s.settings.currency;
-  const icon = (
-    <Medallion
-      ink={s.meta.brandInk}
-      monogram={s.meta.monogram}
-      shape={s.meta.logoShape}
-      size={30}
-    />
-  );
+  const icon = <LabMedallion meta={s.meta} size={30} />;
   const b = boardCard(s);
 
   if (meeting) {

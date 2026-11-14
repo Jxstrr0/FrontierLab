@@ -9,7 +9,7 @@
 // beside a ladder and boxes.
 import { memo } from 'preact/compat';
 import { Ladder } from '../branch/interiorParts';
-import { IsoBox, isoPt, pathOf, type Iso } from '../components/isoKit';
+import { fitRoom, IsoBox, isoPt, pathOf, type Iso } from '../components/isoKit';
 import { Standing } from '../components/isoPeople';
 import { IsoRoom, type RoomSpec } from '../components/isoRoom';
 import { Vignette } from '../components/Vignette';
@@ -49,15 +49,7 @@ export const GpuHallArt = memo(function GpuHallArt(p: {
   const tanks = p.cooling === 'cool_immersion' || p.cooling === 'cool_twophase';
   const w = RACK.i0 + lay.racks * RACK.w + 1.6;
   const d = RACK.j0 + lay.rows * RACK.rowGap + 0.9;
-  const span = w + d;
-  const avail = G.bottom - G.top;
-  const step = Math.min(G.maxStep, G.width / span, avail / (G.wall + span / 2));
-  const height = step * (G.wall + span / 2);
-  const g: Iso = {
-    step,
-    ox: G.cx - ((w - d) * step) / 2,
-    oy: G.top + (avail - height) / 2 + G.wall * step,
-  };
+  const g = fitRoom(G, w, d);
   const room: RoomSpec = {
     g,
     w,

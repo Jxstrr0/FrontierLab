@@ -10,6 +10,7 @@ import { Badge, Card } from '../../components';
 import { useGame } from '../../store';
 import { NewProductSheet } from './NewProductSheet';
 import { digitalEffectText, digitalStatus } from './productSelectors';
+import { ProjectProgress } from './ProjectProgress';
 import { TemplateIcon } from './TemplateIcon';
 import './products.css';
 
@@ -37,26 +38,12 @@ export function DigitalProjects() {
               {st.status === 'running' && <Badge tone="info">Running</Badge>}
             </div>
             {st.status === 'running' && (
-              <>
-                <div
-                  class="pf-progress"
-                  role="progressbar"
-                  aria-label={`${t.name} progress`}
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                  aria-valuenow={Math.round(share * 100)}
-                >
-                  <span class="pf-progress-fill" style={{ width: `${share * 100}%` }} />
-                </div>
-                <div class="pf-dev-meta small">
-                  <span>{Math.round(share * 100)}% done</span>
-                  <span>
-                    {hasProducts
-                      ? `${devWeeksLeft(s, st.dev)} weeks left`
-                      : 'Paused: no Products floor'}
-                  </span>
-                </div>
-              </>
+              <ProjectProgress
+                label={`${t.name} progress`}
+                share={share}
+                left={devWeeksLeft(s, st.dev)}
+                paused={!hasProducts}
+              />
             )}
             {st.status === 'available' && (
               <>

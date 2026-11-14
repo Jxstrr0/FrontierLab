@@ -15,6 +15,29 @@ export interface Iso {
   oy: number;
 }
 
+/** The box a room scene draws in: centre x, top and bottom edges, usable width, the largest cell size and the wall height (cells). */
+export interface SceneFrame {
+  cx: number;
+  top: number;
+  bottom: number;
+  width: number;
+  maxStep: number;
+  wall: number;
+}
+
+/** Sizes a w × d room and its back wall to fit the frame, centred. */
+export function fitRoom(G: SceneFrame, w: number, d: number): Iso {
+  const span = w + d;
+  const avail = G.bottom - G.top;
+  const step = Math.min(G.maxStep, G.width / span, avail / (G.wall + span / 2));
+  const height = step * (G.wall + span / 2);
+  return {
+    step,
+    ox: G.cx - ((w - d) * step) / 2,
+    oy: G.top + (avail - height) / 2 + G.wall * step,
+  };
+}
+
 /** Cell (i, j) at height z (cells) to screen coordinates. */
 export function isoPt(g: Iso, i: number, j: number, z = 0): Pt {
   return [g.ox + (i - j) * g.step, g.oy + ((i + j) * g.step) / 2 - z * g.step];

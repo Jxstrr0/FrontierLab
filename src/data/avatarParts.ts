@@ -53,7 +53,6 @@ export const HAIR_TONE_NAMES = [
 ];
 /** How light each hair colour is (0 dark … 1 light): lighter hair gets sparser hatching. */
 export const HAIR_TONE_LIGHT = [0, 0.1, 0.25, 0.3, 0.45, 0.75, 0.9];
-export const SILVER_HAIR = 6;
 
 /** Six outfit colours, muted so the hatching still reads over them. */
 export const OUTFIT_TONES = ['#5A5D64', '#46536B', '#77434A', '#4F6450', '#B39672', '#D9D0BE'];

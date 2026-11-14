@@ -345,8 +345,6 @@ export const PRODUCTS: Record<string, ProductSpec> = {
   },
 };
 
-export const PRODUCT_IDS = Object.keys(PRODUCTS);
-
 /** Subscription products: plans and usage, whose book balance is ARR (C3a). */
 export const isRecurring = (p: ProductSpec) => p.kind === 'plan' || p.kind === 'usage';
 /** Products whose balances are deposits. */

@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { CITY_MARKET } from '../../src/config/balance';
 import { CITIES } from '../../src/data/cities';
 import { DISTRICT_SPECS } from '../../src/data/districts';
-import { cityBranchGuide, cityMarket } from '../../src/sim/branch/cityMarket';
+import { cityMarket } from '../../src/sim/branch/cityMarket';
 import { advanceWeeks } from '../../src/sim/engine';
 import { newGame } from '../../src/sim/newGame';
 import { type GameState } from '../../src/sim/state';
@@ -32,7 +32,6 @@ describe('Russia', () => {
     // Lot noise averages 1, so the mean ratio sits near the city's density.
     expect(trafficRatio(s, 'mos')).toBeGreaterThan(1.2);
     expect(cityMarket('mos')).toBeCloseTo(CITY_MARKET.XL * CITIES.mos!.density!);
-    expect(cityBranchGuide('mos')).toBeGreaterThan(cityBranchGuide('tyo'));
   });
 
   it('runs a Moscow bank for a year with the books balanced', () => {

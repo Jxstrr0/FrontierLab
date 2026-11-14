@@ -116,8 +116,3 @@ export function resignChance(exec: Executive, market: number, loyaltyBonus = 0):
   const grants = hasUnvested(exec) ? e.grantMult : 1;
   return Math.max(0, e.resignBase * (e.resignLoyalty - loyalty / 100) * pay * grants);
 }
-
-/** Seat title and short code (CEO for the founder). */
-export function seatTitle(seat: ExecSeat): string {
-  return EXEC_SEATS[seat].title;
-}

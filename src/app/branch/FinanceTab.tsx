@@ -2,14 +2,14 @@
 // change, a 5-week bar chart, the branch income statement (SIMULATION §12 line
 // groups) for a week, quarter or year, balances, and Rename / Close branch.
 import { useState } from 'preact/hooks';
-import { BRANCH_NAME_MAX } from '../../config/balance';
 import * as cmd from '../../sim/commands';
 import type { Branch } from '../../sim/state';
-import { BarChart, Card, Row, SectionTitle, Segmented, Sheet } from '../components';
+import { BarChart, Card, Row, SectionTitle, Segmented } from '../components';
 import { count, delta, figure, money, shortDate } from '../format/format';
 import { act, useGame } from '../store';
 import { CloseBranch } from './CloseBranch';
 import { GrowOffice } from './GrowOffice';
+import { RenameSheet } from './RenameSheet';
 import {
   branchBalances,
   dayOfWeek,
@@ -82,7 +82,15 @@ export function FinanceTab({ branch }: { branch: Branch }) {
         </button>
         <CloseBranch branch={branch} />
       </div>
-      {renaming && <RenameSheet branch={branch} onClose={() => setRenaming(false)} />}
+      {renaming && (
+        <RenameSheet
+          title="Rename sales office"
+          label="Sales office name"
+          name={branch.name}
+          onSave={(name) => act(cmd.renameBranch, branch.id, name).ok}
+          onClose={() => setRenaming(false)}
+        />
+      )}
     </div>
   );
 }
@@ -132,42 +140,5 @@ function Statement({ branch, period, sym }: { branch: Branch; period: Period; sy
         strong
       />
     </Card>
-  );
-}
-
-function RenameSheet({ branch, onClose }: { branch: Branch; onClose: () => void }) {
-  const [name, setName] = useState(branch.name);
-  const save = () => {
-    if (act(cmd.renameBranch, branch.id, name).ok) onClose();
-  };
-  return (
-    <Sheet title="Rename sales office" onClose={onClose}>
-      <form
-        class="stack"
-        onSubmit={(e) => {
-          e.preventDefault();
-          save();
-        }}
-      >
-        <label class="br-field">
-          <span class="muted small">Sales office name</span>
-          <input
-            class="br-input"
-            value={name}
-            maxLength={BRANCH_NAME_MAX}
-            autoFocus
-            onInput={(e) => setName((e.target as HTMLInputElement).value)}
-          />
-        </label>
-        <div class="btn-row">
-          <button type="button" class="btn btn-secondary" onClick={onClose}>
-            Cancel
-          </button>
-          <button type="submit" class="btn btn-primary">
-            Save
-          </button>
-        </div>
-      </form>
-    </Sheet>
   );
 }

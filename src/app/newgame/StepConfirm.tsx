@@ -3,7 +3,7 @@
 import { START_DATE } from '../../config/balance';
 import { CITIES } from '../../data/cities';
 import { HOUSE_STYLES } from '../../data/houseStyles';
-import { Card, Medallion, Row, Portrait } from '../components';
+import { Card, LabMedallion, Row, Portrait } from '../components';
 import { gameDate } from '../format/format';
 import { CURRENCY_NAME, DIFFICULTY_LABEL, cashLabel } from './choices';
 import { randomSeed, type Draft } from './draft';
@@ -15,12 +15,7 @@ export function StepConfirm(p: { draft: Draft; patch: (d: Partial<Draft>) => voi
     <div class="stack">
       <Card class="summary">
         <div class="summary-head">
-          <Medallion
-            ink={draft.brandInk}
-            monogram={draft.monogram}
-            shape={draft.logoShape}
-            size={72}
-          />
+          <LabMedallion meta={draft} size={72} />
           <div class="summary-titles">
             <div class="summary-name">{draft.bankName.trim()}</div>
             <div class="small muted">Founded by {draft.founderName.trim()}</div>

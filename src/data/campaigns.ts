@@ -195,5 +195,3 @@ export const CAMPAIGNS: Record<string, CampaignSpec> = {
     ],
   },
 };
-
-export const CAMPAIGN_IDS = Object.keys(CAMPAIGNS);

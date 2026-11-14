@@ -12,7 +12,7 @@ import { CITIES } from '../../data/cities';
 import { DEPARTMENTS } from '../../data/departments';
 import * as cmd from '../../sim/commands';
 import type { DeptId } from '../../sim/state';
-import { Card, Icon, Medallion, Panel, type Tab } from '../components';
+import { Card, Icon, LabMedallion, Panel, type Tab } from '../components';
 import { LayerMedallion } from '../map/LayerIcon';
 import { act, closePanel, openPanel, useGame } from '../store';
 import { AddFloorSheet } from './AddFloorSheet';
@@ -58,14 +58,7 @@ export function HqPanel(p: { officeId?: string; dept?: DeptId }) {
     <Panel
       title="HQ"
       subtitle={[s.meta.bankName, officeAddress(s, office), city].filter(Boolean).join(' · ')}
-      icon={
-        <Medallion
-          ink={s.meta.brandInk}
-          monogram={s.meta.monogram}
-          shape={s.meta.logoShape}
-          size={32}
-        />
-      }
+      icon={<LabMedallion meta={s.meta} size={32} />}
       actions={
         <button type="button" class="hq-office-btn" onClick={() => setOfficeOpen(true)}>
           <Icon name="office" size={18} />

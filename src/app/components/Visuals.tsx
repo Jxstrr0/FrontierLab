@@ -264,3 +264,18 @@ export function Medallion(p: {
     </svg>
   );
 }
+
+/** Your lab's medallion: its ink, monogram and logo shape (GameState.meta, a save's meta or the new-game draft). */
+export function LabMedallion(p: {
+  meta: { brandInk: string; monogram: string; logoShape?: LogoShape };
+  size?: number;
+}) {
+  return (
+    <Medallion
+      ink={p.meta.brandInk}
+      monogram={p.meta.monogram}
+      shape={p.meta.logoShape}
+      size={p.size}
+    />
+  );
+}

@@ -285,20 +285,6 @@ export const MARKET_SECTORS = [
 /** Country names that take "the" mid-sentence ("in the United States"). */
 export const COUNTRIES_WITH_THE: CountryId[] = ['US', 'UK', 'EA'];
 
-/** Each country's fictional share index, as the paper names it. */
-export const INDEX_NAMES: Record<CountryId, string> = {
-  CA: 'Inference Canada Index',
-  US: 'Inference US Composite',
-  UK: 'Inference UK Index',
-  EA: 'Inference Eurozone Index',
-  CH: 'Inference Swiss Index',
-  JP: 'Inference Japan Index',
-  AU: 'Inference Australia Index',
-  SG: 'Inference Singapore Index',
-  HK: 'Inference Hong Kong Index',
-  RU: 'Inference Russia Index',
-};
-
 /** What analysts blame for a year of rising or falling home prices, by phase. */
 export const HOUSING_REASONS: Record<'up' | 'down', Record<Phase, string[]>> = {
   up: {

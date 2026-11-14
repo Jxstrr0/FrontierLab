@@ -40,13 +40,6 @@ export function liveRun(state: GameState, conventionId: string): ConventionRun |
   );
 }
 
-/** True while you are standing in the convention's city during its open week. */
-export function atOpenConvention(state: GameState, run: ConventionRun): boolean {
-  return (
-    conventionPhase(run, state.clock.week) === 'open' && state.world.currentCityId === run.cityId
-  );
-}
-
 /** Why you can't deal with this startup now, or undefined when you can. */
 export function accessBlock(state: GameState, s: Startup): string | undefined {
   if (heldByYou(s)) return undefined;

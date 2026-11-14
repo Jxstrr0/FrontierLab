@@ -8,7 +8,7 @@
 // department yet (a new HQ) it draws the bare room, waiting for a team.
 import type { DeptId } from '../../sim/state';
 import { Vignette } from '../components';
-import { IsoBox, isoPt, jitter, pathOf, type Iso } from '../components/isoKit';
+import { fitRoom, IsoBox, isoPt, jitter, pathOf, type Iso } from '../components/isoKit';
 import { SeatedBack, EmptyChair, Standing } from '../components/isoPeople';
 import { IsoRoom, type RoomSpec } from '../components/isoRoom';
 import { Huddle, Plant } from '../components/isoProps';
@@ -40,15 +40,7 @@ export function OfficeInterior(p: { dept?: DeptId }) {
   const rows = pic.shown > 0 ? Math.ceil(pic.shown / cols) : BARE_ROOM_ROWS;
   const w = M.left + cols - 0.5 + M.right;
   const d = rows + M.back + M.front;
-  const span = w + d;
-  const avail = G.bottom - G.top;
-  const step = Math.min(G.maxStep, G.width / span, avail / (G.wall + span / 2));
-  const height = step * (G.wall + span / 2);
-  const g: Iso = {
-    step,
-    ox: G.cx - ((w - d) * step) / 2,
-    oy: G.top + (avail - height) / 2 + G.wall * step,
-  };
+  const g = fitRoom(G, w, d);
   const nWin = Math.max(2, Math.floor(w / 2.4));
   const room: RoomSpec = {
     g,

@@ -6,7 +6,7 @@ import { CITIES } from '../../data/cities';
 import { DISTRICT_SPECS } from '../../data/districts';
 import { DISTRICTS, type DistrictId } from '../../data/types';
 import type { GameState, Lot } from '../../sim/state';
-import { Badge, Medallion, Segmented } from '../components';
+import { Badge, LabMedallion, Medallion, Segmented } from '../components';
 import { count, money, pct } from '../format/format';
 import { openPanel, useGame } from '../store';
 import { average, cityCoverage, cityLots } from './lotInfo';
@@ -141,12 +141,7 @@ function LotRow(p: {
         onClick={() => openPanel({ type: 'dataCenter', dataCenterId: dc.id })}
         data-lot-id={lot.id}
       >
-        <Medallion
-          ink={s.meta.brandInk}
-          monogram={s.meta.monogram}
-          shape={s.meta.logoShape}
-          size={32}
-        />
+        <LabMedallion meta={s.meta} size={32} />
         <span class="lot-main">
           <span class="lot-address">{lot.address}</span>
           <span class="lot-occupant">{dc.name}</span>
@@ -171,12 +166,7 @@ function LotRow(p: {
         data-tutorial="my-branch"
         data-lot-id={lot.id}
       >
-        <Medallion
-          ink={s.meta.brandInk}
-          monogram={s.meta.monogram}
-          shape={s.meta.logoShape}
-          size={32}
-        />
+        <LabMedallion meta={s.meta} size={32} />
         <span class="lot-main">
           <span class="lot-address">{lot.address}</span>
           <span class="lot-occupant">{branch?.name ?? 'Your sales office'}</span>

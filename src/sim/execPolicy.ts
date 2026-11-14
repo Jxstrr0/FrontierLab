@@ -23,7 +23,7 @@ import {
 import { annualPayroll } from './hq';
 import { brandCampaignCost, brandCampaignsWeeklyCost, hasMarketingFloor } from './hqMarketing';
 import type { PayReviewCadence } from './marketsTypes';
-import { nextReviewDelta, payReviewEveryWeeks } from './payReviews';
+import { nextReviewDelta } from './payReviews';
 import type { GameState } from './state';
 
 /** Most benefit steps the estimate walks (the routine takes one every 4 weeks). */
@@ -184,11 +184,4 @@ export function cadenceEstimate(state: GameState, cadence: PayReviewCadence): Ca
     maxDrift: (MANAGER_PAY.tenureGrowth * everyWeeks) / WEEKS_PER_YEAR,
     next: nextReviewDelta(state),
   };
-}
-
-/** Weeks until the COO's next review on the current cadence (0 when due). */
-export function weeksToNextReview(state: GameState): number {
-  const last = state.executives.lastPayReviewWeek;
-  if (last < 0) return 0;
-  return Math.max(0, last + payReviewEveryWeeks(state) - state.clock.week);
 }

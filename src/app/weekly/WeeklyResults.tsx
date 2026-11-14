@@ -11,7 +11,7 @@ import type { LedgerIssue } from '../../sim/competitionTypes';
 import type { GameState, WeeklySnapshot } from '../../sim/state';
 import { WEEKLY_RESULTS_MODES } from '../../data/settingsOptions';
 import { setSettings } from '../../sim/commands';
-import { Card, Medallion, Modal, Row, SectionTitle, Segmented } from '../components';
+import { Card, LabMedallion, Modal, Row, SectionTitle, Segmented } from '../components';
 import { delta, gameDate, money, moneyFull, monthYear, shortDate } from '../format/format';
 import { act, modal, useGame } from '../store';
 import { articlesFor, LedgerCard } from './LedgerCard';
@@ -70,14 +70,7 @@ export function WeeklyResults(p: { week: number; period?: ResultsPeriod }) {
       title={TITLE[period]}
       class="weekly-modal"
       onClose={close}
-      icon={
-        <Medallion
-          ink={s.meta.brandInk}
-          monogram={s.meta.monogram}
-          shape={s.meta.logoShape}
-          size={30}
-        />
-      }
+      icon={<LabMedallion meta={s.meta} size={30} />}
       footer={
         <>
           <button

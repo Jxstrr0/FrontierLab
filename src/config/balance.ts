@@ -719,8 +719,6 @@ export const HQ_EFFECTS = {
   devSpeedFloor: 0.3,
   modelCostPenalty: 0.3,
   campaignBase: 0.5,
-  /** PD × (1 + riskPd × (1 − k′)); raised from 0.4 in Stage 4 tuning (CONTENT §9). */
-  riskPd: 1.5,
   riskFine: 3,
   /** Loan Desk estimate noise × (1 + this × (1 − k′)). */
   riskEstimate: 1,

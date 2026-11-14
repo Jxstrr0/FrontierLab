@@ -13,7 +13,7 @@ import { EQUIPMENT, type BuildSpec } from '../../data/equipment';
 import { DEFAULT_LOGO_SHAPE } from '../../data/logoShapes';
 import type { LogoShape } from '../../data/types';
 import { Vignette } from '../components/Vignette';
-import { isoPt, placeAt, type Iso } from '../components/isoKit';
+import { fitRoom, isoPt, placeAt, type Iso } from '../components/isoKit';
 import { SeatedFront, Standing, StandingBack, type Mood } from '../components/isoPeople';
 import { IsoRoom, type FloorFinish, type RoomSpec } from '../components/isoRoom';
 import { Bench, Plant, Rack } from '../components/isoProps';
@@ -79,15 +79,7 @@ export const BranchInterior = memo(function BranchInterior(p: {
   const doorW = p.build.vault === 'vlt_safe' ? 0.6 : p.build.vault === 'vlt_fortress' ? 1.6 : 1.32;
   const w = Math.max(L.minW, doorI + doorW + L.rightGap);
   const d = Math.max(L.minD, 0.3 + offices * 1.05 + L.atmZone);
-  const span = w + d;
-  const avail = G.bottom - G.top;
-  const step = Math.min(G.maxStep, G.width / span, avail / (G.wall + span / 2));
-  const height = step * (G.wall + span / 2);
-  const g: Iso = {
-    step,
-    ox: G.cx - ((w - d) * step) / 2,
-    oy: G.top + (avail - height) / 2 + G.wall * step,
-  };
+  const g = fitRoom(G, w, d);
   const room: RoomSpec = {
     g,
     w,
@@ -120,7 +112,7 @@ export const BranchInterior = memo(function BranchInterior(p: {
     open &&
     (quality >= 3.5 || p.build.teller === 'tel_standard' || p.build.teller === 'tel_express');
   const atm = p.build.atm;
-  const s = step;
+  const s = g.step;
 
   const caption = !live
     ? 'Your sales floor'

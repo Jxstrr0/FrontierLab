@@ -823,6 +823,10 @@
   flex-direction: column;
   gap: var(--space-3);
 }
+.offer-center {
+  margin: 0;
+  text-align: center;
+}
 .grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;

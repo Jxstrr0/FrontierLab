@@ -91,13 +91,6 @@ export function dealGpus(state: GameState): number {
   return gpus;
 }
 
-/** This week's take-or-pay bill across every deal. */
-export function dealWeeklyCost(state: GameState): number {
-  let cost = 0;
-  for (const d of Object.values(state.powerDeals)) cost += d.gpus * d.price;
-  return cost;
-}
-
 // ─── Weekly step (tick step 4, before the compute tally) ──────────────────────
 
 const siteName = (site: Site | undefined) => site?.employer?.name ?? site?.refId ?? '';
