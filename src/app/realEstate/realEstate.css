@@ -2,13 +2,6 @@
 .re-note {
   margin: 0;
 }
-.re-center {
-  margin: 0;
-  text-align: center;
-}
-.re-offer {
-  gap: var(--space-3);
-}
 .re-row-head {
   display: flex;
   align-items: center;

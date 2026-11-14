@@ -12,7 +12,7 @@ import { balanceSheet } from '../../sim/balanceSheet';
 import { weeklyCosts } from '../../sim/cashCover';
 import { runwaySnapshot } from '../../sim/runway';
 import { safetySnapshot, tierLift } from '../../sim/safety';
-import { Badge, Card, Medallion, Panel, Row, SectionTitle, Sheet } from '../components';
+import { Badge, Card, LabMedallion, Panel, Row, SectionTitle, Sheet } from '../components';
 import { money, runwayText, safetyRatioText } from '../format/format';
 import { RealEstateCard } from '../realEstate/RealEstateCard';
 import { closePanel, openPanel, useGame } from '../store';
@@ -58,14 +58,7 @@ export function CompanyPanel() {
     <Panel
       title="Company"
       subtitle={s.meta.bankName}
-      icon={
-        <Medallion
-          ink={s.meta.brandInk}
-          monogram={s.meta.monogram}
-          shape={s.meta.logoShape}
-          size={30}
-        />
-      }
+      icon={<LabMedallion meta={s.meta} size={30} />}
       onClose={closePanel}
       advisor={{ text: 'Grow recurring revenue; watch the compute bill.' }}
     >

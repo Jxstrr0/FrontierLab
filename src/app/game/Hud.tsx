@@ -5,7 +5,7 @@
 // Menu button.
 import { CITIES } from '../../data/cities';
 import { PlaneIcon } from '../airport/AirportMedallion';
-import { Icon, Medallion } from '../components';
+import { Icon, LabMedallion } from '../components';
 import { gameDate, money } from '../format/format';
 import { boardChipQuarter, pause, resume, setSpeed, skipAhead, skipping, stepWeek } from '../loop';
 import { boardDue, quarterLabel } from '../../sim/governance';
@@ -32,12 +32,7 @@ export function Hud() {
           data-tutorial="hud-bank"
           onClick={() => openPanel({ type: 'company' })}
         >
-          <Medallion
-            ink={s.meta.brandInk}
-            monogram={s.meta.monogram}
-            shape={s.meta.logoShape}
-            size={30}
-          />
+          <LabMedallion meta={s.meta} size={30} />
           <span class="hud-cash">
             <span class="hud-cash-label">Cash</span>
             <span class={`hud-cash-value${s.company.cash < 0 ? ' tone-bad' : ''}`}>

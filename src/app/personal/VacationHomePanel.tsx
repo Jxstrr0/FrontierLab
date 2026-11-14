@@ -17,8 +17,8 @@ import {
   rebuildCost,
 } from '../../sim/personalValues';
 import type { OwnedHome, Site } from '../../sim/state';
-import { Card, Confirm, Panel, Row, SectionTitle, Stepper } from '../components';
-import { money, moneyFull, moneyStepper, pct } from '../format/format';
+import { Card, Confirm, OfferCard, Panel, Row, SectionTitle } from '../components';
+import { money, moneyFull, pct } from '../format/format';
 import { LayerMedallion } from '../map/LayerIcon';
 import { act, closePanel, toast, useGame } from '../store';
 import './personal.css';
@@ -86,35 +86,17 @@ function ForSale(p: { site: Site; spec: HomeSpec }) {
         <Row label="Asking price" value={moneyFull(asking, sym)} strong />
         <Row label="Upkeep" value={`${money(homeUpkeepWeekly(asking), sym)} / week`} tone="dim" />
       </Card>
-      <SectionTitle>Make an offer</SectionTitle>
-      <Card>
-        <div class="stack">
-          <p class="muted small pw-center">Personal cash {money(s.personal.cash, sym)}</p>
-          <Stepper
-            label="Offer price"
-            value={offer}
-            min={bounds.min}
-            max={bounds.max}
-            step={bounds.step}
-            onChange={setOffer}
-            {...moneyStepper(sym)}
-            hint={`${pct(offer / asking, 0)} of asking`}
-          />
-          <button
-            type="button"
-            class="btn btn-primary btn-block"
-            disabled={!!blocker}
-            onClick={submit}
-          >
-            Offer purchase
-          </button>
-          {blocker && <p class="small tone-bad pw-center">{blocker}</p>}
-          <p class="muted small pw-center">
-            The lower the offer, the likelier a refusal; a refused buyer waits{' '}
-            {HOMES_CFG.refusalWeeks} weeks.
-          </p>
-        </div>
-      </Card>
+      <OfferCard
+        sym={sym}
+        cash={s.personal.cash}
+        offer={offer}
+        bounds={bounds}
+        onOffer={setOffer}
+        hint={`${pct(offer / asking, 0)} of asking`}
+        blocker={blocker}
+        onSubmit={submit}
+        note={`The lower the offer, the likelier a refusal; a refused buyer waits ${HOMES_CFG.refusalWeeks} weeks.`}
+      />
     </>
   );
 }

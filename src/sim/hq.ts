@@ -198,11 +198,6 @@ export function shortfall(state: GameState, id: HqDeptId): number {
   return Math.max(0, 1 - cov(state, id));
 }
 
-/** Default probabilities × (1 + 0.4(1 − k′)) while the Risk team is short (CONTENT §9). */
-export function riskPdMult(state: GameState): number {
-  return 1 + HQ_EFFECTS.riskPd * shortfall(state, 'risk');
-}
-
 /** Branch and brand campaign effects × (0.5 + 0.5 k′) (CONTENT §9, Marketing). */
 export function campaignMult(state: GameState): number {
   return HQ_EFFECTS.campaignBase + (1 - HQ_EFFECTS.campaignBase) * cov(state, 'marketing');

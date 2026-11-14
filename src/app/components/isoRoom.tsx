@@ -162,8 +162,3 @@ export function IsoRoom(p: { r: RoomSpec; back?: ComponentChildren; left?: Compo
     </g>
   );
 }
-
-/** Screen units per cell along a wall, for decal placement (x = cells × step). */
-export const wallX = (g: Iso, cells: number) => cells * g.step;
-/** Decal y for a height in cells (up is negative). */
-export const wallY = (g: Iso, z: number) => -z * g.step;

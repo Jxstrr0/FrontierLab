@@ -9,7 +9,7 @@ import { MILESTONES } from '../../data/milestones';
 import { annualText, isDecade, yearFacts } from '../../sim/annualReport';
 import type { YearReport } from '../../sim/state';
 import { TIER_LABEL } from '../company/CapitalMeter';
-import { BarChart, Medallion, Modal } from '../components';
+import { BarChart, LabMedallion, Modal } from '../components';
 import { count, gameDate, money } from '../format/format';
 import { modal, useGame } from '../store';
 import { Masthead } from './LedgerCard';
@@ -93,14 +93,7 @@ export function AnnualReport(p: { year?: number }) {
       title={decade ? 'The decade in review' : `Annual report ${cur.year}`}
       class="weekly-modal annual-modal"
       onClose={close}
-      icon={
-        <Medallion
-          ink={s.meta.brandInk}
-          monogram={s.meta.monogram}
-          shape={s.meta.logoShape}
-          size={30}
-        />
-      }
+      icon={<LabMedallion meta={s.meta} size={30} />}
       footer={
         <button type="button" class="btn btn-primary btn-block" onClick={close}>
           Continue

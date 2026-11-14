@@ -15,6 +15,7 @@ export { AdvisorBar, Confirm, Modal, Panel, Sheet, type Tab } from './Panel';
 export { LineChart, type LineSeries } from './LineChart';
 export { RadarRosette, type RosetteAxes } from './RadarRosette';
 export { ToastHost } from './Toasts';
-export { BarChart, CoinRating, Medallion, RingGauge, StatBar } from './Visuals';
+export { BarChart, CoinRating, LabMedallion, Medallion, RingGauge, StatBar } from './Visuals';
 export { SpotArt } from './SpotArt';
 export { RerollButton } from './RerollButton';
+export { OfferCard } from './OfferCard';

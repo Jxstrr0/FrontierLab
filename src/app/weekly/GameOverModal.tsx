@@ -1,6 +1,6 @@
 // Game over (DESIGN §5.18): a Ledger front page announcing insolvency (or, in
 // old saves only, a regulator takeover), with the lab's final numbers.
-import { Medallion, Modal } from '../components';
+import { LabMedallion, Modal } from '../components';
 import { count, gameDate, money } from '../format/format';
 import { Masthead } from './LedgerCard';
 import { screen, setGame, useGame } from '../store';
@@ -31,14 +31,7 @@ export function GameOverModal() {
     <Modal
       title="Game over"
       class="weekly-modal gameover-modal"
-      icon={
-        <Medallion
-          ink={s.meta.brandInk}
-          monogram={s.meta.monogram}
-          shape={s.meta.logoShape}
-          size={30}
-        />
-      }
+      icon={<LabMedallion meta={s.meta} size={30} />}
       footer={
         <div class="btn-row">
           <button type="button" class="btn btn-secondary" onClick={() => leave('title')}>

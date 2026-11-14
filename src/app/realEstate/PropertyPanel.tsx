@@ -8,8 +8,8 @@ import { CITIES } from '../../data/cities';
 import { DISTRICT_SPECS } from '../../data/districts';
 import * as cmd from '../../sim/commands';
 import type { PropertyListing, Site } from '../../sim/state';
-import { Card, Panel, Row, SectionTitle, Segmented, Stepper } from '../components';
-import { count, money, moneyFull, moneyStepper, pct } from '../format/format';
+import { Card, OfferCard, Panel, Row } from '../components';
+import { count, money, moneyFull, pct } from '../format/format';
 import { LayerMedallion } from '../map/LayerIcon';
 import { act, closePanel, toast, useGame } from '../store';
 import { OwnedProperty } from './OwnedProperty';
@@ -104,47 +104,22 @@ function ForSale(p: { site: Site; listing: PropertyListing; marketRent: number }
         <Row label="Occupancy" value={pct(listing.occupancy, 1)} />
         <Row label="Asking price" value={moneyFull(listing.asking, sym)} strong />
       </Card>
-      <SectionTitle>Make an offer</SectionTitle>
-      <Card>
-        <div class="stack re-offer">
-          <Segmented
-            label="Buy as"
-            options={[
-              { value: 'company', label: 'Company' },
-              { value: 'personal', label: 'Private' },
-            ]}
-            value={account}
-            onChange={setAccount}
-          />
-          <p class="muted small re-center">
-            {account === 'company' ? 'Corporate cash' : 'Personal cash'} {money(cash, sym)}
-          </p>
-          <Stepper
-            label="Offer price"
-            value={offer}
-            min={bounds.min}
-            max={bounds.max}
-            step={bounds.step}
-            onChange={setOffer}
-            {...moneyStepper(sym)}
-            hint={`${pct(offer / listing.asking, 0)} of asking`}
-          />
-          <button
-            type="button"
-            class="btn btn-primary btn-block"
-            disabled={!!blocker}
-            onClick={submit}
-          >
-            Offer purchase
-          </button>
-          {blocker && <p class="small tone-bad re-center">{blocker}</p>}
-          <p class="muted small re-center">
-            {account === 'company'
-              ? 'Owned by the lab: rent and costs go through the company books.'
-              : 'Owned by you: rent and costs go through your personal cash.'}
-          </p>
-        </div>
-      </Card>
+      <OfferCard
+        sym={sym}
+        cash={cash}
+        account={{ value: account, onChange: setAccount }}
+        offer={offer}
+        bounds={bounds}
+        onOffer={setOffer}
+        hint={`${pct(offer / listing.asking, 0)} of asking`}
+        blocker={blocker}
+        onSubmit={submit}
+        note={
+          account === 'company'
+            ? 'Owned by the lab: rent and costs go through the company books.'
+            : 'Owned by you: rent and costs go through your personal cash.'
+        }
+      />
     </div>
   );
 }

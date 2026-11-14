@@ -21,6 +21,7 @@ import { Card, CoinRating, Confirm, Row, Stepper } from '../../components';
 import { moneyFull, moneyStepper } from '../../format/format';
 import { act, toast, useGame } from '../../store';
 import { NameField } from './NameField';
+import { ProjectProgress } from './ProjectProgress';
 import { MODEL_AXES, oddsRows, TERM_OPTIONS } from './productSelectors';
 
 type Term = (typeof DEV_TERMS)[number];
@@ -174,22 +175,12 @@ function RunningRun(p: { run: TrainingRun }) {
         <span class="pf-dev-name">{r.name}</span>
         <span class="muted small">Training · focus on {axisName(r.focus)}</span>
       </div>
-      <div
-        class="pf-progress"
-        role="progressbar"
-        aria-label={`${r.name} training progress`}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuenow={Math.round(share * 100)}
-      >
-        <span class="pf-progress-fill" style={{ width: `${share * 100}%` }} />
-      </div>
-      <div class="pf-dev-meta small">
-        <span>{Math.round(share * 100)}% done</span>
-        <span class={paused ? 'tone-bad' : ''}>
-          {paused ? 'Paused: no Products floor' : `${left} ${left === 1 ? 'week' : 'weeks'} left`}
-        </span>
-      </div>
+      <ProjectProgress
+        label={`${r.name} training progress`}
+        share={share}
+        left={left}
+        paused={paused}
+      />
       <Row label="Weekly budget" value={moneyFull(r.weeklyBudget, sym)} />
       <Row label="Spent so far" value={moneyFull(r.spent, sym)} tone="dim" />
       <button

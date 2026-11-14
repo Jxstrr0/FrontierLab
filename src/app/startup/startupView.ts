@@ -4,7 +4,6 @@
 import { VENTURE_DEBT } from '../../config/balance';
 import { dateOf, quarterOf } from '../../sim/calendar';
 import type { Account } from '../../sim/portfolio';
-import { startupShares } from '../../sim/portfolio';
 import type { GameState, Startup } from '../../sim/state';
 import { homeCountry } from '../../sim/homeCountry';
 import { accessBlock } from '../../sim/ventureAccess';
@@ -113,5 +112,3 @@ export function debtBounds(s: GameState, st: Startup) {
     rateMax: ceiling + RATE_HEADROOM,
   };
 }
-
-export const yourShares = (st: Startup, account: Account) => startupShares(st, account);

@@ -1,29 +1,30 @@
-// Rename sheet for a data center (SCREENS §5b), the same form as renaming a
-// sales office: one name field, Cancel and Save.
+// The one-field rename sheet (SCREENS §5.5, §5b): a name field, Cancel and
+// Save. Sales offices and data centers both use it; `onSave` runs the rename
+// command and returns true when the new name stuck, which closes the sheet.
 import { useState } from 'preact/hooks';
 import { BRANCH_NAME_MAX } from '../../config/balance';
-import * as cmd from '../../sim/commands';
-import type { DataCenter } from '../../sim/state';
 import { Sheet } from '../components';
-import { act } from '../store';
-import '../branch/branch.css';
+import './branch.css';
 
-export function DcRenameSheet({ dc, onClose }: { dc: DataCenter; onClose: () => void }) {
-  const [name, setName] = useState(dc.name);
-  const save = () => {
-    if (act(cmd.renameDataCenter, dc.id, name).ok) onClose();
-  };
+export function RenameSheet(p: {
+  title: string;
+  label: string;
+  name: string;
+  onSave: (name: string) => boolean;
+  onClose: () => void;
+}) {
+  const [name, setName] = useState(p.name);
   return (
-    <Sheet title="Rename data center" onClose={onClose}>
+    <Sheet title={p.title} onClose={p.onClose}>
       <form
         class="stack"
         onSubmit={(e) => {
           e.preventDefault();
-          save();
+          if (p.onSave(name)) p.onClose();
         }}
       >
         <label class="br-field">
-          <span class="muted small">Data center name</span>
+          <span class="muted small">{p.label}</span>
           <input
             class="br-input"
             value={name}
@@ -33,7 +34,7 @@ export function DcRenameSheet({ dc, onClose }: { dc: DataCenter; onClose: () => 
           />
         </label>
         <div class="btn-row">
-          <button type="button" class="btn btn-secondary" onClick={onClose}>
+          <button type="button" class="btn btn-secondary" onClick={p.onClose}>
             Cancel
           </button>
           <button type="submit" class="btn btn-primary">

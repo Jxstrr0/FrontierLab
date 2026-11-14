@@ -5,8 +5,8 @@ import { useState } from 'preact/hooks';
 import { SPORT_LABEL } from '../../data/franchises';
 import * as cmd from '../../sim/commands';
 import { ordinal } from '../../sim/newsFormat';
-import { Card, Row, SectionTitle, Segmented, Stepper } from '../components';
-import { money, moneyFull, moneyStepper, pct } from '../format/format';
+import { Card, OfferCard, Row } from '../components';
+import { moneyFull, pct } from '../format/format';
 import { act, toast, useGame } from '../store';
 import { offerBounds, type ClubView } from './franchiseView';
 
@@ -40,47 +40,22 @@ export function ClubForSale({ view }: { view: ClubView }) {
         <Row label="Owner" value={view.ownerLabel} />
         <Row label="Valuation" value={moneyFull(club.value, sym)} strong />
       </Card>
-      <SectionTitle>Make an offer</SectionTitle>
-      <Card>
-        <div class="stack fr-offer">
-          <Segmented
-            label="Buy as"
-            options={[
-              { value: 'company', label: 'Company' },
-              { value: 'personal', label: 'Private' },
-            ]}
-            value={account}
-            onChange={setAccount}
-          />
-          <p class="muted small fr-center">
-            {account === 'company' ? 'Corporate cash' : 'Personal cash'} {money(cash, sym)}
-          </p>
-          <Stepper
-            label="Offer price"
-            value={offer}
-            min={bounds.min}
-            max={bounds.max}
-            step={bounds.step}
-            onChange={setOffer}
-            {...moneyStepper(sym)}
-            hint={`${pct(offer / club.value, 0)} of valuation`}
-          />
-          <button
-            type="button"
-            class="btn btn-primary btn-block"
-            disabled={!!blocker}
-            onClick={submit}
-          >
-            Offer purchase
-          </button>
-          {blocker && <p class="small tone-bad fr-center">{blocker}</p>}
-          <p class="muted small fr-center">
-            {account === 'company'
-              ? 'Owned by the lab: the club sits on the balance sheet and its income and costs go through the company books.'
-              : 'Owned by you: the club’s profit or loss goes to your personal cash each week.'}
-          </p>
-        </div>
-      </Card>
+      <OfferCard
+        sym={sym}
+        cash={cash}
+        account={{ value: account, onChange: setAccount }}
+        offer={offer}
+        bounds={bounds}
+        onOffer={setOffer}
+        hint={`${pct(offer / club.value, 0)} of valuation`}
+        blocker={blocker}
+        onSubmit={submit}
+        note={
+          account === 'company'
+            ? 'Owned by the lab: the club sits on the balance sheet and its income and costs go through the company books.'
+            : 'Owned by you: the club’s profit or loss goes to your personal cash each week.'
+        }
+      />
     </div>
   );
 }

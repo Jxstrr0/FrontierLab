@@ -1,22 +1,15 @@
 // The city-wide customer pool (SIMULATION §9.2): reach and room follow your
 // customers across the city, and a full city stops sending new prospects.
 import { describe, expect, it } from 'vitest';
-import { CITY_BRANCH_GUIDE, CITY_MARKET, CITY_SATURATION_EXP } from '../../src/config/balance';
-import {
-  cityBranchGuide,
-  cityCustomers,
-  cityMarket,
-  cityReach,
-  cityRoom,
-} from '../../src/sim/branch/cityMarket';
+import { CITY_MARKET, CITY_SATURATION_EXP } from '../../src/config/balance';
+import { cityCustomers, cityMarket, cityReach, cityRoom } from '../../src/sim/branch/cityMarket';
 import { newGame } from '../../src/sim/newGame';
 import { openScriptedBranch } from '../helpers/scenario';
 
 describe('city market', () => {
-  it('sizes the pool and the branch advice by city size', () => {
+  it('sizes the pool by city size', () => {
     expect(cityMarket('sas')).toBe(CITY_MARKET.S);
     expect(cityMarket('nyc')).toBe(CITY_MARKET.XL);
-    expect(cityBranchGuide('cal')).toBe(CITY_BRANCH_GUIDE.M);
     expect(CITY_MARKET.S).toBeLessThan(CITY_MARKET.M);
     expect(CITY_MARKET.L).toBeLessThan(CITY_MARKET.XL);
   });

@@ -9,11 +9,6 @@ import { rivalArr, rivalFairPerShare, rivalTier } from './rivalFinance';
 import type { Rng } from './rng';
 import type { GameState, RivalBank } from './state';
 
-/** Book value per share of a rival (equity ÷ shares outstanding). */
-export function rivalBvps(bank: RivalBank): number {
-  return bank.equity / Math.max(1, bank.shares);
-}
-
 /**
  * A distressed network's asking price per share: ARR × a distressed multiple ÷
  * shares, floored at MERGERS.distressedMinAsk because a failed lab's ARR can be

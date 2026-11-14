@@ -10,10 +10,10 @@ import { dataCenterPowerBill, hallGpus, pueOf, runningGpus } from '../../sim/dat
 import { Badge, Card, Confirm, Panel, Row, SectionTitle } from '../components';
 import { count, money, moneyFull, weeksText } from '../format/format';
 import { act, closePanel, toast, useGame } from '../store';
+import { RenameSheet } from '../branch/RenameSheet';
 import { ComputeCard } from '../company/ComputeCard';
 import { DataCenterHero } from './DataCenterHero';
 import { DcPartSheet } from './DcPartSheet';
-import { DcRenameSheet } from './DcRenameSheet';
 import { partFact } from './dcView';
 import '../build/build.css';
 import './dataCenter.css';
@@ -153,7 +153,15 @@ export function DataCenterPanel(p: { dataCenterId: string }) {
           onClose={() => setPicking(null)}
         />
       )}
-      {renaming && <DcRenameSheet dc={dc} onClose={() => setRenaming(false)} />}
+      {renaming && (
+        <RenameSheet
+          title="Rename data center"
+          label="Data center name"
+          name={dc.name}
+          onSave={(name) => act(cmd.renameDataCenter, dc.id, name).ok}
+          onClose={() => setRenaming(false)}
+        />
+      )}
       {closing && (
         <Confirm
           title={`Close ${dc.name}?`}

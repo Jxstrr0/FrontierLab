@@ -14,7 +14,6 @@ import {
   offerPremium,
   referencePrice,
   requiredPremium,
-  rivalBvps,
 } from '../../src/sim/mergerPricing';
 import { newGame } from '../../src/sim/newGame';
 import { openScriptedBranch } from '../helpers/scenario';
@@ -165,7 +164,7 @@ describe('regulator checks', () => {
       .filter((r) => r.status === 'active')
       .sort((a, b) => b.equity - a.equity)[0]!;
     bank.status = 'distressed';
-    bank.distressedAsk = rivalBvps(bank) * 0.5;
+    bank.distressedAsk = (bank.equity / Math.max(1, bank.shares)) * 0.5;
     const plan = planDeal(s, bank, bank.distressedAsk);
     expect(plan.cityShares[0]!.share).toBeGreaterThan(MERGERS.maxCityShare);
     const checks = regulatorChecks(plan, cityName);
@@ -255,6 +254,6 @@ describe('closing', () => {
     const bank = smallestRival(s);
     buy(s);
     expect(cmd.offerMerger(s, bank.id, 30).ok).toBe(false);
-    expect(rivalBvps(bank)).toBeGreaterThan(0);
+    expect(bank.equity).toBeGreaterThan(0);
   });
 });

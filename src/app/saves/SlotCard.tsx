@@ -1,6 +1,6 @@
 // One save slot as a certificate card: the bank's medallion, name, game date,
 // cash and when it was saved, with the actions that apply on this screen.
-import { Card, Medallion } from '../components';
+import { Card, LabMedallion } from '../components';
 import { money } from '../format/format';
 import type { SaveMeta } from '../saves';
 
@@ -33,12 +33,7 @@ export function SlotCard(p: {
     <Card class="slot">
       <div class="slot-head">
         {meta ? (
-          <Medallion
-            ink={meta.brandInk}
-            monogram={meta.monogram}
-            shape={meta.logoShape}
-            size={44}
-          />
+          <LabMedallion meta={meta} size={44} />
         ) : (
           <span class="slot-empty-mark" aria-hidden="true" />
         )}

@@ -7,7 +7,7 @@ import { INCIDENT_SPECS } from '../../data/incidents';
 import * as cmd from '../../sim/commands';
 import { optionBlocker, troublesDelegated } from '../../sim/incidents';
 import type { GameState, Incident } from '../../sim/state';
-import { Medallion, Modal, Portrait } from '../components';
+import { LabMedallion, Modal, Portrait } from '../components';
 import { gameDate, localizeMoney, money } from '../format/format';
 import { act, modal, openPanel, toast, useGame } from '../store';
 import './incidents.css';
@@ -41,14 +41,7 @@ export function IncidentModal() {
       title="Incident"
       class="incident-modal"
       onClose={close}
-      icon={
-        <Medallion
-          ink={s.meta.brandInk}
-          monogram={s.meta.monogram}
-          shape={s.meta.logoShape}
-          size={30}
-        />
-      }
+      icon={<LabMedallion meta={s.meta} size={30} />}
       footer={
         inc.scopeKind === 'branch' ? (
           <button
