@@ -11,6 +11,11 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-11-20 — Build rights and a wait on new packages (no version change)
+From the studio's attacker-style test (the owner's picks). Nothing in the game changes.
+- **Build rights.** The workflow gave every job the right to publish the site. Now only the `deploy` job has it (`pages: write`, `id-token: write`); the `build` job, which installs and runs npm packages, can only read the repo. So a tampered package could no longer publish anything. `configure-pages` moved to the deploy job with it. Same shape as the other Longlight games.
+- **Wait on new packages.** Dependabot's monthly pull request now waits a week after a release before proposing it (`cooldown` in `.github/dependabot.yml`). A package published by mistake or by someone who took over an account is usually pulled within days. Security fixes don't wait.
+
 ### 2026-11-20 — Build housekeeping (no version change)
 From the studio security test. Nothing in the game changes. The lint tool's nine moderate warnings are cleared the way Lombard and Laminar cleared theirs (eslint 10.15.0 and a `minimatch` pin under `overrides` in `package.json`); it is a developer tool and never part of the game. The build now installs packages with `npm ci --ignore-scripts`, so a package can't run its own script on install.
 
