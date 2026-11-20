@@ -23,7 +23,8 @@ jobs:
         with:
           node-version: 24
           cache: npm
-      - run: npm ci
+      # --ignore-scripts: packages may not run their own scripts on install.
+      - run: npm ci --ignore-scripts
       - run: npm run lint
       - run: npm test -- --run
       - run: npm run build
