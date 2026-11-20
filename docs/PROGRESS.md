@@ -11,6 +11,9 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-11-20 — Build housekeeping (no version change)
+From the studio security test. Nothing in the game changes. The lint tool's nine moderate warnings are cleared the way Lombard and Laminar cleared theirs (eslint 10.15.0 and a `minimatch` pin under `overrides` in `package.json`); it is a developer tool and never part of the game. The build now installs packages with `npm ci --ignore-scripts`, so a package can't run its own script on install.
+
 ### 2026-11-14 — Code tidy (v0.1.64.2)
 - **Done:** the owner asked for the cleanup a read-only audit suggested. Nothing in the game looks or plays differently, apart from Digital projects now saying "1 week left" (not "1 weeks") and showing a paused build in red like the other progress bars.
   - Deleted `src/sim/eventCatalog.ts` (494 lines that nothing imported) and the 13 unused exports the audit found, including the bank-era `riskPdMult` and its `HQ_EFFECTS.riskPd` number.
