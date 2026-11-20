@@ -28,6 +28,7 @@ No URL routes are used (in-app screen stack), so there are no 404s on refresh.
 
 ## Workflow: `.github/workflows/deploy.yml`
 Bump action majors and the Node version to the current releases when you create it.
+The sketch below is the starting point; the live file (`.github/workflows/deploy.yml`) has moved on. Since 2026-11-20 it gives `pages: write` and `id-token: write` to the `deploy` job only, so the `build` job, which runs npm packages, can't publish.
 
 ```yaml
 name: Deploy to GitHub Pages
