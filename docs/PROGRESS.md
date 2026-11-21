@@ -14,6 +14,9 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 ### 2026-11-21 — Studio catalogue recopied (no version change)
 - Kelbo deleted a retired game's repo, so `LONGLIGHT-STUDIO.md` is refreshed from the master on the studio site. Nothing in the game changed.
 
+### 2026-11-21 — Studio catalogue recopied again (no version change)
+- Outwash, a new Longlight game, was added to the studio site (hidden), so `LONGLIGHT-STUDIO.md` is refreshed from the master on the studio site. Nothing in the game changed.
+
 ### 2026-11-20 — Build rights and a wait on new packages (no version change)
 From the studio's attacker-style test (the owner's picks). Nothing in the game changes.
 - **Build rights.** The workflow gave every job the right to publish the site. Now only the `deploy` job has it (`pages: write`, `id-token: write`); the `build` job, which installs and runs npm packages, can only read the repo. So a tampered package could no longer publish anything. `configure-pages` moved to the deploy job with it. Same shape as the other Longlight games.
