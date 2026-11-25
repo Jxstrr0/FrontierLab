@@ -31,6 +31,7 @@ import type { GameEvent, GameState } from '../sim/state';
 import { homeCountry } from '../sim/homeCountry';
 import { CAPITAL_BUFFER_POLICY } from '../data/newsWorld';
 import { saveToSlot } from './saves';
+import { hasCrashed } from './crash';
 import { play } from './sound/sound';
 import { autosave } from './saves/autosave';
 import { remindToBackUpInGame } from './saves/backupReminder';
@@ -168,6 +169,11 @@ export function stepWeek(): void {
 }
 
 function frame(): void {
+  // The crash screen is up: stop for good, so nothing more is ticked or autosaved.
+  if (hasCrashed()) {
+    stopLoop();
+    return;
+  }
   const now = performance.now();
   const dt = now - last;
   last = now;

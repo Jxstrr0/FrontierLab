@@ -305,12 +305,14 @@ export interface AvatarSpec { head: number; hair: number; facial: number; glasse
   - `frontierlab.lastBackup`: when this device last backed up (a code copied or shared, or a backup file saved), ms since 1970; drives the backup reminder
 - **Format:** `JSON.stringify(state)`, compressed with lz-string `compressToUTF16` (the same string in IndexedDB or localStorage, so the card's checksum carries across).
 - **Export code:** `"FL" + schemaVersion + ":" + compressToEncodedURIComponent(json)`. Vault Street codes (`"VS…"`) are turned away with a clear message. Offer copy-to-clipboard and `navigator.share` when available, and a backup file (`frontier-lab-backup-YYYY-MM-DD.txt`, the same code plus a newline) that Load backup file reads back through Import.
-- **Import:**
-  1. Parse the prefix.
-  2. Decompress.
-  3. Run migrations from that version to current (`migrations[v](state) → state` for each step).
-  4. Validate the required keys.
-  5. Reject codes from a newer version with a clear message.
+- **Import** (`importCode`; a pasted code or a backup file can come from anyone, so nothing in one is trusted):
+  1. Refuse a code longer than `SAVE_CODE_MAX_CHARS`, or a backup file over `BACKUP_FILE_MAX_BYTES`, before reading it (`src/config/saveLimits.ts`).
+  2. Parse the prefix. Reject codes from a newer version with a clear message.
+  3. Decompress with `decompressBounded` (`src/sim/save/boundedLz.ts`, a port of lz-string's reader that stops once the text passes `SAVE_JSON_MAX_CHARS`). A short code can be built to unpack to hundreds of megabytes; the library would build all of it first.
+  4. Run migrations from the save's version to current (`migrations[v](state) → state` for each step). A migration that trips on the save gives "That save can't be brought up to this version of the game."
+  5. Validate the required keys.
+  6. Compare the save with two fresh games made by this version (`importProblem` in `importCheck.ts`, the walk in `shapeCheck.ts`): a number must be a real number, a list a list, a part with names that part with the same names; id-keyed tables (offices, rivals, lots) are checked entry by entry against what a fresh game's entries share. The message says where: "That save code can't be used: company.cash should be a number." It works by example, so it needs no upkeep when the state grows, as long as a shape change comes with a schema bump and a migration (CLAUDE rule 7). A save from an older schema version may lack a name; only a current-version save must carry them all. It cannot see a number that is merely wrong (a negative price); the crash screen (SCREENS §1) is the net for those.
+- **Slots are not checked this way:** `loadFromSlot` uses `deserialize` and the checksum, so a save the game wrote itself is never refused by the import rules.
 - **Size budget:** keep a late-game save under 2 MB uncompressed by:
   - trimming histories (weekly snapshots 260, Ledger issues 52, review cards 8, pnl 52)
   - not storing generated lots for unvisited cities
@@ -487,5 +489,5 @@ One function per action in `src/sim/commands/`. Each returns `{ ok: true } | { o
   - Optional, absent until first used: `products.digitalDone` (completed digital templates), `company.companyOffered` (HQ lineup), `UnderwritingModel.hostedBy` (bureau-hosted custom models; ids `model_N`).
   - `UnderwritingState.switching = { fromId, weeksLeft }` (the old model blending out) instead of `switchingTo`; `activeModelId` is the new model from the moment you switch.
   - Commands: `startDevelopment`, `cancelDevelopment`, `deleteProduct` (`commands/development.ts`); `buyBureauModel`, `commissionBureauModel`, `saveCustomModel`, `activateModel` (`commands/underwriting.ts`); `setApplyRatesToAll`, `setCompanyPrice`, `setCompanyOffered` (`commands/products.ts`).
-- **Saves:** `src/sim/save/serialize.ts` has `serialize`, `deserialize` (with migrations and a required-keys check), `checksum` (cyrb53) and `exportCode`/`importCode`. Save slots live in `src/sim/save/storage.ts`, their data store in `slotData.ts` (§10).
+- **Saves:** `src/sim/save/serialize.ts` has `serialize`, `deserialize` (with migrations and a required-keys check), `checksum` (cyrb53) and `exportCode`/`importCode`. `importCode` adds the size limits (`boundedLz.ts`, `src/config/saveLimits.ts`) and the check against a fresh game (`importCheck.ts`, `shapeCheck.ts`). Save slots live in `src/sim/save/storage.ts`, their data store in `slotData.ts` (§10).
 - **Schema v36** (world calendar, commodities, archive; SIMULATION §24.4–24.6): `NewsDesk.scheduled` (`ScheduledStory[]`: stories written ahead for a week, a tournament's rounds or an expo's close), `NewsDesk.commodities` (weekly prices per commodity id, newest last, at most 53) and `NewsDesk.archive` (`ArchivedStory[]`: every fourth issue's lead story with week, date, tab, icon, headline, body and an optional `reprinted` flag). Migration 35 → 36 gives an existing desk empty ones. New RNG streams `commodities` and `reviews` (branch review cards, split from `news`).
