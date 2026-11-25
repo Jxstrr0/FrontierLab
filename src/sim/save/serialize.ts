@@ -2,8 +2,17 @@
 // load, a required-keys check, a checksum for corruption, and export codes of
 // the form "FL{version}:{lz-string}" for moving a game between devices.
 // Vault Street codes ("VS…") are turned away: the two games' saves don't mix.
-import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
+//
+// A save code can come from anyone, so importCode trusts nothing in one: the
+// code and what it unpacks to have size limits (boundedLz.ts), and the save is
+// compared with a fresh game before it is handed back (importCheck.ts). The
+// game's own slots (storage.ts) use deserialize directly and are not refused
+// by those rules.
+import { compressToEncodedURIComponent } from 'lz-string';
+import { SAVE_CODE_MAX_CHARS, SAVE_JSON_MAX_CHARS } from '../../config/saveLimits';
 import { SCHEMA_VERSION, type GameState } from '../state';
+import { SaveTooBig, decompressBounded } from './boundedLz';
+import { importProblem } from './importCheck';
 import { migrate } from './migrations';
 
 const REQUIRED_KEYS: (keyof GameState)[] = [
@@ -23,7 +32,8 @@ export function serialize(state: GameState): string {
   return JSON.stringify(state);
 }
 
-export function deserialize(json: string): GameState {
+/** Parses and migrates a save; `fromVersion` is the schema version the save itself says it was written at. */
+function readSave(json: string): { state: GameState; fromVersion: number } {
   let raw: unknown;
   try {
     raw = JSON.parse(json);
@@ -37,11 +47,16 @@ export function deserialize(json: string): GameState {
   ) {
     throw new Error("That doesn't look like a Frontier Lab save.");
   }
+  const fromVersion = (raw as { schemaVersion: number }).schemaVersion;
   const state = migrate(raw as Record<string, unknown> & { schemaVersion: number });
   for (const key of REQUIRED_KEYS) {
     if (!(key in state)) throw new Error(`The save is missing "${key}".`);
   }
-  return state as unknown as GameState;
+  return { state: state as unknown as GameState, fromVersion };
+}
+
+export function deserialize(json: string): GameState {
+  return readSave(json).state;
 }
 
 /** cyrb53: a fast 53-bit string hash for save checksums and determinism snapshots. */
@@ -62,7 +77,11 @@ export function exportCode(state: GameState): string {
   return `FL${SCHEMA_VERSION}:${compressToEncodedURIComponent(serialize(state))}`;
 }
 
+/** What the player reads when a code or file is far too big to be a save. */
+export const SAVE_TOO_BIG = 'That is far too big to be a Frontier Lab save, so it was not read.';
+
 export function importCode(code: string): GameState {
+  if (code.length > SAVE_CODE_MAX_CHARS) throw new Error(SAVE_TOO_BIG);
   const trimmed = code.trim();
   if (/^VS\d+:/.test(trimmed)) {
     throw new Error('That is a Vault Street save code. Frontier Lab can only load its own saves.');
@@ -75,7 +94,28 @@ export function importCode(code: string): GameState {
       'This save code comes from a newer version of Frontier Lab. Update the game to load it.',
     );
   }
-  const json = decompressFromEncodedURIComponent(match[2]!);
+  let json: string | null;
+  try {
+    json = decompressBounded(match[2]!, SAVE_JSON_MAX_CHARS);
+  } catch (e) {
+    if (e instanceof SaveTooBig) throw new Error(SAVE_TOO_BIG, { cause: e });
+    throw e;
+  }
   if (!json) throw new Error('That save code is incomplete or damaged.');
-  return deserialize(json);
+  let read: ReturnType<typeof readSave>;
+  try {
+    read = readSave(json);
+  } catch (e) {
+    // readSave's own messages are written for the player. A TypeError and its kind is a migration
+    // tripping over something in the save that it took for granted.
+    if (e instanceof TypeError || e instanceof RangeError || e instanceof ReferenceError) {
+      throw new Error("That save can't be brought up to this version of the game.", { cause: e });
+    }
+    throw e;
+  }
+  const { state, fromVersion } = read;
+  // The save's own version decides how strict the check is, not the label on the code.
+  const problem = importProblem(state, fromVersion);
+  if (problem) throw new Error(`That save code can't be used: ${problem}.`);
+  return state;
 }

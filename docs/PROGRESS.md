@@ -11,6 +11,17 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-11-25 — Safer save codes and a crash screen (v0.1.65.0)
+From the studio security round (Kelbo's pick). A save code or backup file can come from anyone, and the game trusted them too much.
+- **Done:**
+  - **Size limits.** A code longer than 12 million characters, or one that unpacks to more than 32 million, is refused with "far too big to be a Frontier Lab save". A ten-year game's code is about 1.1 million characters, so there is room to grow tenfold. The unpacking is our own bounded copy of lz-string's reader (`src/sim/save/boundedLz.ts`): the library builds the whole text before anyone can look at its size, and a 20 KB code can be written to unpack to hundreds of megabytes.
+  - **A stricter check on imports.** The old check looked for ten top-level names. Now an imported save is compared with a fresh game, part by part (`importCheck.ts`, `shapeCheck.ts`): text where a number belongs, a part emptied or missing, a list where a part belongs are all refused, with a message that says where. Only pasted codes and backup files go through it; the game's own slots load exactly as before.
+  - **A crash screen.** A broken game used to leave a blank page. Now a card says the game stopped and the saves are untouched, with a Reload button back to the title (`src/app/crash.ts`). The clock stops first, so the autosave can't write the broken game over a good one.
+  - A migration that trips on an old save now says "That save can't be brought up to this version of the game" instead of a line of code-speak.
+- **Checked:** lint, tests (determinism snapshot unchanged), build. 96 real save codes made by older builds (save versions 22, 31, 35 and the first 39) all import. Six ways of playing for two years, checked every half year, are never refused (now a test). Hostile saves in a local browser: see the pull request for the numbers.
+- **Found, not changed:** save codes from versions 1, 7 and 15 (the first two days after the conversion, 26 to 27 October) can't be brought forward by the migrations; that was already so, and they now get the plain message. A ten-year "steady" game's save is about 2.8 MB uncompressed, over the 2 MB budget in DATA_MODEL §10.
+- **New files:** `src/sim/save/boundedLz.ts` (adapted from lz-string, MIT), `importCheck.ts`, `shapeCheck.ts`, `src/config/saveLimits.ts`, `src/app/crash.ts`. No new packages.
+
 ### 2026-11-21 — Studio catalogue recopied (no version change)
 - Kelbo deleted a retired game's repo, so `LONGLIGHT-STUDIO.md` is refreshed from the master on the studio site. Nothing in the game changed.
 

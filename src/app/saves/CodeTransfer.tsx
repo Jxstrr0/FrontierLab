@@ -4,7 +4,8 @@
 // go into a backup file and be loaded back from one (backupFile.ts). A line
 // says whether the browser has promised to keep this device's saves.
 import { useEffect, useRef, useState } from 'preact/hooks';
-import { exportCode, importCode } from '../../sim/save/serialize';
+import { SAVE_TOO_BIG, exportCode, importCode } from '../../sim/save/serialize';
+import { BACKUP_FILE_MAX_BYTES } from '../../config/saveLimits';
 import type { GameState } from '../../sim/state';
 import { keepSaves, loadFromSlot, markBackedUp, savesKept, slotMeta, type SlotId } from '../saves';
 import { peekGame, toast } from '../store';
@@ -191,6 +192,11 @@ function Import(p: { inGame: boolean; onLoad: (state: GameState) => void }) {
     const file = input.files?.[0];
     input.value = ''; // so picking the same file again still fires
     if (!file) return;
+    // A backup file is a few hundred KB of text; anything huge is refused before it is read.
+    if (file.size > BACKUP_FILE_MAX_BYTES) {
+      setError(SAVE_TOO_BIG);
+      return;
+    }
     let code: string;
     try {
       code = await readBackupFile(file);
