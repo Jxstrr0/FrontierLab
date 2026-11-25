@@ -11,6 +11,9 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-11-25 — Studio catalogue recopied (no version change)
+- Kelbo deleted The Whip, so `LONGLIGHT-STUDIO.md` is refreshed from the master on the studio site. Nothing in the game changed.
+
 ### 2026-11-25 — Safer save codes and a crash screen (v0.1.65.0)
 From the studio security round (Kelbo's pick). A save code or backup file can come from anyone, and the game trusted them too much.
 - **Done:**
