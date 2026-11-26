@@ -11,6 +11,9 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-11-26 — Studio catalogue recopied (no version change)
+- Kelbo deleted Outwash, so `LONGLIGHT-STUDIO.md` is refreshed from the master on the studio site. Nothing in the game changed.
+
 ### 2026-11-26 — Dependabot watches the GitHub Actions (no version change)
 - From the studio's supply-chain test of 26 November (Kelbo's pick). The workflows' actions are pinned to exact commits, which keeps them safe from tampering, but a fix never arrived by itself. `.github/dependabot.yml` now also has a `github-actions` entry: one grouped pull request a month, major versions included, after the same one-week wait as for packages. Check each new pin against the action's own release before merging. Nothing in the game changed.
 
