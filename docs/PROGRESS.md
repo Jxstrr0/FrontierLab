@@ -11,6 +11,9 @@ Claude Code updates this at the end of every session. Newest entries go at the t
 
 ## Session log
 
+### 2026-11-27 — Studio catalogue recopied (no version change)
+- Kelbo deleted Mainline, so `LONGLIGHT-STUDIO.md` is refreshed from the master on the studio site. Nothing in the game changed.
+
 ### 2026-11-26 — Studio catalogue recopied (no version change)
 - Kelbo deleted Outwash, so `LONGLIGHT-STUDIO.md` is refreshed from the master on the studio site. Nothing in the game changed.
 
